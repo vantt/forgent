@@ -24,11 +24,17 @@
       "targetAnchor": "unheaded-block-1",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-preamble unit docs/specs/herdr-web-dashboard.md#unheaded-block-1 (source lines 1-7) is carried at docs/platform/herdr-web-dashboard/spec.md#unheaded-block-1 (candidate lines 1-7). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded-preamble herdr-web-dashboard.md L1-7 to herdr-web-dashboard/spec.md L1-7; full digest recomputed by script and by hand (raw sha256) on both sides, equal; anchor passes; shard/pack equal; covered by the whole-file diff",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-11-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "dea3185efa03fa43112df841e918ccc6c17fc3768e2b6617f6d9c2ebbefefda5",
-      "targetAncestry": []
+      "targetAncestry": [],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_c947f71f7866d04b60b65ac874dd05a1",
@@ -65,14 +71,20 @@
       "targetAnchor": "unheaded-block-4",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/herdr-web-dashboard.md#unheaded-block-2 (source lines 13-14) is carried at docs/platform/herdr-web-dashboard/spec.md#unheaded-block-4 (candidate lines 35-36). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded-block herdr-web-dashboard.md L13-14 to herdr-web-dashboard/spec.md L35-36; full digest recomputed by script and by hand (raw sha256) on both sides, equal; anchor passes; shard/pack equal; covered by the whole-file diff",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-11-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f5637b304adfb2017df338ea99078d779a43a721765c812868be7dce2b0b55d3",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Purpose"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_e9ca88e52937c9e6a7b45683453caf86",
@@ -81,14 +93,20 @@
       "targetAnchor": "unheaded-block-5",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/herdr-web-dashboard.md#unheaded-block-3 (source lines 16-20) is carried at docs/platform/herdr-web-dashboard/spec.md#unheaded-block-5 (candidate lines 38-42). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded-block herdr-web-dashboard.md L16-20 to herdr-web-dashboard/spec.md L38-42; digests recomputed by script and equal on both sides, anchor passes, shard/pack equal, rationale line ranges match; no unit text differs in the whole-file diff",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-11-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "9cb9250c3b4a59113aabd2ea750c259a8d9dd93ec8c844738c9759af740673af",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Purpose"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_316763f2e8c486f23767f5235763a700",
@@ -97,14 +115,20 @@
       "targetAnchor": "unheaded-block-6",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole unheaded-block unit docs/specs/herdr-web-dashboard.md#unheaded-block-4 (source lines 22-22) is carried at docs/platform/herdr-web-dashboard/spec.md#unheaded-block-6 (candidate lines 44-44). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded-block herdr-web-dashboard.md L22-22 to herdr-web-dashboard/spec.md L44-44; digests recomputed by script and equal on both sides, anchor passes, shard/pack equal, rationale line ranges match; no unit text differs in the whole-file diff",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-11-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "5505254e6beedd833219975b4c9da80989d411eb71c06cc1eb54b88cb9240c25",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Purpose"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_ba9a64fb389def2b21fce816844701ee",
@@ -113,14 +137,20 @@
       "targetAnchor": "unheaded-block-7",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/herdr-web-dashboard.md#unheaded-block-5 (source lines 24-34) is carried at docs/platform/herdr-web-dashboard/spec.md#unheaded-block-7 (candidate lines 46-56). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded-block herdr-web-dashboard.md L24-34 to herdr-web-dashboard/spec.md L46-56; digests recomputed by script and equal on both sides, anchor passes, shard/pack equal, rationale line ranges match; no unit text differs in the whole-file diff",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-11-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "43742a6b577526fdf6a3e89da2aebda6d2c1b22533ba745d7b1a5399ba734fd5",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Purpose"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_ec3a7b2ec42c939b9ac745b6bdbcf5c3",
@@ -176,13 +206,19 @@
       "targetAnchor": "data-dictionary",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/herdr-web-dashboard.md#data-dictionary (source lines 64-64) is carried at docs/platform/herdr-web-dashboard/spec.md#data-dictionary (candidate lines 86-86). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: heading herdr-web-dashboard.md L64-64 to herdr-web-dashboard/spec.md L86-86; digests recomputed by script and equal on both sides, anchor passes, shard/pack equal, rationale line ranges match; no unit text differs in the whole-file diff",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-11-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "056d9384358a4968cb87e85349ad9854943900aa79f69da3c5dcc8a7515f77ba",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_cdbe500eb5f501430eed0011898c2437",
@@ -191,14 +227,20 @@
       "targetAnchor": "unheaded-block-10",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/herdr-web-dashboard.md#unheaded-block-8 (source lines 66-77) is carried at docs/platform/herdr-web-dashboard/spec.md#unheaded-block-10 (candidate lines 88-99). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded-block herdr-web-dashboard.md L66-77 to herdr-web-dashboard/spec.md L88-99; digests recomputed by script and equal on both sides, anchor passes, shard/pack equal, rationale line ranges match; no unit text differs in the whole-file diff",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-11-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "8e2f1fc09a1d0e22e5063a741ee91537bcccf3b7527fe5b49447c9c6c4526605",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Data Dictionary"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_041b58ea676c91fd6d94a0b4772202f2",
@@ -207,13 +249,19 @@
       "targetAnchor": "behaviors-operations",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/herdr-web-dashboard.md#behaviors-operations (source lines 79-79) is carried at docs/platform/herdr-web-dashboard/spec.md#behaviors-operations (candidate lines 101-101). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "deep: heading \"Behaviors & Operations\" herdr-web-dashboard.md L79-79 to herdr-web-dashboard/spec.md L101-101; text and digest identical, shown text identical, anchor passes, rationale line ranges true",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-11-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "082ab0793f07b48919cc224d5e470585bb8e77fea14f32c16a14ac05605500c9",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_7d20f3261994b06bf8aab4ce53375a6b",
@@ -222,14 +270,20 @@
       "targetAnchor": "unheaded-block-11",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/herdr-web-dashboard.md#unheaded-block-9 (source lines 81-82) is carried at docs/platform/herdr-web-dashboard/spec.md#unheaded-block-11 (candidate lines 103-104). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded-block herdr-web-dashboard.md L81-82 to herdr-web-dashboard/spec.md L103-104; digests recomputed by script and equal on both sides, anchor passes, shard/pack equal, rationale line ranges match; no unit text differs in the whole-file diff",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-11-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "56ef9d1bb263a4c4ebb9bb6f14c8e76fc860e387d12b3bd162e9f7758fa7523a",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Behaviors & Operations"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_c05db90b99b33fe90126ccbbfedb2dd6",
@@ -238,14 +292,20 @@
       "targetAnchor": "sign-in",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/herdr-web-dashboard.md#sign-in (source lines 84-84) is carried at docs/platform/herdr-web-dashboard/spec.md#sign-in (candidate lines 106-106). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "deep: heading \"Sign in\" herdr-web-dashboard.md L84-84 to herdr-web-dashboard/spec.md L106-106; text and digest identical, shown text identical, anchor passes, rationale line ranges true",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-11-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "29bf5d1958f9e29181d0a5a30d28b209340cce42f411c1eccfe918f454e6b37c",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Behaviors & Operations"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_8fc8f5d9d754055cd3192f32178f0ef8",
@@ -254,15 +314,21 @@
       "targetAnchor": "unheaded-block-12",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/herdr-web-dashboard.md#unheaded-block-10 (source lines 86-92) is carried at docs/platform/herdr-web-dashboard/spec.md#unheaded-block-12 (candidate lines 108-114). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded-block herdr-web-dashboard.md L86-92 to herdr-web-dashboard/spec.md L108-114; digests recomputed by script and equal on both sides, anchor passes, shard/pack equal, rationale line ranges match; no unit text differs in the whole-file diff",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-11-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "fa5bf141c33adf0feb5f6118ac5d549d6c8b49a74dc1bbd5c5ef5b12b54f90a3",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Behaviors & Operations",
         "Sign in"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_112ba0e0b60b13aa2b6cef0cc605851e",
@@ -271,14 +337,20 @@
       "targetAnchor": "view-the-taskboard",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/herdr-web-dashboard.md#view-the-taskboard (source lines 94-94) is carried at docs/platform/herdr-web-dashboard/spec.md#view-the-taskboard (candidate lines 116-116). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "deep: heading \"View the taskboard\" herdr-web-dashboard.md L94-94 to herdr-web-dashboard/spec.md L116-116; text and digest identical, shown text identical, anchor passes, rationale line ranges true",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-11-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "3bb8852a0023788101d2a06064c4545cb7432ea4adc39f629083541c050d0889",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Behaviors & Operations"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_713e8533374a977b44c019d9296ff88f",
@@ -287,15 +359,21 @@
       "targetAnchor": "unheaded-block-13",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/herdr-web-dashboard.md#unheaded-block-11 (source lines 96-104) is carried at docs/platform/herdr-web-dashboard/spec.md#unheaded-block-13 (candidate lines 118-126). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded-block herdr-web-dashboard.md L96-104 to herdr-web-dashboard/spec.md L118-126; digests recomputed by script and equal on both sides, anchor passes, shard/pack equal, rationale line ranges match; no unit text differs in the whole-file diff",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-11-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "5dd7066702c3791b0b10a5648dbf72eadbd6caa22a72d2315ccbc363474cfd2d",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Behaviors & Operations",
         "View the taskboard"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_2f001429d74fb896c6cbefc04c4a6936",
@@ -304,14 +382,20 @@
       "targetAnchor": "view-a-tasks-detail",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/herdr-web-dashboard.md#view-a-tasks-detail (source lines 106-106) is carried at docs/platform/herdr-web-dashboard/spec.md#view-a-tasks-detail (candidate lines 128-128). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "deep: heading \"View a task's detail\" herdr-web-dashboard.md L106-106 to herdr-web-dashboard/spec.md L128-128; text and digest identical, shown text identical, anchor passes, rationale line ranges true",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-11-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "4c6c04a8e9cf839adac66a55b2fc9c84b8bbbee138afd8d8d25626f9ec217500",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Behaviors & Operations"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_0af7828129bb0ef344d1aff694b04b63",
@@ -320,15 +404,21 @@
       "targetAnchor": "unheaded-block-14",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/herdr-web-dashboard.md#unheaded-block-12 (source lines 108-115) is carried at docs/platform/herdr-web-dashboard/spec.md#unheaded-block-14 (candidate lines 130-137). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded-block herdr-web-dashboard.md L108-115 to herdr-web-dashboard/spec.md L130-137; digests recomputed by script and equal on both sides, anchor passes, shard/pack equal, rationale line ranges match; no unit text differs in the whole-file diff",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-11-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "fddea92eb03048fc39ca8e07c7d5d6648080519149c35168970e5c5314579ceb",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Behaviors & Operations",
         "View a task's detail"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_e4816bd194fd7cd72cde750ee0542bc3",
@@ -337,14 +427,20 @@
       "targetAnchor": "answer-a-parked-question",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/herdr-web-dashboard.md#answer-a-parked-question (source lines 117-117) is carried at docs/platform/herdr-web-dashboard/spec.md#answer-a-parked-question (candidate lines 139-139). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "deep: heading \"Answer a parked question\" herdr-web-dashboard.md L117-117 to herdr-web-dashboard/spec.md L139-139; text and digest identical, shown text identical, anchor passes, rationale line ranges true",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-11-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "121b4db8a77c193d9b004fc14e6a0378aa9011932370640160d9642a1b3f0098",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Behaviors & Operations"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_9d613c56217c5da75868821a335fafbc",
@@ -353,15 +449,21 @@
       "targetAnchor": "unheaded-block-15",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/herdr-web-dashboard.md#unheaded-block-13 (source lines 119-131) is carried at docs/platform/herdr-web-dashboard/spec.md#unheaded-block-15 (candidate lines 141-153). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded-block herdr-web-dashboard.md L119-131 to herdr-web-dashboard/spec.md L141-153; digests recomputed by script and equal on both sides, anchor passes, shard/pack equal, rationale line ranges match; no unit text differs in the whole-file diff",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-11-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "02c2abfc0e3fe0906c987d5096cd89e700df4ddfdb6c624d8ca8c5014e313208",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Behaviors & Operations",
         "Answer a parked question"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_62afe657fd22865fb6384797ba8b2803",
@@ -370,14 +472,20 @@
       "targetAnchor": "approve-a-merge",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/herdr-web-dashboard.md#approve-a-merge (source lines 133-133) is carried at docs/platform/herdr-web-dashboard/spec.md#approve-a-merge (candidate lines 155-155). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "deep: heading \"Approve a merge\" herdr-web-dashboard.md L133-133 to herdr-web-dashboard/spec.md L155-155; text and digest identical, shown text identical, anchor passes, rationale line ranges true",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-11-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "dda55d405c2cee1c6f03f9706fc117d86cf9bd41ee1a4dfeab9d82390a888637",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Behaviors & Operations"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_9d7b246d0d09f47c6fe718ca58c8d36b",
@@ -386,15 +494,21 @@
       "targetAnchor": "unheaded-block-16",
       "claimKind": "decision",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/herdr-web-dashboard.md#unheaded-block-14 (source lines 135-144) is carried at docs/platform/herdr-web-dashboard/spec.md#unheaded-block-16 (candidate lines 157-166). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded-block herdr-web-dashboard.md L135-144 to herdr-web-dashboard/spec.md L157-166; full digest recomputed by script and by hand (raw sha256) on both sides, equal; anchor passes; shard/pack equal; covered by the whole-file diff",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-11-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "56f851b8da5f2ef6070d3123168a84c84275cab6214cc0bc5c53c5fcfebf70a7",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Behaviors & Operations",
         "Approve a merge"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_4058c2cbc13660c9131a073491489bcf",
@@ -403,14 +517,20 @@
       "targetAnchor": "add-a-work-item",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/herdr-web-dashboard.md#add-a-work-item (source lines 146-146) is carried at docs/platform/herdr-web-dashboard/spec.md#add-a-work-item (candidate lines 168-168). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "deep: heading \"Add a work item\" herdr-web-dashboard.md L146-146 to herdr-web-dashboard/spec.md L168-168; text and digest identical, shown text identical, anchor passes, rationale line ranges true",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-11-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "6c1a2d0d5002be77b1c85ce17b652106f39f121388c6b9356ac61992ad455bd3",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Behaviors & Operations"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_027ad55814e7186aae754658b36a3da4",
@@ -419,15 +539,21 @@
       "targetAnchor": "unheaded-block-17",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/herdr-web-dashboard.md#unheaded-block-15 (source lines 148-151) is carried at docs/platform/herdr-web-dashboard/spec.md#unheaded-block-17 (candidate lines 170-173). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded-block herdr-web-dashboard.md L148-151 to herdr-web-dashboard/spec.md L170-173; full digest recomputed by script and by hand (raw sha256) on both sides, equal; anchor passes; shard/pack equal; covered by the whole-file diff",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-11-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "4e9dfc7b870ed0c42ee01256f4dd11e3147a0fbcfee3110d924ca2a91bf50c4b",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Behaviors & Operations",
         "Add a work item"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_663e6a3f4590e633d46c480b812428d6",
@@ -436,14 +562,20 @@
       "targetAnchor": "edit-a-work-item",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/herdr-web-dashboard.md#edit-a-work-item (source lines 153-153) is carried at docs/platform/herdr-web-dashboard/spec.md#edit-a-work-item (candidate lines 175-175). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: heading herdr-web-dashboard.md L153-153 to herdr-web-dashboard/spec.md L175-175; digests recomputed by script and equal on both sides, anchor passes, shard/pack equal, rationale line ranges match; no unit text differs in the whole-file diff",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-11-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f46dae5b90188ed598fd3b80b6905e07a60bf36443fcd0e9c15bb21f0ef33d78",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Behaviors & Operations"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_8103c8b9283356118e1c5f0126d387da",
@@ -452,15 +584,21 @@
       "targetAnchor": "unheaded-block-18",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/herdr-web-dashboard.md#unheaded-block-16 (source lines 155-159) is carried at docs/platform/herdr-web-dashboard/spec.md#unheaded-block-18 (candidate lines 177-181). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded-block herdr-web-dashboard.md L155-159 to herdr-web-dashboard/spec.md L177-181; digests recomputed by script and equal on both sides, anchor passes, shard/pack equal, rationale line ranges match; no unit text differs in the whole-file diff",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-11-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2f88434b367c4e8e15004d9d8dc0176f0c18d30dda2922a07a2272af81036838",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Behaviors & Operations",
         "Edit a work item"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_4d256574d9d600433a7494bfed0048cb",
@@ -469,14 +607,20 @@
       "targetAnchor": "retire-a-work-item",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/herdr-web-dashboard.md#retire-a-work-item (source lines 161-161) is carried at docs/platform/herdr-web-dashboard/spec.md#retire-a-work-item (candidate lines 183-183). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "deep: heading \"Retire a work item\" herdr-web-dashboard.md L161-161 to herdr-web-dashboard/spec.md L183-183; text and digest identical, shown text identical, anchor passes, rationale line ranges true",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-11-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "0f289b671871480d5cd3f29770acb6242825365a44b07966e3631820348b49fe",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Behaviors & Operations"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_1b33df3ee3004adf514f1532e32002cc",
@@ -485,15 +629,21 @@
       "targetAnchor": "unheaded-block-19",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/herdr-web-dashboard.md#unheaded-block-17 (source lines 163-173) is carried at docs/platform/herdr-web-dashboard/spec.md#unheaded-block-19 (candidate lines 185-195). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded-block herdr-web-dashboard.md L163-173 to herdr-web-dashboard/spec.md L185-195; full digest recomputed by script and by hand (raw sha256) on both sides, equal; anchor passes; shard/pack equal; covered by the whole-file diff",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-11-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "9e0b0e9b88a3b25b9731259e1c31d18661c588da2987fc364957d480a2391dd6",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Behaviors & Operations",
         "Retire a work item"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_55d0bc07e0c1c36016fcff043a0c492e",
@@ -502,13 +652,19 @@
       "targetAnchor": "actors-access",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/herdr-web-dashboard.md#actors-access (source lines 175-175) is carried at docs/platform/herdr-web-dashboard/spec.md#actors-access (candidate lines 197-197). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: heading herdr-web-dashboard.md L175-175 to herdr-web-dashboard/spec.md L197-197; digests recomputed by script and equal on both sides, anchor passes, shard/pack equal, rationale line ranges match; no unit text differs in the whole-file diff",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-11-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "c0f68bfbf42066278cf2e94e60e8919d9c54a16274952f3f46797c57d0d5dea1",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_ea002bc3d8c38abf1f348cce4f96931e",
@@ -517,14 +673,20 @@
       "targetAnchor": "unheaded-block-20",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/herdr-web-dashboard.md#unheaded-block-18 (source lines 177-181) is carried at docs/platform/herdr-web-dashboard/spec.md#unheaded-block-20 (candidate lines 199-203). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded-block herdr-web-dashboard.md L177-181 to herdr-web-dashboard/spec.md L199-203; digests recomputed by script and equal on both sides, anchor passes, shard/pack equal, rationale line ranges match; no unit text differs in the whole-file diff",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-11-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "ab25ec2e78e6b621aef48959d5050681a09fcfcd9f0bb232c6e17fb089c3527a",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Actors & Access"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_7b00d9d035bd97de226726944f711311",
@@ -533,14 +695,20 @@
       "targetAnchor": "unheaded-block-21",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/herdr-web-dashboard.md#unheaded-block-19 (source lines 183-186) is carried at docs/platform/herdr-web-dashboard/spec.md#unheaded-block-21 (candidate lines 205-208). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded-block herdr-web-dashboard.md L183-186 to herdr-web-dashboard/spec.md L205-208; digests recomputed by script and equal on both sides, anchor passes, shard/pack equal, rationale line ranges match; no unit text differs in the whole-file diff",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-11-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "956aba0bd61a349e8e839c956ce22ee818fd15e47af10c447c34b9030859ad27",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Actors & Access"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_1522a44e0505b7aaed5d55bf4f2b1900",
@@ -549,14 +717,20 @@
       "targetAnchor": "unheaded-block-22",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/herdr-web-dashboard.md#unheaded-block-20 (source lines 188-196) is carried at docs/platform/herdr-web-dashboard/spec.md#unheaded-block-22 (candidate lines 210-218). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded-block herdr-web-dashboard.md L188-196 to herdr-web-dashboard/spec.md L210-218; digests recomputed by script and equal on both sides, anchor passes, shard/pack equal, rationale line ranges match; no unit text differs in the whole-file diff",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-11-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "b56dc220d011602cc15df733f86c367b9582332414162a6ca27b45ca34f09705",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Actors & Access"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_f41d47fdbe1875d4e57de8d2ecc6dcf7",
@@ -596,13 +770,19 @@
       "targetAnchor": "edge-cases-settled",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/herdr-web-dashboard.md#edge-cases-settled (source lines 246-246) is carried at docs/platform/herdr-web-dashboard/spec.md#edge-cases-settled (candidate lines 268-268). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "deep: heading \"Edge Cases Settled\" herdr-web-dashboard.md L246-246 to herdr-web-dashboard/spec.md L268-268; text and digest identical, shown text identical, anchor passes, rationale line ranges true",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-12-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e57fadfa3c6367e1098e0565fa3a61fe011bb34b4994eb241557beaa2c2ff879",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_878e9f5faa08a2977408f49e04af0a7a",
@@ -611,14 +791,20 @@
       "targetAnchor": "unheaded-block-24",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/herdr-web-dashboard.md#unheaded-block-22 (source lines 248-264) is carried at docs/platform/herdr-web-dashboard/spec.md#unheaded-block-24 (candidate lines 270-286). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded-block herdr-web-dashboard.md L248-264 to herdr-web-dashboard/spec.md L270-286; digests recomputed by script and equal on both sides, anchor passes, shard/pack equal, rationale line ranges match; no unit text differs in the whole-file diff",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-12-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "1c226a16285c1c611d2dcbc3db679c21f6367eb19f66428f97fa0b6741c2027d",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Edge Cases Settled"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_2aae8d6820a6ad622e47c07d29c428bf",

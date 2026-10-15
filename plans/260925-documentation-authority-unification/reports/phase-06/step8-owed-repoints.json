@@ -3379,7 +3379,10 @@
         "docs/platform/observe/spec.md",
         "docs/platform/observe/decisions/observe-component-architecture.md"
       ],
-      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+      "action": "Rebased in candidate: prepend ../ to preserve the same repository referent; label unchanged. Verify destination and downstream consumers at the single cutover link pass.",
+      "candidatePath": "docs/platform/observe/spec.md",
+      "candidateRaw": "../../how-to/compare-discussion-setups-with-metrics-eval.md",
+      "rebaseComplete": true
     },
     {
       "source": "docs/specs/observe.md",
@@ -3389,7 +3392,10 @@
         "docs/platform/observe/spec.md",
         "docs/platform/observe/decisions/observe-component-architecture.md"
       ],
-      "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
+      "action": "Rebased in candidate: prepend ../ to preserve the same repository referent; label unchanged. Verify destination and downstream consumers at the single cutover link pass.",
+      "candidatePath": "docs/platform/observe/spec.md",
+      "candidateRaw": "../../reference/discussion-quality-rubric.md",
+      "rebaseComplete": true
     },
     {
       "source": "docs/specs/observe.md",
@@ -3692,5 +3698,15 @@
       "action": "Preserved verbatim in carriage; verify and repoint in the single link pass. A formerly dead source destination remains an explicit truth/navigation obligation."
     }
   ],
-  "knownStaleText": "step8-evidence.md section 4; explicitly carried, truth sample and full promotion truth check owed."
+  "knownStaleText": "step8-evidence.md section 4; explicitly carried, truth sample and full promotion truth check owed.",
+  "historicalRepointExclusion": {
+    "paths": [
+      "docs/history/**",
+      "CHANGELOG.md"
+    ],
+    "lineHits": 78,
+    "files": 24,
+    "action": "Excluded from repointing: point-in-time records retain dated source citations",
+    "authorization": "Lead decision, current assignment"
+  }
 }

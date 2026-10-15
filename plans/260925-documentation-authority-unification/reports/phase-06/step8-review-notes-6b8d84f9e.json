@@ -1,0 +1,295 @@
+{
+  "reports": [
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-candidates-01-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\n- Result: 70 ok, 0 rework, 0 hold. Eligibility only; no source approval, truth approval or promotion is implied.\n- Carry-over caution for the list as a whole: the Added-in-candidate notes say stale source assertions are carried on purpose; owner answer A40 item 2 (after the request was authored) additionally asks that the five spec carriers (observe, herdr-web-dashboard, agent-confinement, claude-plugin, decision-citation-drift) and the ui-spec overview carry the note \"known stale carried sentences; full truth check owed at promotion\" in the candidate-unverified list. candidate-unverified-specs-ui.json has no such carrier-level field (candidate-unverified-root-authorities.json shows the A35 precedent as workStateSpecCarriers). That is an owed addition once the A40 corrections land, not a tuple or eligibility defect.\n- The gates log of the native sync ends with an AssertionError (the helper expected 3 undisposed registry gaps, the full native ledger gives 1); the author's methodNotes explain it and my own rerun gives 1 as well, so it is not a defect of this list.\n- Nothing was written in the worktree or main checkout; git status --short in the worktree is empty.\n\nUnresolved: none for this part; the A40 carrier note above is for the Lead.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-candidates-02-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\n- Result: 47 ok, 0 rework, 0 hold. Eligibility only; no source approval, truth approval or promotion is implied.\n- Carry-over caution for the list as a whole: the Added-in-candidate notes say stale source assertions are carried on purpose; owner answer A40 item 2 (after the request was authored) additionally asks that the five spec carriers (observe, herdr-web-dashboard, agent-confinement, claude-plugin, decision-citation-drift) and the ui-spec overview carry the note \"known stale carried sentences; full truth check owed at promotion\" in the candidate-unverified list. candidate-unverified-specs-ui.json has no such carrier-level field (candidate-unverified-root-authorities.json shows the A35 precedent as workStateSpecCarriers). That is an owed addition once the A40 corrections land, not a tuple or eligibility defect.\n- The gates log of the native sync ends with an AssertionError (the helper expected 3 undisposed registry gaps, the full native ledger gives 1); the author's methodNotes explain it and my own rerun gives 1 as well, so it is not a defect of this list.\n- Nothing was written in the worktree or main checkout; git status --short in the worktree is empty.\n\nUnresolved: none for this part; the A40 carrier note above is for the Lead.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-identical-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\nThe same heading-only digest also names a Step 4 row (claim_35e55882, distribution.md#behaviors-operations to packaging-distribution, already reviewed, its target digest differs because the heading was carried at H4) and pilot rows. Scoped Step 8 strict E sees only the two members above (native proof shows exactly one duplicate group with these two members), so the request is complete for its scope, but whoever accounts identical-unit exceptions globally should list the Step 4 row too.\n\nUnresolved: none for this entry.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-liveness-01-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\nCounts for this request: ok 60, rework 0, hold 0.\n\nUnresolved: whether the title-based historical rule should also cover child headings of a historical H2 beyond Observe section 6 (none other found); whether section 13.1 should be split into a current recipe and its history is a carriage question for the author and owner, not decided here.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-liveness-02-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\nCounts for this request: ok 60, rework 0, hold 0.\n\nUnresolved: whether the title-based historical rule should also cover child headings of a historical H2 beyond Observe section 6 (none other found); whether section 13.1 should be split into a current recipe and its history is a carriage question for the author and owner, not decided here.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-liveness-03-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\nCounts for this request: ok 59, rework 1, hold 0.\n\nUnresolved: whether the title-based historical rule should also cover child headings of a historical H2 beyond Observe section 6 (none other found); whether section 13.1 should be split into a current recipe and its history is a carriage question for the author and owner, not decided here.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-liveness-04-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\nCounts for this request: ok 44, rework 0, hold 0.\n\nUnresolved: whether the title-based historical rule should also cover child headings of a historical H2 beyond Observe section 6 (none other found); whether section 13.1 should be split into a current recipe and its history is a carriage question for the author and owner, not decided here.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-owner-queue-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\nThe fixes are small edits to the queue and the owed JSON; the evidence digest will change and the entry should be re-requested. Nothing here reopens a decision: no obligation was found to be wrong, only status and completeness.\n\nUnresolved: the docs/history and CHANGELOG.md exclusion needs an explicit statement by the author or Lead.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-predecessor-generation-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\nNo predecessor has an uncarried obligation: the first and third successors contain the whole old unit, and the second old text is replaced by main's rewrite of the same unit, so no A34 partial carry is required and none is being waived. The dashboard accounting is still only proposed; it takes effect when the Lead adds the pending row.\n\nUnresolved: authorization to add the dashboard registryGaps row (claim_7d5937c7) remains with the Lead.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-report-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\nThe report is accurate as a pinned historical statement; it does not and cannot approve later edits. The one point worth a clarifying sentence next time is the fatalCount versus structural fatal distinction.\n\nUnresolved: none for this entry.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-reverse-list-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\n- Result: 1 ok, 0 rework, 0 hold. Reverse eligibility only; the list stays candidate-unverified and every full truth check remains owed at promotion (A28 item 3b).\n- Owed addition (for the Lead): owner answer A40 item 2, decided after this list was authored, asks the five spec carriers (observe, herdr-web-dashboard, agent-confinement, claude-plugin, decision-citation-drift) and the ui-spec overview to carry the note \"known stale carried sentences; full truth check owed at promotion\" in the candidate-unverified list. The current list has no carrier-level field for it (candidate-unverified-root-authorities.json shows the A35 precedent as workStateSpecCarriers). Add it with the A40 corrections; it does not change any tuple.\n- The native-sync gates log ends with an AssertionError (expected 3 undisposed registry gaps, found 1); the author's methodNotes explain it (two confinement gaps already have reviewed accounting) and my reruns also give 1, so the list is unaffected. The remaining open gap is the dashboard predecessor and stays a separate blocker.\n- Nothing was written in the worktree or main checkout; git status --short in the worktree is empty.\n\nUnresolved: none for the list tuples; the A40 carrier note above.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-script-exact-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\n- All 275 Unit-exact thresholds hold at the content commit: smallest source unit is 41 characters (above 40), every target digest occurs once, source occurrences do not exceed target ones, ancestry is equal, and the per-document exact share is at least one half. 255 of 275 units sit at moved line ranges, which the rationale reports correctly.\n- Unit-exact proves unit text and heading ancestry only; it says nothing about stale sentences carried verbatim, which step8-evidence section 4 lists for the later truth pass.\n- Concern for the author, not a verdict problem: list-doc-anchors --check cannot confirm the anchors the rationale cites for non-Markdown file-block units; consider teaching it mixed files.\n\nUnresolved: none for this entry.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-01-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\n- Result: 41 ok, 0 rework, 0 hold. Deep-read rework rate 0 of 11, so the 3 percent expansion rule does not trigger and the whole pack was not read in full; every row still has the full mechanical proof above.\n- The pack classes match my recompute: Unit-exact rows have a unique long digest match with equal ancestry; the Weak-exact rows of the contracts file are weak only because ancestor headings differ (the carrier adds a labelled H1 above the original numbered headings) or the unit is short, which is a script property and not a defect.\n- claimKind labels (for example contract on a spec.md block, specification on a contracts-file block, decision on one interface block) come from the script and do not decide placement; placement follows the map and triage (section 6 to contracts/confinement-authority-v1.md, sections 1 to 5 to spec.md). I did not treat the label as a finding.\n- Source drift: the legacy file differs from the frozen map blob pin 778a93f0; the carriage uses the content-commit text, which equals 111adc51 and HEAD, so conservation is judged against that text as the request states.\n- Ordinary source approval here certifies carriage only, not the truth of the carried sentences, not eligibility, and no retirement or cutover.\n\nUnresolved: none for this request.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-02-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\n- Result: 34 ok, 0 rework, 0 hold. Deep-read rework rate 0 of 10, so the 3 percent expansion rule does not trigger and the whole pack was not read in full; every row still has the full mechanical proof above.\n- The pack classes match my recompute: Unit-exact rows have a unique long digest match with equal ancestry; the Weak-exact rows of the contracts file are weak only because ancestor headings differ (the carrier adds a labelled H1 above the original numbered headings) or the unit is short, which is a script property and not a defect.\n- claimKind labels (for example contract on a spec.md block, specification on a contracts-file block, decision on one interface block) come from the script and do not decide placement; placement follows the map and triage (section 6 to contracts/confinement-authority-v1.md, sections 1 to 5 to spec.md). I did not treat the label as a finding.\n- Source drift: the legacy file differs from the frozen map blob pin 778a93f0; the carriage uses the content-commit text, which equals 111adc51 and HEAD, so conservation is judged against that text as the request states.\n- Ordinary source approval here certifies carriage only, not the truth of the carried sentences, not eligibility, and no retirement or cutover.\n\nUnresolved: none for this request.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-03-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\n- Result: 30 ok, 0 rework, 0 hold. Deep-read rework rate 0 of 10, so the 3 percent expansion rule does not trigger and the whole pack was not read in full; every row still has the full mechanical proof above.\n- The pack classes match my recompute: Unit-exact rows have a unique long digest match with equal ancestry; the Weak-exact rows of the contracts file are weak only because ancestor headings differ (the carrier adds a labelled H1 above the original numbered headings) or the unit is short, which is a script property and not a defect.\n- claimKind labels (for example contract on a spec.md block, specification on a contracts-file block, decision on one interface block) come from the script and do not decide placement; placement follows the map and triage (section 6 to contracts/confinement-authority-v1.md, sections 1 to 5 to spec.md). I did not treat the label as a finding.\n- Source drift: the legacy file differs from the frozen map blob pin 778a93f0; the carriage uses the content-commit text, which equals 111adc51 and HEAD, so conservation is judged against that text as the request states.\n- Ordinary source approval here certifies carriage only, not the truth of the carried sentences, not eligibility, and no retirement or cutover.\n\nUnresolved: none for this request.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-04-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\n- No rework or hold. All rows are whole-unit move carriage at one owner; the dispositions and the Added in candidate labels in the target files tell the truth about what happened.\n- Carriage only: this approval does not certify the truth of current-state sentences (A19) and does not retire the legacy source or approve promotion.\n- Heading rows carry the section through the next heading, so they overlap the unheaded-block rows beneath them by design; both are accounted for separately.\n\nUnresolved: none.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-05-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\n- No rework or hold. All rows are whole-unit move carriage at one owner; the dispositions and the Added in candidate labels in the target files tell the truth about what happened.\n- Carriage only: this approval does not certify the truth of current-state sentences (A19) and does not retire the legacy source or approve promotion.\n- Heading rows carry the section through the next heading, so they overlap the unheaded-block rows beneath them by design; both are accounted for separately.\n\nUnresolved: none.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-06-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\n- No rework or hold. All rows are whole-unit move carriage at one owner; the dispositions and the Added in candidate labels in the target files tell the truth about what happened.\n- Carriage only: this approval does not certify the truth of current-state sentences (A19) and does not retire the legacy source or approve promotion.\n- Heading rows carry the section through the next heading, so they overlap the unheaded-block rows beneath them by design; both are accounted for separately.\n\nUnresolved: none.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-07-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\n- No rework or hold. All rows are whole-unit move carriage at one owner; the dispositions and the Added in candidate labels in the target files tell the truth about what happened.\n- Carriage only: this approval does not certify the truth of current-state sentences (A19) and does not retire the legacy source or approve promotion.\n- Heading rows carry the section through the next heading, so they overlap the unheaded-block rows beneath them by design; both are accounted for separately.\n\nUnresolved: none.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\n- ok on a mechanical row means the mechanical checks passed, nothing more. Carriage review does not judge truth of current-state sentences (A19; A40 corrections are separate), so known stale assertions carried verbatim are not findings here.\n- claimKind in the decisions is the native registry kind (path and text heuristic), not the map kind spec; carriage and owner are unaffected.\n- Added content is limited to the labelled candidate metadata block; nothing unlabelled was added.\n\nUnresolved: none for this request.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-09-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\n- ok on a mechanical row means the mechanical checks passed, nothing more. Carriage review does not judge truth of current-state sentences (A19; A40 corrections are separate), so known stale assertions carried verbatim are not findings here.\n- claimKind in the decisions is the native registry kind (path and text heuristic), not the map kind spec; carriage and owner are unaffected.\n- Added content is limited to the labelled candidate metadata block; nothing unlabelled was added.\n\nUnresolved: none for this request.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-10-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\n- ok on a mechanical row means the mechanical checks passed, nothing more. Carriage review does not judge truth of current-state sentences (A19; A40 corrections are separate), so known stale assertions carried verbatim are not findings here.\n- claimKind in the decisions is the native registry kind (path and text heuristic), not the map kind spec; carriage and owner are unaffected.\n- Added content is limited to the labelled candidate metadata block; nothing unlabelled was added.\n\nUnresolved: none for this request.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-11-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\n- No rework or hold: 0 of the deep-read rows needed rework, so the 3% full-read escalation does not trigger.\n- Carriage only: current-state sentences (A19) are not judged here; known stale links in this source (the herdr layout reference and decision 0014 path, the observe archive path) are carried verbatim as the request requires.\n- Pack and request are consistent: class lists in the request equal the sidecar classes; unequal pairs in the sidecar are only the Judgment rows listed.\n\nUnresolved: none.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-12-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\n- No rework or hold: 0 of the deep-read rows needed rework, so the 3% full-read escalation does not trigger.\n- Carriage only: current-state sentences (A19) are not judged here; known stale links in this source (the herdr layout reference and decision 0014 path, the observe archive path) are carried verbatim as the request requires.\n- Pack and request are consistent: class lists in the request equal the sidecar classes; unequal pairs in the sidecar are only the Judgment rows listed.\n\nUnresolved: none.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-13-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\n- No rework or hold: 0 of the deep-read rows needed rework, so the 3% full-read escalation does not trigger.\n- Carriage only: current-state sentences (A19) are not judged here; known stale links in this source (the herdr layout reference and decision 0014 path, the observe archive path) are carried verbatim as the request requires.\n- Pack and request are consistent: class lists in the request equal the sidecar classes; unequal pairs in the sidecar are only the Judgment rows listed.\n- The three observe rows moved into the decisions file differ in ancestry from source by the added parent heading only; the target spec.md does not point at the moved section 6 except through the area portal README (docs/platform/observe/README.md lists the decisions file), which is acceptable under the portal convention.\n\nUnresolved: none.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-14-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\n- Counts: ok 16, rework 0, hold 0.\n- The candidate scaffolding block is unlabelled-row territory only in the sense that it has no claim row; it is labelled Added in candidate by its own quote line, matching the established pattern of this phase.\n- Source file left untouched (blob equals pin); target at HEAD read, not just the pack.\n\nUnresolved: none.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-15-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\n- Counts: ok 9, rework 0, hold 0.\n- The candidate scaffolding block is unlabelled-row territory only in the sense that it has no claim row; it is labelled Added in candidate by its own quote line, matching the established pattern of this phase.\n- Source file left untouched (blob equals pin); target at HEAD read, not just the pack.\n\nUnresolved: none.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-16-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\n- Counts: ok 5, rework 0, hold 0.\n- The candidate scaffolding block is unlabelled-row territory only in the sense that it has no claim row; it is labelled Added in candidate by its own quote line, matching the established pattern of this phase.\n- Source file left untouched (blob equals pin); target at HEAD read, not just the pack.\n\nUnresolved: none.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-17-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\n- Counts: ok 30, rework 0, hold 0.\n- The candidate scaffolding block is unlabelled-row territory only in the sense that it has no claim row; it is labelled Added in candidate by its own quote line, matching the established pattern of this phase.\n- Source file left untouched (blob equals pin); target at HEAD read, not just the pack.\n\nUnresolved: none.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-18-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\n- Counts: ok 12, rework 0, hold 0.\n- The candidate scaffolding block is unlabelled-row territory only in the sense that it has no claim row; it is labelled Added in candidate by its own quote line, matching the established pattern of this phase.\n- Source file left untouched (blob equals pin); target at HEAD read, not just the pack.\n\nUnresolved: none.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-19-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\n- Counts: ok 10, rework 0, hold 0.\n- The candidate scaffolding block is unlabelled-row territory only in the sense that it has no claim row; it is labelled Added in candidate by its own quote line, matching the established pattern of this phase.\n- Source file left untouched (blob equals pin); target at HEAD read, not just the pack.\n\nUnresolved: none.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-20-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\n- Counts: ok 9, rework 0, hold 0.\n- The candidate scaffolding block is unlabelled-row territory only in the sense that it has no claim row; it is labelled Added in candidate by its own quote line, matching the established pattern of this phase.\n- Source file left untouched (blob equals pin); target at HEAD read, not just the pack.\n\nUnresolved: none.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-21-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\nDeep rework rate in this request: 0 of 1. Generated rows keep regenerate-from-source per A9, N1 and A39; the frozen map rows that said place verbatim into history/generated are overridden by the triage, not edited, as the rationale states. Legacy docs/ui-spec stays a retained tool root until cutover (the compiler needs that layout), outside this request.\n\nUnresolved: none.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-22-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\nDeep rework rate in this request: 0 of 5. Generated rows keep regenerate-from-source per A9, N1 and A39; the frozen map rows that said place verbatim into history/generated are overridden by the triage, not edited, as the rationale states. Legacy docs/ui-spec stays a retained tool root until cutover (the compiler needs that layout), outside this request.\n\nUnresolved: none.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-23-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\nDeep rework rate in this request: 0 of 1. Generated rows keep regenerate-from-source per A9, N1 and A39; the frozen map rows that said place verbatim into history/generated are overridden by the triage, not edited, as the rationale states. Legacy docs/ui-spec stays a retained tool root until cutover (the compiler needs that layout), outside this request.\n\nUnresolved: none.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-24-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\nDeep rework rate in this request: 0 of 1. Generated rows keep regenerate-from-source per A9, N1 and A39; the frozen map rows that said place verbatim into history/generated are overridden by the triage, not edited, as the rationale states. Legacy docs/ui-spec stays a retained tool root until cutover (the compiler needs that layout), outside this request.\n\nUnresolved: none.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-25-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\nDeep rework rate in this request: 0 of 1. Generated rows keep regenerate-from-source per A9, N1 and A39; the frozen map rows that said place verbatim into history/generated are overridden by the triage, not edited, as the rationale states. Legacy docs/ui-spec stays a retained tool root until cutover (the compiler needs that layout), outside this request.\n\nUnresolved: none.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-26-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\n- Carriage review only: truth of current-state sentences is not judged (A19; known false sentences are corrected separately under A40). Link rebases: none made and none needed because the source holds no relative links.\n- The metadata block Related line points to the legacy source path by design (candidate only, canonical No); not a conservation issue.\n\nUnresolved: none.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-27-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\n- Carriage review only: truth of current-state sentences is not judged (A19; known false sentences are corrected separately under A40). Link rebases: none made and none needed because the source holds no relative links.\n- The metadata block Related line points to the legacy source path by design (candidate only, canonical No); not a conservation issue.\n\nUnresolved: none.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-28-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\n- Carriage review only: truth of current-state sentences is not judged (A19; known false sentences are corrected separately under A40). Link rebases: none made and none needed because the source holds no relative links.\n- The metadata block Related line points to the legacy source path by design (candidate only, canonical No); not a conservation issue.\n\nUnresolved: none.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-29-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\nDeep rework rate in this request: 0 of 0. Generated rows keep regenerate-from-source per A9, N1 and A39; the frozen map rows that said place verbatim into history/generated are overridden by the triage, not edited, as the rationale states. Legacy docs/ui-spec stays a retained tool root until cutover (the compiler needs that layout), outside this request.\n\nUnresolved: none.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-30-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\n- Carriage review only: truth of current-state sentences is not judged (A19; known false sentences are corrected separately under A40). Link rebases: none made and none needed because the source holds no relative links.\n- The metadata block Related line points to the legacy source path by design (candidate only, canonical No); not a conservation issue.\n\nUnresolved: none.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-31-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\n- Carriage review only: truth of current-state sentences is not judged (A19; known false sentences are corrected separately under A40). Link rebases: none made and none needed because the source holds no relative links.\n- The metadata block Related line points to the legacy source path by design (candidate only, canonical No); not a conservation issue.\n\nUnresolved: none.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-32-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\n- Carriage review only: truth of current-state sentences is not judged (A19; known false sentences are corrected separately under A40). Link rebases: none made and none needed because the source holds no relative links.\n- The metadata block Related line points to the legacy source path by design (candidate only, canonical No); not a conservation issue.\n\nUnresolved: none.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-33-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\n- Carriage review only: truth of current-state sentences is not judged (A19; known false sentences are corrected separately under A40). Link rebases: none made and none needed because the source holds no relative links.\n- The metadata block Related line points to the legacy source path by design (candidate only, canonical No); not a conservation issue.\n\nUnresolved: none.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-34-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\nDeep rework rate in this request: 0 of 0. Generated rows keep regenerate-from-source per A9, N1 and A39; the frozen map rows that said place verbatim into history/generated are overridden by the triage, not edited, as the rationale states. Legacy docs/ui-spec stays a retained tool root until cutover (the compiler needs that layout), outside this request.\n\nUnresolved: none.\n"
+      ]
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-triage-1276467f3.md",
+      "notesAndConcerns": [
+        "## Notes\n\n1. The frozen map labels four single-target specs (citation drift, distillery, plugin, dashboard) as split while triage records move; with one target the two are the same placement and I accept it.\n2. step8-triage.md lists the five generated files with Source class maintained-authority, which was true before A39 and is stale after it (switchboard now yields generated). The JSON records carry no class, so no digest is affected; correct the table at next touch.\n3. The legacy docs/ui-spec tool root is untouched (no diff since 111adc51), as the request asks; the repoint obligation is reviewed in the owner-queue channel.\n\nUnresolved: none for the 33 entries. The class column in step8-triage.md is a non-blocking correction.\n"
+      ]
+    }
+  ],
+  "sourceReviewRows": 566,
+  "sourceDeepRows": 197,
+  "sourceMechanicalRows": 369,
+  "sourceReworks": 0,
+  "livenessRows": 224,
+  "livenessReworks": 1,
+  "ownerQueueEntries": 1,
+  "ownerQueueReworks": 1,
+  "meaning": "Committed pinned review results; later corrected bindings are submitted afresh, never approved by this reception record."
+}

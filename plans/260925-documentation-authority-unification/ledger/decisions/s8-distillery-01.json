@@ -24,11 +24,17 @@
       "targetAnchor": "unheaded-block-1",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-preamble unit docs/specs/distillery.md#unheaded-block-1 (source lines 1-7) is carried at docs/platform/distillery/spec.md#unheaded-block-1 (candidate lines 1-7). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: front matter preamble unheaded-block-1 lines 1-7 to unheaded-block-1 lines 1-7, equal full digest and ancestry, anchors exist, shard equals pack, source blob equals its pin; text not read line by line. Digest also hand-recomputed in a seeded independent script.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-10-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "38b03ba75f9d6fd9e7f83f5ef5f909d79006e20e49a119a53a8a9a2c229e2e95",
-      "targetAncestry": []
+      "targetAncestry": [],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_6ff089f694102599d1fc8273ea6bbae9",
@@ -37,11 +43,17 @@
       "targetAnchor": "distillery-porting-lifecycle",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Judgment: no target digest match. The whole heading unit docs/specs/distillery.md#distillery-porting-lifecycle (source lines 9-9) is carried at docs/platform/distillery/spec.md#distillery-porting-lifecycle (candidate lines 9-9). The heading section digest changes because labelled candidate metadata is inserted after the original H1; original heading and direct source payload remain verbatim. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "deep: mandatory unequal pair. Whole-file diff of docs/specs/distillery.md against docs/platform/distillery/spec.md is a pure insertion of lines 11-32 (metadata fence plus a blockquote labelled Added in candidate) after the H1, nothing removed or reworded; front matter lines 1-7 first and byte-equal; H1 text and depth unchanged. Source heading has no direct payload, so the rationale phrase direct source payload remains verbatim is vacuous here; the digest differs only because the following block is now the added candidate metadata fence. Rationale (labelled metadata inserted after H1, heading digest changes) is true.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-10-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "23c12fdbccf665c6fc46ba5262d8cd57c2782e69f6938ea2509ffd336dcd0e61",
-      "targetAncestry": []
+      "targetAncestry": [],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_1152a6c3ef3f0678dca8b5c4b28e7816",
@@ -50,13 +62,19 @@
       "targetAnchor": "purpose",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/distillery.md#purpose (source lines 11-11) is carried at docs/platform/distillery/spec.md#purpose (candidate lines 33-33). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "deep: seeded sample. Heading section purpose (starts Distillery is forgent's reference-learning system: it studies external) read in full both directions: source lines 11-11 equal target lines 33-33 byte for byte, shifted only by the 22 added lines; rationale (short heading title makes it Weak-exact, digest equal, whole unit carried) is true; no link rewrite. Digest also hand-recomputed in a seeded independent script.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-10-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "7d67a471d1c385ca8cc0546874593e824df4cf0d1f9c1c6db9741ee0a8bd3acc",
       "targetAncestry": [
         "Distillery — Porting Lifecycle"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_030914214315e12e5ee492361b959fa8",
@@ -65,14 +83,20 @@
       "targetAnchor": "unheaded-block-4",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/distillery.md#unheaded-block-2 (source lines 13-19) is carried at docs/platform/distillery/spec.md#unheaded-block-4 (candidate lines 35-41). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded block unheaded-block-2 lines 13-19 to unheaded-block-4 lines 35-41, equal full digest and ancestry, anchors exist, shard equals pack, source blob equals its pin; text not read line by line.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-10-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "0601f676d24bb748feb8d5ef2ef95533e43b12671f4ded9087e77e0607038e9c",
       "targetAncestry": [
         "Distillery — Porting Lifecycle",
         "Purpose"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_38c50f26b5eddc17470cbce12d130184",
@@ -81,13 +105,19 @@
       "targetAnchor": "entry-points-triggers",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/distillery.md#entry-points-triggers (source lines 21-21) is carried at docs/platform/distillery/spec.md#entry-points-triggers (candidate lines 43-43). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "deep: seeded sample. Heading section entry-points-triggers (starts - A person or agent decides a porting candidate should move to its nex) read in full both directions: source lines 21-21 equal target lines 43-43 byte for byte, shifted only by the 22 added lines; rationale (short heading title makes it Weak-exact, digest equal, whole unit carried) is true; no link rewrite.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-10-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "870113cef74cbf14b1466445a335f784131f0db0065053e0f31e0b7f016f0ff6",
       "targetAncestry": [
         "Distillery — Porting Lifecycle"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_40196224e217e77d89e57d0ffaf2abb2",
@@ -96,14 +126,20 @@
       "targetAnchor": "unheaded-block-5",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/distillery.md#unheaded-block-3 (source lines 23-27) is carried at docs/platform/distillery/spec.md#unheaded-block-5 (candidate lines 45-49). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded block unheaded-block-3 lines 23-27 to unheaded-block-5 lines 45-49, equal full digest and ancestry, anchors exist, shard equals pack, source blob equals its pin; text not read line by line. Digest also hand-recomputed in a seeded independent script.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-10-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "334c0e187773d73024ba617a9bed97656d0bbbcfdd3dcc49b1a6c8fd90b13275",
       "targetAncestry": [
         "Distillery — Porting Lifecycle",
         "Entry Points & Triggers"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_f237c7dc974c7146bd3cd48a0a77d05d",
@@ -112,13 +148,19 @@
       "targetAnchor": "data-dictionary",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/distillery.md#data-dictionary (source lines 29-29) is carried at docs/platform/distillery/spec.md#data-dictionary (candidate lines 51-51). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "deep: seeded sample. Heading section data-dictionary (starts Field Meaning) read in full both directions: source lines 29-29 equal target lines 51-51 byte for byte, shifted only by the 22 added lines; rationale (short heading title makes it Weak-exact, digest equal, whole unit carried) is true; no link rewrite. Digest also hand-recomputed in a seeded independent script.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-10-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "b0061eedc26338d900dcd637e1fecd0b447d89f7be32b6665942b2a39bcffd0c",
       "targetAncestry": [
         "Distillery — Porting Lifecycle"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_a299172986d37bd5b62d22f36bbb8779",
@@ -127,14 +169,20 @@
       "targetAnchor": "unheaded-block-6",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/distillery.md#unheaded-block-4 (source lines 31-41) is carried at docs/platform/distillery/spec.md#unheaded-block-6 (candidate lines 53-63). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded block unheaded-block-4 lines 31-41 to unheaded-block-6 lines 53-63, equal full digest and ancestry, anchors exist, shard equals pack, source blob equals its pin; text not read line by line.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-10-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "3f0f6269d0ff09f0df3c6666b873653c8d001b1771a137fa043bec48268e6834",
       "targetAncestry": [
         "Distillery — Porting Lifecycle",
         "Data Dictionary"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_1672eea7b12dcca590a6976253d8f4c9",
@@ -143,13 +191,19 @@
       "targetAnchor": "behaviors-operations",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/distillery.md#behaviors-operations (source lines 43-43) is carried at docs/platform/distillery/spec.md#behaviors-operations (candidate lines 65-65). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "deep: seeded sample. Heading section behaviors-operations (starts Advance a candidate's status.) read in full both directions: source lines 43-43 equal target lines 65-65 byte for byte, shifted only by the 22 added lines; rationale (short heading title makes it Weak-exact, digest equal, whole unit carried) is true; no link rewrite.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-10-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "8944ba7233c55864d1d718a2e6a33aae31d0e4623adeb8eb6f911026282ed1f1",
       "targetAncestry": [
         "Distillery — Porting Lifecycle"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_f9628d49e013fa3d4269ec432b7ba443",
@@ -158,14 +212,20 @@
       "targetAnchor": "unheaded-block-7",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/distillery.md#unheaded-block-5 (source lines 45-62) is carried at docs/platform/distillery/spec.md#unheaded-block-7 (candidate lines 67-84). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded block unheaded-block-5 lines 45-62 to unheaded-block-7 lines 67-84, equal full digest and ancestry, anchors exist, shard equals pack, source blob equals its pin; text not read line by line.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-10-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "51355c05a9fd75683883f82bc4d1d691274ca95e8d83722abe0933860c4bef99",
       "targetAncestry": [
         "Distillery — Porting Lifecycle",
         "Behaviors & Operations"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_5c674a057e92715ff96b88a32ae0f3f4",
@@ -174,14 +234,20 @@
       "targetAnchor": "unheaded-block-8",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/distillery.md#unheaded-block-6 (source lines 64-80) is carried at docs/platform/distillery/spec.md#unheaded-block-8 (candidate lines 86-102). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded block unheaded-block-6 lines 64-80 to unheaded-block-8 lines 86-102, equal full digest and ancestry, anchors exist, shard equals pack, source blob equals its pin; text not read line by line. Digest also hand-recomputed in a seeded independent script.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-10-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "02543d603ca0b1be88bae787b73b2603664554883fc89896ab0f0e916e3287c4",
       "targetAncestry": [
         "Distillery — Porting Lifecycle",
         "Behaviors & Operations"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_7af861c8f84a4a69a8e1bf2c05073f03",
@@ -190,13 +256,19 @@
       "targetAnchor": "actors-access",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/distillery.md#actors-access (source lines 82-82) is carried at docs/platform/distillery/spec.md#actors-access (candidate lines 104-104). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "deep: seeded sample. Heading section actors-access (starts - Operator/agent — anyone with access to the distillery tooling. No) read in full both directions: source lines 82-82 equal target lines 104-104 byte for byte, shifted only by the 22 added lines; rationale (short heading title makes it Weak-exact, digest equal, whole unit carried) is true; no link rewrite.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-10-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "af0dc11faf7105cb162d9ac1088a5b1c0cd5f5eeec2774b7004540fe897fd326",
       "targetAncestry": [
         "Distillery — Porting Lifecycle"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_00affff32942b999e43d36d74d1d9917",
@@ -205,14 +277,20 @@
       "targetAnchor": "unheaded-block-9",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/distillery.md#unheaded-block-7 (source lines 84-86) is carried at docs/platform/distillery/spec.md#unheaded-block-9 (candidate lines 106-108). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded block unheaded-block-7 lines 84-86 to unheaded-block-9 lines 106-108, equal full digest and ancestry, anchors exist, shard equals pack, source blob equals its pin; text not read line by line.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-10-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "ecbc1e3549a472da566e42516264977768db33d26faedc079f50e6d641b9dc01",
       "targetAncestry": [
         "Distillery — Porting Lifecycle",
         "Actors & Access"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_edc3a60c5df1d6a3d5180c628f8f97ba",
@@ -221,13 +299,19 @@
       "targetAnchor": "business-rules",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/distillery.md#business-rules (source lines 88-88) is carried at docs/platform/distillery/spec.md#business-rules (candidate lines 110-110). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "deep: seeded sample. Heading section business-rules (starts - R1. The lifecycle governs the Status field only. Score, Local,) read in full both directions: source lines 88-88 equal target lines 110-110 byte for byte, shifted only by the 22 added lines; rationale (short heading title makes it Weak-exact, digest equal, whole unit carried) is true; no link rewrite.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-10-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "bf43300daaca9c3415aecfd3aa504ea3ef398b02ba4d9a78406d930e813fbc1e",
       "targetAncestry": [
         "Distillery — Porting Lifecycle"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_637b69327d2486602ee428a8b90936c8",
@@ -236,14 +320,20 @@
       "targetAnchor": "unheaded-block-10",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/distillery.md#unheaded-block-8 (source lines 90-98) is carried at docs/platform/distillery/spec.md#unheaded-block-10 (candidate lines 112-120). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded block unheaded-block-8 lines 90-98 to unheaded-block-10 lines 112-120, equal full digest and ancestry, anchors exist, shard equals pack, source blob equals its pin; text not read line by line.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-10-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f770390c5ca45f6660f36a2c5dff4a537e9b0ac7a021d4a00c09643851c1d49b",
       "targetAncestry": [
         "Distillery — Porting Lifecycle",
         "Business Rules"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_9d1d7d136b9a9ff869d6af4a12e042cc",
@@ -252,13 +342,19 @@
       "targetAnchor": "edge-cases-settled",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/distillery.md#edge-cases-settled (source lines 100-100) is carried at docs/platform/distillery/spec.md#edge-cases-settled (candidate lines 122-122). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "deep: seeded sample. Heading section edge-cases-settled (starts - A candidate may end its life either by being rejected outright (neve) read in full both directions: source lines 100-100 equal target lines 122-122 byte for byte, shifted only by the 22 added lines; rationale (short heading title makes it Weak-exact, digest equal, whole unit carried) is true; no link rewrite.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-10-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "1bb6dbe7fdbfd4c9a7f067777e5cbeaa6b0af5a21bcd9633f5c2de56e164293b",
       "targetAncestry": [
         "Distillery — Porting Lifecycle"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_4e14a24a1ef22e30a058748641d53ec4",
@@ -267,14 +363,20 @@
       "targetAnchor": "unheaded-block-11",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/distillery.md#unheaded-block-9 (source lines 102-110) is carried at docs/platform/distillery/spec.md#unheaded-block-11 (candidate lines 124-132). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded block unheaded-block-9 lines 102-110 to unheaded-block-11 lines 124-132, equal full digest and ancestry, anchors exist, shard equals pack, source blob equals its pin; text not read line by line.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-10-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "60a616595e9c4ddd3d8a4514541aaf9c72c57b1bcc93d97889c5769189adc60d",
       "targetAncestry": [
         "Distillery — Porting Lifecycle",
         "Edge Cases Settled"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_10b6865dee162e3401febaf6d905128f",
@@ -283,13 +385,19 @@
       "targetAnchor": "open-gaps",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/distillery.md#open-gaps (source lines 112-112) is carried at docs/platform/distillery/spec.md#open-gaps (candidate lines 134-134). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "deep: seeded sample. Heading section open-gaps (starts - The status-change command currently must be run from the project's o) read in full both directions: source lines 112-112 equal target lines 134-134 byte for byte, shifted only by the 22 added lines; rationale (short heading title makes it Weak-exact, digest equal, whole unit carried) is true; no link rewrite.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-10-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "3fd19bb3ad9f0ce5f6db178d1904f98fd67c78ddb7b39f1eb70cd561e52faadd",
       "targetAncestry": [
         "Distillery — Porting Lifecycle"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_4e61f8ab46c7791e563a905c6dcc2ba4",
@@ -298,14 +406,20 @@
       "targetAnchor": "unheaded-block-12",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/distillery.md#unheaded-block-10 (source lines 114-128) is carried at docs/platform/distillery/spec.md#unheaded-block-12 (candidate lines 136-150). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded block unheaded-block-10 lines 114-128 to unheaded-block-12 lines 136-150, equal full digest and ancestry, anchors exist, shard equals pack, source blob equals its pin; text not read line by line.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-10-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "78a40b7774cf741b2728ba02969e60ad06b066734352b3445238c6cfb4c11b00",
       "targetAncestry": [
         "Distillery — Porting Lifecycle",
         "Open Gaps"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_a81c4bc7792d5b2b576357b9543176fa",
@@ -314,13 +428,19 @@
       "targetAnchor": "pointers-implementation",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/distillery.md#pointers-implementation (source lines 130-130) is carried at docs/platform/distillery/spec.md#pointers-implementation (candidate lines 152-152). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "deep: seeded sample. Heading section pointers-implementation (starts - CLI command: .agents/skills/distill/scripts/distill.mjs ( move verb)) read in full both directions: source lines 130-130 equal target lines 152-152 byte for byte, shifted only by the 22 added lines; rationale (short heading title makes it Weak-exact, digest equal, whole unit carried) is true; no link rewrite. Digest also hand-recomputed in a seeded independent script.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-10-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "321c80e2289d089428120f6fb75f0ae62f81dd71cfe860c2f74b848981effb37",
       "targetAncestry": [
         "Distillery — Porting Lifecycle"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_f94cf2b9ad1454f4fb3811c1cce319e6",
@@ -329,14 +449,20 @@
       "targetAnchor": "unheaded-block-13",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/distillery.md#unheaded-block-11 (source lines 132-138) is carried at docs/platform/distillery/spec.md#unheaded-block-13 (candidate lines 154-160). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/distillery.md verbatim in docs/platform/distillery/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded block unheaded-block-11 lines 132-138 to unheaded-block-13 lines 154-160, equal full digest and ancestry, anchors exist, shard equals pack, source blob equals its pin; text not read line by line.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-10-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "9423d35eb1a6338d9bcdac92d5492002e9328db395a488a88bd848e20be94289",
       "targetAncestry": [
         "Distillery — Porting Lifecycle",
         "Pointers (implementation)"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     }
   ]
 }

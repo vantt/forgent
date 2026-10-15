@@ -17,11 +17,15 @@ for(const row of rows){
  const b=fs.readFileSync(row.source),text=b.toString('utf8'),units=row.source.endsWith('.md')?gen.extractMarkdownConservationUnits(text):gen.extractMixedFileConservationUnit(row.source,text),ls=text.split('\n');
  const direct=lines.filter(l=>l.path!==row.source&&(l.text.includes(row.source)||l.text.includes(path.basename(row.source))));
  const hs=units.filter(u=>u.unitKind==='heading'); const starts=[{startLine:1,title:'Preamble',anchor:'preamble'},...hs];
+ // Descendants inherit explicit decision-history placement. Mixed rollout/settled-facts
+ // headings keep their existing section rules: their children can describe current recipes.
+ const headingStack=[], decisionHistorySections=new Set();
+ for(const h of hs){while(headingStack.length&&headingStack.at(-1).level>=h.level)headingStack.pop();if(headingStack.some(a=>/(?:Lịch sử quyết định|Quyết định của proposal)/.test(a.title)))decisionHistorySections.add(h.anchor);headingStack.push(h);}
  const sections=starts.map((s,i)=>{const end=(starts[i+1]?.startLine||ls.length+1)-1;if(end<s.startLine)return null;const shown=ls.slice(s.startLine-1,end).join('\n');if(!shown.trim())return null;
  const citedPaths=[...new Set(shown.match(/(?:src|packages|apps|bin|core|domains|scripts|test)\/[A-Za-z0-9_./-]+\.(?:mjs|js|ts|tsx|rs|yaml|json)/g)||[])].filter(fs.existsSync);
  const symbols=[...new Set(shown.match(/\b(?:[A-Z][a-z]+){2,}[A-Za-z0-9]*\b/g)||[])].filter(s=>s.length>7);
  let symbolHits=[];if(symbols.length){try{const out=execFileSync('rg',['-l','-F',...symbols.flatMap(s=>['-e',s]),...['src','packages','apps','bin','core','domains','scripts','test'].filter(fs.existsSync),'-g','!**/target/**','-g','!**/node_modules/**'],{encoding:'utf8',maxBuffer:2*1024*1024});symbolHits=out.trim().split('\n').filter(Boolean);}catch(e){if(e.status!==1)throw e;}}
- const historic= /(?:Lịch sử|Quyết định của proposal|Lộ trình rollout|13\.1 |13\.3 |Kết quả giải quyết)/.test(s.title);
+ const historic= decisionHistorySections.has(s.anchor)|| /(?:Lịch sử|Quyết định của proposal|Lộ trình rollout|13\.1 |13\.3 |Kết quả giải quyết)/.test(s.title);
  return {heading:s.title,anchor:s.anchor,startLine:s.startLine,endLine:end,sha256:sha(shown),classification:row.source.includes('/generated/')?'generated-projection':historic?'historical-or-decision-carriage':'current-by-default',directReferenceCount:direct.length,implementationPaths:citedPaths,subjectSymbols:symbols,subjectHitPaths:symbolHits,retired:false,retirementEligible:false,reason:historic?'Preserve historical evidence/decision and its live citations; placement does not claim that its current assertions are true.':direct.length||citedPaths.length||symbolHits.length?'Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28.':'No direct hit for this section; no retired-subject evidence either, so preserve current-by-default for independent triage.'};}).filter(Boolean);
  scan.files.push({...row,sourceBlob:git('rev-parse',`${pin}:${row.source}`),sourceSHA256:sha(b),bytes:b.length,units:units.length,directReferences:direct,sections});
 }

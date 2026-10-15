@@ -1,6 +1,6 @@
 # Specs and UI section liveness scan
 
-Source commit: `111adc51fd047d99121fd9d076eb4794c87045a4`. Rules: A19/P1, conservative section-level protection. Run before carriage. This is a liveness triage, not a current-truth approval. Full references, section hashes, cited implementation files and lexical subject hits are in `step8-liveness.json`. No subject is declared retired and no section is discarded. Historical placement does not erase current consumers.
+Source commit: `cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f`. Rules: A19/P1, conservative section-level protection. Run before carriage. This is a liveness triage, not a current-truth approval. Full references, section hashes, cited implementation files and lexical subject hits are in `step8-liveness.json`. No subject is declared retired and no section is discarded. Historical placement does not erase current consumers.
 
 | Source | Units | Sections | Live direct citations | Classification |
 |---|---:|---:|---:|---|

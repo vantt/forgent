@@ -50,13 +50,19 @@
       "targetAnchor": "unheaded-block-4",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/fgos-plugin.md#unheaded-block-2 (source lines 11-20) is carried at docs/platform/claude-plugin/spec.md#unheaded-block-4 (candidate lines 33-42). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded block unheaded-block-2 lines 11-20 to unheaded-block-4 lines 33-42, equal full digest and ancestry, anchors exist, shard equals pack, source blob equals its pin; text not read line by line.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "d2988254b0a58d5ddf41e20b1c4fdc5bf07a35b3214fa61c94034e6b0f194e3a",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_3459a397e8c559a737ea21058ac35bd8",
@@ -96,13 +102,19 @@
       "targetAnchor": "data-dictionary",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/fgos-plugin.md#data-dictionary (source lines 37-37) is carried at docs/platform/claude-plugin/spec.md#data-dictionary (candidate lines 59-59). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "deep: seeded sample. Heading section data-dictionary (starts # Element Meaning Values Required Default) read in full both directions: source lines 37-37 equal target lines 59-59 byte for byte, shifted only by the 22 added lines; rationale (short heading title makes it Weak-exact, digest equal, whole unit carried) is true; no link rewrite.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "5f7bbc0ccb0a688217a410356a618559820b7dfd24315cdd7dde1ca8ba7df0be",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_b78f1258e64bd182d527105502e087be",
@@ -111,14 +123,20 @@
       "targetAnchor": "unheaded-block-6",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/fgos-plugin.md#unheaded-block-4 (source lines 39-45) is carried at docs/platform/claude-plugin/spec.md#unheaded-block-6 (candidate lines 61-67). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded block unheaded-block-4 lines 39-45 to unheaded-block-6 lines 61-67, equal full digest and ancestry, anchors exist, shard equals pack, source blob equals its pin; text not read line by line. Digest also hand-recomputed in a seeded independent script.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "c4423a6e79bd0e75d2d4ddce1e935e386ad69ad08b3411958a40879bf0a320f9",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Data Dictionary"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_3ec4250ed3c32495b43a85a96c5cff70",
@@ -127,13 +145,19 @@
       "targetAnchor": "behaviors-operations",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/fgos-plugin.md#behaviors-operations (source lines 47-47) is carried at docs/platform/claude-plugin/spec.md#behaviors-operations (candidate lines 69-69). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: heading behaviors-operations lines 47-47 to 69-69, equal full digest and ancestry, both anchors exist, shard equals pack, whole-file diff shows only the labelled insertion; text not read line by line.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_18ee900e609f459c318ac5997c68203b",
@@ -142,14 +166,20 @@
       "targetAnchor": "submit",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/fgos-plugin.md#submit (source lines 49-49) is carried at docs/platform/claude-plugin/spec.md#submit (candidate lines 71-71). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "deep: seeded sample. Heading section submit (starts - Blocked when: the free-text description is empty — the person is ask) read in full both directions: source lines 49-49 equal target lines 71-71 byte for byte, shifted only by the 22 added lines; rationale (short heading title makes it Weak-exact, digest equal, whole unit carried) is true; no link rewrite.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "69f4f3df21e60aa76283ace9189d4fab1934f4357c3550953af6e3c6de7953c1",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Behaviors & Operations"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_385aed77384716abfc069f4a48427d88",
@@ -158,15 +188,21 @@
       "targetAnchor": "unheaded-block-7",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/fgos-plugin.md#unheaded-block-5 (source lines 51-54) is carried at docs/platform/claude-plugin/spec.md#unheaded-block-7 (candidate lines 73-76). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded block unheaded-block-5 lines 51-54 to unheaded-block-7 lines 73-76, equal full digest and ancestry, anchors exist, shard equals pack, source blob equals its pin; text not read line by line.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "69ee36940c62e85bae6cb0a8f6133292739fd5a659908adf38e9895c800d756c",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Behaviors & Operations",
         "submit"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_daaf32f4b9ef0e4299e44b84d6def08d",
@@ -175,14 +211,20 @@
       "targetAnchor": "pick",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/fgos-plugin.md#pick (source lines 56-56) is carried at docs/platform/claude-plugin/spec.md#pick (candidate lines 78-78). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: heading pick lines 56-56 to 78-78, equal full digest and ancestry, both anchors exist, shard equals pack, whole-file diff shows only the labelled insertion; text not read line by line.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "9ac86adeef720db1e216359a68e7c1d5542d52f83de82a1d599adb1b87d8e8fa",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Behaviors & Operations"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_8fb4083ea46573d60c5f2546534a4066",
@@ -191,15 +233,21 @@
       "targetAnchor": "unheaded-block-8",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/fgos-plugin.md#unheaded-block-6 (source lines 58-61) is carried at docs/platform/claude-plugin/spec.md#unheaded-block-8 (candidate lines 80-83). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded block unheaded-block-6 lines 58-61 to unheaded-block-8 lines 80-83, equal full digest and ancestry, anchors exist, shard equals pack, source blob equals its pin; text not read line by line.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "3248bbfe3551bed95fbe752e14d15dbf2423cf3faedfebe7861ded08cea3848b",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Behaviors & Operations",
         "pick"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_c994cd3014f1e2d3ff41b2cfc002208c",
@@ -208,14 +256,20 @@
       "targetAnchor": "move",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/fgos-plugin.md#move (source lines 63-63) is carried at docs/platform/claude-plugin/spec.md#move (candidate lines 85-85). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: heading move lines 63-63 to 85-85, equal full digest and ancestry, both anchors exist, shard equals pack, whole-file diff shows only the labelled insertion; text not read line by line. Digest also hand-recomputed in a seeded independent script.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f554e2ae143d2fed3e65a0d422e0e8a61fd730f97478424bef8c1b53d463e507",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Behaviors & Operations"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_a24a497ee44ed4600b872d298d5be9b2",
@@ -224,15 +278,21 @@
       "targetAnchor": "unheaded-block-9",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/fgos-plugin.md#unheaded-block-7 (source lines 65-68) is carried at docs/platform/claude-plugin/spec.md#unheaded-block-9 (candidate lines 87-90). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded block unheaded-block-7 lines 65-68 to unheaded-block-9 lines 87-90, equal full digest and ancestry, anchors exist, shard equals pack, source blob equals its pin; text not read line by line.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "bf99b50c0e43c39c941d57769068ae7d464d50c9b1424200b8e2db515b3c33f0",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Behaviors & Operations",
         "move"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_d02d04f7aac6728db08f6b541554038c",
@@ -241,14 +301,20 @@
       "targetAnchor": "return",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/fgos-plugin.md#return (source lines 70-70) is carried at docs/platform/claude-plugin/spec.md#return (candidate lines 92-92). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "deep: seeded sample. Heading section return (starts - Blocked when: the item id does not exist, or is not currently in a s) read in full both directions: source lines 70-70 equal target lines 92-92 byte for byte, shifted only by the 22 added lines; rationale (short heading title makes it Weak-exact, digest equal, whole unit carried) is true; no link rewrite.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "1184c298d87f52f7092d885200d943efc6da34304b13cfb7f76a2e93f9cc66e6",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Behaviors & Operations"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_e060be5e6acfef53337f6b999131cdce",
@@ -257,15 +323,21 @@
       "targetAnchor": "unheaded-block-10",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/fgos-plugin.md#unheaded-block-8 (source lines 72-75) is carried at docs/platform/claude-plugin/spec.md#unheaded-block-10 (candidate lines 94-97). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded block unheaded-block-8 lines 72-75 to unheaded-block-10 lines 94-97, equal full digest and ancestry, anchors exist, shard equals pack, source blob equals its pin; text not read line by line.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "277f2f5f4050e839469b2e30ec823c030fa3eb8484e123bf7ab838602344ab36",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Behaviors & Operations",
         "return"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_4d90e0f091439b7e3c59aacbf3ed4884",
@@ -274,14 +346,20 @@
       "targetAnchor": "ask",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/fgos-plugin.md#ask (source lines 77-77) is carried at docs/platform/claude-plugin/spec.md#ask (candidate lines 99-99). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: heading ask lines 77-77 to 99-99, equal full digest and ancestry, both anchors exist, shard equals pack, whole-file diff shows only the labelled insertion; text not read line by line.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "42231be494cebd0f44c944374d001b5720ab870ebd0f1891ad88b1d5befe0a5d",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Behaviors & Operations"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_5d1a541d049da86b8276fd5bca6a6ca1",
@@ -290,15 +368,21 @@
       "targetAnchor": "unheaded-block-11",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/fgos-plugin.md#unheaded-block-9 (source lines 79-82) is carried at docs/platform/claude-plugin/spec.md#unheaded-block-11 (candidate lines 101-104). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded block unheaded-block-9 lines 79-82 to unheaded-block-11 lines 101-104, equal full digest and ancestry, anchors exist, shard equals pack, source blob equals its pin; text not read line by line. Digest also hand-recomputed in a seeded independent script.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "557f85599964f0fff74ee36cdecd5fd745b8178192267939c973f1e4ffc2722c",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Behaviors & Operations",
         "ask"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_9f72e7f53d957604a35a4f033d1dcbb8",
@@ -307,14 +391,20 @@
       "targetAnchor": "answer",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/fgos-plugin.md#answer (source lines 84-84) is carried at docs/platform/claude-plugin/spec.md#answer (candidate lines 106-106). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: heading answer lines 84-84 to 106-106, equal full digest and ancestry, both anchors exist, shard equals pack, whole-file diff shows only the labelled insertion; text not read line by line.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "7db9db28197c1f24ed1332ec697e4415283e25961e0feb1bdf1758b8a01493d6",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Behaviors & Operations"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_b1dd08c917b5378afded6ca097985955",
@@ -323,15 +413,21 @@
       "targetAnchor": "unheaded-block-12",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/fgos-plugin.md#unheaded-block-10 (source lines 86-89) is carried at docs/platform/claude-plugin/spec.md#unheaded-block-12 (candidate lines 108-111). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded block unheaded-block-10 lines 86-89 to unheaded-block-12 lines 108-111, equal full digest and ancestry, anchors exist, shard equals pack, source blob equals its pin; text not read line by line.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "a4b9943bc3c6e66737b9d80f3679611b3285299feedf1815d367d8ea48b7f78d",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Behaviors & Operations",
         "answer"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_21db618b26ccfc7d18d41e3dd2188b2a",
@@ -340,14 +436,20 @@
       "targetAnchor": "ready",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/fgos-plugin.md#ready (source lines 91-91) is carried at docs/platform/claude-plugin/spec.md#ready (candidate lines 113-113). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "deep: seeded sample. Heading section ready (starts - Runs when: invoked with no argument.) read in full both directions: source lines 91-91 equal target lines 113-113 byte for byte, shifted only by the 22 added lines; rationale (short heading title makes it Weak-exact, digest equal, whole unit carried) is true; no link rewrite.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "7e068866eabcfe636caa83acbf69276ca039f15a26b58acabe6382f1ab43e7f4",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Behaviors & Operations"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_9010b5e75fd37710c5f44ad96a55639c",
@@ -356,15 +458,21 @@
       "targetAnchor": "unheaded-block-13",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/fgos-plugin.md#unheaded-block-11 (source lines 93-96) is carried at docs/platform/claude-plugin/spec.md#unheaded-block-13 (candidate lines 115-118). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded block unheaded-block-11 lines 93-96 to unheaded-block-13 lines 115-118, equal full digest and ancestry, anchors exist, shard equals pack, source blob equals its pin; text not read line by line.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f74520870a5e9a82d39e255bf81abc8ceafd05921cedb345756469bf567a8924",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Behaviors & Operations",
         "ready"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_f03a55e90d7410ff87e42a2c0bd78036",
@@ -373,14 +481,20 @@
       "targetAnchor": "stale",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/fgos-plugin.md#stale (source lines 98-98) is carried at docs/platform/claude-plugin/spec.md#stale (candidate lines 120-120). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: heading stale lines 98-98 to 120-120, equal full digest and ancestry, both anchors exist, shard equals pack, whole-file diff shows only the labelled insertion; text not read line by line. Digest also hand-recomputed in a seeded independent script.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "9a38b884fbb3be329f3ea305ba78dafdf134ba78cac639a85aa448461138f192",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Behaviors & Operations"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_0346f6df67ee90d852cbf6b82a44e102",
@@ -389,15 +503,21 @@
       "targetAnchor": "unheaded-block-14",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/fgos-plugin.md#unheaded-block-12 (source lines 100-103) is carried at docs/platform/claude-plugin/spec.md#unheaded-block-14 (candidate lines 122-125). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded block unheaded-block-12 lines 100-103 to unheaded-block-14 lines 122-125, equal full digest and ancestry, anchors exist, shard equals pack, source blob equals its pin; text not read line by line.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "a6e56e7f186ae8caba61e67a7409c2326933f9fa5c42f7ded397110d75639bf4",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Behaviors & Operations",
         "stale"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_7488655fde00478506a8a1faa605a42a",
@@ -406,14 +526,20 @@
       "targetAnchor": "rollup",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/fgos-plugin.md#rollup (source lines 105-105) is carried at docs/platform/claude-plugin/spec.md#rollup (candidate lines 127-127). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: heading rollup lines 105-105 to 127-127, equal full digest and ancestry, both anchors exist, shard equals pack, whole-file diff shows only the labelled insertion; text not read line by line.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2591c2c85553fdfc314114ab25b86b6297f87cf296df453e528cc2336963de1c",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Behaviors & Operations"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_31e7045fdfec6efddb4c1ba1c5c9d667",
@@ -422,15 +548,21 @@
       "targetAnchor": "unheaded-block-15",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/fgos-plugin.md#unheaded-block-13 (source lines 107-110) is carried at docs/platform/claude-plugin/spec.md#unheaded-block-15 (candidate lines 129-132). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded block unheaded-block-13 lines 107-110 to unheaded-block-15 lines 129-132, equal full digest and ancestry, anchors exist, shard equals pack, source blob equals its pin; text not read line by line.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "4c8071c71c115b559f27ed2cad3a156e32341c1758e1cfd2363c9610d06a4af6",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Behaviors & Operations",
         "rollup"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_40755fce3ffebb9c3cd2f88f379038a2",
@@ -472,14 +604,20 @@
       "targetAnchor": "graph",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/fgos-plugin.md#graph (source lines 119-119) is carried at docs/platform/claude-plugin/spec.md#graph (candidate lines 141-141). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: heading graph lines 119-119 to 141-141, equal full digest and ancestry, both anchors exist, shard equals pack, whole-file diff shows only the labelled insertion; text not read line by line.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "a3ac30bd6417b01ef703a8aad0ed671848ddba9d2e5be011dc3dad856b31b334",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Behaviors & Operations"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_23f3500fb4d183df2bfccc49e503277c",
@@ -488,15 +626,21 @@
       "targetAnchor": "unheaded-block-17",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/fgos-plugin.md#unheaded-block-15 (source lines 121-124) is carried at docs/platform/claude-plugin/spec.md#unheaded-block-17 (candidate lines 143-146). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded block unheaded-block-15 lines 121-124 to unheaded-block-17 lines 143-146, equal full digest and ancestry, anchors exist, shard equals pack, source blob equals its pin; text not read line by line. Digest also hand-recomputed in a seeded independent script.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "cc42ca44f1f20f3a20b2ae3c472c41e3ce256c283f9cc81f00ee7fabf4d3a721",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Behaviors & Operations",
         "graph"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_d249423f3f854623b4924fabe7996e69",
@@ -505,14 +649,20 @@
       "targetAnchor": "conflicts",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/fgos-plugin.md#conflicts (source lines 126-126) is carried at docs/platform/claude-plugin/spec.md#conflicts (candidate lines 148-148). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "deep: seeded sample. Heading section conflicts (starts - Runs when: invoked with no argument.) read in full both directions: source lines 126-126 equal target lines 148-148 byte for byte, shifted only by the 22 added lines; rationale (short heading title makes it Weak-exact, digest equal, whole unit carried) is true; no link rewrite.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "74c55704f46e9f7586335e2f4e9bbb42b12a739f60dd18a75c71cc210983ddf5",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Behaviors & Operations"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_50c93fdb3fd4fd3b6df90a9c6988209c",
@@ -521,15 +671,21 @@
       "targetAnchor": "unheaded-block-18",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/fgos-plugin.md#unheaded-block-16 (source lines 128-131) is carried at docs/platform/claude-plugin/spec.md#unheaded-block-18 (candidate lines 150-153). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded block unheaded-block-16 lines 128-131 to unheaded-block-18 lines 150-153, equal full digest and ancestry, anchors exist, shard equals pack, source blob equals its pin; text not read line by line.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "3cb73398342551d4386bd987ddb2b74058cfafa4fbbaca660057d11379725122",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Behaviors & Operations",
         "conflicts"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_c4c6b55686b7e315f34ae005173b79db",
@@ -538,13 +694,19 @@
       "targetAnchor": "actors-access",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/fgos-plugin.md#actors-access (source lines 133-133) is carried at docs/platform/claude-plugin/spec.md#actors-access (candidate lines 155-155). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "deep: seeded sample. Heading section actors-access (starts Capability Person in a Claude Code session) read in full both directions: source lines 133-133 equal target lines 155-155 byte for byte, shifted only by the 22 added lines; rationale (short heading title makes it Weak-exact, digest equal, whole unit carried) is true; no link rewrite.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "4be8acef415d77200e8b8bef2f2f78665c99cf7882f2395a2597c5b9b99c8f01",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_32b42cc343ea5bed231dbfd43ef4b433",
@@ -553,14 +715,20 @@
       "targetAnchor": "unheaded-block-19",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/fgos-plugin.md#unheaded-block-17 (source lines 135-138) is carried at docs/platform/claude-plugin/spec.md#unheaded-block-19 (candidate lines 157-160). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded block unheaded-block-17 lines 135-138 to unheaded-block-19 lines 157-160, equal full digest and ancestry, anchors exist, shard equals pack, source blob equals its pin; text not read line by line.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e02f12896615760aad3f55c30a0d47c09cf0019eb7e05580b82722c372172891",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Actors & Access"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_dd811f34a76357f46fd5bdf22fc90c93",
@@ -569,14 +737,20 @@
       "targetAnchor": "unheaded-block-20",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/fgos-plugin.md#unheaded-block-18 (source lines 140-142) is carried at docs/platform/claude-plugin/spec.md#unheaded-block-20 (candidate lines 162-164). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded block unheaded-block-18 lines 140-142 to unheaded-block-20 lines 162-164, equal full digest and ancestry, anchors exist, shard equals pack, source blob equals its pin; text not read line by line. Digest also hand-recomputed in a seeded independent script.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "a07dd8cc5608f2eb02359c77e86e8b33e108977fb591ad984ca41fc1e5791e9e",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Actors & Access"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_e7a3305a9d3e88e30a1d14fabe67f161",
@@ -616,13 +790,19 @@
       "targetAnchor": "edge-cases-settled",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/fgos-plugin.md#edge-cases-settled (source lines 151-151) is carried at docs/platform/claude-plugin/spec.md#edge-cases-settled (candidate lines 173-173). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: heading edge-cases-settled lines 151-151 to 173-173, equal full digest and ancestry, both anchors exist, shard equals pack, whole-file diff shows only the labelled insertion; text not read line by line. Digest also hand-recomputed in a seeded independent script.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "0860af295dafd0754f4998f0a8c294ddea276498c7e153d228acfe68ff9009af",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_59bc02175a2f8dc3faff32956d7b57d7",
@@ -631,14 +811,20 @@
       "targetAnchor": "unheaded-block-22",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/fgos-plugin.md#unheaded-block-20 (source lines 153-154) is carried at docs/platform/claude-plugin/spec.md#unheaded-block-22 (candidate lines 175-176). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded block unheaded-block-20 lines 153-154 to unheaded-block-22 lines 175-176, equal full digest and ancestry, anchors exist, shard equals pack, source blob equals its pin; text not read line by line.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "8f6837b88c85ff3a553869172595c5ec1cb22a56c067fd324aa576673c536cc1",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Edge Cases Settled"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_ae9b022759d0facd00d2655cd08dee18",
@@ -678,13 +864,19 @@
       "targetAnchor": "visuals",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/fgos-plugin.md#visuals (source lines 160-160) is carried at docs/platform/claude-plugin/spec.md#visuals (candidate lines 182-182). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: heading visuals lines 160-160 to 182-182, equal full digest and ancestry, both anchors exist, shard equals pack, whole-file diff shows only the labelled insertion; text not read line by line.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "8ccc4d4b2d41a29dca37e0a2f76827b370f532a0105d0ec6f6938aa97e41c57d",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_ca6cdaccc48e3ff8da4532ff2fc1fa55",
@@ -693,14 +885,20 @@
       "targetAnchor": "unheaded-block-24",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
       "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/fgos-plugin.md#unheaded-block-22 (source lines 162-162) is carried at docs/platform/claude-plugin/spec.md#unheaded-block-24 (candidate lines 184-184). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/fgos-plugin.md verbatim in docs/platform/claude-plugin/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+      "reviewNote": "mechanical: unheaded block unheaded-block-22 lines 162-162 to unheaded-block-24 lines 184-184, equal full digest and ancestry, anchors exist, shard equals pack, source blob equals its pin; text not read line by line.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-08-1276467f3.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "15cc6bd4314b7981d203e220c5fe4e4c37dd75542ab1dc62aae55a8d3d1264e4",
       "targetAncestry": [
         "Spec: fgOS Plugin (Claude Code slash-command surface)",
         "Visuals"
-      ]
+      ],
+      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
     },
     {
       "claimId": "claim_f6f21cf211510779923bb69c1986f195",

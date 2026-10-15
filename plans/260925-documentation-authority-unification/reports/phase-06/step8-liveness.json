@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "sourceCommit": "111adc51fd047d99121fd9d076eb4794c87045a4",
+  "sourceCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f",
   "mapPin": "fd6c9ab9e8aac12f99462a1d4f1bf78448d6e9f7",
   "rules": [
     "A19",
@@ -46,59 +46,14 @@
       "units": 200,
       "directReferences": [
         {
-          "path": "docs/architect/documentation-system-discussion.md",
-          "line": 740,
-          "text": "- `docs/specs/confinement-authority.md` has strong structure:"
-        },
-        {
           "path": "src/setup/registrations.mjs",
           "line": 5175,
           "text": "// ─── Confinement Authority (Phase 01 R7, docs/specs/confinement-authority.md) ─"
         },
         {
-          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
-          "line": 5905,
-          "text": "    \"docs/specs/confinement-authority.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 207,
-          "text": "      \"path\": \"docs/specs/confinement-authority.md\","
-        },
-        {
-          "path": "docs/reference/dispatch-module-boundaries.md",
-          "line": 27,
-          "text": "| `dispatch/confinement/` | Confinement Authority subcomponent: one-door runtime execution wrapper (`executeThroughConfinement`), request builder, plan compiler, policy normalizer, backend registry and drivers (local `bwrap` v1 with 8 falsification probes), attestation generator, and evidence store. See `docs/specs/confinement-authority.md`. |"
-        },
-        {
-          "path": "docs/architecture-map.md",
-          "line": 372,
-          "text": "| **CTR010** | dispatch ↔ executor adapter | `confinement-authority.v1`: một cửa runtime duy nhất `executeThroughConfinement(request, adapterPort)` trước khi adapter được spawn agent; chuẩn hóa `confinement-policy.v1`, compile `confinement-plan.v1`, đối chiếu năng lực backend driver (`bwrap` v1 với 8 falsification probes), fail-closed cho `required`, cấm bypass thiếu full confinement, và phát `confinement-attestation.v1` bền | **live** | `src/runner/dispatch/confinement/` · spec `docs/specs/confinement-authority.md` |"
-        },
-        {
-          "path": "docs/transitional-switchboard.md",
-          "line": 59,
-          "text": "| Agent confinement | legacy-current | maintained-authority | `docs/specs/confinement-authority.md` | `src/runner/dispatch/confinement/**` | Spec owns runtime confinement contract, machine backend registry, and driver rules; verified by test suite. |"
-        },
-        {
-          "path": "docs/routing-handoff-contract.md",
-          "line": 88,
-          "text": "  trong `inputs/` của thư mục đó) và bị từ chối chạy nếu không thực thi được (`docs/specs/confinement-authority.md` §9.2)."
-        },
-        {
-          "path": "docs/how-to/configure-and-operate-agent-confinement.md",
-          "line": 264,
-          "text": "A Unit (or Workflow unit template) with `blind: true` runs every role with `hostRead: blind`: the worker cannot read a peer's run state (`.fgos/assignments`, `.fgos/workflow-runs`, `.fgos/dispatch-runs`), the herdr socket directory, another dispatch's private home or process list. It still reads the repo, tracked `.fgos` files and `node`, reads its own assignment directory (read-only) and writes its outbox. Blind needs a working bwrap backend and a fresh blind probe; otherwise the unit is refused, never run unblind. Inputs that live in the hidden run state (`unit-run:` and `gate-answer:` inputs, a panel synthesizer's panelist reports) reach each blind role as byte-identical copies in `inputs/` of its own assignment directory, neutral names (`seat-A`) with `anonymizeInputs`; a source that changed since it settled refuses the unit. The `delphi`, `nominal-group` and `group-cognition` panel steps that must not see each other run blind. Check readiness with the `confinement-blind-read` row of `fgos doctor`. Details: `docs/specs/confinement-authority.md` §9.2."
-        },
-        {
-          "path": "test/runner/dispatch-confinement-p04.test.mjs",
-          "line": 3,
-          "text": "// Spec: docs/specs/confinement-authority.md, plans/.../phase-04-required-enforcement-and-executor-migration.md"
-        },
-        {
-          "path": "test/runner/dispatch-confinement-p05.test.mjs",
-          "line": 3,
-          "text": "// Spec: docs/specs/confinement-authority.md, plans/.../phase-05-herdr-and-legacy-convergence.md"
+          "path": "docs/architect/documentation-system-discussion.md",
+          "line": 740,
+          "text": "- `docs/specs/confinement-authority.md` has strong structure:"
         },
         {
           "path": "src/runner/dispatch/confinement/request.mjs",
@@ -116,34 +71,39 @@
           "text": "// (Phase 02 R1-R7, docs/specs/confinement-authority.md §1, §5.2, §6.6, §6.9)."
         },
         {
-          "path": "docs/specs/runner.md",
-          "line": 1026,
-          "text": "  Selection evidence là Run-owned (`provider-capacity-selection.json`, effective execution contract/evidence) và chỉ được persist dạng redacted: provider, account id/label, lease owner, reason codes/quarantine state, `credentialProvisioned`; không persist credential home path, env values, token, `auth.json` bytes, raw digest/SHA-256. Provisioning của invocation bwrap (cli-spawn và herdr-spawn) dùng selected account `credentialSource` để copy vào private home trước spawn — kind `codex-home` copy `auth.json` vào private `CODEX_HOME`, kind `home-files` (`files`: danh sách đường dẫn tương đối, không `..`) copy đúng các file đó vào private home của agent khác (pi, agy), owner-only, giữ exec bit của helper; inventory vẫn chỉ ở `~/.fgos/config.json`, và pane herdr confine dựa vào nó để khởi động đã đăng nhập (`docs/specs/confinement-authority.md` §13.1, doctor `confined-pane-accounts`); mất/không đọc/copy lỗi thì fail closed trước spawn với class credential-provisioning/config, không quarantine account, không bind-mount real Codex home, và không còn dùng `FGOS_CODEX_CREDENTIAL_HOMES` hash rotation hay executor-id allowlist làm authority placement."
-        },
-        {
-          "path": "docs/specs/runner.md",
-          "line": 1093,
-          "text": "- **RUL77 ([ĐÃ BỊ THAY phần \"each door carries one posture lane\" bởi RUL90 (the raw dispatch doors are removed), decision 0062 — posture now comes from the Unit's `writes` plus the capability; \"an agent executor declares no `for`\" stands] posture belongs to the capability, an agent executor declares no `for`, and each door carries one posture lane; supersedes RUL76 (`execute <id> --for <capability>` with a \"must declare\" gate), 2026-10-13).** An agent executor can do any kind of work, so no `for` list describes it, and a list on one was read as the posture of every dispatch to it (`docs/specs/confinement-authority.md` already said a direct executor call must carry a capability anchor and never infer the minimum from `executor.for`). `resolveCapabilityDetailsFromHints` reads `for` from tool executors only; on an agent executor it is inert (config still loads, so projects and worktrees that carry one keep dispatching) and `fgos doctor` names it under `executor-profile-warnings` (`executor.<id>.agent-for-inert`); the agent executors' `for` lists are gone from this repo's `.fgos/config.json` (`decide --for` routing unchanged: it reads `capabilities.<name>.prefer`). The CLI door `execute <agent>` refuses before spawning when no `--for` is given (`capability-required`, listing the writing capabilities and the read-only door); programmatic callers (Assignment, Work) pass their own capability hints and are unchanged. `execute <agent> --for <capability>` runs the invocation that capability `prefer`s for that executor, else the first plain cli invocation with no sandbox backend, instead of always the first cli invocation. That door leases no provider account, so it carries writing work only: a capability with required confinement is refused (`posture-needs-assignment`). Read-only work runs sandboxed as a Workflow unit with `writes: []` (`fgos workflow start --units`), which binds the read-only posture and leases the account (the architecture-advisory seats ran that way: `confined-bwrap`, login provisioned); `execute --contract <file> --executor <id>` keeps a named provider and leases its account but runs unconfined, read-only by instruction only (measured: `execute openai --for code:review` on the bare door ran `codex-cli-bwrap` confined and got 401 with no login; the same read through `--contract --executor openai` answered, on `cli-spawn` with `confinement: null`). A sandboxed read-only door that also keeps a named provider does not exist yet. The calling agent answers Q1 (does it write? does a provider matter?) from prose doctrine in `core/skills/_shared/capability-matching.md`, with no classifier or workflow generator. Decided after an `architecture-advisory` run (`wf-run-1791875339761-10315b91`: framing and shaping with three blind seats and a synthesizer completed; critique was blocked by a Codex trust prompt, so no reviewed synthesis exists). Not built: a soft provider hint on `decide` (`--prefer`, the synthesizer's recommendation) — naming the executor on `execute` already lets a caller pick a provider, and the hint would change `bind()`, shared with Workflow binding; revisit when a caller needs \"this provider if it can, else any\". Since 2026-10-14 (RUL88 (ad-hoc Unit prefer and persona, the one-liner), decision 0061) that hint exists on the Unit, not on `decide`: `fgos run \"<prompt>\" --provider <id>` and an ad-hoc Unit's `prefer` try the provider first and fail over into the pool, and a read-only one-liner is the sandboxed read-only door that keeps a preferred provider."
-        },
-        {
-          "path": "docs/specs/runner.md",
-          "line": 1495,
-          "text": "**Vai mù thật sự (`blind`) — chặn đọc run state của peer.** Mặc định tắt (không đổi hành vi). Một cờ ở Unit (và ở `template` của Workflow): `blind: true` làm *mọi vai* của Unit chạy với `hostRead: blind` (`docs/specs/confinement-authority.md` §9.2): worker không đọc được `.fgos/assignments`, `.fgos/workflow-runs`, `.fgos/dispatch-runs` của project, thư mục socket herdr, private home của dispatch khác, hay `/proc/<pid>` của tiến trình anh em; chỉ đọc được thư mục của chính nó (brief, ref đã được trao — chỉ-đọc) và ghi outbox. Phần còn lại của host (repo, `node`, DNS) và file tracked trong `.fgos` không đổi. Unit `blind` không bao giờ chạy không-blind: nếu không thực thi được — `bind()` không chọn in-process/inline, không có bwrap, mode không `required`, probe hỏng/chưa tươi, `cwd` hay ref nằm trong vùng bị che — dispatch bị từ chối trước khi spawn với lý do có tên (`blind-in-process`, `blind-requires-confinement`, `blind-hides-workspace`, `blind-ref-hidden`, `confinement-probe-failed`, ...). Với Unit `blind`, input `unit-run:`/`gate-answer:` (và ref bất kỳ nằm trong vùng bị che) không được giao bằng đường dẫn gốc: lúc dispatch, `resolveUnitInputs` + `copyHandoffsInto` chép nguyên byte (kiểm sha256) vào `inputs/` của round dir của chính vai đó, mỗi vai một bản, tên trung tính khi có `anonymizeInputs`; `unit.json` giữ `inputMap`, resume dùng lại bản chép. `blind-ref-hidden` chỉ còn cho ref không chép được. Workflow bật `blind`: hai bước panel của `delphi` (`propose-round-1`, `propose-round-2`), `generate-ideas` của `nominal-group`, `sense-making-panel` của `group-cognition`, `shaping` của `architecture-advisory` (`core/workflows/architecture-advisory.yaml`) và `perspectives` của `business-discussion` (`core/workflows/business-discussion.yaml`)."
-        },
-        {
-          "path": "docs/specs/runner.md",
-          "line": 3142,
-          "text": "  4. **Pane confine cho cả năm họ** (claude, claude qua OpenRouter, codex, agy, pi): mỗi agent giữ state trong private home dựng từ account được lease; công thức và lý do ở [confinement-authority.md §13.1](./confinement-authority.md), account inventory toàn máy ở RUL65b (trên)."
-        },
-        {
-          "path": "docs/specs/reading-map.md",
-          "line": 39,
-          "text": "- `docs/specs/confinement-authority.md` + `src/runner/dispatch/confinement/` — Agent Confinement Authority: runtime one-door confinement enforcement (`executeThroughConfinement`), machine backend registry `~/.fgos/confinement-backends.json`, local `bwrap` v1 driver with 8 falsification probes, required fail-closed checks, attestation storage (`confinement-attestation.v1`), herdr convergence with shared `evaluateBypassPairing`, setup defaults and doctor checks; spec: docs/specs/confinement-authority.md Pane herdr confine cho agent không phải claude (codex/agy/pi): công thức private-home + account inventory + lịch sử các commit đã đi qua (và vì sao từng bị quên) ở §13.1."
-        },
-        {
           "path": "src/runner/dispatch/confinement/policies.mjs",
           "line": 2,
           "text": "// validation, and legacy normalization (Phase 01 R1-R4, docs/specs/confinement-authority.md §6.1-§6.2)."
+        },
+        {
+          "path": "scripts/check-legacy-docs-ratchet.baseline.json",
+          "line": 5905,
+          "text": "    \"docs/specs/confinement-authority.md\": {"
+        },
+        {
+          "path": "docs/transitional-switchboard.md",
+          "line": 59,
+          "text": "| Agent confinement | legacy-current | maintained-authority | `docs/specs/confinement-authority.md` | `src/runner/dispatch/confinement/**` | Spec owns runtime confinement contract, machine backend registry, and driver rules; verified by test suite. |"
+        },
+        {
+          "path": "docs/reference/dispatch-module-boundaries.md",
+          "line": 27,
+          "text": "| `dispatch/confinement/` | Confinement Authority subcomponent: one-door runtime execution wrapper (`executeThroughConfinement`), request builder, plan compiler, policy normalizer, backend registry and drivers (local `bwrap` v1 with 8 falsification probes), attestation generator, and evidence store. See `docs/specs/confinement-authority.md`. |"
+        },
+        {
+          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
+          "line": 207,
+          "text": "      \"path\": \"docs/specs/confinement-authority.md\","
+        },
+        {
+          "path": "docs/architecture-map.md",
+          "line": 372,
+          "text": "| **CTR010** | dispatch ↔ executor adapter | `confinement-authority.v1`: một cửa runtime duy nhất `executeThroughConfinement(request, adapterPort)` trước khi adapter được spawn agent; chuẩn hóa `confinement-policy.v1`, compile `confinement-plan.v1`, đối chiếu năng lực backend driver (`bwrap` v1 với 8 falsification probes), fail-closed cho `required`, cấm bypass thiếu full confinement, và phát `confinement-attestation.v1` bền | **live** | `src/runner/dispatch/confinement/` · spec `docs/specs/confinement-authority.md` |"
+        },
+        {
+          "path": "docs/how-to/configure-and-operate-agent-confinement.md",
+          "line": 264,
+          "text": "A Unit (or Workflow unit template) with `blind: true` runs every role with `hostRead: blind`: the worker cannot read a peer's run state (`.fgos/assignments`, `.fgos/workflow-runs`, `.fgos/dispatch-runs`), the herdr socket directory, another dispatch's private home or process list. It still reads the repo, tracked `.fgos` files and `node`, reads its own assignment directory (read-only) and writes its outbox. Blind needs a working bwrap backend and a fresh blind probe; otherwise the unit is refused, never run unblind. Inputs that live in the hidden run state (`unit-run:` and `gate-answer:` inputs, a panel synthesizer's panelist reports) reach each blind role as byte-identical copies in `inputs/` of its own assignment directory, neutral names (`seat-A`) with `anonymizeInputs`; a source that changed since it settled refuses the unit. The `delphi`, `nominal-group` and `group-cognition` panel steps that must not see each other run blind. Check readiness with the `confinement-blind-read` row of `fgos doctor`. Details: `docs/specs/confinement-authority.md` §9.2."
         },
         {
           "path": "docs/architect/agent-coordination/verification/confinement-authority-implementation/merge-to-main.md",
@@ -179,6 +139,46 @@
           "path": "docs/architect/agent-coordination/verification/confinement-authority-implementation/P00.md",
           "line": 56,
           "text": "- Spec §2's stale `0/17` denominator (`docs/specs/confinement-authority.md:59`, should read `0/18`) — substance correct, only the count is stale; outside P00's lease, a P07 (docs-closeout) item."
+        },
+        {
+          "path": "docs/specs/runner.md",
+          "line": 1026,
+          "text": "  Selection evidence là Run-owned (`provider-capacity-selection.json`, effective execution contract/evidence) và chỉ được persist dạng redacted: provider, account id/label, lease owner, reason codes/quarantine state, `credentialProvisioned`; không persist credential home path, env values, token, `auth.json` bytes, raw digest/SHA-256. Provisioning của invocation bwrap (cli-spawn và herdr-spawn) dùng selected account `credentialSource` để copy vào private home trước spawn — kind `codex-home` copy `auth.json` vào private `CODEX_HOME`, kind `home-files` (`files`: danh sách đường dẫn tương đối, không `..`) copy đúng các file đó vào private home của agent khác (pi, agy), owner-only, giữ exec bit của helper; inventory vẫn chỉ ở `~/.fgos/config.json`, và pane herdr confine dựa vào nó để khởi động đã đăng nhập (`docs/specs/confinement-authority.md` §13.1, doctor `confined-pane-accounts`); mất/không đọc/copy lỗi thì fail closed trước spawn với class credential-provisioning/config, không quarantine account, không bind-mount real Codex home, và không còn dùng `FGOS_CODEX_CREDENTIAL_HOMES` hash rotation hay executor-id allowlist làm authority placement."
+        },
+        {
+          "path": "docs/specs/runner.md",
+          "line": 1093,
+          "text": "- **RUL77 ([ĐÃ BỊ THAY phần \"each door carries one posture lane\" bởi RUL90 (the raw dispatch doors are removed), decision 0062 — posture now comes from the Unit's `writes` plus the capability; \"an agent executor declares no `for`\" stands] posture belongs to the capability, an agent executor declares no `for`, and each door carries one posture lane; supersedes RUL76 (`execute <id> --for <capability>` with a \"must declare\" gate), 2026-10-13).** An agent executor can do any kind of work, so no `for` list describes it, and a list on one was read as the posture of every dispatch to it (`docs/specs/confinement-authority.md` already said a direct executor call must carry a capability anchor and never infer the minimum from `executor.for`). `resolveCapabilityDetailsFromHints` reads `for` from tool executors only; on an agent executor it is inert (config still loads, so projects and worktrees that carry one keep dispatching) and `fgos doctor` names it under `executor-profile-warnings` (`executor.<id>.agent-for-inert`); the agent executors' `for` lists are gone from this repo's `.fgos/config.json` (`decide --for` routing unchanged: it reads `capabilities.<name>.prefer`). The CLI door `execute <agent>` refuses before spawning when no `--for` is given (`capability-required`, listing the writing capabilities and the read-only door); programmatic callers (Assignment, Work) pass their own capability hints and are unchanged. `execute <agent> --for <capability>` runs the invocation that capability `prefer`s for that executor, else the first plain cli invocation with no sandbox backend, instead of always the first cli invocation. That door leases no provider account, so it carries writing work only: a capability with required confinement is refused (`posture-needs-assignment`). Read-only work runs sandboxed as a Workflow unit with `writes: []` (`fgos workflow start --units`), which binds the read-only posture and leases the account (the architecture-advisory seats ran that way: `confined-bwrap`, login provisioned); `execute --contract <file> --executor <id>` keeps a named provider and leases its account but runs unconfined, read-only by instruction only (measured: `execute openai --for code:review` on the bare door ran `codex-cli-bwrap` confined and got 401 with no login; the same read through `--contract --executor openai` answered, on `cli-spawn` with `confinement: null`). A sandboxed read-only door that also keeps a named provider does not exist yet. The calling agent answers Q1 (does it write? does a provider matter?) from prose doctrine in `core/skills/_shared/capability-matching.md`, with no classifier or workflow generator. Decided after an `architecture-advisory` run (`wf-run-1791875339761-10315b91`: framing and shaping with three blind seats and a synthesizer completed; critique was blocked by a Codex trust prompt, so no reviewed synthesis exists). Not built: a soft provider hint on `decide` (`--prefer`, the synthesizer's recommendation) — naming the executor on `execute` already lets a caller pick a provider, and the hint would change `bind()`, shared with Workflow binding; revisit when a caller needs \"this provider if it can, else any\". Since 2026-10-14 (RUL88 (ad-hoc Unit prefer and persona, the one-liner), decision 0061) that hint exists on the Unit, not on `decide`: `fgos run \"<prompt>\" --provider <id>` and an ad-hoc Unit's `prefer` try the provider first and fail over into the pool, and a read-only one-liner is the sandboxed read-only door that keeps a preferred provider."
+        },
+        {
+          "path": "docs/specs/runner.md",
+          "line": 1495,
+          "text": "**Vai mù thật sự (`blind`) — chặn đọc run state của peer.** Mặc định tắt (không đổi hành vi). Một cờ ở Unit (và ở `template` của Workflow): `blind: true` làm *mọi vai* của Unit chạy với `hostRead: blind` (`docs/specs/confinement-authority.md` §9.2): worker không đọc được `.fgos/assignments`, `.fgos/workflow-runs`, `.fgos/dispatch-runs` của project, thư mục socket herdr, private home của dispatch khác, hay `/proc/<pid>` của tiến trình anh em; chỉ đọc được thư mục của chính nó (brief, ref đã được trao — chỉ-đọc) và ghi outbox. Phần còn lại của host (repo, `node`, DNS) và file tracked trong `.fgos` không đổi. Unit `blind` không bao giờ chạy không-blind: nếu không thực thi được — `bind()` không chọn in-process/inline, không có bwrap, mode không `required`, probe hỏng/chưa tươi, `cwd` hay ref nằm trong vùng bị che — dispatch bị từ chối trước khi spawn với lý do có tên (`blind-in-process`, `blind-requires-confinement`, `blind-hides-workspace`, `blind-ref-hidden`, `confinement-probe-failed`, ...). Với Unit `blind`, input `unit-run:`/`gate-answer:` (và ref bất kỳ nằm trong vùng bị che) không được giao bằng đường dẫn gốc: lúc dispatch, `resolveUnitInputs` + `copyHandoffsInto` chép nguyên byte (kiểm sha256) vào `inputs/` của round dir của chính vai đó, mỗi vai một bản, tên trung tính khi có `anonymizeInputs`; `unit.json` giữ `inputMap`, resume dùng lại bản chép. `blind-ref-hidden` chỉ còn cho ref không chép được. Workflow bật `blind`: hai bước panel của `delphi` (`propose-round-1`, `propose-round-2`), `generate-ideas` của `nominal-group`, `sense-making-panel` của `group-cognition`, `shaping` của `architecture-advisory` (`core/workflows/architecture-advisory.yaml`) và `perspectives` của `business-discussion` (`core/workflows/business-discussion.yaml`)."
+        },
+        {
+          "path": "docs/specs/runner.md",
+          "line": 3142,
+          "text": "  4. **Pane confine cho cả năm họ** (claude, claude qua OpenRouter, codex, agy, pi): mỗi agent giữ state trong private home dựng từ account được lease; công thức và lý do ở [confinement-authority.md §13.1](./confinement-authority.md), account inventory toàn máy ở RUL65b (trên)."
+        },
+        {
+          "path": "docs/specs/reading-map.md",
+          "line": 39,
+          "text": "- `docs/specs/confinement-authority.md` + `src/runner/dispatch/confinement/` — Agent Confinement Authority: runtime one-door confinement enforcement (`executeThroughConfinement`), machine backend registry `~/.fgos/confinement-backends.json`, local `bwrap` v1 driver with 8 falsification probes, required fail-closed checks, attestation storage (`confinement-attestation.v1`), herdr convergence with shared `evaluateBypassPairing`, setup defaults and doctor checks; spec: docs/specs/confinement-authority.md Pane herdr confine cho agent không phải claude (codex/agy/pi): công thức private-home + account inventory + lịch sử các commit đã đi qua (và vì sao từng bị quên) ở §13.1."
+        },
+        {
+          "path": "docs/routing-handoff-contract.md",
+          "line": 88,
+          "text": "  trong `inputs/` của thư mục đó) và bị từ chối chạy nếu không thực thi được (`docs/specs/confinement-authority.md` §9.2)."
+        },
+        {
+          "path": "test/runner/dispatch-confinement-p04.test.mjs",
+          "line": 3,
+          "text": "// Spec: docs/specs/confinement-authority.md, plans/.../phase-04-required-enforcement-and-executor-migration.md"
+        },
+        {
+          "path": "test/runner/dispatch-confinement-p05.test.mjs",
+          "line": 3,
+          "text": "// Spec: docs/specs/confinement-authority.md, plans/.../phase-05-herdr-and-legacy-convergence.md"
         }
       ],
       "sections": [
@@ -418,14 +418,14 @@
           ],
           "subjectHitPaths": [
             "src/setup/registrations.mjs",
-            "src/runner/dispatch/recovery.mjs",
             "src/runner/dispatch/config.mjs",
-            "test/runner/dispatch-confinement-authority.test.mjs",
-            "src/runner/dispatch/confinement/policies.mjs",
-            "test/runner/dispatch-confinement-policies.test.mjs",
+            "src/runner/dispatch/recovery.mjs",
             "src/runner/dispatch/confinement/request.mjs",
+            "src/runner/dispatch/confinement/policies.mjs",
+            "test/runner/dispatch-confinement-authority.test.mjs",
             "test/runner/dispatch-confinement-credential-hygiene.test.mjs",
             "test/runner/dispatch-confinement-blind.test.mjs",
+            "test/runner/dispatch-confinement-policies.test.mjs",
             "test/runner/dispatch-confinement-p04.test.mjs"
           ],
           "retired": false,
@@ -490,20 +490,20 @@
             "InvocationConfinementOverrideV1"
           ],
           "subjectHitPaths": [
-            "src/runner/dispatch/assignment-runner.mjs",
-            "test/runner/dispatch-confinement-p05.test.mjs",
             "test/runner/herdr-reconciliation.test.mjs",
+            "test/runner/dispatch-confinement-p05.test.mjs",
             "test/runner/cli-spawn-reconciliation.test.mjs",
+            "test/runner/provider-per-cli-credential-sources.test.mjs",
+            "test/runner/dispatch-confinement-p04.test.mjs",
+            "test/runner/dispatch-confinement-authority.test.mjs",
+            "test/runner/dispatch-confinement-backend-p03.test.mjs",
+            "test/runner/dispatch-confinement-credential-hygiene.test.mjs",
+            "test/runner/dispatch-confinement-blind.test.mjs",
             "src/runner/dispatch/cli.mjs",
+            "src/runner/dispatch/assignment-runner.mjs",
             "src/runner/dispatch/confinement/request.mjs",
             "src/runner/dispatch/confinement/authority.mjs",
-            "src/runner/dispatch/confinement/policies.mjs",
-            "test/runner/dispatch-confinement-p04.test.mjs",
-            "test/runner/dispatch-confinement-backend-p03.test.mjs",
-            "test/runner/dispatch-confinement-blind.test.mjs",
-            "test/runner/dispatch-confinement-credential-hygiene.test.mjs",
-            "test/runner/dispatch-confinement-authority.test.mjs",
-            "test/runner/provider-per-cli-credential-sources.test.mjs"
+            "src/runner/dispatch/confinement/policies.mjs"
           ],
           "retired": false,
           "retirementEligible": false,
@@ -579,15 +579,15 @@
             "ResolvedResourceV1"
           ],
           "subjectHitPaths": [
-            "src/runner/dispatch/recovery.mjs",
-            "src/runner/dispatch/cli.mjs",
-            "src/runner/dispatch/confinement/policies.mjs",
-            "src/runner/dispatch/confinement/attestation-store.mjs",
-            "src/runner/dispatch/confinement/authority.mjs",
             "test/runner/dispatch-confinement-p05.test.mjs",
+            "src/runner/dispatch/cli.mjs",
+            "src/runner/dispatch/recovery.mjs",
+            "src/runner/dispatch/confinement/authority.mjs",
+            "src/runner/dispatch/confinement/policies.mjs",
             "test/runner/dispatch-confinement-backend-p03.test.mjs",
-            "test/runner/dispatch-confinement-p04.test.mjs",
-            "test/runner/dispatch-confinement-authority.test.mjs"
+            "src/runner/dispatch/confinement/attestation-store.mjs",
+            "test/runner/dispatch-confinement-authority.test.mjs",
+            "test/runner/dispatch-confinement-p04.test.mjs"
           ],
           "retired": false,
           "retirementEligible": false,
@@ -640,34 +640,34 @@
           ],
           "subjectHitPaths": [
             "bin/fgos.mjs",
-            "test/setup/skill-wrappers.test.mjs",
-            "src/runner/recovery.mjs",
-            "src/runner/work-dispatch.mjs",
             "src/runner/worker-log.mjs",
+            "src/runner/recovery.mjs",
+            "test/setup/skill-wrappers.test.mjs",
+            "src/runner/work-dispatch.mjs",
             "src/runner/loop.mjs",
             "src/runner/dispatch.mjs",
-            "src/runner/dispatch/recovery.mjs",
             "src/runner/dispatch/herdr-reconcile.mjs",
-            "src/runner/dispatch/dispatch-error.mjs",
-            "src/runner/dispatch/assignment-runner.mjs",
-            "src/runner/dispatch/confinement/attestation-store.mjs",
-            "src/runner/dispatch/cli.mjs",
-            "src/runner/dispatch/transport.mjs",
+            "src/runner/dispatch/recovery.mjs",
             "src/runner/dispatch/herdr-round.mjs",
-            "src/runner/dispatch/confinement/authority.mjs",
-            "test/runner/assignment-runresult.test.mjs",
-            "test/runner/dispatch-production-call-sites.test.mjs",
-            "test/runner/dispatch-confinement-credential-hygiene.test.mjs",
-            "test/runner/dispatch-confinement-p05.test.mjs",
-            "test/runner/dispatch-confinement-blind.test.mjs",
-            "test/runner/herdr-reconciliation.test.mjs",
-            "test/runner/dispatch-confinement-p04.test.mjs",
-            "test/runner/spawn-worker.test.mjs",
-            "test/runner/dispatch-confinement-authority.test.mjs",
-            "test/runner/dispatch.test.mjs",
             "test/runner/dispatch-i08b-remediation.test.mjs",
-            "test/runner/dispatch-confinement-backend-p03.test.mjs",
+            "src/runner/dispatch/dispatch-error.mjs",
+            "src/runner/dispatch/cli.mjs",
+            "src/runner/dispatch/confinement/authority.mjs",
+            "src/runner/dispatch/confinement/attestation-store.mjs",
+            "src/runner/dispatch/transport.mjs",
+            "src/runner/dispatch/assignment-runner.mjs",
+            "test/runner/dispatch-confinement-p05.test.mjs",
+            "test/runner/dispatch-production-call-sites.test.mjs",
+            "test/runner/herdr-reconciliation.test.mjs",
+            "test/runner/dispatch.test.mjs",
             "test/runner/herdr-spawn-adapter.test.mjs",
+            "test/runner/dispatch-confinement-backend-p03.test.mjs",
+            "test/runner/dispatch-confinement-credential-hygiene.test.mjs",
+            "test/runner/dispatch-confinement-authority.test.mjs",
+            "test/runner/dispatch-confinement-p04.test.mjs",
+            "test/runner/dispatch-confinement-blind.test.mjs",
+            "test/runner/assignment-runresult.test.mjs",
+            "test/runner/spawn-worker.test.mjs",
             "test/runner/loop.test.mjs"
           ],
           "retired": false,
@@ -1524,11 +1524,6 @@
           "text": "| Host And Surface Layer | Inbound/outbound surfaces and operator visibility. It translates CLI/API/plugin/dashboard/webhook/chat/Herdr interactions into calls against the engines, without becoming lifecycle or evidence truth. | CLI/API/plugin adapters, Herdr/dashboard visibility, host adapters, surface auth, command/API envelopes. | [fgOS Plugin Spec](../../specs/fgos-plugin.md), [Herdr Web Dashboard Spec](../../specs/herdr-web-dashboard.md), [Visibility And Herdr](../agent-coordination/architecture/visibility-and-herdr.md), [IO Contract](../../io-contract.md) |"
         },
         {
-          "path": "docs/architect/packaging-distribution/history/distribution-baseline.md",
-          "line": 61,
-          "text": "| `docs/specs/fgos-plugin.md` | Claude Code plugin is a host-surface distribution. Slash-command wrappers shell out to the underlying `fgos`; they do not write the store directly. Old resolver prefers project-local checkout/bin, then global PATH, then clear error. | Plugin/skill distribution belongs in payload/projection model. The wrapper-shells-to-`fgos` rule should stay, but command resolution must become runtime-root/active-record based rather than PATH-based. |"
-        },
-        {
           "path": "scripts/check-legacy-docs-ratchet.baseline.json",
           "line": 5941,
           "text": "    \"docs/specs/fgos-plugin.md\": {"
@@ -1537,6 +1532,11 @@
           "path": "docs/transitional-switchboard.md",
           "line": 60,
           "text": "| Claude plugin surface | legacy-current | maintained-authority | `docs/specs/fgos-plugin.md` | `plugins/fgOS/**` | Spec owns slash-command wrappers and plugin manifest behavior. |"
+        },
+        {
+          "path": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+          "line": 61,
+          "text": "| `docs/specs/fgos-plugin.md` | Claude Code plugin is a host-surface distribution. Slash-command wrappers shell out to the underlying `fgos`; they do not write the store directly. Old resolver prefers project-local checkout/bin, then global PATH, then clear error. | Plugin/skill distribution belongs in payload/projection model. The wrapper-shells-to-`fgos` rule should stay, but command resolution must become runtime-root/active-record based rather than PATH-based. |"
         },
         {
           "path": "docs/specs/system-overview.md",
@@ -1921,24 +1921,9 @@
           "text": "// Area spec Edge Cases Settled (docs/specs/herdr-web-dashboard.md:259-260):"
         },
         {
-          "path": "docs/architect/packaging-distribution/history/distribution-baseline.md",
-          "line": 62,
-          "text": "| `docs/specs/herdr-web-dashboard.md` and dashboard references | Herdr is a browser dashboard/gateway surface, not workflow authority itself. It reads/mutates through fgOS verbs/contracts and must avoid becoming a second state writer. | Shared web/gateway remains future constraint only for this delivery slice. Later it must delegate through selected project runtime/adapter. |"
-        },
-        {
           "path": "scripts/check-legacy-docs-ratchet.baseline.json",
           "line": 5947,
           "text": "    \"docs/specs/herdr-web-dashboard.md\": {"
-        },
-        {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 217,
-          "text": "      \"path\": \"docs/specs/herdr-web-dashboard.md\","
-        },
-        {
-          "path": "docs/transitional-switchboard.md",
-          "line": 61,
-          "text": "| Herdr gateway and web dashboard | legacy-current | maintained-authority | `docs/specs/herdr-web-dashboard.md` | `docs/operator-runbook-herdr-cockpit.md`, `docs/specs/runner.md` | Spec owns web dashboard client behavior; runbook owns cockpit operations. |"
         },
         {
           "path": "docs/ui-spec/00-overview.md",
@@ -1949,6 +1934,11 @@
           "path": "docs/ui-spec/spec.config.yaml",
           "line": 3,
           "text": "# Product source of truth: docs/specs/herdr-web-dashboard.md (tsk-54j)."
+        },
+        {
+          "path": "docs/transitional-switchboard.md",
+          "line": 61,
+          "text": "| Herdr gateway and web dashboard | legacy-current | maintained-authority | `docs/specs/herdr-web-dashboard.md` | `docs/operator-runbook-herdr-cockpit.md`, `docs/specs/runner.md` | Spec owns web dashboard client behavior; runbook owns cockpit operations. |"
         },
         {
           "path": "docs/ui-spec/screens/S01-sign-in.md",
@@ -1969,6 +1959,11 @@
           "path": "docs/ui-spec/screens/S04-questions-needing-answer.md",
           "line": 19,
           "text": "`docs/specs/herdr-web-dashboard.md` Data Dictionary #4). D4's whole point"
+        },
+        {
+          "path": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+          "line": 62,
+          "text": "| `docs/specs/herdr-web-dashboard.md` and dashboard references | Herdr is a browser dashboard/gateway surface, not workflow authority itself. It reads/mutates through fgOS verbs/contracts and must avoid becoming a second state writer. | Shared web/gateway remains future constraint only for this delivery slice. Later it must delegate through selected project runtime/adapter. |"
         },
         {
           "path": "docs/ui-spec/30-states-and-errors.md",
@@ -2004,6 +1999,11 @@
           "path": "docs/ui-spec/components/C01-item-card.md",
           "line": 46,
           "text": "(`docs/specs/herdr-web-dashboard.md` §Retire a work item)."
+        },
+        {
+          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
+          "line": 217,
+          "text": "      \"path\": \"docs/specs/herdr-web-dashboard.md\","
         },
         {
           "path": "docs/specs/reading-map.md",
@@ -2343,14 +2343,14 @@
       "units": 25,
       "directReferences": [
         {
-          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
-          "line": 227,
-          "text": "      \"path\": \"docs/specs/observe.md\","
-        },
-        {
           "path": "docs/transitional-switchboard.md",
           "line": 65,
           "text": "| Observe (metrics and friction) | legacy-current | maintained-authority | `docs/specs/observe.md` | `packages/observe/rust/**` | Spec owns observation behavior (metrics and friction); the Rust package owns the implementation. |"
+        },
+        {
+          "path": "scripts/check-legacy-docs-ratchet.exceptions.json",
+          "line": 227,
+          "text": "      \"path\": \"docs/specs/observe.md\","
         },
         {
           "path": "docs/specs/reading-map.md",
@@ -2403,25 +2403,25 @@
             "LegacyFrictionSource"
           ],
           "subjectHitPaths": [
-            "apps/fgos/src/wiring/friction_sources.rs",
-            "apps/fgos/src/wiring/metrics_sources.rs",
             "packages/run-result/rust/src/unit_summary.rs",
+            "apps/fgos/src/wiring/friction_sources.rs",
             "packages/run-result/rust/src/lib.rs",
+            "apps/fgos/src/wiring/metrics_sources.rs",
             "packages/run-result/rust/tests/unit_summary.rs",
             "packages/run-result/rust/tests/layout_fixture.rs",
+            "packages/observe/contracts/observe.observation.v1.json",
             "packages/work-state/contracts/work-events.read.v1.json",
             "packages/work-state/rust/src/legacy_friction.rs",
-            "packages/work-state/rust/src/work_source.rs",
-            "packages/observe/contracts/observe.observation.v1.json",
             "packages/observe/rust/src/provider.rs",
+            "packages/work-state/rust/src/work_source.rs",
             "packages/observe/rust/src/friction_cli.rs",
-            "packages/observe/rust/src/contract.rs",
             "packages/observe/rust/src/friction.rs",
-            "packages/observe/rust/src/sources/invocation_faults.rs",
-            "packages/observe/rust/src/sources/claude_transcripts.rs",
+            "packages/observe/rust/src/contract.rs",
             "packages/observe/rust/src/metrics_cli/mod.rs",
             "packages/observe/rust/src/metrics_cli/runs.rs",
+            "packages/observe/rust/src/sources/invocation_faults.rs",
             "packages/observe/rust/src/metrics_cli/outcomes.rs",
+            "packages/observe/rust/src/sources/claude_transcripts.rs",
             "packages/observe/rust/src/metrics_cli/entropy.rs",
             "packages/observe/rust/src/metrics_cli/faults.rs",
             "packages/observe/rust/src/metrics_cli/harness.rs",
@@ -2445,55 +2445,55 @@
             "RunResult"
           ],
           "subjectHitPaths": [
-            "scripts/regenerate-observe-fixtures.mjs",
-            "src/setup/registrations.mjs",
             "packages/run-result/rust/src/lib.rs",
-            "apps/fgos/src/wiring/metrics_sources.rs",
             "packages/run-result/rust/tests/unit_summary.rs",
             "packages/run-result/rust/tests/layout_fixture.rs",
+            "src/setup/registrations.mjs",
+            "scripts/regenerate-observe-fixtures.mjs",
+            "apps/fgos/src/wiring/metrics_sources.rs",
             "packages/observe/rust/src/scorecard.rs",
             "src/workflow/runner.mjs",
             "src/verbs/dispatch/show-run.mjs",
-            "src/runner/execution/run.mjs",
-            "src/runner/operation-choice.mjs",
-            "src/runner/execution/unit-run-history.mjs",
-            "test/observe/observe-contracts-fixtures.test.mjs",
-            "src/runner/dispatch/herdr-reconcile.mjs",
-            "test/fixtures/usage/pi-multiturn-normal.jsonl",
-            "src/runner/dispatch/settlement.mjs",
-            "test/fixtures/usage/codex-cli-grep-tokens-used.stderr.log",
-            "test/fixtures/usage/pi-multiturn-no-agent-end.jsonl",
-            "test/runner/dispatch-reconciliation.test.mjs",
-            "src/runner/dispatch/visibility-session.mjs",
-            "test/runner/assignment-dispatch.test.mjs",
-            "src/runner/dispatch/provider-account-probe.mjs",
             "src/runner/dispatch/reconcile-cli-spawn.mjs",
             "src/runner/dispatch/runtime-inspection.mjs",
-            "src/runner/dispatch/herdr-round.mjs",
-            "src/runner/dispatch/worker-artifacts.mjs",
+            "test/runner/assignment-dispatch.test.mjs",
+            "test/runner/dispatch-reconciliation.test.mjs",
+            "src/runner/dispatch/herdr-reconcile.mjs",
+            "test/runner/provider-account-probe.test.mjs",
+            "src/runner/dispatch/provider-account-probe.mjs",
+            "test/runner/dispatch-stray-write-attribution.test.mjs",
+            "test/fixtures/usage/pi-multiturn-no-agent-end.jsonl",
+            "src/runner/dispatch/settlement.mjs",
             "test/runner/dispatch-i08b-remediation.test.mjs",
+            "src/runner/dispatch/herdr-round.mjs",
+            "test/fixtures/usage/codex-cli-grep-tokens-used.stderr.log",
+            "test/runner/run-result-v3-reader.test.mjs",
             "src/runner/dispatch/run-result.mjs",
-            "src/runner/dispatch/reconciliation-planner.mjs",
-            "src/runner/dispatch/agent-result-claim-contract.mjs",
+            "src/runner/dispatch/visibility-session.mjs",
+            "src/runner/dispatch/worker-artifacts.mjs",
+            "test/runner/assignment-runresult.test.mjs",
+            "src/runner/dispatch/usage-parsers.mjs",
+            "src/runner/execution/run.mjs",
+            "test/fixtures/usage/pi-multiturn-normal.jsonl",
             "src/runner/dispatch/assignment-normalizer.mjs",
             "src/runner/dispatch/assignment-runner.mjs",
-            "test/runner/run-result-v3-reader.test.mjs",
-            "test/runner/dispatch-operability-production-door.test.mjs",
-            "test/runner/dispatch-stray-write-attribution.test.mjs",
-            "src/runner/dispatch/usage-parsers.mjs",
-            "test/runner/loop.test.mjs",
-            "test/runner/provider-account-probe.test.mjs",
-            "test/runner/driver-rununit.test.mjs",
-            "test/runner/assignment-runresult.test.mjs",
-            "test/runner/run-result-confinement-label.test.mjs",
-            "test/runner/operation-choice.test.mjs",
+            "src/runner/dispatch/agent-result-claim-contract.mjs",
+            "src/runner/operation-choice.mjs",
             "test/runner/run-result-v2.test.mjs",
+            "test/runner/loop.test.mjs",
+            "src/runner/dispatch/reconciliation-planner.mjs",
+            "src/runner/execution/unit-run-history.mjs",
+            "test/runner/driver-rununit.test.mjs",
             "test/runner/execution/unit-run-outcome.test.mjs",
+            "test/runner/dispatch-operability-production-door.test.mjs",
+            "test/runner/operation-choice.test.mjs",
             "test/runner/run-result-source-scan.test.mjs",
-            "test/runner/assignment-enumerator-guard.test.mjs",
-            "test/runner/dispatch.test.mjs",
+            "test/runner/run-result-confinement-label.test.mjs",
+            "test/runner/dispatch-runtime-inspect.test.mjs",
             "test/runner/herdr-round-reconcile.test.mjs",
-            "test/runner/dispatch-runtime-inspect.test.mjs"
+            "test/observe/observe-contracts-fixtures.test.mjs",
+            "test/runner/dispatch.test.mjs",
+            "test/runner/assignment-enumerator-guard.test.mjs"
           ],
           "retired": false,
           "retirementEligible": false,
@@ -2576,25 +2576,25 @@
             "UnitSummarySource"
           ],
           "subjectHitPaths": [
-            "apps/fgos/src/wiring/metrics_sources.rs",
             "packages/run-result/rust/src/unit_summary.rs",
             "packages/run-result/rust/src/lib.rs",
             "packages/run-result/rust/tests/unit_summary.rs",
+            "apps/fgos/src/wiring/metrics_sources.rs",
             "packages/run-result/rust/tests/layout_fixture.rs",
-            "packages/work-state/rust/src/work_source.rs",
             "packages/observe/contracts/observe.observation.v1.json",
             "packages/observe/rust/src/sources/invocation_faults.rs",
             "packages/observe/rust/src/sources/claude_transcripts.rs",
-            "packages/observe/rust/src/provider.rs",
             "packages/observe/rust/src/contract.rs",
+            "packages/observe/rust/src/provider.rs",
             "packages/observe/rust/src/metrics_cli/mod.rs",
             "packages/observe/rust/src/metrics_cli/runs.rs",
-            "packages/observe/rust/src/metrics_cli/harness.rs",
             "packages/observe/rust/src/metrics_cli/coverage.rs",
             "packages/observe/rust/src/metrics_cli/outcomes.rs",
             "packages/observe/rust/src/metrics_cli/snapshot.rs",
             "packages/observe/rust/src/metrics_cli/entropy.rs",
-            "packages/observe/rust/src/metrics_cli/faults.rs"
+            "packages/observe/rust/src/metrics_cli/faults.rs",
+            "packages/observe/rust/src/metrics_cli/harness.rs",
+            "packages/work-state/rust/src/work_source.rs"
           ],
           "retired": false,
           "retirementEligible": false,
@@ -2654,14 +2654,14 @@
           "startLine": 78,
           "endLine": 92,
           "sha256": "e0dcb8d37a12e73a8479327d5e07fa37e7b4630dc48915a04bcf51425cc9a3b1",
-          "classification": "current-by-default",
+          "classification": "historical-or-decision-carriage",
           "directReferenceCount": 3,
           "implementationPaths": [],
           "subjectSymbols": [],
           "subjectHitPaths": [],
           "retired": false,
           "retirementEligible": false,
-          "reason": "Live reference, named subject implementation or source-tool consumer protects this section; truth deferred under A19/A28."
+          "reason": "Preserve historical evidence/decision and its live citations; placement does not claim that its current assertions are true."
         }
       ]
     },
@@ -2722,14 +2722,14 @@
           "text": "    \"docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md\": {"
         },
         {
-          "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
-          "line": 776,
-          "text": "- docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md"
-        },
-        {
           "path": "docs/transitional-switchboard.md",
           "line": 67,
           "text": "| UI specification | legacy-current | maintained-authority | `docs/ui-spec/00-overview.md` (entry for `docs/ui-spec/**`) | Relevant area spec | Visual and UI layout contracts; functional behavior owned by area specs. |"
+        },
+        {
+          "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+          "line": 776,
+          "text": "- docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md"
         },
         {
           "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md",
@@ -2941,8 +2941,8 @@
             "WebSocket"
           ],
           "subjectHitPaths": [
-            "scripts/test-proof-inventory.mjs",
-            "apps/fgos-gateway/web/src/api/poll.ts"
+            "apps/fgos-gateway/web/src/api/poll.ts",
+            "scripts/test-proof-inventory.mjs"
           ],
           "retired": false,
           "retirementEligible": false,
@@ -3132,6 +3132,11 @@
           "text": "(prose or links to 30-states-and-errors.md)"
         },
         {
+          "path": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
+          "line": 76,
+          "text": "  // ST-DISCONNECTED (area spec Edge Cases / 30-states-and-errors.md):"
+        },
+        {
           "path": ".claude/skills/ui-spec/SKILL.md",
           "line": 26,
           "text": "3. **Pass 1 — Skeleton:** generate `spec.config.yaml`, `00-overview.md`, `20-domain-rules.md`, `30-states-and-errors.md`, `15-system-events.md`; create all surface files with frontmatter + prose only (no contract blocks yet)"
@@ -3160,11 +3165,6 @@
           "path": ".claude/skills/ui-spec/METHODOLOGY.md",
           "line": 105,
           "text": "6. `30-states-and-errors.md` — load state/error definitions referenced in the surface"
-        },
-        {
-          "path": "apps/fgos-gateway/web/src/screens/Taskboard.tsx",
-          "line": 76,
-          "text": "  // ST-DISCONNECTED (area spec Edge Cases / 30-states-and-errors.md):"
         },
         {
           "path": ".claude/skills/ui-spec/tools/validate.mjs",
@@ -4155,50 +4155,50 @@
             "WorkItemSource"
           ],
           "subjectHitPaths": [
-            "scripts/explain-command-route.mjs",
             "packages/herdr-fgos-common/rust/src/fgos.rs",
             "packages/herdr-fgos-common/rust/src/ports.rs",
+            "apps/fgos-gateway/web/src/screens/NeedsAnswer.test.tsx",
+            "scripts/explain-command-route.mjs",
+            "apps/fgos-gateway/web/src/screens/Taskboard.test.tsx",
+            "apps/fgos-gateway/web/src/api/client.test.ts",
+            "apps/fgos-gateway/web/src/App.test.tsx",
             "scripts/lib/full-suite-queue.mjs",
             "test/scripts/knowledge-migration.test.mjs",
             "test/scripts/run-tests.test.mjs",
-            "src/state/runtime-coordination.mjs",
-            "test/state/events.test.mjs",
-            "src/state/drift-status.mjs",
-            "test/state/store.test.mjs",
-            "apps/fgos-gateway/web/src/screens/NeedsAnswer.test.tsx",
-            "test/helpers/fake-herdr-pane.mjs",
-            "test/state/porting-store.test.mjs",
-            "apps/fgos-gateway/web/src/screens/Taskboard.test.tsx",
-            "test/e2e/runner-loop.test.mjs",
-            "src/state/postland-drift.mjs",
-            "apps/fgos-gateway/web/src/api/client.test.ts",
-            "apps/fgos-gateway/web/src/App.test.tsx",
-            "test/setup/instruction-registry.test.mjs",
-            "src/state/events.mjs",
             "apps/fgos-gateway/src/ports.rs",
-            "src/evolve/iron-law.mjs",
-            "src/convention/convention-client.mjs",
             "src/observe/friction-client.mjs",
-            "test/runner/fanout-batch-runner-commit.test.mjs",
+            "src/state/events.mjs",
+            "src/state/postland-drift.mjs",
+            "src/convention/convention-client.mjs",
+            "src/evolve/iron-law.mjs",
+            "src/state/drift-status.mjs",
+            "src/state/runtime-coordination.mjs",
             "src/runner/github-adapter.mjs",
-            "test/runner/session.test.mjs",
-            "test/runner/concurrent-claim-eventlog-loss.test.mjs",
-            "src/runner/session.mjs",
-            "test/runner/assignment-dispatch.test.mjs",
-            "test/runner/provider-capacity.test.mjs",
-            "test/runner/loop.test.mjs",
             "src/runner/gateway-control.mjs",
-            "test/runner/dispatch-confinement-backend-p03.test.mjs",
-            "test/runner/lock.test.mjs",
-            "test/runner/assignment-runresult.test.mjs",
+            "test/e2e/runner-loop.test.mjs",
+            "src/runner/session.mjs",
+            "test/helpers/fake-herdr-pane.mjs",
+            "test/state/events.test.mjs",
             "test/rust-host/dev-host.test.mjs",
+            "test/state/store.test.mjs",
+            "test/setup/instruction-registry.test.mjs",
+            "test/state/porting-store.test.mjs",
             "src/runner/execution/commit-unit-work.mjs",
-            "test/runner/github-adapter.test.mjs",
-            "test/runner/loop-rununit.test.mjs",
-            "test/runner/execution/run.test.mjs",
-            "src/runner/dispatch/stop-processes-inside.mjs",
+            "test/runner/session.test.mjs",
+            "test/runner/fanout-batch-runner-commit.test.mjs",
+            "test/runner/lock.test.mjs",
             "src/runner/dispatch/adapters.mjs",
-            "src/runner/dispatch/provider-capacity.mjs"
+            "test/runner/assignment-runresult.test.mjs",
+            "src/runner/dispatch/provider-capacity.mjs",
+            "test/runner/concurrent-claim-eventlog-loss.test.mjs",
+            "src/runner/dispatch/stop-processes-inside.mjs",
+            "test/runner/assignment-dispatch.test.mjs",
+            "test/runner/loop.test.mjs",
+            "test/runner/provider-capacity.test.mjs",
+            "test/runner/dispatch-confinement-backend-p03.test.mjs",
+            "test/runner/execution/run.test.mjs",
+            "test/runner/github-adapter.test.mjs",
+            "test/runner/loop-rununit.test.mjs"
           ],
           "retired": false,
           "retirementEligible": false,
@@ -4929,16 +4929,16 @@
           ],
           "subjectHitPaths": [
             "packages/herdr-fgos-common/rust/src/fgos.rs",
-            "apps/fgos-gateway/src/ports.rs",
             "packages/herdr-fgos-common/rust/src/ports.rs",
             "apps/fgos-gateway/web/src/lib/network.ts",
             "apps/fgos-gateway/web/src/lib/status.ts",
-            "apps/fgos-gateway/web/stitch-exports/S03/design.html",
+            "apps/fgos-gateway/src/ports.rs",
             "apps/fgos-gateway/web/src/screens/TaskDetail.tsx",
             "apps/fgos-gateway/web/src/screens/NeedsAnswer.tsx",
-            "apps/fgos-gateway/web/stitch-exports/S04/design.html",
             "apps/fgos-gateway/web/src/screens/TaskDetail.test.tsx",
-            "apps/fgos-gateway/web/src/App.tsx"
+            "apps/fgos-gateway/web/src/App.tsx",
+            "apps/fgos-gateway/web/stitch-exports/S03/design.html",
+            "apps/fgos-gateway/web/stitch-exports/S04/design.html"
           ],
           "retired": false,
           "retirementEligible": false,
@@ -4982,11 +4982,11 @@
             "apps/fgos-gateway/web/stitch-exports/review.html",
             "apps/fgos-gateway/src/ports.rs",
             "src/runner/dispatch/assignment.mjs",
-            "src/runner/dispatch/assignment-policy.mjs",
-            "src/runner/dispatch/cli.mjs",
-            "src/runner/dispatch/assignment-runner.mjs",
+            "test/architecture.test.mjs",
             "src/runner/dispatch/plan.mjs",
-            "test/architecture.test.mjs"
+            "src/runner/dispatch/assignment-runner.mjs",
+            "src/runner/dispatch/assignment-policy.mjs",
+            "src/runner/dispatch/cli.mjs"
           ],
           "retired": false,
           "retirementEligible": false,
@@ -5266,6 +5266,11 @@
           "text": "    console.error(`ERROR: Cannot read spec.config.yaml at ${configPath}\\n  ${e.message}`);"
         },
         {
+          "path": ".claude/skills/ui-spec/tools/wireframe/client/app.js",
+          "line": 191,
+          "text": "    '<p style=\"color:#9ca3af;padding:40px;text-align:center\">No surfaces found. Check spec.config.yaml.</p>';"
+        },
+        {
           "path": ".claude/skills/ui-spec/CONVENTION.md",
           "line": 4,
           "text": "> The `{project}-contract` tag is configured in `spec.config.yaml` → `contract_tag`. Example: `crm-contract`, `shop-contract`."
@@ -5274,11 +5279,6 @@
           "path": ".claude/skills/ui-spec/CONVENTION.md",
           "line": 198,
           "text": "## 8. `spec.config.yaml` reference"
-        },
-        {
-          "path": ".claude/skills/ui-spec/tools/wireframe/client/app.js",
-          "line": 191,
-          "text": "    '<p style=\"color:#9ca3af;padding:40px;text-align:center\">No surfaces found. Check spec.config.yaml.</p>';"
         },
         {
           "path": "docs/ui-spec/00-overview.md",
