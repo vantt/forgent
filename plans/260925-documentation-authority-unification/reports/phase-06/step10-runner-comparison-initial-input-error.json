@@ -1,0 +1,26 @@
+{
+  "ok": false,
+  "strictGreen": false,
+  "counts": {
+    "claims-unknown-blocking": 0,
+    "claims-not-reviewed": 0,
+    "identical-units-multiple-owners": 0,
+    "candidate-blocks-unreferenced": 63,
+    "claims-partial-carry": 0
+  },
+  "errors": [
+    "partial carries missing: [\"claim_f64fa4a36030f89feab71dc5943015c0\",\"docs/specs/runner.md\",\"unheaded-block-118\",\"92ca20e4e333b0933210a6adf9f39c7cc0a46eb800a1e19404ad019e80730e0a\"]",
+    "partial carries missing: [\"claim_f4058f068a378962aaf237ae038db5af\",\"docs/specs/runner.md\",\"unheaded-block-127\",\"d2f7e04754c3720cace2cf46bb12fb5e3701574c76182e79aacbd1b6f6de95e8\"]",
+    "partial carries missing: [\"claim_77a827ba40c328bd2c4d6a8ec713df65\",\"docs/specs/runner.md\",\"unheaded-block-307\",\"5a99ae10ac39e5bf6d8b29289aaba42958a45534c58e9e2dfa85fbb744472f14\"]",
+    "partial carries missing: [\"claim_3dcf1baab2b0ac4b7ab7f84e30b8ab41\",\"docs/specs/runner.md\",\"unheaded-block-308\",\"24e736b37697fbd3c3ce53ed568dfa89aa2bff023c3e3deb0ed686b364f327e6\"]",
+    "partial carries missing: [\"claim_93d5f2d34cf452029462ea39674fd255\",\"docs/specs/runner.md\",\"unheaded-block-313\",\"dea0728314fa0ae7aa5070aa2d76aa20e1788d2e18d9fcbbe80f5dae4be9ccd8\"]",
+    "partial carries missing: [\"claim_74a47937380f03ed75fa755f0faccffb\",\"docs/specs/runner.md\",\"unheaded-block-69\",\"f57b559b1939a5bead253cd2aaefc94ef14af54a42a8c15d7fbc3bf293ae4757\"]",
+    "partial carries missing: [\"claim_20a5804444535524364c0049e5bc87dd\",\"docs/specs/runner.md\",\"unheaded-block-9\",\"f14dad0a401a272c3f3606f6c1e458003aacc9b553636202bf42ec9fad29a3f0\"]",
+    "partial carries missing: [\"claim_072766aafbaf01714df1aa65347a1d24\",\"docs/specs/runner.md\",\"unheaded-block-90\",\"f503ccc86158d7a9b67881c8983a4acb08172087f1d5f736628e21ef3832a0b2\"]",
+    "partial carries missing: [\"claim_d5ba1eda7530b865fec747ee0adbc102\",\"docs/specs/runner.md\",\"unheaded-block-94\",\"77083ab43b25bd2e30eb1ff1f2b24db87e02420e7cc187773951d44a3a9df49f\"]",
+    "partial carries missing: [\"claim_40aafcee52b22eda087c5f85eacb9392\",\"docs/specs/runner.md\",\"unheaded-block-92\",\"95e75f7d43d50bbae0d6a7979aa0db2f01326f00fc290507fdf8bf046403a547\"]",
+    "partial carries missing: [\"claim_f033905b059f073c62ec27f0ee6da620\",\"docs/specs/runner.md\",\"unheaded-block-92\",\"c331d40816f84d25425abfdfdb8c6bff2a1e92b781bfe82d6f910fc0b1777917\"]",
+    "native count mismatch: claims-partial-carry",
+    "unexpected fatal: claims-partial-carry"
+  ]
+}

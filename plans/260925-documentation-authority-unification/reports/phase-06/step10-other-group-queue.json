@@ -1,0 +1,322 @@
+{
+  "groups": [
+    {
+      "kind": "duplicate",
+      "blobSha": "11684583c2ac84357168e237f3ac045201377712",
+      "paths": [
+        "docs/contracts/fgos-gateway-api-v1.yaml",
+        "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml"
+      ],
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+    },
+    {
+      "kind": "duplicate",
+      "blobSha": "2f163ff6092e16b1cb619c7dcc0765f316af1753",
+      "paths": [
+        "docs/platform/ui-spec/history/schema/surface-contract.schema.json",
+        "docs/ui-spec/schema/surface-contract.schema.json"
+      ],
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+    },
+    {
+      "kind": "duplicate",
+      "blobSha": "ae8c66912fbf631381632347382108e7e6835a4d",
+      "paths": [
+        "docs/architecture-manifest.json",
+        "docs/platform/contracts/architecture-manifest.json"
+      ],
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+    },
+    {
+      "kind": "duplicate",
+      "blobSha": "c51d822673e66f5012eab484c0974f57dd21a2ae",
+      "paths": [
+        "docs/platform/ui-spec/architecture/spec.config.yaml",
+        "docs/ui-spec/spec.config.yaml"
+      ],
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+    },
+    {
+      "kind": "semantic",
+      "key": "agent-confinement:spec-agent-confinement-authority",
+      "paths": [
+        "docs/platform/agent-confinement/spec.md",
+        "docs/specs/confinement-authority.md"
+      ],
+      "rationale": "Same normalized area/title; requires semantic duplicate/conflict review before promotion.",
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+    },
+    {
+      "kind": "semantic",
+      "key": "claude-plugin-surface:spec-fgos-plugin-claude-code-slash-command-surface",
+      "paths": [
+        "docs/platform/claude-plugin/spec.md",
+        "docs/specs/fgos-plugin.md"
+      ],
+      "rationale": "Same normalized area/title; requires semantic duplicate/conflict review before promotion.",
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+    },
+    {
+      "kind": "semantic",
+      "key": "decision-citation-drift:spec-decision-citation-drift-check",
+      "paths": [
+        "docs/platform/decision-citation-drift/spec.md",
+        "docs/specs/decision-citation-drift.md"
+      ],
+      "rationale": "Same normalized area/title; requires semantic duplicate/conflict review before promotion.",
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+    },
+    {
+      "kind": "semantic",
+      "key": "distillery-reference-learning:distillery-porting-lifecycle",
+      "paths": [
+        "docs/platform/distillery/spec.md",
+        "docs/specs/distillery.md"
+      ],
+      "rationale": "Same normalized area/title; requires semantic duplicate/conflict review before promotion.",
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+    },
+    {
+      "kind": "semantic",
+      "key": "documentation-system:transitional-documentation-authority-switchboard",
+      "paths": [
+        "docs/platform/documentation/switchboard.md",
+        "docs/transitional-switchboard.md"
+      ],
+      "rationale": "Same normalized area/title; requires semantic duplicate/conflict review before promotion.",
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+    },
+    {
+      "kind": "semantic",
+      "key": "herdr-gateway-and-web-dashboard:spec-herdr-web-dashboard-browser-surface-for-fgos-work",
+      "paths": [
+        "docs/platform/herdr-web-dashboard/spec.md",
+        "docs/specs/herdr-web-dashboard.md"
+      ],
+      "rationale": "Same normalized area/title; requires semantic duplicate/conflict review before promotion.",
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+    },
+    {
+      "kind": "semantic",
+      "key": "observe-metrics-and-friction:observe-component-specification",
+      "paths": [
+        "docs/platform/observe/spec.md",
+        "docs/specs/observe.md"
+      ],
+      "rationale": "Same normalized area/title; requires semantic duplicate/conflict review before promotion.",
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+    },
+    {
+      "kind": "semantic",
+      "key": "packaging-distribution:runtime-identity-and-activation",
+      "paths": [
+        "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+        "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md"
+      ],
+      "rationale": "Same normalized area/title; requires semantic duplicate/conflict review before promotion.",
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+    },
+    {
+      "kind": "semantic",
+      "key": "platform-documentation-unmapped-candidate:historical-file-prior-navigation-before-whole-file-historical-relocation",
+      "paths": [
+        "docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/documentation-migration/migration-status.md",
+        "docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+        "docs/platform/agent-coordination/history/retired-engine/inbound/intent-preservation-ledger.md"
+      ],
+      "rationale": "Same normalized area/title; requires semantic duplicate/conflict review before promotion.",
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+    },
+    {
+      "kind": "semantic",
+      "key": "runner-dispatch-merge-lifecycle:spec-runner-vòng-tự-hành",
+      "paths": [
+        "docs/platform/runner/spec.md",
+        "docs/specs/runner.md"
+      ],
+      "rationale": "Same normalized area/title; requires semantic duplicate/conflict review before promotion.",
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+    },
+    {
+      "kind": "semantic",
+      "key": "skills-and-domainization:fgos-domainization-architecture",
+      "paths": [
+        "docs/architect/domainization/README.md",
+        "docs/platform/domainization/architecture/domainization.md"
+      ],
+      "rationale": "Same normalized area/title; requires semantic duplicate/conflict review before promotion.",
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+    },
+    {
+      "kind": "semantic",
+      "key": "system-overview:spec-system-overview",
+      "paths": [
+        "docs/platform/system-overview/spec.md",
+        "docs/specs/system-overview.md"
+      ],
+      "rationale": "Same normalized area/title; requires semantic duplicate/conflict review before promotion.",
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+    },
+    {
+      "kind": "semantic",
+      "key": "ui-specification:c01-item-card-status-pill-quick-actions",
+      "paths": [
+        "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+        "docs/ui-spec/components/C01-item-card.md"
+      ],
+      "rationale": "Same normalized area/title; requires semantic duplicate/conflict review before promotion.",
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+    },
+    {
+      "kind": "semantic",
+      "key": "ui-specification:domain-rules",
+      "paths": [
+        "docs/platform/ui-spec/contracts/20-domain-rules.md",
+        "docs/ui-spec/20-domain-rules.md"
+      ],
+      "rationale": "Same normalized area/title; requires semantic duplicate/conflict review before promotion.",
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+    },
+    {
+      "kind": "semantic",
+      "key": "ui-specification:f01-answer-a-parked-question-end-to-end",
+      "paths": [
+        "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+        "docs/ui-spec/flows/F01-answer-a-parked-question.md"
+      ],
+      "rationale": "Same normalized area/title; requires semantic duplicate/conflict review before promotion.",
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+    },
+    {
+      "kind": "semantic",
+      "key": "ui-specification:f02-approve-a-merge-end-to-end",
+      "paths": [
+        "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+        "docs/ui-spec/flows/F02-approve-a-merge.md"
+      ],
+      "rationale": "Same normalized area/title; requires semantic duplicate/conflict review before promotion.",
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+    },
+    {
+      "kind": "semantic",
+      "key": "ui-specification:herdr-web-dashboard-ui-spec-overview",
+      "paths": [
+        "docs/platform/ui-spec/spec.md",
+        "docs/ui-spec/00-overview.md"
+      ],
+      "rationale": "Same normalized area/title; requires semantic duplicate/conflict review before promotion.",
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+    },
+    {
+      "kind": "semantic",
+      "key": "ui-specification:m01-answer-a-parked-question",
+      "paths": [
+        "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+        "docs/ui-spec/modals/M01-answer-question.md"
+      ],
+      "rationale": "Same normalized area/title; requires semantic duplicate/conflict review before promotion.",
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+    },
+    {
+      "kind": "semantic",
+      "key": "ui-specification:m02-approve-a-merge",
+      "paths": [
+        "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+        "docs/ui-spec/modals/M02-approve-merge.md"
+      ],
+      "rationale": "Same normalized area/title; requires semantic duplicate/conflict review before promotion.",
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+    },
+    {
+      "kind": "semantic",
+      "key": "ui-specification:m03-add-or-edit-a-work-item",
+      "paths": [
+        "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+        "docs/ui-spec/modals/M03-add-edit-item.md"
+      ],
+      "rationale": "Same normalized area/title; requires semantic duplicate/conflict review before promotion.",
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+    },
+    {
+      "kind": "semantic",
+      "key": "ui-specification:s01-sign-in",
+      "paths": [
+        "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+        "docs/ui-spec/screens/S01-sign-in.md"
+      ],
+      "rationale": "Same normalized area/title; requires semantic duplicate/conflict review before promotion.",
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+    },
+    {
+      "kind": "semantic",
+      "key": "ui-specification:s02-taskboard",
+      "paths": [
+        "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+        "docs/ui-spec/screens/S02-taskboard.md"
+      ],
+      "rationale": "Same normalized area/title; requires semantic duplicate/conflict review before promotion.",
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+    },
+    {
+      "kind": "semantic",
+      "key": "ui-specification:s03-task-detail",
+      "paths": [
+        "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+        "docs/ui-spec/screens/S03-task-detail.md"
+      ],
+      "rationale": "Same normalized area/title; requires semantic duplicate/conflict review before promotion.",
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+    },
+    {
+      "kind": "semantic",
+      "key": "ui-specification:s04-questions-needing-answer",
+      "paths": [
+        "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+        "docs/ui-spec/screens/S04-questions-needing-answer.md"
+      ],
+      "rationale": "Same normalized area/title; requires semantic duplicate/conflict review before promotion.",
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+    },
+    {
+      "kind": "semantic",
+      "key": "ui-specification:specconfig",
+      "paths": [
+        "docs/platform/ui-spec/architecture/spec.config.yaml",
+        "docs/ui-spec/spec.config.yaml"
+      ],
+      "rationale": "Same normalized area/title; requires semantic duplicate/conflict review before promotion.",
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+    },
+    {
+      "kind": "semantic",
+      "key": "ui-specification:states-and-errors",
+      "paths": [
+        "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+        "docs/ui-spec/30-states-and-errors.md"
+      ],
+      "rationale": "Same normalized area/title; requires semantic duplicate/conflict review before promotion.",
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+    },
+    {
+      "kind": "semantic",
+      "key": "ui-specification:surface-contractschema",
+      "paths": [
+        "docs/platform/ui-spec/history/schema/surface-contract.schema.json",
+        "docs/ui-spec/schema/surface-contract.schema.json"
+      ],
+      "rationale": "Same normalized area/title; requires semantic duplicate/conflict review before promotion.",
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+    },
+    {
+      "kind": "semantic",
+      "key": "ui-specification:system-events",
+      "paths": [
+        "docs/platform/ui-spec/contracts/15-system-events.md",
+        "docs/ui-spec/15-system-events.md"
+      ],
+      "rationale": "Same normalized area/title; requires semantic duplicate/conflict review before promotion.",
+      "action": "Re-evaluate with native retirement/mirror exclusions in Step 10 package/rehearsal; no authority, deletion or implicit approval."
+    }
+  ],
+  "note": "Outside the 15 L10-5 groups; presence here is not a new checker exemption or group resolution."
+}

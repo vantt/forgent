@@ -1,0 +1,29 @@
+{
+  "SYNC": "17b7519663f67da9cc07820c3c241224cb6d60af",
+  "mergePerformedBy": "Lead before this producer turn",
+  "legacyEdits": [
+    {
+      "path": "docs/specs/confinement-authority.md",
+      "ratchetRequired": true,
+      "priorExceptionDigest": "435f3ccca09d9383d489efa8961edd7ae2b8bf5a35d063a91486a8a551325ae0",
+      "expectedDigest": "98f10ba191b729edbe2bfbec7a6ade8047466146ef470345688e6f9f6b9456d6",
+      "lines": [
+        1104,
+        1104
+      ],
+      "mappedSource": "ledger/area-map-specs-ui.md:7",
+      "target": "docs/platform/agent-confinement/spec.md",
+      "action": "Queue exact complete native unit for re-carry, rebind and independent review in docs/package turns"
+    },
+    {
+      "path": "docs/explanation/orphaned-runtime-claim-recovery-unclaim-verb.md",
+      "ratchetRequired": false,
+      "reason": "Outside DEFAULT_ROOTS docs/specs and docs/architect in scripts/check-legacy-docs-ratchet.mjs:23; not a Phase 6 mapped source (exact path absent in every ledger/area-map-*.md).",
+      "mappedSourceMatches": [],
+      "sha256": "9e6cee864083869dbdab59c480a9fead86ce87623ecc0e4ac964bffb44533d86",
+      "diff": "diff --git a/docs/explanation/orphaned-runtime-claim-recovery-unclaim-verb.md b/docs/explanation/orphaned-runtime-claim-recovery-unclaim-verb.md\nindex d5fccaec4..6b6329fbc 100644\n--- a/docs/explanation/orphaned-runtime-claim-recovery-unclaim-verb.md\n+++ b/docs/explanation/orphaned-runtime-claim-recovery-unclaim-verb.md\n@@ -54,6 +54,11 @@ already-tested primitives rather than adding new mechanism:\n   `ClaimError('conflict', ...)` naming the holder and claim age if the\n   claim is still genuinely live, or releasing with `{released: true,\n   reason: 'stale-liveness'}` if not.\n+- Both releases go through `releaseClaim`'s named `adminReason` option,\n+  because the claim usually belongs to another (dead) session and a plain\n+  release is refused for any writer but the claim's own. When the operator\n+  is a different writer, the result adds `admin: {reason, ownerWriterId,\n+  releasedByWriterId}`.\n \n This is additive and composes existing primitives (`releaseClaim`,\n `rebuildViewFromDir`, `isReclaimEligible`) rather than duplicating any of\n"
+    }
+  ],
+  "nativeSyncCount": 0,
+  "registryWrites": 0
+}

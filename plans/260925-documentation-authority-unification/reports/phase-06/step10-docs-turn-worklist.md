@@ -1,0 +1,18 @@
+# Next turn: docs authoring, no sync
+
+SYNC `17b751966`; Step 10 evidence section 9 turn 2; L10-1–L10-11. This is a worklist, not a review request or a claim that docs changed. All actual docs bodies remain unchanged in this data turn. Native sync, snapshot and final review packaging belong to the following package turn.
+
+| Work | Size | Prepared input | Docs-turn action / proof owed |
+|---|---:|---|---|
+| Reading-map merge | 53 verbatim entries | step10-reading-map-merge-table.json | Append the intact curated list into retained docs/reading-map.md; keep legacy references, record stale paths under A35, log promoted-edits; redecide 3 source units. Independent entry/destination/anchor review follows. Phase 9 owns consumer repointing. |
+| Closing instructions | 110 active + 18 gap + 9 retired identities | step10-closing-instructions-skeleton.json | One real shard, deduplicate already-decided identities against canonical inputs. Apply L10-2 with both exact lines, old/new unit digests, residual SHA256 and both native identities; L10-3 for the remaining rows. Keep root files intact; no platform copy; all new/redecided rows pending. Skeleton is outside decisions/ and is not loaded by gates. |
+| Promotion header fills | 37 files | step10-header-fill-worklist.json | Fill only listed fields from existing provenance, one area at a time, portals last. No body edits or truth certification. |
+| Candidate link pass | 416 links / 78 files; 366 repoint, 41 keep-history, 9 queue | step10-link-pass-worklist.json | Exact line/column/original/replacement supplied. Repoint only mapped non-fenced Markdown links; retain original history referents. Log every body change in post-review-edits and each promoted-area portal change in promoted-edits. Non-doc consumers/inline code remain Phase 8/9 queues. |
+| Confinement re-carry | 1 complete new native unit, unheaded-block-113 | step10-confinement-recarry.json | Preserve the binding paragraph at source line 1104 in docs/platform/agent-confinement/spec.md; preserve predecessor identity and rebind/review in next package turn. Do not edit the legacy source. |
+| History index | 1 README | step10-history-readme-draft.md | Author docs/platform/history/documentation-authority-unification/README.md as history kind; remove draft-location wrapper. No snapshot claim until the later --snapshot / --verify run. Phase 9 owns sealing. |
+
+Every changed target digest returns through D, --rebind and independent review (A22/A36/A38); old approvals certify no new binding. After each docs batch: A/B/H/I. Finish all docs before packaging. Do not run sync in the docs turn, do not generate a review pack, and do not edit P/alias-table.json. No new main merge is scheduled.
+
+Before the later global closure proof, resolve the pending Step 8 dashboard predecessor through a binding-matched independent verdict (or record a real blocker); it is not a fourth Rings hold. Other retirement-group and consumer obligations remain in step10-other-group-queue.json and owner-queue.md. The 14 runner historical cutover revalidations and all A34 residual/group obligations persist. Phase 7 owns cross-area readers; L10-11 skips Step 10 readers. Phase 6 eventually stops at awaiting owner review.
+
+Confinement alias/source drift: step10-alias-source-drift-queue.json lists 39 changed/missing anchor-digest comparisons after the binding insertion (including shifted later blocks and containing headings). --table validates targets/schema only; these historical lookup drafts must be revalidated against the native identities after re-carry, with no approval or identity shifted by guess.

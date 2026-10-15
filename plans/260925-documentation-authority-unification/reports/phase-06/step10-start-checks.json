@@ -1,0 +1,84 @@
+{
+  "HEAD": "17b7519663f67da9cc07820c3c241224cb6d60af",
+  "SYNC": "17b7519663f67da9cc07820c3c241224cb6d60af",
+  "B0": "dbe5c432852837ea01e6025b35868bcb7271495d",
+  "A": {
+    "historicalOffenders": [
+      "plans/260925-documentation-authority-unification/phase-06-transform-all-platform-areas-as-candidate-material.md",
+      "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md",
+      "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+      "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.json",
+      "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.md",
+      "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/open-questions.md",
+      "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-07-draft.md",
+      "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-08-draft.md"
+    ],
+    "count": 8,
+    "note": "Historical Lead/prep observations retained; no rebaseline or checker change."
+  },
+  "B": [
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "expected": "a52981ff2862cc2c553dbb3181e4e822a26b146b",
+      "actual": "a52981ff2862cc2c553dbb3181e4e822a26b146b"
+    },
+    {
+      "path": "scripts/doc-inventory-artifact.mjs",
+      "expected": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64",
+      "actual": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64"
+    },
+    {
+      "path": "scripts/generate-shipped-path-inventory.mjs",
+      "expected": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
+      "actual": "0f1cd7e1cee308772c0b56c37f3190333039cfb3"
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.mjs",
+      "expected": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d",
+      "actual": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d"
+    },
+    {
+      "path": "scripts/lib/is-main-module.mjs",
+      "expected": "680570946fa1381474900c9192795514b5b88f48",
+      "actual": "680570946fa1381474900c9192795514b5b88f48"
+    }
+  ],
+  "C": [],
+  "H": {
+    "counts": {
+      "files": 607,
+      "byStatus": {
+        "promoted": 3,
+        "candidate": 213,
+        "legacy-current": 0,
+        "non-authority": 1,
+        "unrouted": 390
+      },
+      "exemptUnrouted": 302,
+      "checked": 216,
+      "findings": 0,
+      "byType": {}
+    },
+    "findings": []
+  },
+  "I": {
+    "equal": true,
+    "links": [
+      "docs/platform/**",
+      "docs/platform/<area",
+      "docs/platform/README.md",
+      "docs/platform/packaging-distribution/README.md",
+      "docs/platform/packaging-distribution/vision.md"
+    ]
+  },
+  "runnerScopeUnchangedAcrossSYNC": true,
+  "registrySHA256": "d2675a26883ff1f81e86e6d107d76f315602ada5253d98d3c849c9a8fff09772",
+  "nativeSyncCount": 0,
+  "registryWrites": 0,
+  "P_alias_table": {
+    "$schema": "./alias-table.schema.json",
+    "version": 1,
+    "description": "Platform alias table: old documentation path -> current platform owner. Intentionally empty until the transformation records real moves; entries are never invented ahead of the move they describe.",
+    "entries": []
+  }
+}

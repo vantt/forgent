@@ -1,0 +1,2188 @@
+{
+  "version": 1,
+  "draft": true,
+  "commit": "17b751966",
+  "description": "L10 data-only lookup draft from frozen maps and native current source decisions; no retirement, promotion or approval. Split bare paths use a mapped area portal; per-anchor entries retain concrete carrier bindings. Phase 9 owns adoption.",
+  "entries": [
+    {
+      "aliasId": "step10-ui-spec-0001",
+      "fromPath": "docs/ui-spec/00-overview.md",
+      "toOwner": "docs/platform/ui-spec/spec.md",
+      "toAnchor": null,
+      "kind": "moved",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/area-map-specs-ui.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0002",
+      "fromPath": "docs/ui-spec/00-overview.md#a-note-on-scale",
+      "toOwner": "docs/platform/ui-spec/spec.md",
+      "toAnchor": "a-note-on-scale",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0003",
+      "fromPath": "docs/ui-spec/00-overview.md#directory-tree",
+      "toOwner": "docs/platform/ui-spec/spec.md",
+      "toAnchor": "directory-tree",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0004",
+      "fromPath": "docs/ui-spec/00-overview.md#herdr-web-dashboard-ui-spec-overview",
+      "toOwner": "docs/platform/ui-spec/spec.md",
+      "toAnchor": "herdr-web-dashboard-ui-spec-overview",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0005",
+      "fromPath": "docs/ui-spec/00-overview.md#how-to-work-on-this-spec",
+      "toOwner": "docs/platform/ui-spec/spec.md",
+      "toAnchor": "how-to-work-on-this-spec",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0006",
+      "fromPath": "docs/ui-spec/00-overview.md#surface-index",
+      "toOwner": "docs/platform/ui-spec/spec.md",
+      "toAnchor": "surface-index",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0007",
+      "fromPath": "docs/ui-spec/00-overview.md#unheaded-block-1",
+      "toOwner": "docs/platform/ui-spec/spec.md",
+      "toAnchor": "unheaded-block-1",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0008",
+      "fromPath": "docs/ui-spec/00-overview.md#unheaded-block-10",
+      "toOwner": "docs/platform/ui-spec/spec.md",
+      "toAnchor": "unheaded-block-12",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0009",
+      "fromPath": "docs/ui-spec/00-overview.md#unheaded-block-11",
+      "toOwner": "docs/platform/ui-spec/spec.md",
+      "toAnchor": "unheaded-block-13",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0010",
+      "fromPath": "docs/ui-spec/00-overview.md#unheaded-block-2",
+      "toOwner": "docs/platform/ui-spec/spec.md",
+      "toAnchor": "unheaded-block-4",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0011",
+      "fromPath": "docs/ui-spec/00-overview.md#unheaded-block-3",
+      "toOwner": "docs/platform/ui-spec/spec.md",
+      "toAnchor": "unheaded-block-5",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0012",
+      "fromPath": "docs/ui-spec/00-overview.md#unheaded-block-4",
+      "toOwner": "docs/platform/ui-spec/spec.md",
+      "toAnchor": "unheaded-block-6",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0013",
+      "fromPath": "docs/ui-spec/00-overview.md#unheaded-block-5",
+      "toOwner": "docs/platform/ui-spec/spec.md",
+      "toAnchor": "unheaded-block-7",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0014",
+      "fromPath": "docs/ui-spec/00-overview.md#unheaded-block-6",
+      "toOwner": "docs/platform/ui-spec/spec.md",
+      "toAnchor": "unheaded-block-8",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0015",
+      "fromPath": "docs/ui-spec/00-overview.md#unheaded-block-7",
+      "toOwner": "docs/platform/ui-spec/spec.md",
+      "toAnchor": "unheaded-block-9",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0016",
+      "fromPath": "docs/ui-spec/00-overview.md#unheaded-block-8",
+      "toOwner": "docs/platform/ui-spec/spec.md",
+      "toAnchor": "unheaded-block-10",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0017",
+      "fromPath": "docs/ui-spec/00-overview.md#unheaded-block-9",
+      "toOwner": "docs/platform/ui-spec/spec.md",
+      "toAnchor": "unheaded-block-11",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0018",
+      "fromPath": "docs/ui-spec/15-system-events.md",
+      "toOwner": "docs/platform/ui-spec/contracts/15-system-events.md",
+      "toAnchor": null,
+      "kind": "moved",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/area-map-specs-ui.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0019",
+      "fromPath": "docs/ui-spec/15-system-events.md#system-events",
+      "toOwner": "docs/platform/ui-spec/contracts/15-system-events.md",
+      "toAnchor": "system-events",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0020",
+      "fromPath": "docs/ui-spec/15-system-events.md#unheaded-block-1",
+      "toOwner": "docs/platform/ui-spec/contracts/15-system-events.md",
+      "toAnchor": "unheaded-block-1",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0021",
+      "fromPath": "docs/ui-spec/15-system-events.md#unheaded-block-2",
+      "toOwner": "docs/platform/ui-spec/contracts/15-system-events.md",
+      "toAnchor": "unheaded-block-4",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0022",
+      "fromPath": "docs/ui-spec/15-system-events.md#unheaded-block-3",
+      "toOwner": "docs/platform/ui-spec/contracts/15-system-events.md",
+      "toAnchor": "unheaded-block-5",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0023",
+      "fromPath": "docs/ui-spec/15-system-events.md#unheaded-block-4",
+      "toOwner": "docs/platform/ui-spec/contracts/15-system-events.md",
+      "toAnchor": "unheaded-block-6",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0024",
+      "fromPath": "docs/ui-spec/15-system-events.md#unheaded-block-5",
+      "toOwner": "docs/platform/ui-spec/contracts/15-system-events.md",
+      "toAnchor": "unheaded-block-7",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0025",
+      "fromPath": "docs/ui-spec/15-system-events.md#unheaded-block-6",
+      "toOwner": "docs/platform/ui-spec/contracts/15-system-events.md",
+      "toAnchor": "unheaded-block-8",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0026",
+      "fromPath": "docs/ui-spec/15-system-events.md#unheaded-block-7",
+      "toOwner": "docs/platform/ui-spec/contracts/15-system-events.md",
+      "toAnchor": "unheaded-block-9",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0027",
+      "fromPath": "docs/ui-spec/15-system-events.md#unheaded-block-8",
+      "toOwner": "docs/platform/ui-spec/contracts/15-system-events.md",
+      "toAnchor": "unheaded-block-10",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0028",
+      "fromPath": "docs/ui-spec/20-domain-rules.md",
+      "toOwner": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+      "toAnchor": null,
+      "kind": "moved",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/area-map-specs-ui.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0029",
+      "fromPath": "docs/ui-spec/20-domain-rules.md#domain-rules",
+      "toOwner": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+      "toAnchor": "domain-rules",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0030",
+      "fromPath": "docs/ui-spec/20-domain-rules.md#unheaded-block-1",
+      "toOwner": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+      "toAnchor": "unheaded-block-1",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0031",
+      "fromPath": "docs/ui-spec/20-domain-rules.md#unheaded-block-2",
+      "toOwner": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+      "toAnchor": "unheaded-block-4",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0032",
+      "fromPath": "docs/ui-spec/20-domain-rules.md#unheaded-block-3",
+      "toOwner": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+      "toAnchor": "unheaded-block-5",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0033",
+      "fromPath": "docs/ui-spec/20-domain-rules.md#unheaded-block-4",
+      "toOwner": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+      "toAnchor": "unheaded-block-6",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0034",
+      "fromPath": "docs/ui-spec/30-states-and-errors.md",
+      "toOwner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "toAnchor": null,
+      "kind": "moved",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/area-map-specs-ui.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0035",
+      "fromPath": "docs/ui-spec/30-states-and-errors.md#err-approve-unavailable",
+      "toOwner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "toAnchor": "err-approve-unavailable",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0036",
+      "fromPath": "docs/ui-spec/30-states-and-errors.md#err-auth",
+      "toOwner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "toAnchor": "err-auth",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0037",
+      "fromPath": "docs/ui-spec/30-states-and-errors.md#err-narrative-path",
+      "toOwner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "toAnchor": "err-narrative-path",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0038",
+      "fromPath": "docs/ui-spec/30-states-and-errors.md#err-write-refused",
+      "toOwner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "toAnchor": "err-write-refused",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0039",
+      "fromPath": "docs/ui-spec/30-states-and-errors.md#errors",
+      "toOwner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "toAnchor": "errors",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0040",
+      "fromPath": "docs/ui-spec/30-states-and-errors.md#st-disconnected",
+      "toOwner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "toAnchor": "st-disconnected",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0041",
+      "fromPath": "docs/ui-spec/30-states-and-errors.md#st-empty-board",
+      "toOwner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "toAnchor": "st-empty-board",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0042",
+      "fromPath": "docs/ui-spec/30-states-and-errors.md#st-empty-filter",
+      "toOwner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "toAnchor": "st-empty-filter",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0043",
+      "fromPath": "docs/ui-spec/30-states-and-errors.md#st-empty-questions",
+      "toOwner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "toAnchor": "st-empty-questions",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0044",
+      "fromPath": "docs/ui-spec/30-states-and-errors.md#st-loading",
+      "toOwner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "toAnchor": "st-loading",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0045",
+      "fromPath": "docs/ui-spec/30-states-and-errors.md#st-narrative-missing",
+      "toOwner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "toAnchor": "st-narrative-missing",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0046",
+      "fromPath": "docs/ui-spec/30-states-and-errors.md#st-never-parked",
+      "toOwner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "toAnchor": "st-never-parked",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0047",
+      "fromPath": "docs/ui-spec/30-states-and-errors.md#st-ready",
+      "toOwner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "toAnchor": "st-ready",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0048",
+      "fromPath": "docs/ui-spec/30-states-and-errors.md#st-submitting",
+      "toOwner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "toAnchor": "st-submitting",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0049",
+      "fromPath": "docs/ui-spec/30-states-and-errors.md#states",
+      "toOwner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "toAnchor": "states",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0050",
+      "fromPath": "docs/ui-spec/30-states-and-errors.md#states-and-errors",
+      "toOwner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "toAnchor": "states-and-errors",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0051",
+      "fromPath": "docs/ui-spec/30-states-and-errors.md#unheaded-block-1",
+      "toOwner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "toAnchor": "unheaded-block-3",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0052",
+      "fromPath": "docs/ui-spec/30-states-and-errors.md#unheaded-block-10",
+      "toOwner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "toAnchor": "unheaded-block-12",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0053",
+      "fromPath": "docs/ui-spec/30-states-and-errors.md#unheaded-block-11",
+      "toOwner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "toAnchor": "unheaded-block-13",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0054",
+      "fromPath": "docs/ui-spec/30-states-and-errors.md#unheaded-block-12",
+      "toOwner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "toAnchor": "unheaded-block-14",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0055",
+      "fromPath": "docs/ui-spec/30-states-and-errors.md#unheaded-block-13",
+      "toOwner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "toAnchor": "unheaded-block-15",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0056",
+      "fromPath": "docs/ui-spec/30-states-and-errors.md#unheaded-block-14",
+      "toOwner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "toAnchor": "unheaded-block-16",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0057",
+      "fromPath": "docs/ui-spec/30-states-and-errors.md#unheaded-block-2",
+      "toOwner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "toAnchor": "unheaded-block-4",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0058",
+      "fromPath": "docs/ui-spec/30-states-and-errors.md#unheaded-block-3",
+      "toOwner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "toAnchor": "unheaded-block-5",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0059",
+      "fromPath": "docs/ui-spec/30-states-and-errors.md#unheaded-block-4",
+      "toOwner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "toAnchor": "unheaded-block-6",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0060",
+      "fromPath": "docs/ui-spec/30-states-and-errors.md#unheaded-block-5",
+      "toOwner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "toAnchor": "unheaded-block-7",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0061",
+      "fromPath": "docs/ui-spec/30-states-and-errors.md#unheaded-block-6",
+      "toOwner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "toAnchor": "unheaded-block-8",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0062",
+      "fromPath": "docs/ui-spec/30-states-and-errors.md#unheaded-block-7",
+      "toOwner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "toAnchor": "unheaded-block-9",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0063",
+      "fromPath": "docs/ui-spec/30-states-and-errors.md#unheaded-block-8",
+      "toOwner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "toAnchor": "unheaded-block-10",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0064",
+      "fromPath": "docs/ui-spec/30-states-and-errors.md#unheaded-block-9",
+      "toOwner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+      "toAnchor": "unheaded-block-11",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0065",
+      "fromPath": "docs/ui-spec/components/C01-item-card.md",
+      "toOwner": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "toAnchor": null,
+      "kind": "moved",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/area-map-specs-ui.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0066",
+      "fromPath": "docs/ui-spec/components/C01-item-card.md#c01-item-card-status-pill-quick-actions",
+      "toOwner": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "toAnchor": "c01-item-card-status-pill-quick-actions",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0067",
+      "fromPath": "docs/ui-spec/components/C01-item-card.md#component-contract",
+      "toOwner": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "toAnchor": "component-contract",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0068",
+      "fromPath": "docs/ui-spec/components/C01-item-card.md#layout",
+      "toOwner": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "toAnchor": "layout",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0069",
+      "fromPath": "docs/ui-spec/components/C01-item-card.md#purpose",
+      "toOwner": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "toAnchor": "purpose",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0070",
+      "fromPath": "docs/ui-spec/components/C01-item-card.md#unheaded-block-1",
+      "toOwner": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "toAnchor": "unheaded-block-1",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0071",
+      "fromPath": "docs/ui-spec/components/C01-item-card.md#unheaded-block-2",
+      "toOwner": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "toAnchor": "unheaded-block-4",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0072",
+      "fromPath": "docs/ui-spec/components/C01-item-card.md#unheaded-block-3",
+      "toOwner": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "toAnchor": "unheaded-block-5",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0073",
+      "fromPath": "docs/ui-spec/components/C01-item-card.md#unheaded-block-4",
+      "toOwner": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "toAnchor": "unheaded-block-6",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0074",
+      "fromPath": "docs/ui-spec/components/C01-item-card.md#unheaded-block-5",
+      "toOwner": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "toAnchor": "unheaded-block-7",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0075",
+      "fromPath": "docs/ui-spec/components/C01-item-card.md#unheaded-block-6",
+      "toOwner": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "toAnchor": "unheaded-block-8",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0076",
+      "fromPath": "docs/ui-spec/components/C01-item-card.md#unheaded-block-7",
+      "toOwner": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "toAnchor": "unheaded-block-9",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0077",
+      "fromPath": "docs/ui-spec/components/C01-item-card.md#unheaded-block-8",
+      "toOwner": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+      "toAnchor": "unheaded-block-10",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0078",
+      "fromPath": "docs/ui-spec/flows/F01-answer-a-parked-question.md",
+      "toOwner": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "toAnchor": null,
+      "kind": "moved",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/area-map-specs-ui.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0079",
+      "fromPath": "docs/ui-spec/flows/F01-answer-a-parked-question.md#branches",
+      "toOwner": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "toAnchor": "branches",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0080",
+      "fromPath": "docs/ui-spec/flows/F01-answer-a-parked-question.md#f01-answer-a-parked-question-end-to-end",
+      "toOwner": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "toAnchor": "f01-answer-a-parked-question-end-to-end",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0081",
+      "fromPath": "docs/ui-spec/flows/F01-answer-a-parked-question.md#purpose",
+      "toOwner": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "toAnchor": "purpose",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0082",
+      "fromPath": "docs/ui-spec/flows/F01-answer-a-parked-question.md#steps",
+      "toOwner": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "toAnchor": "steps",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0083",
+      "fromPath": "docs/ui-spec/flows/F01-answer-a-parked-question.md#unheaded-block-1",
+      "toOwner": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "toAnchor": "unheaded-block-1",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0084",
+      "fromPath": "docs/ui-spec/flows/F01-answer-a-parked-question.md#unheaded-block-2",
+      "toOwner": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "toAnchor": "unheaded-block-4",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0085",
+      "fromPath": "docs/ui-spec/flows/F01-answer-a-parked-question.md#unheaded-block-3",
+      "toOwner": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "toAnchor": "unheaded-block-5",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0086",
+      "fromPath": "docs/ui-spec/flows/F01-answer-a-parked-question.md#unheaded-block-4",
+      "toOwner": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "toAnchor": "unheaded-block-6",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0087",
+      "fromPath": "docs/ui-spec/flows/F01-answer-a-parked-question.md#unheaded-block-5",
+      "toOwner": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "toAnchor": "unheaded-block-7",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0088",
+      "fromPath": "docs/ui-spec/flows/F01-answer-a-parked-question.md#unheaded-block-6",
+      "toOwner": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+      "toAnchor": "unheaded-block-8",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0089",
+      "fromPath": "docs/ui-spec/flows/F02-approve-a-merge.md",
+      "toOwner": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+      "toAnchor": null,
+      "kind": "moved",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/area-map-specs-ui.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0090",
+      "fromPath": "docs/ui-spec/flows/F02-approve-a-merge.md#branches",
+      "toOwner": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+      "toAnchor": "branches",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0091",
+      "fromPath": "docs/ui-spec/flows/F02-approve-a-merge.md#f02-approve-a-merge-end-to-end",
+      "toOwner": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+      "toAnchor": "f02-approve-a-merge-end-to-end",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0092",
+      "fromPath": "docs/ui-spec/flows/F02-approve-a-merge.md#purpose",
+      "toOwner": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+      "toAnchor": "purpose",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0093",
+      "fromPath": "docs/ui-spec/flows/F02-approve-a-merge.md#steps",
+      "toOwner": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+      "toAnchor": "steps",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0094",
+      "fromPath": "docs/ui-spec/flows/F02-approve-a-merge.md#unheaded-block-1",
+      "toOwner": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+      "toAnchor": "unheaded-block-1",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0095",
+      "fromPath": "docs/ui-spec/flows/F02-approve-a-merge.md#unheaded-block-2",
+      "toOwner": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+      "toAnchor": "unheaded-block-4",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0096",
+      "fromPath": "docs/ui-spec/flows/F02-approve-a-merge.md#unheaded-block-3",
+      "toOwner": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+      "toAnchor": "unheaded-block-5",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0097",
+      "fromPath": "docs/ui-spec/flows/F02-approve-a-merge.md#unheaded-block-4",
+      "toOwner": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+      "toAnchor": "unheaded-block-6",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0098",
+      "fromPath": "docs/ui-spec/flows/F02-approve-a-merge.md#unheaded-block-5",
+      "toOwner": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+      "toAnchor": "unheaded-block-7",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0099",
+      "fromPath": "docs/ui-spec/modals/M01-answer-question.md",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "toAnchor": null,
+      "kind": "moved",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/area-map-specs-ui.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0100",
+      "fromPath": "docs/ui-spec/modals/M01-answer-question.md#interactions",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "toAnchor": "interactions",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0101",
+      "fromPath": "docs/ui-spec/modals/M01-answer-question.md#layout",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "toAnchor": "layout",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0102",
+      "fromPath": "docs/ui-spec/modals/M01-answer-question.md#m01-answer-a-parked-question",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "toAnchor": "m01-answer-a-parked-question",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0103",
+      "fromPath": "docs/ui-spec/modals/M01-answer-question.md#purpose",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "toAnchor": "purpose",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0104",
+      "fromPath": "docs/ui-spec/modals/M01-answer-question.md#states",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "toAnchor": "states",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0105",
+      "fromPath": "docs/ui-spec/modals/M01-answer-question.md#unheaded-block-1",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "toAnchor": "unheaded-block-1",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0106",
+      "fromPath": "docs/ui-spec/modals/M01-answer-question.md#unheaded-block-2",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "toAnchor": "unheaded-block-4",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0107",
+      "fromPath": "docs/ui-spec/modals/M01-answer-question.md#unheaded-block-3",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "toAnchor": "unheaded-block-5",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0108",
+      "fromPath": "docs/ui-spec/modals/M01-answer-question.md#unheaded-block-4",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "toAnchor": "unheaded-block-6",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0109",
+      "fromPath": "docs/ui-spec/modals/M01-answer-question.md#unheaded-block-5",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "toAnchor": "unheaded-block-7",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0110",
+      "fromPath": "docs/ui-spec/modals/M01-answer-question.md#unheaded-block-6",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+      "toAnchor": "unheaded-block-8",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0111",
+      "fromPath": "docs/ui-spec/modals/M02-approve-merge.md",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "toAnchor": null,
+      "kind": "moved",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/area-map-specs-ui.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0112",
+      "fromPath": "docs/ui-spec/modals/M02-approve-merge.md#interactions",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "toAnchor": "interactions",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0113",
+      "fromPath": "docs/ui-spec/modals/M02-approve-merge.md#layout",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "toAnchor": "layout",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0114",
+      "fromPath": "docs/ui-spec/modals/M02-approve-merge.md#m02-approve-a-merge",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "toAnchor": "m02-approve-a-merge",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0115",
+      "fromPath": "docs/ui-spec/modals/M02-approve-merge.md#purpose",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "toAnchor": "purpose",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0116",
+      "fromPath": "docs/ui-spec/modals/M02-approve-merge.md#states",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "toAnchor": "states",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0117",
+      "fromPath": "docs/ui-spec/modals/M02-approve-merge.md#unheaded-block-1",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "toAnchor": "unheaded-block-1",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0118",
+      "fromPath": "docs/ui-spec/modals/M02-approve-merge.md#unheaded-block-2",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "toAnchor": "unheaded-block-4",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0119",
+      "fromPath": "docs/ui-spec/modals/M02-approve-merge.md#unheaded-block-3",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "toAnchor": "unheaded-block-5",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0120",
+      "fromPath": "docs/ui-spec/modals/M02-approve-merge.md#unheaded-block-4",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "toAnchor": "unheaded-block-6",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0121",
+      "fromPath": "docs/ui-spec/modals/M02-approve-merge.md#unheaded-block-5",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "toAnchor": "unheaded-block-7",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0122",
+      "fromPath": "docs/ui-spec/modals/M02-approve-merge.md#unheaded-block-6",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "toAnchor": "unheaded-block-8",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0123",
+      "fromPath": "docs/ui-spec/modals/M02-approve-merge.md#unheaded-block-7",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+      "toAnchor": "unheaded-block-9",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0124",
+      "fromPath": "docs/ui-spec/modals/M03-add-edit-item.md",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "toAnchor": null,
+      "kind": "moved",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/area-map-specs-ui.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0125",
+      "fromPath": "docs/ui-spec/modals/M03-add-edit-item.md#interactions",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "toAnchor": "interactions",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0126",
+      "fromPath": "docs/ui-spec/modals/M03-add-edit-item.md#layout",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "toAnchor": "layout",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0127",
+      "fromPath": "docs/ui-spec/modals/M03-add-edit-item.md#m03-add-or-edit-a-work-item",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "toAnchor": "m03-add-or-edit-a-work-item",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0128",
+      "fromPath": "docs/ui-spec/modals/M03-add-edit-item.md#purpose",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "toAnchor": "purpose",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0129",
+      "fromPath": "docs/ui-spec/modals/M03-add-edit-item.md#states",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "toAnchor": "states",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0130",
+      "fromPath": "docs/ui-spec/modals/M03-add-edit-item.md#unheaded-block-1",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "toAnchor": "unheaded-block-1",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0131",
+      "fromPath": "docs/ui-spec/modals/M03-add-edit-item.md#unheaded-block-2",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "toAnchor": "unheaded-block-4",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0132",
+      "fromPath": "docs/ui-spec/modals/M03-add-edit-item.md#unheaded-block-3",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "toAnchor": "unheaded-block-5",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0133",
+      "fromPath": "docs/ui-spec/modals/M03-add-edit-item.md#unheaded-block-4",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "toAnchor": "unheaded-block-6",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0134",
+      "fromPath": "docs/ui-spec/modals/M03-add-edit-item.md#unheaded-block-5",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "toAnchor": "unheaded-block-7",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0135",
+      "fromPath": "docs/ui-spec/modals/M03-add-edit-item.md#unheaded-block-6",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "toAnchor": "unheaded-block-8",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0136",
+      "fromPath": "docs/ui-spec/modals/M03-add-edit-item.md#unheaded-block-7",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "toAnchor": "unheaded-block-9",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0137",
+      "fromPath": "docs/ui-spec/modals/M03-add-edit-item.md#unheaded-block-8",
+      "toOwner": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+      "toAnchor": "unheaded-block-10",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0138",
+      "fromPath": "docs/ui-spec/schema/surface-contract.schema.json",
+      "toOwner": "docs/platform/ui-spec/history/schema/surface-contract.schema.json",
+      "toAnchor": null,
+      "kind": "moved",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/area-map-specs-ui.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0139",
+      "fromPath": "docs/ui-spec/schema/surface-contract.schema.json#file-block",
+      "toOwner": "docs/platform/ui-spec/history/schema/surface-contract.schema.json",
+      "toAnchor": "file-block",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0140",
+      "fromPath": "docs/ui-spec/screens/S01-sign-in.md",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "toAnchor": null,
+      "kind": "moved",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/area-map-specs-ui.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0141",
+      "fromPath": "docs/ui-spec/screens/S01-sign-in.md#interactions",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "toAnchor": "interactions",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0142",
+      "fromPath": "docs/ui-spec/screens/S01-sign-in.md#layout",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "toAnchor": "layout",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0143",
+      "fromPath": "docs/ui-spec/screens/S01-sign-in.md#purpose",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "toAnchor": "purpose",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0144",
+      "fromPath": "docs/ui-spec/screens/S01-sign-in.md#s01-sign-in",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "toAnchor": "s01-sign-in",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0145",
+      "fromPath": "docs/ui-spec/screens/S01-sign-in.md#states",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "toAnchor": "states",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0146",
+      "fromPath": "docs/ui-spec/screens/S01-sign-in.md#unheaded-block-1",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "toAnchor": "unheaded-block-1",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0147",
+      "fromPath": "docs/ui-spec/screens/S01-sign-in.md#unheaded-block-2",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "toAnchor": "unheaded-block-4",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0148",
+      "fromPath": "docs/ui-spec/screens/S01-sign-in.md#unheaded-block-3",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "toAnchor": "unheaded-block-5",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0149",
+      "fromPath": "docs/ui-spec/screens/S01-sign-in.md#unheaded-block-4",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "toAnchor": "unheaded-block-6",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0150",
+      "fromPath": "docs/ui-spec/screens/S01-sign-in.md#unheaded-block-5",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "toAnchor": "unheaded-block-7",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0151",
+      "fromPath": "docs/ui-spec/screens/S01-sign-in.md#unheaded-block-6",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "toAnchor": "unheaded-block-8",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0152",
+      "fromPath": "docs/ui-spec/screens/S01-sign-in.md#unheaded-block-7",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "toAnchor": "unheaded-block-9",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0153",
+      "fromPath": "docs/ui-spec/screens/S01-sign-in.md#unheaded-block-8",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "toAnchor": "unheaded-block-10",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0154",
+      "fromPath": "docs/ui-spec/screens/S01-sign-in.md#unheaded-block-9",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+      "toAnchor": "unheaded-block-11",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0155",
+      "fromPath": "docs/ui-spec/screens/S02-taskboard.md",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "toAnchor": null,
+      "kind": "moved",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/area-map-specs-ui.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0156",
+      "fromPath": "docs/ui-spec/screens/S02-taskboard.md#interactions",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "toAnchor": "interactions",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0157",
+      "fromPath": "docs/ui-spec/screens/S02-taskboard.md#layout",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "toAnchor": "layout",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0158",
+      "fromPath": "docs/ui-spec/screens/S02-taskboard.md#purpose",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "toAnchor": "purpose",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0159",
+      "fromPath": "docs/ui-spec/screens/S02-taskboard.md#s02-taskboard",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "toAnchor": "s02-taskboard",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0160",
+      "fromPath": "docs/ui-spec/screens/S02-taskboard.md#states",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "toAnchor": "states",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0161",
+      "fromPath": "docs/ui-spec/screens/S02-taskboard.md#unheaded-block-1",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "toAnchor": "unheaded-block-1",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0162",
+      "fromPath": "docs/ui-spec/screens/S02-taskboard.md#unheaded-block-10",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "toAnchor": "unheaded-block-12",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0163",
+      "fromPath": "docs/ui-spec/screens/S02-taskboard.md#unheaded-block-11",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "toAnchor": "unheaded-block-13",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0164",
+      "fromPath": "docs/ui-spec/screens/S02-taskboard.md#unheaded-block-12",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "toAnchor": "unheaded-block-14",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0165",
+      "fromPath": "docs/ui-spec/screens/S02-taskboard.md#unheaded-block-13",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "toAnchor": "unheaded-block-15",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0166",
+      "fromPath": "docs/ui-spec/screens/S02-taskboard.md#unheaded-block-14",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "toAnchor": "unheaded-block-16",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0167",
+      "fromPath": "docs/ui-spec/screens/S02-taskboard.md#unheaded-block-15",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "toAnchor": "unheaded-block-17",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0168",
+      "fromPath": "docs/ui-spec/screens/S02-taskboard.md#unheaded-block-2",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "toAnchor": "unheaded-block-4",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0169",
+      "fromPath": "docs/ui-spec/screens/S02-taskboard.md#unheaded-block-3",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "toAnchor": "unheaded-block-5",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0170",
+      "fromPath": "docs/ui-spec/screens/S02-taskboard.md#unheaded-block-4",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "toAnchor": "unheaded-block-6",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0171",
+      "fromPath": "docs/ui-spec/screens/S02-taskboard.md#unheaded-block-5",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "toAnchor": "unheaded-block-7",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0172",
+      "fromPath": "docs/ui-spec/screens/S02-taskboard.md#unheaded-block-6",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "toAnchor": "unheaded-block-8",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0173",
+      "fromPath": "docs/ui-spec/screens/S02-taskboard.md#unheaded-block-7",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "toAnchor": "unheaded-block-9",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0174",
+      "fromPath": "docs/ui-spec/screens/S02-taskboard.md#unheaded-block-8",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "toAnchor": "unheaded-block-10",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0175",
+      "fromPath": "docs/ui-spec/screens/S02-taskboard.md#unheaded-block-9",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+      "toAnchor": "unheaded-block-11",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0176",
+      "fromPath": "docs/ui-spec/screens/S03-task-detail.md",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "toAnchor": null,
+      "kind": "moved",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/area-map-specs-ui.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0177",
+      "fromPath": "docs/ui-spec/screens/S03-task-detail.md#interactions",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "toAnchor": "interactions",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0178",
+      "fromPath": "docs/ui-spec/screens/S03-task-detail.md#layout",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "toAnchor": "layout",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0179",
+      "fromPath": "docs/ui-spec/screens/S03-task-detail.md#purpose",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "toAnchor": "purpose",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0180",
+      "fromPath": "docs/ui-spec/screens/S03-task-detail.md#s03-task-detail",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "toAnchor": "s03-task-detail",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0181",
+      "fromPath": "docs/ui-spec/screens/S03-task-detail.md#states",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "toAnchor": "states",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0182",
+      "fromPath": "docs/ui-spec/screens/S03-task-detail.md#the-questionanswer-timeline-across-rounds",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "toAnchor": "the-questionanswer-timeline-across-rounds",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0183",
+      "fromPath": "docs/ui-spec/screens/S03-task-detail.md#unheaded-block-1",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "toAnchor": "unheaded-block-1",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0184",
+      "fromPath": "docs/ui-spec/screens/S03-task-detail.md#unheaded-block-10",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "toAnchor": "unheaded-block-12",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0185",
+      "fromPath": "docs/ui-spec/screens/S03-task-detail.md#unheaded-block-11",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "toAnchor": "unheaded-block-13",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0186",
+      "fromPath": "docs/ui-spec/screens/S03-task-detail.md#unheaded-block-12",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "toAnchor": "unheaded-block-14",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0187",
+      "fromPath": "docs/ui-spec/screens/S03-task-detail.md#unheaded-block-13",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "toAnchor": "unheaded-block-15",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0188",
+      "fromPath": "docs/ui-spec/screens/S03-task-detail.md#unheaded-block-14",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "toAnchor": "unheaded-block-16",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0189",
+      "fromPath": "docs/ui-spec/screens/S03-task-detail.md#unheaded-block-15",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "toAnchor": "unheaded-block-17",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0190",
+      "fromPath": "docs/ui-spec/screens/S03-task-detail.md#unheaded-block-16",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "toAnchor": "unheaded-block-18",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0191",
+      "fromPath": "docs/ui-spec/screens/S03-task-detail.md#unheaded-block-2",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "toAnchor": "unheaded-block-4",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0192",
+      "fromPath": "docs/ui-spec/screens/S03-task-detail.md#unheaded-block-3",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "toAnchor": "unheaded-block-5",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0193",
+      "fromPath": "docs/ui-spec/screens/S03-task-detail.md#unheaded-block-4",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "toAnchor": "unheaded-block-6",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0194",
+      "fromPath": "docs/ui-spec/screens/S03-task-detail.md#unheaded-block-5",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "toAnchor": "unheaded-block-7",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0195",
+      "fromPath": "docs/ui-spec/screens/S03-task-detail.md#unheaded-block-6",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "toAnchor": "unheaded-block-8",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0196",
+      "fromPath": "docs/ui-spec/screens/S03-task-detail.md#unheaded-block-7",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "toAnchor": "unheaded-block-9",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0197",
+      "fromPath": "docs/ui-spec/screens/S03-task-detail.md#unheaded-block-8",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "toAnchor": "unheaded-block-10",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0198",
+      "fromPath": "docs/ui-spec/screens/S03-task-detail.md#unheaded-block-9",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "toAnchor": "unheaded-block-11",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0199",
+      "fromPath": "docs/ui-spec/screens/S03-task-detail.md#what-context-actually-shows-d17",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "toAnchor": "what-context-actually-shows-d17",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0200",
+      "fromPath": "docs/ui-spec/screens/S03-task-detail.md#why-the-three-regions-sit-in-this-order",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+      "toAnchor": "why-the-three-regions-sit-in-this-order",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0201",
+      "fromPath": "docs/ui-spec/screens/S04-questions-needing-answer.md",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "toAnchor": null,
+      "kind": "moved",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/area-map-specs-ui.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0202",
+      "fromPath": "docs/ui-spec/screens/S04-questions-needing-answer.md#interactions",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "toAnchor": "interactions",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0203",
+      "fromPath": "docs/ui-spec/screens/S04-questions-needing-answer.md#layout",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "toAnchor": "layout",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0204",
+      "fromPath": "docs/ui-spec/screens/S04-questions-needing-answer.md#purpose",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "toAnchor": "purpose",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0205",
+      "fromPath": "docs/ui-spec/screens/S04-questions-needing-answer.md#s04-questions-needing-answer",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "toAnchor": "s04-questions-needing-answer",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0206",
+      "fromPath": "docs/ui-spec/screens/S04-questions-needing-answer.md#states",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "toAnchor": "states",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0207",
+      "fromPath": "docs/ui-spec/screens/S04-questions-needing-answer.md#unheaded-block-1",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "toAnchor": "unheaded-block-1",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0208",
+      "fromPath": "docs/ui-spec/screens/S04-questions-needing-answer.md#unheaded-block-10",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "toAnchor": "unheaded-block-12",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0209",
+      "fromPath": "docs/ui-spec/screens/S04-questions-needing-answer.md#unheaded-block-2",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "toAnchor": "unheaded-block-4",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0210",
+      "fromPath": "docs/ui-spec/screens/S04-questions-needing-answer.md#unheaded-block-3",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "toAnchor": "unheaded-block-5",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0211",
+      "fromPath": "docs/ui-spec/screens/S04-questions-needing-answer.md#unheaded-block-4",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "toAnchor": "unheaded-block-6",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0212",
+      "fromPath": "docs/ui-spec/screens/S04-questions-needing-answer.md#unheaded-block-5",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "toAnchor": "unheaded-block-7",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0213",
+      "fromPath": "docs/ui-spec/screens/S04-questions-needing-answer.md#unheaded-block-6",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "toAnchor": "unheaded-block-8",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0214",
+      "fromPath": "docs/ui-spec/screens/S04-questions-needing-answer.md#unheaded-block-7",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "toAnchor": "unheaded-block-9",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0215",
+      "fromPath": "docs/ui-spec/screens/S04-questions-needing-answer.md#unheaded-block-8",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "toAnchor": "unheaded-block-10",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0216",
+      "fromPath": "docs/ui-spec/screens/S04-questions-needing-answer.md#unheaded-block-9",
+      "toOwner": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+      "toAnchor": "unheaded-block-11",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0217",
+      "fromPath": "docs/ui-spec/spec.config.yaml",
+      "toOwner": "docs/platform/ui-spec/architecture/spec.config.yaml",
+      "toAnchor": null,
+      "kind": "moved",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/area-map-specs-ui.md",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    },
+    {
+      "aliasId": "step10-ui-spec-0218",
+      "fromPath": "docs/ui-spec/spec.config.yaml#file-block",
+      "toOwner": "docs/platform/ui-spec/architecture/spec.config.yaml",
+      "toAnchor": "file-block",
+      "kind": "redirected",
+      "evidenceRef": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "immutableRefs": [],
+      "recordedAt": "2026-10-15"
+    }
+  ]
+}

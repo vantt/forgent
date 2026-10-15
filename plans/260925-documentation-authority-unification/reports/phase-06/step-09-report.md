@@ -1,3 +1,34 @@
+# Step 9 closed at final SYNC — 495 reviewed, zero pending
+
+Assignment `unit-run-1792074987817-29e6c5c2/producer/1`; **SYNC 17b751966** (Lead merged main). This checkpoint supersedes older current-state headings below; their counts/pins remain historical evidence. Final rationale re-review committed by Lead at **25351590a**: **14 ok applied, Notes verbatim**, through unchanged ordinary applyReviewVerdicts. **495/495 source rows reviewed, 0 pending: 446 move / 49 supersede**. The API initially pinned containing SYNC HEAD as reportCommit; native D at the pre-merge proof pin rejected those 14 report references. Only that provenance field was normalized to the actual independent report commit 25351590a after byte equality at both pins; the initial diagnostic is retained. Application changed only the 14 matching rows' review fields; every disposition, source/target binding, rationale and author is unchanged. [Receipts](step10-runner-final-application.json).
+
+**Scoped D: zero fatal. Strict E: only 11 claims-partial-carry + 63 candidate-blocks-unreferenced; no pending runner row, no undisposed source gap or other structural fatal.** Native checks use both prior registries together and unchanged **07d3dec1b registry** (SHA256 d2675a26…). Read-only inventory at the committed review pin **25351590a**: **4484 files / 91331 active units**; source and entire runner candidate namespace are byte-identical across final SYNC. The merged-HEAD reconstruction correctly refused the stale global registry tree binding after two upstream edits; no refresh/bypass was used. Final-main confinement re-carry is explicitly queued in Step 10. This is scoped runner closure, not a current global gate result. **Zero native sync / registry writes.** [Native verification and times](step10-runner-verification.json), [D](step10-runner-D-both.json), [E](step10-runner-E-both.json). New comparison-helper real scoped smoke passes exact source/partial/reverse identity sets and reports **strictGreen false**; unchanged current lists remain **62 runner / 846 root / 908 union**, root alone owns the duplicated routing-handoff fence.
+
+## Review rounds and rework
+
+| Round / packet | Entries | ok | rework | Packet rework rate |
+|---|---:|---:|---:|---:|
+| initial-source | 495 | 494 | 1 | 0.20% |
+| 1803-bounded | 277 | 271 | 6 | 2.17% |
+| b80-bounded | 270 | 256 | 14 | 5.19% |
+| final-rationale | 14 | 14 | 0 | 0.00% |
+
+[Per-report count evidence](step10-runner-review-rounds.json). These are explicit packet/channel rates, not one homogeneous second source round: the 277-entry round mixes source and non-source evidence; the 270-entry round's 14 reworks are rationale-only; the final all-deep 14-row re-review has **0 rework**. The initial source review is 494 ok / 1 rework, with subsequent independent bounded correction reviews and Lead L9 directions recorded below. The 270 packet's 5.19% is disclosed, not claimed below 3%; the existing Lead final-request/closure direction governs this already-reviewed rationale correction. No author waiver, new sample or approval is inferred. All 28 predecessor dispositions and two L9-9 re-decisions are independently accepted, with all 11 partial-carries deep-read; 16 ambiguous old footer identities retain the complete eight-member contextual group (L9-15). Historical reports preserve their own source versus accounting acceptance boundaries.
+
+## Truth, red-team and readers
+
+Independent A28 draw **8/30 false (26.7%)**, escalated and handled by A41/A42. Initial **23 bounded assertion replacements**, followed by the **30 follow-up edits**, are included in the **73 reviewed truth/navigation/hygiene edit ranges**; edit ranges are not a replacement truth sample. Every bounded correction has code evidence and labelled before/after text; initial and follow-up re-reviews plus this rationale-only pass are complete. No new truth draw under A41 item 3. The full liveness population remains **409 current-eligible units, including 226 decision units**; dated history is not presented as current by placement. L9-17 retains truth-03's slightly overbroad canAdvanceEdge wording as explicitly accepted and queued for promotion truth review. Full truth certification remains owed at promotion.
+
+Red-team **R9-1–R9-8 addressed under L9-4** (six broken links rebased, evidence-based liveness, both drift measures, navigation, boilerplate, placement count and scope/stop-9 disclosure); H at final SYNC is **0 findings**, no open Critical/High claimed by the accepted Step 9 closure direction. Original red-team still records its original findings. Fresh readers: **both lenient PASS under the batch partial-counts rule; strict B/C 4/6 for both FAIL**, independence limitations retained. Known-conflict README and owner-queue gaps stay visible; Phase 7 owns cross-area fresh-reader review. **47/47** helper/review/format regression tests pass, zero fail/skip/cancel/todo; no full npm-suite claim.
+
+## Lead decision register carried through closure
+
+L9-1 additive map rows/rebounds; L9-2 drift 27/470 = 5.74% versus disclosed head-side 52/495 = 10.51%; L9-3 ~55 KB carriage into existing mapped files; L9-4 red-team fixes; L9-5 independent draw + A41 corrections replace old truth-population requests; L9-6 lenient reader acceptance with strict failures disclosed; L9-7 contextual footer group; L9-8 evidence-based current decision liveness; L9-9 two partial-carry re-decisions and cutover queue; L9-10 only binding-matching verdicts and rationale hygiene; L9-11 exact historical residuals and expanded 14-entry cutover queue; L9-12 bounded code-evidenced truth corrections; L9-13 all 28 predecessor dispositions and separate reconcile-help code defect; L9-14 one native package / one bounded re-review; L9-15 sixteen footer predecessor supersedes to complete eight-member group; L9-16 both reviewed pure-insertion approaches retained, **strict verbatim residual going forward**; L9-17 truth-03 accepted with explicit promotion check. Full rationales and exact pins remain in owner-answers.md and the historical report checkpoints below; nothing is retroactively rewritten.
+
+**Step 9 closed: yes.** Step 10 data turn is complete; next = **docs turn, evidence section 9 turn 2, no sync**. A34 residual/group/cutover obligations, three Rings holds, 14 historical cutover revalidations (five absent stored digests), separate reconcile-help defect, remaining stale successor, full global closure and promotion truth remain. Closing the batch promotes or retires nothing; Phase 6 remains open and eventually stops at awaiting owner review.
+
+---
+
 # Final runner application verified — 14 rationale rows await review
 
 Assignment `unit-run-1792071833745-bbef008d/producer/1`. This final checkpoint supersedes current counts below; historical checkpoints retain their pins.

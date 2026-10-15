@@ -13273,6 +13273,336 @@
         "Full document read at 77830ba77eb05991d95b005919776ee6254e833b: docs/platform/packaging-distribution/verification/implementation-alignment.md SHA256 87b955ac215ad60f5408e1068be6c2d05f08973be178b8089fbafbd01375e4ba",
         "Current candidate docs/platform/packaging-distribution/verification/implementation-alignment.md SHA256 662bdb61e82b094049e0f924a370060377fc15a7edc85ee6f8427df3ec8f5ab1"
       ]
+    },
+    {
+      "kind": "semantic",
+      "key": "historyevidence:approach",
+      "resolution": "history-no-authority",
+      "rule": "history-no-authority: all listed members retained as immutable evidence; no current authority is inferred and nothing is deleted. L10-5 under A42.",
+      "evidence": [
+        "SYNC 17b751966; step10-group-summary.json (group-only --summary; no identity refresh)",
+        "Current members [\"docs/history/cell-6-3-validate-plan-live-smoke/plan.md\",\"docs/history/dispatch-concept-boundary/plan.md\",\"docs/history/restore-verifiedsha-docs-on-main/plan.md\",\"docs/history/smoke-tsk-56w-4/plan.md\",\"docs/history/smoke-tsk-56w-5/plan.md\",\"docs/history/smoke-tsk-56w-6/plan.md\",\"docs/history/smoke-tsk-56w-9/plan.md\",\"docs/history/tsk-1ne-editwork-scoped-validation/plan.md\",\"docs/history/tsk-2l0-iron-law-check-commit-ordering/plan.md\",\"docs/history/tsk-4lh-stale-claim-release-docs/plan.md\"]",
+        "Member set sha256 29135dfdce1668a21b160e64459a8d1ba89a9337f1b7662cabb7f1fcc59c360d",
+        "Done condition: explicit named rule, complete committed member list, non-authority history classification; current authority remains with mapped source/candidate decisions."
+      ],
+      "members": [
+        "docs/history/cell-6-3-validate-plan-live-smoke/plan.md",
+        "docs/history/dispatch-concept-boundary/plan.md",
+        "docs/history/restore-verifiedsha-docs-on-main/plan.md",
+        "docs/history/smoke-tsk-56w-4/plan.md",
+        "docs/history/smoke-tsk-56w-5/plan.md",
+        "docs/history/smoke-tsk-56w-6/plan.md",
+        "docs/history/smoke-tsk-56w-9/plan.md",
+        "docs/history/tsk-1ne-editwork-scoped-validation/plan.md",
+        "docs/history/tsk-2l0-iron-law-check-commit-ordering/plan.md",
+        "docs/history/tsk-4lh-stale-claim-release-docs/plan.md"
+      ]
+    },
+    {
+      "kind": "semantic",
+      "key": "historyevidence:capability-aware-dispatch-activation",
+      "resolution": "history-no-authority",
+      "rule": "history-no-authority: all listed members retained as immutable evidence; no current authority is inferred and nothing is deleted. L10-5 under A42.",
+      "evidence": [
+        "SYNC 17b751966; step10-group-summary.json (group-only --summary; no identity refresh)",
+        "Current members [\"docs/history/capability-aware-dispatch-activation/CONTEXT.md\",\"docs/history/capability-aware-dispatch-activation/DISCUSSION.md\"]",
+        "Member set sha256 ea16290c4da9fabd5332934acc37f93eecc8536fd091cceefe3631696e2f5794",
+        "Done condition: explicit named rule, complete committed member list, non-authority history classification; current authority remains with mapped source/candidate decisions."
+      ],
+      "members": [
+        "docs/history/capability-aware-dispatch-activation/CONTEXT.md",
+        "docs/history/capability-aware-dispatch-activation/DISCUSSION.md"
+      ]
+    },
+    {
+      "kind": "semantic",
+      "key": "historyevidence:context",
+      "resolution": "history-no-authority",
+      "rule": "history-no-authority: all listed members retained as immutable evidence; no current authority is inferred and nothing is deleted. L10-5 under A42.",
+      "evidence": [
+        "SYNC 17b751966; step10-group-summary.json (group-only --summary; no identity refresh)",
+        "Current members [\"docs/history/current-dispatch-vocabulary-overlay/plan.md\",\"docs/history/iron-law-classification-recipe-path/plan.md\"]",
+        "Member set sha256 1e6c83ed9180322de3386c61283d5f2f50c873a49c0843cc8bb416153d820789",
+        "Done condition: explicit named rule, complete committed member list, non-authority history classification; current authority remains with mapped source/candidate decisions."
+      ],
+      "members": [
+        "docs/history/current-dispatch-vocabulary-overlay/plan.md",
+        "docs/history/iron-law-classification-recipe-path/plan.md"
+      ]
+    },
+    {
+      "kind": "semantic",
+      "key": "historyevidence:core-foundation-vs-domain-specific-directorymodule-boundary-tsk-397",
+      "resolution": "history-no-authority",
+      "rule": "history-no-authority: all listed members retained as immutable evidence; no current authority is inferred and nothing is deleted. L10-5 under A42.",
+      "evidence": [
+        "SYNC 17b751966; step10-group-summary.json (group-only --summary; no identity refresh)",
+        "Current members [\"docs/history/core-foundation-domain-boundary/CONTEXT.md\",\"docs/history/core-foundation-domain-boundary/DISCUSSION.md\"]",
+        "Member set sha256 792ade159a37cf1637246f227251991541ca66d4517bcde3b722ed0f9dfd84d6",
+        "Done condition: explicit named rule, complete committed member list, non-authority history classification; current authority remains with mapped source/candidate decisions."
+      ],
+      "members": [
+        "docs/history/core-foundation-domain-boundary/CONTEXT.md",
+        "docs/history/core-foundation-domain-boundary/DISCUSSION.md"
+      ]
+    },
+    {
+      "kind": "semantic",
+      "key": "historyevidence:failing-test-first-proof",
+      "resolution": "history-no-authority",
+      "rule": "history-no-authority: all listed members retained as immutable evidence; no current authority is inferred and nothing is deleted. L10-5 under A42.",
+      "evidence": [
+        "SYNC 17b751966; step10-group-summary.json (group-only --summary; no identity refresh)",
+        "Current members [\"docs/history/tsk-1ne-editwork-scoped-validation/iron-law-evidence.md\",\"docs/history/tsk-3of/iron-law-evidence.md\"]",
+        "Member set sha256 e07f1871702b844334bb462efd2257b6cee3dcb57aae6778c1e10d83f69b398c",
+        "Done condition: explicit named rule, complete committed member list, non-authority history classification; current authority remains with mapped source/candidate decisions."
+      ],
+      "members": [
+        "docs/history/tsk-1ne-editwork-scoped-validation/iron-law-evidence.md",
+        "docs/history/tsk-3of/iron-law-evidence.md"
+      ]
+    },
+    {
+      "kind": "semantic",
+      "key": "historyevidence:fgos-setup-initializes-global-config",
+      "resolution": "history-no-authority",
+      "rule": "history-no-authority: all listed members retained as immutable evidence; no current authority is inferred and nothing is deleted. L10-5 under A42.",
+      "evidence": [
+        "SYNC 17b751966; step10-group-summary.json (group-only --summary; no identity refresh)",
+        "Current members [\"docs/history/fgos-setup-global-config-init/CONTEXT.md\",\"docs/history/fgos-setup-global-config-init/plan.md\"]",
+        "Member set sha256 50f1b179dd0babce67f86063232d68a7f424f352a54307d87738f789abbbf594",
+        "Done condition: explicit named rule, complete committed member list, non-authority history classification; current authority remains with mapped source/candidate decisions."
+      ],
+      "members": [
+        "docs/history/fgos-setup-global-config-init/CONTEXT.md",
+        "docs/history/fgos-setup-global-config-init/plan.md"
+      ]
+    },
+    {
+      "kind": "semantic",
+      "key": "historyevidence:iron-law-evidence-tsk-1ji",
+      "resolution": "history-no-authority",
+      "rule": "history-no-authority: all listed members retained as immutable evidence; no current authority is inferred and nothing is deleted. L10-5 under A42.",
+      "evidence": [
+        "SYNC 17b751966; step10-group-summary.json (group-only --summary; no identity refresh)",
+        "Current members [\"docs/history/events-jsonl-merge-abort-truncation-gap/iron-law-evidence.md\",\"docs/history/tsk-1ji/iron-law-evidence.md\"]",
+        "Member set sha256 fa3c0bea147630aa2f946ccd7fe0d1de9ccace200faebcec96178ca2b6966286",
+        "Done condition: explicit named rule, complete committed member list, non-authority history classification; current authority remains with mapped source/candidate decisions."
+      ],
+      "members": [
+        "docs/history/events-jsonl-merge-abort-truncation-gap/iron-law-evidence.md",
+        "docs/history/tsk-1ji/iron-law-evidence.md"
+      ]
+    },
+    {
+      "kind": "semantic",
+      "key": "historyevidence:iron-law-evidence-tsk-52p",
+      "resolution": "history-no-authority",
+      "rule": "history-no-authority: all listed members retained as immutable evidence; no current authority is inferred and nothing is deleted. L10-5 under A42.",
+      "evidence": [
+        "SYNC 17b751966; step10-group-summary.json (group-only --summary; no identity refresh)",
+        "Current members [\"docs/history/branch-content-mismatch-fgos-exclusion/iron-law-evidence.md\",\"docs/history/tsk-52p/iron-law-evidence.md\"]",
+        "Member set sha256 b18d059094956894a23eb1055e3012a2807271931499af8ac042698a22f46b18",
+        "Done condition: explicit named rule, complete committed member list, non-authority history classification; current authority remains with mapped source/candidate decisions."
+      ],
+      "members": [
+        "docs/history/branch-content-mismatch-fgos-exclusion/iron-law-evidence.md",
+        "docs/history/tsk-52p/iron-law-evidence.md"
+      ]
+    },
+    {
+      "kind": "semantic",
+      "key": "historyevidence:plan",
+      "resolution": "history-no-authority",
+      "rule": "history-no-authority: all listed members retained as immutable evidence; no current authority is inferred and nothing is deleted. L10-5 under A42.",
+      "evidence": [
+        "SYNC 17b751966; step10-group-summary.json (group-only --summary; no identity refresh)",
+        "Current members [\"docs/history/agent-executor-generalized-capacity-helper/plan.md\",\"docs/history/gate-bypass-artifact-convention/plan.md\"]",
+        "Member set sha256 d88cc97454e990b99c043c2ea06a0b8fbabb32f8870fe8c48b07232b9eeb0bec",
+        "Done condition: explicit named rule, complete committed member list, non-authority history classification; current authority remains with mapped source/candidate decisions."
+      ],
+      "members": [
+        "docs/history/agent-executor-generalized-capacity-helper/plan.md",
+        "docs/history/gate-bypass-artifact-convention/plan.md"
+      ]
+    },
+    {
+      "kind": "semantic",
+      "key": "historyevidence:round3-dispatch-prompt",
+      "resolution": "history-no-authority",
+      "rule": "history-no-authority: all listed members retained as immutable evidence; no current authority is inferred and nothing is deleted. L10-5 under A42.",
+      "evidence": [
+        "SYNC 17b751966; step10-group-summary.json (group-only --summary; no identity refresh)",
+        "Current members [\"docs/history/claude-named-executor/evidence/round3-dispatch-prompt.txt\",\"docs/history/pi-executor-runtime-capacity/evidence/round3-dispatch-prompt.txt\"]",
+        "Member set sha256 5b5c80795edf5b3d8425903d74736ea34645a659000c70b8d3e8ee4e845748cf",
+        "Done condition: explicit named rule, complete committed member list, non-authority history classification; current authority remains with mapped source/candidate decisions."
+      ],
+      "members": [
+        "docs/history/claude-named-executor/evidence/round3-dispatch-prompt.txt",
+        "docs/history/pi-executor-runtime-capacity/evidence/round3-dispatch-prompt.txt"
+      ]
+    },
+    {
+      "kind": "semantic",
+      "key": "historyevidence:scout-1",
+      "resolution": "history-no-authority",
+      "rule": "history-no-authority: all listed members retained as immutable evidence; no current authority is inferred and nothing is deleted. L10-5 under A42.",
+      "evidence": [
+        "SYNC 17b751966; step10-group-summary.json (group-only --summary; no identity refresh)",
+        "Current members [\"docs/history/discover-loop/scout-notes.md\",\"docs/history/tsk-18a-merge-conflict-misclassification/scout-notes.md\",\"docs/history/tsk-396-merge-gate-ordering/scout-notes.md\",\"docs/history/tsk-3bn-merge-conductor-harness-v2/scout-notes.md\",\"docs/history/tsk-3yh-take-deps-resolved-status/scout-notes.md\",\"docs/history/tsk-480-approve-movework-friction-guard/scout-notes.md\",\"docs/history/tsk-4voj-iron-law-leaf-scope/scout-notes.md\",\"docs/history/tsk-5e97-decompose-footprint-overlap-gate/scout-notes.md\"]",
+        "Member set sha256 883aea8bb39f0e0495df82864a80f70ff1738b6a3bca756c9a856c8525a705d2",
+        "Done condition: explicit named rule, complete committed member list, non-authority history classification; current authority remains with mapped source/candidate decisions."
+      ],
+      "members": [
+        "docs/history/discover-loop/scout-notes.md",
+        "docs/history/tsk-18a-merge-conflict-misclassification/scout-notes.md",
+        "docs/history/tsk-396-merge-gate-ordering/scout-notes.md",
+        "docs/history/tsk-3bn-merge-conductor-harness-v2/scout-notes.md",
+        "docs/history/tsk-3yh-take-deps-resolved-status/scout-notes.md",
+        "docs/history/tsk-480-approve-movework-friction-guard/scout-notes.md",
+        "docs/history/tsk-4voj-iron-law-leaf-scope/scout-notes.md",
+        "docs/history/tsk-5e97-decompose-footprint-overlap-gate/scout-notes.md"
+      ]
+    },
+    {
+      "kind": "semantic",
+      "key": "historyevidence:tsk-1pg-herdr-plugin-need-answer-after-deliver-boxes-render-empty",
+      "resolution": "history-no-authority",
+      "rule": "history-no-authority: all listed members retained as immutable evidence; no current authority is inferred and nothing is deleted. L10-5 under A42.",
+      "evidence": [
+        "SYNC 17b751966; step10-group-summary.json (group-only --summary; no identity refresh)",
+        "Current members [\"docs/history/herdr-need-answer-after-deliver-stage-crash/CONTEXT.md\",\"docs/history/herdr-need-answer-after-deliver-stage-crash/plan.md\"]",
+        "Member set sha256 313dbd82a0d656adf3c9aa4fa459464c7db537e664ba7ccfff3a081436a7c219",
+        "Done condition: explicit named rule, complete committed member list, non-authority history classification; current authority remains with mapped source/candidate decisions."
+      ],
+      "members": [
+        "docs/history/herdr-need-answer-after-deliver-stage-crash/CONTEXT.md",
+        "docs/history/herdr-need-answer-after-deliver-stage-crash/plan.md"
+      ]
+    },
+    {
+      "kind": "duplicate",
+      "key": "527e3c427038e026624ea890489451c4eda75a08",
+      "resolution": "retain-as-evidence",
+      "rule": "retain-as-evidence: all listed members retained as immutable evidence; no current authority is inferred and nothing is deleted. L10-5 under A42.",
+      "evidence": [
+        "SYNC 17b751966; step10-group-summary.json (group-only --summary; no identity refresh)",
+        "Current members [\"docs/history/events-jsonl-merge-abort-truncation-gap/iron-law-evidence.md\",\"docs/history/tsk-1ji/iron-law-evidence.md\"]",
+        "Member set sha256 fa3c0bea147630aa2f946ccd7fe0d1de9ccace200faebcec96178ca2b6966286",
+        "Done condition: explicit named rule, complete committed member list, non-authority history classification; current authority remains with mapped source/candidate decisions."
+      ],
+      "members": [
+        "docs/history/events-jsonl-merge-abort-truncation-gap/iron-law-evidence.md",
+        "docs/history/tsk-1ji/iron-law-evidence.md"
+      ]
+    },
+    {
+      "kind": "duplicate",
+      "key": "afc54630233bd4f9f000284694aebae7a47f5b86",
+      "resolution": "retain-as-evidence",
+      "rule": "retain-as-evidence: all listed members retained as immutable evidence; no current authority is inferred and nothing is deleted. L10-5 under A42.",
+      "evidence": [
+        "SYNC 17b751966; step10-group-summary.json (group-only --summary; no identity refresh)",
+        "Current members [\"docs/history/branch-content-mismatch-fgos-exclusion/iron-law-evidence.md\",\"docs/history/tsk-52p/iron-law-evidence.md\"]",
+        "Member set sha256 b18d059094956894a23eb1055e3012a2807271931499af8ac042698a22f46b18",
+        "Done condition: explicit named rule, complete committed member list, non-authority history classification; current authority remains with mapped source/candidate decisions."
+      ],
+      "members": [
+        "docs/history/branch-content-mismatch-fgos-exclusion/iron-law-evidence.md",
+        "docs/history/tsk-52p/iron-law-evidence.md"
+      ]
+    },
+    {
+      "kind": "duplicate",
+      "key": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "resolution": "retain-as-evidence",
+      "rule": "retain-as-evidence: all listed members retained as immutable evidence; no current authority is inferred and nothing is deleted. L10-5 under A42.",
+      "evidence": [
+        "SYNC 17b751966; step10-group-summary.json (group-only --summary; no identity refresh)",
+        "Current members [\"docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log\",\"docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-04-dispatch-synth-slow.json\",\"docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-05-show-after-crash.stderr.log\",\"docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-11-reopen3-refused.json\",\"docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-authority-01.json\",\"docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-authority-02-attack.json\",\"docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-visibility-02-premature-reveal.json\",\"docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/dispatch.claim\",\"docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/stderr.log\",\"docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/dispatch.claim\",\"docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/dispatch.claim\",\"docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/stderr.log\",\"docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/dispatch.claim\",\"docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/dispatch.claim\",\"docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/stderr.log\",\"docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/codex-cli-run2-resume.stderr.log\",\"docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step1-open.stderr.log\",\"docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/glm-cli-step1-open.stderr.log\",\"docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/dispatch.claim\",\"docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/runs/01/stderr.log\",\"docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/dispatch.claim\",\"docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/runs/01/stdout.log\",\"docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/dispatch.claim\",\"docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/runs/01/stderr.log\",\"docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/dispatch.claim\",\"docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/runs/01/stdout.log\",\"docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/dispatch.claim\",\"docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/runs/01/stdout.log\",\"docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/dispatch.claim\",\"docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/runs/01/stderr.log\",\"docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/dispatch.claim\",\"docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/runs/01/stderr.log\",\"docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/dispatch.claim\",\"docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/runs/01/stderr.log\",\"docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/dispatch.claim\",\"docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/stderr.log\",\"docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/dispatch.claim\",\"docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/stderr.log\",\"docs/history/pi-executor-runtime-capacity/evidence/round4-d4-attempt-gpt55-stderr.txt\",\"docs/history/pi-executor-runtime-capacity/evidence/round4b-d4-attempt-gpt55-stderr.txt\",\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log\",\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-04-dispatch-synth-slow.json\",\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-05-show-after-crash.stderr.log\",\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-11-reopen3-refused.json\",\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-authority-01.json\",\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-authority-02-attack.json\",\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-visibility-02-premature-reveal.json\",\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/dispatch.claim\",\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/stderr.log\",\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/dispatch.claim\",\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/dispatch.claim\",\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/stderr.log\",\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/dispatch.claim\",\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/dispatch.claim\",\"docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/stderr.log\",\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/codex-cli-run2-resume.stderr.log\",\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step1-open.stderr.log\",\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/glm-cli-step1-open.stderr.log\",\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/dispatch.claim\",\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/runs/01/stderr.log\",\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/dispatch.claim\",\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/runs/01/stdout.log\",\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/dispatch.claim\",\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/runs/01/stderr.log\",\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/dispatch.claim\",\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/runs/01/stdout.log\",\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/dispatch.claim\",\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/runs/01/stdout.log\",\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/dispatch.claim\",\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/runs/01/stderr.log\",\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/dispatch.claim\",\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/runs/01/stderr.log\",\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/dispatch.claim\",\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/runs/01/stderr.log\",\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/dispatch.claim\",\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/stderr.log\",\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/dispatch.claim\",\"docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/stderr.log\"]",
+        "Member set sha256 6f09f5e55e5f62e7e94babe82cb80365dda42df83c6563b7946a725e6325f634",
+        "Done condition: explicit named rule, complete committed member list, non-authority history classification; current authority remains with mapped source/candidate decisions."
+      ],
+      "members": [
+        "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+        "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-04-dispatch-synth-slow.json",
+        "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-05-show-after-crash.stderr.log",
+        "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-11-reopen3-refused.json",
+        "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-authority-01.json",
+        "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-authority-02-attack.json",
+        "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-visibility-02-premature-reveal.json",
+        "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/dispatch.claim",
+        "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/stderr.log",
+        "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/dispatch.claim",
+        "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/dispatch.claim",
+        "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/stderr.log",
+        "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/dispatch.claim",
+        "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/dispatch.claim",
+        "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/stderr.log",
+        "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/codex-cli-run2-resume.stderr.log",
+        "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step1-open.stderr.log",
+        "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/glm-cli-step1-open.stderr.log",
+        "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/dispatch.claim",
+        "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/runs/01/stderr.log",
+        "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/dispatch.claim",
+        "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/runs/01/stdout.log",
+        "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/dispatch.claim",
+        "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/runs/01/stderr.log",
+        "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/dispatch.claim",
+        "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/runs/01/stdout.log",
+        "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/dispatch.claim",
+        "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/runs/01/stdout.log",
+        "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/dispatch.claim",
+        "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/runs/01/stderr.log",
+        "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/dispatch.claim",
+        "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/runs/01/stderr.log",
+        "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/dispatch.claim",
+        "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/runs/01/stderr.log",
+        "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/dispatch.claim",
+        "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/stderr.log",
+        "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/dispatch.claim",
+        "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/stderr.log",
+        "docs/history/pi-executor-runtime-capacity/evidence/round4-d4-attempt-gpt55-stderr.txt",
+        "docs/history/pi-executor-runtime-capacity/evidence/round4b-d4-attempt-gpt55-stderr.txt",
+        "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-03-authorize-synth.stderr.log",
+        "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-04-dispatch-synth-slow.json",
+        "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-05-show-after-crash.stderr.log",
+        "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-11-reopen3-refused.json",
+        "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-authority-01.json",
+        "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-authority-02-attack.json",
+        "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-visibility-02-premature-reveal.json",
+        "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/dispatch.claim",
+        "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_001/runs/01/stderr.log",
+        "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_002/dispatch.claim",
+        "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/dispatch.claim",
+        "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_003/runs/01/stderr.log",
+        "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_004/dispatch.claim",
+        "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/dispatch.claim",
+        "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/attempt-1-superseded/asgn_coordinator_driver_op_005/runs/01/stderr.log",
+        "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/codex-cli-run2-resume.stderr.log",
+        "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/claude-step1-open.stderr.log",
+        "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/glm-cli-step1-open.stderr.log",
+        "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/dispatch.claim",
+        "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/runs/01/stderr.log",
+        "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/dispatch.claim",
+        "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_002/runs/01/stdout.log",
+        "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/dispatch.claim",
+        "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_003/runs/01/stderr.log",
+        "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/dispatch.claim",
+        "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/runs/01/stdout.log",
+        "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/dispatch.claim",
+        "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_005/runs/01/stdout.log",
+        "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/dispatch.claim",
+        "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_001/runs/01/stderr.log",
+        "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/dispatch.claim",
+        "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run2-followup-codex-pi/fgos-snapshot/assignments/asgn_r8b_followup_driver_op_002/runs/01/stderr.log",
+        "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/dispatch.claim",
+        "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_003/runs/01/stderr.log",
+        "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/dispatch.claim",
+        "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/stderr.log",
+        "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/dispatch.claim",
+        "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/stderr.log"
+      ]
     }
   ]
 }

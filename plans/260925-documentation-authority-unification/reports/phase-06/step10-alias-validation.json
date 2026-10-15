@@ -1,0 +1,118 @@
+{
+  "SYNC": "17b751966",
+  "runs": [
+    {
+      "batch": "agent-coordination",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "scripts/doc-alias-resolver.mjs",
+        "--table",
+        "plans/260925-documentation-authority-unification/reports/phase-06/draft-alias-agent-coordination-step10.json"
+      ],
+      "exitCode": 0,
+      "output": "doc-alias-resolver: alias table is valid (4589 entries).\n"
+    },
+    {
+      "batch": "packaging-distribution",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "scripts/doc-alias-resolver.mjs",
+        "--table",
+        "plans/260925-documentation-authority-unification/reports/phase-06/draft-alias-packaging-distribution-step10.json"
+      ],
+      "exitCode": 0,
+      "output": "doc-alias-resolver: alias table is valid (379 entries).\n"
+    },
+    {
+      "batch": "whole-system",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "scripts/doc-alias-resolver.mjs",
+        "--table",
+        "plans/260925-documentation-authority-unification/reports/phase-06/draft-alias-whole-system-step10.json"
+      ],
+      "exitCode": 0,
+      "output": "doc-alias-resolver: alias table is valid (1639 entries).\n"
+    },
+    {
+      "batch": "proposals-redesigns",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "scripts/doc-alias-resolver.mjs",
+        "--table",
+        "plans/260925-documentation-authority-unification/reports/phase-06/draft-alias-proposals-redesigns-step10.json"
+      ],
+      "exitCode": 0,
+      "output": "doc-alias-resolver: alias table is valid (983 entries).\n"
+    },
+    {
+      "batch": "specs",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "scripts/doc-alias-resolver.mjs",
+        "--table",
+        "plans/260925-documentation-authority-unification/reports/phase-06/draft-alias-specs-step10.json"
+      ],
+      "exitCode": 0,
+      "output": "doc-alias-resolver: alias table is valid (449 entries).\n"
+    },
+    {
+      "batch": "ui-spec",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "scripts/doc-alias-resolver.mjs",
+        "--table",
+        "plans/260925-documentation-authority-unification/reports/phase-06/draft-alias-ui-spec-step10.json"
+      ],
+      "exitCode": 0,
+      "output": "doc-alias-resolver: alias table is valid (218 entries).\n"
+    },
+    {
+      "batch": "runner",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "scripts/doc-alias-resolver.mjs",
+        "--table",
+        "plans/260925-documentation-authority-unification/reports/phase-06/draft-alias-runner-step10.json"
+      ],
+      "exitCode": 0,
+      "output": "doc-alias-resolver: alias table is valid (496 entries).\n"
+    },
+    {
+      "batch": "merged",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "scripts/doc-alias-resolver.mjs",
+        "--table",
+        "plans/260925-documentation-authority-unification/reports/phase-06/draft-alias-merged-step10.json"
+      ],
+      "exitCode": 0,
+      "output": "doc-alias-resolver: alias table is valid (9235 entries).\n"
+    }
+  ],
+  "allValid": true
+}

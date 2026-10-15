@@ -1,0 +1,396 @@
+{
+  "SYNC": "17b751966",
+  "source": "docs/specs/confinement-authority.md",
+  "registryCommit": "b80e8c16c94cb04c80cc4e858933a9b2a04ddc60",
+  "drift": [
+    {
+      "claimId": "claim_46c173824da77fbf25f59072ae8e1620",
+      "priorAnchor": "86-crash-và-cleanup",
+      "priorDigest": "a021e5594432d44b1543517b1219a7406a72c4ba9503363e1f8eef3f8085524a",
+      "currentDigest": "018713d3e9d6a59a7fb677b2dfa0225a5461509d1b26c27c0cfde12103d9d67a",
+      "matchingCurrentAnchors": [],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_d7fa39da9698c447594edefdc44d7ce5",
+      "priorAnchor": "unheaded-block-113",
+      "priorDigest": "a89aecc164ff54f3f6807a0d3231e27b4ca2c77c4e41fd121bbfdb18ea8024f0",
+      "currentDigest": "a7af69f1674754e516550a8802a2acc64dd3a49655a4cdd01fa82d43a540d5ed",
+      "matchingCurrentAnchors": [
+        "unheaded-block-114"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_daf2ec0996ad074a68903680fce85adb",
+      "priorAnchor": "unheaded-block-114",
+      "priorDigest": "f43f3ff53150980b52653b87618308619ddaae4a8ce19572b2589bb7cf744f7a",
+      "currentDigest": "a89aecc164ff54f3f6807a0d3231e27b4ca2c77c4e41fd121bbfdb18ea8024f0",
+      "matchingCurrentAnchors": [
+        "unheaded-block-115"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_73ae83a090b77eed0e84212e99fa6e7c",
+      "priorAnchor": "unheaded-block-115",
+      "priorDigest": "0ef8d6c210698ac4fae241e133b626be662e36e1023900186b541f3f7d0e27b8",
+      "currentDigest": "f43f3ff53150980b52653b87618308619ddaae4a8ce19572b2589bb7cf744f7a",
+      "matchingCurrentAnchors": [
+        "unheaded-block-116"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_cc0d485b1b93357edb755f4121a26206",
+      "priorAnchor": "unheaded-block-116",
+      "priorDigest": "f0aa8cea776fc1a9bd023b6e3e1318c7c9c16589a68d5ac16288b63f23634cbb",
+      "currentDigest": "0ef8d6c210698ac4fae241e133b626be662e36e1023900186b541f3f7d0e27b8",
+      "matchingCurrentAnchors": [
+        "unheaded-block-117"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_f1aeeff92e7bbf3f52b1cc88896cc41e",
+      "priorAnchor": "unheaded-block-117",
+      "priorDigest": "2fcf6811e81b5faf421dcc8038872613f72ad4fb0f62a9c552a56c090a6b31c0",
+      "currentDigest": "f0aa8cea776fc1a9bd023b6e3e1318c7c9c16589a68d5ac16288b63f23634cbb",
+      "matchingCurrentAnchors": [
+        "unheaded-block-118"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_1538dad17e4fa44207a7f70dc2ca7b55",
+      "priorAnchor": "unheaded-block-118",
+      "priorDigest": "9077d21c4c3ff52bd3ddcb04d54a03a978ee83919055752883a6609016055acf",
+      "currentDigest": "2fcf6811e81b5faf421dcc8038872613f72ad4fb0f62a9c552a56c090a6b31c0",
+      "matchingCurrentAnchors": [
+        "unheaded-block-119"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_daa730ce31dbd045d14a42c31c57f316",
+      "priorAnchor": "unheaded-block-119",
+      "priorDigest": "fdcc56c6036171a7393772c55e187bfd7e86e9b00b045bc9d0ae3c81c963fd67",
+      "currentDigest": "9077d21c4c3ff52bd3ddcb04d54a03a978ee83919055752883a6609016055acf",
+      "matchingCurrentAnchors": [
+        "unheaded-block-120"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_1a847c3e3266a47169a83f7ac836ef7b",
+      "priorAnchor": "unheaded-block-120",
+      "priorDigest": "14f3ee1a5085e8338b27e811d4a6fdddb36726d4f98c9df86111a65f594d85fa",
+      "currentDigest": "fdcc56c6036171a7393772c55e187bfd7e86e9b00b045bc9d0ae3c81c963fd67",
+      "matchingCurrentAnchors": [
+        "unheaded-block-121"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_d4bc3fb932ca2d29e917119191f45f1c",
+      "priorAnchor": "unheaded-block-121",
+      "priorDigest": "62da6aab49287cf95b091c9f3b8d55e5eed5b510a040c7663c8d3616cef1a994",
+      "currentDigest": "14f3ee1a5085e8338b27e811d4a6fdddb36726d4f98c9df86111a65f594d85fa",
+      "matchingCurrentAnchors": [
+        "unheaded-block-122"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_68dd1d19379c9a16393429b5e2aac34a",
+      "priorAnchor": "unheaded-block-122",
+      "priorDigest": "cd86d66ba41c3e216cfd4d8bd8d3d67ba807275450780add3123faf7d91d35bb",
+      "currentDigest": "62da6aab49287cf95b091c9f3b8d55e5eed5b510a040c7663c8d3616cef1a994",
+      "matchingCurrentAnchors": [
+        "unheaded-block-123"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_b1731956c352b9977eef7ffa07f88991",
+      "priorAnchor": "unheaded-block-123",
+      "priorDigest": "7cf71cce1a2badb415557e66813aa0937d285bc90ad11c6264e1e54083199ff6",
+      "currentDigest": "cd86d66ba41c3e216cfd4d8bd8d3d67ba807275450780add3123faf7d91d35bb",
+      "matchingCurrentAnchors": [
+        "unheaded-block-124"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_54f630d44a33c5624ebeca834cf25ceb",
+      "priorAnchor": "unheaded-block-124",
+      "priorDigest": "8caafcb371d02a300d8aa42288fc25e25354ddd2301e48508ee4810c99340902",
+      "currentDigest": "7cf71cce1a2badb415557e66813aa0937d285bc90ad11c6264e1e54083199ff6",
+      "matchingCurrentAnchors": [
+        "unheaded-block-125"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_220b8163566ad8b38cbf1d534c871e42",
+      "priorAnchor": "unheaded-block-125",
+      "priorDigest": "d0eb5b8c250cd17479ceba5b41a114e24933e13bfe9ca355ed5871091093e30f",
+      "currentDigest": "8caafcb371d02a300d8aa42288fc25e25354ddd2301e48508ee4810c99340902",
+      "matchingCurrentAnchors": [
+        "unheaded-block-126"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_9d863e7c1e4c3983292845628b60e041",
+      "priorAnchor": "unheaded-block-126",
+      "priorDigest": "a42feb4ea36f23dcda856872a41811401e058cee1f3bfd71af95069725466bc8",
+      "currentDigest": "d0eb5b8c250cd17479ceba5b41a114e24933e13bfe9ca355ed5871091093e30f",
+      "matchingCurrentAnchors": [
+        "unheaded-block-127"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_029dd2509143e3a718a8fc0b7f7be03e",
+      "priorAnchor": "unheaded-block-127",
+      "priorDigest": "5036517c45b86b22554b3c8c1b11e63cc453d4a66722bbd0c820af5ec68cc56f",
+      "currentDigest": "a42feb4ea36f23dcda856872a41811401e058cee1f3bfd71af95069725466bc8",
+      "matchingCurrentAnchors": [
+        "unheaded-block-128"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_0a81cfc730773e8a468f69c67e1a7948",
+      "priorAnchor": "unheaded-block-128",
+      "priorDigest": "685026d049d214e631c09ff55243094abcf13ea2acb41222f115d94bcc335107",
+      "currentDigest": "5036517c45b86b22554b3c8c1b11e63cc453d4a66722bbd0c820af5ec68cc56f",
+      "matchingCurrentAnchors": [
+        "unheaded-block-129"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_bb5abf5828264d19c061b9b0920618a3",
+      "priorAnchor": "unheaded-block-129",
+      "priorDigest": "7653e11267b25193a2a1f9c9969fffcc140830bfec41bb55bd80af4a541dc396",
+      "currentDigest": "685026d049d214e631c09ff55243094abcf13ea2acb41222f115d94bcc335107",
+      "matchingCurrentAnchors": [
+        "unheaded-block-130"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_bd94f9efb9ccdbbc8ca5b90916290c6f",
+      "priorAnchor": "unheaded-block-130",
+      "priorDigest": "ef13d34054bfb70d28e34612c2fa9c8baf76e7a153c8f38c1673b92b9936f2bd",
+      "currentDigest": "7653e11267b25193a2a1f9c9969fffcc140830bfec41bb55bd80af4a541dc396",
+      "matchingCurrentAnchors": [
+        "unheaded-block-131"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_2977601fcac216f335c121ce5a58ec9e",
+      "priorAnchor": "unheaded-block-131",
+      "priorDigest": "6dc2d3110bcb9737263766d842a280447bb840efd94b14cc54cbc739d7c3c0a8",
+      "currentDigest": "ef13d34054bfb70d28e34612c2fa9c8baf76e7a153c8f38c1673b92b9936f2bd",
+      "matchingCurrentAnchors": [
+        "unheaded-block-132"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_d81f120837aab96ba270276e5090e2e0",
+      "priorAnchor": "unheaded-block-132",
+      "priorDigest": "e3281f44b9de246979eb391c466d2aec235d67fd39c35775a42a31261ae2a129",
+      "currentDigest": "6dc2d3110bcb9737263766d842a280447bb840efd94b14cc54cbc739d7c3c0a8",
+      "matchingCurrentAnchors": [
+        "unheaded-block-133"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_34983077687032d7a49ecc61907a6806",
+      "priorAnchor": "unheaded-block-133",
+      "priorDigest": "81541208991d526412de79630015558afcc29113e90b9e33d5818071621c09f7",
+      "currentDigest": "e3281f44b9de246979eb391c466d2aec235d67fd39c35775a42a31261ae2a129",
+      "matchingCurrentAnchors": [
+        "unheaded-block-134"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_d9f0a2209948f0357cac70dc0778b0bb",
+      "priorAnchor": "unheaded-block-134",
+      "priorDigest": "0863b0b9257af2b10d97f01c65e9433aa9e18f3bca620427ae014d6c874bd9dc",
+      "currentDigest": "81541208991d526412de79630015558afcc29113e90b9e33d5818071621c09f7",
+      "matchingCurrentAnchors": [
+        "unheaded-block-135"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_f82a2cff173a458bb2231203222c10e0",
+      "priorAnchor": "unheaded-block-135",
+      "priorDigest": "03aadf655bc30ec74e7e34d25a18d3b8f3f866fc2120a48550822fada8afa1d5",
+      "currentDigest": "0863b0b9257af2b10d97f01c65e9433aa9e18f3bca620427ae014d6c874bd9dc",
+      "matchingCurrentAnchors": [
+        "unheaded-block-136"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_c030fece276e5228ec08051c9b243dd4",
+      "priorAnchor": "unheaded-block-136",
+      "priorDigest": "92b2a00d3ef31661c9945793933c8796b9d85c5d1ff72795cb0f4cb1882526d1",
+      "currentDigest": "03aadf655bc30ec74e7e34d25a18d3b8f3f866fc2120a48550822fada8afa1d5",
+      "matchingCurrentAnchors": [
+        "unheaded-block-137"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_84e60054f3f70565af1fcf9c09352d83",
+      "priorAnchor": "unheaded-block-137",
+      "priorDigest": "a7fc9ce0823faab5b809042244aae5280d335cab7d03343c7e3ba2fe7e1e20ea",
+      "currentDigest": "92b2a00d3ef31661c9945793933c8796b9d85c5d1ff72795cb0f4cb1882526d1",
+      "matchingCurrentAnchors": [
+        "unheaded-block-138"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_53e0df53a67f6897195cbf23839c6c9b",
+      "priorAnchor": "unheaded-block-138",
+      "priorDigest": "d06ca4feb3fc1e931aa43134c6d30fe620ab3850b195c9d1dd417a68464059f4",
+      "currentDigest": "a7fc9ce0823faab5b809042244aae5280d335cab7d03343c7e3ba2fe7e1e20ea",
+      "matchingCurrentAnchors": [
+        "unheaded-block-139"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_eaadf6a68a7c7f9ed4005478db93c95b",
+      "priorAnchor": "unheaded-block-139",
+      "priorDigest": "09081a2c1a3eb4536192eed72162efca188fdf9b084170519b57415f216c32c3",
+      "currentDigest": "d06ca4feb3fc1e931aa43134c6d30fe620ab3850b195c9d1dd417a68464059f4",
+      "matchingCurrentAnchors": [
+        "unheaded-block-140"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_e017f3c0a36bb052472cf9ad2bd616b4",
+      "priorAnchor": "unheaded-block-140",
+      "priorDigest": "0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc",
+      "currentDigest": "09081a2c1a3eb4536192eed72162efca188fdf9b084170519b57415f216c32c3",
+      "matchingCurrentAnchors": [
+        "unheaded-block-141"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_81ec7e246f5d04771ed8242d9f45a51c",
+      "priorAnchor": "unheaded-block-141",
+      "priorDigest": "3adecc728b89a0251ef17f37a38077c58eb02791d61ae5358fbf4e73445230b5",
+      "currentDigest": "0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc",
+      "matchingCurrentAnchors": [
+        "unheaded-block-142"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_0da9c2a174db070122d3b5c6af25e677",
+      "priorAnchor": "unheaded-block-142",
+      "priorDigest": "ae79ac51f3a5a094bad8bc45affea34150699320dc4e427a6a8b8653b5ea8c6d",
+      "currentDigest": "3adecc728b89a0251ef17f37a38077c58eb02791d61ae5358fbf4e73445230b5",
+      "matchingCurrentAnchors": [
+        "unheaded-block-143"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_022af2ccb616ad85400526fd94408258",
+      "priorAnchor": "unheaded-block-143",
+      "priorDigest": "9c24e69b1b4a4ede9fce9ed6d771f342920397506c61c2a546df8163a810c5ae",
+      "currentDigest": "ae79ac51f3a5a094bad8bc45affea34150699320dc4e427a6a8b8653b5ea8c6d",
+      "matchingCurrentAnchors": [
+        "unheaded-block-144"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_19c1aba20ad51fafc86dc889996c2063",
+      "priorAnchor": "unheaded-block-144",
+      "priorDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+      "currentDigest": "9c24e69b1b4a4ede9fce9ed6d771f342920397506c61c2a546df8163a810c5ae",
+      "matchingCurrentAnchors": [
+        "unheaded-block-145"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_3751f92605ff426f0c91aea00cf436f9",
+      "priorAnchor": "unheaded-block-145",
+      "priorDigest": "af28f424e64708cf882cb1c0f7919d22ea461c5a71cf3c39ba0654b90de583b4",
+      "currentDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
+      "matchingCurrentAnchors": [
+        "unheaded-block-146"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_3a59166febcee14eae6a7815533da0b8",
+      "priorAnchor": "unheaded-block-146",
+      "priorDigest": "6b135234f1db94662f8db717b7ce7f1b4911e2415c195e4715e7c2ae0987acd9",
+      "currentDigest": "af28f424e64708cf882cb1c0f7919d22ea461c5a71cf3c39ba0654b90de583b4",
+      "matchingCurrentAnchors": [
+        "unheaded-block-147"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_9926460074ef65ebbb208553bc11562e",
+      "priorAnchor": "unheaded-block-147",
+      "priorDigest": "7a4a02217b1fb56fa31b960e54231e46290d1c09d415ef8bbaf5dc32683f940b",
+      "currentDigest": "6b135234f1db94662f8db717b7ce7f1b4911e2415c195e4715e7c2ae0987acd9",
+      "matchingCurrentAnchors": [
+        "unheaded-block-148"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_3be68f87d3d60c946927441f13933a84",
+      "priorAnchor": "unheaded-block-148",
+      "priorDigest": "05a668d4bfd01094c18b54e82e2ea42408957cb1725c27a31b8173c35b8a0b33",
+      "currentDigest": "7a4a02217b1fb56fa31b960e54231e46290d1c09d415ef8bbaf5dc32683f940b",
+      "matchingCurrentAnchors": [
+        "unheaded-block-149"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_dbbee9d940a2d595936e12ba6781f684",
+      "priorAnchor": "unheaded-block-149",
+      "priorDigest": "63bf6e3f79aef39f4af16bbcdeb237dff250a8f2aefbe0e5b18249eab50649e1",
+      "currentDigest": "05a668d4bfd01094c18b54e82e2ea42408957cb1725c27a31b8173c35b8a0b33",
+      "matchingCurrentAnchors": [
+        "unheaded-block-150"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    },
+    {
+      "claimId": "claim_c491a724bb730522215633d79a66e5b3",
+      "priorAnchor": "unheaded-block-150",
+      "priorDigest": "b412674cbe8f64e89a752ba65cf9752f00b362a19455bcded73bd2a283d4ab16",
+      "currentDigest": "63bf6e3f79aef39f4af16bbcdeb237dff250a8f2aefbe0e5b18249eab50649e1",
+      "matchingCurrentAnchors": [
+        "unheaded-block-151"
+      ],
+      "action": "Keep draft historical lineage; revalidate per-anchor aliases after confinement re-carry/native sync. No current binding or retirement approval."
+    }
+  ],
+  "note": "Alias --table validates target/schema, not the semantic current-source binding. The confinement main edit is queued; preserve immutable draft lineage but rebind/review after re-carry. Do not auto-shift identity."
+}

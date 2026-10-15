@@ -1,0 +1,15 @@
+✔ deduplicates overlapping candidate lists and accounts native strict red without claiming strict green (9.704281ms)
+✔ rejects same-size candidate substitutions and stale digest/anchor/path/identity (1.071002ms)
+✔ rejects unexpected fatal, unknown open category and summary-count mismatch (1.012456ms)
+✔ pending claims must equal holds by identity; unknown-blocking also counted (0.71573ms)
+✔ partial carries compare full native identity including registry predecessors (0.698487ms)
+✔ identical groups compare digest and exact owner sets rather than group counts (0.81296ms)
+✔ missing explicit rows, malformed data and duplicate native identities fail closed (0.717215ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 189.170629

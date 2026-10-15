@@ -1132,16 +1132,21 @@
       "targetAnchor": "unheaded-block-17",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
       "rationale": "Judgment: supersede the source unit at docs/specs/runner.md#unheaded-block-29 with docs/platform/runner/operations/h-51f5cd7279fd.md#unheaded-block-17. Labelled follow-up corrections followup-truth-09 changed this unit; source and target native unit digests differ. The token-level source-to-target changes are the labelled follow-up edits, with no other source loss or unlabelled addition, as documented in step9-a42-followup-corrections.json. Complete original source remains immutable; dated decision semantics are retained. Full source and current target, concrete correction evidence, and before/after rationale are in the bounded rationale re-review request. Pending independent review; full truth check and revalidation/rebinding remain owed at promotion and legacy cutover.",
-      "reviewNote": "deep: block Unheaded block 29 source L301-308 to operations/h-51f5cd7279fd.md#unheaded-block-17; token-level source-to-target diff read both directions, every hunk lies inside an edit range (followup-truth-09) and is labelled in the carrier, nothing else added or lost; rework: disposition was moved from move to supersede because the unit text now differs (followup-truth-09), yet the rationale still carries the move wording (carried at the target anchor, Full native unit digest equal), which is false because source digest 0a8a86fc and target digest 637ef875 differ and the A42 prefix names no concrete correction; replace the stale carried/digest-equal sentence with the labelled correction (followup-truth-09); shard row equals pack, anchors exist, source and target digests recomputed by script",
+      "reviewNote": "deep: stale carried/digest-equal sentence is gone from the committed shard rationale and pack afterRationale (shard equals pack); rationale names followup-truth-09; reversing exactly those labelled carrier edit(s) on the target text reproduces the source text with no other loss or addition (unit rewritten from the old STR39 live-tee description to the current Work loop capture pointer (loop.mjs:1110-1112,1150-1163)); supersede legal, row otherwise unchanged vs 11fc7590f, still pending, anchors exist, digests recomputed by script",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-rationale-rereview-b80e8c16c.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "637ef875f1e436e19b19e1f85ee124b2ac8a67dced524e9ef926c92b84cfc556",
       "targetAncestry": [
         "Added in candidate: Runner Behaviors & Operations",
         "Behaviors & Operations",
         "Xem live output worker khi đang chạy (live tee, STR39)"
-      ]
+      ],
+      "reviewReportCommit": "25351590ab8743233619407c9a9f20da2b830299"
     },
     {
       "claimId": "claim_85a972e5144ff1c803aac5141be7f204",
@@ -2082,14 +2087,19 @@
       "targetAnchor": "actors-access",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
       "rationale": "Judgment: supersede the source unit at docs/specs/runner.md#actors-access with docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md#actors-access. Labelled follow-up corrections followup-truth-12 changed this unit; source and target native unit digests differ. The token-level source-to-target changes are the labelled follow-up edits, with no other source loss or unlabelled addition, as documented in step9-a42-followup-corrections.json. Complete original source remains immutable; dated decision semantics are retained. Full source and current target, concrete correction evidence, and before/after rationale are in the bounded rationale re-review request. Pending independent review; full truth check and revalidation/rebinding remain owed at promotion and legacy cutover.",
-      "reviewNote": "deep: heading Actors & Access source L941-941 to subcomponents/h-6df5686d0d54/spec.md#actors-access; token-level source-to-target diff read both directions, every hunk lies inside an edit range (followup-truth-12) and is labelled in the carrier, nothing else added or lost; rework: disposition was moved from move to supersede because the unit text now differs (followup-truth-12), yet the rationale still carries the move wording (carried at the target anchor, Full native unit digest equal), which is false because source digest 3f682e32 and target digest b860dec0 differ and the A42 prefix names no concrete correction; replace the stale carried/digest-equal sentence with the labelled correction (followup-truth-12); shard row equals pack, anchors exist, source and target digests recomputed by script",
+      "reviewNote": "deep: stale carried/digest-equal sentence is gone from the committed shard rationale and pack afterRationale (shard equals pack); rationale names followup-truth-12; reversing exactly those labelled carrier edit(s) on the target text reproduces the source text with no other loss or addition (section-level digest of the Actors & Access heading changes only through the labelled edit in the following block (evolve door removed, 120af6b3d)); supersede legal, row otherwise unchanged vs 11fc7590f, still pending, anchors exist, digests recomputed by script",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-rationale-rereview-b80e8c16c.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "b860dec045aac1ef7bd041e99451ae747df3b3bdcedee268b427ec9eda3ee667",
       "targetAncestry": [
         "Added in candidate: Runner Actors & Access"
-      ]
+      ],
+      "reviewReportCommit": "25351590ab8743233619407c9a9f20da2b830299"
     },
     {
       "claimId": "claim_add6d13e14df87ad5d5bd46cc5bb98d4",
@@ -2098,15 +2108,20 @@
       "targetAnchor": "unheaded-block-3",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
       "rationale": "Judgment: supersede the source unit at docs/specs/runner.md#unheaded-block-60 with docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md#unheaded-block-3. Labelled follow-up corrections followup-truth-12 changed this unit; source and target native unit digests differ. The token-level source-to-target changes are the labelled follow-up edits, with no other source loss or unlabelled addition, as documented in step9-a42-followup-corrections.json. Complete original source remains immutable; dated decision semantics are retained. Full source and current target, concrete correction evidence, and before/after rationale are in the bounded rationale re-review request. Pending independent review; full truth check and revalidation/rebinding remain owed at promotion and legacy cutover.",
-      "reviewNote": "deep: block Unheaded block 60 source L943-950 to subcomponents/h-6df5686d0d54/spec.md#unheaded-block-3; token-level source-to-target diff read both directions, every hunk lies inside an edit range (followup-truth-12) and is labelled in the carrier, nothing else added or lost; rework: disposition was moved from move to supersede because the unit text now differs (followup-truth-12), yet the rationale still carries the move wording (carried at the target anchor, Full native unit digest equal), which is false because source digest 81c27248 and target digest 69f0927e differ and the A42 prefix names no concrete correction; replace the stale carried/digest-equal sentence with the labelled correction (followup-truth-12); shard row equals pack, anchors exist, source and target digests recomputed by script",
+      "reviewNote": "deep: stale carried/digest-equal sentence is gone from the committed shard rationale and pack afterRationale (shard equals pack); rationale names followup-truth-12; reversing exactly those labelled carrier edit(s) on the target text reproduces the source text with no other loss or addition (adds the former-evolve / door-removed annotation and renames the role cell to Historical operator role); supersede legal, row otherwise unchanged vs 11fc7590f, still pending, anchors exist, digests recomputed by script",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-rationale-rereview-b80e8c16c.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "69f0927ed54ab08aa5fc1e9f43beca35a3ad76e034a98945ea39674b4dc4cb2f",
       "targetAncestry": [
         "Added in candidate: Runner Actors & Access",
         "Actors & Access"
-      ]
+      ],
+      "reviewReportCommit": "25351590ab8743233619407c9a9f20da2b830299"
     },
     {
       "claimId": "claim_32d366486b72925c171d9fefc84179e2",
@@ -2180,15 +2195,20 @@
       "targetAnchor": "unheaded-block-5",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
       "rationale": "Judgment: supersede the source unit at docs/specs/runner.md#unheaded-block-63 with docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#unheaded-block-5. Labelled follow-up corrections followup-truth-06, followup-truth-07, followup-truth-08 changed this unit; source and target native unit digests differ. The token-level source-to-target changes are the labelled follow-up edits, with no other source loss or unlabelled addition, as documented in step9-a42-followup-corrections.json. Complete original source remains immutable; dated decision semantics are retained. Full source and current target, concrete correction evidence, and before/after rationale are in the bounded rationale re-review request. Pending independent review; full truth check and revalidation/rebinding remain owed at promotion and legacy cutover.",
-      "reviewNote": "deep: block Unheaded block 63 source L988-996 to subcomponents/h-6979005beaf7/spec.md#unheaded-block-5; token-level source-to-target diff read both directions, every hunk lies inside an edit range (followup-truth-06, followup-truth-07, followup-truth-08) and is labelled in the carrier, nothing else added or lost; rework: disposition was moved from move to supersede because the unit text now differs (followup-truth-06, followup-truth-07, followup-truth-08), yet the rationale still carries the move wording (carried at the target anchor, Full native unit digest equal), which is false because source digest c60f41f6 and target digest b8280518 differ and the A42 prefix names no concrete correction; replace the stale carried/digest-equal sentence with the labelled correction (followup-truth-06, followup-truth-07, followup-truth-08); shard row equals pack, anchors exist, source and target digests recomputed by script",
+      "reviewNote": "deep: stale carried/digest-equal sentence is gone from the committed shard rationale and pack afterRationale (shard equals pack); rationale names followup-truth-06 + followup-truth-07 + followup-truth-08; reversing exactly those labelled carrier edit(s) on the target text reproduces the source text with no other loss or addition (three labelled edits in the same block (evolve door removal annotations, 120af6b3d, bin/fgos.mjs:4373)); supersede legal, row otherwise unchanged vs 11fc7590f, still pending, anchors exist, digests recomputed by script",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-rationale-rereview-b80e8c16c.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "b8280518ac1d2f020be1040eb91e63467e9626fed7f82749f70fc0c534403893",
       "targetAncestry": [
         "Added in candidate: Runner Business Rules",
         "Business Rules"
-      ]
+      ],
+      "reviewReportCommit": "25351590ab8743233619407c9a9f20da2b830299"
     },
     {
       "claimId": "claim_4b223132b77128c46c544871c36a8e3b",
@@ -2197,15 +2217,20 @@
       "targetAnchor": "unheaded-block-6",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
       "rationale": "Judgment: supersede the source unit at docs/specs/runner.md#unheaded-block-64 with docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#unheaded-block-6. Labelled follow-up corrections followup-truth-05 changed this unit; source and target native unit digests differ. The token-level source-to-target changes are the labelled follow-up edits, with no other source loss or unlabelled addition, as documented in step9-a42-followup-corrections.json. Complete original source remains immutable; dated decision semantics are retained. Full source and current target, concrete correction evidence, and before/after rationale are in the bounded rationale re-review request. Pending independent review; full truth check and revalidation/rebinding remain owed at promotion and legacy cutover.",
-      "reviewNote": "deep: block Unheaded block 64 source L998-1005 to subcomponents/h-6979005beaf7/spec.md#unheaded-block-6; token-level source-to-target diff read both directions, every hunk lies inside an edit range (followup-truth-05) and is labelled in the carrier, nothing else added or lost; rework: disposition was moved from move to supersede because the unit text now differs (followup-truth-05), yet the rationale still carries the move wording (carried at the target anchor, Full native unit digest equal), which is false because source digest a887e766 and target digest b7889c4d differ and the A42 prefix names no concrete correction; replace the stale carried/digest-equal sentence with the labelled correction (followup-truth-05); shard row equals pack, anchors exist, source and target digests recomputed by script",
+      "reviewNote": "deep: stale carried/digest-equal sentence is gone from the committed shard rationale and pack afterRationale (shard equals pack); rationale names followup-truth-05; reversing exactly those labelled carrier edit(s) on the target text reproduces the source text with no other loss or addition (unit rewritten to the current loop.mjs capture behaviour; 12691 vs 13279 normalized chars); supersede legal, row otherwise unchanged vs 11fc7590f, still pending, anchors exist, digests recomputed by script",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-rationale-rereview-b80e8c16c.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "b7889c4d1e65be6918b7184594b540b8ead2d8d13d4266f8e0101a6af2375aba",
       "targetAncestry": [
         "Added in candidate: Runner Business Rules",
         "Business Rules"
-      ]
+      ],
+      "reviewReportCommit": "25351590ab8743233619407c9a9f20da2b830299"
     },
     {
       "claimId": "claim_f90bfbcb40720cb854dbd54aa96ca471",
@@ -2874,14 +2899,19 @@
       "targetAnchor": "edge-cases-settled",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
       "rationale": "Judgment: supersede the source unit at docs/specs/runner.md#edge-cases-settled with docs/platform/runner/subcomponents/h-37aced3896a8/spec.md#edge-cases-settled. Labelled follow-up corrections followup-truth-11 changed this unit; source and target native unit digests differ. The token-level source-to-target changes are the labelled follow-up edits, with no other source loss or unlabelled addition, as documented in step9-a42-followup-corrections.json. Complete original source remains immutable; dated decision semantics are retained. Full source and current target, concrete correction evidence, and before/after rationale are in the bounded rationale re-review request. Pending independent review; full truth check and revalidation/rebinding remain owed at promotion and legacy cutover.",
-      "reviewNote": "deep: heading Edge Cases Settled source L1123-1123 to subcomponents/h-37aced3896a8/spec.md#edge-cases-settled; token-level source-to-target diff read both directions, every hunk lies inside an edit range (followup-truth-11) and is labelled in the carrier, nothing else added or lost; rework: disposition was moved from move to supersede because the unit text now differs (followup-truth-11), yet the rationale still carries the move wording (carried at the target anchor, Full native unit digest equal), which is false because source digest c1c87e9a and target digest 42f7d3b5 differ and the A42 prefix names no concrete correction; replace the stale carried/digest-equal sentence with the labelled correction (followup-truth-11); shard row equals pack, anchors exist, source and target digests recomputed by script",
+      "reviewNote": "deep: stale carried/digest-equal sentence is gone from the committed shard rationale and pack afterRationale (shard equals pack); rationale names followup-truth-11; reversing exactly those labelled carrier edit(s) on the target text reproduces the source text with no other loss or addition (heading digest folds in the section payload, whose only change is the labelled evolve-historical e2e note); supersede legal, row otherwise unchanged vs 11fc7590f, still pending, anchors exist, digests recomputed by script",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-rationale-rereview-b80e8c16c.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "42f7d3b5bc55faa2dccd8f8d20cb008002957c8a31549f3fda4d1568c161b894",
       "targetAncestry": [
         "Added in candidate: Runner Edge Cases Settled"
-      ]
+      ],
+      "reviewReportCommit": "25351590ab8743233619407c9a9f20da2b830299"
     },
     {
       "claimId": "claim_3332d3ab8fadd91605a8a92da08091b7",
@@ -2934,15 +2964,20 @@
       "targetAnchor": "unheaded-block-5",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
       "rationale": "Judgment: supersede the source unit at docs/specs/runner.md#unheaded-block-97 with docs/platform/runner/subcomponents/h-37aced3896a8/spec.md#unheaded-block-5. Labelled follow-up corrections followup-truth-11 changed this unit; source and target native unit digests differ. The token-level source-to-target changes are the labelled follow-up edits, with no other source loss or unlabelled addition, as documented in step9-a42-followup-corrections.json. Complete original source remains immutable; dated decision semantics are retained. Full source and current target, concrete correction evidence, and before/after rationale are in the bounded rationale re-review request. Pending independent review; full truth check and revalidation/rebinding remain owed at promotion and legacy cutover.",
-      "reviewNote": "deep: block Unheaded block 97 source L1172-1173 to subcomponents/h-37aced3896a8/spec.md#unheaded-block-5; token-level source-to-target diff read both directions, every hunk lies inside an edit range (followup-truth-11) and is labelled in the carrier, nothing else added or lost; rework: disposition was moved from move to supersede because the unit text now differs (followup-truth-11), yet the rationale still carries the move wording (carried at the target anchor, Full native unit digest equal), which is false because source digest 153dc43f and target digest 2e056142 differ and the A42 prefix names no concrete correction; replace the stale carried/digest-equal sentence with the labelled correction (followup-truth-11); shard row equals pack, anchors exist, source and target digests recomputed by script",
+      "reviewNote": "deep: stale carried/digest-equal sentence is gone from the committed shard rationale and pack afterRationale (shard equals pack); rationale names followup-truth-11; reversing exactly those labelled carrier edit(s) on the target text reproduces the source text with no other loss or addition (adds the historical-e2e note for the removed evolve door, nothing else changed); supersede legal, row otherwise unchanged vs 11fc7590f, still pending, anchors exist, digests recomputed by script",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-rationale-rereview-b80e8c16c.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2e0561425f15bad2d92bbd21e6b7f837523159beb3b8de7fe250e67cbed1a27c",
       "targetAncestry": [
         "Added in candidate: Runner Edge Cases Settled",
         "Edge Cases Settled"
-      ]
+      ],
+      "reviewReportCommit": "25351590ab8743233619407c9a9f20da2b830299"
     },
     {
       "claimId": "claim_faf7be822c2140f22e6d5a5882f84595",
@@ -3235,14 +3270,19 @@
       "targetAnchor": "executorprofile-invocation-target-vocabulary-phase-06-executor-policy-dispatch-seams-identitysupports-made-real-config-phase-c-executor-profile-schema-migration",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
       "rationale": "Judgment: supersede the source unit at docs/specs/runner.md#executorprofile-invocation-target-vocabulary-phase-06-executor-policy-dispatch-seams-identitysupports-made-real-config-phase-c-executor-profile-schema-migration with docs/platform/runner/contracts/h-b3eb60fb4d2b.md#executorprofile-invocation-target-vocabulary-phase-06-executor-policy-dispatch-seams-identitysupports-made-real-config-phase-c-executor-profile-schema-migration. Labelled follow-up corrections followup-truth-01, followup-truth-02, followup-truth-03, followup-truth-04 changed this unit; source and target native unit digests differ. The token-level source-to-target changes are the labelled follow-up edits, with no other source loss or unlabelled addition, as documented in step9-a42-followup-corrections.json. Complete original source remains immutable; dated decision semantics are retained. Full source and current target, concrete correction evidence, and before/after rationale are in the bounded rationale re-review request. Pending independent review; full truth check and revalidation/rebinding remain owed at promotion and legacy cutover.",
-      "reviewNote": "deep: heading ExecutorProfile / Invocation — target vocabu source L1297-1297 to contracts/h-b3eb60fb4d2b.md#executorprofile-invocation-target-vocabu; token-level source-to-target diff read both directions, every hunk lies inside an edit range (followup-truth-01, followup-truth-02, followup-truth-03, followup-truth-04) and is labelled in the carrier, nothing else added or lost; rework: disposition was moved from move to supersede because the unit text now differs (followup-truth-01, followup-truth-02, followup-truth-03, followup-truth-04), yet the rationale still carries the move wording (carried at the target anchor, Full native unit digest equal), which is false because source digest 0f54c491 and target digest 6f6c6fcf differ and the A42 prefix names no concrete correction; replace the stale carried/digest-equal sentence with the labelled correction (followup-truth-01, followup-truth-02, followup-truth-03, followup-truth-04); shard row equals pack, anchors exist, source and target digests recomputed by script",
+      "reviewNote": "deep: stale carried/digest-equal sentence is gone from the committed shard rationale and pack afterRationale (shard equals pack); rationale names followup-truth-01 + followup-truth-02 + followup-truth-03 + followup-truth-04; reversing exactly those labelled carrier edit(s) on the target text reproduces the source text with no other loss or addition (heading digest folds in section payload whose four changes are exactly the four labelled executor-profile edits); supersede legal, row otherwise unchanged vs 11fc7590f, still pending, anchors exist, digests recomputed by script",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-rationale-rereview-b80e8c16c.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "6f6c6fcfe0b845e97c07b1bc7bc7c33190225499a676a4b7179336280c542012",
       "targetAncestry": [
         "Added in candidate: Runner ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)"
-      ]
+      ],
+      "reviewReportCommit": "25351590ab8743233619407c9a9f20da2b830299"
     },
     {
       "claimId": "claim_66d031f3f3d5009c11d96357e48d985a",
@@ -3251,15 +3291,20 @@
       "targetAnchor": "unheaded-block-3",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
       "rationale": "Judgment: supersede the source unit at docs/specs/runner.md#unheaded-block-106 with docs/platform/runner/contracts/h-b3eb60fb4d2b.md#unheaded-block-3. Labelled follow-up corrections followup-truth-01 changed this unit; source and target native unit digests differ. The token-level source-to-target changes are the labelled follow-up edits, with no other source loss or unlabelled addition, as documented in step9-a42-followup-corrections.json. Complete original source remains immutable; dated decision semantics are retained. Full source and current target, concrete correction evidence, and before/after rationale are in the bounded rationale re-review request. Pending independent review; full truth check and revalidation/rebinding remain owed at promotion and legacy cutover.",
-      "reviewNote": "deep: block Unheaded block 106 source L1299-1320 to contracts/h-b3eb60fb4d2b.md#unheaded-block-3; token-level source-to-target diff read both directions, every hunk lies inside an edit range (followup-truth-01) and is labelled in the carrier, nothing else added or lost; rework: disposition was moved from move to supersede because the unit text now differs (followup-truth-01), yet the rationale still carries the move wording (carried at the target anchor, Full native unit digest equal), which is false because source digest 5fde748f and target digest c334d72c differ and the A42 prefix names no concrete correction; replace the stale carried/digest-equal sentence with the labelled correction (followup-truth-01); shard row equals pack, anchors exist, source and target digests recomputed by script",
+      "reviewNote": "deep: stale carried/digest-equal sentence is gone from the committed shard rationale and pack afterRationale (shard equals pack); rationale names followup-truth-01; reversing exactly those labelled carrier edit(s) on the target text reproduces the source text with no other loss or addition (rewrites the stale no-consumer statement to the current-state correction using transport.mjs and assignment-policy.mjs evidence); supersede legal, row otherwise unchanged vs 11fc7590f, still pending, anchors exist, digests recomputed by script",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-rationale-rereview-b80e8c16c.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "c334d72c0b9610f0ff55a4b5ac0a2c9166facd2a7900b447f1959e0efb3276e4",
       "targetAncestry": [
         "Added in candidate: Runner ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
         "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)"
-      ]
+      ],
+      "reviewReportCommit": "25351590ab8743233619407c9a9f20da2b830299"
     },
     {
       "claimId": "claim_95d2ecdb9d54c1d56116b65a9df0c04d",
@@ -3334,15 +3379,20 @@
       "targetAnchor": "unheaded-block-7",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
       "rationale": "Judgment: supersede the source unit at docs/specs/runner.md#unheaded-block-110 with docs/platform/runner/contracts/h-b3eb60fb4d2b.md#unheaded-block-7. Labelled follow-up corrections followup-truth-02 changed this unit; source and target native unit digests differ. The token-level source-to-target changes are the labelled follow-up edits, with no other source loss or unlabelled addition, as documented in step9-a42-followup-corrections.json. Complete original source remains immutable; dated decision semantics are retained. Full source and current target, concrete correction evidence, and before/after rationale are in the bounded rationale re-review request. Pending independent review; full truth check and revalidation/rebinding remain owed at promotion and legacy cutover.",
-      "reviewNote": "deep: block Unheaded block 110 source L1341-1345 to contracts/h-b3eb60fb4d2b.md#unheaded-block-7; token-level source-to-target diff read both directions, every hunk lies inside an edit range (followup-truth-02) and is labelled in the carrier, nothing else added or lost; rework: disposition was moved from move to supersede because the unit text now differs (followup-truth-02), yet the rationale still carries the move wording (carried at the target anchor, Full native unit digest equal), which is false because source digest dfa2fbd2 and target digest 0ff401fc differ and the A42 prefix names no concrete correction; replace the stale carried/digest-equal sentence with the labelled correction (followup-truth-02); shard row equals pack, anchors exist, source and target digests recomputed by script",
+      "reviewNote": "deep (digests also hand-recomputed with sha256sum): stale carried/digest-equal sentence is gone from the committed shard rationale and pack afterRationale (shard equals pack); rationale names followup-truth-02; reversing exactly those labelled carrier edit(s) on the target text reproduces the source text with no other loss or addition (replaces the not-yet Phase D/E framing with the completed-migration note citing the archived plan); supersede legal, row otherwise unchanged vs 11fc7590f, still pending, anchors exist, digests recomputed by script",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-rationale-rereview-b80e8c16c.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "0ff401fc6d61831531fb616b1635f9043c166874573071e17cc04f368e9ad183",
       "targetAncestry": [
         "Added in candidate: Runner ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
         "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)"
-      ]
+      ],
+      "reviewReportCommit": "25351590ab8743233619407c9a9f20da2b830299"
     },
     {
       "claimId": "claim_2811db1449ad8dc4655f8531d5c5701e",
@@ -3351,15 +3401,20 @@
       "targetAnchor": "unheaded-block-8",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
       "rationale": "Judgment: supersede the source unit at docs/specs/runner.md#unheaded-block-111 with docs/platform/runner/contracts/h-b3eb60fb4d2b.md#unheaded-block-8. Labelled follow-up corrections followup-truth-03 changed this unit; source and target native unit digests differ. The token-level source-to-target changes are the labelled follow-up edits, with no other source loss or unlabelled addition, as documented in step9-a42-followup-corrections.json. Complete original source remains immutable; dated decision semantics are retained. Full source and current target, concrete correction evidence, and before/after rationale are in the bounded rationale re-review request. Pending independent review; full truth check and revalidation/rebinding remain owed at promotion and legacy cutover.",
-      "reviewNote": "deep: block Unheaded block 111 source L1347-1354 to contracts/h-b3eb60fb4d2b.md#unheaded-block-8; token-level source-to-target diff read both directions, every hunk lies inside an edit range (followup-truth-03) and is labelled in the carrier, nothing else added or lost; rework: disposition was moved from move to supersede because the unit text now differs (followup-truth-03), yet the rationale still carries the move wording (carried at the target anchor, Full native unit digest equal), which is false because source digest fc05b724 and target digest 7b630b89 differ and the A42 prefix names no concrete correction; replace the stale carried/digest-equal sentence with the labelled correction (followup-truth-03); shard row equals pack, anchors exist, source and target digests recomputed by script",
+      "reviewNote": "deep: stale carried/digest-equal sentence is gone from the committed shard rationale and pack afterRationale (shard equals pack); rationale names followup-truth-03; reversing exactly those labelled carrier edit(s) on the target text reproduces the source text with no other loss or addition (marks the alias patch as former and retired, citing assignment-policy.mjs:88-98); supersede legal, row otherwise unchanged vs 11fc7590f, still pending, anchors exist, digests recomputed by script",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-rationale-rereview-b80e8c16c.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "7b630b89fdcb48025ba14f021bdc19bec3eed03ffedf4ac24af141562f7675e3",
       "targetAncestry": [
         "Added in candidate: Runner ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
         "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)"
-      ]
+      ],
+      "reviewReportCommit": "25351590ab8743233619407c9a9f20da2b830299"
     },
     {
       "claimId": "claim_5f91b173c863af29efb4d8af8c734b4c",
@@ -3368,15 +3423,20 @@
       "targetAnchor": "unheaded-block-9",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
       "rationale": "Judgment: supersede the source unit at docs/specs/runner.md#unheaded-block-112 with docs/platform/runner/contracts/h-b3eb60fb4d2b.md#unheaded-block-9. Labelled follow-up corrections followup-truth-04 changed this unit; source and target native unit digests differ. The token-level source-to-target changes are the labelled follow-up edits, with no other source loss or unlabelled addition, as documented in step9-a42-followup-corrections.json. Complete original source remains immutable; dated decision semantics are retained. Full source and current target, concrete correction evidence, and before/after rationale are in the bounded rationale re-review request. Pending independent review; full truth check and revalidation/rebinding remain owed at promotion and legacy cutover.",
-      "reviewNote": "deep: block Unheaded block 112 source L1356-1360 to contracts/h-b3eb60fb4d2b.md#unheaded-block-9; token-level source-to-target diff read both directions, every hunk lies inside an edit range (followup-truth-04) and is labelled in the carrier, nothing else added or lost; rework: disposition was moved from move to supersede because the unit text now differs (followup-truth-04), yet the rationale still carries the move wording (carried at the target anchor, Full native unit digest equal), which is false because source digest 8effb31b and target digest f4886338 differ and the A42 prefix names no concrete correction; replace the stale carried/digest-equal sentence with the labelled correction (followup-truth-04); shard row equals pack, anchors exist, source and target digests recomputed by script",
+      "reviewNote": "deep (digests also hand-recomputed with sha256sum): stale carried/digest-equal sentence is gone from the committed shard rationale and pack afterRationale (shard equals pack); rationale names followup-truth-04; reversing exactly those labelled carrier edit(s) on the target text reproduces the source text with no other loss or addition (replaces the Phase E not-yet statement with the completion correction, dropping the old consolidation-has-not-happened text); supersede legal, row otherwise unchanged vs 11fc7590f, still pending, anchors exist, digests recomputed by script",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-rationale-rereview-b80e8c16c.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f4886338571ebec2a610be75ec1eabd41578febbffae0c17605e3bc94ecc744c",
       "targetAncestry": [
         "Added in candidate: Runner ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)",
         "ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)"
-      ]
+      ],
+      "reviewReportCommit": "25351590ab8743233619407c9a9f20da2b830299"
     },
     {
       "claimId": "claim_39d792588a8be9f5c525406f7692f77c",
@@ -4021,15 +4081,20 @@
       "targetAnchor": "unheaded-block-26",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
       "rationale": "Judgment: supersede the source unit at docs/specs/runner.md#unheaded-block-140 with docs/platform/runner/architecture/h-69197b459754.md#unheaded-block-26. Labelled follow-up corrections followup-truth-15 changed this unit; source and target native unit digests differ. The token-level source-to-target changes are the labelled follow-up edits, with no other source loss or unlabelled addition, as documented in step9-a42-followup-corrections.json. Complete original source remains immutable; dated decision semantics are retained. Full source and current target, concrete correction evidence, and before/after rationale are in the bounded rationale re-review request. Pending independent review; full truth check and revalidation/rebinding remain owed at promotion and legacy cutover.",
-      "reviewNote": "deep: block Unheaded block 140 source L1528-1563 to architecture/h-69197b459754.md#unheaded-block-26; token-level source-to-target diff read both directions, every hunk lies inside an edit range (followup-truth-15) and is labelled in the carrier, nothing else added or lost; rework: disposition was moved from move to supersede because the unit text now differs (followup-truth-15), yet the rationale still carries the move wording (carried at the target anchor, Full native unit digest equal), which is false because source digest dceb2f26 and target digest fa12380b differ and the A42 prefix names no concrete correction; replace the stale carried/digest-equal sentence with the labelled correction (followup-truth-15); shard row equals pack, anchors exist, source and target digests recomputed by script",
+      "reviewNote": "deep: stale carried/digest-equal sentence is gone from the committed shard rationale and pack afterRationale (shard equals pack); rationale names followup-truth-15; reversing exactly those labelled carrier edit(s) on the target text reproduces the source text with no other loss or addition (annotates the coordination session-engine mention as removed in 2180b4e72, nothing else changed); supersede legal, row otherwise unchanged vs 11fc7590f, still pending, anchors exist, digests recomputed by script",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-rationale-rereview-b80e8c16c.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "fa12380ba45b60a32c819272d07b996412a915e0e5bae3a091799807c78d882b",
       "targetAncestry": [
         "Added in candidate: Runner Dispatch operability implementation slice (2026-09-16)",
         "Dispatch operability implementation slice (2026-09-16)"
-      ]
+      ],
+      "reviewReportCommit": "25351590ab8743233619407c9a9f20da2b830299"
     },
     {
       "claimId": "claim_88d627e8f4ea6556a45d97bc81b03f28",
@@ -4038,15 +4103,20 @@
       "targetAnchor": "unheaded-block-27",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
       "rationale": "Judgment: supersede the source unit at docs/specs/runner.md#unheaded-block-141 with docs/platform/runner/architecture/h-69197b459754.md#unheaded-block-27. Labelled follow-up corrections followup-truth-16 changed this unit; source and target native unit digests differ. The token-level source-to-target changes are the labelled follow-up edits, with no other source loss or unlabelled addition, as documented in step9-a42-followup-corrections.json. Complete original source remains immutable; dated decision semantics are retained. Full source and current target, concrete correction evidence, and before/after rationale are in the bounded rationale re-review request. Pending independent review; full truth check and revalidation/rebinding remain owed at promotion and legacy cutover.",
-      "reviewNote": "deep: block Unheaded block 141 source L1565-1577 to architecture/h-69197b459754.md#unheaded-block-27; token-level source-to-target diff read both directions, every hunk lies inside an edit range (followup-truth-16) and is labelled in the carrier, nothing else added or lost; rework: disposition was moved from move to supersede because the unit text now differs (followup-truth-16), yet the rationale still carries the move wording (carried at the target anchor, Full native unit digest equal), which is false because source digest ff375152 and target digest 5c2cca94 differ and the A42 prefix names no concrete correction; replace the stale carried/digest-equal sentence with the labelled correction (followup-truth-16); shard row equals pack, anchors exist, source and target digests recomputed by script",
+      "reviewNote": "deep: stale carried/digest-equal sentence is gone from the committed shard rationale and pack afterRationale (shard equals pack); rationale names followup-truth-16; reversing exactly those labelled carrier edit(s) on the target text reproduces the source text with no other loss or addition (annotates runCoordinationHeadless as removed in 2180b4e72 (former adapter), nothing else changed); supersede legal, row otherwise unchanged vs 11fc7590f, still pending, anchors exist, digests recomputed by script",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-rationale-rereview-b80e8c16c.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "5c2cca94cc507e1f552e5a5a6b298bd81f7c9d5b4bd3abd8fbe9e1c2d24db498",
       "targetAncestry": [
         "Added in candidate: Runner Dispatch operability implementation slice (2026-09-16)",
         "Dispatch operability implementation slice (2026-09-16)"
-      ]
+      ],
+      "reviewReportCommit": "25351590ab8743233619407c9a9f20da2b830299"
     },
     {
       "claimId": "claim_5e0cf165c59b615201e26c123abc8099",
@@ -15199,5 +15269,5 @@
       "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
     }
   ],
-  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md"
+  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-rationale-rereview-b80e8c16c.md"
 }

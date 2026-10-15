@@ -1,0 +1,9 @@
+{
+  "SYNC": "17b751966",
+  "scope": "Group-only final-tree measurement; no retirement rehearsal or global gate claim",
+  "result": {
+    "duplicates": 4,
+    "mirrors": 814,
+    "semantic": 28
+  }
+}

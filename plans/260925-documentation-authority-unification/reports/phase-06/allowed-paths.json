@@ -22,5 +22,6 @@
   "scripts/check-doc-constitution.mjs",
   "scripts/check-doc-candidate-status.mjs",
   "scripts/check-legacy-docs-ratchet.exceptions.json",
-  "test/scripts/"
+  "test/scripts/",
+  "scripts/compare-doc-global-closure.mjs"
 ]

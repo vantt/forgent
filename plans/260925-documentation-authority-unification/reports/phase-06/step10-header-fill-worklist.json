@@ -1,0 +1,555 @@
+{
+  "SYNC": "17b751966",
+  "bodyEdits": false,
+  "items": [
+    {
+      "path": "docs/platform/README.md",
+      "missing": [
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "7ec050aacc3c0b42a7830c9d42b0bcae09a4d9cd0c1e4a90432d819d6fc4a2c7",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/architecture-map.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "19dcc976d77b0e25257069d01234691f66d25c2fd0e0b83b8f4bec92c62abad3",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/component-boundary.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "16c70676490df514a56a57bba3b66f88ac8acafa889de9920d6612bc086d93b9",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/convention/spec.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "ce58ee5ab16696335be7cbe7b5be46449eca2799b4eb5266aa0b13a4276424a6",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/architecture/README.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "6c553e47f749c222c04f3f852bbedacbe4241a94a03129d3fa192272a72bccd8",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "c6696b9b64fd9bbb71e12070640d060a4f1ed6492773457955f9df979412bee9",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "b54adc926555da030df92e1e1c90c339f10ba4152a17a3486df06a4a0ca7927a",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/architecture/invocation-kernel.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "64b03ea5fb9b59818d280d73a724d9e7c888065938337bcb85d7ebc077079930",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "bed5a1a058b6975cfc1cd9186170a22b88c0fab8c1ba7244d13f00bab8d316b9",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "bc0a292df192ec7ee1dbc217feed5057de129e55e02beaaf60dd4dd6edabdb37",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/architecture/provider-routing.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "2f7020661b7b1fd8fa2a32da4222a9af166c1c83d72ce7acb86212c754b5df50",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "3a021a8335b612e3b9af7a30f341172ffe3778997474abe94206fbc0d5e9cc20",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/contracts/README.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "78dc6c19680d7d7b919790ec03b5a6049c0128048089c391fcddbe783948ef97",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/contracts/command-route-descriptor.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "05ef5644dc45256e6bf8f667752bbbcc2b15e27353424e0abb39da819618a893",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "39c7a77ccdc4c2704b6a105f4f0d239e95779c5d9e07f6af804522c57e7be7f4",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/contracts/external-provider-manifest.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "6e83b3e3f272bedd55d66b72a3162a324303cf0fe1f65de9076551c1bd75c627",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/contracts/legacy-payload.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "6210a5a5e8c109281b235843c868f00d14f3cab9ed628db66322f5dc4131d272",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/contracts/operation-catalog.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "f9bf2d39c408707eed4838b86500d39b5b1757461b69bcb514560ca24e6c41ef",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/contracts/operation-provider.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "c24d5b5cdc749a6fb14b56d480e67f37f6a9a3e028f1dfcfdeeb6cb0ef3a1ef6",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/contracts/operation-request-outcome.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "575948d31413753f0172ef6d3ac7aea2ceeb0334211cec34f7ed1cc13ed39482",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/decisions/README.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "719cb95807671f5ba243233b6e26f4fac7a43bb9845ea2b35681c19dba4bb537",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "19ea939648aa05b4e97b82e87f2f894a3c6286e70c969e43d68d21c74f2170e8",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/spec.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "67e0d029b6f3317608f0ed6e7874216b01a5c880db351f0834bb163e1434799c",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/verification/README.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "fb9438f8e9845804cfe10f18efc2e1e4f805d7ed3d5e562e0c029a74afad4509",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "57e693d8130de7d32af879f65ed17e53c38ad1f5219dddc802ba25f9262c49bc",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "59a4ee0383c26af63e9430b8440bd8c22a81a1de0dfc32efb7ba82dc8d9689e7",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "d97afecf2a64681f02aa9fd715f459dae4ea688aa39c0f22d044ac37501c472a",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "cf866186d80f2b9c8bbb5b35a83cf14d70bde9bdda8c8627a03d0e6fb199fe1f",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "a082d00c31d0301643ffd1ae3880e058cbcdd99fa169ef8525309faa7f5d6d3f",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "48161a13b8b7bb6547a2014aa411aab00fca5ec9acfa0c60d8f1cf207683ffef",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/vision.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "0e3950d4d0ce937e43007b365f8a978780f4b97dafad3f5bd97071349380f04a",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/intent-preservation-ledger.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "1a714ec716759f8aedf62e3bcdf24c15b6d0586769b7e665189c5a612636fca7",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/work-state/README.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "5c56bdd0a47f6158fce19fede669305222eb2c85dbc34f792fd15b54288f9fc8",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/work-state/architecture/implementation-pointers.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "75e105a5e11e3f4dfdb1d1dfbd2c0cafcf8d6289a2d65f1cc0e7a0656267cab7",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "1226302831032c9f18ce9520be648bbc94540eb5f8dbc0ca25495526a83f1daa",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "6627bc6db0e7e27ea2fca7d06f7c76b521c6f0e109036625c1291997e2df913c",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    },
+    {
+      "path": "docs/platform/work-state/spec.md",
+      "missing": [
+        "Implementation",
+        "Provenance",
+        "Writer type",
+        "Canonical for",
+        "Use this when",
+        "Do not use this for",
+        "Supersedes",
+        "Superseded by"
+      ],
+      "sha256": "c92192d5763be108278c861e58ec03daf4946b0bc981fc570d183f588dd04bb4",
+      "instruction": "Fill only listed header fields from extant provenance; no current truth approval; rebind all returned target-drift rows, then review. Per-area writes; portals last."
+    }
+  ]
+}

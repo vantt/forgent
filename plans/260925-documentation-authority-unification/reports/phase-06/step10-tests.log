@@ -1,0 +1,57 @@
+✔ review pack contains full source and target units and reverse unmatched candidate blocks (18.582004ms)
+✔ seeded review uses six real text mutations and scores missed defects and false flags (69.7432ms)
+✔ review application binds current digest and keeps rework and hold pending without inventing approval (37.006694ms)
+✔ valid source digest prefixes survive pack and review application with full seen-text bindings (19.717364ms)
+✔ verdict table names the reviewer and requires an explicit verdict and own note for each row (3.047601ms)
+✔ unknown dispositions remain blocking after a hold verdict and pass decision validation (12.081446ms)
+✔ unknown dispositions remain blocking after a rework verdict and pass decision validation (7.563911ms)
+✔ the same reviewer session on another date is still the author session (5.975561ms)
+✔ pre-reviewed hand rows without committed evidence are rejected instead of skipped (4.214305ms)
+✔ a public seeded pack does not expose its replay inputs or retain original mutated digests (15.475045ms)
+✔ review application requires a passing sensitivity result for the exact shown pack (14.916125ms)
+✔ approval cannot attach to target text or heading ancestry changed after the pack (14.631552ms)
+✔ approved rows retain the seen unit binding and their own report across review rounds (10.948685ms)
+✔ sensitivity controls must belong to the bound batch even when the sensitivity score passes (15.169314ms)
+✔ deduplicates overlapping candidate lists and accounts native strict red without claiming strict green (5.887964ms)
+✔ rejects same-size candidate substitutions and stale digest/anchor/path/identity (1.235289ms)
+✔ rejects unexpected fatal, unknown open category and summary-count mismatch (1.25777ms)
+✔ pending claims must equal holds by identity; unknown-blocking also counted (1.204377ms)
+✔ partial carries compare full native identity including registry predecessors (0.961086ms)
+✔ identical groups compare digest and exact owner sets rather than group counts (0.951737ms)
+✔ missing explicit rows, malformed data and duplicate native identities fail closed (1.053685ms)
+✔ reviewers receive full text and a unified diff in Markdown with safely nested fences (345.10157ms)
+✔ the public seeded Markdown can be scored without exposing the seed or private selection key (1023.721307ms)
+✔ script-proven carries supply batch sensitivity controls without reopening accepted decisions (1086.206733ms)
+✔ a new shard cannot claim legacy compatibility by deleting author fields (325.461598ms)
+✔ ordinary committed reviews approve seen text without a sensitivity pack and retain their report pin (1010.882195ms)
+▶ ordinary reviews cannot approve a changed digest, an unauthored row or their own session
+  ✔ target-digest (401.089367ms)
+  ✔ source-digest (349.429246ms)
+  ✔ authoredBy (385.298355ms)
+  ✔ authorSession (249.405973ms)
+  ✔ same-session (356.357527ms)
+✔ ordinary reviews cannot approve a changed digest, an unauthored row or their own session (1749.288042ms)
+▶ checkpoint reports cannot use the ordinary channel to omit sensitivity proof
+  ✔ checkpoint 3 (709.084966ms)
+  ✔ checkpoint 6 (497.843008ms)
+  ✔ checkpoint 10 (541.801911ms)
+✔ checkpoint reports cannot use the ordinary channel to omit sensitivity proof (1749.784414ms)
+✔ the review lint accepts a well-formed ordinary report before application and writes nothing (336.188192ms)
+✔ the review lint uses the recorded target digest of an applied shard without an inventory (444.857794ms)
+▶ the review lint names the line and claim of each malformed verdict row
+  ✔ source-digest-not-64-hex (258.984098ms)
+  ✔ wrong-cell-count (240.161548ms)
+  ✔ non-bare-first-cell (282.554228ms)
+  ✔ target-digest-mismatch (286.498329ms)
+  ✔ source-digest-mismatch (335.114063ms)
+  ✔ bad-verdict (273.413797ms)
+✔ the review lint names the line and claim of each malformed verdict row (1678.453525ms)
+✔ the review lint allows labelled non-claim rows but reports unknown claims and missing headers (974.7942ms)
+ℹ tests 46
+ℹ suites 0
+ℹ pass 46
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11084.292667

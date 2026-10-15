@@ -1,0 +1,81 @@
+{
+  "rounds": [
+    {
+      "round": "initial-source",
+      "reports": [
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1706-runner-source-16-81d0ed074.md",
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1706-runner-source-05-81d0ed074.md",
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1706-runner-source-13-81d0ed074.md",
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1706-runner-source-14-81d0ed074.md",
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1706-runner-source-02-81d0ed074.md",
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1706-runner-source-19-81d0ed074.md",
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1706-runner-source-23-81d0ed074.md",
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1706-runner-source-07-81d0ed074.md",
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1706-runner-source-22-81d0ed074.md",
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1706-runner-source-01-81d0ed074.md",
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1706-runner-source-12-81d0ed074.md",
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1706-runner-source-15-81d0ed074.md",
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1706-runner-source-03-81d0ed074.md",
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1706-runner-source-04-81d0ed074.md",
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1706-runner-source-10-81d0ed074.md",
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1706-runner-source-21-81d0ed074.md",
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1706-runner-source-18-81d0ed074.md",
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1706-runner-source-20-81d0ed074.md",
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1706-runner-source-08-81d0ed074.md",
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1706-runner-source-17-81d0ed074.md",
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1706-runner-source-11-81d0ed074.md",
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1706-runner-source-09-81d0ed074.md",
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1706-runner-source-06-81d0ed074.md"
+      ],
+      "counts": {
+        "ok": 494,
+        "rework": 1,
+        "hold": 0
+      },
+      "total": 495,
+      "reworkRate": 0.00202020202020202
+    },
+    {
+      "round": "1803-bounded",
+      "reports": [
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1803-runner-bounded-rereview-26f5f6119-part1.md",
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1803-runner-bounded-rereview-26f5f6119-part2.md"
+      ],
+      "counts": {
+        "ok": 271,
+        "rework": 6,
+        "hold": 0
+      },
+      "total": 277,
+      "reworkRate": 0.021660649819494584
+    },
+    {
+      "round": "b80-bounded",
+      "reports": [
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part2.md",
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md"
+      ],
+      "counts": {
+        "ok": 256,
+        "rework": 14,
+        "hold": 0
+      },
+      "total": 270,
+      "reworkRate": 0.05185185185185185
+    },
+    {
+      "round": "final-rationale",
+      "reports": [
+        "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-rationale-rereview-b80e8c16c.md"
+      ],
+      "counts": {
+        "ok": 14,
+        "rework": 0,
+        "hold": 0
+      },
+      "total": 14,
+      "reworkRate": 0.0
+    }
+  ],
+  "note": "Packet-entry rework rates; distinct source/rationale/accounting channels must not be collapsed into a homogeneous second source round. Mandatory deep reviews and Lead L9 decisions remain recorded in source reports; this summary changes no stop rule."
+}

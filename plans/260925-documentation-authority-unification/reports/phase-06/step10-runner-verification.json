@@ -1,0 +1,137 @@
+{
+  "SYNC": "17b751966",
+  "inventoryCommit": "25351590ab8743233619407c9a9f20da2b830299",
+  "registryRequestCommit": "07d3dec1b",
+  "registrySha256": "d2675a26883ff1f81e86e6d107d76f315602ada5253d98d3c849c9a8fff09772",
+  "nativeSyncCount": 0,
+  "registryWrites": 0,
+  "inventory": {
+    "files": 4484,
+    "activeUnits": 91331
+  },
+  "method": "Read-only generateInventory at committed final review before merge; full runner source and candidate namespace unchanged across final SYNC. Both prior registries together in actual native D/E. Merged-HEAD inventory refused stale global tree binding, retained as limitation; no registry refresh/bypass. Not a current global proof.",
+  "priorRegistries": [
+    "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+    "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"
+  ],
+  "runs": [
+    {
+      "label": "both",
+      "check": "D",
+      "inventoryCommit": "25351590ab8743233619407c9a9f20da2b830299",
+      "scope": [
+        "docs/specs/runner.md"
+      ],
+      "previousRegistries": [
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"
+      ],
+      "seconds": 98.26,
+      "file": "step10-runner-D-both.json",
+      "fatal": 0,
+      "fatalTypes": [],
+      "open": [
+        {
+          "type": "claims-partial-carry",
+          "count": 11
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 63
+        }
+      ]
+    },
+    {
+      "label": "both",
+      "check": "E",
+      "inventoryCommit": "25351590ab8743233619407c9a9f20da2b830299",
+      "scope": [
+        "docs/specs/runner.md"
+      ],
+      "previousRegistries": [
+        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"
+      ],
+      "seconds": 97.905,
+      "file": "step10-runner-E-both.json",
+      "fatal": 2,
+      "fatalTypes": [
+        "claims-partial-carry",
+        "candidate-blocks-unreferenced"
+      ],
+      "open": [
+        {
+          "type": "claims-partial-carry",
+          "count": 11
+        },
+        {
+          "type": "candidate-blocks-unreferenced",
+          "count": 63
+        }
+      ]
+    }
+  ],
+  "initialDiagnostic": {
+    "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-runner-initial-D-provenance.json",
+    "fatal": 14,
+    "type": "decision-review-report-missing",
+    "cause": "Ordinary applicator used containing SYNC HEAD as reportCommit, which is newer than scoped inventory pin; normalized only the 14 reportCommit fields to actual immutable report commit 25351590a after proving report bytes equal at both pins. No source/target, reviewer, note, checker or identity change."
+  },
+  "reportProvenancePin": {
+    "commit": "25351590ab8743233619407c9a9f20da2b830299",
+    "reportSHA256": "311282dec7097365da18c1e1ee82039becddfa431a301670557125754c3faf8c",
+    "identicalAtSYNC": true,
+    "reason": "Unchanged ordinary API verified/application at SYNC; normalize only reportCommit to the actual independent report commit (25351590a), not the later containing merge HEAD. Source, target, rationale, note and reviewer unchanged; gate semantics untouched."
+  },
+  "D_fatal": 0,
+  "E_open": [
+    {
+      "type": "claims-partial-carry",
+      "count": 11
+    },
+    {
+      "type": "candidate-blocks-unreferenced",
+      "count": 63
+    }
+  ],
+  "pendingRunnerRows": 0,
+  "reviewedRunnerRows": 495,
+  "dispositions": {
+    "supersede": 49,
+    "move": 446
+  },
+  "notesVerbatim": true,
+  "changedSourceRowIds": [
+    "claim_c989dc1877e144abd29d133c0a59efc9",
+    "claim_0686418ae7571d82eade8059c698709d",
+    "claim_add6d13e14df87ad5d5bd46cc5bb98d4",
+    "claim_3ff43c5fd67cb1df9a9c2f81a0849057",
+    "claim_4b223132b77128c46c544871c36a8e3b",
+    "claim_099eb566c825967cf35f9397f2d7b947",
+    "claim_36f4a3c4ae623f3a348faadd747dcba7",
+    "claim_ef6c4ace21b84e2eeb9de2ad200e5cfb",
+    "claim_66d031f3f3d5009c11d96357e48d985a",
+    "claim_d29be3d33893c060220d82b135fcb7c0",
+    "claim_2811db1449ad8dc4655f8531d5c5701e",
+    "claim_5f91b173c863af29efb4d8af8c734b4c",
+    "claim_a11926d30be8de43744fc81023f6dab5",
+    "claim_88d627e8f4ea6556a45d97bc81b03f28"
+  ],
+  "allNonReviewFieldsUnchanged": true,
+  "runnerScopeUnchangedAcrossSYNC": true,
+  "comparison": {
+    "ok": true,
+    "strictGreen": false,
+    "counts": {
+      "claims-unknown-blocking": 0,
+      "claims-not-reviewed": 0,
+      "identical-units-multiple-owners": 0,
+      "candidate-blocks-unreferenced": 63,
+      "claims-partial-carry": 11
+    },
+    "errors": []
+  },
+  "strictGreen": false,
+  "Step9Closed": true,
+  "obligations": "11 partials and 63 reverse units are lawful pre-cutover openness, not strict green. Rings, A34/group residuals, 14 historical cutover rebindings (five absent stored digests), lenient readers, aliases/consumers, truth at promotion and Step 10 global closure remain."
+}

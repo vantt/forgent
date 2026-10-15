@@ -1,3 +1,17 @@
+# Step 9 closed — Step 10 data turn complete
+
+Assignment `unit-run-1792074987817-29e6c5c2/producer/1`; **SYNC 17b751966**, **B0 dbe5c432852837ea01e6025b35868bcb7271495d**. Lead merged main before this turn. **Step 9 CLOSED: 14 final ok applied with verbatim Notes; 495 reviewed / 0 pending.** Native D zero fatal; strict E only **11 A34 partial / 63 reverse**. Both prior registries together; unchanged 07d3dec1b registry; runner namespace unchanged across SYNC. Read-only inventory at final review pin 25351590a: 4484 files / 91331 active units. No native sync, carry-forward or registry write. Global merged-HEAD registry binding is deliberately not claimed. [Step 9 closure](step-09-report.md), [native verification](step10-runner-verification.json).
+
+Step 10 **authoring/data turn complete**: final-tree **822 duplicate / 219 semantic** groups; **15 named-rule records** with full members (12 history-no-authority, 3 retain-as-evidence); three manual group checks, nothing deleted. **3 Rings holds** with reasons. L10-6 comparator tests first red, **8/8 green**, combined regression **47/47 pass**; real scoped smoke passes and retains strictGreen false. Expected global inputs preserve all eight candidate lists (3609 rows / 2293 tuples), 347 identical groups and 25 A34 partial identities. No global-green claim; native group check still 4 duplicate / 28 semantic open outside the 15 named groups.
+
+**Seven new alias drafts + merged 9235 entries**, all native --table valid, zero conflicting targets; **1028/1039** legacy bare paths covered and **11 reasoned no-alias entries**. P/alias-table.json remains empty. Ratchet clean after confinement accounting; the new complete binding unit queued for re-carry. The orphan-recovery bullet is outside ratchet roots and every Phase 6 frozen map.
+
+**Next turn = docs turn (step10-evidence section 9 turn 2), no sync.** [Worklist](step10-docs-turn-worklist.md): **53 reading-map entries; 110 active + 18 gap + 9 retired instruction identities; 37 header fills; 416 links / 78 files (366 repoint, 41 history keep, 9 queue); one confinement unit; one history README draft**. Skeletons are not active decisions. [Step 10 draft](step-10-report.md).
+
+A retains 8 historical observations, B/C/I equal, H zero findings. Existing lenient/strict reader distinction, A34/Rings/cutover obligations, dashboard predecessor verdict, stale successor binding, other group and inbound-edge closure, rebind/review, global D/E, rehearsal, snapshot/verify, T9, truth draw, red-team/checkpoint and scorecard/effort remain explicit. No new owner-direction blocker for docs authoring. Full npm suite and global closure not claimed. No docs/protected tool/baseline edits, review packs, CLI, workspace git writes, promotion, retirement, push or deletion. Required external outbox is the assignment exception. Incidental metadata-only .fgos reference stat is disclosed in step10-data-reproduction.json; no content read or workspace .fgos write. Runner owns commit; Phase 6 remains open.
+
+---
+
 # Runner final application complete — one 14-row review pending
 
 Assignment `unit-run-1792071833745-bbef008d/producer/1`; content **b80e8c16c**, registry/request **07d3dec1b** reused unchanged. **256 ok applied, Notes verbatim; 14 rationale-only reworks fixed and pending**, all supersede; source **481 reviewed / 14 pending**. [Receipts](runner-final-verdict-application.json).
