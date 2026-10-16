@@ -171,3 +171,20 @@ test('judge vector names are unique', () => {
   const names = judge.vectors.map((vector) => vector.name);
   assert.deepEqual(names.filter((name, i) => names.indexOf(name) !== i), []);
 });
+
+test('the Rust-owned activation, install and observe locks are leaf mutexes fenced by tombstone', () => {
+  const rustOwned = registry.locks.filter((lock) => lock.owner === '4.4');
+  assert.deepEqual(rustOwned.map((lock) => lock.name).sort(), ['activation', 'install', 'observe']);
+  const expected = {
+    activation: { scope: 'repo', v3Path: '<fgosDir>/locks/activation.lock', v1Shape: 'file-link', v1Path: '.fgos/installation/activation.lock' },
+    install: { scope: 'machine', v3Path: '<lockRoot>/install.lock', v1Shape: 'file-wx', v1Path: '<stateRoot>/install.lock' },
+    observe: { scope: 'repo', v3Path: '<fgosDir>/locks/observe.lock', v1Shape: 'file-wx', v1Path: '.fgos/observe/.lock' },
+  };
+  for (const lock of rustOwned) {
+    assert.equal(lock.kind, 'mutex', `${lock.name}: kind`);
+    assert.equal(lock.rank, 80, `${lock.name}: rank`);
+    assert.equal(lock.fence, 'tombstone', `${lock.name}: fence`);
+    const want = expected[lock.name];
+    for (const key of Object.keys(want)) assert.equal(lock[key], want[key], `${lock.name}: ${key}`);
+  }
+});
