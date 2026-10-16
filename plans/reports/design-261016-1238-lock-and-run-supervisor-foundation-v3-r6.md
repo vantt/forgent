@@ -212,7 +212,7 @@ Cơ chế, đơn giản nhất mà đúng (r6, sau lần đo thứ hai):
 **Probe chứng minh.** Ba probe dưới đã có trong `tools/platform-probe` và **xanh trên cả ba nền** ở lần đo hai (12.11), với job do supervisor giữ. Còn thiếu một probe cho đường dự phòng ở bước 2: `predecessor-all-owners-dead` (Windows) — holder và process giữ job cùng bị giết trong lúc git bị chặn trong hook; contender mở job thất bại, chạy dự phòng Toolhelp; khẳng định 0 lần đi tiếp khi còn process trong chuỗi chưa signaled, lặp 50 lần. Các probe đã có:
 - `git-borrow-blocking-hook-predecessor-check` (Windows): như `git-borrow-blocking-hook`, nhưng contender sau khi lấy `LockFileEx` còn chạy bước 2 rồi mới ghi thời điểm "được đi tiếp". Lặp 50 lần. Khẳng định: thời điểm được đi tiếp **luôn ≥** thời điểm process cuối trong job chết (0 vi phạm); ghi phân bố thời gian chờ thêm.
 - `predecessor-record-stale` (Windows): record trỏ tới một job đã đóng từ trước → `OpenJobObject` thất bại → đi tiếp ngay (đo độ trễ thêm).
-- `predecessor-drain-timeout` (Windows): job trước có process không chết (giữ handle job ở process ngoài) → sau `predecessorDrainMs` contender `TerminateJobObject` rồi đi tiếp, hoặc trả `held` có tên.
+- `predecessor-drain-timeout` (Windows): job trước có process không chết (giữ handle job ở process ngoài) → contender `TerminateJobObject` (r6: ngay, không chờ cạn), chờ member signaled rồi đi tiếp, hoặc trả `held` có tên.
 - Cùng ba ca cho Linux/macOS với miền tương ứng (đối chứng).
 
 Cổng giấu khác biệt: caller chỉ thấy `acquire/release/run_borrowed`. Chỗ duy nhất biết "fd" hay "job" là driver. Đường nóng tạm thời (6.6) không dùng cổng này cho fast path; nó chỉ dùng cổng cho lock `state.reclaim`.
