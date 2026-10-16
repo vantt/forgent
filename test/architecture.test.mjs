@@ -13,7 +13,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
-import YAML from 'yaml';
+import { parseYaml } from '../src/util/yaml.mjs';
 import { lexSource } from './helpers/js-source-lexer.mjs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -932,7 +932,7 @@ test('A4 boundary guard: dispatch, execution, the dispatch barrel and src/workfl
     const wfDir = path.join(domainsDir, d, 'workflows');
     if (!fs.existsSync(wfDir)) continue;
     for (const file of fs.readdirSync(wfDir)) {
-      const wf = YAML.parse(fs.readFileSync(path.join(wfDir, file), 'utf8'));
+      const wf = parseYaml(fs.readFileSync(path.join(wfDir, file), 'utf8'), { filename: file });
       for (const step of wf?.steps ?? []) if (step.phase) stepIds.add(step.id);
     }
   }
@@ -1174,4 +1174,84 @@ test('A4 guarded folders hold only plain .mjs sources, so every guard reads ever
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }
+});
+
+// One door for YAML: src/util/yaml.mjs is the only module that may load a YAML parser, and it loads
+// the vendored bundle. Anything else -- the npm packages, the bundle itself -- going around it is a
+// second authority on how fgOS reads YAML.
+const YAML_DOOR = 'src/util/yaml.mjs';
+const YAML_THIRD_PARTY = 'src/util/third-party/js-yaml.mjs';
+const YAML_SPECIFIER = /^(?:(?:js-)?yaml(?:\/.*)?|(?:.*\/)?third-party\/js-yaml\.mjs)$/;
+
+/** Specifiers in `rawSource` that load a YAML parser, by import, `import()`, `require()` or `createRequire(...)()`. */
+export function findYamlParserLoads(rawSource) {
+  const { code, shape } = lexSource(rawSource);
+  const patterns = [
+    /\b(?:import|export)\b[^;]*?\bfrom\s*(['"])([^'"]+)\1/gms,
+    /\bimport\s*(['"])([^'"]+)\1/gms,
+    /(?<![\w$.])import\(\s*(['"`])([^'"`]+)\1\s*[,)]/gms,
+    /\brequire\(\s*(['"`])([^'"`]+)\1\s*,?\s*\)/gms,
+    /\bcreateRequire\s*\([^)]*\)\s*\(\s*(['"`])([^'"`]+)\1\s*,?\s*\)/gms,
+  ];
+  const loads = [];
+  for (const pattern of patterns) {
+    for (const m of code.matchAll(pattern)) {
+      // A match that begins inside a string or template literal is text, not a load.
+      if (shape[m.index] !== code[m.index]) continue;
+      if (YAML_SPECIFIER.test(m[2])) loads.push(m[2]);
+    }
+  }
+  return loads;
+}
+
+function scriptFilesUnder(dir) {
+  const full = path.join(root, dir);
+  if (!fs.existsSync(full)) return [];
+  return fs.readdirSync(full, { withFileTypes: true, recursive: true })
+    .filter((e) => e.isFile() && /\.(mjs|cjs|js)$/.test(e.name))
+    .map((e) => path.relative(root, path.join(e.parentPath, e.name)).split(path.sep).join('/'))
+    .filter((f) => !f.split('/').includes('node_modules'));
+}
+
+test('YAML has one door: only src/util/yaml.mjs loads a YAML parser', () => {
+  const violations = ['src', 'bin', 'scripts', 'test']
+    .flatMap(scriptFilesUnder)
+    .filter((file) => file !== YAML_DOOR && file !== YAML_THIRD_PARTY)
+    .flatMap((file) => findYamlParserLoads(fs.readFileSync(path.join(root, file), 'utf8')).map((spec) => `${file}: ${spec}`));
+  assert.deepEqual(violations, [], `Expected every YAML parse to go through ${YAML_DOOR}, found:\n${violations.join('\n')}`);
+  assert.deepEqual(findYamlParserLoads(fs.readFileSync(path.join(root, YAML_DOOR), 'utf8')), ['./third-party/js-yaml.mjs']);
+});
+
+test('YAML door guard catches each way to load a parser and ignores comments, strings and other packages', () => {
+  const caught = [
+    "import YAML from 'yaml';",
+    "import { parse } from \"yaml\";",
+    "import jsyaml from 'js-yaml';",
+    "import * as y from 'yaml/browser/index.js';",
+    "import 'yaml';",
+    "export { parse } from 'yaml';",
+    "const YAML = await import('yaml');",
+    "const YAML = await import(`js-yaml`);",
+    "const YAML = require('yaml');",
+    "const YAML = module.require('js-yaml');",
+    "const YAML = createRequire(import.meta.url)('yaml');",
+    "const YAML = createRequire(\n  import.meta.url,\n)(\n  'js-yaml',\n);",
+    "import { loadAll } from '../util/third-party/js-yaml.mjs';",
+    "import { loadAll } from './third-party/js-yaml.mjs';",
+    "if (x) {}\n/'/.test(y); import('yaml'); //'",
+  ];
+  for (const source of caught) assert.ok(findYamlParserLoads(source).length >= 1, source);
+  const passed = [
+    "import { parseYaml } from '../util/yaml.mjs';",
+    "import { parseYaml } from './yaml.mjs';",
+    "import yamlish from 'yamlish';",
+    "import x from './my-yaml.mjs';",
+    "// import YAML from 'yaml';",
+    "/* const YAML = require('yaml'); */",
+    "const t = \"const YAML = await import('yaml');\";",
+    'const t = `import jsyaml from \'js-yaml\';`;',
+    "const parse = (s) => s; parse('yaml');",
+    "obj.import('yaml');",
+  ];
+  for (const source of passed) assert.deepEqual(findYamlParserLoads(source), [], source);
 });

@@ -11,20 +11,20 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import YAML from 'yaml';
+import { parseYaml } from '../src/util/yaml.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 export function compileDomain(domainDir) {
   const registryPath = path.join(domainDir, 'registry.yaml');
   if (!fs.existsSync(registryPath)) return null;
-  const registry = YAML.parse(fs.readFileSync(registryPath, 'utf8')) ?? {};
+  const registry = parseYaml(fs.readFileSync(registryPath, 'utf8'), { filename: registryPath }) ?? {};
   const workflows = {};
   const workflowsDir = path.join(domainDir, 'workflows');
   if (fs.existsSync(workflowsDir)) {
     for (const file of fs.readdirSync(workflowsDir).sort()) {
       if (!/\.ya?ml$/.test(file)) continue;
-      workflows[path.basename(file, path.extname(file))] = YAML.parse(fs.readFileSync(path.join(workflowsDir, file), 'utf8'));
+      workflows[path.basename(file, path.extname(file))] = parseYaml(fs.readFileSync(path.join(workflowsDir, file), 'utf8'), { filename: file });
     }
   }
   return { registry, workflows };

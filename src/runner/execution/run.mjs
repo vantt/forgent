@@ -23,6 +23,7 @@ import { ensureRunnerConfigForDir, RunnerConfigError, assertRunTimeoutMs } from 
 import { commitOnBranch, commitUnitWork, foreignIndexDetail, preflightUnitWorktree } from './commit-unit-work.mjs';
 import { assertSyncResumable, commitRoundWithSync, effectiveWriteScope, runPendingSync, seedSync, syncBrief, syncSummary } from './unit-sync.mjs';
 import { resolveAgentDefinition } from '../agent-definitions.mjs';
+import { parseYaml } from '../../util/yaml.mjs';
 import { dispatchLockFile, parseCompositePidIdentity } from '../main-checkout-lock.mjs';
 import { reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, plainInputName, isSeatInput } from './handoff-refs.mjs';
 import { outcomeOfRunResult, readUnitRunHistory } from './unit-run-history.mjs';
@@ -382,16 +383,14 @@ export async function runUnit(options = {}) {
       try {
         raw = JSON.parse(stdinContent);
       } catch {
-        const YAML = await import('yaml');
-        raw = (YAML.default || YAML).parse(stdinContent);
+        raw = parseYaml(stdinContent, { filename: '<stdin>' });
       }
     } else if (options.unitPath) {
       const content = fs.readFileSync(path.resolve(options.unitPath), 'utf8');
       try {
         raw = JSON.parse(content);
       } catch {
-        const YAML = await import('yaml');
-        raw = (YAML.default || YAML).parse(content);
+        raw = parseYaml(content, { filename: options.unitPath });
       }
     } else {
       throw new RunnerConfigError('runUnit requires --unit <file|-> or unitData');

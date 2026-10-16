@@ -28,7 +28,6 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { parse as parseYaml } from 'yaml';
 
 import { resolveMainCheckoutRoot } from '../src/runner/paths.mjs';
 import { readSharedConfig } from '../src/config/shared-config-file.mjs';
@@ -36,6 +35,7 @@ import { resolveTierModel } from '../src/runner/dispatch.mjs';
 import { RIGOR_VALUES } from '../src/runner/rigor.mjs';
 import { DEFAULT_RIGOR_TO_TIER } from '../src/runner/dispatch/config.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
+import { parseYaml } from '../src/util/yaml.mjs';
 
 const REPO_ROOT = path.resolve(import.meta.dirname, '..');
 const TARGET_DIR = path.join(REPO_ROOT, '.claude', 'agents');
@@ -177,7 +177,7 @@ export function findAgentYamlFiles(repoRoot) {
 
 /** Pure: source yaml text -> generated adapter markdown text. */
 export function projectAgentMarkdown(name, sourceYamlText, models, sourcePath = `agents/${name}.yaml`) {
-  const def = parseYaml(sourceYamlText);
+  const def = parseYaml(sourceYamlText, { filename: sourcePath });
   assertPlatformAgnostic(name, sourceYamlText);
   validateDefinition(name, def);
 
@@ -228,7 +228,7 @@ export function resolveAgentFiles(agentFiles, repoRoot = REPO_ROOT) {
     let agentName = file.name;
     try {
       const sourceYamlText = fs.readFileSync(file.filePath, 'utf8');
-      const def = parseYaml(sourceYamlText);
+      const def = parseYaml(sourceYamlText, { filename: file.filePath });
       if (def && typeof def.name === 'string') {
         agentName = def.name;
       }
@@ -283,7 +283,7 @@ function main() {
 
   for (const file of agentFiles) {
     const sourceYamlText = fs.readFileSync(file.filePath, 'utf8');
-    const def = parseYaml(sourceYamlText);
+    const def = parseYaml(sourceYamlText, { filename: file.filePath });
     const name = def?.name ?? file.name;
     const relPath = path.relative(REPO_ROOT, file.filePath);
     const markdown = projectAgentMarkdown(name, sourceYamlText, models, relPath);

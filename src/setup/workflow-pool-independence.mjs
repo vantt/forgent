@@ -18,11 +18,11 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { createRequire } from 'node:module';
 
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
 import { detectHerdrPresent } from '../runner/execution/run.mjs';
 import { resolvePattern } from '../runner/execution/patterns/presets.mjs';
+import { parseYaml } from '../util/yaml.mjs';
 
 // Patterns whose roles are bound against each other's provider family.
 const INDEPENDENCE_PATTERNS = new Set(['panel', 'reviewed']);
@@ -50,23 +50,15 @@ function workflowDefinitionFiles(root) {
   return files;
 }
 
-/** Workflow definitions under `roots` (package root, then the project), each as { id, steps }.
- * The YAML parser is loaded lazily: `fgos setup` runs from copies that have no installed
- * dependencies, and a missing parser must read as "cannot evaluate", not as a crash. */
+/** Workflow definitions under `roots` (package root, then the project), each as { id, steps }. */
 export function loadWorkflowDefinitions(roots) {
-  let YAML;
-  try {
-    YAML = createRequire(import.meta.url)('yaml');
-  } catch (err) {
-    return { unavailable: `the yaml package is not installed here (${err.code ?? err.message})` };
-  }
   const workflows = new Map();
   const unreadable = [];
   for (const root of roots) {
     for (const { file, fallbackId } of workflowDefinitionFiles(root)) {
       try {
         const body = fs.readFileSync(file, 'utf8');
-        const raw = file.endsWith('.json') ? JSON.parse(body) : YAML.parse(body);
+        const raw = file.endsWith('.json') ? JSON.parse(body) : parseYaml(body, { filename: file });
         const id = typeof raw?.id === 'string' && raw.id ? raw.id : fallbackId;
         if (!workflows.has(id)) workflows.set(id, { id, steps: Array.isArray(raw?.steps) ? raw.steps : [] });
       } catch (err) {
