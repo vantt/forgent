@@ -1,0 +1,137 @@
+{
+  "version": 1,
+  "shard": "s10-whole-corpus-checkpoint",
+  "commit": "38672e7f157788cbe1b2bf59511bd61046dce660",
+  "packId": "87641f795c349b5692f8ed527d359c74036e22af782d4fd9c5f645319c754aa1",
+  "seed": "s10-checkpoint-a4954387-70727b4fbf41d974494fb35b35784491",
+  "nonce": "4514114d4823315b24dcd6b1f2bcd6bfdadc7638e9145e357284958c71bdedc6",
+  "reviewer": "reviewer:claude-session:a4954387@2026-10-17",
+  "rows": [
+    {
+      "claimId": "claim_a0843b462d3bf38fde961cbb25ca58a0",
+      "mutated": true,
+      "mutationKind": "added-claim"
+    },
+    {
+      "claimId": "claim_55fcd0b3068a4dd160eebddfc979c730",
+      "mutated": true,
+      "mutationKind": "swapped-number"
+    },
+    {
+      "claimId": "claim_06e68651628b7a731b974ec5c34c9743",
+      "mutated": true,
+      "mutationKind": "swapped-enum"
+    },
+    {
+      "claimId": "claim_3556244cddca60196c895328e4e9be76",
+      "mutated": true,
+      "mutationKind": "removed-negation"
+    },
+    {
+      "claimId": "claim_cf5c63a7dd524801f09ae8137fdc3d6e",
+      "mutated": true,
+      "mutationKind": "dropped-clause"
+    },
+    {
+      "claimId": "claim_d06b2ce15133866437a691773e465006",
+      "mutated": true,
+      "mutationKind": "deleted-list-item"
+    },
+    {
+      "claimId": "claim_f2dbfad6908d2219d0e43956ad5ead5d",
+      "mutated": false
+    },
+    {
+      "claimId": "claim_12073295363676caa66ef2cbc89bf5af",
+      "mutated": false
+    },
+    {
+      "claimId": "claim_f7df64e38ac8a92071c076fc8a880354",
+      "mutated": false
+    },
+    {
+      "claimId": "claim_ada79ea98a1532eddb6e55b127defcc3",
+      "mutated": false
+    },
+    {
+      "claimId": "claim_7d81e1c559b866bef63a156ef78a8fde",
+      "mutated": false
+    },
+    {
+      "claimId": "claim_5a4d6d1690851cf76fac5e243b45073f",
+      "mutated": false
+    },
+    {
+      "claimId": "claim_b43e854fdbacb527b69c860c90f8fe3a",
+      "mutated": false
+    },
+    {
+      "claimId": "claim_64f01a59fd4ef00a1d0952bdcae43eeb",
+      "mutated": false
+    },
+    {
+      "claimId": "claim_0933f628c1695da663d86205af0d7e82",
+      "mutated": false
+    },
+    {
+      "claimId": "claim_bd9700b35680814aed54cb5ead71f93e",
+      "mutated": false
+    },
+    {
+      "claimId": "claim_1794a3b9ec470264eb9fdd9c4c3b1cf1",
+      "mutated": false
+    },
+    {
+      "claimId": "claim_fdba65f9b9568b8b056ca62b641ba27a",
+      "mutated": false
+    },
+    {
+      "claimId": "claim_701238f18b72b5e60284fb3dae43624f",
+      "mutated": false
+    },
+    {
+      "claimId": "claim_52bf0b51048e5b812c73f85f42534778",
+      "mutated": false
+    },
+    {
+      "claimId": "claim_6376930136b523da72f7a8ec1ce68ed3",
+      "mutated": false
+    },
+    {
+      "claimId": "claim_92c3c3b2a0b5991999883dba598126bb",
+      "mutated": false
+    },
+    {
+      "claimId": "claim_eb66de2e1574509b34c3a9cdbe3d9d7f",
+      "mutated": false
+    },
+    {
+      "claimId": "claim_b63727f20ff5dddbcf952143d51a7cc5",
+      "mutated": false
+    },
+    {
+      "claimId": "claim_489326b91f16cf6cf1a95548603b3ee0",
+      "mutated": false
+    },
+    {
+      "claimId": "claim_7bc7717a92a34ad4dc50159f7cf1d93f",
+      "mutated": false
+    },
+    {
+      "claimId": "claim_d1d70b955b085baafa10ffcec2702b8d",
+      "mutated": false
+    },
+    {
+      "claimId": "claim_4e50b00f1e92a79cb73a879ec3d1fc2c",
+      "mutated": false
+    },
+    {
+      "claimId": "claim_53d0c6c318eaaca97e659055b6c120fa",
+      "mutated": false
+    },
+    {
+      "claimId": "claim_14da24bed0920b9efb22bbe4bbe0bbdc",
+      "mutated": false
+    }
+  ]
+}
