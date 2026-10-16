@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { listLegacyNodeSourceFiles, hashFile, computeArtifactDigest } from '../../scripts/build-rust-distribution.mjs';
+import { listLegacyNodeSourceFiles, hashFile, computeArtifactDigest, resolveProductionDependencies } from '../../scripts/build-rust-distribution.mjs';
 import { initStore, addWork } from '../../src/state/store.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -35,8 +35,11 @@ function fixture() {
     fs.mkdirSync(path.dirname(destination), { recursive: true });
     fs.copyFileSync(path.join(repoRoot, relative), destination);
   }
-  // Real production dependencies, copied rather than symlinked into the payload.
-  fs.cpSync(path.join(repoRoot, 'node_modules'), path.join(checkout, 'node_modules'), { recursive: true, dereference: true });
+  // The declared production dependencies, if any, copied rather than symlinked into the payload.
+  const packageJson = JSON.parse(fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf8'));
+  for (const [name, dir] of resolveProductionDependencies(repoRoot, packageJson)) {
+    fs.cpSync(dir, path.join(checkout, 'node_modules', ...name.split('/')), { recursive: true, dereference: true });
+  }
   const session = process.env.CLAUDE_CODE_SESSION_ID;
   const stateHome = process.env.FGOS_STATE_HOME;
   process.env.FGOS_STATE_HOME = path.join(root, 'state');

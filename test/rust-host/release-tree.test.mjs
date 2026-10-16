@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { spawnSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import {
   REPO_ROOT,
@@ -28,30 +28,41 @@ const __dirname = path.dirname(__filename);
 
 const DEPENDENCY_DIR = 'node' + '_modules';
 
-test('the staged legacy-node payload carries its production dependencies and can load them', () => {
+test('the staged legacy-node payload carries the vendored YAML parser and any declared production dependencies, and loads them', () => {
   const tempOut = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-rel-deps-'));
   const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-rel-deps-work-'));
   try {
     buildRustDistribution({ outDir: tempOut, repoRoot: REPO_ROOT });
     const legacyNodeDir = path.join(tempOut, 'libexec', 'legacy-node');
     const declared = Object.keys(JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'package.json'), 'utf8')).dependencies ?? {});
-    assert.ok(declared.length > 0, 'the checkout declares at least one runtime dependency');
 
     const manifest = JSON.parse(fs.readFileSync(path.join(tempOut, 'manifest.json'), 'utf8'));
     const listed = new Set(manifest.files.map((f) => f.path));
+    for (const vendored of ['src/util/yaml.mjs', 'src/util/third-party/js-yaml.mjs']) {
+      const rel = `libexec/legacy-node/${vendored}`;
+      assert.ok(fs.existsSync(path.join(tempOut, rel)), `${vendored} must be staged with the legacy-node sources`);
+      assert.ok(listed.has(rel), `${vendored} must be listed in manifest files[] so verify covers it`);
+    }
     for (const dep of declared) {
       const rel = `libexec/legacy-node/${DEPENDENCY_DIR}/${dep}/package.json`;
       assert.ok(fs.existsSync(path.join(tempOut, rel)), `${dep} must be staged next to the legacy-node sources`);
       assert.ok(listed.has(rel), `${dep} must be listed in manifest files[] so verify covers it`);
     }
 
-    // A verb that loads a dependency must run from the staged tree alone, with no checkout around it.
-    const res = spawnSync(process.execPath, [path.join(legacyNodeDir, 'bin', 'fgos.mjs'), 'workflow', 'status', '--dir', workDir], {
+    // Modules that read YAML must load and run from the staged tree alone, with no checkout around it.
+    const probe = [
+      "const door = await import(process.argv[1] + '/src/util/yaml.mjs');",
+      "await import(process.argv[1] + '/src/workflow/loader.mjs');",
+      "await import(process.argv[1] + '/src/setup/instruction-registry.mjs');",
+      "process.stdout.write(JSON.stringify(door.parseYaml('a: [1, 2]\\n')));",
+    ].join('\n');
+    const res = spawnSync(process.execPath, ['--input-type=module', '-e', probe, pathToFileURL(legacyNodeDir).href], {
       cwd: workDir,
       encoding: 'utf8',
       env: { ...process.env, NODE_PATH: '' },
     });
-    assert.doesNotMatch(`${res.stdout}${res.stderr}`, /Cannot find package/, 'the staged tree resolves its own dependencies');
+    assert.equal(res.status, 0, `${res.stdout}${res.stderr}`);
+    assert.equal(res.stdout, '{"a":[1,2]}');
   } finally {
     fs.rmSync(tempOut, { recursive: true, force: true });
     fs.rmSync(workDir, { recursive: true, force: true });

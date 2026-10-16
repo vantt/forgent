@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- New skill `instruction-audit` (`/instruction-audit`) audits any repository's agent instruction surface on demand or on a schedule. It measures what each agent runtime (Claude Code, AGENTS.md readers, Gemini, Cursor, Copilot) loads on every turn, finds blocks loaded twice and which tool wrote them, duplicate or broken hook registrations, and paths in settings that no longer exist. It also runs read-only lanes over rules, enforcement and git history, and writes a ranked report with a delta against the previous run. It never edits the files it audits.
 - `fgos identity [--pid <n>] [--fgos-dir <dir>]` prints which writer the calling process is, as `{id, source}`. The answer comes from one place, the Rust crate `fgos-session-identity`, which Node now calls for every state write; `fgos doctor` check `writer-identity-resolvable` asks both the running host and the activated release (the one a plain `git commit` hook uses).
 - `fgos workflow start` supports `--timeout <dur>` and `--account <id>` flags, propagating overrides down to each Unit run while honoring Unit self-declared timeouts.
 - `fgos doctor` check `executor-posture-coverage` verifies that core capabilities have executors capable of applying required posture, providing actionable remediation instructions when misconfigured.
@@ -64,6 +65,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The verb manifest's `schema_version` is `3.0`: a verb with sub-verbs keeps only `sub` in its verb-level `parameters`, and each sub-verb's flags are under `subcommands.<sub>.parameters`.
 - `fgos --help` refuses an unknown verb, sub-verb, extra word or option with exit 4 instead of ignoring it. It still accepts `--dir`, which the `fgos` shell function appends.
 - The `fgos run` and `fgos workflow` help say which door to use: one task → `fgos run "<prompt>"`; planned work → `fgos workflow start <preset>|--units <file>`.
+- A fresh checkout, a linked worktree and `fgos setup` no longer need `npm install`: fgOS has no npm runtime dependency now. Its YAML parser (js-yaml) ships inside the source tree and every YAML read goes through one wrapper, `src/util/yaml.mjs`, so `fgos doctor` check `dependencies-installed` passes with "no runtime dependencies declared" and the workflow tests load without `node_modules`.
+- Agent definitions (`fgos/agents`, `domains/*/agents`, `core/agents`) and project or domain workflow files must be valid YAML. `fgos doctor` names a file that is not, with its line and column, in the checks `agent-claims-resolve`, `agent-type-names-unique`, `workflow-capabilities-configured`, `workflow-pools-satisfy-independence` and `blind-steps-use-proven-pools`; a seat that names such a definition is refused, and the agent roster skips it with one warning line on stderr. A definition indented as a whole now reads as a mapping and seats; a numeric `name: 123` reads as "123".
+- `fgos doctor` checks `workflow-pools-satisfy-independence` and `blind-steps-use-proven-pools` now evaluate in a copy without dependencies instead of passing with "not evaluated", so a project can see new failures there. A workflow that cannot be parsed fails those checks and `workflow-capabilities-configured` by name, but no longer hides their results for the other workflows. A problem path is prefixed `package:` or `project:` when both trees are scanned, and a file that cannot be read is reported as such rather than as unparsable.
+- A persona whose list item or value reads as a mapping (an unquoted `": "`, for example `- Escalate when: budget exceeded`) is refused with its path by `fgos agents`, `fgos doctor` and persona resolution, instead of the text being dropped silently. Pinned text from an earlier run with that shape still renders as it was pinned.
+- A workspace persona that cannot be parsed or has the wrong shape refuses `fgos run` and workflow unit runs with the named problem; before, the run fell back to the core persona of the same name or to no persona text.
+- A YAML file whose aliases expand past 100000 values, or that references itself, is rejected with a message naming the file.
+- `fgos doctor` check `agent-type-names-unique` reports problems as `<file>: <problem>`, like the other checks. The dispatch warning `agent roster: …` for a bad agent file prints once per process instead of on every lookup.
+- `fgos doctor` check `domain-registry-compiled` now also reports a `compiled.json` that is stale against its YAML and domain YAML that cannot be parsed; `npm run build:domains` regenerates it.
+- Persona text rendered into a worker prompt now comes from the parsed agent file: a block-scalar value shows in full, an inline `# comment` is stripped and a number is normalised (`1e3` shows as `1000`). A persona file that cannot be parsed renders one `could not be parsed` line instead of silently dropping its section; a run pinned by an earlier release resumes with the persona text it was pinned with.
 
 ### Removed
 
@@ -73,6 +83,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `dispatch fanout-batch` is gone. Fanout runs from `node src/runner/fanout-batch.mjs "<ids>" [--has-live-task-access]`, with the same output keys (`fired`, `mechanismChanged`, `unavailable`, `deferred`, and `slotsFull: true` when no slot is free).
 - `decide --work` runs only as `fgos dispatch decide --work <id>`; `node src/runner/dispatch.mjs decide --work` is refused with a pointer to it.
 - `AGENTS.md` and every skill render no longer teach the removed doors. Other projects keep their old rendered skills until they activate a release that carries this change and run `fgos setup`.
+- The `yaml` npm dependency, the hand-written YAML readers in the doctor checks and the persona renderer, and the "not evaluated: yaml package not installed" branches. `fgos doctor` no longer warns about multi-line persona markers because they now render.
 
 ### Fixed
 
