@@ -14,7 +14,7 @@
     "fds": "stdin /dev/null; stdout one JSON line; stderr appended to supervisor.log; no other fd: the step never receives a lock description",
     "stdout": {
       "done": { "result": "done", "detail": "object" },
-      "retry": { "result": "retry", "reason": "string, e.g. credential-home-kept; no receipt, adopt retries later" },
+      "retry": { "result": "retry", "reason": "string, e.g. credential-home-kept; exit code 75; no receipt, adopt retries later" },
       "error": { "result": "error", "code": { "enum": ["host-version-mismatch", "envelope-invalid", "payload-missing", "io", "internal"] }, "message": "string" }
     },
     "timeout": "the runner kills the step's process group after stepTimeoutMs; no receipt"

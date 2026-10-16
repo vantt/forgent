@@ -79,7 +79,7 @@
       "argv": "fgos internal attempt-step <stepId> --protocol 1 --run-dir <attemptDir>",
       "execution": "the host execs the Node payload of envelope.payloadRoot (resolved like apps/fgos/src/legacy_exec.rs, never PATH) with entry src/run-supervisor/attempt-step.mjs, passing stepId and the attemptDir",
       "stdout": "step-receipt.v1.json stepProcess.stdout",
-      "exitCodes": { "0": "done", "10": "retry", "65": "envelope-invalid", "66": "payload-missing", "70": "error" }
+      "exitCodes": { "0": "done", "65": "envelope-invalid", "66": "payload-missing", "70": "error", "75": "retry (EX_TEMPFAIL): no receipt, adopt runs the step again later" }
     },
     "lock-scan": {
       "argv": "fgos internal lock-scan --protocol 1",
