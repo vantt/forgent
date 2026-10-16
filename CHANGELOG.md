@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- New skill `instruction-audit` (`/instruction-audit`) audits any repository's agent instruction surface on demand or on a schedule. It measures what each agent runtime (Claude Code, AGENTS.md readers, Gemini, Cursor, Copilot) loads on every turn, finds blocks loaded twice and which tool wrote them, duplicate or broken hook registrations, and paths in settings that no longer exist. It also runs read-only lanes over rules, enforcement and git history, and writes a ranked report with a delta against the previous run. It never edits the files it audits.
 - `fgos identity [--pid <n>] [--fgos-dir <dir>]` prints which writer the calling process is, as `{id, source}`. The answer comes from one place, the Rust crate `fgos-session-identity`, which Node now calls for every state write; `fgos doctor` check `writer-identity-resolvable` asks both the running host and the activated release (the one a plain `git commit` hook uses).
 - `fgos workflow start` supports `--timeout <dur>` and `--account <id>` flags, propagating overrides down to each Unit run while honoring Unit self-declared timeouts.
 - `fgos doctor` check `executor-posture-coverage` verifies that core capabilities have executors capable of applying required posture, providing actionable remediation instructions when misconfigured.
