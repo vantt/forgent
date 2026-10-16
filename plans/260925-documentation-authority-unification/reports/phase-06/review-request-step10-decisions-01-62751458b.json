@@ -1,0 +1,113 @@
+{
+  "version": 1,
+  "contentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "comparisonBase": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "authorSession": "codex-session:unit-run-1792122626822-ceb0cdd9@2026-10-16",
+  "packagedBy": "codex-session:unit-run-1792122626822-ceb0cdd9@2026-10-16",
+  "section": "decisions",
+  "entryCount": 2,
+  "entries": [
+    {
+      "kind": "package-native-predecessor-decision",
+      "authorSession": "codex-session:unit-run-1792122626822-ceb0cdd9@2026-10-16",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-round4-native-predecessors.json",
+      "collection": "registryGaps",
+      "claimId": "claim_f15e4328e1e5df90c51f535e75da554b",
+      "currentDecision": {
+        "claimId": "claim_f15e4328e1e5df90c51f535e75da554b",
+        "sourcePath": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+        "sourceUnitDigest": "9643a6fe01ce142637dcea09eb07b8690322ab13683212165934615d5aba3ae5",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+        "targetAnchor": "unheaded-block-44",
+        "targetUnitDigest": "f03302423020c8beeac177192fbe0952433473b78efd7c17f5eb96b39d67dbca",
+        "targetAncestry": [
+          "Architecture Advisory Artifact Templates",
+          "7. Constraint Findings — optional manual constraint/critique shape"
+        ],
+        "rationale": "Source: docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md:436-437#unheaded-block-44 (historical witness at 9b0526380); unit SHA256 9643a6fe01ce142637dcea09eb07b8690322ab13683212165934615d5aba3ae5.\nTarget: docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md:436-437#unheaded-block-44 (current lines); unit SHA256 f03302423020c8beeac177192fbe0952433473b78efd7c17f5eb96b39d67dbca.\nSource and target unit digests differ.\nTarget changed since last reviewed digest 9643a6fe01ce142637dcea09eb07b8690322ab13683212165934615d5aba3ae5 at 0f063d18fdab01cb6f2c915bb60ff528c5e0f238.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nL10-31/explicit-section-correction: \"Registered counterparts: constraint-lens shaping and reviewed critique reports,\" → \"Added in candidate — registered counterparts: constraint-lens shaping and reviewed critique reports,\"; evidence step10-round4-doc-edits.json.\nDisposition supersede: Account for docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md#unheaded-block-44 under docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md#unheaded-block-44; source context \"Architecture Advisory Artifact Templates / 7. Constraint Findings — optional manual constraint/critique shape\", target context \"Architecture Advisory Artifact Templates / 7. Constraint Findings — optional manual constraint/critique shape\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792122626822-ceb0cdd9@2026-10-16",
+        "reviewNote": "Independent review pending at 62751458b; no approval carried."
+      },
+      "after": {
+        "claimId": "claim_f15e4328e1e5df90c51f535e75da554b",
+        "sourcePath": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+        "sourceUnitDigest": "9643a6fe01ce142637dcea09eb07b8690322ab13683212165934615d5aba3ae5",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+        "targetAnchor": "unheaded-block-44",
+        "targetUnitDigest": "f03302423020c8beeac177192fbe0952433473b78efd7c17f5eb96b39d67dbca",
+        "targetAncestry": [
+          "Architecture Advisory Artifact Templates",
+          "7. Constraint Findings — optional manual constraint/critique shape"
+        ],
+        "rationale": "Source: docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md:436-437#unheaded-block-44 (historical witness at 9b0526380); unit SHA256 9643a6fe01ce142637dcea09eb07b8690322ab13683212165934615d5aba3ae5.\nTarget: docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md:436-437#unheaded-block-44 (current lines); unit SHA256 f03302423020c8beeac177192fbe0952433473b78efd7c17f5eb96b39d67dbca.\nSource and target unit digests differ.\nTarget changed since last reviewed digest 9643a6fe01ce142637dcea09eb07b8690322ab13683212165934615d5aba3ae5 at 0f063d18fdab01cb6f2c915bb60ff528c5e0f238.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nL10-31/explicit-section-correction: \"Registered counterparts: constraint-lens shaping and reviewed critique reports,\" → \"Added in candidate — registered counterparts: constraint-lens shaping and reviewed critique reports,\"; evidence step10-round4-doc-edits.json.\nDisposition supersede: Account for docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md#unheaded-block-44 under docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md#unheaded-block-44; source context \"Architecture Advisory Artifact Templates / 7. Constraint Findings — optional manual constraint/critique shape\", target context \"Architecture Advisory Artifact Templates / 7. Constraint Findings — optional manual constraint/critique shape\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792122626822-ceb0cdd9@2026-10-16",
+        "reviewNote": "Independent review pending at 62751458b; no approval carried."
+      },
+      "packageOverlay": true,
+      "contentPin": "62751458b22b47e930dc33b8501d07798b91ace3",
+      "deepRequired": true,
+      "witness": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync627-predecessor-reconciliation.json",
+      "reviewScope": "Pending package-overlay row; bind to runner package commit before ordinary review. Not claimed present at content pin.",
+      "entryId": "decisions-001"
+    },
+    {
+      "kind": "package-native-predecessor-decision",
+      "authorSession": "codex-session:unit-run-1792122626822-ceb0cdd9@2026-10-16",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-round4-native-predecessors.json",
+      "collection": "registryGaps",
+      "claimId": "claim_9e9d711e331efe5a12c8b8bf50371dc6",
+      "currentDecision": {
+        "claimId": "claim_9e9d711e331efe5a12c8b8bf50371dc6",
+        "sourcePath": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+        "sourceUnitDigest": "087d5cdd477bde5b2bf98882290f0d23d3e44a06f0c6f93b7f15e6bcfa391c63",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+        "targetAnchor": "unheaded-block-117",
+        "targetUnitDigest": "7486a9e911dc83dd8182817e3d51bccd7b2e95a87b245307e19b3dd1de9fbb34",
+        "targetAncestry": [
+          "Architecture Advisory Role Doctrine",
+          "Driver-Disposition Doctrine",
+          "Evidence And Conduct Boundaries"
+        ],
+        "rationale": "Source: docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md:1470-1471#unheaded-block-117 (historical witness at 9b0526380); unit SHA256 087d5cdd477bde5b2bf98882290f0d23d3e44a06f0c6f93b7f15e6bcfa391c63.\nTarget: docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md:1470-1471#unheaded-block-117 (current lines); unit SHA256 7486a9e911dc83dd8182817e3d51bccd7b2e95a87b245307e19b3dd1de9fbb34.\nSource and target unit digests differ.\nTarget changed since last reviewed digest 087d5cdd477bde5b2bf98882290f0d23d3e44a06f0c6f93b7f15e6bcfa391c63 at 0f063d18fdab01cb6f2c915bb60ff528c5e0f238.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nL10-31/explicit-section-correction: \"Current packet dispositions require actual evidence when they turn on claims\" → \"Added in candidate — current-Workflow correction; the former driver-specific rules remain in the historical snapshot linked above. Current packet dispositions require actual evidence when they turn on claims\"; evidence step10-round4-doc-edits.json.\nDisposition supersede: Account for docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md#unheaded-block-117 under docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md#unheaded-block-117; source context \"Architecture Advisory Role Doctrine / Driver-Disposition Doctrine / Evidence And Conduct Boundaries\", target context \"Architecture Advisory Role Doctrine / Driver-Disposition Doctrine / Evidence And Conduct Boundaries\". The complete source direct section occurs verbatim inside the bound target section; native unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792122626822-ceb0cdd9@2026-10-16",
+        "reviewNote": "Independent review pending at 62751458b; no approval carried."
+      },
+      "after": {
+        "claimId": "claim_9e9d711e331efe5a12c8b8bf50371dc6",
+        "sourcePath": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+        "sourceUnitDigest": "087d5cdd477bde5b2bf98882290f0d23d3e44a06f0c6f93b7f15e6bcfa391c63",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+        "targetAnchor": "unheaded-block-117",
+        "targetUnitDigest": "7486a9e911dc83dd8182817e3d51bccd7b2e95a87b245307e19b3dd1de9fbb34",
+        "targetAncestry": [
+          "Architecture Advisory Role Doctrine",
+          "Driver-Disposition Doctrine",
+          "Evidence And Conduct Boundaries"
+        ],
+        "rationale": "Source: docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md:1470-1471#unheaded-block-117 (historical witness at 9b0526380); unit SHA256 087d5cdd477bde5b2bf98882290f0d23d3e44a06f0c6f93b7f15e6bcfa391c63.\nTarget: docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md:1470-1471#unheaded-block-117 (current lines); unit SHA256 7486a9e911dc83dd8182817e3d51bccd7b2e95a87b245307e19b3dd1de9fbb34.\nSource and target unit digests differ.\nTarget changed since last reviewed digest 087d5cdd477bde5b2bf98882290f0d23d3e44a06f0c6f93b7f15e6bcfa391c63 at 0f063d18fdab01cb6f2c915bb60ff528c5e0f238.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nL10-31/explicit-section-correction: \"Current packet dispositions require actual evidence when they turn on claims\" → \"Added in candidate — current-Workflow correction; the former driver-specific rules remain in the historical snapshot linked above. Current packet dispositions require actual evidence when they turn on claims\"; evidence step10-round4-doc-edits.json.\nDisposition supersede: Account for docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md#unheaded-block-117 under docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md#unheaded-block-117; source context \"Architecture Advisory Role Doctrine / Driver-Disposition Doctrine / Evidence And Conduct Boundaries\", target context \"Architecture Advisory Role Doctrine / Driver-Disposition Doctrine / Evidence And Conduct Boundaries\". The complete source direct section occurs verbatim inside the bound target section; native unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792122626822-ceb0cdd9@2026-10-16",
+        "reviewNote": "Independent review pending at 62751458b; no approval carried."
+      },
+      "packageOverlay": true,
+      "contentPin": "62751458b22b47e930dc33b8501d07798b91ace3",
+      "deepRequired": true,
+      "witness": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync627-predecessor-reconciliation.json",
+      "reviewScope": "Pending package-overlay row; bind to runner package commit before ordinary review. Not claimed present at content pin.",
+      "entryId": "decisions-002"
+    }
+  ],
+  "seedChosen": false,
+  "verdictChosen": false
+}

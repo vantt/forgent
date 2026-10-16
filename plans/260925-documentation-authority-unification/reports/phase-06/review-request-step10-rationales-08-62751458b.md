@@ -1,0 +1,3104 @@
+# Bounded re-review: rationales 8
+
+Author session: `codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16`
+Packaged by: `codex-session:unit-run-1792122626822-ceb0cdd9@2026-10-16`
+Content commit: `62751458b22b47e930dc33b8501d07798b91ace3`; author changes `eb793bc63`; comparison `9b0526380329d8cb1cb6085a1c8f378e943e2505`.
+Entries: **26**; maximum 60 entries and 400000 bytes per Markdown/sidecar.
+[One request index](review-request-step10-index-62751458b.md).
+
+Committed `currentDecision`/`after` snapshots come from `git show 62751458b22b47e930dc33b8501d07798b91ace3:<shard>` through `reviewEntryFromCommittedRow`. Explicit `packageOverlay` and `packageOverlayAfter` values are fresh pending native/dependent rows and require the runner package commit for ordinary verdict binding. Before prose is historical. No producer seed, draw or verdict.
+
+Exact scratch-only reproduction commands, run sequentially from repository root at the runner package checkout:
+
+```sh
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work python3 plans/260925-documentation-authority-unification/reports/phase-06/step10-sync287-reproduce.py consistency --output /tmp/fgos-work/review627/consistency.json
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/scripts/doc-*.test.mjs test/scripts/check-doc-*.test.mjs test/scripts/generate-doc-inventory.test.mjs test/scripts/list-doc-anchors.test.mjs test/scripts/verify-phase-02.test.mjs test/scripts/next-doc-id.test.mjs
+env -u CLAUDE_CODE_SESSION_ID python3 - <<'PY'
+import json
+from pathlib import Path
+p=Path('/tmp/fgos-work/review627'); p.mkdir(parents=True, exist_ok=True)
+if p.is_symlink() or not p.resolve().is_relative_to('/tmp/fgos-work') or p.resolve().is_relative_to(Path.cwd().resolve()): raise RuntimeError('unsafe scratch directory')
+for name in ['step10-native-inventory.bin','step10-sync627-D-both.json','step10-sync627-D-identity.json','step10-sync627-D-phase02.json','step10-sync627-D-summary.json','step10-sync627-target-ownership.json','step10-sync627-link-replay.json']:
+    out=p/name
+    if out.is_symlink() or out.exists() and out.stat().st_nlink!=1: raise RuntimeError('unsafe scratch output')
+j=json.loads(Path('plans/260925-documentation-authority-unification/reports/phase-06/step10-sync627-reproduction.json').read_text())
+for name,text in j['readOnlyScripts'].items():
+    out=p/name
+    if out.is_symlink() or out.exists() and out.stat().st_nlink!=1: raise RuntimeError('unsafe scratch file')
+    out.write_text(text)
+PY
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --max-old-space-size=4096 --max-semi-space-size=16 /tmp/fgos-work/review627/inventory-readonly.mjs
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --max-old-space-size=4096 --max-semi-space-size=16 /tmp/fgos-work/review627/verify-readonly.mjs
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node /tmp/fgos-work/review627/ownership-readonly.mjs
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node /tmp/fgos-work/review627/audit-ownership-readonly.mjs
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work python3 /tmp/fgos-work/review627/replay-readonly.py
+```
+
+The unchanged checker audits **all 12895 rows /92 shards**, including all whole-section and distinct-occurrence rules, **836** selected outputs and the native-dependent refresh. Expected tests: **490** pass. No author `--apply`, carry-forward, registry persistence or repository output occurs in these reviewer commands. Inventory replay reads the sole compact registry; its regenerated inventory and all D/ownership/link outputs stay under `/tmp/fgos-work/review627/`. Reader reproduction needs available scratch space and memory; do the heavy commands sequentially. Historical author mutation scripts in the provenance manifest are evidence only.
+
+A36: every pending submitted claim receives ordinary verdict and digest/anchor/shard equality. Independently seed >=45/296 rationale deep sample plus >=45/298 conservative Weak-exact/Judgment population (one reviewer draw can satisfy both only if coverage proved). Every listed unequal-digest, partial/historical row, all52 whole-section headings, all8 own-occurrence footers, restored L10-2, and marked docs/tool/native corrections are deep. [Exact deep populations](step10-sync627-A36.json). Reviewer records seed/sample IDs; >3% deep rework escalates to whole set. No separate claim verdict on frozen/footer/accounting references when the pending claim is already submitted in rationales/decisions. Existing reviewed approvals remain; evidence/native tuples do not approve current truth or cutover.
+
+## Entry rationale-211
+
+```json
+{
+  "entryId": "rationale-211",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_107aa6389a5ce8f7b219e31c0e035797",
+  "before": {
+    "claimId": "claim_107aa6389a5ce8f7b219e31c0e035797",
+    "sourceUnitDigest": "9479ce7305ce7c47e5626bcb7a47747e5646dc35e8a7c2925dd396d17b907db6",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/vocabulary/concept-relationships.md:120-120#unheaded-block-10 (current lines); unit SHA256 9479ce7305ce7c47e5626bcb7a47747e5646dc35e8a7c2925dd396d17b907db6.\nTarget: docs/platform/agent-coordination/vocabulary/concept-relationships.md:81-81#lifecycle-and-isolation (current lines); unit SHA256 9daec59d721acb2ad6ea1e246330a4414dc75fd9fdb1982654a0d5d62e33d2f2.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 9daec59d721acb2ad6ea1e246330a4414dc75fd9fdb1982654a0d5d62e33d2f2 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 10\" → \"Lifecycle And Isolation\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-10 under docs/platform/agent-coordination/vocabulary/concept-relationships.md#lifecycle-and-isolation; source context \"Agent Coordination Concept Relationships / Lifecycle And Isolation\", target context \"Agent Coordination Concept Relationships\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+    "targetAnchor": "lifecycle-and-isolation",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "rationale-406: deep: supersede, texts differ so the not-an-equal-digest-copy sentence is true; source starts \"Lifecycle ownership and execution isolation are indepen\" and the successor section \"Lifecycle And Isolation\" (100 percent of its longer words reappear there); facts recomputed equal: source unheaded-block-10 L120-120, target lifecycle-and-isolation L81-81, both full digests, links 0/0 (0 destination changes, 0 added, 0 removed), target anchor check passed, shard row equals pack, unchanged-since-review clause 9daec59d at 947f6169e matches the reviewed base row at 5035fed52.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-07-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "9daec59d721acb2ad6ea1e246330a4414dc75fd9fdb1982654a0d5d62e33d2f2",
+    "targetAncestry": [
+      "Agent Coordination Concept Relationships"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_107aa6389a5ce8f7b219e31c0e035797",
+    "sourceUnitDigest": "9479ce7305ce7c47e5626bcb7a47747e5646dc35e8a7c2925dd396d17b907db6",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/vocabulary/concept-relationships.md:120-120#unheaded-block-10 (current lines); unit SHA256 9479ce7305ce7c47e5626bcb7a47747e5646dc35e8a7c2925dd396d17b907db6.\nTarget: docs/platform/agent-coordination/vocabulary/concept-relationships.md:81-81#lifecycle-and-isolation (current lines); unit SHA256 9daec59d721acb2ad6ea1e246330a4414dc75fd9fdb1982654a0d5d62e33d2f2.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 9daec59d721acb2ad6ea1e246330a4414dc75fd9fdb1982654a0d5d62e33d2f2 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 10\" → \"Lifecycle And Isolation\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 1 removed and 10 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-10 under docs/platform/agent-coordination/vocabulary/concept-relationships.md#lifecycle-and-isolation; source context \"Agent Coordination Concept Relationships / Lifecycle And Isolation\", target context \"Agent Coordination Concept Relationships\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+    "targetAnchor": "lifecycle-and-isolation",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "9daec59d721acb2ad6ea1e246330a4414dc75fd9fdb1982654a0d5d62e33d2f2",
+    "targetAncestry": [
+      "Agent Coordination Concept Relationships"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 210,
+  "factsSHA256": "4b7f7115e33c0f1f769a5710d302c2324d9ffb26f6a26bdbc151ce7ea76cdc31",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-10",
+    "githubAnchor": "unheaded-block-10",
+    "stableAnchor": "unheaded-block-10",
+    "title": "Unheaded block 10",
+    "startLine": 120,
+    "endLine": 120,
+    "textDigest": "9479ce7305ce7c47e5626bcb7a47747e5646dc35e8a7c2925dd396d17b907db6",
+    "sample": "Lifecycle ownership and execution isolation are independent:",
+    "identityFingerprint": "2328bc4318cae61c09e1e9b6af84bc187c0e2df48bbd652f8c09e654f5c56e13",
+    "ancestry": [
+      "Agent Coordination Concept Relationships",
+      "Lifecycle And Isolation"
+    ],
+    "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "Lifecycle And Isolation",
+    "anchor": "lifecycle-and-isolation",
+    "githubAnchor": "lifecycle-and-isolation",
+    "stableAnchor": "h-097768996186",
+    "startLine": 81,
+    "endLine": 81,
+    "textDigest": "9daec59d721acb2ad6ea1e246330a4414dc75fd9fdb1982654a0d5d62e33d2f2",
+    "sample": "Lifecycle And Isolation",
+    "sectionPayloadDigest": "669cee01c40f65d9adeac81768f97cad8273b7bb018461cc58187c72a96ae9e9",
+    "followingBlockDigest": "69eef35b9e60c68994a6446198388478fa263eef44fdadb0f8738b6b26af7573",
+    "identityFingerprint": "7e3e54d8286e69144b8564d38d79b232cf73e999f5cd4baf8500d3d997f16450",
+    "ancestry": [
+      "Agent Coordination Concept Relationships"
+    ],
+    "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_107aa6389a5ce8f7b219e31c0e035797",
+    "sourceUnitDigest": "9479ce7305ce7c47e5626bcb7a47747e5646dc35e8a7c2925dd396d17b907db6",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/vocabulary/concept-relationships.md:120-120#unheaded-block-10 (current lines); unit SHA256 9479ce7305ce7c47e5626bcb7a47747e5646dc35e8a7c2925dd396d17b907db6.\nTarget: docs/platform/agent-coordination/vocabulary/concept-relationships.md:81-81#lifecycle-and-isolation (current lines); unit SHA256 9daec59d721acb2ad6ea1e246330a4414dc75fd9fdb1982654a0d5d62e33d2f2.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 9daec59d721acb2ad6ea1e246330a4414dc75fd9fdb1982654a0d5d62e33d2f2 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 10\" → \"Lifecycle And Isolation\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 1 removed and 10 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-10 under docs/platform/agent-coordination/vocabulary/concept-relationships.md#lifecycle-and-isolation; source context \"Agent Coordination Concept Relationships / Lifecycle And Isolation\", target context \"Agent Coordination Concept Relationships\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+    "targetAnchor": "lifecycle-and-isolation",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "9daec59d721acb2ad6ea1e246330a4414dc75fd9fdb1982654a0d5d62e33d2f2",
+    "targetAncestry": [
+      "Agent Coordination Concept Relationships"
+    ]
+  }
+}
+```
+
+## Entry rationale-212
+
+```json
+{
+  "entryId": "rationale-212",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_bf750d9fbc029003115d37d885e8a43d",
+  "before": {
+    "claimId": "claim_bf750d9fbc029003115d37d885e8a43d",
+    "sourceUnitDigest": "8695ee22fb427809d49f0499adbec430467024e719186b7d8eec6baf2349208d",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/vocabulary/concept-relationships.md:122-125#unheaded-block-11 (current lines); unit SHA256 8695ee22fb427809d49f0499adbec430467024e719186b7d8eec6baf2349208d.\nTarget: docs/platform/agent-coordination/vocabulary/concept-relationships.md:81-81#lifecycle-and-isolation (current lines); unit SHA256 9daec59d721acb2ad6ea1e246330a4414dc75fd9fdb1982654a0d5d62e33d2f2.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 9daec59d721acb2ad6ea1e246330a4414dc75fd9fdb1982654a0d5d62e33d2f2 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 11\" → \"Lifecycle And Isolation\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-11 under docs/platform/agent-coordination/vocabulary/concept-relationships.md#lifecycle-and-isolation; source context \"Agent Coordination Concept Relationships / Lifecycle And Isolation\", target context \"Agent Coordination Concept Relationships\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+    "targetAnchor": "lifecycle-and-isolation",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "rationale-407: deep: supersede, texts differ so the not-an-equal-digest-copy sentence is true; source starts \"```txt lifecycle: inherited / independent isolation: sh\" and the successor section \"Lifecycle And Isolation\" (100 percent of its longer words reappear there); facts recomputed equal: source unheaded-block-11 L122-125, target lifecycle-and-isolation L81-81, both full digests, links 0/0 (0 destination changes, 0 added, 0 removed), target anchor check passed, shard row equals pack, unchanged-since-review clause 9daec59d at 947f6169e matches the reviewed base row at 5035fed52.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-07-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "9daec59d721acb2ad6ea1e246330a4414dc75fd9fdb1982654a0d5d62e33d2f2",
+    "targetAncestry": [
+      "Agent Coordination Concept Relationships"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_bf750d9fbc029003115d37d885e8a43d",
+    "sourceUnitDigest": "8695ee22fb427809d49f0499adbec430467024e719186b7d8eec6baf2349208d",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/vocabulary/concept-relationships.md:122-125#unheaded-block-11 (current lines); unit SHA256 8695ee22fb427809d49f0499adbec430467024e719186b7d8eec6baf2349208d.\nTarget: docs/platform/agent-coordination/vocabulary/concept-relationships.md:81-81#lifecycle-and-isolation (current lines); unit SHA256 9daec59d721acb2ad6ea1e246330a4414dc75fd9fdb1982654a0d5d62e33d2f2.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 9daec59d721acb2ad6ea1e246330a4414dc75fd9fdb1982654a0d5d62e33d2f2 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 11\" → \"Lifecycle And Isolation\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 2 removed and 8 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-11 under docs/platform/agent-coordination/vocabulary/concept-relationships.md#lifecycle-and-isolation; source context \"Agent Coordination Concept Relationships / Lifecycle And Isolation\", target context \"Agent Coordination Concept Relationships\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+    "targetAnchor": "lifecycle-and-isolation",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "9daec59d721acb2ad6ea1e246330a4414dc75fd9fdb1982654a0d5d62e33d2f2",
+    "targetAncestry": [
+      "Agent Coordination Concept Relationships"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 211,
+  "factsSHA256": "2f480403a3d2e11356c702b6babf0305e4046d86cf10f0320ce9a2135dd2be21",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-11",
+    "githubAnchor": "unheaded-block-11",
+    "stableAnchor": "unheaded-block-11",
+    "title": "Unheaded block 11",
+    "startLine": 122,
+    "endLine": 125,
+    "textDigest": "8695ee22fb427809d49f0499adbec430467024e719186b7d8eec6baf2349208d",
+    "sample": "```txt\nlifecycle: inherited | independent\nisolation: shared | isolated\n```",
+    "identityFingerprint": "3c0235c81a772467d1b6222b84c7b6eb50985693c8a8a76f01ccf9793c25794a",
+    "ancestry": [
+      "Agent Coordination Concept Relationships",
+      "Lifecycle And Isolation"
+    ],
+    "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "Lifecycle And Isolation",
+    "anchor": "lifecycle-and-isolation",
+    "githubAnchor": "lifecycle-and-isolation",
+    "stableAnchor": "h-097768996186",
+    "startLine": 81,
+    "endLine": 81,
+    "textDigest": "9daec59d721acb2ad6ea1e246330a4414dc75fd9fdb1982654a0d5d62e33d2f2",
+    "sample": "Lifecycle And Isolation",
+    "sectionPayloadDigest": "669cee01c40f65d9adeac81768f97cad8273b7bb018461cc58187c72a96ae9e9",
+    "followingBlockDigest": "69eef35b9e60c68994a6446198388478fa263eef44fdadb0f8738b6b26af7573",
+    "identityFingerprint": "7e3e54d8286e69144b8564d38d79b232cf73e999f5cd4baf8500d3d997f16450",
+    "ancestry": [
+      "Agent Coordination Concept Relationships"
+    ],
+    "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_bf750d9fbc029003115d37d885e8a43d",
+    "sourceUnitDigest": "8695ee22fb427809d49f0499adbec430467024e719186b7d8eec6baf2349208d",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/vocabulary/concept-relationships.md:122-125#unheaded-block-11 (current lines); unit SHA256 8695ee22fb427809d49f0499adbec430467024e719186b7d8eec6baf2349208d.\nTarget: docs/platform/agent-coordination/vocabulary/concept-relationships.md:81-81#lifecycle-and-isolation (current lines); unit SHA256 9daec59d721acb2ad6ea1e246330a4414dc75fd9fdb1982654a0d5d62e33d2f2.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 9daec59d721acb2ad6ea1e246330a4414dc75fd9fdb1982654a0d5d62e33d2f2 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 11\" → \"Lifecycle And Isolation\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 2 removed and 8 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-11 under docs/platform/agent-coordination/vocabulary/concept-relationships.md#lifecycle-and-isolation; source context \"Agent Coordination Concept Relationships / Lifecycle And Isolation\", target context \"Agent Coordination Concept Relationships\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+    "targetAnchor": "lifecycle-and-isolation",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "9daec59d721acb2ad6ea1e246330a4414dc75fd9fdb1982654a0d5d62e33d2f2",
+    "targetAncestry": [
+      "Agent Coordination Concept Relationships"
+    ]
+  }
+}
+```
+
+## Entry rationale-213
+
+```json
+{
+  "entryId": "rationale-213",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_3f0b7f9d49eca4beeb45b83aff2b0f80",
+  "before": {
+    "claimId": "claim_3f0b7f9d49eca4beeb45b83aff2b0f80",
+    "sourceUnitDigest": "87be696331efc42d26a462149699ad19f88c28fba51799f183195f99d4e8e97a",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/vocabulary/concept-relationships.md:127-129#unheaded-block-12 (current lines); unit SHA256 87be696331efc42d26a462149699ad19f88c28fba51799f183195f99d4e8e97a.\nTarget: docs/platform/agent-coordination/vocabulary/concept-relationships.md:81-81#lifecycle-and-isolation (current lines); unit SHA256 9daec59d721acb2ad6ea1e246330a4414dc75fd9fdb1982654a0d5d62e33d2f2.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 9daec59d721acb2ad6ea1e246330a4414dc75fd9fdb1982654a0d5d62e33d2f2 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 12\" → \"Lifecycle And Isolation\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-12 under docs/platform/agent-coordination/vocabulary/concept-relationships.md#lifecycle-and-isolation; source context \"Agent Coordination Concept Relationships / Lifecycle And Isolation\", target context \"Agent Coordination Concept Relationships\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+    "targetAnchor": "lifecycle-and-isolation",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "rationale-408: deep: supersede, texts differ so the not-an-equal-digest-copy sentence is true; source starts \"An inherited isolated task may use an ephemeral branch/\" and the successor section \"Lifecycle And Isolation\" (50 percent of its longer words reappear there); facts recomputed equal: source unheaded-block-12 L127-129, target lifecycle-and-isolation L81-81, both full digests, links 0/0 (0 destination changes, 0 added, 0 removed), target anchor check passed, shard row equals pack, unchanged-since-review clause 9daec59d at 947f6169e matches the reviewed base row at 5035fed52.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-07-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "9daec59d721acb2ad6ea1e246330a4414dc75fd9fdb1982654a0d5d62e33d2f2",
+    "targetAncestry": [
+      "Agent Coordination Concept Relationships"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_3f0b7f9d49eca4beeb45b83aff2b0f80",
+    "sourceUnitDigest": "87be696331efc42d26a462149699ad19f88c28fba51799f183195f99d4e8e97a",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/vocabulary/concept-relationships.md:127-129#unheaded-block-12 (current lines); unit SHA256 87be696331efc42d26a462149699ad19f88c28fba51799f183195f99d4e8e97a.\nTarget: docs/platform/agent-coordination/vocabulary/concept-relationships.md:81-81#lifecycle-and-isolation (current lines); unit SHA256 9daec59d721acb2ad6ea1e246330a4414dc75fd9fdb1982654a0d5d62e33d2f2.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 9daec59d721acb2ad6ea1e246330a4414dc75fd9fdb1982654a0d5d62e33d2f2 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 12\" → \"Lifecycle And Isolation\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 3 removed and 10 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-12 under docs/platform/agent-coordination/vocabulary/concept-relationships.md#lifecycle-and-isolation; source context \"Agent Coordination Concept Relationships / Lifecycle And Isolation\", target context \"Agent Coordination Concept Relationships\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+    "targetAnchor": "lifecycle-and-isolation",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "9daec59d721acb2ad6ea1e246330a4414dc75fd9fdb1982654a0d5d62e33d2f2",
+    "targetAncestry": [
+      "Agent Coordination Concept Relationships"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 212,
+  "factsSHA256": "fb03f3e6c2fb833a8d237f4f23d561d20689673801928f85b0eaf83858f5a6bd",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-12",
+    "githubAnchor": "unheaded-block-12",
+    "stableAnchor": "unheaded-block-12",
+    "title": "Unheaded block 12",
+    "startLine": 127,
+    "endLine": 129,
+    "textDigest": "87be696331efc42d26a462149699ad19f88c28fba51799f183195f99d4e8e97a",
+    "sample": "An inherited isolated task may use an ephemeral branch/worktree without\nbecoming Work. Independent child Work uses Work-owned durable isolation and\nmerge behavior.",
+    "identityFingerprint": "bb770a62d6d2ee675f4c14ff0628ac1a2e8bec93d82931229a71a735c262603f",
+    "ancestry": [
+      "Agent Coordination Concept Relationships",
+      "Lifecycle And Isolation"
+    ],
+    "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "Lifecycle And Isolation",
+    "anchor": "lifecycle-and-isolation",
+    "githubAnchor": "lifecycle-and-isolation",
+    "stableAnchor": "h-097768996186",
+    "startLine": 81,
+    "endLine": 81,
+    "textDigest": "9daec59d721acb2ad6ea1e246330a4414dc75fd9fdb1982654a0d5d62e33d2f2",
+    "sample": "Lifecycle And Isolation",
+    "sectionPayloadDigest": "669cee01c40f65d9adeac81768f97cad8273b7bb018461cc58187c72a96ae9e9",
+    "followingBlockDigest": "69eef35b9e60c68994a6446198388478fa263eef44fdadb0f8738b6b26af7573",
+    "identityFingerprint": "7e3e54d8286e69144b8564d38d79b232cf73e999f5cd4baf8500d3d997f16450",
+    "ancestry": [
+      "Agent Coordination Concept Relationships"
+    ],
+    "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_3f0b7f9d49eca4beeb45b83aff2b0f80",
+    "sourceUnitDigest": "87be696331efc42d26a462149699ad19f88c28fba51799f183195f99d4e8e97a",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/vocabulary/concept-relationships.md:127-129#unheaded-block-12 (current lines); unit SHA256 87be696331efc42d26a462149699ad19f88c28fba51799f183195f99d4e8e97a.\nTarget: docs/platform/agent-coordination/vocabulary/concept-relationships.md:81-81#lifecycle-and-isolation (current lines); unit SHA256 9daec59d721acb2ad6ea1e246330a4414dc75fd9fdb1982654a0d5d62e33d2f2.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 9daec59d721acb2ad6ea1e246330a4414dc75fd9fdb1982654a0d5d62e33d2f2 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 12\" → \"Lifecycle And Isolation\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 3 removed and 10 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-12 under docs/platform/agent-coordination/vocabulary/concept-relationships.md#lifecycle-and-isolation; source context \"Agent Coordination Concept Relationships / Lifecycle And Isolation\", target context \"Agent Coordination Concept Relationships\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+    "targetAnchor": "lifecycle-and-isolation",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "9daec59d721acb2ad6ea1e246330a4414dc75fd9fdb1982654a0d5d62e33d2f2",
+    "targetAncestry": [
+      "Agent Coordination Concept Relationships"
+    ]
+  }
+}
+```
+
+## Entry rationale-214
+
+```json
+{
+  "entryId": "rationale-214",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_f11410ffab23bcae1d89e8b6cbedf8bc",
+  "before": {
+    "claimId": "claim_f11410ffab23bcae1d89e8b6cbedf8bc",
+    "sourceUnitDigest": "1f83d2721e63ae946e300e062ec9ddba592ef25ef25ff196524cd6e492ef214e",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/vocabulary/concept-relationships.md:133-138#unheaded-block-13 (current lines); unit SHA256 1f83d2721e63ae946e300e062ec9ddba592ef25ef25ff196524cd6e492ef214e.\nTarget: docs/platform/agent-coordination/vocabulary/concept-relationships.md:95-95#coordination-rings (current lines); unit SHA256 845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 13\" → \"Coordination Rings\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-13 under docs/platform/agent-coordination/vocabulary/concept-relationships.md#coordination-rings; source context \"Agent Coordination Concept Relationships / Coordination Rings\", target context \"Agent Coordination Concept Relationships\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+    "targetAnchor": "coordination-rings",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "rationale-409: deep: supersede, texts differ so the not-an-equal-digest-copy sentence is true; source starts \"```txt Strategic ring = Orchestrator Activation ring = \" and the successor section \"Coordination Rings\" (87 percent of its longer words reappear there); the decision row carries no targetUnitDigest or targetAncestry field, the rationale cites the recomputed target digest and says no prior reviewed digest exists, which is accurate; facts recomputed equal: source unheaded-block-13 L133-138, target coordination-rings L95-95, both full digests, links 0/0 (0 destination changes, 0 added, 0 removed), target anchor check passed, shard row equals pack, no prior reviewed digest is claimed.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-07-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823",
+    "targetAncestry": [
+      "Agent Coordination Concept Relationships"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_f11410ffab23bcae1d89e8b6cbedf8bc",
+    "sourceUnitDigest": "1f83d2721e63ae946e300e062ec9ddba592ef25ef25ff196524cd6e492ef214e",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/vocabulary/concept-relationships.md:133-138#unheaded-block-13 (current lines); unit SHA256 1f83d2721e63ae946e300e062ec9ddba592ef25ef25ff196524cd6e492ef214e.\nTarget: docs/platform/agent-coordination/vocabulary/concept-relationships.md:95-95#coordination-rings (current lines); unit SHA256 845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 13\" → \"Coordination Rings\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 6 removed and 8 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-13 under docs/platform/agent-coordination/vocabulary/concept-relationships.md#coordination-rings; source context \"Agent Coordination Concept Relationships / Coordination Rings\", target context \"Agent Coordination Concept Relationships\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+    "targetAnchor": "coordination-rings",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823",
+    "targetAncestry": [
+      "Agent Coordination Concept Relationships"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 213,
+  "factsSHA256": "bf6810e03fbc686d5be0f576820cd0938b70882a629cdfca6854828806393977",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-13",
+    "githubAnchor": "unheaded-block-13",
+    "stableAnchor": "unheaded-block-13",
+    "title": "Unheaded block 13",
+    "startLine": 133,
+    "endLine": 138,
+    "textDigest": "1f83d2721e63ae946e300e062ec9ddba592ef25ef25ff196524cd6e492ef214e",
+    "sample": "```txt\nStrategic ring  = Orchestrator\nActivation ring = Launcher\nFlow ring       = Router + Driver\nExecution ring  = Dispatcher\n```",
+    "identityFingerprint": "1e1d09fdb0311df6b05f8dce5fe2b82e3e0ede7062b6b750a4e290b50340d85b",
+    "ancestry": [
+      "Agent Coordination Concept Relationships",
+      "Coordination Rings"
+    ],
+    "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "Coordination Rings",
+    "anchor": "coordination-rings",
+    "githubAnchor": "coordination-rings",
+    "stableAnchor": "h-ac11baad42e7",
+    "startLine": 95,
+    "endLine": 95,
+    "textDigest": "845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823",
+    "sample": "Coordination Rings",
+    "sectionPayloadDigest": "bce54693db90009c0a56cb735d561d37e93bb50c6095341a558351bec0f5e8cf",
+    "followingBlockDigest": "aa01943e9305701d35d00d1542f51a2fb0088686175c7f45957d54f0ceadb365",
+    "identityFingerprint": "b5ccafe8ce8629d269c28335083ec4e5234edbb917bbd46a057b61f94a62d28d",
+    "ancestry": [
+      "Agent Coordination Concept Relationships"
+    ],
+    "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_f11410ffab23bcae1d89e8b6cbedf8bc",
+    "sourceUnitDigest": "1f83d2721e63ae946e300e062ec9ddba592ef25ef25ff196524cd6e492ef214e",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/vocabulary/concept-relationships.md:133-138#unheaded-block-13 (current lines); unit SHA256 1f83d2721e63ae946e300e062ec9ddba592ef25ef25ff196524cd6e492ef214e.\nTarget: docs/platform/agent-coordination/vocabulary/concept-relationships.md:95-95#coordination-rings (current lines); unit SHA256 845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 13\" → \"Coordination Rings\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 6 removed and 8 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-13 under docs/platform/agent-coordination/vocabulary/concept-relationships.md#coordination-rings; source context \"Agent Coordination Concept Relationships / Coordination Rings\", target context \"Agent Coordination Concept Relationships\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+    "targetAnchor": "coordination-rings",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823",
+    "targetAncestry": [
+      "Agent Coordination Concept Relationships"
+    ]
+  }
+}
+```
+
+## Entry rationale-215
+
+```json
+{
+  "entryId": "rationale-215",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_bd4897029d5fdbab80b1b7ccee475e12",
+  "before": {
+    "claimId": "claim_bd4897029d5fdbab80b1b7ccee475e12",
+    "sourceUnitDigest": "67f9f91fe484e41c014e151aaee4856f8aba43c473e42ffa3428d00e693db22c",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/vocabulary/concept-relationships.md:140-141#unheaded-block-14 (current lines); unit SHA256 67f9f91fe484e41c014e151aaee4856f8aba43c473e42ffa3428d00e693db22c.\nTarget: docs/platform/agent-coordination/vocabulary/concept-relationships.md:95-95#coordination-rings (current lines); unit SHA256 845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 14\" → \"Coordination Rings\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-14 under docs/platform/agent-coordination/vocabulary/concept-relationships.md#coordination-rings; source context \"Agent Coordination Concept Relationships / Coordination Rings\", target context \"Agent Coordination Concept Relationships\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+    "targetAnchor": "coordination-rings",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "rationale-410: deep: supersede, texts differ so the not-an-equal-digest-copy sentence is true; source starts \"The rings are responsibility boundaries, not necessaril\" and the successor section \"Coordination Rings\" (33 percent of its longer words reappear there); same as its sibling: row has no stored target digest, the rationale digest was recomputed equal and no unchanged-since-review claim is made; facts recomputed equal: source unheaded-block-14 L140-141, target coordination-rings L95-95, both full digests, links 0/0 (0 destination changes, 0 added, 0 removed), target anchor check passed, shard row equals pack, no prior reviewed digest is claimed.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-07-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823",
+    "targetAncestry": [
+      "Agent Coordination Concept Relationships"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_bd4897029d5fdbab80b1b7ccee475e12",
+    "sourceUnitDigest": "67f9f91fe484e41c014e151aaee4856f8aba43c473e42ffa3428d00e693db22c",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/vocabulary/concept-relationships.md:140-141#unheaded-block-14 (current lines); unit SHA256 67f9f91fe484e41c014e151aaee4856f8aba43c473e42ffa3428d00e693db22c.\nTarget: docs/platform/agent-coordination/vocabulary/concept-relationships.md:95-95#coordination-rings (current lines); unit SHA256 845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 14\" → \"Coordination Rings\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 2 removed and 8 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-14 under docs/platform/agent-coordination/vocabulary/concept-relationships.md#coordination-rings; source context \"Agent Coordination Concept Relationships / Coordination Rings\", target context \"Agent Coordination Concept Relationships\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+    "targetAnchor": "coordination-rings",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823",
+    "targetAncestry": [
+      "Agent Coordination Concept Relationships"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 214,
+  "factsSHA256": "74cc023ff0e4a47cc1884d146717ba3497baf6190173120b463f20ddef678080",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-14",
+    "githubAnchor": "unheaded-block-14",
+    "stableAnchor": "unheaded-block-14",
+    "title": "Unheaded block 14",
+    "startLine": 140,
+    "endLine": 141,
+    "textDigest": "67f9f91fe484e41c014e151aaee4856f8aba43c473e42ffa3428d00e693db22c",
+    "sample": "The rings are responsibility boundaries, not necessarily one process or module\nper ring.",
+    "identityFingerprint": "ab506b8d2df15cb275914e2f7c92d098a7043c781e5c1203bef95cda6de4d4d8",
+    "ancestry": [
+      "Agent Coordination Concept Relationships",
+      "Coordination Rings"
+    ],
+    "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "Coordination Rings",
+    "anchor": "coordination-rings",
+    "githubAnchor": "coordination-rings",
+    "stableAnchor": "h-ac11baad42e7",
+    "startLine": 95,
+    "endLine": 95,
+    "textDigest": "845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823",
+    "sample": "Coordination Rings",
+    "sectionPayloadDigest": "bce54693db90009c0a56cb735d561d37e93bb50c6095341a558351bec0f5e8cf",
+    "followingBlockDigest": "aa01943e9305701d35d00d1542f51a2fb0088686175c7f45957d54f0ceadb365",
+    "identityFingerprint": "b5ccafe8ce8629d269c28335083ec4e5234edbb917bbd46a057b61f94a62d28d",
+    "ancestry": [
+      "Agent Coordination Concept Relationships"
+    ],
+    "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_bd4897029d5fdbab80b1b7ccee475e12",
+    "sourceUnitDigest": "67f9f91fe484e41c014e151aaee4856f8aba43c473e42ffa3428d00e693db22c",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/vocabulary/concept-relationships.md:140-141#unheaded-block-14 (current lines); unit SHA256 67f9f91fe484e41c014e151aaee4856f8aba43c473e42ffa3428d00e693db22c.\nTarget: docs/platform/agent-coordination/vocabulary/concept-relationships.md:95-95#coordination-rings (current lines); unit SHA256 845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 14\" → \"Coordination Rings\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 2 removed and 8 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-14 under docs/platform/agent-coordination/vocabulary/concept-relationships.md#coordination-rings; source context \"Agent Coordination Concept Relationships / Coordination Rings\", target context \"Agent Coordination Concept Relationships\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+    "targetAnchor": "coordination-rings",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823",
+    "targetAncestry": [
+      "Agent Coordination Concept Relationships"
+    ]
+  }
+}
+```
+
+## Entry rationale-216
+
+```json
+{
+  "entryId": "rationale-216",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_371515038b57bcd114632a79a36a922e",
+  "before": {
+    "claimId": "claim_371515038b57bcd114632a79a36a922e",
+    "sourceUnitDigest": "07d60e2878c0fabbc24af234d3c37ee5f7c109932e185350ef6acea09dfa4138",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md:43-45#unheaded-block-6 (current lines); unit SHA256 07d60e2878c0fabbc24af234d3c37ee5f7c109932e185350ef6acea09dfa4138.\nTarget: docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md:46-46#cell (current lines); unit SHA256 fa6249650b8b19f7f5374e9a36fdbb7d7b9d1445c6d7601d3ffa42b8e661e144.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest fa6249650b8b19f7f5374e9a36fdbb7d7b9d1445c6d7601d3ffa42b8e661e144 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 6\" → \"Cell\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md#unheaded-block-6 under docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md#cell; source context \"Deprecated And Reserved Coordination Terms / Discouraged Or Ambiguous / Cell\", target context \"Deprecated And Reserved Coordination Terms / Discouraged Or Ambiguous\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
+    "targetAnchor": "cell",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "rationale-411: deep: supersede, texts differ so the not-an-equal-digest-copy sentence is true; source starts \"May be used informally in implementation planning or th\" and the successor section \"Cell\" (55 percent of its longer words reappear there); facts recomputed equal: source unheaded-block-6 L43-45, target cell L46-46, both full digests, links 0/0 (0 destination changes, 0 added, 0 removed), target anchor check passed, shard row equals pack, unchanged-since-review clause fa624965 at 947f6169e matches the reviewed base row at 5035fed52.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-07-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "fa6249650b8b19f7f5374e9a36fdbb7d7b9d1445c6d7601d3ffa42b8e661e144",
+    "targetAncestry": [
+      "Deprecated And Reserved Coordination Terms",
+      "Discouraged Or Ambiguous"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_371515038b57bcd114632a79a36a922e",
+    "sourceUnitDigest": "07d60e2878c0fabbc24af234d3c37ee5f7c109932e185350ef6acea09dfa4138",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md:43-45#unheaded-block-6 (current lines); unit SHA256 07d60e2878c0fabbc24af234d3c37ee5f7c109932e185350ef6acea09dfa4138.\nTarget: docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md:46-46#cell (current lines); unit SHA256 fa6249650b8b19f7f5374e9a36fdbb7d7b9d1445c6d7601d3ffa42b8e661e144.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest fa6249650b8b19f7f5374e9a36fdbb7d7b9d1445c6d7601d3ffa42b8e661e144 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 6\" → \"Cell\".\nWhole direct section differs; depth block → 3; 0 distinct link changes; normalized line order differs; 3 removed and 5 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md#unheaded-block-6 under docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md#cell; source context \"Deprecated And Reserved Coordination Terms / Discouraged Or Ambiguous / Cell\", target context \"Deprecated And Reserved Coordination Terms / Discouraged Or Ambiguous\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
+    "targetAnchor": "cell",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "fa6249650b8b19f7f5374e9a36fdbb7d7b9d1445c6d7601d3ffa42b8e661e144",
+    "targetAncestry": [
+      "Deprecated And Reserved Coordination Terms",
+      "Discouraged Or Ambiguous"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 215,
+  "factsSHA256": "3b7456ccc6acfbbf297826611045b6fed37b51090ae10c73552ac7bc544a2a54",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-6",
+    "githubAnchor": "unheaded-block-6",
+    "stableAnchor": "unheaded-block-6",
+    "title": "Unheaded block 6",
+    "startLine": 43,
+    "endLine": 45,
+    "textDigest": "07d60e2878c0fabbc24af234d3c37ee5f7c109932e185350ef6acea09dfa4138",
+    "sample": "May be used informally in implementation planning or the operating harness, but\nis not currently a canonical runtime entity. Use AdhocTask for the proposed\nsession-local runtime co",
+    "identityFingerprint": "949081a7a3a3d4f7078b2863abdc494fba1dab175cc12caee539ce33666ba2fd",
+    "ancestry": [
+      "Deprecated And Reserved Coordination Terms",
+      "Discouraged Or Ambiguous",
+      "Cell"
+    ],
+    "path": "docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Cell",
+    "anchor": "cell",
+    "githubAnchor": "cell",
+    "stableAnchor": "h-3da86d2c941d",
+    "startLine": 46,
+    "endLine": 46,
+    "textDigest": "fa6249650b8b19f7f5374e9a36fdbb7d7b9d1445c6d7601d3ffa42b8e661e144",
+    "sample": "Cell",
+    "sectionPayloadDigest": "51f58750eb2504515eb314299218f45c8a6c32dff926e4e9c2250b5ffe3227d9",
+    "followingBlockDigest": "51f58750eb2504515eb314299218f45c8a6c32dff926e4e9c2250b5ffe3227d9",
+    "identityFingerprint": "9375e8c4ca85cf6014b7e7e59f43baeb1dd55916a5369e7e12d13e7b380e3b37",
+    "ancestry": [
+      "Deprecated And Reserved Coordination Terms",
+      "Discouraged Or Ambiguous"
+    ],
+    "path": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_371515038b57bcd114632a79a36a922e",
+    "sourceUnitDigest": "07d60e2878c0fabbc24af234d3c37ee5f7c109932e185350ef6acea09dfa4138",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md:43-45#unheaded-block-6 (current lines); unit SHA256 07d60e2878c0fabbc24af234d3c37ee5f7c109932e185350ef6acea09dfa4138.\nTarget: docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md:46-46#cell (current lines); unit SHA256 fa6249650b8b19f7f5374e9a36fdbb7d7b9d1445c6d7601d3ffa42b8e661e144.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest fa6249650b8b19f7f5374e9a36fdbb7d7b9d1445c6d7601d3ffa42b8e661e144 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 6\" → \"Cell\".\nWhole direct section differs; depth block → 3; 0 distinct link changes; normalized line order differs; 3 removed and 5 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md#unheaded-block-6 under docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md#cell; source context \"Deprecated And Reserved Coordination Terms / Discouraged Or Ambiguous / Cell\", target context \"Deprecated And Reserved Coordination Terms / Discouraged Or Ambiguous\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
+    "targetAnchor": "cell",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "fa6249650b8b19f7f5374e9a36fdbb7d7b9d1445c6d7601d3ffa42b8e661e144",
+    "targetAncestry": [
+      "Deprecated And Reserved Coordination Terms",
+      "Discouraged Or Ambiguous"
+    ]
+  }
+}
+```
+
+## Entry rationale-217
+
+```json
+{
+  "entryId": "rationale-217",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "registryGaps",
+  "claimId": "claim_ab182560a5142f22e010e35a97b115dc",
+  "before": {
+    "claimId": "claim_ab182560a5142f22e010e35a97b115dc",
+    "sourceUnitDigest": "212ffb52fe719fef01a51f585286aedd6792e48d063ada3a2663933e7c2593ec",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/dispatch-control-plane.md:66-78#unheaded-block-9 (historical witness at f4bc8027ff2ef34b7c7c1b084330b62fdcbc353f); unit SHA256 212ffb52fe719fef01a51f585286aedd6792e48d063ada3a2663933e7c2593ec.\nTarget: docs/platform/agent-coordination/architecture/dispatch-control-plane.md:75-75#routing-identities (current lines); unit SHA256 9c69e65aaa7365451581b53232299d73dd29a2c56b1ae0f85cede6710c0d116e.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 9c69e65aaa7365451581b53232299d73dd29a2c56b1ae0f85cede6710c0d116e at b1e53b4fb0e99963328e84b63a4764c0d87abb21.\nLinks: source 0, target 2; 2 changed spellings/labels, 0 destination changes; 2 added, 0 removed.\nLink 1: \"none\" (none) → \"earlier normalization plan\" (../../../history/dispatch-core-contract-normalization/plan.md); resolved none → docs/history/dispatch-core-contract-normalization/plan.md.\nLink 2: \"none\" (none) → \"Assignment/Run/RunResult Contract\" (../contracts/assignment-run-runresult.md); resolved none → docs/platform/agent-coordination/contracts/assignment-run-runresult.md.\nHeading depth: not a heading → 2; title \"Unheaded block 9\" → \"Routing Identities\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-9 under docs/platform/agent-coordination/architecture/dispatch-control-plane.md#routing-identities; source context \"Dispatch Control Plane / Routing Identities\", target context \"Dispatch Control Plane\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+    "targetAnchor": "routing-identities",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "sourcePath": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md",
+    "sourceAnchor": "unheaded-block-9",
+    "reviewNote": "deep: supersede dispatch-control-plane.md:66-78#unheaded-block-9@f4bc8027f -> dispatch-control-plane.md:75-75#routing-identities; digests differ and were recomputed by extractor; lines equal the real spans; anchor ok; context equals the real ancestry; links 0/2/2/0/2/0 recomputed independently and equal; 0 correction line(s) checked (after-text in target); 2 residual text hunk(s) beyond links/corrections, which the successor-text sentence discloses; last-reviewed digest backed by a committed ok verdict. hand-recomputed both digests (seed 2026101608).",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-10-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "9c69e65aaa7365451581b53232299d73dd29a2c56b1ae0f85cede6710c0d116e",
+    "targetAncestry": [
+      "Dispatch Control Plane"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_ab182560a5142f22e010e35a97b115dc",
+    "sourceUnitDigest": "212ffb52fe719fef01a51f585286aedd6792e48d063ada3a2663933e7c2593ec",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/dispatch-control-plane.md:66-78#unheaded-block-9 (historical witness at f4bc8027ff2ef34b7c7c1b084330b62fdcbc353f); unit SHA256 212ffb52fe719fef01a51f585286aedd6792e48d063ada3a2663933e7c2593ec.\nTarget: docs/platform/agent-coordination/architecture/dispatch-control-plane.md:75-75#routing-identities (current lines); unit SHA256 9c69e65aaa7365451581b53232299d73dd29a2c56b1ae0f85cede6710c0d116e.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 9c69e65aaa7365451581b53232299d73dd29a2c56b1ae0f85cede6710c0d116e at b1e53b4fb0e99963328e84b63a4764c0d87abb21.\nLinks: source 0, target 2; 2 changed spellings/labels, 0 destination changes; 2 added, 0 removed.\nLink 1: \"none\" (none) → \"earlier normalization plan\" (../../../history/dispatch-core-contract-normalization/plan.md); resolved none → docs/history/dispatch-core-contract-normalization/plan.md.\nLink 2: \"none\" (none) → \"Assignment/Run/RunResult Contract\" (../contracts/assignment-run-runresult.md); resolved none → docs/platform/agent-coordination/contracts/assignment-run-runresult.md.\nHeading depth: not a heading → 2; title \"Unheaded block 9\" → \"Routing Identities\".\nWhole direct section differs; depth block → 2; 2 distinct link changes; normalized line order differs; 10 removed and 31 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-9 under docs/platform/agent-coordination/architecture/dispatch-control-plane.md#routing-identities; source context \"Dispatch Control Plane / Routing Identities\", target context \"Dispatch Control Plane\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+    "targetAnchor": "routing-identities",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "sourcePath": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md",
+    "sourceAnchor": "unheaded-block-9",
+    "targetUnitDigest": "9c69e65aaa7365451581b53232299d73dd29a2c56b1ae0f85cede6710c0d116e",
+    "targetAncestry": [
+      "Dispatch Control Plane"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 216,
+  "factsSHA256": "eae0be695655abc782cb8408bf8d257eca8d444d76c344488e6a4a0cfed3966f",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-9",
+    "githubAnchor": "unheaded-block-9",
+    "stableAnchor": "unheaded-block-9",
+    "title": "Unheaded block 9",
+    "startLine": 66,
+    "endLine": 78,
+    "textDigest": "212ffb52fe719fef01a51f585286aedd6792e48d063ada3a2663933e7c2593ec",
+    "sample": "`purpose` is not a third identity. It is compatibility terminology for\ncapability. The `--for <purpose>` CLI flag and the `purpose`/`for` parameter\nnames threaded through `src/runn",
+    "identityFingerprint": "cac7133df5be0f0dbf0a887f67d10af6f7d3302555eb984153bdfd8779cd58ca",
+    "ancestry": [
+      "Dispatch Control Plane",
+      "Routing Identities"
+    ],
+    "path": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md",
+    "commit": "f4bc8027ff2ef34b7c7c1b084330b62fdcbc353f"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "Routing Identities",
+    "anchor": "routing-identities",
+    "githubAnchor": "routing-identities",
+    "stableAnchor": "h-dc3169b90652",
+    "startLine": 75,
+    "endLine": 75,
+    "textDigest": "9c69e65aaa7365451581b53232299d73dd29a2c56b1ae0f85cede6710c0d116e",
+    "sample": "Routing Identities",
+    "sectionPayloadDigest": "60ac9d927e2ed8d4f3ba1681c8a33367ec5653e821b29c75dd7ef508ef005ef3",
+    "followingBlockDigest": "d2314434187178f9d2649ed75ca946408c144840f05524bf9e3b85ece0ba0dce",
+    "identityFingerprint": "fae1dfdeffd484ed58521885bae257924cad919657764c8d8da2a115b43f3f40",
+    "ancestry": [
+      "Dispatch Control Plane"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_ab182560a5142f22e010e35a97b115dc",
+    "sourceUnitDigest": "212ffb52fe719fef01a51f585286aedd6792e48d063ada3a2663933e7c2593ec",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/dispatch-control-plane.md:66-78#unheaded-block-9 (historical witness at f4bc8027ff2ef34b7c7c1b084330b62fdcbc353f); unit SHA256 212ffb52fe719fef01a51f585286aedd6792e48d063ada3a2663933e7c2593ec.\nTarget: docs/platform/agent-coordination/architecture/dispatch-control-plane.md:75-75#routing-identities (current lines); unit SHA256 9c69e65aaa7365451581b53232299d73dd29a2c56b1ae0f85cede6710c0d116e.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 9c69e65aaa7365451581b53232299d73dd29a2c56b1ae0f85cede6710c0d116e at b1e53b4fb0e99963328e84b63a4764c0d87abb21.\nLinks: source 0, target 2; 2 changed spellings/labels, 0 destination changes; 2 added, 0 removed.\nLink 1: \"none\" (none) → \"earlier normalization plan\" (../../../history/dispatch-core-contract-normalization/plan.md); resolved none → docs/history/dispatch-core-contract-normalization/plan.md.\nLink 2: \"none\" (none) → \"Assignment/Run/RunResult Contract\" (../contracts/assignment-run-runresult.md); resolved none → docs/platform/agent-coordination/contracts/assignment-run-runresult.md.\nHeading depth: not a heading → 2; title \"Unheaded block 9\" → \"Routing Identities\".\nWhole direct section differs; depth block → 2; 2 distinct link changes; normalized line order differs; 10 removed and 31 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-9 under docs/platform/agent-coordination/architecture/dispatch-control-plane.md#routing-identities; source context \"Dispatch Control Plane / Routing Identities\", target context \"Dispatch Control Plane\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+    "targetAnchor": "routing-identities",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "sourcePath": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md",
+    "sourceAnchor": "unheaded-block-9",
+    "targetUnitDigest": "9c69e65aaa7365451581b53232299d73dd29a2c56b1ae0f85cede6710c0d116e",
+    "targetAncestry": [
+      "Dispatch Control Plane"
+    ]
+  }
+}
+```
+
+## Entry rationale-218
+
+```json
+{
+  "entryId": "rationale-218",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+  "collection": "registryGaps",
+  "claimId": "claim_97479b13a60800e856813bfd4f0cbb78",
+  "before": {
+    "claimId": "claim_97479b13a60800e856813bfd4f0cbb78",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/runner.md",
+    "targetAnchor": "unheaded-block-150",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "rationale": "Source: docs/specs/runner.md:1665-1665#unheaded-block-150 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:1665-1665#unheaded-block-150 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-150 under docs/specs/runner.md#unheaded-block-150; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0005 — Runner & cô lập worker / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0005 — Runner & cô lập worker / Hệ quả\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "reviewNote": "rationale-413: deep: seeded sample, source and target text compared byte-for-byte and read, equal; \"Đổi quyết định này = supersede bằng record mới, không s\" (same file, different occurrence), target context 0005 — Runner & cô lập worker / Hệ quả; first of eight identical footer sentences: source block-150 is the correct occurrence, but the registry native anchor is block-144 (older snapshot) and the +6 shift is not disclosed; the cited occurrence happens to be the right one so the facts hold; facts recomputed equal: source unheaded-block-150 L1665-1665, target unheaded-block-150 L1665-1665, both full digests, links 0/0 (0 destination changes, 0 added, 0 removed), target anchor check passed, shard row equals pack, no prior reviewed digest is claimed.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-07-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "targetAncestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0005 — Runner & cô lập worker",
+      "Hệ quả"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_97479b13a60800e856813bfd4f0cbb78",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/runner.md",
+    "targetAnchor": "unheaded-block-150",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/specs/runner.md:1665-1665#unheaded-block-150 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:1665-1665#unheaded-block-150 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-150 under docs/specs/runner.md#unheaded-block-150; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0005 — Runner & cô lập worker / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0005 — Runner & cô lập worker / Hệ quả\". The complete bound unit is carried with an equal native digest. SOURCE occurrence 1 of 8; registered anchor unheaded-block-144 shifts +6 to unheaded-block-150, with identical text and preserved occurrence order authenticated at 02106766dd6185208187f5fcaca7725cf60da9fe (L10-30).\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "targetAncestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0005 — Runner & cô lập worker",
+      "Hệ quả"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [
+    "L10-30/footer-own-occurrence"
+  ],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 217,
+  "factsSHA256": "8b9a701038dc3ef1390264ad867fb330ef6f5cddf6723f992c1851c800abe1bd",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-150",
+    "githubAnchor": "unheaded-block-150",
+    "stableAnchor": "unheaded-block-150",
+    "title": "Unheaded block 150",
+    "startLine": 1665,
+    "endLine": 1665,
+    "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+    "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0005 — Runner & cô lập worker",
+      "Hệ quả"
+    ],
+    "path": "docs/specs/runner.md",
+    "occurrence": 1,
+    "registeredAnchor": "unheaded-block-144",
+    "anchorShift": 6,
+    "occurrenceWitness": "02106766dd6185208187f5fcaca7725cf60da9fe"
+  },
+  "targetWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-150",
+    "githubAnchor": "unheaded-block-150",
+    "stableAnchor": "unheaded-block-150",
+    "title": "Unheaded block 150",
+    "startLine": 1665,
+    "endLine": 1665,
+    "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+    "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0005 — Runner & cô lập worker",
+      "Hệ quả"
+    ],
+    "path": "docs/specs/runner.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_97479b13a60800e856813bfd4f0cbb78",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/runner.md",
+    "targetAnchor": "unheaded-block-150",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/specs/runner.md:1665-1665#unheaded-block-150 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:1665-1665#unheaded-block-150 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-150 under docs/specs/runner.md#unheaded-block-150; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0005 — Runner & cô lập worker / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0005 — Runner & cô lập worker / Hệ quả\". The complete bound unit is carried with an equal native digest. SOURCE occurrence 1 of 8; registered anchor unheaded-block-144 shifts +6 to unheaded-block-150, with identical text and preserved occurrence order authenticated at 02106766dd6185208187f5fcaca7725cf60da9fe (L10-30).\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "targetAncestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0005 — Runner & cô lập worker",
+      "Hệ quả"
+    ]
+  }
+}
+```
+
+## Entry rationale-219
+
+```json
+{
+  "entryId": "rationale-219",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+  "collection": "registryGaps",
+  "claimId": "claim_50dca4885019ac5125d941ea5a86f448",
+  "before": {
+    "claimId": "claim_50dca4885019ac5125d941ea5a86f448",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/runner.md",
+    "targetAnchor": "unheaded-block-155",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/specs/runner.md:1665-1665#unheaded-block-150 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:1693-1693#unheaded-block-155 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-150 under docs/specs/runner.md#unheaded-block-155; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0005 — Runner & cô lập worker / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0008 — Routing theo audience của từng interface / Hệ quả\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetAncestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0008 — Routing theo audience của từng interface",
+      "Hệ quả"
+    ]
+  },
+  "after": {
+    "claimId": "claim_50dca4885019ac5125d941ea5a86f448",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/runner.md",
+    "targetAnchor": "unheaded-block-155",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/specs/runner.md:1693-1693#unheaded-block-155 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:1693-1693#unheaded-block-155 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-155 under docs/specs/runner.md#unheaded-block-155; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0008 — Routing theo audience của từng interface / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0008 — Routing theo audience của từng interface / Hệ quả\". The complete bound unit is carried with an equal native digest. SOURCE occurrence 2 of 8; registered anchor unheaded-block-149 shifts +6 to unheaded-block-155, with identical text and preserved occurrence order authenticated at 02106766dd6185208187f5fcaca7725cf60da9fe (L10-30).\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetAncestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0008 — Routing theo audience của từng interface",
+      "Hệ quả"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [
+    "L10-30/footer-own-occurrence"
+  ],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 218,
+  "factsSHA256": "8e065df3134741a0636f507b6847fb18ba3cb5e6adc2fbe360aa981ce78b77bc",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-155",
+    "githubAnchor": "unheaded-block-155",
+    "stableAnchor": "unheaded-block-155",
+    "title": "Unheaded block 155",
+    "startLine": 1693,
+    "endLine": 1693,
+    "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+    "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0008 — Routing theo audience của từng interface",
+      "Hệ quả"
+    ],
+    "path": "docs/specs/runner.md",
+    "occurrence": 2,
+    "registeredAnchor": "unheaded-block-149",
+    "anchorShift": 6,
+    "occurrenceWitness": "02106766dd6185208187f5fcaca7725cf60da9fe"
+  },
+  "targetWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-155",
+    "githubAnchor": "unheaded-block-155",
+    "stableAnchor": "unheaded-block-155",
+    "title": "Unheaded block 155",
+    "startLine": 1693,
+    "endLine": 1693,
+    "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+    "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0008 — Routing theo audience của từng interface",
+      "Hệ quả"
+    ],
+    "path": "docs/specs/runner.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_50dca4885019ac5125d941ea5a86f448",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/runner.md",
+    "targetAnchor": "unheaded-block-155",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/specs/runner.md:1693-1693#unheaded-block-155 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:1693-1693#unheaded-block-155 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-155 under docs/specs/runner.md#unheaded-block-155; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0008 — Routing theo audience của từng interface / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0008 — Routing theo audience của từng interface / Hệ quả\". The complete bound unit is carried with an equal native digest. SOURCE occurrence 2 of 8; registered anchor unheaded-block-149 shifts +6 to unheaded-block-155, with identical text and preserved occurrence order authenticated at 02106766dd6185208187f5fcaca7725cf60da9fe (L10-30).\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetAncestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0008 — Routing theo audience của từng interface",
+      "Hệ quả"
+    ]
+  }
+}
+```
+
+## Entry rationale-220
+
+```json
+{
+  "entryId": "rationale-220",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+  "collection": "registryGaps",
+  "claimId": "claim_07ae72c4d2c93884a120cf2ca12250a8",
+  "before": {
+    "claimId": "claim_07ae72c4d2c93884a120cf2ca12250a8",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/runner.md",
+    "targetAnchor": "unheaded-block-167",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/specs/runner.md:1665-1665#unheaded-block-150 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:1802-1802#unheaded-block-167 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-150 under docs/specs/runner.md#unheaded-block-167; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0005 — Runner & cô lập worker / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập) / Hệ quả\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetAncestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
+      "Hệ quả"
+    ]
+  },
+  "after": {
+    "claimId": "claim_07ae72c4d2c93884a120cf2ca12250a8",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/runner.md",
+    "targetAnchor": "unheaded-block-167",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/specs/runner.md:1802-1802#unheaded-block-167 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:1802-1802#unheaded-block-167 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-167 under docs/specs/runner.md#unheaded-block-167; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập) / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập) / Hệ quả\". The complete bound unit is carried with an equal native digest. SOURCE occurrence 3 of 8; registered anchor unheaded-block-161 shifts +6 to unheaded-block-167, with identical text and preserved occurrence order authenticated at 02106766dd6185208187f5fcaca7725cf60da9fe (L10-30).\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetAncestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
+      "Hệ quả"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [
+    "L10-30/footer-own-occurrence"
+  ],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 219,
+  "factsSHA256": "bf227b4f16dfdfb179b0772dc5e66af49822cadb8882d8d85e9d2672cd63a451",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-167",
+    "githubAnchor": "unheaded-block-167",
+    "stableAnchor": "unheaded-block-167",
+    "title": "Unheaded block 167",
+    "startLine": 1802,
+    "endLine": 1802,
+    "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+    "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
+      "Hệ quả"
+    ],
+    "path": "docs/specs/runner.md",
+    "occurrence": 3,
+    "registeredAnchor": "unheaded-block-161",
+    "anchorShift": 6,
+    "occurrenceWitness": "02106766dd6185208187f5fcaca7725cf60da9fe"
+  },
+  "targetWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-167",
+    "githubAnchor": "unheaded-block-167",
+    "stableAnchor": "unheaded-block-167",
+    "title": "Unheaded block 167",
+    "startLine": 1802,
+    "endLine": 1802,
+    "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+    "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
+      "Hệ quả"
+    ],
+    "path": "docs/specs/runner.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_07ae72c4d2c93884a120cf2ca12250a8",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/runner.md",
+    "targetAnchor": "unheaded-block-167",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/specs/runner.md:1802-1802#unheaded-block-167 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:1802-1802#unheaded-block-167 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-167 under docs/specs/runner.md#unheaded-block-167; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập) / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập) / Hệ quả\". The complete bound unit is carried with an equal native digest. SOURCE occurrence 3 of 8; registered anchor unheaded-block-161 shifts +6 to unheaded-block-167, with identical text and preserved occurrence order authenticated at 02106766dd6185208187f5fcaca7725cf60da9fe (L10-30).\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetAncestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
+      "Hệ quả"
+    ]
+  }
+}
+```
+
+## Entry rationale-221
+
+```json
+{
+  "entryId": "rationale-221",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+  "collection": "registryGaps",
+  "claimId": "claim_211f0b98400863f2a0e9b9cdaa2259fe",
+  "before": {
+    "claimId": "claim_211f0b98400863f2a0e9b9cdaa2259fe",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/runner.md",
+    "targetAnchor": "unheaded-block-176",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/specs/runner.md:1665-1665#unheaded-block-150 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:1886-1886#unheaded-block-176 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-150 under docs/specs/runner.md#unheaded-block-176; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0005 — Runner & cô lập worker / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence / Hệ quả\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetAncestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+      "Hệ quả"
+    ]
+  },
+  "after": {
+    "claimId": "claim_211f0b98400863f2a0e9b9cdaa2259fe",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/runner.md",
+    "targetAnchor": "unheaded-block-176",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/specs/runner.md:1886-1886#unheaded-block-176 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:1886-1886#unheaded-block-176 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-176 under docs/specs/runner.md#unheaded-block-176; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence / Hệ quả\". The complete bound unit is carried with an equal native digest. SOURCE occurrence 4 of 8; registered anchor unheaded-block-170 shifts +6 to unheaded-block-176, with identical text and preserved occurrence order authenticated at 02106766dd6185208187f5fcaca7725cf60da9fe (L10-30).\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetAncestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+      "Hệ quả"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [
+    "L10-30/footer-own-occurrence"
+  ],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 220,
+  "factsSHA256": "436a382a3990fe7d7689a2c668a375b442bb9c5184f309a92306f227be2eb2f9",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-176",
+    "githubAnchor": "unheaded-block-176",
+    "stableAnchor": "unheaded-block-176",
+    "title": "Unheaded block 176",
+    "startLine": 1886,
+    "endLine": 1886,
+    "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+    "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+      "Hệ quả"
+    ],
+    "path": "docs/specs/runner.md",
+    "occurrence": 4,
+    "registeredAnchor": "unheaded-block-170",
+    "anchorShift": 6,
+    "occurrenceWitness": "02106766dd6185208187f5fcaca7725cf60da9fe"
+  },
+  "targetWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-176",
+    "githubAnchor": "unheaded-block-176",
+    "stableAnchor": "unheaded-block-176",
+    "title": "Unheaded block 176",
+    "startLine": 1886,
+    "endLine": 1886,
+    "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+    "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+      "Hệ quả"
+    ],
+    "path": "docs/specs/runner.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_211f0b98400863f2a0e9b9cdaa2259fe",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/runner.md",
+    "targetAnchor": "unheaded-block-176",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/specs/runner.md:1886-1886#unheaded-block-176 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:1886-1886#unheaded-block-176 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-176 under docs/specs/runner.md#unheaded-block-176; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence / Hệ quả\". The complete bound unit is carried with an equal native digest. SOURCE occurrence 4 of 8; registered anchor unheaded-block-170 shifts +6 to unheaded-block-176, with identical text and preserved occurrence order authenticated at 02106766dd6185208187f5fcaca7725cf60da9fe (L10-30).\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetAncestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+      "Hệ quả"
+    ]
+  }
+}
+```
+
+## Entry rationale-222
+
+```json
+{
+  "entryId": "rationale-222",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+  "collection": "registryGaps",
+  "claimId": "claim_1d8baa1def0cea7595b62de99846b489",
+  "before": {
+    "claimId": "claim_1d8baa1def0cea7595b62de99846b489",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/runner.md",
+    "targetAnchor": "unheaded-block-241",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/specs/runner.md:1665-1665#unheaded-block-150 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:2410-2410#unheaded-block-241 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-150 under docs/specs/runner.md#unheaded-block-241; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0005 — Runner & cô lập worker / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0028 — Đổi tên pinned term `orchestrator` thành `launcher` / Hệ quả\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetAncestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
+      "Hệ quả"
+    ]
+  },
+  "after": {
+    "claimId": "claim_1d8baa1def0cea7595b62de99846b489",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/runner.md",
+    "targetAnchor": "unheaded-block-241",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/specs/runner.md:2410-2410#unheaded-block-241 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:2410-2410#unheaded-block-241 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-241 under docs/specs/runner.md#unheaded-block-241; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0028 — Đổi tên pinned term `orchestrator` thành `launcher` / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0028 — Đổi tên pinned term `orchestrator` thành `launcher` / Hệ quả\". The complete bound unit is carried with an equal native digest. SOURCE occurrence 5 of 8; registered anchor unheaded-block-235 shifts +6 to unheaded-block-241, with identical text and preserved occurrence order authenticated at 02106766dd6185208187f5fcaca7725cf60da9fe (L10-30).\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetAncestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
+      "Hệ quả"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [
+    "L10-30/footer-own-occurrence"
+  ],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 221,
+  "factsSHA256": "9b2cd69e0eaac2914f5744efdf2570b74f4bc3ab4719f59b66559a56c31bdd3d",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-241",
+    "githubAnchor": "unheaded-block-241",
+    "stableAnchor": "unheaded-block-241",
+    "title": "Unheaded block 241",
+    "startLine": 2410,
+    "endLine": 2410,
+    "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+    "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
+      "Hệ quả"
+    ],
+    "path": "docs/specs/runner.md",
+    "occurrence": 5,
+    "registeredAnchor": "unheaded-block-235",
+    "anchorShift": 6,
+    "occurrenceWitness": "02106766dd6185208187f5fcaca7725cf60da9fe"
+  },
+  "targetWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-241",
+    "githubAnchor": "unheaded-block-241",
+    "stableAnchor": "unheaded-block-241",
+    "title": "Unheaded block 241",
+    "startLine": 2410,
+    "endLine": 2410,
+    "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+    "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
+      "Hệ quả"
+    ],
+    "path": "docs/specs/runner.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_1d8baa1def0cea7595b62de99846b489",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/runner.md",
+    "targetAnchor": "unheaded-block-241",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/specs/runner.md:2410-2410#unheaded-block-241 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:2410-2410#unheaded-block-241 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-241 under docs/specs/runner.md#unheaded-block-241; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0028 — Đổi tên pinned term `orchestrator` thành `launcher` / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0028 — Đổi tên pinned term `orchestrator` thành `launcher` / Hệ quả\". The complete bound unit is carried with an equal native digest. SOURCE occurrence 5 of 8; registered anchor unheaded-block-235 shifts +6 to unheaded-block-241, with identical text and preserved occurrence order authenticated at 02106766dd6185208187f5fcaca7725cf60da9fe (L10-30).\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetAncestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
+      "Hệ quả"
+    ]
+  }
+}
+```
+
+## Entry rationale-223
+
+```json
+{
+  "entryId": "rationale-223",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+  "collection": "registryGaps",
+  "claimId": "claim_012bfa2639fb107eeb3baee4fb502f54",
+  "before": {
+    "claimId": "claim_012bfa2639fb107eeb3baee4fb502f54",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/runner.md",
+    "targetAnchor": "unheaded-block-250",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/specs/runner.md:1665-1665#unheaded-block-150 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:2499-2499#unheaded-block-250 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-150 under docs/specs/runner.md#unheaded-block-250; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0005 — Runner & cô lập worker / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị / Hệ quả\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetAncestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
+      "Hệ quả"
+    ]
+  },
+  "after": {
+    "claimId": "claim_012bfa2639fb107eeb3baee4fb502f54",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/runner.md",
+    "targetAnchor": "unheaded-block-250",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/specs/runner.md:2499-2499#unheaded-block-250 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:2499-2499#unheaded-block-250 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-250 under docs/specs/runner.md#unheaded-block-250; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị / Hệ quả\". The complete bound unit is carried with an equal native digest. SOURCE occurrence 6 of 8; registered anchor unheaded-block-244 shifts +6 to unheaded-block-250, with identical text and preserved occurrence order authenticated at 02106766dd6185208187f5fcaca7725cf60da9fe (L10-30).\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetAncestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
+      "Hệ quả"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [
+    "L10-30/footer-own-occurrence"
+  ],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 222,
+  "factsSHA256": "48f40a1ae81b64277dd6beb28224da375d8e5d3e0ef761395d21fc58d3f4fcd0",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-250",
+    "githubAnchor": "unheaded-block-250",
+    "stableAnchor": "unheaded-block-250",
+    "title": "Unheaded block 250",
+    "startLine": 2499,
+    "endLine": 2499,
+    "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+    "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
+      "Hệ quả"
+    ],
+    "path": "docs/specs/runner.md",
+    "occurrence": 6,
+    "registeredAnchor": "unheaded-block-244",
+    "anchorShift": 6,
+    "occurrenceWitness": "02106766dd6185208187f5fcaca7725cf60da9fe"
+  },
+  "targetWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-250",
+    "githubAnchor": "unheaded-block-250",
+    "stableAnchor": "unheaded-block-250",
+    "title": "Unheaded block 250",
+    "startLine": 2499,
+    "endLine": 2499,
+    "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+    "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
+      "Hệ quả"
+    ],
+    "path": "docs/specs/runner.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_012bfa2639fb107eeb3baee4fb502f54",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/runner.md",
+    "targetAnchor": "unheaded-block-250",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/specs/runner.md:2499-2499#unheaded-block-250 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:2499-2499#unheaded-block-250 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-250 under docs/specs/runner.md#unheaded-block-250; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị / Hệ quả\". The complete bound unit is carried with an equal native digest. SOURCE occurrence 6 of 8; registered anchor unheaded-block-244 shifts +6 to unheaded-block-250, with identical text and preserved occurrence order authenticated at 02106766dd6185208187f5fcaca7725cf60da9fe (L10-30).\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetAncestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
+      "Hệ quả"
+    ]
+  }
+}
+```
+
+## Entry rationale-224
+
+```json
+{
+  "entryId": "rationale-224",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+  "collection": "registryGaps",
+  "claimId": "claim_99806d8b21d05eb7a8e8744d765bea00",
+  "before": {
+    "claimId": "claim_99806d8b21d05eb7a8e8744d765bea00",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/runner.md",
+    "targetAnchor": "unheaded-block-274",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/specs/runner.md:1665-1665#unheaded-block-150 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:2680-2680#unheaded-block-274 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-150 under docs/specs/runner.md#unheaded-block-274; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0005 — Runner & cô lập worker / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới / Hệ quả\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetAncestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
+      "Hệ quả"
+    ]
+  },
+  "after": {
+    "claimId": "claim_99806d8b21d05eb7a8e8744d765bea00",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/runner.md",
+    "targetAnchor": "unheaded-block-274",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/specs/runner.md:2680-2680#unheaded-block-274 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:2680-2680#unheaded-block-274 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-274 under docs/specs/runner.md#unheaded-block-274; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới / Hệ quả\". The complete bound unit is carried with an equal native digest. SOURCE occurrence 7 of 8; registered anchor unheaded-block-268 shifts +6 to unheaded-block-274, with identical text and preserved occurrence order authenticated at 02106766dd6185208187f5fcaca7725cf60da9fe (L10-30).\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetAncestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
+      "Hệ quả"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [
+    "L10-30/footer-own-occurrence"
+  ],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 223,
+  "factsSHA256": "6510ca185388b5a6bc796641f5d32c4cf1234c61321ebb77e43eeb1388c5882d",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-274",
+    "githubAnchor": "unheaded-block-274",
+    "stableAnchor": "unheaded-block-274",
+    "title": "Unheaded block 274",
+    "startLine": 2680,
+    "endLine": 2680,
+    "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+    "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
+      "Hệ quả"
+    ],
+    "path": "docs/specs/runner.md",
+    "occurrence": 7,
+    "registeredAnchor": "unheaded-block-268",
+    "anchorShift": 6,
+    "occurrenceWitness": "02106766dd6185208187f5fcaca7725cf60da9fe"
+  },
+  "targetWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-274",
+    "githubAnchor": "unheaded-block-274",
+    "stableAnchor": "unheaded-block-274",
+    "title": "Unheaded block 274",
+    "startLine": 2680,
+    "endLine": 2680,
+    "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+    "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
+      "Hệ quả"
+    ],
+    "path": "docs/specs/runner.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_99806d8b21d05eb7a8e8744d765bea00",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/runner.md",
+    "targetAnchor": "unheaded-block-274",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/specs/runner.md:2680-2680#unheaded-block-274 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:2680-2680#unheaded-block-274 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-274 under docs/specs/runner.md#unheaded-block-274; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới / Hệ quả\". The complete bound unit is carried with an equal native digest. SOURCE occurrence 7 of 8; registered anchor unheaded-block-268 shifts +6 to unheaded-block-274, with identical text and preserved occurrence order authenticated at 02106766dd6185208187f5fcaca7725cf60da9fe (L10-30).\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetAncestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
+      "Hệ quả"
+    ]
+  }
+}
+```
+
+## Entry rationale-225
+
+```json
+{
+  "entryId": "rationale-225",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+  "collection": "registryGaps",
+  "claimId": "claim_a6f43d98b3eebe97802fd01a4ac7863b",
+  "before": {
+    "claimId": "claim_a6f43d98b3eebe97802fd01a4ac7863b",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/runner.md",
+    "targetAnchor": "unheaded-block-286",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/specs/runner.md:1665-1665#unheaded-block-150 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:2792-2792#unheaded-block-286 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-150 under docs/specs/runner.md#unheaded-block-286; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0005 — Runner & cô lập worker / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người / Hệ quả\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetAncestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+      "Hệ quả"
+    ]
+  },
+  "after": {
+    "claimId": "claim_a6f43d98b3eebe97802fd01a4ac7863b",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/runner.md",
+    "targetAnchor": "unheaded-block-286",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/specs/runner.md:2792-2792#unheaded-block-286 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:2792-2792#unheaded-block-286 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-286 under docs/specs/runner.md#unheaded-block-286; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người / Hệ quả\". The complete bound unit is carried with an equal native digest. SOURCE occurrence 8 of 8; registered anchor unheaded-block-280 shifts +6 to unheaded-block-286, with identical text and preserved occurrence order authenticated at 02106766dd6185208187f5fcaca7725cf60da9fe (L10-30).\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetAncestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+      "Hệ quả"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [
+    "L10-30/footer-own-occurrence"
+  ],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 224,
+  "factsSHA256": "11ecb2699b2c134642acbc5bd29f4608a405f263f525c29fe04f24d04e0f64e3",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-286",
+    "githubAnchor": "unheaded-block-286",
+    "stableAnchor": "unheaded-block-286",
+    "title": "Unheaded block 286",
+    "startLine": 2792,
+    "endLine": 2792,
+    "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+    "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+      "Hệ quả"
+    ],
+    "path": "docs/specs/runner.md",
+    "occurrence": 8,
+    "registeredAnchor": "unheaded-block-280",
+    "anchorShift": 6,
+    "occurrenceWitness": "02106766dd6185208187f5fcaca7725cf60da9fe"
+  },
+  "targetWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-286",
+    "githubAnchor": "unheaded-block-286",
+    "stableAnchor": "unheaded-block-286",
+    "title": "Unheaded block 286",
+    "startLine": 2792,
+    "endLine": 2792,
+    "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+    "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6",
+    "ancestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+      "Hệ quả"
+    ],
+    "path": "docs/specs/runner.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_a6f43d98b3eebe97802fd01a4ac7863b",
+    "sourcePath": "docs/specs/runner.md",
+    "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/runner.md",
+    "targetAnchor": "unheaded-block-286",
+    "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/specs/runner.md:2792-2792#unheaded-block-286 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:2792-2792#unheaded-block-286 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-286 under docs/specs/runner.md#unheaded-block-286; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người / Hệ quả\". The complete bound unit is carried with an equal native digest. SOURCE occurrence 8 of 8; registered anchor unheaded-block-280 shifts +6 to unheaded-block-286, with identical text and preserved occurrence order authenticated at 02106766dd6185208187f5fcaca7725cf60da9fe (L10-30).\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetAncestry": [
+      "Spec: Runner (vòng tự hành)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+      "Hệ quả"
+    ]
+  }
+}
+```
+
+## Entry rationale-226
+
+```json
+{
+  "entryId": "rationale-226",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+  "collection": "claims",
+  "claimId": "claim_af6831310fe9fcdaa7c8e69902e3c767",
+  "before": {
+    "claimId": "claim_af6831310fe9fcdaa7c8e69902e3c767",
+    "sourceUnitDigest": "a180ac1d80159115a4f336ae648d311a92f7b2a09de392544c38273cf1ffa34f",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "partial-carry",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+    "targetAnchor": "1-component-classes",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:19-19#1-component-classes (current lines); unit SHA256 a180ac1d80159115a4f336ae648d311a92f7b2a09de392544c38273cf1ffa34f.\nTarget: docs/platform/host-invocation-routing/architecture/external-provider-protocol.md:77-77#1-component-classes (current lines); unit SHA256 fd51d86a3880f7da70c7e5791d50dfb1af4cd414023a70d924a3606a319e252f.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest fd51d86a3880f7da70c7e5791d50dfb1af4cd414023a70d924a3606a319e252f at 0c06e6e6b67a3897d660ee54de25fdc9971e59a4.\nLinks: source 0, target 1; 1 changed spellings/labels, 0 destination changes; 1 added, 0 removed.\nLink 1: \"none\" (none) → \"the dropped-005 restoration\" (release-boundaries.md#restored-class-definitions); resolved none → docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions.\nHeading depth: 2 → 4; title \"1. Component Classes\" → \"1. Component Classes\".\nApplicable labelled corrections: none in this bound unit.\nDisposition partial-carry: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes under docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#1-component-classes; source context \"External Provider Protocol\", target context \"Architecture: External Provider Protocol / Retained selected source material / External Provider Protocol\". The source text occurs verbatim inside the bound target section; section-level unit digests differ. Recorded residual: The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-7 (claim_d90840823918415e74ddd353dae32ea3; **Core component** — required for a useful fgOS release; owned by fgOS, released atomically with the host, normally statically linked once m); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-8 (claim_2ce14ab31e5b889ce37c4e99735c69e5; **Packaged extension** — owned and shipped by fgOS but not required for a minimum useful release; may be enabled/disabled/omitted by configu); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-10 (claim_95063c4b27e671f29631d4fd68427008; | Component class | Common invocation mechanism | Notes | |---|---|---| | Core component | Built-in after migration; LegacyNode during trans); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-11 (claim_bb84143c32c84b94257bfeb7ca6dacd2; This classification blocks two mistakes: treating every statically linked implementation as architecturally core, and treating every out-of-)..\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "remainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-7 (claim_d90840823918415e74ddd353dae32ea3; **Core component** — required for a useful fgOS release; owned by fgOS, released atomically with the host, normally statically linked once m); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-8 (claim_2ce14ab31e5b889ce37c4e99735c69e5; **Packaged extension** — owned and shipped by fgOS but not required for a minimum useful release; may be enabled/disabled/omitted by configu); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-10 (claim_95063c4b27e671f29631d4fd68427008; | Component class | Common invocation mechanism | Notes | |---|---|---| | Core component | Built-in after migration; LegacyNode during trans); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-11 (claim_bb84143c32c84b94257bfeb7ca6dacd2; This classification blocks two mistakes: treating every statically linked implementation as architecturally core, and treating every out-of-).",
+    "reviewNote": "rationale-421: deep: partial-carry of a heading (depth 2 to 4, same title); named remainders checked by script: b7 found b8 found b10 found b11 found inside restored section restored-class-definitions; the sentence that the source text occurs verbatim inside the target section is true only because the shorter heading line is a substring of the deeper one, the real carry is the Recorded residual, whose anchors exist; facts recomputed equal: source 1-component-classes L19-19, target 1-component-classes L77-77, both full digests, links 0/1 (0 destination changes, 1 added, 0 removed), target anchor check passed, shard row equals pack, unchanged-since-review clause fd51d86a at 0c06e6e6b matches the reviewed base row at 5035fed52.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "fd51d86a3880f7da70c7e5791d50dfb1af4cd414023a70d924a3606a319e252f",
+    "targetAncestry": [
+      "Architecture: External Provider Protocol",
+      "Retained selected source material",
+      "External Provider Protocol"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_af6831310fe9fcdaa7c8e69902e3c767",
+    "sourceUnitDigest": "a180ac1d80159115a4f336ae648d311a92f7b2a09de392544c38273cf1ffa34f",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "partial-carry",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+    "targetAnchor": "1-component-classes",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:19-19#1-component-classes (current lines); unit SHA256 a180ac1d80159115a4f336ae648d311a92f7b2a09de392544c38273cf1ffa34f.\nTarget: docs/platform/host-invocation-routing/architecture/external-provider-protocol.md:77-77#1-component-classes (current lines); unit SHA256 fd51d86a3880f7da70c7e5791d50dfb1af4cd414023a70d924a3606a319e252f.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest fd51d86a3880f7da70c7e5791d50dfb1af4cd414023a70d924a3606a319e252f at 0c06e6e6b67a3897d660ee54de25fdc9971e59a4.\nLinks: source 0, target 1; 1 changed spellings/labels, 0 destination changes; 1 added, 0 removed.\nLink 1: \"none\" (none) → \"the dropped-005 restoration\" (release-boundaries.md#restored-class-definitions); resolved none → docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions.\nHeading depth: 2 → 4; title \"1. Component Classes\" → \"1. Component Classes\".\nWhole direct section differs; depth 2 → 4; 1 distinct link changes; normalized line order differs; 8 removed and 1 added nonblank lines after heading/link/correction normalization.\nSection accounting (existing-labelled-successor-correction): Complete direct section compared to the next native heading. Depth 2 → 4, title \"1. Component Classes\" → \"1. Component Classes\"; 1 distinct link spelling/label changes; 0 applicable exact labelled corrections. Normalized nonblank line order differs; exact raw-section removed/added line witnesses are accounted below; correction-normalized counts are reported separately. Partial section carriage: removed text is in the live named residual carriers docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions. Candidate additions/corrections are explicitly labelled in the direct section: [\"Added in candidate: this retained source detail is carried verbatim in <link>.\"]. Added lines are authenticated contributions from sibling source-unit bindings: docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#1-component-classes. Existing correction labels named corrected successor / truth-ledger-agent-coordination.json at immutable account 9b0526380:plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json; exact section delta: removed [\"**Core component** — required for a useful fgOS release; owned by fgOS, released atomically with the host, normally statically linked once migrated. Not optional and not replaceable by default; may expose extension points, but a plugin implementing one does not become the authority owner of the core component. Examples: Work Lifecycle, Host Invocation, authority gating, provider routing, DispatchPlan selection, Assignment/Run/RunResult contracts, init/doctor health.\",\"**Packaged extension** — owned and shipped by fgOS but not required for a minimum useful release; may be enabled/disabled/omitted by configuration, edition, or environment. Follows fgOS release discipline, compatibility policy, init/doctor registration, docs, tests. More trustworthy than a user plugin because fgOS ships it, but disabling it must not corrupt core state or block boot. Examples: optional domain packages, optional coordination protocol packs, optional Herdr/dashboard surfaces.\",\"| Component class | Common invocation mechanism | Notes |\",\"|---|---|---|\",\"| Core component | Built-in after migration; LegacyNode during transition | Required, fgOS-owned, atomically released. |\",\"| Packaged extension | Built-in, ExternalProcess, or ExternalWasm | fgOS-owned but optional; install/init/doctor aware. |\",\"| User plugin | ExternalProcess or ExternalWasm | User-owned, independently installed; manifest-linked and capability-gated. |\",\"This classification blocks two mistakes: treating every statically linked implementation as architecturally core, and treating every out-of-process implementation as a user plugin. Packaging and authority follow component class; runtime calling details follow invocation mechanism.\"]; added [\"Added in candidate: this retained source detail is carried verbatim in <link>.\"]. This records replacement, not byte carriage or current-truth certification.\nApplicable labelled corrections: none in this bound unit.\nDisposition partial-carry: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes under docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#1-component-classes; source context \"External Provider Protocol\", target context \"Architecture: External Provider Protocol / Retained selected source material / External Provider Protocol\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy. Recorded residual: The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-7 (claim_d90840823918415e74ddd353dae32ea3; **Core component** — required for a useful fgOS release; owned by fgOS, released atomically with the host, normally statically linked once m); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-8 (claim_2ce14ab31e5b889ce37c4e99735c69e5; **Packaged extension** — owned and shipped by fgOS but not required for a minimum useful release; may be enabled/disabled/omitted by configu); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-10 (claim_95063c4b27e671f29631d4fd68427008; | Component class | Common invocation mechanism | Notes | |---|---|---| | Core component | Built-in after migration; LegacyNode during trans); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-11 (claim_bb84143c32c84b94257bfeb7ca6dacd2; This classification blocks two mistakes: treating every statically linked implementation as architecturally core, and treating every out-of-)..\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "remainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-7 (claim_d90840823918415e74ddd353dae32ea3; **Core component** — required for a useful fgOS release; owned by fgOS, released atomically with the host, normally statically linked once m); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-8 (claim_2ce14ab31e5b889ce37c4e99735c69e5; **Packaged extension** — owned and shipped by fgOS but not required for a minimum useful release; may be enabled/disabled/omitted by configu); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-10 (claim_95063c4b27e671f29631d4fd68427008; | Component class | Common invocation mechanism | Notes | |---|---|---| | Core component | Built-in after migration; LegacyNode during trans); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-11 (claim_bb84143c32c84b94257bfeb7ca6dacd2; This classification blocks two mistakes: treating every statically linked implementation as architecturally core, and treating every out-of-).",
+    "targetUnitDigest": "fd51d86a3880f7da70c7e5791d50dfb1af4cd414023a70d924a3606a319e252f",
+    "targetAncestry": [
+      "Architecture: External Provider Protocol",
+      "Retained selected source material",
+      "External Provider Protocol"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [
+    "L10-31/whole-direct-section"
+  ],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 225,
+  "factsSHA256": "f2fa4e4ccdbfa6beba18fa2cfa81c6e14c923ef86a327ea95901003e77b345c6",
+  "sourceWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "1. Component Classes",
+    "anchor": "1-component-classes",
+    "githubAnchor": "1-component-classes",
+    "stableAnchor": "h-92b1177d769e",
+    "startLine": 19,
+    "endLine": 19,
+    "textDigest": "a180ac1d80159115a4f336ae648d311a92f7b2a09de392544c38273cf1ffa34f",
+    "sample": "1. Component Classes",
+    "sectionPayloadDigest": "8adadf227979ecf0a54d96cab2259780060c0fa23948ad666b793ab01a624598",
+    "followingBlockDigest": "8feb0186702101ea68fd7ddb663ad2b16f0d35b809cfb9759cca4702a7453499",
+    "identityFingerprint": "9edfeae9f410e74e0390e98144b4a500d9be0d0e821db1b273d647ec20bdfc60",
+    "ancestry": [
+      "External Provider Protocol"
+    ],
+    "path": "docs/architect/host-invocation-routing/external-provider-protocol.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 4,
+    "title": "1. Component Classes",
+    "anchor": "1-component-classes",
+    "githubAnchor": "1-component-classes",
+    "stableAnchor": "h-acb633f23754",
+    "startLine": 77,
+    "endLine": 77,
+    "textDigest": "fd51d86a3880f7da70c7e5791d50dfb1af4cd414023a70d924a3606a319e252f",
+    "sample": "1. Component Classes",
+    "sectionPayloadDigest": "673a29b5ec914514271f5b49a4bcaa4a501242b6360ba75ce40c62f92ba8c574",
+    "followingBlockDigest": "8feb0186702101ea68fd7ddb663ad2b16f0d35b809cfb9759cca4702a7453499",
+    "identityFingerprint": "d9df4cb372fde103375a8e65a9faba3a5e73b267e88b9c4b0f42d28479e9d6f8",
+    "ancestry": [
+      "Architecture: External Provider Protocol",
+      "Retained selected source material",
+      "External Provider Protocol"
+    ],
+    "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md"
+  },
+  "sectionExplanation": {
+    "kind": "existing-labelled-successor-correction",
+    "description": "Complete direct section compared to the next native heading. Depth 2 → 4, title \"1. Component Classes\" → \"1. Component Classes\"; 1 distinct link spelling/label changes; 0 applicable exact labelled corrections. Normalized nonblank line order differs; exact raw-section removed/added line witnesses are accounted below; correction-normalized counts are reported separately. Partial section carriage: removed text is in the live named residual carriers docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions. Candidate additions/corrections are explicitly labelled in the direct section: [\"Added in candidate: this retained source detail is carried verbatim in <link>.\"]. Added lines are authenticated contributions from sibling source-unit bindings: docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#1-component-classes. Existing correction labels named corrected successor / truth-ledger-agent-coordination.json at immutable account 9b0526380:plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json; exact section delta: removed [\"**Core component** — required for a useful fgOS release; owned by fgOS, released atomically with the host, normally statically linked once migrated. Not optional and not replaceable by default; may expose extension points, but a plugin implementing one does not become the authority owner of the core component. Examples: Work Lifecycle, Host Invocation, authority gating, provider routing, DispatchPlan selection, Assignment/Run/RunResult contracts, init/doctor health.\",\"**Packaged extension** — owned and shipped by fgOS but not required for a minimum useful release; may be enabled/disabled/omitted by configuration, edition, or environment. Follows fgOS release discipline, compatibility policy, init/doctor registration, docs, tests. More trustworthy than a user plugin because fgOS ships it, but disabling it must not corrupt core state or block boot. Examples: optional domain packages, optional coordination protocol packs, optional Herdr/dashboard surfaces.\",\"| Component class | Common invocation mechanism | Notes |\",\"|---|---|---|\",\"| Core component | Built-in after migration; LegacyNode during transition | Required, fgOS-owned, atomically released. |\",\"| Packaged extension | Built-in, ExternalProcess, or ExternalWasm | fgOS-owned but optional; install/init/doctor aware. |\",\"| User plugin | ExternalProcess or ExternalWasm | User-owned, independently installed; manifest-linked and capability-gated. |\",\"This classification blocks two mistakes: treating every statically linked implementation as architecturally core, and treating every out-of-process implementation as a user plugin. Packaging and authority follow component class; runtime calling details follow invocation mechanism.\"]; added [\"Added in candidate: this retained source detail is carried verbatim in <link>.\"]. This records replacement, not byte carriage or current-truth certification.",
+    "completeWitnessesAt": "62751458b22b47e930dc33b8501d07798b91ace3:plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json#/changes/225/facts/sectionExplanation"
+  },
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_af6831310fe9fcdaa7c8e69902e3c767",
+    "sourceUnitDigest": "a180ac1d80159115a4f336ae648d311a92f7b2a09de392544c38273cf1ffa34f",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "partial-carry",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+    "targetAnchor": "1-component-classes",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:19-19#1-component-classes (current lines); unit SHA256 a180ac1d80159115a4f336ae648d311a92f7b2a09de392544c38273cf1ffa34f.\nTarget: docs/platform/host-invocation-routing/architecture/external-provider-protocol.md:77-77#1-component-classes (current lines); unit SHA256 fd51d86a3880f7da70c7e5791d50dfb1af4cd414023a70d924a3606a319e252f.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest fd51d86a3880f7da70c7e5791d50dfb1af4cd414023a70d924a3606a319e252f at 0c06e6e6b67a3897d660ee54de25fdc9971e59a4.\nLinks: source 0, target 1; 1 changed spellings/labels, 0 destination changes; 1 added, 0 removed.\nLink 1: \"none\" (none) → \"the dropped-005 restoration\" (release-boundaries.md#restored-class-definitions); resolved none → docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions.\nHeading depth: 2 → 4; title \"1. Component Classes\" → \"1. Component Classes\".\nWhole direct section differs; depth 2 → 4; 1 distinct link changes; normalized line order differs; 8 removed and 1 added nonblank lines after heading/link/correction normalization.\nSection accounting (existing-labelled-successor-correction): Complete direct section compared to the next native heading. Depth 2 → 4, title \"1. Component Classes\" → \"1. Component Classes\"; 1 distinct link spelling/label changes; 0 applicable exact labelled corrections. Normalized nonblank line order differs; exact raw-section removed/added line witnesses are accounted below; correction-normalized counts are reported separately. Partial section carriage: removed text is in the live named residual carriers docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions. Candidate additions/corrections are explicitly labelled in the direct section: [\"Added in candidate: this retained source detail is carried verbatim in <link>.\"]. Added lines are authenticated contributions from sibling source-unit bindings: docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#1-component-classes. Existing correction labels named corrected successor / truth-ledger-agent-coordination.json at immutable account 9b0526380:plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json; exact section delta: removed [\"**Core component** — required for a useful fgOS release; owned by fgOS, released atomically with the host, normally statically linked once migrated. Not optional and not replaceable by default; may expose extension points, but a plugin implementing one does not become the authority owner of the core component. Examples: Work Lifecycle, Host Invocation, authority gating, provider routing, DispatchPlan selection, Assignment/Run/RunResult contracts, init/doctor health.\",\"**Packaged extension** — owned and shipped by fgOS but not required for a minimum useful release; may be enabled/disabled/omitted by configuration, edition, or environment. Follows fgOS release discipline, compatibility policy, init/doctor registration, docs, tests. More trustworthy than a user plugin because fgOS ships it, but disabling it must not corrupt core state or block boot. Examples: optional domain packages, optional coordination protocol packs, optional Herdr/dashboard surfaces.\",\"| Component class | Common invocation mechanism | Notes |\",\"|---|---|---|\",\"| Core component | Built-in after migration; LegacyNode during transition | Required, fgOS-owned, atomically released. |\",\"| Packaged extension | Built-in, ExternalProcess, or ExternalWasm | fgOS-owned but optional; install/init/doctor aware. |\",\"| User plugin | ExternalProcess or ExternalWasm | User-owned, independently installed; manifest-linked and capability-gated. |\",\"This classification blocks two mistakes: treating every statically linked implementation as architecturally core, and treating every out-of-process implementation as a user plugin. Packaging and authority follow component class; runtime calling details follow invocation mechanism.\"]; added [\"Added in candidate: this retained source detail is carried verbatim in <link>.\"]. This records replacement, not byte carriage or current-truth certification.\nApplicable labelled corrections: none in this bound unit.\nDisposition partial-carry: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes under docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#1-component-classes; source context \"External Provider Protocol\", target context \"Architecture: External Provider Protocol / Retained selected source material / External Provider Protocol\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy. Recorded residual: The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-7 (claim_d90840823918415e74ddd353dae32ea3; **Core component** — required for a useful fgOS release; owned by fgOS, released atomically with the host, normally statically linked once m); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-8 (claim_2ce14ab31e5b889ce37c4e99735c69e5; **Packaged extension** — owned and shipped by fgOS but not required for a minimum useful release; may be enabled/disabled/omitted by configu); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-10 (claim_95063c4b27e671f29631d4fd68427008; | Component class | Common invocation mechanism | Notes | |---|---|---| | Core component | Built-in after migration; LegacyNode during trans); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-11 (claim_bb84143c32c84b94257bfeb7ca6dacd2; This classification blocks two mistakes: treating every statically linked implementation as architecturally core, and treating every out-of-)..\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "remainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-7 (claim_d90840823918415e74ddd353dae32ea3; **Core component** — required for a useful fgOS release; owned by fgOS, released atomically with the host, normally statically linked once m); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-8 (claim_2ce14ab31e5b889ce37c4e99735c69e5; **Packaged extension** — owned and shipped by fgOS but not required for a minimum useful release; may be enabled/disabled/omitted by configu); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-10 (claim_95063c4b27e671f29631d4fd68427008; | Component class | Common invocation mechanism | Notes | |---|---|---| | Core component | Built-in after migration; LegacyNode during trans); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-11 (claim_bb84143c32c84b94257bfeb7ca6dacd2; This classification blocks two mistakes: treating every statically linked implementation as architecturally core, and treating every out-of-).",
+    "targetUnitDigest": "fd51d86a3880f7da70c7e5791d50dfb1af4cd414023a70d924a3606a319e252f",
+    "targetAncestry": [
+      "Architecture: External Provider Protocol",
+      "Retained selected source material",
+      "External Provider Protocol"
+    ]
+  }
+}
+```
+
+## Entry rationale-227
+
+```json
+{
+  "entryId": "rationale-227",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+  "collection": "claims",
+  "claimId": "claim_d90840823918415e74ddd353dae32ea3",
+  "before": {
+    "claimId": "claim_d90840823918415e74ddd353dae32ea3",
+    "sourceUnitDigest": "ca3175301f93d1e7fd4591388e947fbf0ee82bac0c8052f27fcca200f4b992ab",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "targetAnchor": "unheaded-block-14",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:30-30#unheaded-block-7 (current lines); unit SHA256 ca3175301f93d1e7fd4591388e947fbf0ee82bac0c8052f27fcca200f4b992ab.\nTarget: docs/platform/host-invocation-routing/architecture/release-boundaries.md:106-108#unheaded-block-14 (current lines); unit SHA256 8726336468979ea33b99ca48587fd63d0a9de92528653b469166b727d669eef9.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 8726336468979ea33b99ca48587fd63d0a9de92528653b469166b727d669eef9 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-7 under docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-14; source context \"External Provider Protocol / 1. Component Classes\", target context \"Architecture: Release Boundaries / Restored class definitions\". The source text occurs verbatim inside the bound target section; section-level unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "reviewNote": "rationale-422: deep: move where the source block sits byte-for-byte inside the target unit, which only adds a ````md fence (target is exactly 12 characters longer: fence open and close), the restored literal block; the verbatim-inside sentence is true; facts recomputed equal: source unheaded-block-7 L30-30, target unheaded-block-14 L106-108, both full digests, links 0/0 (0 destination changes, 0 added, 0 removed), target anchor check passed, shard row equals pack, unchanged-since-review clause 87263364 at 13322f8a6 matches the reviewed base row at 5035fed52.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "8726336468979ea33b99ca48587fd63d0a9de92528653b469166b727d669eef9",
+    "targetAncestry": [
+      "Architecture: Release Boundaries",
+      "Restored class definitions"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_d90840823918415e74ddd353dae32ea3",
+    "sourceUnitDigest": "ca3175301f93d1e7fd4591388e947fbf0ee82bac0c8052f27fcca200f4b992ab",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "targetAnchor": "unheaded-block-14",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:30-30#unheaded-block-7 (current lines); unit SHA256 ca3175301f93d1e7fd4591388e947fbf0ee82bac0c8052f27fcca200f4b992ab.\nTarget: docs/platform/host-invocation-routing/architecture/release-boundaries.md:106-108#unheaded-block-14 (current lines); unit SHA256 8726336468979ea33b99ca48587fd63d0a9de92528653b469166b727d669eef9.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 8726336468979ea33b99ca48587fd63d0a9de92528653b469166b727d669eef9 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-7 under docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-14; source context \"External Provider Protocol / 1. Component Classes\", target context \"Architecture: Release Boundaries / Restored class definitions\". The complete source direct section occurs verbatim inside the bound target section; native unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "8726336468979ea33b99ca48587fd63d0a9de92528653b469166b727d669eef9",
+    "targetAncestry": [
+      "Architecture: Release Boundaries",
+      "Restored class definitions"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 226,
+  "factsSHA256": "4d8fa818dfd50e0ab4e96bc3502c9cf2a9db782814846a6696355bbd4628076c",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-7",
+    "githubAnchor": "unheaded-block-7",
+    "stableAnchor": "unheaded-block-7",
+    "title": "Unheaded block 7",
+    "startLine": 30,
+    "endLine": 30,
+    "textDigest": "ca3175301f93d1e7fd4591388e947fbf0ee82bac0c8052f27fcca200f4b992ab",
+    "sample": "**Core component** — required for a useful fgOS release; owned by fgOS, released atomically with the host, normally statically linked once migrated. Not optional and not replaceabl",
+    "identityFingerprint": "b2af22952c2167b383a43d65d06bfcea5f2fd16bbd5e194026f066a5c86586f1",
+    "ancestry": [
+      "External Provider Protocol",
+      "1. Component Classes"
+    ],
+    "path": "docs/architect/host-invocation-routing/external-provider-protocol.md"
+  },
+  "targetWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-14",
+    "githubAnchor": "unheaded-block-14",
+    "stableAnchor": "unheaded-block-14",
+    "title": "Unheaded block 14",
+    "startLine": 106,
+    "endLine": 108,
+    "textDigest": "8726336468979ea33b99ca48587fd63d0a9de92528653b469166b727d669eef9",
+    "sample": "````md\n**Core component** — required for a useful fgOS release; owned by fgOS, released atomically with the host, normally statically linked once migrated. Not optional and not rep",
+    "identityFingerprint": "5875473dc712da31f06c05a5196fbf0ea0e4c1370d86d4122e2a0a47e50d01f2",
+    "ancestry": [
+      "Architecture: Release Boundaries",
+      "Restored class definitions"
+    ],
+    "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_d90840823918415e74ddd353dae32ea3",
+    "sourceUnitDigest": "ca3175301f93d1e7fd4591388e947fbf0ee82bac0c8052f27fcca200f4b992ab",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "targetAnchor": "unheaded-block-14",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:30-30#unheaded-block-7 (current lines); unit SHA256 ca3175301f93d1e7fd4591388e947fbf0ee82bac0c8052f27fcca200f4b992ab.\nTarget: docs/platform/host-invocation-routing/architecture/release-boundaries.md:106-108#unheaded-block-14 (current lines); unit SHA256 8726336468979ea33b99ca48587fd63d0a9de92528653b469166b727d669eef9.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 8726336468979ea33b99ca48587fd63d0a9de92528653b469166b727d669eef9 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-7 under docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-14; source context \"External Provider Protocol / 1. Component Classes\", target context \"Architecture: Release Boundaries / Restored class definitions\". The complete source direct section occurs verbatim inside the bound target section; native unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "8726336468979ea33b99ca48587fd63d0a9de92528653b469166b727d669eef9",
+    "targetAncestry": [
+      "Architecture: Release Boundaries",
+      "Restored class definitions"
+    ]
+  }
+}
+```
+
+## Entry rationale-228
+
+```json
+{
+  "entryId": "rationale-228",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+  "collection": "claims",
+  "claimId": "claim_95063c4b27e671f29631d4fd68427008",
+  "before": {
+    "claimId": "claim_95063c4b27e671f29631d4fd68427008",
+    "sourceUnitDigest": "f57d1f9db82a03d77d5a7226ebc084f864232da06ef14aa014d72da08587aa29",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "targetAnchor": "unheaded-block-16",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:36-40#unheaded-block-10 (current lines); unit SHA256 f57d1f9db82a03d77d5a7226ebc084f864232da06ef14aa014d72da08587aa29.\nTarget: docs/platform/host-invocation-routing/architecture/release-boundaries.md:114-120#unheaded-block-16 (current lines); unit SHA256 b73a8d7457c473f6265103183b3b10c0d07ac7de04d4e0d8664e500aa5275e99.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest b73a8d7457c473f6265103183b3b10c0d07ac7de04d4e0d8664e500aa5275e99 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-10 under docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-16; source context \"External Provider Protocol / 1. Component Classes\", target context \"Architecture: Release Boundaries / Restored class definitions\". The source text occurs verbatim inside the bound target section; section-level unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "reviewNote": "rationale-423: deep: move where the source block sits byte-for-byte inside the target unit, which only adds a ````md fence (target is exactly 12 characters longer: fence open and close), the restored literal block; the verbatim-inside sentence is true; facts recomputed equal: source unheaded-block-10 L36-40, target unheaded-block-16 L114-120, both full digests, links 0/0 (0 destination changes, 0 added, 0 removed), target anchor check passed, shard row equals pack, unchanged-since-review clause b73a8d74 at 13322f8a6 matches the reviewed base row at 5035fed52.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "b73a8d7457c473f6265103183b3b10c0d07ac7de04d4e0d8664e500aa5275e99",
+    "targetAncestry": [
+      "Architecture: Release Boundaries",
+      "Restored class definitions"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_95063c4b27e671f29631d4fd68427008",
+    "sourceUnitDigest": "f57d1f9db82a03d77d5a7226ebc084f864232da06ef14aa014d72da08587aa29",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "targetAnchor": "unheaded-block-16",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:36-40#unheaded-block-10 (current lines); unit SHA256 f57d1f9db82a03d77d5a7226ebc084f864232da06ef14aa014d72da08587aa29.\nTarget: docs/platform/host-invocation-routing/architecture/release-boundaries.md:114-120#unheaded-block-16 (current lines); unit SHA256 b73a8d7457c473f6265103183b3b10c0d07ac7de04d4e0d8664e500aa5275e99.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest b73a8d7457c473f6265103183b3b10c0d07ac7de04d4e0d8664e500aa5275e99 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-10 under docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-16; source context \"External Provider Protocol / 1. Component Classes\", target context \"Architecture: Release Boundaries / Restored class definitions\". The complete source direct section occurs verbatim inside the bound target section; native unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "b73a8d7457c473f6265103183b3b10c0d07ac7de04d4e0d8664e500aa5275e99",
+    "targetAncestry": [
+      "Architecture: Release Boundaries",
+      "Restored class definitions"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 227,
+  "factsSHA256": "b8971273ef2eb95c933cd32faf8005e84fac0bf837b7d2bffe32abf389de48fa",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-10",
+    "githubAnchor": "unheaded-block-10",
+    "stableAnchor": "unheaded-block-10",
+    "title": "Unheaded block 10",
+    "startLine": 36,
+    "endLine": 40,
+    "textDigest": "f57d1f9db82a03d77d5a7226ebc084f864232da06ef14aa014d72da08587aa29",
+    "sample": "| Component class | Common invocation mechanism | Notes |\n|---|---|---|\n| Core component | Built-in after migration; LegacyNode during transition | Required, fgOS-owned, atomically",
+    "identityFingerprint": "b103896701ba97a0b888ceaf2cce79e0a935a152df138f0739d2e55accb2db4b",
+    "ancestry": [
+      "External Provider Protocol",
+      "1. Component Classes"
+    ],
+    "path": "docs/architect/host-invocation-routing/external-provider-protocol.md"
+  },
+  "targetWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-16",
+    "githubAnchor": "unheaded-block-16",
+    "stableAnchor": "unheaded-block-16",
+    "title": "Unheaded block 16",
+    "startLine": 114,
+    "endLine": 120,
+    "textDigest": "b73a8d7457c473f6265103183b3b10c0d07ac7de04d4e0d8664e500aa5275e99",
+    "sample": "````md\n| Component class | Common invocation mechanism | Notes |\n|---|---|---|\n| Core component | Built-in after migration; LegacyNode during transition | Required, fgOS-owned, ato",
+    "identityFingerprint": "a77e1402c6690c1f574349e1405635a2373b1bef149db34357ae70161c29f409",
+    "ancestry": [
+      "Architecture: Release Boundaries",
+      "Restored class definitions"
+    ],
+    "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_95063c4b27e671f29631d4fd68427008",
+    "sourceUnitDigest": "f57d1f9db82a03d77d5a7226ebc084f864232da06ef14aa014d72da08587aa29",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "targetAnchor": "unheaded-block-16",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:36-40#unheaded-block-10 (current lines); unit SHA256 f57d1f9db82a03d77d5a7226ebc084f864232da06ef14aa014d72da08587aa29.\nTarget: docs/platform/host-invocation-routing/architecture/release-boundaries.md:114-120#unheaded-block-16 (current lines); unit SHA256 b73a8d7457c473f6265103183b3b10c0d07ac7de04d4e0d8664e500aa5275e99.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest b73a8d7457c473f6265103183b3b10c0d07ac7de04d4e0d8664e500aa5275e99 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-10 under docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-16; source context \"External Provider Protocol / 1. Component Classes\", target context \"Architecture: Release Boundaries / Restored class definitions\". The complete source direct section occurs verbatim inside the bound target section; native unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "b73a8d7457c473f6265103183b3b10c0d07ac7de04d4e0d8664e500aa5275e99",
+    "targetAncestry": [
+      "Architecture: Release Boundaries",
+      "Restored class definitions"
+    ]
+  }
+}
+```
+
+## Entry rationale-229
+
+```json
+{
+  "entryId": "rationale-229",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+  "collection": "claims",
+  "claimId": "claim_bb84143c32c84b94257bfeb7ca6dacd2",
+  "before": {
+    "claimId": "claim_bb84143c32c84b94257bfeb7ca6dacd2",
+    "sourceUnitDigest": "242f609e08654c18bbb6beb2af3941a88ac66d62f30d02a4d30832e425e609c4",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "targetAnchor": "unheaded-block-17",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:42-42#unheaded-block-11 (current lines); unit SHA256 242f609e08654c18bbb6beb2af3941a88ac66d62f30d02a4d30832e425e609c4.\nTarget: docs/platform/host-invocation-routing/architecture/release-boundaries.md:122-124#unheaded-block-17 (current lines); unit SHA256 3e98835b0ff33fc28c7e5eba0d48522b6637cc0b1c1c89774a2091a2d98e4a84.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 3e98835b0ff33fc28c7e5eba0d48522b6637cc0b1c1c89774a2091a2d98e4a84 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-11 under docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-17; source context \"External Provider Protocol / 1. Component Classes\", target context \"Architecture: Release Boundaries / Restored class definitions\". The source text occurs verbatim inside the bound target section; section-level unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "reviewNote": "rationale-424: deep: move where the source block sits byte-for-byte inside the target unit, which only adds a ````md fence (target is exactly 12 characters longer: fence open and close), the restored literal block; the verbatim-inside sentence is true; facts recomputed equal: source unheaded-block-11 L42-42, target unheaded-block-17 L122-124, both full digests, links 0/0 (0 destination changes, 0 added, 0 removed), target anchor check passed, shard row equals pack, unchanged-since-review clause 3e98835b at 13322f8a6 matches the reviewed base row at 5035fed52.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "3e98835b0ff33fc28c7e5eba0d48522b6637cc0b1c1c89774a2091a2d98e4a84",
+    "targetAncestry": [
+      "Architecture: Release Boundaries",
+      "Restored class definitions"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_bb84143c32c84b94257bfeb7ca6dacd2",
+    "sourceUnitDigest": "242f609e08654c18bbb6beb2af3941a88ac66d62f30d02a4d30832e425e609c4",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "targetAnchor": "unheaded-block-17",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:42-42#unheaded-block-11 (current lines); unit SHA256 242f609e08654c18bbb6beb2af3941a88ac66d62f30d02a4d30832e425e609c4.\nTarget: docs/platform/host-invocation-routing/architecture/release-boundaries.md:122-124#unheaded-block-17 (current lines); unit SHA256 3e98835b0ff33fc28c7e5eba0d48522b6637cc0b1c1c89774a2091a2d98e4a84.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 3e98835b0ff33fc28c7e5eba0d48522b6637cc0b1c1c89774a2091a2d98e4a84 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-11 under docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-17; source context \"External Provider Protocol / 1. Component Classes\", target context \"Architecture: Release Boundaries / Restored class definitions\". The complete source direct section occurs verbatim inside the bound target section; native unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "3e98835b0ff33fc28c7e5eba0d48522b6637cc0b1c1c89774a2091a2d98e4a84",
+    "targetAncestry": [
+      "Architecture: Release Boundaries",
+      "Restored class definitions"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 228,
+  "factsSHA256": "dc568567bd06c0b7c4826c314d98f613135cf282b71453845bd11dcf5e436a75",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-11",
+    "githubAnchor": "unheaded-block-11",
+    "stableAnchor": "unheaded-block-11",
+    "title": "Unheaded block 11",
+    "startLine": 42,
+    "endLine": 42,
+    "textDigest": "242f609e08654c18bbb6beb2af3941a88ac66d62f30d02a4d30832e425e609c4",
+    "sample": "This classification blocks two mistakes: treating every statically linked implementation as architecturally core, and treating every out-of-process implementation as a user plugin.",
+    "identityFingerprint": "81e7dd302187e241845244fd8796763bac8609c0916447f877800504d279a807",
+    "ancestry": [
+      "External Provider Protocol",
+      "1. Component Classes"
+    ],
+    "path": "docs/architect/host-invocation-routing/external-provider-protocol.md"
+  },
+  "targetWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-17",
+    "githubAnchor": "unheaded-block-17",
+    "stableAnchor": "unheaded-block-17",
+    "title": "Unheaded block 17",
+    "startLine": 122,
+    "endLine": 124,
+    "textDigest": "3e98835b0ff33fc28c7e5eba0d48522b6637cc0b1c1c89774a2091a2d98e4a84",
+    "sample": "````md\nThis classification blocks two mistakes: treating every statically linked implementation as architecturally core, and treating every out-of-process implementation as a user ",
+    "identityFingerprint": "275c16e12d0eac90850fd46140850b7d72c9781896d6cf3dd13008f12ba1550c",
+    "ancestry": [
+      "Architecture: Release Boundaries",
+      "Restored class definitions"
+    ],
+    "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_bb84143c32c84b94257bfeb7ca6dacd2",
+    "sourceUnitDigest": "242f609e08654c18bbb6beb2af3941a88ac66d62f30d02a4d30832e425e609c4",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "targetAnchor": "unheaded-block-17",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:42-42#unheaded-block-11 (current lines); unit SHA256 242f609e08654c18bbb6beb2af3941a88ac66d62f30d02a4d30832e425e609c4.\nTarget: docs/platform/host-invocation-routing/architecture/release-boundaries.md:122-124#unheaded-block-17 (current lines); unit SHA256 3e98835b0ff33fc28c7e5eba0d48522b6637cc0b1c1c89774a2091a2d98e4a84.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 3e98835b0ff33fc28c7e5eba0d48522b6637cc0b1c1c89774a2091a2d98e4a84 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-11 under docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-17; source context \"External Provider Protocol / 1. Component Classes\", target context \"Architecture: Release Boundaries / Restored class definitions\". The complete source direct section occurs verbatim inside the bound target section; native unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "3e98835b0ff33fc28c7e5eba0d48522b6637cc0b1c1c89774a2091a2d98e4a84",
+    "targetAncestry": [
+      "Architecture: Release Boundaries",
+      "Restored class definitions"
+    ]
+  }
+}
+```
+
+## Entry rationale-230
+
+```json
+{
+  "entryId": "rationale-230",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+  "collection": "claims",
+  "claimId": "claim_d5dd5fbdb3483914743a14791a5f02a8",
+  "before": {
+    "claimId": "claim_d5dd5fbdb3483914743a14791a5f02a8",
+    "sourceUnitDigest": "19bd3465163fc281e12f6ac88d531d651ce0e8329d0485fa4536c107516305fe",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "partial-carry",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+    "targetAnchor": "2-invocation-mechanisms",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:44-44#2-invocation-mechanisms (current lines); unit SHA256 19bd3465163fc281e12f6ac88d531d651ce0e8329d0485fa4536c107516305fe.\nTarget: docs/platform/host-invocation-routing/architecture/external-provider-protocol.md:97-97#2-invocation-mechanisms (current lines); unit SHA256 e7a9211054b328f165f59f75bfc1633b8b3a60a383afeff778f1eb2312f6d8a0.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest e7a9211054b328f165f59f75bfc1633b8b3a60a383afeff778f1eb2312f6d8a0 at 2b445a90693c6d5e9861a916be3279482f171a18.\nLinks: source 1, target 5; 5 changed spellings/labels, 1 destination changes; 4 added, 0 removed.\nLink 1: \"none\" (none) → \"the dropped-005 restoration\" (release-boundaries.md#restored-class-definitions); resolved none → docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions.\nLink 2: \"Legacy CLI Transition\" (./legacy-cli-transition.md) → \"Legacy CLI Transition\" (legacy-cli-transition.md); resolved docs/architect/host-invocation-routing/legacy-cli-transition.md → docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md.\nLink 3: \"none\" (none) → \"the dropped-006 restoration\" (../contracts/component-protocol.md#restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost); resolved none → docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost.\nLink 4: \"none\" (none) → \"the dropped-006 restoration\" (../contracts/component-protocol.md#restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost); resolved none → docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost.\nLink 5: \"none\" (none) → \"the dropped-006 restoration\" (../contracts/component-protocol.md#restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost); resolved none → docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost.\nHeading depth: 2 → 4; title \"2. Invocation Mechanisms\" → \"2. Invocation Mechanisms\".\nApplicable labelled corrections: none in this bound unit.\nDisposition partial-carry: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms under docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#2-invocation-mechanisms; source context \"External Provider Protocol\", target context \"Architecture: External Provider Protocol / Retained selected source material / External Provider Protocol\". The source text occurs verbatim inside the bound target section; section-level unit digests differ. Recorded residual: The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-12 (claim_3f7b5a5b5b1c39251e56f0d232e11ec3; ```rust enum Provider { BuiltIn(Arc<dyn OperationProvider>), ExternalProcess(ProcessRpcClient), ExternalWasm(WasmComponent), } `); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-14 (claim_962d99a375bab41c2063612523bdf348; **Built-In** — a trusted Rust crate statically linked into the host binary, called through the `OperationProvider` trait. No serialization o); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-15 (claim_f2755ef85799b9a6ec4fd4f5d03e9106; **External Process** — an independently installed, language-neutral plugin reached through persistent framed RPC (§3). Fits extensions needi); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-16 (claim_66ce4edf221963b22ad02dbdf872da1c; **External WebAssembly** — a sandboxed plugin reached through a typed component interface such as WIT. Fits pure or tightly capability-scope); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-17 (claim_8948a9c62d80ce2692687f3fcfbaf8ff; Native Rust dynamic libraries are not the default external mechanism: Rust has no stable ABI, and in-process third-party native code loses t)..\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "remainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-12 (claim_3f7b5a5b5b1c39251e56f0d232e11ec3; ```rust enum Provider { BuiltIn(Arc<dyn OperationProvider>), ExternalProcess(ProcessRpcClient), ExternalWasm(WasmComponent), } `); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-14 (claim_962d99a375bab41c2063612523bdf348; **Built-In** — a trusted Rust crate statically linked into the host binary, called through the `OperationProvider` trait. No serialization o); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-15 (claim_f2755ef85799b9a6ec4fd4f5d03e9106; **External Process** — an independently installed, language-neutral plugin reached through persistent framed RPC (§3). Fits extensions needi); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-16 (claim_66ce4edf221963b22ad02dbdf872da1c; **External WebAssembly** — a sandboxed plugin reached through a typed component interface such as WIT. Fits pure or tightly capability-scope); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-17 (claim_8948a9c62d80ce2692687f3fcfbaf8ff; Native Rust dynamic libraries are not the default external mechanism: Rust has no stable ABI, and in-process third-party native code loses t).",
+    "reviewNote": "rationale-425: deep: partial-carry of a heading (depth 2 to 4, same title); named remainders checked by script: b12 found b14 found b15 found b16 found b17 found inside restored section restored-class-definitions; the sentence that the source text occurs verbatim inside the target section is true only because the shorter heading line is a substring of the deeper one, the real carry is the Recorded residual, whose anchors exist; facts recomputed equal: source 2-invocation-mechanisms L44-44, target 2-invocation-mechanisms L97-97, both full digests, links 1/5 (1 destination changes, 4 added, 0 removed), target anchor check passed, shard row equals pack, unchanged-since-review clause e7a92110 at 2b445a906 matches the reviewed base row at 5035fed52.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "e7a9211054b328f165f59f75bfc1633b8b3a60a383afeff778f1eb2312f6d8a0",
+    "targetAncestry": [
+      "Architecture: External Provider Protocol",
+      "Retained selected source material",
+      "External Provider Protocol"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_d5dd5fbdb3483914743a14791a5f02a8",
+    "sourceUnitDigest": "19bd3465163fc281e12f6ac88d531d651ce0e8329d0485fa4536c107516305fe",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "partial-carry",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+    "targetAnchor": "2-invocation-mechanisms",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:44-44#2-invocation-mechanisms (current lines); unit SHA256 19bd3465163fc281e12f6ac88d531d651ce0e8329d0485fa4536c107516305fe.\nTarget: docs/platform/host-invocation-routing/architecture/external-provider-protocol.md:97-97#2-invocation-mechanisms (current lines); unit SHA256 e7a9211054b328f165f59f75bfc1633b8b3a60a383afeff778f1eb2312f6d8a0.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest e7a9211054b328f165f59f75bfc1633b8b3a60a383afeff778f1eb2312f6d8a0 at 2b445a90693c6d5e9861a916be3279482f171a18.\nLinks: source 1, target 5; 3 changed spellings/labels, 1 destination changes; 2 added, 0 removed.\nLink 1: \"none\" (none) → \"the dropped-005 restoration\" (release-boundaries.md#restored-class-definitions); resolved none → docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions.\nLink 2: \"Legacy CLI Transition\" (./legacy-cli-transition.md) → \"Legacy CLI Transition\" (legacy-cli-transition.md); resolved docs/architect/host-invocation-routing/legacy-cli-transition.md → docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md.\nLink 3: \"none\" (none) → \"the dropped-006 restoration\" (../contracts/component-protocol.md#restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost); resolved none → docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost.\nHeading depth: 2 → 4; title \"2. Invocation Mechanisms\" → \"2. Invocation Mechanisms\".\nWhole direct section differs; depth 2 → 4; 3 distinct link changes; normalized line order differs; 11 removed and 4 added nonblank lines after heading/link/correction normalization.\nSection accounting (existing-labelled-successor-correction): Complete direct section compared to the next native heading. Depth 2 → 4, title \"2. Invocation Mechanisms\" → \"2. Invocation Mechanisms\"; 3 distinct link spelling/label changes; 0 applicable exact labelled corrections. Normalized nonblank line order differs; exact raw-section removed/added line witnesses are accounted below; correction-normalized counts are reported separately. Partial section carriage: removed text is in the live named residual carriers docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions. Candidate additions/corrections are explicitly labelled in the direct section: [\"Added in candidate: this retained source detail is carried verbatim in <link>.\",\"Added in candidate: this retained source detail is carried verbatim in <link>.\",\"Added in candidate: this retained source detail is carried verbatim in <link>.\",\"Added in candidate: this retained source detail is carried verbatim in <link>.\"]. Added lines are authenticated contributions from sibling source-unit bindings: docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#2-invocation-mechanisms. Existing correction labels named corrected successor / truth-ledger-agent-coordination.json at immutable account 9b0526380:plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json; exact section delta: removed [\"```rust\",\"enum Provider {\",\"    BuiltIn(Arc<dyn OperationProvider>),\",\"    ExternalProcess(ProcessRpcClient),\",\"    ExternalWasm(WasmComponent),\",\"}\",\"```\",\"**Built-In** — a trusted Rust crate statically linked into the host binary, called through the `OperationProvider` trait. No serialization or cross-process cost; still obeys the owning port and authority boundary. Normal mechanism for core components, and may serve packaged extensions fgOS chooses to compile in.\",\"**External Process** — an independently installed, language-neutral plugin reached through persistent framed RPC (§3). Fits extensions needing filesystem, Git, network, subprocess, or other OS capabilities. Crash/restart and resource isolation are part of the adapter contract.\",\"**External WebAssembly** — a sandboxed plugin reached through a typed component interface such as WIT. Fits pure or tightly capability-scoped extensions. Required host functions are explicit capabilities, not ambient access.\",\"Native Rust dynamic libraries are not the default external mechanism: Rust has no stable ABI, and in-process third-party native code loses the crash/memory isolation process or WASM boundaries give.\"]; added [\"Added in candidate: this retained source detail is carried verbatim in <link>.\",\"Added in candidate: this retained source detail is carried verbatim in <link>.\",\"Added in candidate: this retained source detail is carried verbatim in <link>.\",\"Added in candidate: this retained source detail is carried verbatim in <link>.\"]. This records replacement, not byte carriage or current-truth certification.\nApplicable labelled corrections: none in this bound unit.\nDisposition partial-carry: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms under docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#2-invocation-mechanisms; source context \"External Provider Protocol\", target context \"Architecture: External Provider Protocol / Retained selected source material / External Provider Protocol\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy. Recorded residual: The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-12 (claim_3f7b5a5b5b1c39251e56f0d232e11ec3; ```rust enum Provider { BuiltIn(Arc<dyn OperationProvider>), ExternalProcess(ProcessRpcClient), ExternalWasm(WasmComponent), } `); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-14 (claim_962d99a375bab41c2063612523bdf348; **Built-In** — a trusted Rust crate statically linked into the host binary, called through the `OperationProvider` trait. No serialization o); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-15 (claim_f2755ef85799b9a6ec4fd4f5d03e9106; **External Process** — an independently installed, language-neutral plugin reached through persistent framed RPC (§3). Fits extensions needi); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-16 (claim_66ce4edf221963b22ad02dbdf872da1c; **External WebAssembly** — a sandboxed plugin reached through a typed component interface such as WIT. Fits pure or tightly capability-scope); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-17 (claim_8948a9c62d80ce2692687f3fcfbaf8ff; Native Rust dynamic libraries are not the default external mechanism: Rust has no stable ABI, and in-process third-party native code loses t)..\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "remainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-12 (claim_3f7b5a5b5b1c39251e56f0d232e11ec3; ```rust enum Provider { BuiltIn(Arc<dyn OperationProvider>), ExternalProcess(ProcessRpcClient), ExternalWasm(WasmComponent), } `); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-14 (claim_962d99a375bab41c2063612523bdf348; **Built-In** — a trusted Rust crate statically linked into the host binary, called through the `OperationProvider` trait. No serialization o); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-15 (claim_f2755ef85799b9a6ec4fd4f5d03e9106; **External Process** — an independently installed, language-neutral plugin reached through persistent framed RPC (§3). Fits extensions needi); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-16 (claim_66ce4edf221963b22ad02dbdf872da1c; **External WebAssembly** — a sandboxed plugin reached through a typed component interface such as WIT. Fits pure or tightly capability-scope); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-17 (claim_8948a9c62d80ce2692687f3fcfbaf8ff; Native Rust dynamic libraries are not the default external mechanism: Rust has no stable ABI, and in-process third-party native code loses t).",
+    "targetUnitDigest": "e7a9211054b328f165f59f75bfc1633b8b3a60a383afeff778f1eb2312f6d8a0",
+    "targetAncestry": [
+      "Architecture: External Provider Protocol",
+      "Retained selected source material",
+      "External Provider Protocol"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [
+    "L10-31/whole-direct-section"
+  ],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 229,
+  "factsSHA256": "b8cb924c5c6d814aeadc51d463359784c6ec0d35fc7095202f03f03c380ca6d3",
+  "sourceWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "2. Invocation Mechanisms",
+    "anchor": "2-invocation-mechanisms",
+    "githubAnchor": "2-invocation-mechanisms",
+    "stableAnchor": "h-fe53eeba6aad",
+    "startLine": 44,
+    "endLine": 44,
+    "textDigest": "19bd3465163fc281e12f6ac88d531d651ce0e8329d0485fa4536c107516305fe",
+    "sample": "2. Invocation Mechanisms",
+    "sectionPayloadDigest": "5d8807b5392b1328d04b8c887869d808e754e64de79039395690d2508672d057",
+    "followingBlockDigest": "d09d58dd69d2e8725c47283982c08f0adf224cec74a505042ce7c7a9631c1c05",
+    "identityFingerprint": "5d22ff53e52b7fc0f2fe529af86c15bf9c3de7f172a56667f5662ae2a64df61b",
+    "ancestry": [
+      "External Provider Protocol"
+    ],
+    "path": "docs/architect/host-invocation-routing/external-provider-protocol.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 4,
+    "title": "2. Invocation Mechanisms",
+    "anchor": "2-invocation-mechanisms",
+    "githubAnchor": "2-invocation-mechanisms",
+    "stableAnchor": "h-dbf1556fed47",
+    "startLine": 97,
+    "endLine": 97,
+    "textDigest": "e7a9211054b328f165f59f75bfc1633b8b3a60a383afeff778f1eb2312f6d8a0",
+    "sample": "2. Invocation Mechanisms",
+    "sectionPayloadDigest": "f990bbcb2e3e62d23034e35275ac4537c0abd0ba1faddc3b1d613ba2f34041fc",
+    "followingBlockDigest": "7c9657b50b7838a59effaedb399fe053cf3fd4cfbd7158d41efa3264787d2819",
+    "identityFingerprint": "5aa88654995bf6b1825e6bbe3bf8eb659660da6000fb6ec12fb03bf8030358b0",
+    "ancestry": [
+      "Architecture: External Provider Protocol",
+      "Retained selected source material",
+      "External Provider Protocol"
+    ],
+    "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md"
+  },
+  "sectionExplanation": {
+    "kind": "existing-labelled-successor-correction",
+    "description": "Complete direct section compared to the next native heading. Depth 2 → 4, title \"2. Invocation Mechanisms\" → \"2. Invocation Mechanisms\"; 3 distinct link spelling/label changes; 0 applicable exact labelled corrections. Normalized nonblank line order differs; exact raw-section removed/added line witnesses are accounted below; correction-normalized counts are reported separately. Partial section carriage: removed text is in the live named residual carriers docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions. Candidate additions/corrections are explicitly labelled in the direct section: [\"Added in candidate: this retained source detail is carried verbatim in <link>.\",\"Added in candidate: this retained source detail is carried verbatim in <link>.\",\"Added in candidate: this retained source detail is carried verbatim in <link>.\",\"Added in candidate: this retained source detail is carried verbatim in <link>.\"]. Added lines are authenticated contributions from sibling source-unit bindings: docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#2-invocation-mechanisms. Existing correction labels named corrected successor / truth-ledger-agent-coordination.json at immutable account 9b0526380:plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json; exact section delta: removed [\"```rust\",\"enum Provider {\",\"    BuiltIn(Arc<dyn OperationProvider>),\",\"    ExternalProcess(ProcessRpcClient),\",\"    ExternalWasm(WasmComponent),\",\"}\",\"```\",\"**Built-In** — a trusted Rust crate statically linked into the host binary, called through the `OperationProvider` trait. No serialization or cross-process cost; still obeys the owning port and authority boundary. Normal mechanism for core components, and may serve packaged extensions fgOS chooses to compile in.\",\"**External Process** — an independently installed, language-neutral plugin reached through persistent framed RPC (§3). Fits extensions needing filesystem, Git, network, subprocess, or other OS capabilities. Crash/restart and resource isolation are part of the adapter contract.\",\"**External WebAssembly** — a sandboxed plugin reached through a typed component interface such as WIT. Fits pure or tightly capability-scoped extensions. Required host functions are explicit capabilities, not ambient access.\",\"Native Rust dynamic libraries are not the default external mechanism: Rust has no stable ABI, and in-process third-party native code loses the crash/memory isolation process or WASM boundaries give.\"]; added [\"Added in candidate: this retained source detail is carried verbatim in <link>.\",\"Added in candidate: this retained source detail is carried verbatim in <link>.\",\"Added in candidate: this retained source detail is carried verbatim in <link>.\",\"Added in candidate: this retained source detail is carried verbatim in <link>.\"]. This records replacement, not byte carriage or current-truth certification.",
+    "completeWitnessesAt": "62751458b22b47e930dc33b8501d07798b91ace3:plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json#/changes/229/facts/sectionExplanation"
+  },
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_d5dd5fbdb3483914743a14791a5f02a8",
+    "sourceUnitDigest": "19bd3465163fc281e12f6ac88d531d651ce0e8329d0485fa4536c107516305fe",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "partial-carry",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+    "targetAnchor": "2-invocation-mechanisms",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:44-44#2-invocation-mechanisms (current lines); unit SHA256 19bd3465163fc281e12f6ac88d531d651ce0e8329d0485fa4536c107516305fe.\nTarget: docs/platform/host-invocation-routing/architecture/external-provider-protocol.md:97-97#2-invocation-mechanisms (current lines); unit SHA256 e7a9211054b328f165f59f75bfc1633b8b3a60a383afeff778f1eb2312f6d8a0.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest e7a9211054b328f165f59f75bfc1633b8b3a60a383afeff778f1eb2312f6d8a0 at 2b445a90693c6d5e9861a916be3279482f171a18.\nLinks: source 1, target 5; 3 changed spellings/labels, 1 destination changes; 2 added, 0 removed.\nLink 1: \"none\" (none) → \"the dropped-005 restoration\" (release-boundaries.md#restored-class-definitions); resolved none → docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions.\nLink 2: \"Legacy CLI Transition\" (./legacy-cli-transition.md) → \"Legacy CLI Transition\" (legacy-cli-transition.md); resolved docs/architect/host-invocation-routing/legacy-cli-transition.md → docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md.\nLink 3: \"none\" (none) → \"the dropped-006 restoration\" (../contracts/component-protocol.md#restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost); resolved none → docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost.\nHeading depth: 2 → 4; title \"2. Invocation Mechanisms\" → \"2. Invocation Mechanisms\".\nWhole direct section differs; depth 2 → 4; 3 distinct link changes; normalized line order differs; 11 removed and 4 added nonblank lines after heading/link/correction normalization.\nSection accounting (existing-labelled-successor-correction): Complete direct section compared to the next native heading. Depth 2 → 4, title \"2. Invocation Mechanisms\" → \"2. Invocation Mechanisms\"; 3 distinct link spelling/label changes; 0 applicable exact labelled corrections. Normalized nonblank line order differs; exact raw-section removed/added line witnesses are accounted below; correction-normalized counts are reported separately. Partial section carriage: removed text is in the live named residual carriers docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions. Candidate additions/corrections are explicitly labelled in the direct section: [\"Added in candidate: this retained source detail is carried verbatim in <link>.\",\"Added in candidate: this retained source detail is carried verbatim in <link>.\",\"Added in candidate: this retained source detail is carried verbatim in <link>.\",\"Added in candidate: this retained source detail is carried verbatim in <link>.\"]. Added lines are authenticated contributions from sibling source-unit bindings: docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#2-invocation-mechanisms. Existing correction labels named corrected successor / truth-ledger-agent-coordination.json at immutable account 9b0526380:plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json; exact section delta: removed [\"```rust\",\"enum Provider {\",\"    BuiltIn(Arc<dyn OperationProvider>),\",\"    ExternalProcess(ProcessRpcClient),\",\"    ExternalWasm(WasmComponent),\",\"}\",\"```\",\"**Built-In** — a trusted Rust crate statically linked into the host binary, called through the `OperationProvider` trait. No serialization or cross-process cost; still obeys the owning port and authority boundary. Normal mechanism for core components, and may serve packaged extensions fgOS chooses to compile in.\",\"**External Process** — an independently installed, language-neutral plugin reached through persistent framed RPC (§3). Fits extensions needing filesystem, Git, network, subprocess, or other OS capabilities. Crash/restart and resource isolation are part of the adapter contract.\",\"**External WebAssembly** — a sandboxed plugin reached through a typed component interface such as WIT. Fits pure or tightly capability-scoped extensions. Required host functions are explicit capabilities, not ambient access.\",\"Native Rust dynamic libraries are not the default external mechanism: Rust has no stable ABI, and in-process third-party native code loses the crash/memory isolation process or WASM boundaries give.\"]; added [\"Added in candidate: this retained source detail is carried verbatim in <link>.\",\"Added in candidate: this retained source detail is carried verbatim in <link>.\",\"Added in candidate: this retained source detail is carried verbatim in <link>.\",\"Added in candidate: this retained source detail is carried verbatim in <link>.\"]. This records replacement, not byte carriage or current-truth certification.\nApplicable labelled corrections: none in this bound unit.\nDisposition partial-carry: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms under docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#2-invocation-mechanisms; source context \"External Provider Protocol\", target context \"Architecture: External Provider Protocol / Retained selected source material / External Provider Protocol\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy. Recorded residual: The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-12 (claim_3f7b5a5b5b1c39251e56f0d232e11ec3; ```rust enum Provider { BuiltIn(Arc<dyn OperationProvider>), ExternalProcess(ProcessRpcClient), ExternalWasm(WasmComponent), } `); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-14 (claim_962d99a375bab41c2063612523bdf348; **Built-In** — a trusted Rust crate statically linked into the host binary, called through the `OperationProvider` trait. No serialization o); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-15 (claim_f2755ef85799b9a6ec4fd4f5d03e9106; **External Process** — an independently installed, language-neutral plugin reached through persistent framed RPC (§3). Fits extensions needi); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-16 (claim_66ce4edf221963b22ad02dbdf872da1c; **External WebAssembly** — a sandboxed plugin reached through a typed component interface such as WIT. Fits pure or tightly capability-scope); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-17 (claim_8948a9c62d80ce2692687f3fcfbaf8ff; Native Rust dynamic libraries are not the default external mechanism: Rust has no stable ABI, and in-process third-party native code loses t)..\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "remainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms is retained verbatim at docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-12 (claim_3f7b5a5b5b1c39251e56f0d232e11ec3; ```rust enum Provider { BuiltIn(Arc<dyn OperationProvider>), ExternalProcess(ProcessRpcClient), ExternalWasm(WasmComponent), } `); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-14 (claim_962d99a375bab41c2063612523bdf348; **Built-In** — a trusted Rust crate statically linked into the host binary, called through the `OperationProvider` trait. No serialization o); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-15 (claim_f2755ef85799b9a6ec4fd4f5d03e9106; **External Process** — an independently installed, language-neutral plugin reached through persistent framed RPC (§3). Fits extensions needi); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-16 (claim_66ce4edf221963b22ad02dbdf872da1c; **External WebAssembly** — a sandboxed plugin reached through a typed component interface such as WIT. Fits pure or tightly capability-scope); docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-17 (claim_8948a9c62d80ce2692687f3fcfbaf8ff; Native Rust dynamic libraries are not the default external mechanism: Rust has no stable ABI, and in-process third-party native code loses t).",
+    "targetUnitDigest": "e7a9211054b328f165f59f75bfc1633b8b3a60a383afeff778f1eb2312f6d8a0",
+    "targetAncestry": [
+      "Architecture: External Provider Protocol",
+      "Retained selected source material",
+      "External Provider Protocol"
+    ]
+  }
+}
+```
+
+## Entry rationale-231
+
+```json
+{
+  "entryId": "rationale-231",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+  "collection": "claims",
+  "claimId": "claim_3f7b5a5b5b1c39251e56f0d232e11ec3",
+  "before": {
+    "claimId": "claim_3f7b5a5b5b1c39251e56f0d232e11ec3",
+    "sourceUnitDigest": "d09d58dd69d2e8725c47283982c08f0adf224cec74a505042ce7c7a9631c1c05",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "targetAnchor": "unheaded-block-18",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:46-52#unheaded-block-12 (current lines); unit SHA256 d09d58dd69d2e8725c47283982c08f0adf224cec74a505042ce7c7a9631c1c05.\nTarget: docs/platform/host-invocation-routing/architecture/release-boundaries.md:126-134#unheaded-block-18 (current lines); unit SHA256 3da997bcd8918278b3621a1c24864aecf416acee475c99fec3afd04fb1063d58.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 3da997bcd8918278b3621a1c24864aecf416acee475c99fec3afd04fb1063d58 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-12 under docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-18; source context \"External Provider Protocol / 2. Invocation Mechanisms\", target context \"Architecture: Release Boundaries / Restored class definitions\". The source text occurs verbatim inside the bound target section; section-level unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "reviewNote": "rationale-426: deep: move where the source block sits byte-for-byte inside the target unit, which only adds a ````md fence (target is exactly 12 characters longer: fence open and close), the restored literal block; the verbatim-inside sentence is true; facts recomputed equal: source unheaded-block-12 L46-52, target unheaded-block-18 L126-134, both full digests, links 0/0 (0 destination changes, 0 added, 0 removed), target anchor check passed, shard row equals pack, unchanged-since-review clause 3da997bc at 13322f8a6 matches the reviewed base row at 5035fed52.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "3da997bcd8918278b3621a1c24864aecf416acee475c99fec3afd04fb1063d58",
+    "targetAncestry": [
+      "Architecture: Release Boundaries",
+      "Restored class definitions"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_3f7b5a5b5b1c39251e56f0d232e11ec3",
+    "sourceUnitDigest": "d09d58dd69d2e8725c47283982c08f0adf224cec74a505042ce7c7a9631c1c05",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "targetAnchor": "unheaded-block-18",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:46-52#unheaded-block-12 (current lines); unit SHA256 d09d58dd69d2e8725c47283982c08f0adf224cec74a505042ce7c7a9631c1c05.\nTarget: docs/platform/host-invocation-routing/architecture/release-boundaries.md:126-134#unheaded-block-18 (current lines); unit SHA256 3da997bcd8918278b3621a1c24864aecf416acee475c99fec3afd04fb1063d58.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 3da997bcd8918278b3621a1c24864aecf416acee475c99fec3afd04fb1063d58 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-12 under docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-18; source context \"External Provider Protocol / 2. Invocation Mechanisms\", target context \"Architecture: Release Boundaries / Restored class definitions\". The complete source direct section occurs verbatim inside the bound target section; native unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "3da997bcd8918278b3621a1c24864aecf416acee475c99fec3afd04fb1063d58",
+    "targetAncestry": [
+      "Architecture: Release Boundaries",
+      "Restored class definitions"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 230,
+  "factsSHA256": "b41d5659887a7e33ff56f6bbeb5ba95f6d70535d486d85726ec13446b58d1749",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-12",
+    "githubAnchor": "unheaded-block-12",
+    "stableAnchor": "unheaded-block-12",
+    "title": "Unheaded block 12",
+    "startLine": 46,
+    "endLine": 52,
+    "textDigest": "d09d58dd69d2e8725c47283982c08f0adf224cec74a505042ce7c7a9631c1c05",
+    "sample": "```rust\nenum Provider {\n    BuiltIn(Arc<dyn OperationProvider>),\n    ExternalProcess(ProcessRpcClient),\n    ExternalWasm(WasmComponent),\n}\n```",
+    "identityFingerprint": "e40d28f9b455614ef14e3cbb2030adb86c6d2875d0bad2aaba9d150983671ca7",
+    "ancestry": [
+      "External Provider Protocol",
+      "2. Invocation Mechanisms"
+    ],
+    "path": "docs/architect/host-invocation-routing/external-provider-protocol.md"
+  },
+  "targetWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-18",
+    "githubAnchor": "unheaded-block-18",
+    "stableAnchor": "unheaded-block-18",
+    "title": "Unheaded block 18",
+    "startLine": 126,
+    "endLine": 134,
+    "textDigest": "3da997bcd8918278b3621a1c24864aecf416acee475c99fec3afd04fb1063d58",
+    "sample": "````md\n```rust\nenum Provider {\n    BuiltIn(Arc<dyn OperationProvider>),\n    ExternalProcess(ProcessRpcClient),\n    ExternalWasm(WasmComponent),\n}\n```\n````",
+    "identityFingerprint": "a4aeb4c4664a1311fcf530eb809c570a9b2a71682ba149a7e12e166094b961c3",
+    "ancestry": [
+      "Architecture: Release Boundaries",
+      "Restored class definitions"
+    ],
+    "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_3f7b5a5b5b1c39251e56f0d232e11ec3",
+    "sourceUnitDigest": "d09d58dd69d2e8725c47283982c08f0adf224cec74a505042ce7c7a9631c1c05",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "targetAnchor": "unheaded-block-18",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:46-52#unheaded-block-12 (current lines); unit SHA256 d09d58dd69d2e8725c47283982c08f0adf224cec74a505042ce7c7a9631c1c05.\nTarget: docs/platform/host-invocation-routing/architecture/release-boundaries.md:126-134#unheaded-block-18 (current lines); unit SHA256 3da997bcd8918278b3621a1c24864aecf416acee475c99fec3afd04fb1063d58.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 3da997bcd8918278b3621a1c24864aecf416acee475c99fec3afd04fb1063d58 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-12 under docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-18; source context \"External Provider Protocol / 2. Invocation Mechanisms\", target context \"Architecture: Release Boundaries / Restored class definitions\". The complete source direct section occurs verbatim inside the bound target section; native unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "3da997bcd8918278b3621a1c24864aecf416acee475c99fec3afd04fb1063d58",
+    "targetAncestry": [
+      "Architecture: Release Boundaries",
+      "Restored class definitions"
+    ]
+  }
+}
+```
+
+## Entry rationale-232
+
+```json
+{
+  "entryId": "rationale-232",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+  "collection": "claims",
+  "claimId": "claim_962d99a375bab41c2063612523bdf348",
+  "before": {
+    "claimId": "claim_962d99a375bab41c2063612523bdf348",
+    "sourceUnitDigest": "ad59236e4c47fac38590ed404ef23f56d3525321141a1c30bc19a7196c86b27d",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "targetAnchor": "unheaded-block-19",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:56-56#unheaded-block-14 (current lines); unit SHA256 ad59236e4c47fac38590ed404ef23f56d3525321141a1c30bc19a7196c86b27d.\nTarget: docs/platform/host-invocation-routing/architecture/release-boundaries.md:136-138#unheaded-block-19 (current lines); unit SHA256 28063dfbfde3d042943f471867eb0e590c37428feebb7e4bde144cedbbf03f0e.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 28063dfbfde3d042943f471867eb0e590c37428feebb7e4bde144cedbbf03f0e at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-14 under docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-19; source context \"External Provider Protocol / 2. Invocation Mechanisms\", target context \"Architecture: Release Boundaries / Restored class definitions\". The source text occurs verbatim inside the bound target section; section-level unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "reviewNote": "rationale-427: deep: move where the source block sits byte-for-byte inside the target unit, which only adds a ````md fence (target is exactly 12 characters longer: fence open and close), the restored literal block; the verbatim-inside sentence is true; facts recomputed equal: source unheaded-block-14 L56-56, target unheaded-block-19 L136-138, both full digests, links 0/0 (0 destination changes, 0 added, 0 removed), target anchor check passed, shard row equals pack, unchanged-since-review clause 28063dfb at 13322f8a6 matches the reviewed base row at 5035fed52.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "28063dfbfde3d042943f471867eb0e590c37428feebb7e4bde144cedbbf03f0e",
+    "targetAncestry": [
+      "Architecture: Release Boundaries",
+      "Restored class definitions"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_962d99a375bab41c2063612523bdf348",
+    "sourceUnitDigest": "ad59236e4c47fac38590ed404ef23f56d3525321141a1c30bc19a7196c86b27d",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "targetAnchor": "unheaded-block-19",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:56-56#unheaded-block-14 (current lines); unit SHA256 ad59236e4c47fac38590ed404ef23f56d3525321141a1c30bc19a7196c86b27d.\nTarget: docs/platform/host-invocation-routing/architecture/release-boundaries.md:136-138#unheaded-block-19 (current lines); unit SHA256 28063dfbfde3d042943f471867eb0e590c37428feebb7e4bde144cedbbf03f0e.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 28063dfbfde3d042943f471867eb0e590c37428feebb7e4bde144cedbbf03f0e at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-14 under docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-19; source context \"External Provider Protocol / 2. Invocation Mechanisms\", target context \"Architecture: Release Boundaries / Restored class definitions\". The complete source direct section occurs verbatim inside the bound target section; native unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "28063dfbfde3d042943f471867eb0e590c37428feebb7e4bde144cedbbf03f0e",
+    "targetAncestry": [
+      "Architecture: Release Boundaries",
+      "Restored class definitions"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 231,
+  "factsSHA256": "388fe88fb01bfb37c8a9c53a3b9c1304a818393ff76601393944dc97d796a788",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-14",
+    "githubAnchor": "unheaded-block-14",
+    "stableAnchor": "unheaded-block-14",
+    "title": "Unheaded block 14",
+    "startLine": 56,
+    "endLine": 56,
+    "textDigest": "ad59236e4c47fac38590ed404ef23f56d3525321141a1c30bc19a7196c86b27d",
+    "sample": "**Built-In** — a trusted Rust crate statically linked into the host binary, called through the `OperationProvider` trait. No serialization or cross-process cost; still obeys the ow",
+    "identityFingerprint": "c3acf07951633a18fa9ff0192baf550e31516681aa932e7320ca7fad70fc86c9",
+    "ancestry": [
+      "External Provider Protocol",
+      "2. Invocation Mechanisms"
+    ],
+    "path": "docs/architect/host-invocation-routing/external-provider-protocol.md"
+  },
+  "targetWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-19",
+    "githubAnchor": "unheaded-block-19",
+    "stableAnchor": "unheaded-block-19",
+    "title": "Unheaded block 19",
+    "startLine": 136,
+    "endLine": 138,
+    "textDigest": "28063dfbfde3d042943f471867eb0e590c37428feebb7e4bde144cedbbf03f0e",
+    "sample": "````md\n**Built-In** — a trusted Rust crate statically linked into the host binary, called through the `OperationProvider` trait. No serialization or cross-process cost; still obeys",
+    "identityFingerprint": "bd094b05246a36d00c2a7bb01461d1ee1dfc60d527d6d7683be5c871e79c7713",
+    "ancestry": [
+      "Architecture: Release Boundaries",
+      "Restored class definitions"
+    ],
+    "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_962d99a375bab41c2063612523bdf348",
+    "sourceUnitDigest": "ad59236e4c47fac38590ed404ef23f56d3525321141a1c30bc19a7196c86b27d",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "targetAnchor": "unheaded-block-19",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:56-56#unheaded-block-14 (current lines); unit SHA256 ad59236e4c47fac38590ed404ef23f56d3525321141a1c30bc19a7196c86b27d.\nTarget: docs/platform/host-invocation-routing/architecture/release-boundaries.md:136-138#unheaded-block-19 (current lines); unit SHA256 28063dfbfde3d042943f471867eb0e590c37428feebb7e4bde144cedbbf03f0e.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 28063dfbfde3d042943f471867eb0e590c37428feebb7e4bde144cedbbf03f0e at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-14 under docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-19; source context \"External Provider Protocol / 2. Invocation Mechanisms\", target context \"Architecture: Release Boundaries / Restored class definitions\". The complete source direct section occurs verbatim inside the bound target section; native unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "28063dfbfde3d042943f471867eb0e590c37428feebb7e4bde144cedbbf03f0e",
+    "targetAncestry": [
+      "Architecture: Release Boundaries",
+      "Restored class definitions"
+    ]
+  }
+}
+```
+
+## Entry rationale-233
+
+```json
+{
+  "entryId": "rationale-233",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+  "collection": "claims",
+  "claimId": "claim_f2755ef85799b9a6ec4fd4f5d03e9106",
+  "before": {
+    "claimId": "claim_f2755ef85799b9a6ec4fd4f5d03e9106",
+    "sourceUnitDigest": "e0492b4f17e96958b01aace4d3033f0cee43b21404128dd13a56f82072066ccb",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "targetAnchor": "unheaded-block-20",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:58-58#unheaded-block-15 (current lines); unit SHA256 e0492b4f17e96958b01aace4d3033f0cee43b21404128dd13a56f82072066ccb.\nTarget: docs/platform/host-invocation-routing/architecture/release-boundaries.md:140-142#unheaded-block-20 (current lines); unit SHA256 5e13fbf6b82041abbdcc4dde206304a30dec6c264e25c744d5ef22677e9f15ac.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 5e13fbf6b82041abbdcc4dde206304a30dec6c264e25c744d5ef22677e9f15ac at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-15 under docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-20; source context \"External Provider Protocol / 2. Invocation Mechanisms\", target context \"Architecture: Release Boundaries / Restored class definitions\". The source text occurs verbatim inside the bound target section; section-level unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "reviewNote": "rationale-428: deep: move where the source block sits byte-for-byte inside the target unit, which only adds a ````md fence (target is exactly 12 characters longer: fence open and close), the restored literal block; the verbatim-inside sentence is true; facts recomputed equal: source unheaded-block-15 L58-58, target unheaded-block-20 L140-142, both full digests, links 0/0 (0 destination changes, 0 added, 0 removed), target anchor check passed, shard row equals pack, unchanged-since-review clause 5e13fbf6 at 13322f8a6 matches the reviewed base row at 5035fed52.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "5e13fbf6b82041abbdcc4dde206304a30dec6c264e25c744d5ef22677e9f15ac",
+    "targetAncestry": [
+      "Architecture: Release Boundaries",
+      "Restored class definitions"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_f2755ef85799b9a6ec4fd4f5d03e9106",
+    "sourceUnitDigest": "e0492b4f17e96958b01aace4d3033f0cee43b21404128dd13a56f82072066ccb",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "targetAnchor": "unheaded-block-20",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:58-58#unheaded-block-15 (current lines); unit SHA256 e0492b4f17e96958b01aace4d3033f0cee43b21404128dd13a56f82072066ccb.\nTarget: docs/platform/host-invocation-routing/architecture/release-boundaries.md:140-142#unheaded-block-20 (current lines); unit SHA256 5e13fbf6b82041abbdcc4dde206304a30dec6c264e25c744d5ef22677e9f15ac.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 5e13fbf6b82041abbdcc4dde206304a30dec6c264e25c744d5ef22677e9f15ac at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-15 under docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-20; source context \"External Provider Protocol / 2. Invocation Mechanisms\", target context \"Architecture: Release Boundaries / Restored class definitions\". The complete source direct section occurs verbatim inside the bound target section; native unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "5e13fbf6b82041abbdcc4dde206304a30dec6c264e25c744d5ef22677e9f15ac",
+    "targetAncestry": [
+      "Architecture: Release Boundaries",
+      "Restored class definitions"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 232,
+  "factsSHA256": "13cad655e71da4c2b9fa59f302977a0689667c9278cd2e4bda3ccccabdb21b92",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-15",
+    "githubAnchor": "unheaded-block-15",
+    "stableAnchor": "unheaded-block-15",
+    "title": "Unheaded block 15",
+    "startLine": 58,
+    "endLine": 58,
+    "textDigest": "e0492b4f17e96958b01aace4d3033f0cee43b21404128dd13a56f82072066ccb",
+    "sample": "**External Process** — an independently installed, language-neutral plugin reached through persistent framed RPC (§3). Fits extensions needing filesystem, Git, network, subprocess,",
+    "identityFingerprint": "8384afd0fed63c4a3905a605e9d6125f8ea30da0cbe73d41e707976365832f75",
+    "ancestry": [
+      "External Provider Protocol",
+      "2. Invocation Mechanisms"
+    ],
+    "path": "docs/architect/host-invocation-routing/external-provider-protocol.md"
+  },
+  "targetWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-20",
+    "githubAnchor": "unheaded-block-20",
+    "stableAnchor": "unheaded-block-20",
+    "title": "Unheaded block 20",
+    "startLine": 140,
+    "endLine": 142,
+    "textDigest": "5e13fbf6b82041abbdcc4dde206304a30dec6c264e25c744d5ef22677e9f15ac",
+    "sample": "````md\n**External Process** — an independently installed, language-neutral plugin reached through persistent framed RPC (§3). Fits extensions needing filesystem, Git, network, subp",
+    "identityFingerprint": "674a195785ee66c271c324a2c42897d3ce802b671c8dbc9d5844a7f47260eaa7",
+    "ancestry": [
+      "Architecture: Release Boundaries",
+      "Restored class definitions"
+    ],
+    "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_f2755ef85799b9a6ec4fd4f5d03e9106",
+    "sourceUnitDigest": "e0492b4f17e96958b01aace4d3033f0cee43b21404128dd13a56f82072066ccb",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "targetAnchor": "unheaded-block-20",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:58-58#unheaded-block-15 (current lines); unit SHA256 e0492b4f17e96958b01aace4d3033f0cee43b21404128dd13a56f82072066ccb.\nTarget: docs/platform/host-invocation-routing/architecture/release-boundaries.md:140-142#unheaded-block-20 (current lines); unit SHA256 5e13fbf6b82041abbdcc4dde206304a30dec6c264e25c744d5ef22677e9f15ac.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 5e13fbf6b82041abbdcc4dde206304a30dec6c264e25c744d5ef22677e9f15ac at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-15 under docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-20; source context \"External Provider Protocol / 2. Invocation Mechanisms\", target context \"Architecture: Release Boundaries / Restored class definitions\". The complete source direct section occurs verbatim inside the bound target section; native unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "5e13fbf6b82041abbdcc4dde206304a30dec6c264e25c744d5ef22677e9f15ac",
+    "targetAncestry": [
+      "Architecture: Release Boundaries",
+      "Restored class definitions"
+    ]
+  }
+}
+```
+
+## Entry rationale-234
+
+```json
+{
+  "entryId": "rationale-234",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+  "collection": "claims",
+  "claimId": "claim_66ce4edf221963b22ad02dbdf872da1c",
+  "before": {
+    "claimId": "claim_66ce4edf221963b22ad02dbdf872da1c",
+    "sourceUnitDigest": "4188ad667cd103dbf687bae37f8981faf863dd2ec0de70679a79193e58c28522",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "targetAnchor": "unheaded-block-21",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:60-60#unheaded-block-16 (current lines); unit SHA256 4188ad667cd103dbf687bae37f8981faf863dd2ec0de70679a79193e58c28522.\nTarget: docs/platform/host-invocation-routing/architecture/release-boundaries.md:144-146#unheaded-block-21 (current lines); unit SHA256 438edf5341c9e187a6b5810fb958a7889e4267b684f3d9921b2670a8ca545481.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 438edf5341c9e187a6b5810fb958a7889e4267b684f3d9921b2670a8ca545481 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-16 under docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-21; source context \"External Provider Protocol / 2. Invocation Mechanisms\", target context \"Architecture: Release Boundaries / Restored class definitions\". The source text occurs verbatim inside the bound target section; section-level unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "reviewNote": "rationale-429: deep: move where the source block sits byte-for-byte inside the target unit, which only adds a ````md fence (target is exactly 12 characters longer: fence open and close), the restored literal block; the verbatim-inside sentence is true; facts recomputed equal: source unheaded-block-16 L60-60, target unheaded-block-21 L144-146, both full digests, links 0/0 (0 destination changes, 0 added, 0 removed), target anchor check passed, shard row equals pack, unchanged-since-review clause 438edf53 at 13322f8a6 matches the reviewed base row at 5035fed52.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "438edf5341c9e187a6b5810fb958a7889e4267b684f3d9921b2670a8ca545481",
+    "targetAncestry": [
+      "Architecture: Release Boundaries",
+      "Restored class definitions"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_66ce4edf221963b22ad02dbdf872da1c",
+    "sourceUnitDigest": "4188ad667cd103dbf687bae37f8981faf863dd2ec0de70679a79193e58c28522",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "targetAnchor": "unheaded-block-21",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:60-60#unheaded-block-16 (current lines); unit SHA256 4188ad667cd103dbf687bae37f8981faf863dd2ec0de70679a79193e58c28522.\nTarget: docs/platform/host-invocation-routing/architecture/release-boundaries.md:144-146#unheaded-block-21 (current lines); unit SHA256 438edf5341c9e187a6b5810fb958a7889e4267b684f3d9921b2670a8ca545481.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 438edf5341c9e187a6b5810fb958a7889e4267b684f3d9921b2670a8ca545481 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-16 under docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-21; source context \"External Provider Protocol / 2. Invocation Mechanisms\", target context \"Architecture: Release Boundaries / Restored class definitions\". The complete source direct section occurs verbatim inside the bound target section; native unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "438edf5341c9e187a6b5810fb958a7889e4267b684f3d9921b2670a8ca545481",
+    "targetAncestry": [
+      "Architecture: Release Boundaries",
+      "Restored class definitions"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 233,
+  "factsSHA256": "4ab9c47e3d745a3cf1a5c54d96ffa794dab542aca945dfb7b117acd3fb59c78d",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-16",
+    "githubAnchor": "unheaded-block-16",
+    "stableAnchor": "unheaded-block-16",
+    "title": "Unheaded block 16",
+    "startLine": 60,
+    "endLine": 60,
+    "textDigest": "4188ad667cd103dbf687bae37f8981faf863dd2ec0de70679a79193e58c28522",
+    "sample": "**External WebAssembly** — a sandboxed plugin reached through a typed component interface such as WIT. Fits pure or tightly capability-scoped extensions. Required host functions ar",
+    "identityFingerprint": "9254c2e6f8470b52be510e62b101eca7d63083ba3f441806c5887e23ae3411f9",
+    "ancestry": [
+      "External Provider Protocol",
+      "2. Invocation Mechanisms"
+    ],
+    "path": "docs/architect/host-invocation-routing/external-provider-protocol.md"
+  },
+  "targetWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-21",
+    "githubAnchor": "unheaded-block-21",
+    "stableAnchor": "unheaded-block-21",
+    "title": "Unheaded block 21",
+    "startLine": 144,
+    "endLine": 146,
+    "textDigest": "438edf5341c9e187a6b5810fb958a7889e4267b684f3d9921b2670a8ca545481",
+    "sample": "````md\n**External WebAssembly** — a sandboxed plugin reached through a typed component interface such as WIT. Fits pure or tightly capability-scoped extensions. Required host funct",
+    "identityFingerprint": "d2e5892671104a9374fe2559c198ebedd53ca84b5909c2f2bb2ab04de2ce3677",
+    "ancestry": [
+      "Architecture: Release Boundaries",
+      "Restored class definitions"
+    ],
+    "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_66ce4edf221963b22ad02dbdf872da1c",
+    "sourceUnitDigest": "4188ad667cd103dbf687bae37f8981faf863dd2ec0de70679a79193e58c28522",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "targetAnchor": "unheaded-block-21",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:60-60#unheaded-block-16 (current lines); unit SHA256 4188ad667cd103dbf687bae37f8981faf863dd2ec0de70679a79193e58c28522.\nTarget: docs/platform/host-invocation-routing/architecture/release-boundaries.md:144-146#unheaded-block-21 (current lines); unit SHA256 438edf5341c9e187a6b5810fb958a7889e4267b684f3d9921b2670a8ca545481.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 438edf5341c9e187a6b5810fb958a7889e4267b684f3d9921b2670a8ca545481 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-16 under docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-21; source context \"External Provider Protocol / 2. Invocation Mechanisms\", target context \"Architecture: Release Boundaries / Restored class definitions\". The complete source direct section occurs verbatim inside the bound target section; native unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "438edf5341c9e187a6b5810fb958a7889e4267b684f3d9921b2670a8ca545481",
+    "targetAncestry": [
+      "Architecture: Release Boundaries",
+      "Restored class definitions"
+    ]
+  }
+}
+```
+
+## Entry rationale-235
+
+```json
+{
+  "entryId": "rationale-235",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+  "collection": "claims",
+  "claimId": "claim_8948a9c62d80ce2692687f3fcfbaf8ff",
+  "before": {
+    "claimId": "claim_8948a9c62d80ce2692687f3fcfbaf8ff",
+    "sourceUnitDigest": "f32d862a6e98405216984764ea4f4899b64449d161c74e938f23d9b3e83281ed",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "targetAnchor": "unheaded-block-22",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:62-62#unheaded-block-17 (current lines); unit SHA256 f32d862a6e98405216984764ea4f4899b64449d161c74e938f23d9b3e83281ed.\nTarget: docs/platform/host-invocation-routing/architecture/release-boundaries.md:148-150#unheaded-block-22 (current lines); unit SHA256 4d5eb89ed283ce4f938956e515228eea393c127dfe2fca7b2853e7b711b7d900.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 4d5eb89ed283ce4f938956e515228eea393c127dfe2fca7b2853e7b711b7d900 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-17 under docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-22; source context \"External Provider Protocol / 2. Invocation Mechanisms\", target context \"Architecture: Release Boundaries / Restored class definitions\". The source text occurs verbatim inside the bound target section; section-level unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "reviewNote": "rationale-430: deep: move where the source block sits byte-for-byte inside the target unit, which only adds a ````md fence (target is exactly 12 characters longer: fence open and close), the restored literal block; the verbatim-inside sentence is true; facts recomputed equal: source unheaded-block-17 L62-62, target unheaded-block-22 L148-150, both full digests, links 0/0 (0 destination changes, 0 added, 0 removed), target anchor check passed, shard row equals pack, unchanged-since-review clause 4d5eb89e at 13322f8a6 matches the reviewed base row at 5035fed52.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "4d5eb89ed283ce4f938956e515228eea393c127dfe2fca7b2853e7b711b7d900",
+    "targetAncestry": [
+      "Architecture: Release Boundaries",
+      "Restored class definitions"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_8948a9c62d80ce2692687f3fcfbaf8ff",
+    "sourceUnitDigest": "f32d862a6e98405216984764ea4f4899b64449d161c74e938f23d9b3e83281ed",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "targetAnchor": "unheaded-block-22",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:62-62#unheaded-block-17 (current lines); unit SHA256 f32d862a6e98405216984764ea4f4899b64449d161c74e938f23d9b3e83281ed.\nTarget: docs/platform/host-invocation-routing/architecture/release-boundaries.md:148-150#unheaded-block-22 (current lines); unit SHA256 4d5eb89ed283ce4f938956e515228eea393c127dfe2fca7b2853e7b711b7d900.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 4d5eb89ed283ce4f938956e515228eea393c127dfe2fca7b2853e7b711b7d900 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-17 under docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-22; source context \"External Provider Protocol / 2. Invocation Mechanisms\", target context \"Architecture: Release Boundaries / Restored class definitions\". The complete source direct section occurs verbatim inside the bound target section; native unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "4d5eb89ed283ce4f938956e515228eea393c127dfe2fca7b2853e7b711b7d900",
+    "targetAncestry": [
+      "Architecture: Release Boundaries",
+      "Restored class definitions"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 234,
+  "factsSHA256": "bd834fd70d1f9a0b79cb0362537d42a794f5962a308d408c054d031de972c35c",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-17",
+    "githubAnchor": "unheaded-block-17",
+    "stableAnchor": "unheaded-block-17",
+    "title": "Unheaded block 17",
+    "startLine": 62,
+    "endLine": 62,
+    "textDigest": "f32d862a6e98405216984764ea4f4899b64449d161c74e938f23d9b3e83281ed",
+    "sample": "Native Rust dynamic libraries are not the default external mechanism: Rust has no stable ABI, and in-process third-party native code loses the crash/memory isolation process or WAS",
+    "identityFingerprint": "c5e449d709bb09a6789be47634279e77a825a315af3046ff9ca874fc5c729dc1",
+    "ancestry": [
+      "External Provider Protocol",
+      "2. Invocation Mechanisms"
+    ],
+    "path": "docs/architect/host-invocation-routing/external-provider-protocol.md"
+  },
+  "targetWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-22",
+    "githubAnchor": "unheaded-block-22",
+    "stableAnchor": "unheaded-block-22",
+    "title": "Unheaded block 22",
+    "startLine": 148,
+    "endLine": 150,
+    "textDigest": "4d5eb89ed283ce4f938956e515228eea393c127dfe2fca7b2853e7b711b7d900",
+    "sample": "````md\nNative Rust dynamic libraries are not the default external mechanism: Rust has no stable ABI, and in-process third-party native code loses the crash/memory isolation process",
+    "identityFingerprint": "1e62f03a0c3434a0742f9879fb0efef45b2b9033449a2bc244b4ab404f1f6f26",
+    "ancestry": [
+      "Architecture: Release Boundaries",
+      "Restored class definitions"
+    ],
+    "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_8948a9c62d80ce2692687f3fcfbaf8ff",
+    "sourceUnitDigest": "f32d862a6e98405216984764ea4f4899b64449d161c74e938f23d9b3e83281ed",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+    "targetAnchor": "unheaded-block-22",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:62-62#unheaded-block-17 (current lines); unit SHA256 f32d862a6e98405216984764ea4f4899b64449d161c74e938f23d9b3e83281ed.\nTarget: docs/platform/host-invocation-routing/architecture/release-boundaries.md:148-150#unheaded-block-22 (current lines); unit SHA256 4d5eb89ed283ce4f938956e515228eea393c127dfe2fca7b2853e7b711b7d900.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 4d5eb89ed283ce4f938956e515228eea393c127dfe2fca7b2853e7b711b7d900 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-17 under docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-22; source context \"External Provider Protocol / 2. Invocation Mechanisms\", target context \"Architecture: Release Boundaries / Restored class definitions\". The complete source direct section occurs verbatim inside the bound target section; native unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "4d5eb89ed283ce4f938956e515228eea393c127dfe2fca7b2853e7b711b7d900",
+    "targetAncestry": [
+      "Architecture: Release Boundaries",
+      "Restored class definitions"
+    ]
+  }
+}
+```
+
+## Entry rationale-236
+
+```json
+{
+  "entryId": "rationale-236",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+  "collection": "claims",
+  "claimId": "claim_8066684d5e7c7159d6f58caeef26d8cc",
+  "before": {
+    "claimId": "claim_8066684d5e7c7159d6f58caeef26d8cc",
+    "sourceUnitDigest": "4788de97424c5b1035cf2384d427ef5a7694dfbae3af9c94f73cf5dcf4420ea6",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "partial-carry",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+    "targetAnchor": "3-component-protocol",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:72-72#3-component-protocol (current lines); unit SHA256 4788de97424c5b1035cf2384d427ef5a7694dfbae3af9c94f73cf5dcf4420ea6.\nTarget: docs/platform/host-invocation-routing/architecture/external-provider-protocol.md:122-122#3-component-protocol (current lines); unit SHA256 7cf43dd0dccf83e356b760c88da2576ecb1eb4cf9219caaf09a95ff12d2fd5a8.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 7cf43dd0dccf83e356b760c88da2576ecb1eb4cf9219caaf09a95ff12d2fd5a8 at 0c06e6e6b67a3897d660ee54de25fdc9971e59a4.\nLinks: source 0, target 1; 1 changed spellings/labels, 0 destination changes; 1 added, 0 removed.\nLink 1: \"none\" (none) → \"the dropped-007 restoration\" (../contracts/component-protocol.md#restored-semantic-contract-stays-transport-neutral); resolved none → docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-semantic-contract-stays-transport-neutral.\nHeading depth: 2 → 4; title \"3. Component Protocol\" → \"3. Component Protocol\".\nApplicable labelled corrections: none in this bound unit.\nDisposition partial-carry: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol under docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#3-component-protocol; source context \"External Provider Protocol\", target context \"Architecture: External Provider Protocol / Retained selected source material / External Provider Protocol\". The source text occurs verbatim inside the bound target section; section-level unit digests differ. Recorded residual: The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-semantic-contract-stays-transport-neutral and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-25 (claim_d1c4102dc6dea3ae86434fb12c0abf71; The semantic contract stays transport-neutral: a future binary codec or local socket transport may replace framing without renaming the oper)..\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "remainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-semantic-contract-stays-transport-neutral and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-25 (claim_d1c4102dc6dea3ae86434fb12c0abf71; The semantic contract stays transport-neutral: a future binary codec or local socket transport may replace framing without renaming the oper).",
+    "reviewNote": "rationale-431: deep: partial-carry of a heading (depth 2 to 4, same title); named remainders checked by script: b25 found inside restored section restored-semantic-contract-stays-transport-neutral; the sentence that the source text occurs verbatim inside the target section is true only because the shorter heading line is a substring of the deeper one, the real carry is the Recorded residual, whose anchors exist; facts recomputed equal: source 3-component-protocol L72-72, target 3-component-protocol L122-122, both full digests, links 0/1 (0 destination changes, 1 added, 0 removed), target anchor check passed, shard row equals pack, unchanged-since-review clause 7cf43dd0 at 0c06e6e6b matches the reviewed base row at 5035fed52.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "7cf43dd0dccf83e356b760c88da2576ecb1eb4cf9219caaf09a95ff12d2fd5a8",
+    "targetAncestry": [
+      "Architecture: External Provider Protocol",
+      "Retained selected source material",
+      "External Provider Protocol"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_8066684d5e7c7159d6f58caeef26d8cc",
+    "sourceUnitDigest": "4788de97424c5b1035cf2384d427ef5a7694dfbae3af9c94f73cf5dcf4420ea6",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "partial-carry",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+    "targetAnchor": "3-component-protocol",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:72-72#3-component-protocol (current lines); unit SHA256 4788de97424c5b1035cf2384d427ef5a7694dfbae3af9c94f73cf5dcf4420ea6.\nTarget: docs/platform/host-invocation-routing/architecture/external-provider-protocol.md:122-122#3-component-protocol (current lines); unit SHA256 7cf43dd0dccf83e356b760c88da2576ecb1eb4cf9219caaf09a95ff12d2fd5a8.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 7cf43dd0dccf83e356b760c88da2576ecb1eb4cf9219caaf09a95ff12d2fd5a8 at 0c06e6e6b67a3897d660ee54de25fdc9971e59a4.\nLinks: source 0, target 1; 1 changed spellings/labels, 0 destination changes; 1 added, 0 removed.\nLink 1: \"none\" (none) → \"the dropped-007 restoration\" (../contracts/component-protocol.md#restored-semantic-contract-stays-transport-neutral); resolved none → docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-semantic-contract-stays-transport-neutral.\nHeading depth: 2 → 4; title \"3. Component Protocol\" → \"3. Component Protocol\".\nWhole direct section differs; depth 2 → 4; 1 distinct link changes; normalized line order differs; 1 removed and 1 added nonblank lines after heading/link/correction normalization.\nSection accounting (existing-labelled-successor-correction): Complete direct section compared to the next native heading. Depth 2 → 4, title \"3. Component Protocol\" → \"3. Component Protocol\"; 1 distinct link spelling/label changes; 0 applicable exact labelled corrections. Normalized nonblank line order differs; exact raw-section removed/added line witnesses are accounted below; correction-normalized counts are reported separately. Partial section carriage: removed text is in the live named residual carriers docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-semantic-contract-stays-transport-neutral. Candidate additions/corrections are explicitly labelled in the direct section: [\"Added in candidate: this retained source detail is carried verbatim in <link>.\"]. Added lines are authenticated contributions from sibling source-unit bindings: docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#3-component-protocol. Existing correction labels named corrected successor / truth-ledger-agent-coordination.json at immutable account 9b0526380:plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json; exact section delta: removed [\"The semantic contract stays transport-neutral: a future binary codec or local socket transport may replace framing without renaming the operation.\"]; added [\"Added in candidate: this retained source detail is carried verbatim in <link>.\"]. This records replacement, not byte carriage or current-truth certification.\nApplicable labelled corrections: none in this bound unit.\nDisposition partial-carry: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol under docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#3-component-protocol; source context \"External Provider Protocol\", target context \"Architecture: External Provider Protocol / Retained selected source material / External Provider Protocol\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy. Recorded residual: The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-semantic-contract-stays-transport-neutral and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-25 (claim_d1c4102dc6dea3ae86434fb12c0abf71; The semantic contract stays transport-neutral: a future binary codec or local socket transport may replace framing without renaming the oper)..\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "remainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-semantic-contract-stays-transport-neutral and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-25 (claim_d1c4102dc6dea3ae86434fb12c0abf71; The semantic contract stays transport-neutral: a future binary codec or local socket transport may replace framing without renaming the oper).",
+    "targetUnitDigest": "7cf43dd0dccf83e356b760c88da2576ecb1eb4cf9219caaf09a95ff12d2fd5a8",
+    "targetAncestry": [
+      "Architecture: External Provider Protocol",
+      "Retained selected source material",
+      "External Provider Protocol"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [
+    "L10-31/whole-direct-section"
+  ],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 235,
+  "factsSHA256": "e9eb2a4557f662f12cb4bc86c14c88e9478a7b4b03ad524cddbd8facabca7d45",
+  "sourceWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "3. Component Protocol",
+    "anchor": "3-component-protocol",
+    "githubAnchor": "3-component-protocol",
+    "stableAnchor": "h-3d2776445484",
+    "startLine": 72,
+    "endLine": 72,
+    "textDigest": "4788de97424c5b1035cf2384d427ef5a7694dfbae3af9c94f73cf5dcf4420ea6",
+    "sample": "3. Component Protocol",
+    "sectionPayloadDigest": "e71acdcc9325f5470c9e8b393d1115b8e47c2bf44fd5397ead27703eb1193a99",
+    "followingBlockDigest": "aa5e4116035d0b11d423c86594b2b314f62685ed66d610c53e45cd409a2f4999",
+    "identityFingerprint": "53de331d0d46a89817008914533b3e4804ad4f3b82c21ef2d39df86cf130c572",
+    "ancestry": [
+      "External Provider Protocol"
+    ],
+    "path": "docs/architect/host-invocation-routing/external-provider-protocol.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 4,
+    "title": "3. Component Protocol",
+    "anchor": "3-component-protocol",
+    "githubAnchor": "3-component-protocol",
+    "stableAnchor": "h-bab6626a3b3f",
+    "startLine": 122,
+    "endLine": 122,
+    "textDigest": "7cf43dd0dccf83e356b760c88da2576ecb1eb4cf9219caaf09a95ff12d2fd5a8",
+    "sample": "3. Component Protocol",
+    "sectionPayloadDigest": "9229fc3e7df43971e02ec720977cd9190fbe3882ca9fccf689e332f62945383f",
+    "followingBlockDigest": "aa5e4116035d0b11d423c86594b2b314f62685ed66d610c53e45cd409a2f4999",
+    "identityFingerprint": "66a04939a685fc3010a2080c0cb9533bcd069a467d36909a42099855075ce9e0",
+    "ancestry": [
+      "Architecture: External Provider Protocol",
+      "Retained selected source material",
+      "External Provider Protocol"
+    ],
+    "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md"
+  },
+  "sectionExplanation": {
+    "kind": "existing-labelled-successor-correction",
+    "description": "Complete direct section compared to the next native heading. Depth 2 → 4, title \"3. Component Protocol\" → \"3. Component Protocol\"; 1 distinct link spelling/label changes; 0 applicable exact labelled corrections. Normalized nonblank line order differs; exact raw-section removed/added line witnesses are accounted below; correction-normalized counts are reported separately. Partial section carriage: removed text is in the live named residual carriers docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-semantic-contract-stays-transport-neutral. Candidate additions/corrections are explicitly labelled in the direct section: [\"Added in candidate: this retained source detail is carried verbatim in <link>.\"]. Added lines are authenticated contributions from sibling source-unit bindings: docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#3-component-protocol. Existing correction labels named corrected successor / truth-ledger-agent-coordination.json at immutable account 9b0526380:plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json; exact section delta: removed [\"The semantic contract stays transport-neutral: a future binary codec or local socket transport may replace framing without renaming the operation.\"]; added [\"Added in candidate: this retained source detail is carried verbatim in <link>.\"]. This records replacement, not byte carriage or current-truth certification.",
+    "completeWitnessesAt": "62751458b22b47e930dc33b8501d07798b91ace3:plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json#/changes/235/facts/sectionExplanation"
+  },
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_8066684d5e7c7159d6f58caeef26d8cc",
+    "sourceUnitDigest": "4788de97424c5b1035cf2384d427ef5a7694dfbae3af9c94f73cf5dcf4420ea6",
+    "claimKind": "contract",
+    "kind": "architecture",
+    "disposition": "partial-carry",
+    "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+    "targetAnchor": "3-component-protocol",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/external-provider-protocol.md:72-72#3-component-protocol (current lines); unit SHA256 4788de97424c5b1035cf2384d427ef5a7694dfbae3af9c94f73cf5dcf4420ea6.\nTarget: docs/platform/host-invocation-routing/architecture/external-provider-protocol.md:122-122#3-component-protocol (current lines); unit SHA256 7cf43dd0dccf83e356b760c88da2576ecb1eb4cf9219caaf09a95ff12d2fd5a8.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 7cf43dd0dccf83e356b760c88da2576ecb1eb4cf9219caaf09a95ff12d2fd5a8 at 0c06e6e6b67a3897d660ee54de25fdc9971e59a4.\nLinks: source 0, target 1; 1 changed spellings/labels, 0 destination changes; 1 added, 0 removed.\nLink 1: \"none\" (none) → \"the dropped-007 restoration\" (../contracts/component-protocol.md#restored-semantic-contract-stays-transport-neutral); resolved none → docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-semantic-contract-stays-transport-neutral.\nHeading depth: 2 → 4; title \"3. Component Protocol\" → \"3. Component Protocol\".\nWhole direct section differs; depth 2 → 4; 1 distinct link changes; normalized line order differs; 1 removed and 1 added nonblank lines after heading/link/correction normalization.\nSection accounting (existing-labelled-successor-correction): Complete direct section compared to the next native heading. Depth 2 → 4, title \"3. Component Protocol\" → \"3. Component Protocol\"; 1 distinct link spelling/label changes; 0 applicable exact labelled corrections. Normalized nonblank line order differs; exact raw-section removed/added line witnesses are accounted below; correction-normalized counts are reported separately. Partial section carriage: removed text is in the live named residual carriers docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-semantic-contract-stays-transport-neutral. Candidate additions/corrections are explicitly labelled in the direct section: [\"Added in candidate: this retained source detail is carried verbatim in <link>.\"]. Added lines are authenticated contributions from sibling source-unit bindings: docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#3-component-protocol. Existing correction labels named corrected successor / truth-ledger-agent-coordination.json at immutable account 9b0526380:plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json; exact section delta: removed [\"The semantic contract stays transport-neutral: a future binary codec or local socket transport may replace framing without renaming the operation.\"]; added [\"Added in candidate: this retained source detail is carried verbatim in <link>.\"]. This records replacement, not byte carriage or current-truth certification.\nApplicable labelled corrections: none in this bound unit.\nDisposition partial-carry: Account for docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol under docs/platform/host-invocation-routing/architecture/external-provider-protocol.md#3-component-protocol; source context \"External Provider Protocol\", target context \"Architecture: External Provider Protocol / Retained selected source material / External Provider Protocol\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy. Recorded residual: The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-semantic-contract-stays-transport-neutral and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-25 (claim_d1c4102dc6dea3ae86434fb12c0abf71; The semantic contract stays transport-neutral: a future binary codec or local socket transport may replace framing without renaming the oper)..\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "remainder": "The relocated passage of docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol is retained verbatim at docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-semantic-contract-stays-transport-neutral and accounted by the sibling source decisions for those literal restoration blocks. The primary target retains the surrounding section text and links directly to those live anchors. Named source remainder: docs/architect/host-invocation-routing/external-provider-protocol.md#unheaded-block-25 (claim_d1c4102dc6dea3ae86434fb12c0abf71; The semantic contract stays transport-neutral: a future binary codec or local socket transport may replace framing without renaming the oper).",
+    "targetUnitDigest": "7cf43dd0dccf83e356b760c88da2576ecb1eb4cf9219caaf09a95ff12d2fd5a8",
+    "targetAncestry": [
+      "Architecture: External Provider Protocol",
+      "Retained selected source material",
+      "External Provider Protocol"
+    ]
+  }
+}
+```
+

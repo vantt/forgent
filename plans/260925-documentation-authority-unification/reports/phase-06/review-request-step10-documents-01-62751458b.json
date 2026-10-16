@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "contentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "comparisonBase": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "packagedBy": "codex-session:unit-run-1792122626822-ceb0cdd9@2026-10-16",
+  "section": "documents",
+  "entryCount": 2,
+  "entries": [
+    {
+      "kind": "conservation-label-carrier-fix",
+      "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "line": 436,
+      "before": "Registered counterparts: constraint-lens shaping and reviewed critique reports,",
+      "after": "Added in candidate — registered counterparts: constraint-lens shaping and reviewed critique reports,",
+      "label": "L10-31/explicit-section-correction",
+      "evidenceCommit": "9b0526380",
+      "historicalPreservation": "Complete pre-rework source is retained verbatim in the document-linked literal-snapshot; previously reviewed current-Workflow rewrite in truth-ledger-agent-coordination.json.",
+      "beforeLine": "Registered counterparts: constraint-lens shaping and reviewed critique reports,",
+      "afterLine": "Added in candidate — registered counterparts: constraint-lens shaping and reviewed critique reports,",
+      "beforeCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+      "afterCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+      "diff": "diff --git a/docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md b/docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md\nindex a61be5ce2..13a76a196 100644\n--- a/docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md\n+++ b/docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md\n@@ -431,11 +431,11 @@ was easy.\n \n ---\n \n ## 7. Constraint Findings — optional manual constraint/critique shape\n \n-Registered counterparts: constraint-lens shaping and reviewed critique reports,\n+Added in candidate — registered counterparts: constraint-lens shaping and reviewed critique reports,\n not a separate numbered runtime phase or mandatory file.\n \n **Why this exists.** To force ranking and reversibility judgment, which is the\n entire value of this role. A flat risk list is indistinguishable from noise.\n \n",
+      "deepRequired": true,
+      "entryId": "documents-001"
+    },
+    {
+      "kind": "conservation-label-carrier-fix",
+      "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+      "line": 1470,
+      "before": "Current packet dispositions require actual evidence when they turn on claims",
+      "after": "Added in candidate — current-Workflow correction; the former driver-specific rules remain in the historical snapshot linked above. Current packet dispositions require actual evidence when they turn on claims",
+      "label": "L10-31/explicit-section-correction",
+      "evidenceCommit": "9b0526380",
+      "historicalPreservation": "Complete pre-rework source is retained verbatim in the document-linked literal-snapshot; previously reviewed current-Workflow rewrite in truth-ledger-agent-coordination.json.",
+      "beforeLine": "Current packet dispositions require actual evidence when they turn on claims",
+      "afterLine": "Added in candidate — current-Workflow correction; the former driver-specific rules remain in the historical snapshot linked above. Current packet dispositions require actual evidence when they turn on claims",
+      "beforeCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+      "afterCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+      "diff": "diff --git a/docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md b/docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md\nindex 711092996..08f5e525f 100644\n--- a/docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md\n+++ b/docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md\n@@ -1465,11 +1465,11 @@ forbidden.\n Requires citing the observation, by path or by run result, made by an advisor who\n looked. Not \"our reasoning shows this is wrong\".\n \n ### Evidence And Conduct Boundaries\n \n-Current packet dispositions require actual evidence when they turn on claims\n+Added in candidate — current-Workflow correction; the former driver-specific rules remain in the historical snapshot linked above. Current packet dispositions require actual evidence when they turn on claims\n about PROJECT_ROOT or the panel's artifacts (`SKILL.md:124-128`):\n \n - **Invalidation:** cite a real observation, not the producer's unsupported\n   explanation for why dissent would be inconvenient.\n - **Answer:** cite the artifact that answers the concern.\n",
+      "deepRequired": true,
+      "entryId": "documents-002"
+    }
+  ],
+  "seedChosen": false,
+  "verdictChosen": false
+}

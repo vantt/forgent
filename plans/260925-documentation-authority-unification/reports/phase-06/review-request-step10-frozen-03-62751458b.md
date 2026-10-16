@@ -1,0 +1,678 @@
+# Bounded re-review: frozen 3
+
+Author session: `codex-session:unit-run-1792093168554-f28af963@2026-10-16`
+Packaged by: `codex-session:unit-run-1792122626822-ceb0cdd9@2026-10-16`
+Content commit: `62751458b22b47e930dc33b8501d07798b91ace3`; author changes `eb793bc63`; comparison `9b0526380329d8cb1cb6085a1c8f378e943e2505`.
+Entries: **12**; maximum 60 entries and 400000 bytes per Markdown/sidecar.
+[One request index](review-request-step10-index-62751458b.md).
+
+Committed `currentDecision`/`after` snapshots come from `git show 62751458b22b47e930dc33b8501d07798b91ace3:<shard>` through `reviewEntryFromCommittedRow`. Explicit `packageOverlay` and `packageOverlayAfter` values are fresh pending native/dependent rows and require the runner package commit for ordinary verdict binding. Before prose is historical. No producer seed, draw or verdict.
+
+Exact scratch-only reproduction commands, run sequentially from repository root at the runner package checkout:
+
+```sh
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work python3 plans/260925-documentation-authority-unification/reports/phase-06/step10-sync287-reproduce.py consistency --output /tmp/fgos-work/review627/consistency.json
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/scripts/doc-*.test.mjs test/scripts/check-doc-*.test.mjs test/scripts/generate-doc-inventory.test.mjs test/scripts/list-doc-anchors.test.mjs test/scripts/verify-phase-02.test.mjs test/scripts/next-doc-id.test.mjs
+env -u CLAUDE_CODE_SESSION_ID python3 - <<'PY'
+import json
+from pathlib import Path
+p=Path('/tmp/fgos-work/review627'); p.mkdir(parents=True, exist_ok=True)
+if p.is_symlink() or not p.resolve().is_relative_to('/tmp/fgos-work') or p.resolve().is_relative_to(Path.cwd().resolve()): raise RuntimeError('unsafe scratch directory')
+for name in ['step10-native-inventory.bin','step10-sync627-D-both.json','step10-sync627-D-identity.json','step10-sync627-D-phase02.json','step10-sync627-D-summary.json','step10-sync627-target-ownership.json','step10-sync627-link-replay.json']:
+    out=p/name
+    if out.is_symlink() or out.exists() and out.stat().st_nlink!=1: raise RuntimeError('unsafe scratch output')
+j=json.loads(Path('plans/260925-documentation-authority-unification/reports/phase-06/step10-sync627-reproduction.json').read_text())
+for name,text in j['readOnlyScripts'].items():
+    out=p/name
+    if out.is_symlink() or out.exists() and out.stat().st_nlink!=1: raise RuntimeError('unsafe scratch file')
+    out.write_text(text)
+PY
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --max-old-space-size=4096 --max-semi-space-size=16 /tmp/fgos-work/review627/inventory-readonly.mjs
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --max-old-space-size=4096 --max-semi-space-size=16 /tmp/fgos-work/review627/verify-readonly.mjs
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node /tmp/fgos-work/review627/ownership-readonly.mjs
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node /tmp/fgos-work/review627/audit-ownership-readonly.mjs
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work python3 /tmp/fgos-work/review627/replay-readonly.py
+```
+
+The unchanged checker audits **all 12895 rows /92 shards**, including all whole-section and distinct-occurrence rules, **836** selected outputs and the native-dependent refresh. Expected tests: **490** pass. No author `--apply`, carry-forward, registry persistence or repository output occurs in these reviewer commands. Inventory replay reads the sole compact registry; its regenerated inventory and all D/ownership/link outputs stay under `/tmp/fgos-work/review627/`. Reader reproduction needs available scratch space and memory; do the heavy commands sequentially. Historical author mutation scripts in the provenance manifest are evidence only.
+
+A36: every pending submitted claim receives ordinary verdict and digest/anchor/shard equality. Independently seed >=45/296 rationale deep sample plus >=45/298 conservative Weak-exact/Judgment population (one reviewer draw can satisfy both only if coverage proved). Every listed unequal-digest, partial/historical row, all52 whole-section headings, all8 own-occurrence footers, restored L10-2, and marked docs/tool/native corrections are deep. [Exact deep populations](step10-sync627-A36.json). Reviewer records seed/sample IDs; >3% deep rework escalates to whole set. No separate claim verdict on frozen/footer/accounting references when the pending claim is already submitted in rationales/decisions. Existing reviewed approvals remain; evidence/native tuples do not approve current truth or cutover.
+
+## Entry frozen-062
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-062",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+  "collection": "claims",
+  "claimId": "claim_45840c035132a9c46aa748567ae37648",
+  "frozenRecord": {
+    "claimId": "claim_45840c035132a9c46aa748567ae37648",
+    "sourceUnitDigest": "fe8801065e62f36e",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0032-declarative-structure",
+    "targetUnitDigest": "f13c8f30093babf6efcf6b2fbb0062eecfe81a6db5527e400d33b8c3167a4cc5",
+    "disposition": "promote",
+    "rationale": "Source H4 \"III. Cấu trúc khai báo ...\" is carried as H3 \"0032 Declarative Structure\"; title translated and seq references dropped. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "13. ADR 0032 Multi-Role Team Harness"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_45840c035132a9c46aa748567ae37648",
+    "sourceUnitDigest": "fe8801065e62f36e",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0032-declarative-structure",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Source H4 \"III. Cấu trúc khai báo ...\" is carried as H3 \"0032 Declarative Structure\"; title translated and seq references dropped. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading retitle H4 \"III. Cấu trúc khai báo (seq 18059, 18060, 18110, 181...\" to H3 \"0032 Declarative Structure\"; section payload digest and following-block digest equal at both ends (4770 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok. The source title parenthetical (seq 18059, 18060, 18110, 18189, 18232, 1...) is not in the target title; the rationale says seq references dropped.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "f13c8f30093babf6efcf6b2fbb0062eecfe81a6db5527e400d33b8c3167a4cc5",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "13. ADR 0032 Multi-Role Team Harness"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-063
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-063",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+  "collection": "claims",
+  "claimId": "claim_7baf6e6911d7bdc8cbb66425d0aff57a",
+  "frozenRecord": {
+    "claimId": "claim_7baf6e6911d7bdc8cbb66425d0aff57a",
+    "sourceUnitDigest": "58d933902652fcbf",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0032-implementation-sequence",
+    "targetUnitDigest": "861c399f16053144093e08b8bf68e573b9afa26758d326b719c0bb5ddcd0d88f",
+    "disposition": "promote",
+    "rationale": "Source H4 \"IV. Trình tự triển khai (seq 18030)\" is carried as H3 \"0032 Implementation Sequence\"; title translated. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "13. ADR 0032 Multi-Role Team Harness"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_7baf6e6911d7bdc8cbb66425d0aff57a",
+    "sourceUnitDigest": "58d933902652fcbf",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0032-implementation-sequence",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Source H4 \"IV. Trình tự triển khai (seq 18030)\" is carried as H3 \"0032 Implementation Sequence\"; title translated. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading retitle H4 \"IV. Trình tự triển khai (seq 18030)\" to H3 \"0032 Implementation Sequence\"; section payload digest and following-block digest equal at both ends (708 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok. The source title parenthetical (seq 18030) is not in the target title; the rationale says seq references dropped. Digests also hand-recomputed with an independent script: equal.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "861c399f16053144093e08b8bf68e573b9afa26758d326b719c0bb5ddcd0d88f",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "13. ADR 0032 Multi-Role Team Harness"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-064
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-064",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+  "collection": "claims",
+  "claimId": "claim_963bf3272df983c42aead0351a429ce4",
+  "frozenRecord": {
+    "claimId": "claim_963bf3272df983c42aead0351a429ce4",
+    "sourceUnitDigest": "7d8d4de935f8bf82",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0032-marketing-cockpit-comparison-conclusion",
+    "targetUnitDigest": "8a71adf68dd932df92f4e48b38dabd720531a798392f3d046c521c0cfb7ef4b7",
+    "disposition": "promote",
+    "rationale": "Source H4 \"V. Kết luận so sánh marketing-cockpit ...\" is carried as H3 \"0032 Marketing Cockpit Comparison Conclusion\"; title translated. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "13. ADR 0032 Multi-Role Team Harness"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_963bf3272df983c42aead0351a429ce4",
+    "sourceUnitDigest": "7d8d4de935f8bf82",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0032-marketing-cockpit-comparison-conclusion",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Source H4 \"V. Kết luận so sánh marketing-cockpit ...\" is carried as H3 \"0032 Marketing Cockpit Comparison Conclusion\"; title translated. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading retitle H4 \"V. Kết luận so sánh marketing-cockpit (vòng fable, v...\" to H3 \"0032 Marketing Cockpit Comparison Conclusion\"; section payload digest and following-block digest equal at both ends (1274 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok. The source title parenthetical (vòng fable, vẫn đứng vững) is not in the target title and the rationale only says translated (non-blocking).",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "8a71adf68dd932df92f4e48b38dabd720531a798392f3d046c521c0cfb7ef4b7",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "13. ADR 0032 Multi-Role Team Harness"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-065
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-065",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+  "collection": "claims",
+  "claimId": "claim_c696887f984b8248a620d445d341cf0b",
+  "frozenRecord": {
+    "claimId": "claim_c696887f984b8248a620d445d341cf0b",
+    "sourceUnitDigest": "6c186518993aba9c",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0032-deliberately-deferred-questions",
+    "targetUnitDigest": "c71143d4c041f9d8943b66c9a1138bf3ce8e6f108c19234f9872579dc9eca773",
+    "disposition": "promote",
+    "rationale": "Source H4 \"VI. Treo có chủ đích (không phải quên)\" is carried as H3 \"0032 Deliberately Deferred Questions\"; title translated. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "13. ADR 0032 Multi-Role Team Harness"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_c696887f984b8248a620d445d341cf0b",
+    "sourceUnitDigest": "6c186518993aba9c",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0032-deliberately-deferred-questions",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Source H4 \"VI. Treo có chủ đích (không phải quên)\" is carried as H3 \"0032 Deliberately Deferred Questions\"; title translated. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading retitle H4 \"VI. Treo có chủ đích (không phải quên)\" to H3 \"0032 Deliberately Deferred Questions\"; section payload digest and following-block digest equal at both ends (691 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok. The source title parenthetical (không phải quên) is not in the target title and the rationale only says translated (non-blocking). Digests also hand-recomputed with an independent script: equal.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "c71143d4c041f9d8943b66c9a1138bf3ce8e6f108c19234f9872579dc9eca773",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "13. ADR 0032 Multi-Role Team Harness"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-066
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-066",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+  "collection": "claims",
+  "claimId": "claim_cf9060b6664b21d6e5fac0b31aac0ff6",
+  "frozenRecord": {
+    "claimId": "claim_cf9060b6664b21d6e5fac0b31aac0ff6",
+    "sourceUnitDigest": "a88af4784f074e4e",
+    "targetOwner": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+    "targetAnchor": "3-state-at-distill-time",
+    "targetUnitDigest": "dda4c28cba5f1a13d782c50c996bc50d5848d6d8172ecb38066a23e8e1c19023",
+    "disposition": "promote",
+    "rationale": "Source H4 \"VII. Trạng thái tại thời điểm distill (2026-08-15)\" is carried as H2 \"3. State At Distill Time\" in the history document; dated snapshot, title differs. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Multi-Role Harness Distill Record"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_cf9060b6664b21d6e5fac0b31aac0ff6",
+    "sourceUnitDigest": "a88af4784f074e4e",
+    "targetOwner": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+    "targetAnchor": "3-state-at-distill-time",
+    "claimKind": "historical-context",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Source H4 \"VII. Trạng thái tại thời điểm distill (2026-08-15)\" is carried as H2 \"3. State At Distill Time\" in the history document; dated snapshot, title differs. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading \"VII. Trạng thái tại thời điểm distill (2026-08-15)\" becomes H2 \"3. State At Distill Time\" in the history document; section payload digest and following-block digest equal (898 chars under it), so only title and level differ; the date 2026-08-15 in the source title is not in the target title and the rationale says only \"dated snapshot, title differs\" (non-blocking: the date survives in the retired-decision-history blockquote); anchor ok. Digests also hand-recomputed with an independent script: equal.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-09-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "dda4c28cba5f1a13d782c50c996bc50d5848d6d8172ecb38066a23e8e1c19023",
+    "targetAncestry": [
+      "Multi-Role Harness Distill Record"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-067
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-067",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+  "collection": "claims",
+  "claimId": "claim_581643ec8243af5744e04c222f13c214",
+  "frozenRecord": {
+    "claimId": "claim_581643ec8243af5744e04c222f13c214",
+    "sourceUnitDigest": "a143984b5d286e28",
+    "targetOwner": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+    "targetAnchor": "4-implementation-review-and-verification-after-distill",
+    "targetUnitDigest": "a88add6a18b0023671d9f83c9261dfd52d1440fd05936db3be3acd430adb0b11",
+    "disposition": "promote",
+    "rationale": "Source H4 \"VIII. Sau distill ...\" is carried as H2 \"4. Implementation Review And Verification After Distill\"; dated section, title translated. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Multi-Role Harness Distill Record"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_581643ec8243af5744e04c222f13c214",
+    "sourceUnitDigest": "a143984b5d286e28",
+    "targetOwner": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+    "targetAnchor": "4-implementation-review-and-verification-after-distill",
+    "claimKind": "historical-context",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Source H4 \"VIII. Sau distill ...\" is carried as H2 \"4. Implementation Review And Verification After Distill\"; dated section, title translated. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading \"VIII. Sau distill ... (2026-08-15/16)\" becomes H2 \"4. Implementation Review And Verification After Distill\"; payload and following-block digests equal so the section text is intact; the date span in the source title is dropped from the target title while the rationale says \"dated section, title translated\" (non-blocking, 2026-08-16 still appears at history line 78); anchor ok.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-09-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "a88add6a18b0023671d9f83c9261dfd52d1440fd05936db3be3acd430adb0b11",
+    "targetAncestry": [
+      "Multi-Role Harness Distill Record"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-068
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-068",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_51848961a2bbf93d37bc2b46d9f141f5",
+  "frozenRecord": {
+    "claimId": "claim_51848961a2bbf93d37bc2b46d9f141f5",
+    "sourceUnitDigest": "a8638afcbc30af3cfed8ddecb38f890e54215f551afcbd9a9d09d23c02d8bce3",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "2-input-direction-verb-and-identity",
+    "targetUnitDigest": "7c4e0214ec4c8c108c24c1b00a560516fbc5de0bc1a26d70a082eca5ccafb23c",
+    "disposition": "supersede",
+    "rationale": "Heading translated and renumbered: “Chiều vào — verb + danh tính” becomes “2. Input Direction Verb And Identity”. Its forty-line direct source body is carried under new H3 subsections, each body unit has its own decision row. Heading and section digests differ because of translation, numbering and structural relocation, in addition to the disclosed Session Identity relative link rebase. Native identity resolved at 19ca8de23; no provisional identity, source retirement, authority flip or truth approval.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "sourcePath": "docs/io-contract.md",
+    "sourceAnchor": "chiều-vào-verb-danh-tính",
+    "targetAncestry": [
+      "CLI I/O Contract"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_51848961a2bbf93d37bc2b46d9f141f5",
+    "sourcePath": "docs/io-contract.md",
+    "sourceAnchor": "chiều-vào-verb-danh-tính",
+    "sourceUnitDigest": "a8638afcbc30af3cfed8ddecb38f890e54215f551afcbd9a9d09d23c02d8bce3",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Heading translated and renumbered: “Chiều vào — verb + danh tính” becomes “2. Input Direction Verb And Identity”. Its forty-line direct source body is carried under new H3 subsections, each body unit has its own decision row. Heading and section digests differ because of translation, numbering and structural relocation, in addition to the disclosed Session Identity relative link rebase. Native identity resolved at 19ca8de23; no provisional identity, source retirement, authority flip or truth approval.",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "2-input-direction-verb-and-identity",
+    "reviewNote": "deep: supersede of the \"Chiều vào\" heading; the heading text is translated and renumbered, its 2218-char source section payload is not under the target heading (39 chars) but every body unit of that section (blocks 3 to 8 of docs/io-contract.md) has its own decision row to cli-io-contract.md blocks 4,7,10,8,13,14, so nothing is stranded; the rationale also discloses the Session Identity link rebase; anchor ok.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-09-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "7c4e0214ec4c8c108c24c1b00a560516fbc5de0bc1a26d70a082eca5ccafb23c",
+    "targetAncestry": [
+      "CLI I/O Contract"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-083
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-083",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "claimId": "claim_ccf1acf857fc4e9757a933ca22ed34f1",
+  "frozenRecord": {
+    "claimId": "claim_ccf1acf857fc4e9757a933ca22ed34f1",
+    "sourceUnitDigest": "fed79e2e75d57ab326d97e74e6b2cd4b8fd1474aa6df3abb284ae2bb6d46f817",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "Retain in place outside platform documentation authority: AGENTS.md#legacy-node-cli-ownership-boundary, source unit SHA256 fed79e2e75d57ab326d97e74e6b2cd4b8fd1474aa6df3abb284ae2bb6d46f817, source file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. Pending independent review; no authority flip or truth certificate.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "legacy-node-cli-ownership-boundary"
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_ccf1acf857fc4e9757a933ca22ed34f1",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "legacy-node-cli-ownership-boundary",
+    "sourceUnitDigest": "fed79e2e75d57ab326d97e74e6b2cd4b8fd1474aa6df3abb284ae2bb6d46f817",
+    "claimKind": "navigation",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Retain in place outside platform documentation authority: AGENTS.md#legacy-node-cli-ownership-boundary, source unit SHA256 fed79e2e75d57ab326d97e74e6b2cd4b8fd1474aa6df3abb284ae2bb6d46f817, source file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. Pending independent review; no authority flip or truth certificate.",
+    "reviewNote": "deep: retain-in-place heading row with no target; AGENTS.md sha256 47f3a4e5 equals the file hash quoted in the rationale, the quoted unit digest fed79e2e recomputes equal, the section \"Legacy-Node CLI Ownership Boundary\" is at line 83; nothing carried, nothing added; the rationale sentence \"Pending independent review\" is stale on a reviewed row but is the repo-wide convention (452 rows). Digests also hand-recomputed with an independent script: equal.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-09-287a22d33.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-100
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-100",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-mapped-conservation.json",
+  "collection": "claims",
+  "claimId": "claim_1be7573f879e8eda05723b6d40b3b84e",
+  "frozenRecord": {
+    "claimId": "claim_1be7573f879e8eda05723b6d40b3b84e",
+    "sourceUnitDigest": "12b28da343768f1576f3797fb78cc9f5e32b1875275d52d38a1b56ffd6a5d467",
+    "targetOwner": "docs/platform/documentation/switchboard.md",
+    "targetAnchor": "5-related-files",
+    "targetUnitDigest": "31d43bc08eb7f07bb47204e7cef0998d514836e35e717db722eb8e171a2c578e",
+    "disposition": "supersede",
+    "rationale": "Frozen root map assigns docs/transitional-switchboard.md#5-related-files to docs/platform/documentation/switchboard.md#5-related-files. Carry the complete unit into its candidate switchboard doc owner. This unit includes 6 documented link spelling adjustment(s): [docs/reading-map.md](reading-map.md) becomes [docs/reading-map.md](../../reading-map.md) (Relative spelling changes only; original repository destination conserved.); [docs/platform/README.md](platform/README.md) becomes [docs/platform/README.md](../README.md) (Relative spelling changes only; original repository destination conserved.); [docs/doc-governance.md](doc-governance.md) becomes [docs/platform/governance.md](../governance.md) (Destination repointed to docs/platform/governance.md and label changed from docs/doc-governance.md to docs/platform/governance.md.); [docs/platform/migration-authoring-rules.md](platform/migration-authoring-rules.md) becomes [docs/platform/migration-authoring-rules.md](../migration-authoring-rules.md) (Relative spelling changes only; original repository destination conserved.); [plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md](../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md) becomes [plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md](../../../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md) (Relative spelling changes only; original repository destination conserved.); [plans/260925-documentation-authority-unification/plan.md](../plans/260925-documentation-authority-unification/plan.md) becomes [plans/260925-documentation-authority-unification/plan.md](../../../plans/260925-documentation-authority-unification/plan.md) (Relative spelling changes only; original repository destination conserved.). Full source/target text and diff are submitted for independent whole-unit conservation review; wrapping/header/relative-path changes grant no truth approval. No source retirement, promotion or component-boundary change. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding. L10 review correction: the doc-governance link is repointed to docs/platform/governance.md; its original legacy destination is not retained. Both label change and candidate referent are disclosed; pending independent review.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Transitional Documentation Authority Switchboard"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_1be7573f879e8eda05723b6d40b3b84e",
+    "sourceUnitDigest": "12b28da343768f1576f3797fb78cc9f5e32b1875275d52d38a1b56ffd6a5d467",
+    "targetOwner": "docs/platform/documentation/switchboard.md",
+    "targetAnchor": "5-related-files",
+    "claimKind": "navigation",
+    "disposition": "supersede",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Frozen root map assigns docs/transitional-switchboard.md#5-related-files to docs/platform/documentation/switchboard.md#5-related-files. Carry the complete unit into its candidate switchboard doc owner. This unit includes 6 documented link spelling adjustment(s): [docs/reading-map.md](reading-map.md) becomes [docs/reading-map.md](../../reading-map.md) (Relative spelling changes only; original repository destination conserved.); [docs/platform/README.md](platform/README.md) becomes [docs/platform/README.md](../README.md) (Relative spelling changes only; original repository destination conserved.); [docs/doc-governance.md](doc-governance.md) becomes [docs/platform/governance.md](../governance.md) (Destination repointed to docs/platform/governance.md and label changed from docs/doc-governance.md to docs/platform/governance.md.); [docs/platform/migration-authoring-rules.md](platform/migration-authoring-rules.md) becomes [docs/platform/migration-authoring-rules.md](../migration-authoring-rules.md) (Relative spelling changes only; original repository destination conserved.); [plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md](../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md) becomes [plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md](../../../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md) (Relative spelling changes only; original repository destination conserved.); [plans/260925-documentation-authority-unification/plan.md](../plans/260925-documentation-authority-unification/plan.md) becomes [plans/260925-documentation-authority-unification/plan.md](../../../plans/260925-documentation-authority-unification/plan.md) (Relative spelling changes only; original repository destination conserved.). Full source/target text and diff are submitted for independent whole-unit conservation review; wrapping/header/relative-path changes grant no truth approval. No source retirement, promotion or component-boundary change. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding. L10 review correction: the doc-governance link is repointed to docs/platform/governance.md; its original legacy destination is not retained. Both label change and candidate referent are disclosed; pending independent review.",
+    "reviewNote": "deep: Related Files heading of the switchboard; heading text equal but the section payload differs (742 vs 752 chars) only by the six link changes the rationale lists (checked one by one: five spelling-only rebases, one repoint docs/doc-governance.md to docs/platform/governance.md with label change, both disclosed); anchor 5-related-files ok in the target; link-label policy for the repointed row was accepted in the cited report. Digests also hand-recomputed with an independent script: equal.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-09-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "31d43bc08eb7f07bb47204e7cef0998d514836e35e717db722eb8e171a2c578e",
+    "targetAncestry": [
+      "Transitional Documentation Authority Switchboard"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-101
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-101",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-retained-navigation-proposal.json",
+  "collection": "claims",
+  "claimId": "claim_8e290abbe8f1344bf8f19c997da11921",
+  "frozenRecord": {
+    "claimId": "claim_8e290abbe8f1344bf8f19c997da11921",
+    "sourceUnitDigest": "19c2ff247fb664d39a56d6194b1d47b6dce16ea18c8ee19369bd2884efbf918a",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "Retain in place outside platform documentation authority: docs/specs/reading-map.md#reading-map-sản-phẩm, source unit SHA256 19c2ff247fb664d39a56d6194b1d47b6dce16ea18c8ee19369bd2884efbf918a, source file SHA256 22606348608523b94c6a25f1540007aec5512d340278efea1f835713a7e67250 at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. docs/reading-map.md section 5 contains seven labelled truth corrections plus the Session Identity entry; retained legacy docs/specs/reading-map.md is untouched. Pending independent review; no authority flip or truth certificate.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "sourcePath": "docs/specs/reading-map.md",
+    "sourceAnchor": "reading-map-sản-phẩm"
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_8e290abbe8f1344bf8f19c997da11921",
+    "sourcePath": "docs/specs/reading-map.md",
+    "sourceAnchor": "reading-map-sản-phẩm",
+    "sourceUnitDigest": "19c2ff247fb664d39a56d6194b1d47b6dce16ea18c8ee19369bd2884efbf918a",
+    "claimKind": "navigation",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Retain in place outside platform documentation authority: docs/specs/reading-map.md#reading-map-sản-phẩm, source unit SHA256 19c2ff247fb664d39a56d6194b1d47b6dce16ea18c8ee19369bd2884efbf918a, source file SHA256 22606348608523b94c6a25f1540007aec5512d340278efea1f835713a7e67250 at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. docs/reading-map.md section 5 contains seven labelled truth corrections plus the Session Identity entry; retained legacy docs/specs/reading-map.md is untouched. Pending independent review; no authority flip or truth certificate.",
+    "reviewNote": "mechanical: retain-in-place H1 of docs/specs/reading-map.md; file sha256 22606348 equals the pin and the rationale, unit digest 19c2ff24 recomputes equal; the rationale claim of seven labelled truth corrections plus the Session Identity entry in docs/reading-map.md was counted true (see 306); no target. Digests also hand-recomputed with an independent script: equal.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-09-287a22d33.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-102
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-102",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-retained-navigation-proposal.json",
+  "collection": "claims",
+  "claimId": "claim_c8677c74072e0ac1ac4d9b345de1ee1f",
+  "frozenRecord": {
+    "claimId": "claim_c8677c74072e0ac1ac4d9b345de1ee1f",
+    "sourceUnitDigest": "01204e281f177e257efc7b015d93651c874a149f0e4bb3a68054b943a66d2e91",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "Retain in place outside platform documentation authority: docs/reading-map.md#5-detailed-product-and-source-map, source unit SHA256 01204e281f177e257efc7b015d93651c874a149f0e4bb3a68054b943a66d2e91, source file SHA256 f4fce87549f728da23d13a9ff8c8c85efc397956bfacf5c5cf83badf13dc5abb at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. docs/reading-map.md section 5 contains seven labelled truth corrections plus the Session Identity entry; retained legacy docs/specs/reading-map.md is untouched. Pending independent review; no authority flip or truth certificate.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "sourcePath": "docs/reading-map.md",
+    "sourceAnchor": "5-detailed-product-and-source-map"
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_c8677c74072e0ac1ac4d9b345de1ee1f",
+    "sourcePath": "docs/reading-map.md",
+    "sourceAnchor": "5-detailed-product-and-source-map",
+    "sourceUnitDigest": "01204e281f177e257efc7b015d93651c874a149f0e4bb3a68054b943a66d2e91",
+    "claimKind": "navigation",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Retain in place outside platform documentation authority: docs/reading-map.md#5-detailed-product-and-source-map, source unit SHA256 01204e281f177e257efc7b015d93651c874a149f0e4bb3a68054b943a66d2e91, source file SHA256 f4fce87549f728da23d13a9ff8c8c85efc397956bfacf5c5cf83badf13dc5abb at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. docs/reading-map.md section 5 contains seven labelled truth corrections plus the Session Identity entry; retained legacy docs/specs/reading-map.md is untouched. Pending independent review; no authority flip or truth certificate.",
+    "reviewNote": "deep: retain-in-place heading of docs/reading-map.md section 5; file sha256 f4fce875 equals the pin, unit digest 01204e28 equal; counted seven Truth correction labels plus the Session Identity entry in section 5 as the rationale says; no target, no carry.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-09-287a22d33.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-117
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-117",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+  "collection": "claims",
+  "claimId": "claim_5788dd19c4378fbb442c6a455f0e7857",
+  "frozenRecord": {
+    "claimId": "claim_5788dd19c4378fbb442c6a455f0e7857",
+    "sourceUnitDigest": "29d41a45489095b7ca89fd6570c786bc74bce025d8b3c4cb995cf315b3c653d9",
+    "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+    "targetAnchor": "0063-work-chỉ-là-bên-dùng-dispatch-nhận-input-generic-thay-phần-đầu-vào-còn-lại-của-rul73-dispatch-does-not-know-work2",
+    "targetUnitDigest": "3a1f30f7334b753a47a5c620be560d11b00e969789882a65e594c96d92177f55",
+    "disposition": "supersede",
+    "rationale": "Judgment: labelled candidate addition. Whole heading docs/specs/runner.md#0063-work-chỉ-là-bên-dùng-dispatch-nhận-input-generic-thay-phần-đầu-vào-còn-lại-của-rul73-dispatch-does-not-know-work2 (lines 3329–3329) carried at docs/platform/runner/decisions/h-36d872fbb0e5.md#0063-work-chỉ-là-bên-dùng-dispatch-nhận-input-generic-thay-phần-đầu-vào-còn-lại-của-rul73-dispatch-does-not-know-work2. Source/target digests differ because the labelled 0064 introduction blockquote (Added in candidate: Settled runner decision carried from the retained source) sits at the end of the 0063 direct section; source decision text remains verbatim. Supersede records that labelled addition. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover. L10-13/L10-14: specific candidate link correction or explicit added-decision wrapper changes this direct unit; current target binding re-decided pending. Historical decision semantics remain; all text differences shown in step10-correction-edits.json. No approval carry.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_5788dd19c4378fbb442c6a455f0e7857",
+    "sourceUnitDigest": "29d41a45489095b7ca89fd6570c786bc74bce025d8b3c4cb995cf315b3c653d9",
+    "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+    "targetAnchor": "0063-work-chỉ-là-bên-dùng-dispatch-nhận-input-generic-thay-phần-đầu-vào-còn-lại-của-rul73-dispatch-does-not-know-work2",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Judgment: labelled candidate addition. Whole heading docs/specs/runner.md#0063-work-chỉ-là-bên-dùng-dispatch-nhận-input-generic-thay-phần-đầu-vào-còn-lại-của-rul73-dispatch-does-not-know-work2 (lines 3329–3329) carried at docs/platform/runner/decisions/h-36d872fbb0e5.md#0063-work-chỉ-là-bên-dùng-dispatch-nhận-input-generic-thay-phần-đầu-vào-còn-lại-của-rul73-dispatch-does-not-know-work2. Source/target digests differ because the labelled 0064 introduction blockquote (Added in candidate: Settled runner decision carried from the retained source) sits at the end of the 0063 direct section; source decision text remains verbatim. Supersede records that labelled addition. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover. L10-13/L10-14: specific candidate link correction or explicit added-decision wrapper changes this direct unit; current target binding re-decided pending. Historical decision semantics remain; all text differences shown in step10-correction-edits.json. No approval carry.",
+    "reviewNote": "deep: 0063 heading, unit text equal, section payload differs (5250 vs 5331 chars) by exactly the one labelled \"Added in candidate\" 0064 blockquote that the rationale names; the rationale now cites the true source line 3329; supersede with the labelled addition is the right disposition; anchor ok.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-09-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "3a1f30f7334b753a47a5c620be560d11b00e969789882a65e594c96d92177f55",
+    "targetAncestry": [
+      "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+      "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+

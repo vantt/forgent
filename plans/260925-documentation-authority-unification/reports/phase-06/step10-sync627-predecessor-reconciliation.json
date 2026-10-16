@@ -1,0 +1,181 @@
+{
+  "contentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "priorCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792122626822-ceb0cdd9@2026-10-16",
+  "newPredecessors": [
+    {
+      "claimId": "claim_f15e4328e1e5df90c51f535e75da554b",
+      "nativePredecessor": {
+        "sourcePath": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+        "unitDigest": "0f35e2a68dba79e8691a1dbeabc4aae960abfa8664239abf2054bf09473fa0ba",
+        "identityFingerprint": "0f35e2a68dba79e8691a1dbeabc4aae960abfa8664239abf2054bf09473fa0ba",
+        "claimId": "claim_f15e4328e1e5df90c51f535e75da554b",
+        "sourceAnchor": "unheaded-block-44",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "9643a6fe01ce142637dcea09eb07b8690322ab13683212165934615d5aba3ae5",
+        "claimKind": "procedure",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-44 is not a stable heading anchor"
+      },
+      "nativeSuccessor": {
+        "sourcePath": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+        "unitDigest": "af5da2fe05d1bd41adb3b876f7f6691be48fc28c4740e0cbebe2c64ab2500beb",
+        "identityFingerprint": "af5da2fe05d1bd41adb3b876f7f6691be48fc28c4740e0cbebe2c64ab2500beb",
+        "claimId": "claim_4a2dfdbfa271d8f20b4e581757288988",
+        "sourceAnchor": "unheaded-block-44",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "f03302423020c8beeac177192fbe0952433473b78efd7c17f5eb96b39d67dbca",
+        "claimKind": "procedure",
+        "status": "future",
+        "origin": "added-since-287a22d33a0eaf2d9e47549a1142daf62361bb8c"
+      },
+      "beforeCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+      "beforeSource": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-44",
+        "githubAnchor": "unheaded-block-44",
+        "stableAnchor": "unheaded-block-44",
+        "title": "Unheaded block 44",
+        "startLine": 436,
+        "endLine": 437,
+        "textDigest": "9643a6fe01ce142637dcea09eb07b8690322ab13683212165934615d5aba3ae5",
+        "sample": "Registered counterparts: constraint-lens shaping and reviewed critique reports,\nnot a separate numbered runtime phase or mandatory file.",
+        "identityFingerprint": "0f35e2a68dba79e8691a1dbeabc4aae960abfa8664239abf2054bf09473fa0ba",
+        "ancestry": [
+          "Architecture Advisory Artifact Templates",
+          "7. Constraint Findings — optional manual constraint/critique shape"
+        ],
+        "text": "Registered counterparts: constraint-lens shaping and reviewed critique reports,\nnot a separate numbered runtime phase or mandatory file."
+      },
+      "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+      "currentSource": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-44",
+        "githubAnchor": "unheaded-block-44",
+        "stableAnchor": "unheaded-block-44",
+        "title": "Unheaded block 44",
+        "startLine": 436,
+        "endLine": 437,
+        "textDigest": "f03302423020c8beeac177192fbe0952433473b78efd7c17f5eb96b39d67dbca",
+        "sample": "Added in candidate — registered counterparts: constraint-lens shaping and reviewed critique reports,\nnot a separate numbered runtime phase or mandatory file.",
+        "identityFingerprint": "af5da2fe05d1bd41adb3b876f7f6691be48fc28c4740e0cbebe2c64ab2500beb",
+        "ancestry": [
+          "Architecture Advisory Artifact Templates",
+          "7. Constraint Findings — optional manual constraint/critique shape"
+        ],
+        "text": "Added in candidate — registered counterparts: constraint-lens shaping and reviewed critique reports,\nnot a separate numbered runtime phase or mandatory file."
+      },
+      "after": {
+        "claimId": "claim_f15e4328e1e5df90c51f535e75da554b",
+        "sourcePath": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+        "sourceUnitDigest": "9643a6fe01ce142637dcea09eb07b8690322ab13683212165934615d5aba3ae5",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+        "targetAnchor": "unheaded-block-44",
+        "targetUnitDigest": "f03302423020c8beeac177192fbe0952433473b78efd7c17f5eb96b39d67dbca",
+        "targetAncestry": [
+          "Architecture Advisory Artifact Templates",
+          "7. Constraint Findings — optional manual constraint/critique shape"
+        ],
+        "rationale": "A22/A31/L10-31: native predecessor from 287a22d33 is superseded by the current same-section unit after the authorized explicit conservation label addition. The Constraint Findings addition is now labelled registered-counterparts; the Role Doctrine correction is labelled current-Workflow and points to its historical snapshot. No original source or snapshot text was removed. Complete immutable before/after unit text and native successor identity are recorded in step10-sync627-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval.",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792122626822-ceb0cdd9@2026-10-16",
+        "reviewNote": "Independent review pending at 62751458b; no approval carried."
+      },
+      "deepRequired": true
+    },
+    {
+      "claimId": "claim_9e9d711e331efe5a12c8b8bf50371dc6",
+      "nativePredecessor": {
+        "sourcePath": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+        "unitDigest": "b475398ae494b6c3ef3859fa0d80aa989e3b3ed01789cea21ff41f4ae8e2cec5",
+        "identityFingerprint": "b475398ae494b6c3ef3859fa0d80aa989e3b3ed01789cea21ff41f4ae8e2cec5",
+        "claimId": "claim_9e9d711e331efe5a12c8b8bf50371dc6",
+        "sourceAnchor": "unheaded-block-117",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "087d5cdd477bde5b2bf98882290f0d23d3e44a06f0c6f93b7f15e6bcfa391c63",
+        "claimKind": "procedure",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-117 is not a stable heading anchor"
+      },
+      "nativeSuccessor": {
+        "sourcePath": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+        "unitDigest": "0093aca093c7750ec5c3b0e2bb870a1fba3b1f888cc2292efd9a9d109c023faa",
+        "identityFingerprint": "0093aca093c7750ec5c3b0e2bb870a1fba3b1f888cc2292efd9a9d109c023faa",
+        "claimId": "claim_cfdd80946e57e4ea360ed04c1413f4dd",
+        "sourceAnchor": "unheaded-block-117",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "7486a9e911dc83dd8182817e3d51bccd7b2e95a87b245307e19b3dd1de9fbb34",
+        "claimKind": "procedure",
+        "status": "future",
+        "origin": "added-since-287a22d33a0eaf2d9e47549a1142daf62361bb8c"
+      },
+      "beforeCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+      "beforeSource": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-117",
+        "githubAnchor": "unheaded-block-117",
+        "stableAnchor": "unheaded-block-117",
+        "title": "Unheaded block 117",
+        "startLine": 1470,
+        "endLine": 1471,
+        "textDigest": "087d5cdd477bde5b2bf98882290f0d23d3e44a06f0c6f93b7f15e6bcfa391c63",
+        "sample": "Current packet dispositions require actual evidence when they turn on claims\nabout PROJECT_ROOT or the panel's artifacts (`SKILL.md:124-128`):",
+        "identityFingerprint": "b475398ae494b6c3ef3859fa0d80aa989e3b3ed01789cea21ff41f4ae8e2cec5",
+        "ancestry": [
+          "Architecture Advisory Role Doctrine",
+          "Driver-Disposition Doctrine",
+          "Evidence And Conduct Boundaries"
+        ],
+        "text": "Current packet dispositions require actual evidence when they turn on claims\nabout PROJECT_ROOT or the panel's artifacts (`SKILL.md:124-128`):"
+      },
+      "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+      "currentSource": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-117",
+        "githubAnchor": "unheaded-block-117",
+        "stableAnchor": "unheaded-block-117",
+        "title": "Unheaded block 117",
+        "startLine": 1470,
+        "endLine": 1471,
+        "textDigest": "7486a9e911dc83dd8182817e3d51bccd7b2e95a87b245307e19b3dd1de9fbb34",
+        "sample": "Added in candidate — current-Workflow correction; the former driver-specific rules remain in the historical snapshot linked above. Current packet dispositions require actual eviden",
+        "identityFingerprint": "0093aca093c7750ec5c3b0e2bb870a1fba3b1f888cc2292efd9a9d109c023faa",
+        "ancestry": [
+          "Architecture Advisory Role Doctrine",
+          "Driver-Disposition Doctrine",
+          "Evidence And Conduct Boundaries"
+        ],
+        "text": "Added in candidate — current-Workflow correction; the former driver-specific rules remain in the historical snapshot linked above. Current packet dispositions require actual evidence when they turn on claims\nabout PROJECT_ROOT or the panel's artifacts (`SKILL.md:124-128`):"
+      },
+      "after": {
+        "claimId": "claim_9e9d711e331efe5a12c8b8bf50371dc6",
+        "sourcePath": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+        "sourceUnitDigest": "087d5cdd477bde5b2bf98882290f0d23d3e44a06f0c6f93b7f15e6bcfa391c63",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+        "targetAnchor": "unheaded-block-117",
+        "targetUnitDigest": "7486a9e911dc83dd8182817e3d51bccd7b2e95a87b245307e19b3dd1de9fbb34",
+        "targetAncestry": [
+          "Architecture Advisory Role Doctrine",
+          "Driver-Disposition Doctrine",
+          "Evidence And Conduct Boundaries"
+        ],
+        "rationale": "A22/A31/L10-31: native predecessor from 287a22d33 is superseded by the current same-section unit after the authorized explicit conservation label addition. The Constraint Findings addition is now labelled registered-counterparts; the Role Doctrine correction is labelled current-Workflow and points to its historical snapshot. No original source or snapshot text was removed. Complete immutable before/after unit text and native successor identity are recorded in step10-sync627-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval.",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792122626822-ceb0cdd9@2026-10-16",
+        "reviewNote": "Independent review pending at 62751458b; no approval carried."
+      },
+      "deepRequired": true
+    }
+  ],
+  "registryWritten": false,
+  "approvalCarried": false,
+  "priorPendingReconciliation": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-reconciliation.json",
+  "priorResiduals": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json",
+  "priorA34AcceptanceUnchanged": true
+}

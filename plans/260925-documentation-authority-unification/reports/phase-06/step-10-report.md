@@ -1,3 +1,63 @@
+# Step 10 package at 62751458b complete — independent review next
+
+Assignment `unit-run-1792122626822-ceb0cdd9/producer/1`; Author session `codex-session:unit-run-1792122626822-ceb0cdd9@2026-10-16`. Content/SYNC **`62751458b22b47e930dc33b8501d07798b91ace3`**, author `eb793bc63`, comparison `9b0526380`. Main merge changes no docs; no re-carry blocker. Runner owns commits. Phase 6 remains open.
+
+## One native sync and complete native proof
+
+**One native carry-forward / one compact registry persistence**, known IDs **99,553 → 99,555**, zero loss. Active inventory/registry tuples equal: **4,486 files /91,374 units**. Registry **62,180,479 bytes**, SHA256 `562c2583dfc1e2d9d6e0a7b86679a8d00e53dda09a28fb006ec020667c79227a`. Original carry/persistence took about2.966s; the complete sync/inventory recovery span was **1157.147s**. Successful inventory-only generation took **659.669s**.
+
+**Resource recovery is explicit:** the initial process exited137 after persistence, and the first inventory-only retry also exited137. Neither produced a complete inventory. The successful second inventory-only retry used4096MiB old-space/16MiB semi-space, with no new carry-forward or registry write. There were **three inventory attempts /one complete genuine native inventory**, not three syncs. The subsequent D runs reused that complete enumerable inventory via v8, with no omitted fields or fabricated overlay inventory. [Native proof](step10-sync627-native-proof.json), [initial own log](step10-sync627-native.log), [first inventory-only retry](step10-sync627-inventory-recovery.log), [successful retry](step10-sync627-inventory-recovery2.log).
+
+Four directly changed units from the two conservation-label fixes resolve as **two retained heading IDs, two new block IDs and two old block predecessor gaps**. Every known ID remains. All **14 actual native metadata/tuple transitions** are submitted, including both new IDs/gaps. Each predecessor has exact old/current text, digest, ancestry and native identity, and a pending same-section supersede decision. No truth or cutover approval is carried. [Reconciliation](step10-sync627-predecessor-reconciliation.json), [pending native shard](../../ledger/decisions/s10-round4-native-predecessors.json).
+
+## Binding, rationale and structural checks
+
+**9,210 current claim/registryGap target bindings /zero drift /zero rebinds /zero native --rebind calls.** Every drift candidate would use content-based repair; none occurred. Source duplicates retain own registered occurrence/historical witnesses. [All bindings](step10-sync627-rebindings.json).
+
+The unchanged all-shard author checker first exposed **four exact-regeneration differences** after native sync: two new predecessor rationales and two existing pending heading explanations whose authenticated sibling-source witness sets gained those predecessor blocks. Its whole-section, legacy and historical-target checks already had zero findings. All four outputs were refreshed from the unchanged renderer and authenticated binding/section facts, remain pending, and are explicitly package overlays. The two existing heading source/target/digest/disposition values are unchanged; only dependent prose, author and pending note changed. **No checker was edited.** [Exact before/after and initial findings](step10-sync627-native-dependent-refresh.json). The original content-pin snapshots remain immutable and separate from the overlay.
+
+**Final one-pass consistency: 12,895 rows /92 shards, 836 selected outputs, zero findings.** This directly includes every current shard and retired collection, including both new predecessor rows; no oldRow workaround or supplemental bypass is needed. It checks **3,498 whole-heading mappings**, **34 distinct-source families /116 physical occurrences**, and **40 exact historical target witnesses**. The **84 existing historical source-witness limits** remain enumerated; no unavailable text/range/equality is invented. Saved report losslessly interns repeated witness metadata; raw scratch output SHA is recorded. [Full current consistency](step10-sync627-all-shards-consistency.json), [actual run](step10-sync627-final-consistency.log).
+
+**D has zero fatal findings against both priors together and each separately**, reusing the same genuine complete native inventory and unchanged gates:
+
+| Prior registries | Duration seconds | Fatal findings |
+|---|---:|---:|
+| both | 95.216 | 0 |
+| identity | 92.779 | 0 |
+| phase02 | 94.493 | 0 |
+
+[D summary](step10-sync627-D-summary.json), [own D log](step10-sync627-native-D.log). Structural D does not imply strict global E/current-truth/promotion/closure.
+
+**Ownership:** zero target drift, duplicate native platform target identity or new active-source collision pairs relative to round4; all254 historical/reference conservation groups remain enumerable. **Link replay366+98+4 positions:zero findings.** Read-only reviewer ownership/link scripts reproduced byte-equivalent JSON results in scratch. **49 dependent historical accounting projections** refreshed to committed current bindings/native successors without mutating old source/residual/before witnesses. [Ownership](step10-sync627-target-ownership.json), [replay](step10-sync627-link-replay.json), [dependent projections](step10-sync627-dependent-accounting.json).
+
+**490/490 document-tool tests pass**, zero failure/cancel/skip/todo, with `env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work`. A/B/H and strict candidate metadata pass; check A reads unchanged allowed-paths and retains only eight disclosed historical Lead paths. Frozen I bytes unchanged; current reader links equal the pin. The existing upstream Session Identity route delta against the old baseline stays disclosed, with no rebaseline. No full npm-suite or global E claim. [Tests](step10-sync627-tests.log), [A/B/H/I](step10-sync627-checks.json), [final audit](step10-sync627-final-audit.json).
+
+## One bounded re-review set
+
+[ONE current index](review-request-step10-index-62751458b.md), with JSON projection: **545 entries /29 request files**; per-file counts **30, 31, 32, 31, 28, 27, 31, 26, 18, 20, 16, 6, 2, 40, 60, 12, 4, 1, 8, 2, 7, 14, 11, 9, 4, 4, 47, 10, 14**. Every part and sidecar <=60 entries and400000 bytes; largest **356,321 bytes**. Every header names its actual Author session, packaged-by session, exact content pin, scratch-only checker/test/native-D/ownership/link commands and A36 obligations. Historical request sets are evidence only.
+
+The set covers **every296 original changed-pending rationale**, all52 whole-section heading explanations, all7+1 runner footers with own historical occurrence and first +6 shift, both conservation-label carrier before/afters, both L10-32 renamed historical successors, complete frozen117 list and restored claim_5c520fcb, L10-28–32 owner directions, full generator/checker-orchestrator/reproduction/test diffs, application/revocation/owner-queue metadata, all49 fresh accounting projections and14 native transitions. **All787 changed reviewed applications are kept and excluded as new claim submissions.** The frozen117 comprise **116 reviewed records plus the restored L10-2 pending row**, not117 current approvals. The frozen L10-2 rationale equals5035fed52 verbatim and preserves original lines, all identities/digests, residual SHA256 `d4bd139d397c007d0f633998319284bfc37073b27ed39f377cd677946fe00a0d`, and the superseded A34 note. Four latest link-count reworks remain excluded from freezing and pending, with distinct counts8/8/4/4.
+
+There are **298 unique pending current claim submissions**:296 original rationale rows plus two new predecessors. Frozen/footer/accounting entries are references or confirmations, not duplicate claim verdicts. Two native-dependent heading updates are explicit `packageOverlayAfter` values beside immutable62751458b rows. New predecessor decisions are also explicit package overlays. **Bind all four overlays to the runner package commit before issuing ordinary verdicts**; never treat them as already committed at the content pin. [Coverage](step10-sync627-package-coverage.json), [refresh](step10-sync627-native-dependent-refresh.json).
+
+**A36 deep lists are marked:** all269 unequal-digest submissions,12 partial carries,52 headings,8 footer occurrences, restored L10-2, historical successors and marked carrier/tool/native changes. Independent reviewer chooses/records seeds and sampled IDs: at least45/296 rationale sample plus45/298 conservative Weak-exact/Judgment draw; one independent draw can satisfy both only if coverage proves both thresholds. Every pending claim receives ordinary verdict and mechanical digest/anchor/shard equality; >3% deep rework escalates to the full set. No producer seed, sample or verdict was selected. [Exact populations](step10-sync627-A36.json).
+
+## Reproduction and next action
+
+Every request header contains the exact scratch-only commands. The safe unchanged read-only checker door is:
+
+```sh
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work python3 plans/260925-documentation-authority-unification/reports/phase-06/step10-sync287-reproduce.py consistency --output /tmp/fgos-work/review627/consistency.json
+```
+
+[Reproduction manifest](step10-sync627-reproduction.json) separates `readOnlyScripts` from historical author mutation scripts. Materialize only `readOnlyScripts` through the header command; inventory replay reads the existing registry, D uses its full native inventory and every output stays in `/tmp/fgos-work/review627/`. Run heavy reader commands sequentially; none re-syncs/persists registry or applies rationales. Tests use external TMPDIR. Source/gate/extractor/vocabulary/constitution/baseline/docs bytes remain unchanged; all writes are inside this plan, except the required external outbox. No fgOS CLI, Git writes, lifecycle verbs, subagent dispatch, promotion, retirement, deletion, alias adoption, push or landing. No callable MDView tool is available; external CLI database registration is outside the write scope, so no preview URL is claimed.
+
+**Next: independent ordinary review of this ONE set**, apply only matching committed verdicts with verbatim Notes, then the existing global D/E/T9/promotion-truth/mutation/third-refresh/rehearsal/alias/checkpoint/sensitivity/red-team/scorecard/effort work. All4007 frozen author-time pending tails still need promotion truth reconciliation. Rings holds, dashboard predecessor/stale successor, A34 residuals,32 other groups,14 runner-cutover obligations and inbound/non-doc consumer queues remain explicit. No global-green or Phase6 closure claim. No remaining execution blocker for this package; independent review and downstream gates remain open.
+
+---
+
+## Historical author report
+
 # Round-4 author corrections complete — package next
 
 Assignment `unit-run-1792118148618-e4fd15ef/producer/1`; input `9b0526380`, independent reports `0836714ae`, reviewed content `287a22d33`, request `bca590a4e`. All **33 Notes/Concerns** read; Lead L10-28–L10-32 recorded under A42. This is an author/docs result; Phase 6 remains open.

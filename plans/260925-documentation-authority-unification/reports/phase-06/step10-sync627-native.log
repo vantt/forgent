@@ -1,0 +1,2 @@
+Native carry start 2026-10-16T03:51:11.631Z 287a22d33a0eaf2d9e47549a1142daf62361bb8c 99553
+Persisted compact once 2026-10-16T03:51:14.597Z {"fromCommit":"287a22d33a0eaf2d9e47549a1142daf62361bb8c","toCommit":"62751458b22b47e930dc33b8501d07798b91ace3","oldUnits":91374,"newUnits":91374,"kept":90996,"paired":374,"moved":0,"editedKept":2,"added":2,"gaps":2,"retired":0,"retiredDocuments":0}

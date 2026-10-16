@@ -1,0 +1,7 @@
+{"scanned":12895,"shards":92,"generated":836,"legacyFindings":0,"generatedFindings":4,"sourceWitnessLimits":84,"ok":false}
+Traceback (most recent call last):
+  File "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-06/step10-sync287-reproduce.py", line 16, in <module>
+    subprocess.run(['node',str(script),'--check','--output',str(output)],cwd=root,env=env,check=True)
+  File "/usr/lib/python3.10/subprocess.py", line 526, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['node', '/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-rebuild.mjs', '--check', '--output', '/tmp/fgos-work/package627/consistency.json']' returned non-zero exit status 1.

@@ -1,0 +1,3382 @@
+# Bounded re-review: frozen 2
+
+Author session: `codex-session:unit-run-1792093168554-f28af963@2026-10-16`
+Packaged by: `codex-session:unit-run-1792122626822-ceb0cdd9@2026-10-16`
+Content commit: `62751458b22b47e930dc33b8501d07798b91ace3`; author changes `eb793bc63`; comparison `9b0526380329d8cb1cb6085a1c8f378e943e2505`.
+Entries: **60**; maximum 60 entries and 400000 bytes per Markdown/sidecar.
+[One request index](review-request-step10-index-62751458b.md).
+
+Committed `currentDecision`/`after` snapshots come from `git show 62751458b22b47e930dc33b8501d07798b91ace3:<shard>` through `reviewEntryFromCommittedRow`. Explicit `packageOverlay` and `packageOverlayAfter` values are fresh pending native/dependent rows and require the runner package commit for ordinary verdict binding. Before prose is historical. No producer seed, draw or verdict.
+
+Exact scratch-only reproduction commands, run sequentially from repository root at the runner package checkout:
+
+```sh
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work python3 plans/260925-documentation-authority-unification/reports/phase-06/step10-sync287-reproduce.py consistency --output /tmp/fgos-work/review627/consistency.json
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/scripts/doc-*.test.mjs test/scripts/check-doc-*.test.mjs test/scripts/generate-doc-inventory.test.mjs test/scripts/list-doc-anchors.test.mjs test/scripts/verify-phase-02.test.mjs test/scripts/next-doc-id.test.mjs
+env -u CLAUDE_CODE_SESSION_ID python3 - <<'PY'
+import json
+from pathlib import Path
+p=Path('/tmp/fgos-work/review627'); p.mkdir(parents=True, exist_ok=True)
+if p.is_symlink() or not p.resolve().is_relative_to('/tmp/fgos-work') or p.resolve().is_relative_to(Path.cwd().resolve()): raise RuntimeError('unsafe scratch directory')
+for name in ['step10-native-inventory.bin','step10-sync627-D-both.json','step10-sync627-D-identity.json','step10-sync627-D-phase02.json','step10-sync627-D-summary.json','step10-sync627-target-ownership.json','step10-sync627-link-replay.json']:
+    out=p/name
+    if out.is_symlink() or out.exists() and out.stat().st_nlink!=1: raise RuntimeError('unsafe scratch output')
+j=json.loads(Path('plans/260925-documentation-authority-unification/reports/phase-06/step10-sync627-reproduction.json').read_text())
+for name,text in j['readOnlyScripts'].items():
+    out=p/name
+    if out.is_symlink() or out.exists() and out.stat().st_nlink!=1: raise RuntimeError('unsafe scratch file')
+    out.write_text(text)
+PY
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --max-old-space-size=4096 --max-semi-space-size=16 /tmp/fgos-work/review627/inventory-readonly.mjs
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --max-old-space-size=4096 --max-semi-space-size=16 /tmp/fgos-work/review627/verify-readonly.mjs
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node /tmp/fgos-work/review627/ownership-readonly.mjs
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node /tmp/fgos-work/review627/audit-ownership-readonly.mjs
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work python3 /tmp/fgos-work/review627/replay-readonly.py
+```
+
+The unchanged checker audits **all 12895 rows /92 shards**, including all whole-section and distinct-occurrence rules, **836** selected outputs and the native-dependent refresh. Expected tests: **490** pass. No author `--apply`, carry-forward, registry persistence or repository output occurs in these reviewer commands. Inventory replay reads the sole compact registry; its regenerated inventory and all D/ownership/link outputs stay under `/tmp/fgos-work/review627/`. Reader reproduction needs available scratch space and memory; do the heavy commands sequentially. Historical author mutation scripts in the provenance manifest are evidence only.
+
+A36: every pending submitted claim receives ordinary verdict and digest/anchor/shard equality. Independently seed >=45/296 rationale deep sample plus >=45/298 conservative Weak-exact/Judgment population (one reviewer draw can satisfy both only if coverage proved). Every listed unequal-digest, partial/historical row, all52 whole-section headings, all8 own-occurrence footers, restored L10-2, and marked docs/tool/native corrections are deep. [Exact deep populations](step10-sync627-A36.json). Reviewer records seed/sample IDs; >3% deep rework escalates to whole set. No separate claim verdict on frozen/footer/accounting references when the pending claim is already submitted in rationales/decisions. Existing reviewed approvals remain; evidence/native tuples do not approve current truth or cutover.
+
+## Entry frozen-002
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-002",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_ae1f21106b52006a2ff377f9104a1fce",
+  "frozenRecord": {
+    "claimId": "claim_ae1f21106b52006a2ff377f9104a1fce",
+    "sourceUnitDigest": "0e00c9cccba1af1e",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "1-provenance-of-retired-decisions",
+    "targetUnitDigest": "260da5fd6eab8c113ea7e756985b782b5e45721aae8f34aab1e50389af0dff24",
+    "disposition": "promote",
+    "rationale": "Source H2 stating where the retired records came from is represented by the frozen H2 \"1. Provenance Of Retired Decisions\"; only the heading title differs (numbered, English, no tsk id in the title). Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_ae1f21106b52006a2ff377f9104a1fce",
+    "sourceUnitDigest": "0e00c9cccba1af1e",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "1-provenance-of-retired-decisions",
+    "claimKind": "historical-context",
+    "disposition": "promote",
+    "rationale": "Source H2 stating where the retired records came from is represented by the frozen H2 \"1. Provenance Of Retired Decisions\"; only the heading title differs (numbered, English, no tsk id in the title). Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H2 'Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)' (L1363) to H2 '1. Provenance Of Retired Decisions' (L23) in retired-decision-history.md: title change, section payload digest equal and the payload text byte-equal on both sides; depth equal; the quoted target title equals the live target, the rationale's 'only the heading title differs' is true; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "260da5fd6eab8c113ea7e756985b782b5e45721aae8f34aab1e50389af0dff24",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-003
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-003",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_5412ac73c702e4ec33e4b59dd9ad1940",
+  "frozenRecord": {
+    "claimId": "claim_5412ac73c702e4ec33e4b59dd9ad1940",
+    "sourceUnitDigest": "cb78249b3b34c872",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "2-adr-0002-flat-work-model",
+    "targetUnitDigest": "dfbfbdbf1e8717cabbe38306651ad15e816065313a7244b973a62ba4703a843d",
+    "disposition": "promote",
+    "rationale": "Source ADR 0002 title heading is represented by the frozen H2 \"2. ADR 0002 ...\" (2-adr-0002-flat-work-model); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_5412ac73c702e4ec33e4b59dd9ad1940",
+    "sourceUnitDigest": "cb78249b3b34c872",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "2-adr-0002-flat-work-model",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Source ADR 0002 title heading is represented by the frozen H2 \"2. ADR 0002 ...\" (2-adr-0002-flat-work-model); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H3 '0002 — Mô hình việc phẳng' (L1368) to H2 '2. ADR 0002 Flat Work Model' (L27) in retired-decision-history.md: title renumbered and translated, depth H3 to H2; section payload differs only by the blockquote link destination rewritten to the in-document anchor, disclosed on claim_0201a1d6, while this rationale says the record text is unchanged, true of the prose and acceptable because the link sits in its own unit; ancestry ok, anchor ok, digests recomputed equal to the shard; the rationale abbreviates the title with three dots but names the exact anchor; shared target with the merge row is by design",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "dfbfbdbf1e8717cabbe38306651ad15e816065313a7244b973a62ba4703a843d",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-004
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-004",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_f8e2b48d6234ca8a73e15cdaad7d9c07",
+  "frozenRecord": {
+    "claimId": "claim_f8e2b48d6234ca8a73e15cdaad7d9c07",
+    "sourceUnitDigest": "a05e96aa58d47c2d",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "2-adr-0002-flat-work-model",
+    "targetUnitDigest": "dfbfbdbf1e8717cabbe38306651ad15e816065313a7244b973a62ba4703a843d",
+    "disposition": "merge",
+    "rationale": "Repeated duplicate title \"# 0002 - Mo hinh viec phang\" inside the ADR 0002 text: merged into the single ADR 0002 H2 (no second H1 in the candidate), so no claim is lost but the heading itself does not appear twice. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_f8e2b48d6234ca8a73e15cdaad7d9c07",
+    "sourceUnitDigest": "a05e96aa58d47c2d",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "2-adr-0002-flat-work-model",
+    "claimKind": "decision",
+    "disposition": "merge",
+    "rationale": "Repeated duplicate title \"# 0002 - Mo hinh viec phang\" inside the ADR 0002 text: merged into the single ADR 0002 H2 (no second H1 in the candidate), so no claim is lost but the heading itself does not appear twice. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H1 '0002 — Mô hình việc phẳng' (L1375) to H2 '2. ADR 0002 Flat Work Model' (L27) in retired-decision-history.md: second H1 of ADR 0002 with an empty payload (source L1375) merged into the single ADR 0002 H2: the title text is the one already carried by claim_5412ac73 so nothing is lost; the rationale quotes the title ASCII-folded (without diacritics and dash) rather than verbatim, a cosmetic point; digests recomputed equal to the shard, anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "dfbfbdbf1e8717cabbe38306651ad15e816065313a7244b973a62ba4703a843d",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-005
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-005",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_faeaa8e46158de47c45810fb0a595dcc",
+  "frozenRecord": {
+    "claimId": "claim_faeaa8e46158de47c45810fb0a595dcc",
+    "sourceUnitDigest": "f014a166cf0c8f3d",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0002-context",
+    "targetUnitDigest": "5cd2a9a136e3025d04ed41810213e2a9c383290b3eb3e863644e4af952612d3e",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0002 is represented by the frozen H3 \"0002 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "2. ADR 0002 Flat Work Model"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_faeaa8e46158de47c45810fb0a595dcc",
+    "sourceUnitDigest": "f014a166cf0c8f3d",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "0002-context",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0002 is represented by the frozen H3 \"0002 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H4 'Bối cảnh' (L1377) to H3 '0002 Context' (L34) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "5cd2a9a136e3025d04ed41810213e2a9c383290b3eb3e863644e4af952612d3e",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "2. ADR 0002 Flat Work Model"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-006
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-006",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_5b6cd72833b3ee7ea7a2862b4eadb328",
+  "frozenRecord": {
+    "claimId": "claim_5b6cd72833b3ee7ea7a2862b4eadb328",
+    "sourceUnitDigest": "d6043b1481fba899",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0002-decision",
+    "targetUnitDigest": "6a7b90c72430f1cb8d04a666d3fa97514ec1f6ba3c24cf36641333a9745f4e19",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0002 is represented by the frozen H3 \"0002 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "2. ADR 0002 Flat Work Model"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_5b6cd72833b3ee7ea7a2862b4eadb328",
+    "sourceUnitDigest": "d6043b1481fba899",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "0002-decision",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0002 is represented by the frozen H3 \"0002 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H4 'Quyết định' (L1384) to H3 '0002 Decision' (L41) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "6a7b90c72430f1cb8d04a666d3fa97514ec1f6ba3c24cf36641333a9745f4e19",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "2. ADR 0002 Flat Work Model"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-007
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-007",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_e8b18c86c4297b05e04a14793817bf6a",
+  "frozenRecord": {
+    "claimId": "claim_e8b18c86c4297b05e04a14793817bf6a",
+    "sourceUnitDigest": "e91bbb5ae8fcb8f8",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0002-consequences",
+    "targetUnitDigest": "fc62699538350fccc923e8874a342f8d5e5f5582ae09db366066bf776b60ef7a",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0002 is represented by the frozen H3 \"0002 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "2. ADR 0002 Flat Work Model"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_e8b18c86c4297b05e04a14793817bf6a",
+    "sourceUnitDigest": "e91bbb5ae8fcb8f8",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "0002-consequences",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0002 is represented by the frozen H3 \"0002 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H4 'Hệ quả' (L1394) to H3 '0002 Consequences' (L51) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "fc62699538350fccc923e8874a342f8d5e5f5582ae09db366066bf776b60ef7a",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "2. ADR 0002 Flat Work Model"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-008
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-008",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_0e062808f47ce5c348b6b44a91650ecc",
+  "frozenRecord": {
+    "claimId": "claim_0e062808f47ce5c348b6b44a91650ecc",
+    "sourceUnitDigest": "c0dc9acc17db4283",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "3-adr-0003-naming-and-data-layout",
+    "targetUnitDigest": "eed7c45e529a07ba42be1926c4715e28e71d7ab481a6e270e4db28d1981b35d3",
+    "disposition": "promote",
+    "rationale": "Source ADR 0003 title heading is represented by the frozen H2 \"3. ADR 0003 ...\" (3-adr-0003-naming-and-data-layout); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_0e062808f47ce5c348b6b44a91650ecc",
+    "sourceUnitDigest": "c0dc9acc17db4283",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "3-adr-0003-naming-and-data-layout",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Source ADR 0003 title heading is represented by the frozen H2 \"3. ADR 0003 ...\" (3-adr-0003-naming-and-data-layout); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H3 '0003 — Đặt tên & bố cục dữ liệu' (L1405) to H2 '3. ADR 0003 Naming And Data Layout' (L62) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H3 to H2 is a depth-only change the rationale does not name (it only says 'frozen H2'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "eed7c45e529a07ba42be1926c4715e28e71d7ab481a6e270e4db28d1981b35d3",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-009
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-009",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_75f47ef3fd99abd07c138f106f1ca023",
+  "frozenRecord": {
+    "claimId": "claim_75f47ef3fd99abd07c138f106f1ca023",
+    "sourceUnitDigest": "203f9cd3142f933c",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0003-context",
+    "targetUnitDigest": "c6a2c64d4858021065b5e9f3a7dd05666d15ee2123b64859bc98ecf175325bd1",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0003 is represented by the frozen H3 \"0003 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "3. ADR 0003 Naming And Data Layout"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_75f47ef3fd99abd07c138f106f1ca023",
+    "sourceUnitDigest": "203f9cd3142f933c",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "0003-context",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0003 is represented by the frozen H3 \"0003 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H4 'Bối cảnh' (L1407) to H3 '0003 Context' (L64) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "c6a2c64d4858021065b5e9f3a7dd05666d15ee2123b64859bc98ecf175325bd1",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "3. ADR 0003 Naming And Data Layout"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-010
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-010",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_c6a1314c4583518f5100cc53e78b1979",
+  "frozenRecord": {
+    "claimId": "claim_c6a1314c4583518f5100cc53e78b1979",
+    "sourceUnitDigest": "798c507e268c8c14",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0003-decision",
+    "targetUnitDigest": "d0f79f2a53f7edfc1d92c6e8c71d50e3eecb588a7bccf96f3eb9c97f0a628a7d",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0003 is represented by the frozen H3 \"0003 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "3. ADR 0003 Naming And Data Layout"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_c6a1314c4583518f5100cc53e78b1979",
+    "sourceUnitDigest": "798c507e268c8c14",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "0003-decision",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0003 is represented by the frozen H3 \"0003 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H4 'Quyết định' (L1413) to H3 '0003 Decision' (L70) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "d0f79f2a53f7edfc1d92c6e8c71d50e3eecb588a7bccf96f3eb9c97f0a628a7d",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "3. ADR 0003 Naming And Data Layout"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-011
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-011",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_f161fbd15476131b86b7c2fd2f1d8f59",
+  "frozenRecord": {
+    "claimId": "claim_f161fbd15476131b86b7c2fd2f1d8f59",
+    "sourceUnitDigest": "055bb7583cd58580",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0003-consequences",
+    "targetUnitDigest": "e6a929b78a9cc9b4254c5e289f33c764837ff88c2f3ff9919376e5f8823b9ff0",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0003 is represented by the frozen H3 \"0003 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "3. ADR 0003 Naming And Data Layout"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_f161fbd15476131b86b7c2fd2f1d8f59",
+    "sourceUnitDigest": "055bb7583cd58580",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "0003-consequences",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0003 is represented by the frozen H3 \"0003 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H4 'Hệ quả' (L1422) to H3 '0003 Consequences' (L79) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "e6a929b78a9cc9b4254c5e289f33c764837ff88c2f3ff9919376e5f8823b9ff0",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "3. ADR 0003 Naming And Data Layout"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-012
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-012",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_5908b357cb98d52934398e26e43fcb39",
+  "frozenRecord": {
+    "claimId": "claim_5908b357cb98d52934398e26e43fcb39",
+    "sourceUnitDigest": "a0ff252fe4a05fd8",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "4-adr-0004-scope-and-non-goals",
+    "targetUnitDigest": "2d2db2abca61349471af2e2a3d0f5581e7f87af45a979df1e541c1448a865f8a",
+    "disposition": "promote",
+    "rationale": "Source ADR 0004 title heading is represented by the frozen H2 \"4. ADR 0004 ...\" (4-adr-0004-scope-and-non-goals); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_5908b357cb98d52934398e26e43fcb39",
+    "sourceUnitDigest": "a0ff252fe4a05fd8",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "4-adr-0004-scope-and-non-goals",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Source ADR 0004 title heading is represented by the frozen H2 \"4. ADR 0004 ...\" (4-adr-0004-scope-and-non-goals); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H3 '0004 — Phạm vi & non-goal' (L1432) to H2 '4. ADR 0004 Scope And Non-Goals' (L89) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H3 to H2 is a depth-only change the rationale does not name (it only says 'frozen H2'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "2d2db2abca61349471af2e2a3d0f5581e7f87af45a979df1e541c1448a865f8a",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-013
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-013",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_67494c7de8ad006fcb01b825ea00e6b2",
+  "frozenRecord": {
+    "claimId": "claim_67494c7de8ad006fcb01b825ea00e6b2",
+    "sourceUnitDigest": "f27931862e682c2f",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0004-context",
+    "targetUnitDigest": "2d45d4866f7526c232afdeaf650c17f9c3efee2a04afd9e6241922d522abffe9",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0004 is represented by the frozen H3 \"0004 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "4. ADR 0004 Scope And Non-Goals"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_67494c7de8ad006fcb01b825ea00e6b2",
+    "sourceUnitDigest": "f27931862e682c2f",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "0004-context",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0004 is represented by the frozen H3 \"0004 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H4 'Bối cảnh' (L1434) to H3 '0004 Context' (L91) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "2d45d4866f7526c232afdeaf650c17f9c3efee2a04afd9e6241922d522abffe9",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "4. ADR 0004 Scope And Non-Goals"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-014
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-014",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_4063855a9287de7cf5b27cb77d96955f",
+  "frozenRecord": {
+    "claimId": "claim_4063855a9287de7cf5b27cb77d96955f",
+    "sourceUnitDigest": "b72bf8ee1aea6db6",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0004-decision",
+    "targetUnitDigest": "59bda06684c6859316ad8f0b236bc7b6ebc9dc72139fca854456d9b38de05252",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0004 is represented by the frozen H3 \"0004 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "4. ADR 0004 Scope And Non-Goals"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_4063855a9287de7cf5b27cb77d96955f",
+    "sourceUnitDigest": "b72bf8ee1aea6db6",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "0004-decision",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0004 is represented by the frozen H3 \"0004 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H4 'Quyết định' (L1444) to H3 '0004 Decision' (L101) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (hand-sha256 payload digest equal), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "59bda06684c6859316ad8f0b236bc7b6ebc9dc72139fca854456d9b38de05252",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "4. ADR 0004 Scope And Non-Goals"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-015
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-015",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_0b4d53be3903ac1ce9299b5d7174feab",
+  "frozenRecord": {
+    "claimId": "claim_0b4d53be3903ac1ce9299b5d7174feab",
+    "sourceUnitDigest": "e44f9991b9931d7c",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0004-consequences",
+    "targetUnitDigest": "12d505aab6487945d39c7e3a3f15ad06171917f8bf16b2b27387a9c6efd0d33b",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0004 is represented by the frozen H3 \"0004 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "4. ADR 0004 Scope And Non-Goals"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_0b4d53be3903ac1ce9299b5d7174feab",
+    "sourceUnitDigest": "e44f9991b9931d7c",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "0004-consequences",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0004 is represented by the frozen H3 \"0004 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H4 'Hệ quả' (L1454) to H3 '0004 Consequences' (L111) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "12d505aab6487945d39c7e3a3f15ad06171917f8bf16b2b27387a9c6efd0d33b",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "4. ADR 0004 Scope And Non-Goals"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-016
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-016",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_dbc0da98acd1c90327ebd67850cc8983",
+  "frozenRecord": {
+    "claimId": "claim_dbc0da98acd1c90327ebd67850cc8983",
+    "sourceUnitDigest": "2ff34201c3aa91d6",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "5-adr-0006-proposed-status",
+    "targetUnitDigest": "67c97b2b884ac9505324dc3b688a7989f36bfd27700bf7389751058845c479f0",
+    "disposition": "promote",
+    "rationale": "Source ADR 0006 title heading is represented by the frozen H2 \"5. ADR 0006 ...\" (5-adr-0006-proposed-status); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_dbc0da98acd1c90327ebd67850cc8983",
+    "sourceUnitDigest": "2ff34201c3aa91d6",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "5-adr-0006-proposed-status",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Source ADR 0006 title heading is represented by the frozen H2 \"5. ADR 0006 ...\" (5-adr-0006-proposed-status); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H3 '0006 — Trạng thái `proposed`' (L1463) to H2 '5. ADR 0006 Proposed Status' (L120) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H3 to H2 is a depth-only change the rationale does not name (it only says 'frozen H2'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "67c97b2b884ac9505324dc3b688a7989f36bfd27700bf7389751058845c479f0",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-017
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-017",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_a79114f19bb479ea6b69c50166af8972",
+  "frozenRecord": {
+    "claimId": "claim_a79114f19bb479ea6b69c50166af8972",
+    "sourceUnitDigest": "9c8485790cf86a6a",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0006-context",
+    "targetUnitDigest": "6163b36b62dbb7c76e3510b09ab0d83b08f3542562b99abc5c41cd0534b0c789",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0006 is represented by the frozen H3 \"0006 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_a79114f19bb479ea6b69c50166af8972",
+    "sourceUnitDigest": "9c8485790cf86a6a",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "0006-context",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0006 is represented by the frozen H3 \"0006 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H4 'Bối cảnh' (L1465) to H3 '0006 Context' (L122) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (hand-sha256 payload digest equal), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "6163b36b62dbb7c76e3510b09ab0d83b08f3542562b99abc5c41cd0534b0c789",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-018
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-018",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_99fa84eefd3c917530ef1a453f08be21",
+  "frozenRecord": {
+    "claimId": "claim_99fa84eefd3c917530ef1a453f08be21",
+    "sourceUnitDigest": "965caf0a03321009",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0006-decision",
+    "targetUnitDigest": "ffd717cc616acfaa71c4fb8a61763bcfb0a5272b8345d44b839fc6e10e2afb43",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0006 is represented by the frozen H3 \"0006 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_99fa84eefd3c917530ef1a453f08be21",
+    "sourceUnitDigest": "965caf0a03321009",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "0006-decision",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0006 is represented by the frozen H3 \"0006 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H4 'Quyết định' (L1474) to H3 '0006 Decision' (L131) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "ffd717cc616acfaa71c4fb8a61763bcfb0a5272b8345d44b839fc6e10e2afb43",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-019
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-019",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_e602fe2731b631f7be06ccebc5cf8e91",
+  "frozenRecord": {
+    "claimId": "claim_e602fe2731b631f7be06ccebc5cf8e91",
+    "sourceUnitDigest": "899175d57462b103",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0006-consequences",
+    "targetUnitDigest": "783e9b5f2b2e44c3010507770e87c9785bcf8ff5b1aae09aecd902440090f996",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0006 is represented by the frozen H3 \"0006 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_e602fe2731b631f7be06ccebc5cf8e91",
+    "sourceUnitDigest": "899175d57462b103",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "0006-consequences",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0006 is represented by the frozen H3 \"0006 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H4 'Hệ quả' (L1492) to H3 '0006 Consequences' (L149) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "783e9b5f2b2e44c3010507770e87c9785bcf8ff5b1aae09aecd902440090f996",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "5. ADR 0006 Proposed Status"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-020
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-020",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_2f1ede55aaf8adff2f15c46ffc646e8d",
+  "frozenRecord": {
+    "claimId": "claim_2f1ede55aaf8adff2f15c46ffc646e8d",
+    "sourceUnitDigest": "0652eaa390a60c98",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "6-adr-0007-schema-and-event-evolution",
+    "targetUnitDigest": "38c7e64350e2c0ead7dc9dab84c6ecc28918e7bb019e31a35b07fc88b495842f",
+    "disposition": "promote",
+    "rationale": "Source ADR 0007 title heading is represented by the frozen H2 \"6. ADR 0007 ...\" (6-adr-0007-schema-and-event-evolution); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_2f1ede55aaf8adff2f15c46ffc646e8d",
+    "sourceUnitDigest": "0652eaa390a60c98",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "6-adr-0007-schema-and-event-evolution",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Source ADR 0007 title heading is represented by the frozen H2 \"6. ADR 0007 ...\" (6-adr-0007-schema-and-event-evolution); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H3 '0007 — Tiến hoá schema & event' (L1504) to H2 '6. ADR 0007 Schema And Event Evolution' (L161) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H3 to H2 is a depth-only change the rationale does not name (it only says 'frozen H2'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "38c7e64350e2c0ead7dc9dab84c6ecc28918e7bb019e31a35b07fc88b495842f",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-021
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-021",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_208f5cc84da2b23ab24abde2c91c4f06",
+  "frozenRecord": {
+    "claimId": "claim_208f5cc84da2b23ab24abde2c91c4f06",
+    "sourceUnitDigest": "5483e14a0ec0d67c",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0007-context",
+    "targetUnitDigest": "ab86aba22bff4bd95dfd666582cad23d4a6f3c760c8cf86de79efdac597d4dd2",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0007 is represented by the frozen H3 \"0007 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "6. ADR 0007 Schema And Event Evolution"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_208f5cc84da2b23ab24abde2c91c4f06",
+    "sourceUnitDigest": "5483e14a0ec0d67c",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "0007-context",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0007 is represented by the frozen H3 \"0007 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H4 'Bối cảnh' (L1506) to H3 '0007 Context' (L163) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (hand-sha256 payload digest equal), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "ab86aba22bff4bd95dfd666582cad23d4a6f3c760c8cf86de79efdac597d4dd2",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "6. ADR 0007 Schema And Event Evolution"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-022
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-022",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_886f9acc902249e303bacc887ffb9882",
+  "frozenRecord": {
+    "claimId": "claim_886f9acc902249e303bacc887ffb9882",
+    "sourceUnitDigest": "eb9a345fe658f7c4",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0007-decision",
+    "targetUnitDigest": "08f6311c148ae29221fd5d1a3613d38b0e740914a3dcde683f27d48ee398de27",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0007 is represented by the frozen H3 \"0007 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "6. ADR 0007 Schema And Event Evolution"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_886f9acc902249e303bacc887ffb9882",
+    "sourceUnitDigest": "eb9a345fe658f7c4",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "0007-decision",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0007 is represented by the frozen H3 \"0007 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H4 'Quyết định' (L1512) to H3 '0007 Decision' (L169) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "08f6311c148ae29221fd5d1a3613d38b0e740914a3dcde683f27d48ee398de27",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "6. ADR 0007 Schema And Event Evolution"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-023
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-023",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_9faf2f6fcfad6a089f7077f61abb3b56",
+  "frozenRecord": {
+    "claimId": "claim_9faf2f6fcfad6a089f7077f61abb3b56",
+    "sourceUnitDigest": "e5123dd05236e7c9",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0007-consequences",
+    "targetUnitDigest": "55d9c1f19dff0d40bd97abcc406422ba20f7091135f9eaa20462af0bb2388f82",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0007 is represented by the frozen H3 \"0007 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "6. ADR 0007 Schema And Event Evolution"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_9faf2f6fcfad6a089f7077f61abb3b56",
+    "sourceUnitDigest": "e5123dd05236e7c9",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "0007-consequences",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0007 is represented by the frozen H3 \"0007 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H4 'Hệ quả' (L1524) to H3 '0007 Consequences' (L181) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "55d9c1f19dff0d40bd97abcc406422ba20f7091135f9eaa20462af0bb2388f82",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "6. ADR 0007 Schema And Event Evolution"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-024
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-024",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_e375b70390617716823280eb03a82a87",
+  "frozenRecord": {
+    "claimId": "claim_e375b70390617716823280eb03a82a87",
+    "sourceUnitDigest": "520a09658b949755",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "7-adr-0011-explicit-version-for-every-contract",
+    "targetUnitDigest": "7b520a895337dc7ea9a23e4bcc1debc386a39fc1e8120673d0aa77ea4a309457",
+    "disposition": "promote",
+    "rationale": "Source ADR 0011 title heading is represented by the frozen H2 \"7. ADR 0011 ...\" (7-adr-0011-explicit-version-for-every-contract); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_e375b70390617716823280eb03a82a87",
+    "sourceUnitDigest": "520a09658b949755",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "7-adr-0011-explicit-version-for-every-contract",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Source ADR 0011 title heading is represented by the frozen H2 \"7. ADR 0011 ...\" (7-adr-0011-explicit-version-for-every-contract); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H3 '0011 — Version tường minh cho mọi contract' (L1535) to H2 '7. ADR 0011 Explicit Version For Every Contract' (L192) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H3 to H2 is a depth-only change the rationale does not name (it only says 'frozen H2'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "7b520a895337dc7ea9a23e4bcc1debc386a39fc1e8120673d0aa77ea4a309457",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-025
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-025",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_a93bf40197e2bf32890a9cf931226e15",
+  "frozenRecord": {
+    "claimId": "claim_a93bf40197e2bf32890a9cf931226e15",
+    "sourceUnitDigest": "f0e519e3d177081f",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0011-context",
+    "targetUnitDigest": "e113b11d301e876e8e3b3d3f59eca420dab2ea0aa6f3adc8d3ac076de93317d4",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0011 is represented by the frozen H3 \"0011 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_a93bf40197e2bf32890a9cf931226e15",
+    "sourceUnitDigest": "f0e519e3d177081f",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "0011-context",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0011 is represented by the frozen H3 \"0011 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H4 'Bối cảnh' (L1537) to H3 '0011 Context' (L194) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "e113b11d301e876e8e3b3d3f59eca420dab2ea0aa6f3adc8d3ac076de93317d4",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-026
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-026",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_ff4510bb2afe125aedac972ed943ce2c",
+  "frozenRecord": {
+    "claimId": "claim_ff4510bb2afe125aedac972ed943ce2c",
+    "sourceUnitDigest": "03f45ad00ec7a12c",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0011-decision",
+    "targetUnitDigest": "28cc1686008a465c5f12c2c878349dc018dd023ba3dbd514689390ca5ac61776",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0011 is represented by the frozen H3 \"0011 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_ff4510bb2afe125aedac972ed943ce2c",
+    "sourceUnitDigest": "03f45ad00ec7a12c",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "0011-decision",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0011 is represented by the frozen H3 \"0011 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H4 'Quyết định' (L1556) to H3 '0011 Decision' (L213) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "28cc1686008a465c5f12c2c878349dc018dd023ba3dbd514689390ca5ac61776",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-027
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-027",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_0dd6189a9d8ed1bcdd656127bf71774e",
+  "frozenRecord": {
+    "claimId": "claim_0dd6189a9d8ed1bcdd656127bf71774e",
+    "sourceUnitDigest": "3bd6300879f149e8",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0011-consequences",
+    "targetUnitDigest": "54a5977501d4d13b842a24d99b66e4591c4b04006f57477f35b248e444d7585c",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0011 is represented by the frozen H3 \"0011 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_0dd6189a9d8ed1bcdd656127bf71774e",
+    "sourceUnitDigest": "3bd6300879f149e8",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "0011-consequences",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0011 is represented by the frozen H3 \"0011 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H4 'Hệ quả' (L1577) to H3 '0011 Consequences' (L234) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "54a5977501d4d13b842a24d99b66e4591c4b04006f57477f35b248e444d7585c",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "7. ADR 0011 Explicit Version For Every Contract"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-028
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-028",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_e3c928a8fca5c645487d1b574f0c5d36",
+  "frozenRecord": {
+    "claimId": "claim_e3c928a8fca5c645487d1b574f0c5d36",
+    "sourceUnitDigest": "9b3ff4bedb1e8747",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "8-adr-0012-unified-typed-edge-graph-model",
+    "targetUnitDigest": "e9c5857a60ea685d3aab78eae8e2b44b7d96e10698e4764d4a8b109e54f47f45",
+    "disposition": "promote",
+    "rationale": "Source ADR 0012 title heading is represented by the frozen H2 \"8. ADR 0012 ...\" (8-adr-0012-unified-typed-edge-graph-model); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_e3c928a8fca5c645487d1b574f0c5d36",
+    "sourceUnitDigest": "9b3ff4bedb1e8747",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "8-adr-0012-unified-typed-edge-graph-model",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Source ADR 0012 title heading is represented by the frozen H2 \"8. ADR 0012 ...\" (8-adr-0012-unified-typed-edge-graph-model); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H3 '0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời' (L1589) to H2 '8. ADR 0012 Unified Typed-Edge Graph Model' (L246) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H3 to H2 is a depth-only change the rationale does not name (it only says 'frozen H2'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "e9c5857a60ea685d3aab78eae8e2b44b7d96e10698e4764d4a8b109e54f47f45",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-029
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-029",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_386a8c90d7f9d79a52190add7a82f33f",
+  "frozenRecord": {
+    "claimId": "claim_386a8c90d7f9d79a52190add7a82f33f",
+    "sourceUnitDigest": "95bdd9de256a67e0",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0012-context",
+    "targetUnitDigest": "0dc5cda4fa7fbd44208f88a810d9e6f77a67e9efa236041735d82bad31cd0158",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0012 is represented by the frozen H3 \"0012 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_386a8c90d7f9d79a52190add7a82f33f",
+    "sourceUnitDigest": "95bdd9de256a67e0",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "0012-context",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0012 is represented by the frozen H3 \"0012 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H4 'Bối cảnh' (L1591) to H3 '0012 Context' (L248) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "0dc5cda4fa7fbd44208f88a810d9e6f77a67e9efa236041735d82bad31cd0158",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-030
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-030",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_3b4da5c5b12c6780b24e84b53ca73e49",
+  "frozenRecord": {
+    "claimId": "claim_3b4da5c5b12c6780b24e84b53ca73e49",
+    "sourceUnitDigest": "24cacb854eb926ac",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0012-decision",
+    "targetUnitDigest": "9dee590708c4181b56606cd803fd345edfe4a9db456d03efe6a0d63e7b8ad917",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0012 is represented by the frozen H3 \"0012 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_3b4da5c5b12c6780b24e84b53ca73e49",
+    "sourceUnitDigest": "24cacb854eb926ac",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "0012-decision",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0012 is represented by the frozen H3 \"0012 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H4 'Quyết định' (L1614) to H3 '0012 Decision' (L271) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "9dee590708c4181b56606cd803fd345edfe4a9db456d03efe6a0d63e7b8ad917",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-031
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-031",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_c6a32a1e4ab8c7078b89199236f3d5e0",
+  "frozenRecord": {
+    "claimId": "claim_c6a32a1e4ab8c7078b89199236f3d5e0",
+    "sourceUnitDigest": "f35473b9295a35af",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0012-consequences",
+    "targetUnitDigest": "764a0029f0ee73f78c522c71e69830fac20871e226b636c7832f1461d0c0c79c",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0012 is represented by the frozen H3 \"0012 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_c6a32a1e4ab8c7078b89199236f3d5e0",
+    "sourceUnitDigest": "f35473b9295a35af",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "0012-consequences",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0012 is represented by the frozen H3 \"0012 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H4 'Hệ quả' (L1653) to H3 '0012 Consequences' (L310) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "764a0029f0ee73f78c522c71e69830fac20871e226b636c7832f1461d0c0c79c",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "8. ADR 0012 Unified Typed-Edge Graph Model"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-032
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-032",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_2d27908b73621a411fcf708b067b6ba2",
+  "frozenRecord": {
+    "claimId": "claim_2d27908b73621a411fcf708b067b6ba2",
+    "sourceUnitDigest": "f529cf675d973db5",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "9-adr-0013-report-not-write-channel-for-discovered-from",
+    "targetUnitDigest": "bb9207e0916a5823e45378afb7d0247d511cb2bf870386fdefd982d8a17e51cb",
+    "disposition": "promote",
+    "rationale": "Source ADR 0013 title heading is represented by the frozen H2 \"9. ADR 0013 ...\" (9-adr-0013-report-not-write-channel-for-discovered-from); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_2d27908b73621a411fcf708b067b6ba2",
+    "sourceUnitDigest": "f529cf675d973db5",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "9-adr-0013-report-not-write-channel-for-discovered-from",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Source ADR 0013 title heading is represented by the frozen H2 \"9. ADR 0013 ...\" (9-adr-0013-report-not-write-channel-for-discovered-from); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H3 '0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`' (L1666) to H2 '9. ADR 0013 Report-Not-Write Channel For Discovered-From' (L323) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H3 to H2 is a depth-only change the rationale does not name (it only says 'frozen H2'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (hand-sha256 payload digest equal), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "bb9207e0916a5823e45378afb7d0247d511cb2bf870386fdefd982d8a17e51cb",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-033
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-033",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_e68c14be45a430e3676761d7bdc9e6db",
+  "frozenRecord": {
+    "claimId": "claim_e68c14be45a430e3676761d7bdc9e6db",
+    "sourceUnitDigest": "31a7f48e9cc16169",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0013-context",
+    "targetUnitDigest": "39a94a27f6e89fec290ba89590cff97929d9c7625c0ad041e4bb461c53fe5d61",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0013 is represented by the frozen H3 \"0013 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_e68c14be45a430e3676761d7bdc9e6db",
+    "sourceUnitDigest": "31a7f48e9cc16169",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "0013-context",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0013 is represented by the frozen H3 \"0013 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H4 'Bối cảnh' (L1668) to H3 '0013 Context' (L325) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "39a94a27f6e89fec290ba89590cff97929d9c7625c0ad041e4bb461c53fe5d61",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-034
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-034",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_1f9265c6ad8bc4b9e8cf754fb1b8b164",
+  "frozenRecord": {
+    "claimId": "claim_1f9265c6ad8bc4b9e8cf754fb1b8b164",
+    "sourceUnitDigest": "9b836a5af7fa427d",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0013-decision",
+    "targetUnitDigest": "dc61b855030de6ec8c01fd1fd46215522d2327be9adb6c025724d974f8843b8e",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0013 is represented by the frozen H3 \"0013 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_1f9265c6ad8bc4b9e8cf754fb1b8b164",
+    "sourceUnitDigest": "9b836a5af7fa427d",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "0013-decision",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0013 is represented by the frozen H3 \"0013 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H4 'Quyết định' (L1683) to H3 '0013 Decision' (L340) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "dc61b855030de6ec8c01fd1fd46215522d2327be9adb6c025724d974f8843b8e",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-035
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-035",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_df1ec9feeaeb131a98f44cebcd3c8f6c",
+  "frozenRecord": {
+    "claimId": "claim_df1ec9feeaeb131a98f44cebcd3c8f6c",
+    "sourceUnitDigest": "261b711fa046562a",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0013-consequences",
+    "targetUnitDigest": "19ae019de9e9e6e87ca9d19d8bb92a18bbefab9ab1579d1010a315477e994782",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0013 is represented by the frozen H3 \"0013 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_df1ec9feeaeb131a98f44cebcd3c8f6c",
+    "sourceUnitDigest": "261b711fa046562a",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "0013-consequences",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0013 is represented by the frozen H3 \"0013 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H4 'Hệ quả' (L1715) to H3 '0013 Consequences' (L372) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (hand-sha256 payload digest equal), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "19ae019de9e9e6e87ca9d19d8bb92a18bbefab9ab1579d1010a315477e994782",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-036
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-036",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_9f56719f95c81edecfe6dfda00ca0268",
+  "frozenRecord": {
+    "claimId": "claim_9f56719f95c81edecfe6dfda00ca0268",
+    "sourceUnitDigest": "5c944fd5d5e941cc",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0013-trust-boundary",
+    "targetUnitDigest": "f4b2987afebaa4bfcb171bf9122acb39d864d4321de4cc1af5bc61afa7f3c58b",
+    "disposition": "promote",
+    "rationale": "Section heading \"Ranh giới tin cậy (bổ chú 2026-07-18, review-fix S11)\" of ADR 0013 is represented by the frozen H3 \"0013 Trust Boundary\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_9f56719f95c81edecfe6dfda00ca0268",
+    "sourceUnitDigest": "5c944fd5d5e941cc",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "0013-trust-boundary",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Ranh giới tin cậy (bổ chú 2026-07-18, review-fix S11)\" of ADR 0013 is represented by the frozen H3 \"0013 Trust Boundary\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H4 'Ranh giới tin cậy (bổ chú 2026-07-18, review-fix S11)' (L1726) to H3 '0013 Trust Boundary' (L383) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "f4b2987afebaa4bfcb171bf9122acb39d864d4321de4cc1af5bc61afa7f3c58b",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-037
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-037",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_4e04420f3322b42d6a313faa72216ae9",
+  "frozenRecord": {
+    "claimId": "claim_4e04420f3322b42d6a313faa72216ae9",
+    "sourceUnitDigest": "58646cbd3a8ef4bd",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0013-delivery-guarantee",
+    "targetUnitDigest": "42a5b4fd66d36c0accc5dd7dffd9f8d1fb12d5b002b70a26114cfe538f6c23f1",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bảo đảm giao-nhận (bổ chú 2026-07-18, review-fix S11)\" of ADR 0013 is represented by the frozen H3 \"0013 Delivery Guarantee\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_4e04420f3322b42d6a313faa72216ae9",
+    "sourceUnitDigest": "58646cbd3a8ef4bd",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "0013-delivery-guarantee",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bảo đảm giao-nhận (bổ chú 2026-07-18, review-fix S11)\" of ADR 0013 is represented by the frozen H3 \"0013 Delivery Guarantee\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H4 'Bảo đảm giao-nhận (bổ chú 2026-07-18, review-fix S11)' (L1742) to H3 '0013 Delivery Guarantee' (L399) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "42a5b4fd66d36c0accc5dd7dffd9f8d1fb12d5b002b70a26114cfe538f6c23f1",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-038
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-038",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_fe29583fb3eaae959e22d8ea42f76e6d",
+  "frozenRecord": {
+    "claimId": "claim_fe29583fb3eaae959e22d8ea42f76e6d",
+    "sourceUnitDigest": "e702d74cca4d0100",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0013-alternatives-considered",
+    "targetUnitDigest": "dd8d4e0029a8249cf8149298e7a2d77c1497f8922738eb1904e786085c1b7f65",
+    "disposition": "promote",
+    "rationale": "Section heading \"Phương án đã cân nhắc và bỏ\" of ADR 0013 is represented by the frozen H3 \"0013 Alternatives Considered\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_fe29583fb3eaae959e22d8ea42f76e6d",
+    "sourceUnitDigest": "e702d74cca4d0100",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "0013-alternatives-considered",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Phương án đã cân nhắc và bỏ\" of ADR 0013 is represented by the frozen H3 \"0013 Alternatives Considered\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H4 'Phương án đã cân nhắc và bỏ' (L1750) to H3 '0013 Alternatives Considered' (L407) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "dd8d4e0029a8249cf8149298e7a2d77c1497f8922738eb1904e786085c1b7f65",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-039
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-039",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_e763e03b02e0c2d677ef4b49f30a9ad3",
+  "frozenRecord": {
+    "claimId": "claim_e763e03b02e0c2d677ef4b49f30a9ad3",
+    "sourceUnitDigest": "74fba64154edbbc6",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "10-adr-0019-pre-release-exemption-for-the-schema-evolution-rule",
+    "targetUnitDigest": "76fc593cba1fa3b5ebaf7e373e9251e1774f5eb9c16d0e6ced80024d7d410c8f",
+    "disposition": "promote",
+    "rationale": "Source ADR 0019 title heading is represented by the frozen H2 \"10. ADR 0019 ...\" (10-adr-0019-pre-release-exemption-for-the-schema-evolution-rule); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_e763e03b02e0c2d677ef4b49f30a9ad3",
+    "sourceUnitDigest": "74fba64154edbbc6",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "10-adr-0019-pre-release-exemption-for-the-schema-evolution-rule",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Source ADR 0019 title heading is represented by the frozen H2 \"10. ADR 0019 ...\" (10-adr-0019-pre-release-exemption-for-the-schema-evolution-rule); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H3 '0019 — Miễn trừ pre-release cho RUL11 (viết lại nhật ký tại chỗ)' (L1759) to H2 '10. ADR 0019 Pre-Release Exemption For The Schema Evolution Rule' (L416) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H3 to H2 is a depth-only change the rationale does not name (it only says 'frozen H2'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "76fc593cba1fa3b5ebaf7e373e9251e1774f5eb9c16d0e6ced80024d7d410c8f",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-040
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-040",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_a9ff1aae0ff13bbce2c3ba5e9f30b19e",
+  "frozenRecord": {
+    "claimId": "claim_a9ff1aae0ff13bbce2c3ba5e9f30b19e",
+    "sourceUnitDigest": "15548911bb940170",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0019-context",
+    "targetUnitDigest": "b589b460ed77e03ef37631a2f2e387529c52965ea0cb49f198e4e67d4c368d04",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0019 is represented by the frozen H3 \"0019 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "10. ADR 0019 Pre-Release Exemption For The Schema Evolution Rule"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_a9ff1aae0ff13bbce2c3ba5e9f30b19e",
+    "sourceUnitDigest": "15548911bb940170",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "0019-context",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0019 is represented by the frozen H3 \"0019 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H4 'Bối cảnh' (L1761) to H3 '0019 Context' (L418) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "b589b460ed77e03ef37631a2f2e387529c52965ea0cb49f198e4e67d4c368d04",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "10. ADR 0019 Pre-Release Exemption For The Schema Evolution Rule"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-041
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-041",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_86e1127b120054dafe55e52585c2a1d9",
+  "frozenRecord": {
+    "claimId": "claim_86e1127b120054dafe55e52585c2a1d9",
+    "sourceUnitDigest": "1eb8c8df3524d600",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0019-decision",
+    "targetUnitDigest": "f4473462b5e03712e55bee9a240b00c7699d73164ee8bc8bf071b6dfff526187",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0019 is represented by the frozen H3 \"0019 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "10. ADR 0019 Pre-Release Exemption For The Schema Evolution Rule"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_86e1127b120054dafe55e52585c2a1d9",
+    "sourceUnitDigest": "1eb8c8df3524d600",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "0019-decision",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Quyết định\" of ADR 0019 is represented by the frozen H3 \"0019 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H4 'Quyết định' (L1775) to H3 '0019 Decision' (L432) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "f4473462b5e03712e55bee9a240b00c7699d73164ee8bc8bf071b6dfff526187",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "10. ADR 0019 Pre-Release Exemption For The Schema Evolution Rule"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-042
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-042",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_9974f7370cd9be4ca66f08057a94d3d7",
+  "frozenRecord": {
+    "claimId": "claim_9974f7370cd9be4ca66f08057a94d3d7",
+    "sourceUnitDigest": "8ae8c5f37b83bcd7",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0019-consequences",
+    "targetUnitDigest": "de5943f8259424b72bc4cfb00883277e6e232f8b46e0f0fb46efcd42f5dda549",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0019 is represented by the frozen H3 \"0019 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "10. ADR 0019 Pre-Release Exemption For The Schema Evolution Rule"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_9974f7370cd9be4ca66f08057a94d3d7",
+    "sourceUnitDigest": "8ae8c5f37b83bcd7",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "0019-consequences",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Hệ quả\" of ADR 0019 is represented by the frozen H3 \"0019 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading H4 'Hệ quả' (L1812) to H3 '0019 Consequences' (L469) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "de5943f8259424b72bc4cfb00883277e6e232f8b46e0f0fb46efcd42f5dda549",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "10. ADR 0019 Pre-Release Exemption For The Schema Evolution Rule"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-043
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-043",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_ebfb0421fa0d9c6693aaf57a262dd471",
+  "frozenRecord": {
+    "claimId": "claim_ebfb0421fa0d9c6693aaf57a262dd471",
+    "sourceUnitDigest": "c71c9558d2d278e6",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "11-adr-0024-rename-proposed-status-to-awaiting-approval",
+    "targetUnitDigest": "9a20af2987019cf46f528ef85e14e942102ce13d868c9cd7ae034e513c1da91a",
+    "disposition": "promote",
+    "rationale": "Source ADR 0024 title heading is represented by the frozen H2 \"11. ADR 0024 ...\" (11-adr-0024-rename-proposed-status-to-awaiting-approval); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_ebfb0421fa0d9c6693aaf57a262dd471",
+    "sourceUnitDigest": "c71c9558d2d278e6",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "11-adr-0024-rename-proposed-status-to-awaiting-approval",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Source ADR 0024 title heading is represented by the frozen H2 \"11. ADR 0024 ...\" (11-adr-0024-rename-proposed-status-to-awaiting-approval); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading retitle H3 \"0024 — Đổi tên status `proposed` thành `awaiting-app...\" to H2 \"11. ADR 0024 Rename Proposed Status To Awaiting-Appr...\"; section payload digest and following-block digest equal at both ends (62 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "9a20af2987019cf46f528ef85e14e942102ce13d868c9cd7ae034e513c1da91a",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-044
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-044",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+  "collection": "claims",
+  "claimId": "claim_aa501f53cee0b7ec6adc656971266a97",
+  "frozenRecord": {
+    "claimId": "claim_aa501f53cee0b7ec6adc656971266a97",
+    "sourceUnitDigest": "a70886dacf6f54f1",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0024-context",
+    "targetUnitDigest": "e7d340683e7d23c9fc7e740c59e3218b1ba61e5d3580913aaa17db28483b9bd9",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0024 is represented by the frozen H3 \"0024 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "11. ADR 0024 Rename Proposed Status To Awaiting-Approval"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_aa501f53cee0b7ec6adc656971266a97",
+    "sourceUnitDigest": "a70886dacf6f54f1",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "reviewStatus": "reviewed",
+    "targetAnchor": "0024-context",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "rationale": "Section heading \"Bối cảnh\" of ADR 0024 is represented by the frozen H3 \"0024 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading retitle H4 \"Bối cảnh\" to H3 \"0024 Context\"; section payload digest and following-block digest equal at both ends (1107 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok. Digests also hand-recomputed with an independent script: equal.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "e7d340683e7d23c9fc7e740c59e3218b1ba61e5d3580913aaa17db28483b9bd9",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "11. ADR 0024 Rename Proposed Status To Awaiting-Approval"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-045
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-045",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+  "collection": "claims",
+  "claimId": "claim_69ddf8650201dae7cbe8fe80373c6a7c",
+  "frozenRecord": {
+    "claimId": "claim_69ddf8650201dae7cbe8fe80373c6a7c",
+    "sourceUnitDigest": "1c78b8c81620de3d",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0024-decision",
+    "targetUnitDigest": "83a65ba5e8f913c18138dea769b80eefb0b28529ba97e89546e42575decf9366",
+    "disposition": "promote",
+    "rationale": "Source H4 \"Quyết định\" of ADR 0024 is carried as the H3 \"0024 Decision\"; title differs (English, ADR-prefixed), heading-only unit. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "11. ADR 0024 Rename Proposed Status To Awaiting-Approval"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_69ddf8650201dae7cbe8fe80373c6a7c",
+    "sourceUnitDigest": "1c78b8c81620de3d",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0024-decision",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Source H4 \"Quyết định\" of ADR 0024 is carried as the H3 \"0024 Decision\"; title differs (English, ADR-prefixed), heading-only unit. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading retitle H4 \"Quyết định\" to H3 \"0024 Decision\"; section payload digest and following-block digest equal at both ends (1041 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok. Digests also hand-recomputed with an independent script: equal.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "83a65ba5e8f913c18138dea769b80eefb0b28529ba97e89546e42575decf9366",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "11. ADR 0024 Rename Proposed Status To Awaiting-Approval"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-046
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-046",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+  "collection": "claims",
+  "claimId": "claim_b1c9fa89736c52b8bff6d5ec328cc553",
+  "frozenRecord": {
+    "claimId": "claim_b1c9fa89736c52b8bff6d5ec328cc553",
+    "sourceUnitDigest": "6b827c7b203c054c",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0024-consequences",
+    "targetUnitDigest": "1cf238e42a2f95624c1b9839bb786556437785c3f35db1788e9e566cc94bf563",
+    "disposition": "promote",
+    "rationale": "Source H4 \"Hệ quả\" of ADR 0024 is carried as H3 \"0024 Consequences\"; title differs, heading-only unit. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "11. ADR 0024 Rename Proposed Status To Awaiting-Approval"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_b1c9fa89736c52b8bff6d5ec328cc553",
+    "sourceUnitDigest": "6b827c7b203c054c",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0024-consequences",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Source H4 \"Hệ quả\" of ADR 0024 is carried as H3 \"0024 Consequences\"; title differs, heading-only unit. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading retitle H4 \"Hệ quả\" to H3 \"0024 Consequences\"; section payload digest and following-block digest equal at both ends (899 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "1cf238e42a2f95624c1b9839bb786556437785c3f35db1788e9e566cc94bf563",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "11. ADR 0024 Rename Proposed Status To Awaiting-Approval"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-047
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-047",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+  "collection": "claims",
+  "claimId": "claim_aa3cf298aaa31c6dc9b4c8382434bc9c",
+  "frozenRecord": {
+    "claimId": "claim_aa3cf298aaa31c6dc9b4c8382434bc9c",
+    "sourceUnitDigest": "8a864bfaf25cf078",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "12-adr-0027-domain-owns-the-pre-delivered-status-vocabulary",
+    "targetUnitDigest": "6ac1fb5912f4bccdf38301b753d5c1c7d7e4bfc5a152c9f00b156abaaafe7a79",
+    "disposition": "promote",
+    "rationale": "Source H3 for ADR 0027 is carried as H2 \"12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary\"; title shortened/translated and level changed. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_aa3cf298aaa31c6dc9b4c8382434bc9c",
+    "sourceUnitDigest": "8a864bfaf25cf078",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "12-adr-0027-domain-owns-the-pre-delivered-status-vocabulary",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Source H3 for ADR 0027 is carried as H2 \"12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary\"; title shortened/translated and level changed. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading retitle H3 \"0027 — Domain sở hữu vocabulary/transition status đo...\" to H2 \"12. ADR 0027 Domain Owns The Pre-Delivered Status Vo...\"; section payload digest and following-block digest equal at both ends (108 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok. The source title parenthetical (supersede base-workflow-model) is not in the target title and the rationale only says translated (non-blocking).",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "6ac1fb5912f4bccdf38301b753d5c1c7d7e4bfc5a152c9f00b156abaaafe7a79",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-048
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-048",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+  "collection": "claims",
+  "claimId": "claim_818a58278988ed797931b14ca91614e2",
+  "frozenRecord": {
+    "claimId": "claim_818a58278988ed797931b14ca91614e2",
+    "sourceUnitDigest": "a06a29884a79a4eb",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0027-context",
+    "targetUnitDigest": "452a2ba22e0a3ab3caa9b41add3ce44e9f750f2242c676baf1a0e24e4631a027",
+    "disposition": "promote",
+    "rationale": "Source H4 \"Bối cảnh\" of ADR 0027 is carried as H3 \"0027 Context\"; title differs, heading-only unit. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_818a58278988ed797931b14ca91614e2",
+    "sourceUnitDigest": "a06a29884a79a4eb",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0027-context",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Source H4 \"Bối cảnh\" of ADR 0027 is carried as H3 \"0027 Context\"; title differs, heading-only unit. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading retitle H4 \"Bối cảnh\" to H3 \"0027 Context\"; section payload digest and following-block digest equal at both ends (3226 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "452a2ba22e0a3ab3caa9b41add3ce44e9f750f2242c676baf1a0e24e4631a027",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-049
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-049",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+  "collection": "claims",
+  "claimId": "claim_466331635349f55e32c11e0fcf56d334",
+  "frozenRecord": {
+    "claimId": "claim_466331635349f55e32c11e0fcf56d334",
+    "sourceUnitDigest": "d76f5cf17475a3fb",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0027-decision",
+    "targetUnitDigest": "3969babe82040ce7d1d34672b372c59d3fd1d3721811bdcbfc19c2f0b0960afc",
+    "disposition": "promote",
+    "rationale": "Source H4 \"Quyết định\" of ADR 0027 is carried as H3 \"0027 Decision\"; title differs, heading-only unit. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_466331635349f55e32c11e0fcf56d334",
+    "sourceUnitDigest": "d76f5cf17475a3fb",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0027-decision",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Source H4 \"Quyết định\" of ADR 0027 is carried as H3 \"0027 Decision\"; title differs, heading-only unit. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading retitle H4 \"Quyết định\" to H3 \"0027 Decision\"; section payload digest and following-block digest equal at both ends (3164 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "3969babe82040ce7d1d34672b372c59d3fd1d3721811bdcbfc19c2f0b0960afc",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-050
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-050",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+  "collection": "claims",
+  "claimId": "claim_0da8b597cb243173df9f5eb46a34ec76",
+  "frozenRecord": {
+    "claimId": "claim_0da8b597cb243173df9f5eb46a34ec76",
+    "sourceUnitDigest": "7dae6b0f1c8a4ba4",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0027-consumer-audit",
+    "targetUnitDigest": "e8596bf17b33258ee768e967da03d9efeddd19149ecdbccf1510cc7bdf3ec674",
+    "disposition": "promote",
+    "rationale": "Source H4 \"Audit: mọi consumer thật ...\" is carried as H3 \"0027 Consumer Audit\"; title shortened and translated. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_0da8b597cb243173df9f5eb46a34ec76",
+    "sourceUnitDigest": "7dae6b0f1c8a4ba4",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0027-consumer-audit",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Source H4 \"Audit: mọi consumer thật ...\" is carried as H3 \"0027 Consumer Audit\"; title shortened and translated. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading retitle H4 \"Audit: mọi consumer thật của `status-fsm.mjs`/`STATU...\" to H3 \"0027 Consumer Audit\"; section payload digest and following-block digest equal at both ends (832 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "e8596bf17b33258ee768e967da03d9efeddd19149ecdbccf1510cc7bdf3ec674",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-051
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-051",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+  "collection": "claims",
+  "claimId": "claim_7889671f1f2783b634ef6d90a251f3e9",
+  "frozenRecord": {
+    "claimId": "claim_7889671f1f2783b634ef6d90a251f3e9",
+    "sourceUnitDigest": "cfb28f2fabec3889",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0027-audit-1-status-source-of-truth",
+    "targetUnitDigest": "50248a7774c2a4f3faf5bf48e42047130dd788a8ab92dc278a4c66bf17a2654a",
+    "disposition": "promote",
+    "rationale": "Source H5 \"1. Nguồn sự thật\" is carried as H4 \"0027 Audit 1 Status Source Of Truth\"; title and level changed. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
+      "0027 Consumer Audit"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_7889671f1f2783b634ef6d90a251f3e9",
+    "sourceUnitDigest": "cfb28f2fabec3889",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0027-audit-1-status-source-of-truth",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Source H5 \"1. Nguồn sự thật\" is carried as H4 \"0027 Audit 1 Status Source Of Truth\"; title and level changed. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading retitle H5 \"1. Nguồn sự thật (định nghĩa STATUSES/TRANSITIONS)\" to H4 \"0027 Audit 1 Status Source Of Truth\"; section payload digest and following-block digest equal at both ends (1173 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok. The source title parenthetical (định nghĩa STATUSES/TRANSITIONS) is not in the target title and the rationale only says translated (non-blocking).",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "50248a7774c2a4f3faf5bf48e42047130dd788a8ab92dc278a4c66bf17a2654a",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
+      "0027 Consumer Audit"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-052
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-052",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+  "collection": "claims",
+  "claimId": "claim_c0adce3f717a031d4159eee6dd0aaaa1",
+  "frozenRecord": {
+    "claimId": "claim_c0adce3f717a031d4159eee6dd0aaaa1",
+    "sourceUnitDigest": "517a80cc0c3f64d3",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0027-audit-2-resolved-statuses-set",
+    "targetUnitDigest": "a4b78ba726bd39959cca89e81fa9d1bd269cf16807d014204b9427573cde9dea",
+    "disposition": "promote",
+    "rationale": "Source H5 \"2. RESOLVED_STATUSES\" is carried as H4 \"0027 Audit 2 Resolved Statuses Set\"; title and level changed. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
+      "0027 Consumer Audit"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_c0adce3f717a031d4159eee6dd0aaaa1",
+    "sourceUnitDigest": "517a80cc0c3f64d3",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0027-audit-2-resolved-statuses-set",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Source H5 \"2. RESOLVED_STATUSES\" is carried as H4 \"0027 Audit 2 Resolved Statuses Set\"; title and level changed. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading retitle H5 \"2. `RESOLVED_STATUSES` (tập \"giống category\" viết ta...\" to H4 \"0027 Audit 2 Resolved Statuses Set\"; section payload digest and following-block digest equal at both ends (2489 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok. The source title parenthetical (tập \"giống category\" viết tay, trộn cả 2...) is not in the target title and the rationale only says translated (non-blocking). Digests also hand-recomputed with an independent script: equal.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "a4b78ba726bd39959cca89e81fa9d1bd269cf16807d014204b9427573cde9dea",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
+      "0027 Consumer Audit"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-053
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-053",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+  "collection": "claims",
+  "claimId": "claim_ebfe14fc1ae59246f7b3c8871b402520",
+  "frozenRecord": {
+    "claimId": "claim_ebfe14fc1ae59246f7b3c8871b402520",
+    "sourceUnitDigest": "8590e597d5f07589",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0027-audit-3-cli-status-literals",
+    "targetUnitDigest": "f921d3b97d03d68d8e8ea0e0722b18935ef9d37b362a0ce7e23b40b04aea8d27",
+    "disposition": "promote",
+    "rationale": "Source H5 \"3. Literal status trong verb logic\" is carried as H4 \"0027 Audit 3 CLI Status Literals\"; title and level changed. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
+      "0027 Consumer Audit"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_ebfe14fc1ae59246f7b3c8871b402520",
+    "sourceUnitDigest": "8590e597d5f07589",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0027-audit-3-cli-status-literals",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Source H5 \"3. Literal status trong verb logic\" is carried as H4 \"0027 Audit 3 CLI Status Literals\"; title and level changed. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading retitle H5 \"3. Literal status trong verb logic của `bin/fgos.mjs...\" to H4 \"0027 Audit 3 CLI Status Literals\"; section payload digest and following-block digest equal at both ends (2690 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok. The source title parenthetical (tầng CLI/store — chính là \"bảng transiti...) is not in the target title and the rationale only says translated (non-blocking). Digests also hand-recomputed with an independent script: equal.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "f921d3b97d03d68d8e8ea0e0722b18935ef9d37b362a0ce7e23b40b04aea8d27",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
+      "0027 Consumer Audit"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-054
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-054",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+  "collection": "claims",
+  "claimId": "claim_6a85836cdc08fbdfde62f6d3fd9c2d8f",
+  "frozenRecord": {
+    "claimId": "claim_6a85836cdc08fbdfde62f6d3fd9c2d8f",
+    "sourceUnitDigest": "96096e1e5dd0a59c",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0027-audit-4-runner-consumers",
+    "targetUnitDigest": "cab0851daca0bf6a441036d7b9e02d4f16af9a41b78fd56f251727b173b51e5d",
+    "disposition": "promote",
+    "rationale": "Source H5 \"4. runner/ ...\" is carried as H4 \"0027 Audit 4 Runner Consumers\"; title and level changed. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
+      "0027 Consumer Audit"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_6a85836cdc08fbdfde62f6d3fd9c2d8f",
+    "sourceUnitDigest": "96096e1e5dd0a59c",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0027-audit-4-runner-consumers",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Source H5 \"4. runner/ ...\" is carried as H4 \"0027 Audit 4 Runner Consumers\"; title and level changed. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading retitle H5 \"4. `runner/` — vòng tự hành, tiêu thụ nặng nhóm đầu\" to H4 \"0027 Audit 4 Runner Consumers\"; section payload digest and following-block digest equal at both ends (1712 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "cab0851daca0bf6a441036d7b9e02d4f16af9a41b78fd56f251727b173b51e5d",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
+      "0027 Consumer Audit"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-055
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-055",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+  "collection": "claims",
+  "claimId": "claim_f1507b5008c678f9474202706e018774",
+  "frozenRecord": {
+    "claimId": "claim_f1507b5008c678f9474202706e018774",
+    "sourceUnitDigest": "80901672ceab8f8c",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0027-audit-5-other-domain-agnostic-mechanisms",
+    "targetUnitDigest": "42d14b107b6ba2a390f6c7881ba8471c91817a24674e7eae6f05ff917d296692",
+    "disposition": "promote",
+    "rationale": "Source H5 \"5. Cơ chế domain-agnostic khác\" is carried as H4 \"0027 Audit 5 Other Domain-Agnostic Mechanisms\"; title and level changed. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
+      "0027 Consumer Audit"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_f1507b5008c678f9474202706e018774",
+    "sourceUnitDigest": "80901672ceab8f8c",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0027-audit-5-other-domain-agnostic-mechanisms",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Source H5 \"5. Cơ chế domain-agnostic khác\" is carried as H4 \"0027 Audit 5 Other Domain-Agnostic Mechanisms\"; title and level changed. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading retitle H5 \"5. Cơ chế domain-agnostic khác (được DISCUSSION.md l...\" to H4 \"0027 Audit 5 Other Domain-Agnostic Mechanisms\"; section payload digest and following-block digest equal at both ends (1768 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok. The source title parenthetical (được DISCUSSION.md liệt tường minh) is not in the target title and the rationale only says translated (non-blocking).",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "42d14b107b6ba2a390f6c7881ba8471c91817a24674e7eae6f05ff917d296692",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
+      "0027 Consumer Audit"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-056
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-056",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+  "collection": "claims",
+  "claimId": "claim_3fbb7ac76d27f06cc8e095a1d0e6b88e",
+  "frozenRecord": {
+    "claimId": "claim_3fbb7ac76d27f06cc8e095a1d0e6b88e",
+    "sourceUnitDigest": "a2754368a8483a13",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0027-audit-6-adjacent-gaps",
+    "targetUnitDigest": "379c5e08a01f354caaa42087399545a3e49c45edece199864baa00f02e0a7bbc",
+    "disposition": "promote",
+    "rationale": "Source H5 \"6. Gap liên quan ...\" is carried as H4 \"0027 Audit 6 Adjacent Gaps\"; title and level changed. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
+      "0027 Consumer Audit"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_3fbb7ac76d27f06cc8e095a1d0e6b88e",
+    "sourceUnitDigest": "a2754368a8483a13",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0027-audit-6-adjacent-gaps",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Source H5 \"6. Gap liên quan ...\" is carried as H4 \"0027 Audit 6 Adjacent Gaps\"; title and level changed. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading retitle H5 \"6. Gap liên quan nhưng KHÔNG phải phạm vi audit stat...\" to H4 \"0027 Audit 6 Adjacent Gaps\"; section payload digest and following-block digest equal at both ends (460 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok. The source title parenthetical (ghi nhận để không lặp lại công sức) is not in the target title and the rationale only says translated (non-blocking).",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "379c5e08a01f354caaa42087399545a3e49c45edece199864baa00f02e0a7bbc",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
+      "0027 Consumer Audit"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-057
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-057",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+  "collection": "claims",
+  "claimId": "claim_e2d3709ee991f35ec6153e7e84c46e2f",
+  "frozenRecord": {
+    "claimId": "claim_e2d3709ee991f35ec6153e7e84c46e2f",
+    "sourceUnitDigest": "d35b961952abd6b3",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0027-consequences",
+    "targetUnitDigest": "7729270993aaa029e4ceb8b64300670303de6930bf6412bd3c8097b7dac134ba",
+    "disposition": "promote",
+    "rationale": "Source H4 \"Hệ quả\" of ADR 0027 is carried as H3 \"0027 Consequences\"; title differs, heading-only unit. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_e2d3709ee991f35ec6153e7e84c46e2f",
+    "sourceUnitDigest": "d35b961952abd6b3",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0027-consequences",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Source H4 \"Hệ quả\" of ADR 0027 is carried as H3 \"0027 Consequences\"; title differs, heading-only unit. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading retitle H4 \"Hệ quả\" to H3 \"0027 Consequences\"; section payload digest and following-block digest equal at both ends (1960 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "7729270993aaa029e4ceb8b64300670303de6930bf6412bd3c8097b7dac134ba",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-058
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-058",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+  "collection": "claims",
+  "claimId": "claim_217bf9908c0941c13b1eaf2f7a2d9d64",
+  "frozenRecord": {
+    "claimId": "claim_217bf9908c0941c13b1eaf2f7a2d9d64",
+    "sourceUnitDigest": "f617f1c06417c2f7",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "13-adr-0032-multi-role-team-harness",
+    "targetUnitDigest": "adc471524e7f457d3d74097885286fe95536a2bcb0db955d80faa15452aad116",
+    "disposition": "promote",
+    "rationale": "Source H3 \"0032 — Multi-role Team Harness: trục role/holder ...\" is carried as H2 \"13. ADR 0032 Multi-Role Team Harness\"; title shortened and translated. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_217bf9908c0941c13b1eaf2f7a2d9d64",
+    "sourceUnitDigest": "f617f1c06417c2f7",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "13-adr-0032-multi-role-team-harness",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Source H3 \"0032 — Multi-role Team Harness: trục role/holder ...\" is carried as H2 \"13. ADR 0032 Multi-Role Team Harness\"; title shortened and translated. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading retitle H3 \"0032 — Multi-role Team Harness: trục role/holder, ha...\" to H2 \"13. ADR 0032 Multi-Role Team Harness\"; section payload digest and following-block digest equal at both ends (747 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok. Digests also hand-recomputed with an independent script: equal.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "adc471524e7f457d3d74097885286fe95536a2bcb0db955d80faa15452aad116",
+    "targetAncestry": [
+      "Retired Decision History: Work State"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-059
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-059",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+  "collection": "claims",
+  "claimId": "claim_e6ae96517c239248948c36255ae4dcac",
+  "frozenRecord": {
+    "claimId": "claim_e6ae96517c239248948c36255ae4dcac",
+    "sourceUnitDigest": "8f1228fba7212659",
+    "targetOwner": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+    "targetAnchor": "2-distill-journey",
+    "targetUnitDigest": "8cb65c5075a2a4c13e78b4300f757cfeb334104a6783d6f9c1e6c60f44515274",
+    "disposition": "promote",
+    "rationale": "Source H4 \"Hành trình\" is carried as H2 \"2. Distill Journey\" in the history document, not in the decision record; title differs. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Multi-Role Harness Distill Record"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_e6ae96517c239248948c36255ae4dcac",
+    "sourceUnitDigest": "8f1228fba7212659",
+    "targetOwner": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+    "targetAnchor": "2-distill-journey",
+    "claimKind": "historical-context",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Source H4 \"Hành trình\" is carried as H2 \"2. Distill Journey\" in the history document, not in the decision record; title differs. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading retitle H4 \"Hành trình\" to H2 \"2. Distill Journey\"; section payload digest and following-block digest equal at both ends (464 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "8cb65c5075a2a4c13e78b4300f757cfeb334104a6783d6f9c1e6c60f44515274",
+    "targetAncestry": [
+      "Multi-Role Harness Distill Record"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-060
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-060",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+  "collection": "claims",
+  "claimId": "claim_7e0016df70b7640b0337c5daf5f80e90",
+  "frozenRecord": {
+    "claimId": "claim_7e0016df70b7640b0337c5daf5f80e90",
+    "sourceUnitDigest": "18b3552e741e5967",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0032-foundation-architecture",
+    "targetUnitDigest": "43773d8a795297806063bf0a0df747a426a048d010c7835e6a4c364f948e25e9",
+    "disposition": "promote",
+    "rationale": "Source H4 \"I. Kiến trúc nền (seq ...)\" is carried as H3 \"0032 Foundation Architecture\"; title translated and seq references dropped. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "13. ADR 0032 Multi-Role Team Harness"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_7e0016df70b7640b0337c5daf5f80e90",
+    "sourceUnitDigest": "18b3552e741e5967",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0032-foundation-architecture",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Source H4 \"I. Kiến trúc nền (seq ...)\" is carried as H3 \"0032 Foundation Architecture\"; title translated and seq references dropped. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading retitle H4 \"I. Kiến trúc nền (seq 18029, 18031)\" to H3 \"0032 Foundation Architecture\"; section payload digest and following-block digest equal at both ends (788 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok. The source title parenthetical (seq 18029, 18031) is not in the target title; the rationale says seq references dropped.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "43773d8a795297806063bf0a0df747a426a048d010c7835e6a4c364f948e25e9",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "13. ADR 0032 Multi-Role Team Harness"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+
+## Entry frozen-061
+
+```json
+{
+  "kind": "frozen-reviewed-rationale-confirmation",
+  "entryId": "frozen-061",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+  "collection": "claims",
+  "claimId": "claim_f30f58465c33adf6343057d6c3fcb2b3",
+  "frozenRecord": {
+    "claimId": "claim_f30f58465c33adf6343057d6c3fcb2b3",
+    "sourceUnitDigest": "bade02e702bb44fe",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0032-handoff",
+    "targetUnitDigest": "6b297c17245b7ff04f30f0e8abc72bbb41907953c204d3469f8896771b5e88e0",
+    "disposition": "promote",
+    "rationale": "Source H4 \"II. Handoff ...\" is carried as H3 \"0032 Handoff\"; title shortened and seq references dropped. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "witnessCommit": "9b0526380",
+    "reason": "Deliberately authored rationale independently reviewed; preserve at unchanged binding (L10-29).",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "13. ADR 0032 Multi-Role Team Harness"
+    ]
+  },
+  "existingApprovalPreserved": true,
+  "mechanicalRequired": true,
+  "deepRequired": false,
+  "tags": [],
+  "reviewScope": "Confirm frozen list and complete binding/rationale. Reviewed rows keep approval; pending L10-2 verdict is submitted once in rationales. L10-2 must equal original 5035fed52 rationale, full identities/digests/residual and superseded A34 note.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_f30f58465c33adf6343057d6c3fcb2b3",
+    "sourceUnitDigest": "bade02e702bb44fe",
+    "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+    "targetAnchor": "0032-handoff",
+    "claimKind": "decision",
+    "disposition": "promote",
+    "reviewStatus": "reviewed",
+    "rationale": "Source H4 \"II. Handoff ...\" is carried as H3 \"0032 Handoff\"; title shortened and seq references dropped. Target digest expanded to full SHA256; source and target content are unchanged.",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "reviewNote": "deep: heading retitle H4 \"II. Handoff — trái tim của tính uyển chuyển (seq 180...\" to H3 \"0032 Handoff\"; section payload digest and following-block digest equal at both ends (1327 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok. The source title parenthetical (seq 18032, 18070, 18058) is not in the target title; the rationale says seq references dropped.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "6b297c17245b7ff04f30f0e8abc72bbb41907953c204d3469f8896771b5e88e0",
+    "targetAncestry": [
+      "Retired Decision History: Work State",
+      "13. ADR 0032 Multi-Role Team Harness"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  }
+}
+```
+

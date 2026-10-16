@@ -1,0 +1,763 @@
+# Bounded re-review: rationales 12
+
+Author session: `codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16`
+Packaged by: `codex-session:unit-run-1792122626822-ceb0cdd9@2026-10-16`
+Content commit: `62751458b22b47e930dc33b8501d07798b91ace3`; author changes `eb793bc63`; comparison `9b0526380329d8cb1cb6085a1c8f378e943e2505`.
+Entries: **6**; maximum 60 entries and 400000 bytes per Markdown/sidecar.
+[One request index](review-request-step10-index-62751458b.md).
+
+Committed `currentDecision`/`after` snapshots come from `git show 62751458b22b47e930dc33b8501d07798b91ace3:<shard>` through `reviewEntryFromCommittedRow`. Explicit `packageOverlay` and `packageOverlayAfter` values are fresh pending native/dependent rows and require the runner package commit for ordinary verdict binding. Before prose is historical. No producer seed, draw or verdict.
+
+Exact scratch-only reproduction commands, run sequentially from repository root at the runner package checkout:
+
+```sh
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work python3 plans/260925-documentation-authority-unification/reports/phase-06/step10-sync287-reproduce.py consistency --output /tmp/fgos-work/review627/consistency.json
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/scripts/doc-*.test.mjs test/scripts/check-doc-*.test.mjs test/scripts/generate-doc-inventory.test.mjs test/scripts/list-doc-anchors.test.mjs test/scripts/verify-phase-02.test.mjs test/scripts/next-doc-id.test.mjs
+env -u CLAUDE_CODE_SESSION_ID python3 - <<'PY'
+import json
+from pathlib import Path
+p=Path('/tmp/fgos-work/review627'); p.mkdir(parents=True, exist_ok=True)
+if p.is_symlink() or not p.resolve().is_relative_to('/tmp/fgos-work') or p.resolve().is_relative_to(Path.cwd().resolve()): raise RuntimeError('unsafe scratch directory')
+for name in ['step10-native-inventory.bin','step10-sync627-D-both.json','step10-sync627-D-identity.json','step10-sync627-D-phase02.json','step10-sync627-D-summary.json','step10-sync627-target-ownership.json','step10-sync627-link-replay.json']:
+    out=p/name
+    if out.is_symlink() or out.exists() and out.stat().st_nlink!=1: raise RuntimeError('unsafe scratch output')
+j=json.loads(Path('plans/260925-documentation-authority-unification/reports/phase-06/step10-sync627-reproduction.json').read_text())
+for name,text in j['readOnlyScripts'].items():
+    out=p/name
+    if out.is_symlink() or out.exists() and out.stat().st_nlink!=1: raise RuntimeError('unsafe scratch file')
+    out.write_text(text)
+PY
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --max-old-space-size=4096 --max-semi-space-size=16 /tmp/fgos-work/review627/inventory-readonly.mjs
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --max-old-space-size=4096 --max-semi-space-size=16 /tmp/fgos-work/review627/verify-readonly.mjs
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node /tmp/fgos-work/review627/ownership-readonly.mjs
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node /tmp/fgos-work/review627/audit-ownership-readonly.mjs
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work python3 /tmp/fgos-work/review627/replay-readonly.py
+```
+
+The unchanged checker audits **all 12895 rows /92 shards**, including all whole-section and distinct-occurrence rules, **836** selected outputs and the native-dependent refresh. Expected tests: **490** pass. No author `--apply`, carry-forward, registry persistence or repository output occurs in these reviewer commands. Inventory replay reads the sole compact registry; its regenerated inventory and all D/ownership/link outputs stay under `/tmp/fgos-work/review627/`. Reader reproduction needs available scratch space and memory; do the heavy commands sequentially. Historical author mutation scripts in the provenance manifest are evidence only.
+
+A36: every pending submitted claim receives ordinary verdict and digest/anchor/shard equality. Independently seed >=45/296 rationale deep sample plus >=45/298 conservative Weak-exact/Judgment population (one reviewer draw can satisfy both only if coverage proved). Every listed unequal-digest, partial/historical row, all52 whole-section headings, all8 own-occurrence footers, restored L10-2, and marked docs/tool/native corrections are deep. [Exact deep populations](step10-sync627-A36.json). Reviewer records seed/sample IDs; >3% deep rework escalates to whole set. No separate claim verdict on frozen/footer/accounting references when the pending claim is already submitted in rationales/decisions. Existing reviewed approvals remain; evidence/native tuples do not approve current truth or cutover.
+
+## Entry rationale-291
+
+```json
+{
+  "entryId": "rationale-291",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+  "collection": "rows",
+  "claimId": "claim_0145c13614b75e7da1321473afa8a0f1",
+  "before": {
+    "claimId": "claim_0145c13614b75e7da1321473afa8a0f1",
+    "sourcePath": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+    "sourceAnchor": "unheaded-block-10",
+    "sourceUnitDigest": "1162040b79db2beccc2fe163e3f008e931b8f6ce13d15113a3f2838abb9df2a5",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+    "targetAnchor": "surface-taxonomy",
+    "shownTargetDigest": "6783eba05403033970ee5832ace843ceccf7b816a0b115fa601d31c4921a311a",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:106-114#unheaded-block-10 (historical witness at d23045c2de83e3508fda8fd2580b43ece2e1e046); unit SHA256 1162040b79db2beccc2fe163e3f008e931b8f6ce13d15113a3f2838abb9df2a5.\nTarget: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:85-85#happy-path-routing (historical witness at ce575996f; absent from current binding location); unit SHA256 0c50fe16d128e763572d7c17246d17511168a21279be7960e8975ff40f91f2be.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 0c50fe16d128e763572d7c17246d17511168a21279be7960e8975ff40f91f2be at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 10\" → \"Happy Path Routing\".\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-10 under docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#happy-path-routing; source context \"Group Thinking Trigger Surface / Happy Path Routing\", target context \"Group Thinking Trigger Surface\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "shownSourceText": "| User phrase | Expected route |\n|---|---|\n| \"run a panel on whether we should split this service\" | `architecture-panel` -> `fgos-architecture-panel` -> architecture advisory protocol -> `advise` |\n| \"compare these 3 implementation options\" | `option-comparison` when the options are concrete; upgrade to `architecture-panel` if repository investigation and a full architecture recommendation are requested |\n| \"red-team this architecture decision\" | `architecture-panel`; red-team remains a declared phase inside that protocol |\n| \"get independent opinions before I commit\" | `independent-feedback`; ask only for the subject if it is absent |\n| \"review this proposal with group thinking\" | `proposal-review`; use the proposal text or artifact already in scope |\n| \"business panel: should we change pricing?\" | `strategy-options` if alternatives must be generated/compared; `business-review` if a concrete pricing proposal exists |\n| \"coding panel: should this be a plugin or core feature?\" | `coding-design-panel` -> `architecture-panel` -> `advise`; never `fgos-code-panel` because no implementation was requested |",
+    "shownSourceDigest": "1162040b79db2beccc2fe163e3f008e931b8f6ce13d15113a3f2838abb9df2a5",
+    "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+    "targetUnitDigest": "acfa27bd06c8c37b033b7a44209aa880627f7de384684846e6f8bed12129c4f6",
+    "targetAncestry": [
+      "Group Thinking Trigger Surface"
+    ]
+  },
+  "after": {
+    "claimId": "claim_0145c13614b75e7da1321473afa8a0f1",
+    "sourcePath": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+    "sourceAnchor": "unheaded-block-10",
+    "sourceUnitDigest": "1162040b79db2beccc2fe163e3f008e931b8f6ce13d15113a3f2838abb9df2a5",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+    "targetAnchor": "surface-taxonomy",
+    "shownTargetDigest": "6783eba05403033970ee5832ace843ceccf7b816a0b115fa601d31c4921a311a",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:106-114#unheaded-block-10 (historical witness at d23045c2de83e3508fda8fd2580b43ece2e1e046); unit SHA256 1162040b79db2beccc2fe163e3f008e931b8f6ce13d15113a3f2838abb9df2a5.\nTarget: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:70-70#surface-taxonomy (current lines); unit SHA256 acfa27bd06c8c37b033b7a44209aa880627f7de384684846e6f8bed12129c4f6.\nSource and target unit digests differ.\nTarget changed since last reviewed digest 0c50fe16d128e763572d7c17246d17511168a21279be7960e8975ff40f91f2be at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 2; 2 changed spellings/labels, 0 destination changes; 2 added, 0 removed.\nLink 1: \"none\" (none) → \"`request-kinds-and-routes.md`\" (../../../../core/skills/fgos-advise/references/request-kinds-and-routes.md); resolved none → core/skills/fgos-advise/references/request-kinds-and-routes.md.\nLink 2: \"none\" (none) → \"`fgos-advise`\" (../../../../core/skills/fgos-advise/SKILL.md); resolved none → core/skills/fgos-advise/SKILL.md.\nHeading depth: not a heading → 2; title \"Unheaded block 10\" → \"Surface Taxonomy\".\nWhole direct section differs; depth block → 2; 2 distinct link changes; normalized line order differs; 9 removed and 9 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-10 under docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#surface-taxonomy; source context \"Group Thinking Trigger Surface / Happy Path Routing\", target context \"Group Thinking Trigger Surface\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy. L10-32/A34: current renamed section supersedes the prior target at historical witness ce575996f; upstream 09fe3ab32 and f4ed59997 replaced that section. No unchanged-current-target assertion or historical approval is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "shownSourceText": "| User phrase | Expected route |\n|---|---|\n| \"run a panel on whether we should split this service\" | `architecture-panel` -> `fgos-architecture-panel` -> architecture advisory protocol -> `advise` |\n| \"compare these 3 implementation options\" | `option-comparison` when the options are concrete; upgrade to `architecture-panel` if repository investigation and a full architecture recommendation are requested |\n| \"red-team this architecture decision\" | `architecture-panel`; red-team remains a declared phase inside that protocol |\n| \"get independent opinions before I commit\" | `independent-feedback`; ask only for the subject if it is absent |\n| \"review this proposal with group thinking\" | `proposal-review`; use the proposal text or artifact already in scope |\n| \"business panel: should we change pricing?\" | `strategy-options` if alternatives must be generated/compared; `business-review` if a concrete pricing proposal exists |\n| \"coding panel: should this be a plugin or core feature?\" | `coding-design-panel` -> `architecture-panel` -> `advise`; never `fgos-code-panel` because no implementation was requested |",
+    "shownSourceDigest": "1162040b79db2beccc2fe163e3f008e931b8f6ce13d15113a3f2838abb9df2a5",
+    "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+    "targetUnitDigest": "acfa27bd06c8c37b033b7a44209aa880627f7de384684846e6f8bed12129c4f6",
+    "targetAncestry": [
+      "Group Thinking Trigger Surface"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [
+    "L10-32/renamed-retired-successor"
+  ],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 290,
+  "factsSHA256": "05da3f3fd56a5d388d1d4de5de26b9a93ffff494a752dd151c8c4cacdff9f6dd",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-10",
+    "githubAnchor": "unheaded-block-10",
+    "stableAnchor": "unheaded-block-10",
+    "title": "Unheaded block 10",
+    "startLine": 106,
+    "endLine": 114,
+    "textDigest": "1162040b79db2beccc2fe163e3f008e931b8f6ce13d15113a3f2838abb9df2a5",
+    "sample": "| User phrase | Expected route |\n|---|---|\n| \"run a panel on whether we should split this service\" | `architecture-panel` -> `fgos-architecture-panel` -> architecture advisory prot",
+    "identityFingerprint": "5bb718f9c390c24af76f4e1a213641c947e37c0a33cda64e2b1cad629e69d919",
+    "ancestry": [
+      "Group Thinking Trigger Surface",
+      "Happy Path Routing"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+    "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "Surface Taxonomy",
+    "anchor": "surface-taxonomy",
+    "githubAnchor": "surface-taxonomy",
+    "stableAnchor": "h-1c2e8eca3086",
+    "startLine": 70,
+    "endLine": 70,
+    "textDigest": "acfa27bd06c8c37b033b7a44209aa880627f7de384684846e6f8bed12129c4f6",
+    "sample": "Surface Taxonomy",
+    "sectionPayloadDigest": "b7c8760c894fef840cef9630c446a32f9ebcd8b838d6b82676968f2eb3d5a0e7",
+    "followingBlockDigest": "b7c8760c894fef840cef9630c446a32f9ebcd8b838d6b82676968f2eb3d5a0e7",
+    "identityFingerprint": "d1bf4b8ac7578f3519ba30de4657e81ad94f9b70dbc07fc488034d57ab396331",
+    "ancestry": [
+      "Group Thinking Trigger Surface"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_0145c13614b75e7da1321473afa8a0f1",
+    "sourcePath": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+    "sourceAnchor": "unheaded-block-10",
+    "sourceUnitDigest": "1162040b79db2beccc2fe163e3f008e931b8f6ce13d15113a3f2838abb9df2a5",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+    "targetAnchor": "surface-taxonomy",
+    "shownTargetDigest": "6783eba05403033970ee5832ace843ceccf7b816a0b115fa601d31c4921a311a",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:106-114#unheaded-block-10 (historical witness at d23045c2de83e3508fda8fd2580b43ece2e1e046); unit SHA256 1162040b79db2beccc2fe163e3f008e931b8f6ce13d15113a3f2838abb9df2a5.\nTarget: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:70-70#surface-taxonomy (current lines); unit SHA256 acfa27bd06c8c37b033b7a44209aa880627f7de384684846e6f8bed12129c4f6.\nSource and target unit digests differ.\nTarget changed since last reviewed digest 0c50fe16d128e763572d7c17246d17511168a21279be7960e8975ff40f91f2be at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 2; 2 changed spellings/labels, 0 destination changes; 2 added, 0 removed.\nLink 1: \"none\" (none) → \"`request-kinds-and-routes.md`\" (../../../../core/skills/fgos-advise/references/request-kinds-and-routes.md); resolved none → core/skills/fgos-advise/references/request-kinds-and-routes.md.\nLink 2: \"none\" (none) → \"`fgos-advise`\" (../../../../core/skills/fgos-advise/SKILL.md); resolved none → core/skills/fgos-advise/SKILL.md.\nHeading depth: not a heading → 2; title \"Unheaded block 10\" → \"Surface Taxonomy\".\nWhole direct section differs; depth block → 2; 2 distinct link changes; normalized line order differs; 9 removed and 9 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-10 under docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#surface-taxonomy; source context \"Group Thinking Trigger Surface / Happy Path Routing\", target context \"Group Thinking Trigger Surface\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy. L10-32/A34: current renamed section supersedes the prior target at historical witness ce575996f; upstream 09fe3ab32 and f4ed59997 replaced that section. No unchanged-current-target assertion or historical approval is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "shownSourceText": "| User phrase | Expected route |\n|---|---|\n| \"run a panel on whether we should split this service\" | `architecture-panel` -> `fgos-architecture-panel` -> architecture advisory protocol -> `advise` |\n| \"compare these 3 implementation options\" | `option-comparison` when the options are concrete; upgrade to `architecture-panel` if repository investigation and a full architecture recommendation are requested |\n| \"red-team this architecture decision\" | `architecture-panel`; red-team remains a declared phase inside that protocol |\n| \"get independent opinions before I commit\" | `independent-feedback`; ask only for the subject if it is absent |\n| \"review this proposal with group thinking\" | `proposal-review`; use the proposal text or artifact already in scope |\n| \"business panel: should we change pricing?\" | `strategy-options` if alternatives must be generated/compared; `business-review` if a concrete pricing proposal exists |\n| \"coding panel: should this be a plugin or core feature?\" | `coding-design-panel` -> `architecture-panel` -> `advise`; never `fgos-code-panel` because no implementation was requested |",
+    "shownSourceDigest": "1162040b79db2beccc2fe163e3f008e931b8f6ce13d15113a3f2838abb9df2a5",
+    "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+    "targetUnitDigest": "acfa27bd06c8c37b033b7a44209aa880627f7de384684846e6f8bed12129c4f6",
+    "targetAncestry": [
+      "Group Thinking Trigger Surface"
+    ]
+  }
+}
+```
+
+## Entry rationale-292
+
+```json
+{
+  "entryId": "rationale-292",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+  "collection": "rows",
+  "claimId": "claim_deb1e4063a1eabf13dd8ed523748039f",
+  "before": {
+    "claimId": "claim_deb1e4063a1eabf13dd8ed523748039f",
+    "sourcePath": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+    "sourceAnchor": "unheaded-block-20",
+    "sourceUnitDigest": "6bea20cb9a1aa9d19c5c6e9ef6e1ccf1f7ec636b964c2aaa50521ba3c14d73d5",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+    "targetAnchor": "b-add-fgos-advise",
+    "shownTargetDigest": "245116acac90f31a527eca59811652803d0415b74a13e78f1585303b061f086e",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:193-195#unheaded-block-20 (historical witness at d23045c2de83e3508fda8fd2580b43ece2e1e046); unit SHA256 6bea20cb9a1aa9d19c5c6e9ef6e1ccf1f7ec636b964c2aaa50521ba3c14d73d5.\nTarget: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:148-148#b-add-fgos-panel (historical witness at ce575996f; absent from current binding location); unit SHA256 255adc34ce54db5747cd3c1a8d950b6d92f47a1ee0360648afd326076ae6281c.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 255adc34ce54db5747cd3c1a8d950b6d92f47a1ee0360648afd326076ae6281c at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 20\" → \"B. Add `fgos-panel`\".\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-20 under docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#b-add-fgos-panel; source context \"Group Thinking Trigger Surface / Alternatives Considered / B. Add `fgos-panel`\", target context \"Group Thinking Trigger Surface / Alternatives Considered\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "shownSourceText": "Selected. It gives natural requests one memorable entrypoint, keeps all mapping\nin this canonical table, and delegates unchanged execution to the pack gate and\nregistered protocol. Existing specialist skills remain available.",
+    "shownSourceDigest": "6bea20cb9a1aa9d19c5c6e9ef6e1ccf1f7ec636b964c2aaa50521ba3c14d73d5",
+    "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+    "targetUnitDigest": "bb1ae7699ab58ef15b7ea30bf4d78b57cdd8eb69b9a4ef6a7713e83e50f9eb3c",
+    "targetAncestry": [
+      "Group Thinking Trigger Surface",
+      "Alternatives Considered"
+    ]
+  },
+  "after": {
+    "claimId": "claim_deb1e4063a1eabf13dd8ed523748039f",
+    "sourcePath": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+    "sourceAnchor": "unheaded-block-20",
+    "sourceUnitDigest": "6bea20cb9a1aa9d19c5c6e9ef6e1ccf1f7ec636b964c2aaa50521ba3c14d73d5",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+    "targetAnchor": "b-add-fgos-advise",
+    "shownTargetDigest": "245116acac90f31a527eca59811652803d0415b74a13e78f1585303b061f086e",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:193-195#unheaded-block-20 (historical witness at d23045c2de83e3508fda8fd2580b43ece2e1e046); unit SHA256 6bea20cb9a1aa9d19c5c6e9ef6e1ccf1f7ec636b964c2aaa50521ba3c14d73d5.\nTarget: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:132-132#b-add-fgos-advise (current lines); unit SHA256 bb1ae7699ab58ef15b7ea30bf4d78b57cdd8eb69b9a4ef6a7713e83e50f9eb3c.\nSource and target unit digests differ.\nTarget changed since last reviewed digest 255adc34ce54db5747cd3c1a8d950b6d92f47a1ee0360648afd326076ae6281c at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 20\" → \"B. Add `fgos-advise`\".\nWhole direct section differs; depth block → 3; 0 distinct link changes; normalized line order differs; 3 removed and 4 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-20 under docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#b-add-fgos-advise; source context \"Group Thinking Trigger Surface / Alternatives Considered / B. Add `fgos-panel`\", target context \"Group Thinking Trigger Surface / Alternatives Considered\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy. L10-32/A34: current renamed section supersedes the prior target at historical witness ce575996f; upstream 09fe3ab32 and f4ed59997 replaced that section. No unchanged-current-target assertion or historical approval is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "shownSourceText": "Selected. It gives natural requests one memorable entrypoint, keeps all mapping\nin this canonical table, and delegates unchanged execution to the pack gate and\nregistered protocol. Existing specialist skills remain available.",
+    "shownSourceDigest": "6bea20cb9a1aa9d19c5c6e9ef6e1ccf1f7ec636b964c2aaa50521ba3c14d73d5",
+    "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+    "targetUnitDigest": "bb1ae7699ab58ef15b7ea30bf4d78b57cdd8eb69b9a4ef6a7713e83e50f9eb3c",
+    "targetAncestry": [
+      "Group Thinking Trigger Surface",
+      "Alternatives Considered"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [
+    "L10-32/renamed-retired-successor"
+  ],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 291,
+  "factsSHA256": "ab9c8cd2d5e33f13ae884fa581115ff9611be5f54a44dc12e86f630f4301d811",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-20",
+    "githubAnchor": "unheaded-block-20",
+    "stableAnchor": "unheaded-block-20",
+    "title": "Unheaded block 20",
+    "startLine": 193,
+    "endLine": 195,
+    "textDigest": "6bea20cb9a1aa9d19c5c6e9ef6e1ccf1f7ec636b964c2aaa50521ba3c14d73d5",
+    "sample": "Selected. It gives natural requests one memorable entrypoint, keeps all mapping\nin this canonical table, and delegates unchanged execution to the pack gate and\nregistered protocol.",
+    "identityFingerprint": "26bb6fd72c7f1067a2c10418524ec0e20c5cd75ae9f2fb616376cbf5451299aa",
+    "ancestry": [
+      "Group Thinking Trigger Surface",
+      "Alternatives Considered",
+      "B. Add `fgos-panel`"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+    "commit": "d23045c2de83e3508fda8fd2580b43ece2e1e046"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "B. Add `fgos-advise`",
+    "anchor": "b-add-fgos-advise",
+    "githubAnchor": "b-add-fgos-advise",
+    "stableAnchor": "h-e1e75f492433",
+    "startLine": 132,
+    "endLine": 132,
+    "textDigest": "bb1ae7699ab58ef15b7ea30bf4d78b57cdd8eb69b9a4ef6a7713e83e50f9eb3c",
+    "sample": "B. Add `fgos-advise`",
+    "sectionPayloadDigest": "6773625e16ca5d9a1fd1dd0cc346ded0fe7b396078432a25f7a6073346e911cb",
+    "followingBlockDigest": "6773625e16ca5d9a1fd1dd0cc346ded0fe7b396078432a25f7a6073346e911cb",
+    "identityFingerprint": "be0182f855cbc2ddcfd04468c8c4391d4bfa9aafb889055b08e3720b9f4a938c",
+    "ancestry": [
+      "Group Thinking Trigger Surface",
+      "Alternatives Considered"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_deb1e4063a1eabf13dd8ed523748039f",
+    "sourcePath": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+    "sourceAnchor": "unheaded-block-20",
+    "sourceUnitDigest": "6bea20cb9a1aa9d19c5c6e9ef6e1ccf1f7ec636b964c2aaa50521ba3c14d73d5",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+    "targetAnchor": "b-add-fgos-advise",
+    "shownTargetDigest": "245116acac90f31a527eca59811652803d0415b74a13e78f1585303b061f086e",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:193-195#unheaded-block-20 (historical witness at d23045c2de83e3508fda8fd2580b43ece2e1e046); unit SHA256 6bea20cb9a1aa9d19c5c6e9ef6e1ccf1f7ec636b964c2aaa50521ba3c14d73d5.\nTarget: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:132-132#b-add-fgos-advise (current lines); unit SHA256 bb1ae7699ab58ef15b7ea30bf4d78b57cdd8eb69b9a4ef6a7713e83e50f9eb3c.\nSource and target unit digests differ.\nTarget changed since last reviewed digest 255adc34ce54db5747cd3c1a8d950b6d92f47a1ee0360648afd326076ae6281c at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 20\" → \"B. Add `fgos-advise`\".\nWhole direct section differs; depth block → 3; 0 distinct link changes; normalized line order differs; 3 removed and 4 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-20 under docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#b-add-fgos-advise; source context \"Group Thinking Trigger Surface / Alternatives Considered / B. Add `fgos-panel`\", target context \"Group Thinking Trigger Surface / Alternatives Considered\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy. L10-32/A34: current renamed section supersedes the prior target at historical witness ce575996f; upstream 09fe3ab32 and f4ed59997 replaced that section. No unchanged-current-target assertion or historical approval is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "shownSourceText": "Selected. It gives natural requests one memorable entrypoint, keeps all mapping\nin this canonical table, and delegates unchanged execution to the pack gate and\nregistered protocol. Existing specialist skills remain available.",
+    "shownSourceDigest": "6bea20cb9a1aa9d19c5c6e9ef6e1ccf1f7ec636b964c2aaa50521ba3c14d73d5",
+    "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+    "targetUnitDigest": "bb1ae7699ab58ef15b7ea30bf4d78b57cdd8eb69b9a4ef6a7713e83e50f9eb3c",
+    "targetAncestry": [
+      "Group Thinking Trigger Surface",
+      "Alternatives Considered"
+    ]
+  }
+}
+```
+
+## Entry rationale-293
+
+```json
+{
+  "entryId": "rationale-293",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-mapped-conservation.json",
+  "collection": "claims",
+  "claimId": "claim_53ebf4b541ff8f6a2c40e3b95304d6b7",
+  "before": {
+    "claimId": "claim_53ebf4b541ff8f6a2c40e3b95304d6b7",
+    "sourceUnitDigest": "2aff5e7721a256efce78953c498af0839f56f0bb5b9918290a36bbc072659eb1",
+    "targetOwner": "docs/platform/documentation/operations/portals/docs-portal.md",
+    "targetAnchor": "1-read-first",
+    "claimKind": "navigation",
+    "disposition": "supersede",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "Frozen root map assigns docs/README.md#1-read-first to docs/platform/documentation/operations/portals/docs-portal.md#1-read-first. Carry the complete unit into its candidate portal owner. This unit includes 13 documented link spelling adjustment(s): [doc-governance.md](doc-governance.md) becomes [doc-governance.md](../../../governance.md) (Candidate destination repointed to docs/platform/governance.md; label preserved.); [reading-map.md](reading-map.md) becomes [reading-map.md](../../../../reading-map.md) (Relative spelling changes only; original repository destination conserved.); [platform/README.md](platform/README.md) becomes [platform/README.md](../../../README.md) (Relative spelling changes only; original repository destination conserved.); [specs/reading-map.md](specs/reading-map.md) becomes [specs/reading-map.md](../../../../specs/reading-map.md) (Relative spelling changes only; original repository destination conserved.); [user/](user/) becomes [user/](../../../../user) (Relative spelling changes only; original repository destination conserved.); [how-to/](how-to/) becomes [how-to/](../../../../how-to) (Relative spelling changes only; original repository destination conserved.); [reference/](reference/) becomes [reference/](../../../../reference) (Relative spelling changes only; original repository destination conserved.); [explanation/](explanation/) becomes [explanation/](../../../../explanation) (Relative spelling changes only; original repository destination conserved.); [user/](user/) becomes [user/](../../../../user) (Relative spelling changes only; original repository destination conserved.); [doc-governance.md](doc-governance.md) becomes [doc-governance.md](../../../governance.md) (Candidate destination repointed to docs/platform/governance.md; label preserved.); [reading-map.md](reading-map.md) becomes [reading-map.md](../../../../reading-map.md) (Relative spelling changes only; original repository destination conserved.); [platform/README.md](platform/README.md) becomes [platform/README.md](../../../README.md) (Relative spelling changes only; original repository destination conserved.); [specs/reading-map.md](specs/reading-map.md) becomes [specs/reading-map.md](../../../../specs/reading-map.md) (Relative spelling changes only; original repository destination conserved.). Full source/target text and diff are submitted for independent whole-unit conservation review; wrapping/header/relative-path changes grant no truth approval. No source retirement, promotion or component-boundary change. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10 review correction: the doc-governance link is repointed to docs/platform/governance.md; its original legacy destination is not retained. Label and candidate referent are disclosed; pending independent review.",
+    "reviewNote": "deep: heading 1 Read First; same 13 link pairs checked by script in both directions, no unlisted link change, governance repoint disclosed; anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-345f15d95.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "16929d439319f41461ebf8f9278446e233b23a3b2450a9b9bd4295b12e1052db",
+    "targetAncestry": [
+      "fgOS Documentation"
+    ],
+    "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+  },
+  "after": {
+    "claimId": "claim_53ebf4b541ff8f6a2c40e3b95304d6b7",
+    "sourceUnitDigest": "2aff5e7721a256efce78953c498af0839f56f0bb5b9918290a36bbc072659eb1",
+    "targetOwner": "docs/platform/documentation/operations/portals/docs-portal.md",
+    "targetAnchor": "1-read-first",
+    "claimKind": "navigation",
+    "disposition": "supersede",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "rationale": "Source: docs/README.md:23-23#1-read-first (current lines); unit SHA256 2aff5e7721a256efce78953c498af0839f56f0bb5b9918290a36bbc072659eb1.\nTarget: docs/platform/documentation/operations/portals/docs-portal.md:24-24#1-read-first (current lines); unit SHA256 16929d439319f41461ebf8f9278446e233b23a3b2450a9b9bd4295b12e1052db.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 16929d439319f41461ebf8f9278446e233b23a3b2450a9b9bd4295b12e1052db at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 8, target 8; 8 changed spellings/labels, 1 destination changes; 0 added, 0 removed.\nLink 1: \"doc-governance.md\" (doc-governance.md) → \"doc-governance.md\" (../../../governance.md); resolved docs/doc-governance.md → docs/platform/governance.md.\nLink 2: \"reading-map.md\" (reading-map.md) → \"reading-map.md\" (../../../../reading-map.md); resolved docs/reading-map.md → docs/reading-map.md.\nLink 3: \"platform/README.md\" (platform/README.md) → \"platform/README.md\" (../../../README.md); resolved docs/platform/README.md → docs/platform/README.md.\nLink 4: \"specs/reading-map.md\" (specs/reading-map.md) → \"specs/reading-map.md\" (../../../../specs/reading-map.md); resolved docs/specs/reading-map.md → docs/specs/reading-map.md.\nLink 5: \"user/\" (user/) → \"user/\" (../../../../user); resolved docs/user → docs/user.\nLink 6: \"how-to/\" (how-to/) → \"how-to/\" (../../../../how-to); resolved docs/how-to → docs/how-to.\nLink 7: \"reference/\" (reference/) → \"reference/\" (../../../../reference); resolved docs/reference → docs/reference.\nLink 8: \"explanation/\" (explanation/) → \"explanation/\" (../../../../explanation); resolved docs/explanation → docs/explanation.\nHeading depth: 2 → 2; title \"1. Read First\" → \"1. Read First\".\nWhole direct section differs; depth 2 → 2; 8 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (heading-and-links): Complete direct section compared to the next native heading. Depth 2 → 2, title \"1. Read First\" → \"1. Read First\"; 8 distinct link spelling/label changes; 0 applicable exact labelled corrections. Normalized nonblank line order matches; exact raw-section removed/added line witnesses are accounted below; correction-normalized counts are reported separately.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/README.md#1-read-first under docs/platform/documentation/operations/portals/docs-portal.md#1-read-first; source context \"fgOS Documentation\", target context \"fgOS Documentation\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "16929d439319f41461ebf8f9278446e233b23a3b2450a9b9bd4295b12e1052db",
+    "targetAncestry": [
+      "fgOS Documentation"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [
+    "L10-31/whole-direct-section",
+    "L10-31/distinct-link-pairs"
+  ],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 292,
+  "factsSHA256": "a9cad7609536661f307f45d4c11ad6cf810efffbebb78a2954114a226379b2b4",
+  "sourceWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "1. Read First",
+    "anchor": "1-read-first",
+    "githubAnchor": "1-read-first",
+    "stableAnchor": "h-0388bde5e628",
+    "startLine": 23,
+    "endLine": 23,
+    "textDigest": "2aff5e7721a256efce78953c498af0839f56f0bb5b9918290a36bbc072659eb1",
+    "sample": "1. Read First",
+    "sectionPayloadDigest": "dd493e9c64c0caf205f6acc1617c588a0f6710dc0a4f5922d58551efaf63e579",
+    "followingBlockDigest": "dd493e9c64c0caf205f6acc1617c588a0f6710dc0a4f5922d58551efaf63e579",
+    "identityFingerprint": "cec3cc48da5f0304a04509a6f525b0c65718f1af632d8ce8616da9e9d2a8f2f5",
+    "ancestry": [
+      "fgOS Documentation"
+    ],
+    "path": "docs/README.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "1. Read First",
+    "anchor": "1-read-first",
+    "githubAnchor": "1-read-first",
+    "stableAnchor": "h-b7f427058523",
+    "startLine": 24,
+    "endLine": 24,
+    "textDigest": "16929d439319f41461ebf8f9278446e233b23a3b2450a9b9bd4295b12e1052db",
+    "sample": "1. Read First",
+    "sectionPayloadDigest": "1b6544779a1b1b2aea1f57d5e9f59d5831cbbb499161f8ed90e23e16e3a7f134",
+    "followingBlockDigest": "1b6544779a1b1b2aea1f57d5e9f59d5831cbbb499161f8ed90e23e16e3a7f134",
+    "identityFingerprint": "a814e0205376a0b450f0c1452ade36d628a85ed7f199e7203356f2268efc309f",
+    "ancestry": [
+      "fgOS Documentation"
+    ],
+    "path": "docs/platform/documentation/operations/portals/docs-portal.md"
+  },
+  "sectionExplanation": {
+    "kind": "heading-and-links",
+    "description": "Complete direct section compared to the next native heading. Depth 2 → 2, title \"1. Read First\" → \"1. Read First\"; 8 distinct link spelling/label changes; 0 applicable exact labelled corrections. Normalized nonblank line order matches; exact raw-section removed/added line witnesses are accounted below; correction-normalized counts are reported separately.",
+    "completeWitnessesAt": "62751458b22b47e930dc33b8501d07798b91ace3:plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json#/changes/292/facts/sectionExplanation"
+  },
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_53ebf4b541ff8f6a2c40e3b95304d6b7",
+    "sourceUnitDigest": "2aff5e7721a256efce78953c498af0839f56f0bb5b9918290a36bbc072659eb1",
+    "targetOwner": "docs/platform/documentation/operations/portals/docs-portal.md",
+    "targetAnchor": "1-read-first",
+    "claimKind": "navigation",
+    "disposition": "supersede",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "rationale": "Source: docs/README.md:23-23#1-read-first (current lines); unit SHA256 2aff5e7721a256efce78953c498af0839f56f0bb5b9918290a36bbc072659eb1.\nTarget: docs/platform/documentation/operations/portals/docs-portal.md:24-24#1-read-first (current lines); unit SHA256 16929d439319f41461ebf8f9278446e233b23a3b2450a9b9bd4295b12e1052db.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 16929d439319f41461ebf8f9278446e233b23a3b2450a9b9bd4295b12e1052db at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 8, target 8; 8 changed spellings/labels, 1 destination changes; 0 added, 0 removed.\nLink 1: \"doc-governance.md\" (doc-governance.md) → \"doc-governance.md\" (../../../governance.md); resolved docs/doc-governance.md → docs/platform/governance.md.\nLink 2: \"reading-map.md\" (reading-map.md) → \"reading-map.md\" (../../../../reading-map.md); resolved docs/reading-map.md → docs/reading-map.md.\nLink 3: \"platform/README.md\" (platform/README.md) → \"platform/README.md\" (../../../README.md); resolved docs/platform/README.md → docs/platform/README.md.\nLink 4: \"specs/reading-map.md\" (specs/reading-map.md) → \"specs/reading-map.md\" (../../../../specs/reading-map.md); resolved docs/specs/reading-map.md → docs/specs/reading-map.md.\nLink 5: \"user/\" (user/) → \"user/\" (../../../../user); resolved docs/user → docs/user.\nLink 6: \"how-to/\" (how-to/) → \"how-to/\" (../../../../how-to); resolved docs/how-to → docs/how-to.\nLink 7: \"reference/\" (reference/) → \"reference/\" (../../../../reference); resolved docs/reference → docs/reference.\nLink 8: \"explanation/\" (explanation/) → \"explanation/\" (../../../../explanation); resolved docs/explanation → docs/explanation.\nHeading depth: 2 → 2; title \"1. Read First\" → \"1. Read First\".\nWhole direct section differs; depth 2 → 2; 8 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (heading-and-links): Complete direct section compared to the next native heading. Depth 2 → 2, title \"1. Read First\" → \"1. Read First\"; 8 distinct link spelling/label changes; 0 applicable exact labelled corrections. Normalized nonblank line order matches; exact raw-section removed/added line witnesses are accounted below; correction-normalized counts are reported separately.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/README.md#1-read-first under docs/platform/documentation/operations/portals/docs-portal.md#1-read-first; source context \"fgOS Documentation\", target context \"fgOS Documentation\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "16929d439319f41461ebf8f9278446e233b23a3b2450a9b9bd4295b12e1052db",
+    "targetAncestry": [
+      "fgOS Documentation"
+    ]
+  },
+  "distinctLinkChanges": 8
+}
+```
+
+## Entry rationale-294
+
+```json
+{
+  "entryId": "rationale-294",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-mapped-conservation.json",
+  "collection": "claims",
+  "claimId": "claim_53d2f5742d24e980328f8cee963fb73b",
+  "before": {
+    "claimId": "claim_53d2f5742d24e980328f8cee963fb73b",
+    "sourceUnitDigest": "dd493e9c64c0caf205f6acc1617c588a0f6710dc0a4f5922d58551efaf63e579",
+    "targetOwner": "docs/platform/documentation/operations/portals/docs-portal.md",
+    "targetAnchor": "unheaded-block-3",
+    "claimKind": "navigation",
+    "disposition": "supersede",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "Frozen root map assigns docs/README.md#unheaded-block-3 to docs/platform/documentation/operations/portals/docs-portal.md#unheaded-block-3. Carry the complete unit into its candidate portal owner. This unit includes 13 documented link spelling adjustment(s): [doc-governance.md](doc-governance.md) becomes [doc-governance.md](../../../governance.md) (Candidate destination repointed to docs/platform/governance.md; label preserved.); [reading-map.md](reading-map.md) becomes [reading-map.md](../../../../reading-map.md) (Relative spelling changes only; original repository destination conserved.); [platform/README.md](platform/README.md) becomes [platform/README.md](../../../README.md) (Relative spelling changes only; original repository destination conserved.); [specs/reading-map.md](specs/reading-map.md) becomes [specs/reading-map.md](../../../../specs/reading-map.md) (Relative spelling changes only; original repository destination conserved.); [user/](user/) becomes [user/](../../../../user) (Relative spelling changes only; original repository destination conserved.); [how-to/](how-to/) becomes [how-to/](../../../../how-to) (Relative spelling changes only; original repository destination conserved.); [reference/](reference/) becomes [reference/](../../../../reference) (Relative spelling changes only; original repository destination conserved.); [explanation/](explanation/) becomes [explanation/](../../../../explanation) (Relative spelling changes only; original repository destination conserved.); [user/](user/) becomes [user/](../../../../user) (Relative spelling changes only; original repository destination conserved.); [doc-governance.md](doc-governance.md) becomes [doc-governance.md](../../../governance.md) (Candidate destination repointed to docs/platform/governance.md; label preserved.); [reading-map.md](reading-map.md) becomes [reading-map.md](../../../../reading-map.md) (Relative spelling changes only; original repository destination conserved.); [platform/README.md](platform/README.md) becomes [platform/README.md](../../../README.md) (Relative spelling changes only; original repository destination conserved.); [specs/reading-map.md](specs/reading-map.md) becomes [specs/reading-map.md](../../../../specs/reading-map.md) (Relative spelling changes only; original repository destination conserved.). Full source/target text and diff are submitted for independent whole-unit conservation review; wrapping/header/relative-path changes grant no truth approval. No source retirement, promotion or component-boundary change. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10 review correction: the doc-governance link is repointed to docs/platform/governance.md; its original legacy destination is not retained. Label and candidate referent are disclosed; pending independent review.",
+    "reviewNote": "deep: unit-3 table of docs/README.md; 13 rationale link pairs all present in source and target in the right direction, no unlisted link change, the doc-governance repoint disclosed; anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-345f15d95.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "1b6544779a1b1b2aea1f57d5e9f59d5831cbbb499161f8ed90e23e16e3a7f134",
+    "targetAncestry": [
+      "fgOS Documentation",
+      "1. Read First"
+    ],
+    "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+  },
+  "after": {
+    "claimId": "claim_53d2f5742d24e980328f8cee963fb73b",
+    "sourceUnitDigest": "dd493e9c64c0caf205f6acc1617c588a0f6710dc0a4f5922d58551efaf63e579",
+    "targetOwner": "docs/platform/documentation/operations/portals/docs-portal.md",
+    "targetAnchor": "unheaded-block-3",
+    "claimKind": "navigation",
+    "disposition": "supersede",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "rationale": "Source: docs/README.md:25-31#unheaded-block-3 (current lines); unit SHA256 dd493e9c64c0caf205f6acc1617c588a0f6710dc0a4f5922d58551efaf63e579.\nTarget: docs/platform/documentation/operations/portals/docs-portal.md:26-32#unheaded-block-3 (current lines); unit SHA256 1b6544779a1b1b2aea1f57d5e9f59d5831cbbb499161f8ed90e23e16e3a7f134.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 1b6544779a1b1b2aea1f57d5e9f59d5831cbbb499161f8ed90e23e16e3a7f134 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 8, target 8; 8 changed spellings/labels, 1 destination changes; 0 added, 0 removed.\nLink 1: \"doc-governance.md\" (doc-governance.md) → \"doc-governance.md\" (../../../governance.md); resolved docs/doc-governance.md → docs/platform/governance.md.\nLink 2: \"reading-map.md\" (reading-map.md) → \"reading-map.md\" (../../../../reading-map.md); resolved docs/reading-map.md → docs/reading-map.md.\nLink 3: \"platform/README.md\" (platform/README.md) → \"platform/README.md\" (../../../README.md); resolved docs/platform/README.md → docs/platform/README.md.\nLink 4: \"specs/reading-map.md\" (specs/reading-map.md) → \"specs/reading-map.md\" (../../../../specs/reading-map.md); resolved docs/specs/reading-map.md → docs/specs/reading-map.md.\nLink 5: \"user/\" (user/) → \"user/\" (../../../../user); resolved docs/user → docs/user.\nLink 6: \"how-to/\" (how-to/) → \"how-to/\" (../../../../how-to); resolved docs/how-to → docs/how-to.\nLink 7: \"reference/\" (reference/) → \"reference/\" (../../../../reference); resolved docs/reference → docs/reference.\nLink 8: \"explanation/\" (explanation/) → \"explanation/\" (../../../../explanation); resolved docs/explanation → docs/explanation.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/README.md#unheaded-block-3 under docs/platform/documentation/operations/portals/docs-portal.md#unheaded-block-3; source context \"fgOS Documentation / 1. Read First\", target context \"fgOS Documentation / 1. Read First\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "1b6544779a1b1b2aea1f57d5e9f59d5831cbbb499161f8ed90e23e16e3a7f134",
+    "targetAncestry": [
+      "fgOS Documentation",
+      "1. Read First"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [
+    "L10-31/distinct-link-pairs"
+  ],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 293,
+  "factsSHA256": "f60685f5c5d3fbc29ae6dec825f9544b89aa5a496d664136e88f58b86115650b",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-3",
+    "githubAnchor": "unheaded-block-3",
+    "stableAnchor": "unheaded-block-3",
+    "title": "Unheaded block 3",
+    "startLine": 25,
+    "endLine": 31,
+    "textDigest": "dd493e9c64c0caf205f6acc1617c588a0f6710dc0a4f5922d58551efaf63e579",
+    "sample": "| Need | Read |\n|---|---|\n| Documentation rules | [doc-governance.md](doc-governance.md) |\n| What to read first | [reading-map.md](reading-map.md) |\n| Platform/system design docs |",
+    "identityFingerprint": "35c102622494eddeb663918f320ef645dad103fc25612e3702bb8a698ff2a97f",
+    "ancestry": [
+      "fgOS Documentation",
+      "1. Read First"
+    ],
+    "path": "docs/README.md"
+  },
+  "targetWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-3",
+    "githubAnchor": "unheaded-block-3",
+    "stableAnchor": "unheaded-block-3",
+    "title": "Unheaded block 3",
+    "startLine": 26,
+    "endLine": 32,
+    "textDigest": "1b6544779a1b1b2aea1f57d5e9f59d5831cbbb499161f8ed90e23e16e3a7f134",
+    "sample": "| Need | Read |\n|---|---|\n| Documentation rules | [doc-governance.md](../../../governance.md) |\n| What to read first | [reading-map.md](../../../../reading-map.md) |\n| Platform/sys",
+    "identityFingerprint": "b6440a58ea9a4eabe172338048fc3ac4e5c8a770c26b67c9fe4ebfe80189cbf5",
+    "ancestry": [
+      "fgOS Documentation",
+      "1. Read First"
+    ],
+    "path": "docs/platform/documentation/operations/portals/docs-portal.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_53d2f5742d24e980328f8cee963fb73b",
+    "sourceUnitDigest": "dd493e9c64c0caf205f6acc1617c588a0f6710dc0a4f5922d58551efaf63e579",
+    "targetOwner": "docs/platform/documentation/operations/portals/docs-portal.md",
+    "targetAnchor": "unheaded-block-3",
+    "claimKind": "navigation",
+    "disposition": "supersede",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "rationale": "Source: docs/README.md:25-31#unheaded-block-3 (current lines); unit SHA256 dd493e9c64c0caf205f6acc1617c588a0f6710dc0a4f5922d58551efaf63e579.\nTarget: docs/platform/documentation/operations/portals/docs-portal.md:26-32#unheaded-block-3 (current lines); unit SHA256 1b6544779a1b1b2aea1f57d5e9f59d5831cbbb499161f8ed90e23e16e3a7f134.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 1b6544779a1b1b2aea1f57d5e9f59d5831cbbb499161f8ed90e23e16e3a7f134 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 8, target 8; 8 changed spellings/labels, 1 destination changes; 0 added, 0 removed.\nLink 1: \"doc-governance.md\" (doc-governance.md) → \"doc-governance.md\" (../../../governance.md); resolved docs/doc-governance.md → docs/platform/governance.md.\nLink 2: \"reading-map.md\" (reading-map.md) → \"reading-map.md\" (../../../../reading-map.md); resolved docs/reading-map.md → docs/reading-map.md.\nLink 3: \"platform/README.md\" (platform/README.md) → \"platform/README.md\" (../../../README.md); resolved docs/platform/README.md → docs/platform/README.md.\nLink 4: \"specs/reading-map.md\" (specs/reading-map.md) → \"specs/reading-map.md\" (../../../../specs/reading-map.md); resolved docs/specs/reading-map.md → docs/specs/reading-map.md.\nLink 5: \"user/\" (user/) → \"user/\" (../../../../user); resolved docs/user → docs/user.\nLink 6: \"how-to/\" (how-to/) → \"how-to/\" (../../../../how-to); resolved docs/how-to → docs/how-to.\nLink 7: \"reference/\" (reference/) → \"reference/\" (../../../../reference); resolved docs/reference → docs/reference.\nLink 8: \"explanation/\" (explanation/) → \"explanation/\" (../../../../explanation); resolved docs/explanation → docs/explanation.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/README.md#unheaded-block-3 under docs/platform/documentation/operations/portals/docs-portal.md#unheaded-block-3; source context \"fgOS Documentation / 1. Read First\", target context \"fgOS Documentation / 1. Read First\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "1b6544779a1b1b2aea1f57d5e9f59d5831cbbb499161f8ed90e23e16e3a7f134",
+    "targetAncestry": [
+      "fgOS Documentation",
+      "1. Read First"
+    ]
+  },
+  "distinctLinkChanges": 8
+}
+```
+
+## Entry rationale-295
+
+```json
+{
+  "entryId": "rationale-295",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-mapped-conservation.json",
+  "collection": "claims",
+  "claimId": "claim_2ae0cd4fc1cf487f7caa4d77d46e9682",
+  "before": {
+    "claimId": "claim_2ae0cd4fc1cf487f7caa4d77d46e9682",
+    "sourceUnitDigest": "93e63d0c77140732f2db5dcff67c39869f924d501e3556dfb36a9d48cc73ed8d",
+    "targetOwner": "docs/platform/documentation/operations/portals/docs-portal.md",
+    "targetAnchor": "4-related-files",
+    "claimKind": "navigation",
+    "disposition": "supersede",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "Frozen root map assigns docs/README.md#4-related-files to docs/platform/documentation/operations/portals/docs-portal.md#4-related-files. Carry the complete unit into its candidate portal owner. This unit includes 8 documented link spelling adjustment(s): [doc-governance.md](doc-governance.md) becomes [doc-governance.md](../../../governance.md) (Candidate destination repointed to docs/platform/governance.md; label preserved.); [reading-map.md](reading-map.md) becomes [reading-map.md](../../../../reading-map.md) (Relative spelling changes only; original repository destination conserved.); [platform/README.md](platform/README.md) becomes [platform/README.md](../../../README.md) (Relative spelling changes only; original repository destination conserved.); [specs/reading-map.md](specs/reading-map.md) becomes [specs/reading-map.md](../../../../specs/reading-map.md) (Relative spelling changes only; original repository destination conserved.); [doc-governance.md](doc-governance.md) becomes [doc-governance.md](../../../governance.md) (Candidate destination repointed to docs/platform/governance.md; label preserved.); [reading-map.md](reading-map.md) becomes [reading-map.md](../../../../reading-map.md) (Relative spelling changes only; original repository destination conserved.); [platform/README.md](platform/README.md) becomes [platform/README.md](../../../README.md) (Relative spelling changes only; original repository destination conserved.); [specs/reading-map.md](specs/reading-map.md) becomes [specs/reading-map.md](../../../../specs/reading-map.md) (Relative spelling changes only; original repository destination conserved.). Full source/target text and diff are submitted for independent whole-unit conservation review; wrapping/header/relative-path changes grant no truth approval. No source retirement, promotion or component-boundary change. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10 review correction: the doc-governance link is repointed to docs/platform/governance.md; its original legacy destination is not retained. Label and candidate referent are disclosed; pending independent review.",
+    "reviewNote": "deep: heading 4 Related Files of docs/README.md; same four link respellings as the sibling rows, every rationale pair found in source and target in the right direction, governance repoint disclosed; anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-345f15d95.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "6dcde68b9663bbcefb3354897ee57514583ac7767a09df3f74a615011844a828",
+    "targetAncestry": [
+      "fgOS Documentation"
+    ],
+    "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+  },
+  "after": {
+    "claimId": "claim_2ae0cd4fc1cf487f7caa4d77d46e9682",
+    "sourceUnitDigest": "93e63d0c77140732f2db5dcff67c39869f924d501e3556dfb36a9d48cc73ed8d",
+    "targetOwner": "docs/platform/documentation/operations/portals/docs-portal.md",
+    "targetAnchor": "4-related-files",
+    "claimKind": "navigation",
+    "disposition": "supersede",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "rationale": "Source: docs/README.md:50-50#4-related-files (current lines); unit SHA256 93e63d0c77140732f2db5dcff67c39869f924d501e3556dfb36a9d48cc73ed8d.\nTarget: docs/platform/documentation/operations/portals/docs-portal.md:51-51#4-related-files (current lines); unit SHA256 6dcde68b9663bbcefb3354897ee57514583ac7767a09df3f74a615011844a828.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 6dcde68b9663bbcefb3354897ee57514583ac7767a09df3f74a615011844a828 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 4, target 4; 4 changed spellings/labels, 1 destination changes; 0 added, 0 removed.\nLink 1: \"doc-governance.md\" (doc-governance.md) → \"doc-governance.md\" (../../../governance.md); resolved docs/doc-governance.md → docs/platform/governance.md.\nLink 2: \"reading-map.md\" (reading-map.md) → \"reading-map.md\" (../../../../reading-map.md); resolved docs/reading-map.md → docs/reading-map.md.\nLink 3: \"platform/README.md\" (platform/README.md) → \"platform/README.md\" (../../../README.md); resolved docs/platform/README.md → docs/platform/README.md.\nLink 4: \"specs/reading-map.md\" (specs/reading-map.md) → \"specs/reading-map.md\" (../../../../specs/reading-map.md); resolved docs/specs/reading-map.md → docs/specs/reading-map.md.\nHeading depth: 2 → 2; title \"4. Related Files\" → \"4. Related Files\".\nWhole direct section differs; depth 2 → 2; 4 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (heading-and-links): Complete direct section compared to the next native heading. Depth 2 → 2, title \"4. Related Files\" → \"4. Related Files\"; 4 distinct link spelling/label changes; 0 applicable exact labelled corrections. Normalized nonblank line order matches; exact raw-section removed/added line witnesses are accounted below; correction-normalized counts are reported separately.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/README.md#4-related-files under docs/platform/documentation/operations/portals/docs-portal.md#4-related-files; source context \"fgOS Documentation\", target context \"fgOS Documentation\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "6dcde68b9663bbcefb3354897ee57514583ac7767a09df3f74a615011844a828",
+    "targetAncestry": [
+      "fgOS Documentation"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [
+    "L10-31/whole-direct-section",
+    "L10-31/distinct-link-pairs"
+  ],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 294,
+  "factsSHA256": "6e920f992dfaaea64b91c574c2e6681f6b40e475ae994033b677d71a2c738bd5",
+  "sourceWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "4. Related Files",
+    "anchor": "4-related-files",
+    "githubAnchor": "4-related-files",
+    "stableAnchor": "h-cf68b4d6c4eb",
+    "startLine": 50,
+    "endLine": 50,
+    "textDigest": "93e63d0c77140732f2db5dcff67c39869f924d501e3556dfb36a9d48cc73ed8d",
+    "sample": "4. Related Files",
+    "sectionPayloadDigest": "30081b87c5f3fa70b025b187fa5dd4cc947c337d5c005aec01a17fd48d6652ef",
+    "followingBlockDigest": "30081b87c5f3fa70b025b187fa5dd4cc947c337d5c005aec01a17fd48d6652ef",
+    "identityFingerprint": "55ebb1dce18c7da888a4ee94323b12f7d42eeab62d3d74718bf7c754cf7d45ff",
+    "ancestry": [
+      "fgOS Documentation"
+    ],
+    "path": "docs/README.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "4. Related Files",
+    "anchor": "4-related-files",
+    "githubAnchor": "4-related-files",
+    "stableAnchor": "h-fd2851fe7923",
+    "startLine": 51,
+    "endLine": 51,
+    "textDigest": "6dcde68b9663bbcefb3354897ee57514583ac7767a09df3f74a615011844a828",
+    "sample": "4. Related Files",
+    "sectionPayloadDigest": "10836db6663f77db9404e1d2502532f3928bef5224306570368ddb4fceb59d15",
+    "followingBlockDigest": "10836db6663f77db9404e1d2502532f3928bef5224306570368ddb4fceb59d15",
+    "identityFingerprint": "dd41e36bfc7693425fc2e18d107aebbce61eb77793e853011d71db8cc1ec13b0",
+    "ancestry": [
+      "fgOS Documentation"
+    ],
+    "path": "docs/platform/documentation/operations/portals/docs-portal.md"
+  },
+  "sectionExplanation": {
+    "kind": "heading-and-links",
+    "description": "Complete direct section compared to the next native heading. Depth 2 → 2, title \"4. Related Files\" → \"4. Related Files\"; 4 distinct link spelling/label changes; 0 applicable exact labelled corrections. Normalized nonblank line order matches; exact raw-section removed/added line witnesses are accounted below; correction-normalized counts are reported separately.",
+    "completeWitnessesAt": "62751458b22b47e930dc33b8501d07798b91ace3:plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json#/changes/294/facts/sectionExplanation"
+  },
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_2ae0cd4fc1cf487f7caa4d77d46e9682",
+    "sourceUnitDigest": "93e63d0c77140732f2db5dcff67c39869f924d501e3556dfb36a9d48cc73ed8d",
+    "targetOwner": "docs/platform/documentation/operations/portals/docs-portal.md",
+    "targetAnchor": "4-related-files",
+    "claimKind": "navigation",
+    "disposition": "supersede",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "rationale": "Source: docs/README.md:50-50#4-related-files (current lines); unit SHA256 93e63d0c77140732f2db5dcff67c39869f924d501e3556dfb36a9d48cc73ed8d.\nTarget: docs/platform/documentation/operations/portals/docs-portal.md:51-51#4-related-files (current lines); unit SHA256 6dcde68b9663bbcefb3354897ee57514583ac7767a09df3f74a615011844a828.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 6dcde68b9663bbcefb3354897ee57514583ac7767a09df3f74a615011844a828 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 4, target 4; 4 changed spellings/labels, 1 destination changes; 0 added, 0 removed.\nLink 1: \"doc-governance.md\" (doc-governance.md) → \"doc-governance.md\" (../../../governance.md); resolved docs/doc-governance.md → docs/platform/governance.md.\nLink 2: \"reading-map.md\" (reading-map.md) → \"reading-map.md\" (../../../../reading-map.md); resolved docs/reading-map.md → docs/reading-map.md.\nLink 3: \"platform/README.md\" (platform/README.md) → \"platform/README.md\" (../../../README.md); resolved docs/platform/README.md → docs/platform/README.md.\nLink 4: \"specs/reading-map.md\" (specs/reading-map.md) → \"specs/reading-map.md\" (../../../../specs/reading-map.md); resolved docs/specs/reading-map.md → docs/specs/reading-map.md.\nHeading depth: 2 → 2; title \"4. Related Files\" → \"4. Related Files\".\nWhole direct section differs; depth 2 → 2; 4 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (heading-and-links): Complete direct section compared to the next native heading. Depth 2 → 2, title \"4. Related Files\" → \"4. Related Files\"; 4 distinct link spelling/label changes; 0 applicable exact labelled corrections. Normalized nonblank line order matches; exact raw-section removed/added line witnesses are accounted below; correction-normalized counts are reported separately.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/README.md#4-related-files under docs/platform/documentation/operations/portals/docs-portal.md#4-related-files; source context \"fgOS Documentation\", target context \"fgOS Documentation\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "6dcde68b9663bbcefb3354897ee57514583ac7767a09df3f74a615011844a828",
+    "targetAncestry": [
+      "fgOS Documentation"
+    ]
+  },
+  "distinctLinkChanges": 4
+}
+```
+
+## Entry rationale-296
+
+```json
+{
+  "entryId": "rationale-296",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-mapped-conservation.json",
+  "collection": "claims",
+  "claimId": "claim_0f63a4c33bd9ab4d707e6ea459868a91",
+  "before": {
+    "claimId": "claim_0f63a4c33bd9ab4d707e6ea459868a91",
+    "sourceUnitDigest": "30081b87c5f3fa70b025b187fa5dd4cc947c337d5c005aec01a17fd48d6652ef",
+    "targetOwner": "docs/platform/documentation/operations/portals/docs-portal.md",
+    "targetAnchor": "unheaded-block-6",
+    "claimKind": "navigation",
+    "disposition": "supersede",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+    "rationale": "Frozen root map assigns docs/README.md#unheaded-block-6 to docs/platform/documentation/operations/portals/docs-portal.md#unheaded-block-6. Carry the complete unit into its candidate portal owner. This unit includes 8 documented link spelling adjustment(s): [doc-governance.md](doc-governance.md) becomes [doc-governance.md](../../../governance.md) (Candidate destination repointed to docs/platform/governance.md; label preserved.); [reading-map.md](reading-map.md) becomes [reading-map.md](../../../../reading-map.md) (Relative spelling changes only; original repository destination conserved.); [platform/README.md](platform/README.md) becomes [platform/README.md](../../../README.md) (Relative spelling changes only; original repository destination conserved.); [specs/reading-map.md](specs/reading-map.md) becomes [specs/reading-map.md](../../../../specs/reading-map.md) (Relative spelling changes only; original repository destination conserved.); [doc-governance.md](doc-governance.md) becomes [doc-governance.md](../../../governance.md) (Candidate destination repointed to docs/platform/governance.md; label preserved.); [reading-map.md](reading-map.md) becomes [reading-map.md](../../../../reading-map.md) (Relative spelling changes only; original repository destination conserved.); [platform/README.md](platform/README.md) becomes [platform/README.md](../../../README.md) (Relative spelling changes only; original repository destination conserved.); [specs/reading-map.md](specs/reading-map.md) becomes [specs/reading-map.md](../../../../specs/reading-map.md) (Relative spelling changes only; original repository destination conserved.). Full source/target text and diff are submitted for independent whole-unit conservation review; wrapping/header/relative-path changes grant no truth approval. No source retirement, promotion or component-boundary change. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10 review correction: the doc-governance link is repointed to docs/platform/governance.md; its original legacy destination is not retained. Label and candidate referent are disclosed; pending independent review.",
+    "reviewNote": "deep: unit-6 of docs/README.md; four link destinations respelled, and the rationale lists every pair in the right direction (source to target, checked by script against both texts) with the doc-governance repoint to platform/governance.md disclosed; no other difference; anchor ok",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-345f15d95.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "10836db6663f77db9404e1d2502532f3928bef5224306570368ddb4fceb59d15",
+    "targetAncestry": [
+      "fgOS Documentation",
+      "4. Related Files"
+    ],
+    "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+  },
+  "after": {
+    "claimId": "claim_0f63a4c33bd9ab4d707e6ea459868a91",
+    "sourceUnitDigest": "30081b87c5f3fa70b025b187fa5dd4cc947c337d5c005aec01a17fd48d6652ef",
+    "targetOwner": "docs/platform/documentation/operations/portals/docs-portal.md",
+    "targetAnchor": "unheaded-block-6",
+    "claimKind": "navigation",
+    "disposition": "supersede",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "rationale": "Source: docs/README.md:52-57#unheaded-block-6 (current lines); unit SHA256 30081b87c5f3fa70b025b187fa5dd4cc947c337d5c005aec01a17fd48d6652ef.\nTarget: docs/platform/documentation/operations/portals/docs-portal.md:53-58#unheaded-block-6 (current lines); unit SHA256 10836db6663f77db9404e1d2502532f3928bef5224306570368ddb4fceb59d15.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 10836db6663f77db9404e1d2502532f3928bef5224306570368ddb4fceb59d15 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 4, target 4; 4 changed spellings/labels, 1 destination changes; 0 added, 0 removed.\nLink 1: \"doc-governance.md\" (doc-governance.md) → \"doc-governance.md\" (../../../governance.md); resolved docs/doc-governance.md → docs/platform/governance.md.\nLink 2: \"reading-map.md\" (reading-map.md) → \"reading-map.md\" (../../../../reading-map.md); resolved docs/reading-map.md → docs/reading-map.md.\nLink 3: \"platform/README.md\" (platform/README.md) → \"platform/README.md\" (../../../README.md); resolved docs/platform/README.md → docs/platform/README.md.\nLink 4: \"specs/reading-map.md\" (specs/reading-map.md) → \"specs/reading-map.md\" (../../../../specs/reading-map.md); resolved docs/specs/reading-map.md → docs/specs/reading-map.md.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/README.md#unheaded-block-6 under docs/platform/documentation/operations/portals/docs-portal.md#unheaded-block-6; source context \"fgOS Documentation / 4. Related Files\", target context \"fgOS Documentation / 4. Related Files\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "10836db6663f77db9404e1d2502532f3928bef5224306570368ddb4fceb59d15",
+    "targetAncestry": [
+      "fgOS Documentation",
+      "4. Related Files"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [
+    "L10-31/distinct-link-pairs"
+  ],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 295,
+  "factsSHA256": "eb39d3ff508ef71ab40a6f92a8a527995311c52af6db956c5977283b9fc60405",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-6",
+    "githubAnchor": "unheaded-block-6",
+    "stableAnchor": "unheaded-block-6",
+    "title": "Unheaded block 6",
+    "startLine": 52,
+    "endLine": 57,
+    "textDigest": "30081b87c5f3fa70b025b187fa5dd4cc947c337d5c005aec01a17fd48d6652ef",
+    "sample": "| Relationship | File |\n|---|---|\n| governs documentation system | [doc-governance.md](doc-governance.md) |\n| routes readers by purpose | [reading-map.md](reading-map.md) |\n| platf",
+    "identityFingerprint": "5c8580e3565348aa4ced09bdee5fc79a220fb033fbee07aae2c68c99deafb27e",
+    "ancestry": [
+      "fgOS Documentation",
+      "4. Related Files"
+    ],
+    "path": "docs/README.md"
+  },
+  "targetWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-6",
+    "githubAnchor": "unheaded-block-6",
+    "stableAnchor": "unheaded-block-6",
+    "title": "Unheaded block 6",
+    "startLine": 53,
+    "endLine": 58,
+    "textDigest": "10836db6663f77db9404e1d2502532f3928bef5224306570368ddb4fceb59d15",
+    "sample": "| Relationship | File |\n|---|---|\n| governs documentation system | [doc-governance.md](../../../governance.md) |\n| routes readers by purpose | [reading-map.md](../../../../reading-",
+    "identityFingerprint": "669a81c6103d573b4531661cbcc96a948cb0b85ed1fed9b62faec199d78ca40f",
+    "ancestry": [
+      "fgOS Documentation",
+      "4. Related Files"
+    ],
+    "path": "docs/platform/documentation/operations/portals/docs-portal.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_0f63a4c33bd9ab4d707e6ea459868a91",
+    "sourceUnitDigest": "30081b87c5f3fa70b025b187fa5dd4cc947c337d5c005aec01a17fd48d6652ef",
+    "targetOwner": "docs/platform/documentation/operations/portals/docs-portal.md",
+    "targetAnchor": "unheaded-block-6",
+    "claimKind": "navigation",
+    "disposition": "supersede",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "rationale": "Source: docs/README.md:52-57#unheaded-block-6 (current lines); unit SHA256 30081b87c5f3fa70b025b187fa5dd4cc947c337d5c005aec01a17fd48d6652ef.\nTarget: docs/platform/documentation/operations/portals/docs-portal.md:53-58#unheaded-block-6 (current lines); unit SHA256 10836db6663f77db9404e1d2502532f3928bef5224306570368ddb4fceb59d15.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 10836db6663f77db9404e1d2502532f3928bef5224306570368ddb4fceb59d15 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 4, target 4; 4 changed spellings/labels, 1 destination changes; 0 added, 0 removed.\nLink 1: \"doc-governance.md\" (doc-governance.md) → \"doc-governance.md\" (../../../governance.md); resolved docs/doc-governance.md → docs/platform/governance.md.\nLink 2: \"reading-map.md\" (reading-map.md) → \"reading-map.md\" (../../../../reading-map.md); resolved docs/reading-map.md → docs/reading-map.md.\nLink 3: \"platform/README.md\" (platform/README.md) → \"platform/README.md\" (../../../README.md); resolved docs/platform/README.md → docs/platform/README.md.\nLink 4: \"specs/reading-map.md\" (specs/reading-map.md) → \"specs/reading-map.md\" (../../../../specs/reading-map.md); resolved docs/specs/reading-map.md → docs/specs/reading-map.md.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/README.md#unheaded-block-6 under docs/platform/documentation/operations/portals/docs-portal.md#unheaded-block-6; source context \"fgOS Documentation / 4. Related Files\", target context \"fgOS Documentation / 4. Related Files\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "10836db6663f77db9404e1d2502532f3928bef5224306570368ddb4fceb59d15",
+    "targetAncestry": [
+      "fgOS Documentation",
+      "4. Related Files"
+    ]
+  },
+  "distinctLinkChanges": 4
+}
+```
+

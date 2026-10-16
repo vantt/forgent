@@ -1,0 +1,3495 @@
+# Bounded re-review: rationales 2
+
+Author session: `codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16`
+Packaged by: `codex-session:unit-run-1792122626822-ceb0cdd9@2026-10-16`
+Content commit: `62751458b22b47e930dc33b8501d07798b91ace3`; author changes `eb793bc63`; comparison `9b0526380329d8cb1cb6085a1c8f378e943e2505`.
+Entries: **31**; maximum 60 entries and 400000 bytes per Markdown/sidecar.
+[One request index](review-request-step10-index-62751458b.md).
+
+Committed `currentDecision`/`after` snapshots come from `git show 62751458b22b47e930dc33b8501d07798b91ace3:<shard>` through `reviewEntryFromCommittedRow`. Explicit `packageOverlay` and `packageOverlayAfter` values are fresh pending native/dependent rows and require the runner package commit for ordinary verdict binding. Before prose is historical. No producer seed, draw or verdict.
+
+Exact scratch-only reproduction commands, run sequentially from repository root at the runner package checkout:
+
+```sh
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work python3 plans/260925-documentation-authority-unification/reports/phase-06/step10-sync287-reproduce.py consistency --output /tmp/fgos-work/review627/consistency.json
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/scripts/doc-*.test.mjs test/scripts/check-doc-*.test.mjs test/scripts/generate-doc-inventory.test.mjs test/scripts/list-doc-anchors.test.mjs test/scripts/verify-phase-02.test.mjs test/scripts/next-doc-id.test.mjs
+env -u CLAUDE_CODE_SESSION_ID python3 - <<'PY'
+import json
+from pathlib import Path
+p=Path('/tmp/fgos-work/review627'); p.mkdir(parents=True, exist_ok=True)
+if p.is_symlink() or not p.resolve().is_relative_to('/tmp/fgos-work') or p.resolve().is_relative_to(Path.cwd().resolve()): raise RuntimeError('unsafe scratch directory')
+for name in ['step10-native-inventory.bin','step10-sync627-D-both.json','step10-sync627-D-identity.json','step10-sync627-D-phase02.json','step10-sync627-D-summary.json','step10-sync627-target-ownership.json','step10-sync627-link-replay.json']:
+    out=p/name
+    if out.is_symlink() or out.exists() and out.stat().st_nlink!=1: raise RuntimeError('unsafe scratch output')
+j=json.loads(Path('plans/260925-documentation-authority-unification/reports/phase-06/step10-sync627-reproduction.json').read_text())
+for name,text in j['readOnlyScripts'].items():
+    out=p/name
+    if out.is_symlink() or out.exists() and out.stat().st_nlink!=1: raise RuntimeError('unsafe scratch file')
+    out.write_text(text)
+PY
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --max-old-space-size=4096 --max-semi-space-size=16 /tmp/fgos-work/review627/inventory-readonly.mjs
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --max-old-space-size=4096 --max-semi-space-size=16 /tmp/fgos-work/review627/verify-readonly.mjs
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node /tmp/fgos-work/review627/ownership-readonly.mjs
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node /tmp/fgos-work/review627/audit-ownership-readonly.mjs
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work python3 /tmp/fgos-work/review627/replay-readonly.py
+```
+
+The unchanged checker audits **all 12895 rows /92 shards**, including all whole-section and distinct-occurrence rules, **836** selected outputs and the native-dependent refresh. Expected tests: **490** pass. No author `--apply`, carry-forward, registry persistence or repository output occurs in these reviewer commands. Inventory replay reads the sole compact registry; its regenerated inventory and all D/ownership/link outputs stay under `/tmp/fgos-work/review627/`. Reader reproduction needs available scratch space and memory; do the heavy commands sequentially. Historical author mutation scripts in the provenance manifest are evidence only.
+
+A36: every pending submitted claim receives ordinary verdict and digest/anchor/shard equality. Independently seed >=45/296 rationale deep sample plus >=45/298 conservative Weak-exact/Judgment population (one reviewer draw can satisfy both only if coverage proved). Every listed unequal-digest, partial/historical row, all52 whole-section headings, all8 own-occurrence footers, restored L10-2, and marked docs/tool/native corrections are deep. [Exact deep populations](step10-sync627-A36.json). Reviewer records seed/sample IDs; >3% deep rework escalates to whole set. No separate claim verdict on frozen/footer/accounting references when the pending claim is already submitted in rationales/decisions. Existing reviewed approvals remain; evidence/native tuples do not approve current truth or cutover.
+
+## Entry rationale-031
+
+```json
+{
+  "entryId": "rationale-031",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_976c9258480b6a6549a86ce7f22c593e",
+  "before": {
+    "claimId": "claim_976c9258480b6a6549a86ce7f22c593e",
+    "sourceUnitDigest": "79cd1e06fa13094d10975bb96137f73a4cf5ad8205777c9ce7e6cb83e162d515",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/dispatch-control-plane.md:97-100#unheaded-block-12 (current lines); unit SHA256 79cd1e06fa13094d10975bb96137f73a4cf5ad8205777c9ce7e6cb83e162d515.\nTarget: docs/platform/agent-coordination/architecture/dispatch-control-plane.md:115-115#contracts (current lines); unit SHA256 bbe2a5a5b82a6a3145532c058e0d786e05b3bd13215fdce5b39d9dedf53e6b46.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest bbe2a5a5b82a6a3145532c058e0d786e05b3bd13215fdce5b39d9dedf53e6b46 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 12\" → \"Contracts\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-12 under docs/platform/agent-coordination/architecture/dispatch-control-plane.md#contracts; source context \"Dispatch Control Plane / Contracts\", target context \"Dispatch Control Plane\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+    "targetAnchor": "contracts",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "deep: read full source block (These three contracts are canonical for this control pl...) against target section 'Contracts' (h2); 0 of 4 source lines appear verbatim in the target section, the rest is rewritten current wording, so supersede with a named successor is truthful and no carried claim is made; Heading depth and Links lines (0/0) verified; digests differ as stated and both recomputed; anchor checked; last-reviewed digest present at 947f6169e. hand-recomputed by independent python.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-04-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "bbe2a5a5b82a6a3145532c058e0d786e05b3bd13215fdce5b39d9dedf53e6b46",
+    "targetAncestry": [
+      "Dispatch Control Plane"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_976c9258480b6a6549a86ce7f22c593e",
+    "sourceUnitDigest": "79cd1e06fa13094d10975bb96137f73a4cf5ad8205777c9ce7e6cb83e162d515",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/dispatch-control-plane.md:97-100#unheaded-block-12 (current lines); unit SHA256 79cd1e06fa13094d10975bb96137f73a4cf5ad8205777c9ce7e6cb83e162d515.\nTarget: docs/platform/agent-coordination/architecture/dispatch-control-plane.md:115-115#contracts (current lines); unit SHA256 bbe2a5a5b82a6a3145532c058e0d786e05b3bd13215fdce5b39d9dedf53e6b46.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest bbe2a5a5b82a6a3145532c058e0d786e05b3bd13215fdce5b39d9dedf53e6b46 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 12\" → \"Contracts\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 4 removed and 5 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-12 under docs/platform/agent-coordination/architecture/dispatch-control-plane.md#contracts; source context \"Dispatch Control Plane / Contracts\", target context \"Dispatch Control Plane\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+    "targetAnchor": "contracts",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "bbe2a5a5b82a6a3145532c058e0d786e05b3bd13215fdce5b39d9dedf53e6b46",
+    "targetAncestry": [
+      "Dispatch Control Plane"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 30,
+  "factsSHA256": "cb2537bfda6b0935936507792930a17e20e4e2598b860303bc6e9cd68011a416",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-12",
+    "githubAnchor": "unheaded-block-12",
+    "stableAnchor": "unheaded-block-12",
+    "title": "Unheaded block 12",
+    "startLine": 97,
+    "endLine": 100,
+    "textDigest": "79cd1e06fa13094d10975bb96137f73a4cf5ad8205777c9ce7e6cb83e162d515",
+    "sample": "These three contracts are canonical for this control plane. They are\nadditive over the current implementation, not a replacement of it — see the\nImplementation Status line under ea",
+    "identityFingerprint": "28662d525193a9e961356700b635676a5cea968635d7fb6b8250a8ca83e8e382",
+    "ancestry": [
+      "Dispatch Control Plane",
+      "Contracts"
+    ],
+    "path": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "Contracts",
+    "anchor": "contracts",
+    "githubAnchor": "contracts",
+    "stableAnchor": "h-e7363ac9ec25",
+    "startLine": 115,
+    "endLine": 115,
+    "textDigest": "bbe2a5a5b82a6a3145532c058e0d786e05b3bd13215fdce5b39d9dedf53e6b46",
+    "sample": "Contracts",
+    "sectionPayloadDigest": "922bfcad23dbfa7021321e00d28d9ba68f29871894e66fb1fb9b1e24438215f8",
+    "followingBlockDigest": "922bfcad23dbfa7021321e00d28d9ba68f29871894e66fb1fb9b1e24438215f8",
+    "identityFingerprint": "37ecf07553010fe3d5e6b7d8f58f7de5712277c15c5d40134a334c8a6598bb27",
+    "ancestry": [
+      "Dispatch Control Plane"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_976c9258480b6a6549a86ce7f22c593e",
+    "sourceUnitDigest": "79cd1e06fa13094d10975bb96137f73a4cf5ad8205777c9ce7e6cb83e162d515",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/dispatch-control-plane.md:97-100#unheaded-block-12 (current lines); unit SHA256 79cd1e06fa13094d10975bb96137f73a4cf5ad8205777c9ce7e6cb83e162d515.\nTarget: docs/platform/agent-coordination/architecture/dispatch-control-plane.md:115-115#contracts (current lines); unit SHA256 bbe2a5a5b82a6a3145532c058e0d786e05b3bd13215fdce5b39d9dedf53e6b46.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest bbe2a5a5b82a6a3145532c058e0d786e05b3bd13215fdce5b39d9dedf53e6b46 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 12\" → \"Contracts\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 4 removed and 5 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-12 under docs/platform/agent-coordination/architecture/dispatch-control-plane.md#contracts; source context \"Dispatch Control Plane / Contracts\", target context \"Dispatch Control Plane\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+    "targetAnchor": "contracts",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "bbe2a5a5b82a6a3145532c058e0d786e05b3bd13215fdce5b39d9dedf53e6b46",
+    "targetAncestry": [
+      "Dispatch Control Plane"
+    ]
+  }
+}
+```
+
+## Entry rationale-032
+
+```json
+{
+  "entryId": "rationale-032",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_88d68c4bcfd5253c805d3f898f3faa4f",
+  "before": {
+    "claimId": "claim_88d68c4bcfd5253c805d3f898f3faa4f",
+    "sourceUnitDigest": "660379a03ef45ee4294296fa6c6457a0c39aecaa2f43b4a9da3a8428ca859ba4",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/dispatch-control-plane.md:104-124#unheaded-block-13 (current lines); unit SHA256 660379a03ef45ee4294296fa6c6457a0c39aecaa2f43b4a9da3a8428ca859ba4.\nTarget: docs/platform/agent-coordination/architecture/dispatch-control-plane.md:122-122#dispatchrequest-outer-core (current lines); unit SHA256 c9e22dfa3e05e994e43bfa65ca96600406295aa8182af265e948fedce72ff9d3.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest c9e22dfa3e05e994e43bfa65ca96600406295aa8182af265e948fedce72ff9d3 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 13\" → \"DispatchRequest (outer → core)\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-13 under docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatchrequest-outer-core; source context \"Dispatch Control Plane / Contracts / DispatchRequest (outer → core)\", target context \"Dispatch Control Plane / Contracts\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+    "targetAnchor": "dispatchrequest-outer-core",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "deep: read full source block ('''json {   \"target\": { \"kind\": \"capability / executor\"...) against target section 'DispatchRequest (outer → core)' (h3); 19 of 21 source lines appear verbatim in the target section, the rest is rewritten current wording, so supersede with a named successor is truthful and no carried claim is made; Heading depth and Links lines (0/0) verified; digests differ as stated and both recomputed; anchor checked; last-reviewed digest present at 947f6169e.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-04-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "c9e22dfa3e05e994e43bfa65ca96600406295aa8182af265e948fedce72ff9d3",
+    "targetAncestry": [
+      "Dispatch Control Plane",
+      "Contracts"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_88d68c4bcfd5253c805d3f898f3faa4f",
+    "sourceUnitDigest": "660379a03ef45ee4294296fa6c6457a0c39aecaa2f43b4a9da3a8428ca859ba4",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/dispatch-control-plane.md:104-124#unheaded-block-13 (current lines); unit SHA256 660379a03ef45ee4294296fa6c6457a0c39aecaa2f43b4a9da3a8428ca859ba4.\nTarget: docs/platform/agent-coordination/architecture/dispatch-control-plane.md:122-122#dispatchrequest-outer-core (current lines); unit SHA256 c9e22dfa3e05e994e43bfa65ca96600406295aa8182af265e948fedce72ff9d3.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest c9e22dfa3e05e994e43bfa65ca96600406295aa8182af265e948fedce72ff9d3 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 13\" → \"DispatchRequest (outer → core)\".\nWhole direct section differs; depth block → 3; 0 distinct link changes; normalized line order differs; 2 removed and 22 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-13 under docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatchrequest-outer-core; source context \"Dispatch Control Plane / Contracts / DispatchRequest (outer → core)\", target context \"Dispatch Control Plane / Contracts\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+    "targetAnchor": "dispatchrequest-outer-core",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "c9e22dfa3e05e994e43bfa65ca96600406295aa8182af265e948fedce72ff9d3",
+    "targetAncestry": [
+      "Dispatch Control Plane",
+      "Contracts"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 31,
+  "factsSHA256": "d097b1bd812005e23d514eef2ff202adf1647dfa844bbce31686f4d23534d090",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-13",
+    "githubAnchor": "unheaded-block-13",
+    "stableAnchor": "unheaded-block-13",
+    "title": "Unheaded block 13",
+    "startLine": 104,
+    "endLine": 124,
+    "textDigest": "660379a03ef45ee4294296fa6c6457a0c39aecaa2f43b4a9da3a8428ca859ba4",
+    "sample": "```json\n{\n  \"target\": { \"kind\": \"capability | executor\", \"value\": \"code:implement\" },\n  \"policy\": {\n    \"minTier\": \"standard\",\n    \"preferExecutor\": \"agy-herdr\",\n    \"fallbackExecu",
+    "identityFingerprint": "82c40fa365974be05e16b90afc125214cfb63ec26382f083d9869e9e22491e44",
+    "ancestry": [
+      "Dispatch Control Plane",
+      "Contracts",
+      "DispatchRequest (outer → core)"
+    ],
+    "path": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "DispatchRequest (outer → core)",
+    "anchor": "dispatchrequest-outer-core",
+    "githubAnchor": "dispatchrequest-outer-core",
+    "stableAnchor": "h-87fc3e76c440",
+    "startLine": 122,
+    "endLine": 122,
+    "textDigest": "c9e22dfa3e05e994e43bfa65ca96600406295aa8182af265e948fedce72ff9d3",
+    "sample": "DispatchRequest (outer → core)",
+    "sectionPayloadDigest": "0da9c347fe2cf42e4e000a13bc907840bcbe47a8f8f89f417762324c024ced22",
+    "followingBlockDigest": "17e0f084c6eb1a651635402658b3c817c4b131f89dd778d02f5b108e87c00aa8",
+    "identityFingerprint": "54921a4f660edb38a132cf04d6a846253c2d231436642b2e6d499f9ee8194d85",
+    "ancestry": [
+      "Dispatch Control Plane",
+      "Contracts"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_88d68c4bcfd5253c805d3f898f3faa4f",
+    "sourceUnitDigest": "660379a03ef45ee4294296fa6c6457a0c39aecaa2f43b4a9da3a8428ca859ba4",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/dispatch-control-plane.md:104-124#unheaded-block-13 (current lines); unit SHA256 660379a03ef45ee4294296fa6c6457a0c39aecaa2f43b4a9da3a8428ca859ba4.\nTarget: docs/platform/agent-coordination/architecture/dispatch-control-plane.md:122-122#dispatchrequest-outer-core (current lines); unit SHA256 c9e22dfa3e05e994e43bfa65ca96600406295aa8182af265e948fedce72ff9d3.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest c9e22dfa3e05e994e43bfa65ca96600406295aa8182af265e948fedce72ff9d3 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 13\" → \"DispatchRequest (outer → core)\".\nWhole direct section differs; depth block → 3; 0 distinct link changes; normalized line order differs; 2 removed and 22 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-13 under docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatchrequest-outer-core; source context \"Dispatch Control Plane / Contracts / DispatchRequest (outer → core)\", target context \"Dispatch Control Plane / Contracts\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+    "targetAnchor": "dispatchrequest-outer-core",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "c9e22dfa3e05e994e43bfa65ca96600406295aa8182af265e948fedce72ff9d3",
+    "targetAncestry": [
+      "Dispatch Control Plane",
+      "Contracts"
+    ]
+  }
+}
+```
+
+## Entry rationale-033
+
+```json
+{
+  "entryId": "rationale-033",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_f90925846cf63161875b4657557bdf4f",
+  "before": {
+    "claimId": "claim_f90925846cf63161875b4657557bdf4f",
+    "sourceUnitDigest": "a5f0746c52639a115b4cc3c46edf9c430b1c809223e2bb7e7d64e4d8081a0f21",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/dispatch-control-plane.md:140-148#unheaded-block-15 (current lines); unit SHA256 a5f0746c52639a115b4cc3c46edf9c430b1c809223e2bb7e7d64e4d8081a0f21.\nTarget: docs/platform/agent-coordination/architecture/dispatch-control-plane.md:122-122#dispatchrequest-outer-core (current lines); unit SHA256 c9e22dfa3e05e994e43bfa65ca96600406295aa8182af265e948fedce72ff9d3.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest c9e22dfa3e05e994e43bfa65ca96600406295aa8182af265e948fedce72ff9d3 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 15\" → \"DispatchRequest (outer → core)\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-15 under docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatchrequest-outer-core; source context \"Dispatch Control Plane / Contracts / DispatchRequest (outer → core)\", target context \"Dispatch Control Plane / Contracts\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+    "targetAnchor": "dispatchrequest-outer-core",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "deep: read full source block (**Implementation status.** No single typed 'DispatchReq...) against target section 'DispatchRequest (outer → core)' (h3); 2 of 9 source lines appear verbatim in the target section, the rest is rewritten current wording, so supersede with a named successor is truthful and no carried claim is made; Heading depth and Links lines (0/0) verified; digests differ as stated and both recomputed; anchor checked; last-reviewed digest present at 947f6169e.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-04-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "c9e22dfa3e05e994e43bfa65ca96600406295aa8182af265e948fedce72ff9d3",
+    "targetAncestry": [
+      "Dispatch Control Plane",
+      "Contracts"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_f90925846cf63161875b4657557bdf4f",
+    "sourceUnitDigest": "a5f0746c52639a115b4cc3c46edf9c430b1c809223e2bb7e7d64e4d8081a0f21",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/dispatch-control-plane.md:140-148#unheaded-block-15 (current lines); unit SHA256 a5f0746c52639a115b4cc3c46edf9c430b1c809223e2bb7e7d64e4d8081a0f21.\nTarget: docs/platform/agent-coordination/architecture/dispatch-control-plane.md:122-122#dispatchrequest-outer-core (current lines); unit SHA256 c9e22dfa3e05e994e43bfa65ca96600406295aa8182af265e948fedce72ff9d3.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest c9e22dfa3e05e994e43bfa65ca96600406295aa8182af265e948fedce72ff9d3 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 15\" → \"DispatchRequest (outer → core)\".\nWhole direct section differs; depth block → 3; 0 distinct link changes; normalized line order differs; 7 removed and 39 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-15 under docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatchrequest-outer-core; source context \"Dispatch Control Plane / Contracts / DispatchRequest (outer → core)\", target context \"Dispatch Control Plane / Contracts\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+    "targetAnchor": "dispatchrequest-outer-core",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "c9e22dfa3e05e994e43bfa65ca96600406295aa8182af265e948fedce72ff9d3",
+    "targetAncestry": [
+      "Dispatch Control Plane",
+      "Contracts"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 32,
+  "factsSHA256": "60e3637941f6ff76260d4a12ddeedbf67ae65a32019ce1e185aae22ca8b2a854",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-15",
+    "githubAnchor": "unheaded-block-15",
+    "stableAnchor": "unheaded-block-15",
+    "title": "Unheaded block 15",
+    "startLine": 140,
+    "endLine": 148,
+    "textDigest": "a5f0746c52639a115b4cc3c46edf9c430b1c809223e2bb7e7d64e4d8081a0f21",
+    "sample": "**Implementation status.** No single typed `DispatchRequest` object exists\nyet. `compileDispatchPlan()`'s options bag\n(`executorId | for | work | assignment | stage | needsSoul |\nh",
+    "identityFingerprint": "0bef764155425ca2ab4af3e86ec0e4e27df12a49732bec841cf663be24cd0103",
+    "ancestry": [
+      "Dispatch Control Plane",
+      "Contracts",
+      "DispatchRequest (outer → core)"
+    ],
+    "path": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "DispatchRequest (outer → core)",
+    "anchor": "dispatchrequest-outer-core",
+    "githubAnchor": "dispatchrequest-outer-core",
+    "stableAnchor": "h-87fc3e76c440",
+    "startLine": 122,
+    "endLine": 122,
+    "textDigest": "c9e22dfa3e05e994e43bfa65ca96600406295aa8182af265e948fedce72ff9d3",
+    "sample": "DispatchRequest (outer → core)",
+    "sectionPayloadDigest": "0da9c347fe2cf42e4e000a13bc907840bcbe47a8f8f89f417762324c024ced22",
+    "followingBlockDigest": "17e0f084c6eb1a651635402658b3c817c4b131f89dd778d02f5b108e87c00aa8",
+    "identityFingerprint": "54921a4f660edb38a132cf04d6a846253c2d231436642b2e6d499f9ee8194d85",
+    "ancestry": [
+      "Dispatch Control Plane",
+      "Contracts"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_f90925846cf63161875b4657557bdf4f",
+    "sourceUnitDigest": "a5f0746c52639a115b4cc3c46edf9c430b1c809223e2bb7e7d64e4d8081a0f21",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/dispatch-control-plane.md:140-148#unheaded-block-15 (current lines); unit SHA256 a5f0746c52639a115b4cc3c46edf9c430b1c809223e2bb7e7d64e4d8081a0f21.\nTarget: docs/platform/agent-coordination/architecture/dispatch-control-plane.md:122-122#dispatchrequest-outer-core (current lines); unit SHA256 c9e22dfa3e05e994e43bfa65ca96600406295aa8182af265e948fedce72ff9d3.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest c9e22dfa3e05e994e43bfa65ca96600406295aa8182af265e948fedce72ff9d3 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 15\" → \"DispatchRequest (outer → core)\".\nWhole direct section differs; depth block → 3; 0 distinct link changes; normalized line order differs; 7 removed and 39 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-15 under docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatchrequest-outer-core; source context \"Dispatch Control Plane / Contracts / DispatchRequest (outer → core)\", target context \"Dispatch Control Plane / Contracts\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+    "targetAnchor": "dispatchrequest-outer-core",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "c9e22dfa3e05e994e43bfa65ca96600406295aa8182af265e948fedce72ff9d3",
+    "targetAncestry": [
+      "Dispatch Control Plane",
+      "Contracts"
+    ]
+  }
+}
+```
+
+## Entry rationale-034
+
+```json
+{
+  "entryId": "rationale-034",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_6d348715644da34b65032ea70555a2c5",
+  "before": {
+    "claimId": "claim_6d348715644da34b65032ea70555a2c5",
+    "sourceUnitDigest": "250ec2e00a19da1f8b1d5e457e45fc375c7d2cd648dc3ee53d9b08ff1e6716e2",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/dispatch-control-plane.md:158-168#unheaded-block-17 (current lines); unit SHA256 250ec2e00a19da1f8b1d5e457e45fc375c7d2cd648dc3ee53d9b08ff1e6716e2.\nTarget: docs/platform/agent-coordination/architecture/dispatch-control-plane.md:168-168#policypatch (current lines); unit SHA256 36695f40c8dcd1f98944f0e05e72217b0e13d6bbc80aa925e4c8923448349989.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 36695f40c8dcd1f98944f0e05e72217b0e13d6bbc80aa925e4c8923448349989 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 17\" → \"PolicyPatch\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-17 under docs/platform/agent-coordination/architecture/dispatch-control-plane.md#policypatch; source context \"Dispatch Control Plane / Contracts / PolicyPatch\", target context \"Dispatch Control Plane / Contracts\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+    "targetAnchor": "policypatch",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "deep: read full source block ('''txt runner/default → definition/protocol → operation...) against target section 'PolicyPatch' (h3); 3 of 11 source lines appear verbatim in the target section, the rest is rewritten current wording, so supersede with a named successor is truthful and no carried claim is made; Heading depth and Links lines (0/0) verified; digests differ as stated and both recomputed; anchor checked; last-reviewed digest present at 947f6169e.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-04-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "36695f40c8dcd1f98944f0e05e72217b0e13d6bbc80aa925e4c8923448349989",
+    "targetAncestry": [
+      "Dispatch Control Plane",
+      "Contracts"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_6d348715644da34b65032ea70555a2c5",
+    "sourceUnitDigest": "250ec2e00a19da1f8b1d5e457e45fc375c7d2cd648dc3ee53d9b08ff1e6716e2",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/dispatch-control-plane.md:158-168#unheaded-block-17 (current lines); unit SHA256 250ec2e00a19da1f8b1d5e457e45fc375c7d2cd648dc3ee53d9b08ff1e6716e2.\nTarget: docs/platform/agent-coordination/architecture/dispatch-control-plane.md:168-168#policypatch (current lines); unit SHA256 36695f40c8dcd1f98944f0e05e72217b0e13d6bbc80aa925e4c8923448349989.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 36695f40c8dcd1f98944f0e05e72217b0e13d6bbc80aa925e4c8923448349989 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 17\" → \"PolicyPatch\".\nWhole direct section differs; depth block → 3; 0 distinct link changes; normalized line order differs; 9 removed and 28 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-17 under docs/platform/agent-coordination/architecture/dispatch-control-plane.md#policypatch; source context \"Dispatch Control Plane / Contracts / PolicyPatch\", target context \"Dispatch Control Plane / Contracts\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+    "targetAnchor": "policypatch",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "36695f40c8dcd1f98944f0e05e72217b0e13d6bbc80aa925e4c8923448349989",
+    "targetAncestry": [
+      "Dispatch Control Plane",
+      "Contracts"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 33,
+  "factsSHA256": "d18940eb8475e99eedbed5dff44e0d6b2c05079eb8e49c79ac0c843be214c55c",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-17",
+    "githubAnchor": "unheaded-block-17",
+    "stableAnchor": "unheaded-block-17",
+    "title": "Unheaded block 17",
+    "startLine": 158,
+    "endLine": 168,
+    "textDigest": "250ec2e00a19da1f8b1d5e457e45fc375c7d2cd648dc3ee53d9b08ff1e6716e2",
+    "sample": "```txt\nrunner/default\n→ definition/protocol\n→ operation/taskSpec\n→ role\n→ actor/persona\n→ Work constraints\n→ Assignment\n→ trusted human/CLI override\n→ governance\n```",
+    "identityFingerprint": "b7d3c6d593b9a3e19c0c38cebef1c3658809877edc093301a6e9d1e65c60d809",
+    "ancestry": [
+      "Dispatch Control Plane",
+      "Contracts",
+      "PolicyPatch"
+    ],
+    "path": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "PolicyPatch",
+    "anchor": "policypatch",
+    "githubAnchor": "policypatch",
+    "stableAnchor": "h-455cad6c325d",
+    "startLine": 168,
+    "endLine": 168,
+    "textDigest": "36695f40c8dcd1f98944f0e05e72217b0e13d6bbc80aa925e4c8923448349989",
+    "sample": "PolicyPatch",
+    "sectionPayloadDigest": "d7523921a319dfd86a405c8cf0b90377abdc65d9a380522f5d1eaee2938db475",
+    "followingBlockDigest": "846b9708d0b2e720a661902b68dede79f61adc4354a6023e656720fdd1295b95",
+    "identityFingerprint": "8d9591dd214d768b3ccaff35e9c65dfe9222a203128a06f956c30893df973e8a",
+    "ancestry": [
+      "Dispatch Control Plane",
+      "Contracts"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_6d348715644da34b65032ea70555a2c5",
+    "sourceUnitDigest": "250ec2e00a19da1f8b1d5e457e45fc375c7d2cd648dc3ee53d9b08ff1e6716e2",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/dispatch-control-plane.md:158-168#unheaded-block-17 (current lines); unit SHA256 250ec2e00a19da1f8b1d5e457e45fc375c7d2cd648dc3ee53d9b08ff1e6716e2.\nTarget: docs/platform/agent-coordination/architecture/dispatch-control-plane.md:168-168#policypatch (current lines); unit SHA256 36695f40c8dcd1f98944f0e05e72217b0e13d6bbc80aa925e4c8923448349989.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 36695f40c8dcd1f98944f0e05e72217b0e13d6bbc80aa925e4c8923448349989 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 17\" → \"PolicyPatch\".\nWhole direct section differs; depth block → 3; 0 distinct link changes; normalized line order differs; 9 removed and 28 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-17 under docs/platform/agent-coordination/architecture/dispatch-control-plane.md#policypatch; source context \"Dispatch Control Plane / Contracts / PolicyPatch\", target context \"Dispatch Control Plane / Contracts\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+    "targetAnchor": "policypatch",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "36695f40c8dcd1f98944f0e05e72217b0e13d6bbc80aa925e4c8923448349989",
+    "targetAncestry": [
+      "Dispatch Control Plane",
+      "Contracts"
+    ]
+  }
+}
+```
+
+## Entry rationale-035
+
+```json
+{
+  "entryId": "rationale-035",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_1da19454b145196be8e6880ee621fc16",
+  "before": {
+    "claimId": "claim_1da19454b145196be8e6880ee621fc16",
+    "sourceUnitDigest": "fcd98567b2d5218f8f72e677335a5a8a73ee4ed19bfe73947a05b59b9a80fcce",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/dispatch-control-plane.md:170-170#unheaded-block-18 (current lines); unit SHA256 fcd98567b2d5218f8f72e677335a5a8a73ee4ed19bfe73947a05b59b9a80fcce.\nTarget: docs/platform/agent-coordination/architecture/dispatch-control-plane.md:168-168#policypatch (current lines); unit SHA256 36695f40c8dcd1f98944f0e05e72217b0e13d6bbc80aa925e4c8923448349989.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 36695f40c8dcd1f98944f0e05e72217b0e13d6bbc80aa925e4c8923448349989 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 18\" → \"PolicyPatch\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-18 under docs/platform/agent-coordination/architecture/dispatch-control-plane.md#policypatch; source context \"Dispatch Control Plane / Contracts / PolicyPatch\", target context \"Dispatch Control Plane / Contracts\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+    "targetAnchor": "policypatch",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "deep: read full source block (Merge rules (already accepted and enforced):...) against target section 'PolicyPatch' (h3); 0 of 1 source lines appear verbatim in the target section, the rest is rewritten current wording, so supersede with a named successor is truthful and no carried claim is made; Heading depth and Links lines (0/0) verified; digests differ as stated and both recomputed; anchor checked; last-reviewed digest present at 947f6169e. hand-recomputed by independent python.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-04-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "36695f40c8dcd1f98944f0e05e72217b0e13d6bbc80aa925e4c8923448349989",
+    "targetAncestry": [
+      "Dispatch Control Plane",
+      "Contracts"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_1da19454b145196be8e6880ee621fc16",
+    "sourceUnitDigest": "fcd98567b2d5218f8f72e677335a5a8a73ee4ed19bfe73947a05b59b9a80fcce",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/dispatch-control-plane.md:170-170#unheaded-block-18 (current lines); unit SHA256 fcd98567b2d5218f8f72e677335a5a8a73ee4ed19bfe73947a05b59b9a80fcce.\nTarget: docs/platform/agent-coordination/architecture/dispatch-control-plane.md:168-168#policypatch (current lines); unit SHA256 36695f40c8dcd1f98944f0e05e72217b0e13d6bbc80aa925e4c8923448349989.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 36695f40c8dcd1f98944f0e05e72217b0e13d6bbc80aa925e4c8923448349989 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 18\" → \"PolicyPatch\".\nWhole direct section differs; depth block → 3; 0 distinct link changes; normalized line order differs; 1 removed and 30 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-18 under docs/platform/agent-coordination/architecture/dispatch-control-plane.md#policypatch; source context \"Dispatch Control Plane / Contracts / PolicyPatch\", target context \"Dispatch Control Plane / Contracts\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+    "targetAnchor": "policypatch",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "36695f40c8dcd1f98944f0e05e72217b0e13d6bbc80aa925e4c8923448349989",
+    "targetAncestry": [
+      "Dispatch Control Plane",
+      "Contracts"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 34,
+  "factsSHA256": "e458c363e9ebc6fd710e635fd3272cffdc316628b92391120e27e6650a9f6cfe",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-18",
+    "githubAnchor": "unheaded-block-18",
+    "stableAnchor": "unheaded-block-18",
+    "title": "Unheaded block 18",
+    "startLine": 170,
+    "endLine": 170,
+    "textDigest": "fcd98567b2d5218f8f72e677335a5a8a73ee4ed19bfe73947a05b59b9a80fcce",
+    "sample": "Merge rules (already accepted and enforced):",
+    "identityFingerprint": "bae909b477957c713ad653fe78bcb353e692fe38d425060a380cb980827113bb",
+    "ancestry": [
+      "Dispatch Control Plane",
+      "Contracts",
+      "PolicyPatch"
+    ],
+    "path": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "PolicyPatch",
+    "anchor": "policypatch",
+    "githubAnchor": "policypatch",
+    "stableAnchor": "h-455cad6c325d",
+    "startLine": 168,
+    "endLine": 168,
+    "textDigest": "36695f40c8dcd1f98944f0e05e72217b0e13d6bbc80aa925e4c8923448349989",
+    "sample": "PolicyPatch",
+    "sectionPayloadDigest": "d7523921a319dfd86a405c8cf0b90377abdc65d9a380522f5d1eaee2938db475",
+    "followingBlockDigest": "846b9708d0b2e720a661902b68dede79f61adc4354a6023e656720fdd1295b95",
+    "identityFingerprint": "8d9591dd214d768b3ccaff35e9c65dfe9222a203128a06f956c30893df973e8a",
+    "ancestry": [
+      "Dispatch Control Plane",
+      "Contracts"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_1da19454b145196be8e6880ee621fc16",
+    "sourceUnitDigest": "fcd98567b2d5218f8f72e677335a5a8a73ee4ed19bfe73947a05b59b9a80fcce",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/dispatch-control-plane.md:170-170#unheaded-block-18 (current lines); unit SHA256 fcd98567b2d5218f8f72e677335a5a8a73ee4ed19bfe73947a05b59b9a80fcce.\nTarget: docs/platform/agent-coordination/architecture/dispatch-control-plane.md:168-168#policypatch (current lines); unit SHA256 36695f40c8dcd1f98944f0e05e72217b0e13d6bbc80aa925e4c8923448349989.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 36695f40c8dcd1f98944f0e05e72217b0e13d6bbc80aa925e4c8923448349989 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 18\" → \"PolicyPatch\".\nWhole direct section differs; depth block → 3; 0 distinct link changes; normalized line order differs; 1 removed and 30 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-18 under docs/platform/agent-coordination/architecture/dispatch-control-plane.md#policypatch; source context \"Dispatch Control Plane / Contracts / PolicyPatch\", target context \"Dispatch Control Plane / Contracts\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+    "targetAnchor": "policypatch",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "36695f40c8dcd1f98944f0e05e72217b0e13d6bbc80aa925e4c8923448349989",
+    "targetAncestry": [
+      "Dispatch Control Plane",
+      "Contracts"
+    ]
+  }
+}
+```
+
+## Entry rationale-036
+
+```json
+{
+  "entryId": "rationale-036",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_0548f4c5eada0527c365b6d10bc62b65",
+  "before": {
+    "claimId": "claim_0548f4c5eada0527c365b6d10bc62b65",
+    "sourceUnitDigest": "3583305de78b7cdc72b5867540aaa0a18573358477c8db746e6c36ef1aa3d05d",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/dispatch-control-plane.md:172-181#unheaded-block-19 (current lines); unit SHA256 3583305de78b7cdc72b5867540aaa0a18573358477c8db746e6c36ef1aa3d05d.\nTarget: docs/platform/agent-coordination/architecture/dispatch-control-plane.md:168-168#policypatch (current lines); unit SHA256 36695f40c8dcd1f98944f0e05e72217b0e13d6bbc80aa925e4c8923448349989.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 36695f40c8dcd1f98944f0e05e72217b0e13d6bbc80aa925e4c8923448349989 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 19\" → \"PolicyPatch\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-19 under docs/platform/agent-coordination/architecture/dispatch-control-plane.md#policypatch; source context \"Dispatch Control Plane / Contracts / PolicyPatch\", target context \"Dispatch Control Plane / Contracts\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+    "targetAnchor": "policypatch",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "deep: read full source block (- tier constraints accumulate monotonically — a weaker ...) against target section 'PolicyPatch' (h3); 0 of 10 source lines appear verbatim in the target section, the rest is rewritten current wording, so supersede with a named successor is truthful and no carried claim is made; Heading depth and Links lines (0/0) verified; digests differ as stated and both recomputed; anchor checked; last-reviewed digest present at 947f6169e.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-04-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "36695f40c8dcd1f98944f0e05e72217b0e13d6bbc80aa925e4c8923448349989",
+    "targetAncestry": [
+      "Dispatch Control Plane",
+      "Contracts"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_0548f4c5eada0527c365b6d10bc62b65",
+    "sourceUnitDigest": "3583305de78b7cdc72b5867540aaa0a18573358477c8db746e6c36ef1aa3d05d",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/dispatch-control-plane.md:172-181#unheaded-block-19 (current lines); unit SHA256 3583305de78b7cdc72b5867540aaa0a18573358477c8db746e6c36ef1aa3d05d.\nTarget: docs/platform/agent-coordination/architecture/dispatch-control-plane.md:168-168#policypatch (current lines); unit SHA256 36695f40c8dcd1f98944f0e05e72217b0e13d6bbc80aa925e4c8923448349989.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 36695f40c8dcd1f98944f0e05e72217b0e13d6bbc80aa925e4c8923448349989 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 19\" → \"PolicyPatch\".\nWhole direct section differs; depth block → 3; 0 distinct link changes; normalized line order differs; 10 removed and 30 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-19 under docs/platform/agent-coordination/architecture/dispatch-control-plane.md#policypatch; source context \"Dispatch Control Plane / Contracts / PolicyPatch\", target context \"Dispatch Control Plane / Contracts\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+    "targetAnchor": "policypatch",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "36695f40c8dcd1f98944f0e05e72217b0e13d6bbc80aa925e4c8923448349989",
+    "targetAncestry": [
+      "Dispatch Control Plane",
+      "Contracts"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 35,
+  "factsSHA256": "ab96f1051b37e431fe39661a6d04d119dd9ebee3622eb82562d4e4b04ef066b7",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-19",
+    "githubAnchor": "unheaded-block-19",
+    "stableAnchor": "unheaded-block-19",
+    "title": "Unheaded block 19",
+    "startLine": 172,
+    "endLine": 181,
+    "textDigest": "3583305de78b7cdc72b5867540aaa0a18573358477c8db746e6c36ef1aa3d05d",
+    "sample": "- tier constraints accumulate monotonically — a weaker layer cannot lower a\n  stronger required tier;\n- executor preference is most-specific-wins, subject to registration and\n  gov",
+    "identityFingerprint": "9812e780b692cab26660a17965fe2bb7e397c85c180e81fc21539acd4cc9fbb7",
+    "ancestry": [
+      "Dispatch Control Plane",
+      "Contracts",
+      "PolicyPatch"
+    ],
+    "path": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "PolicyPatch",
+    "anchor": "policypatch",
+    "githubAnchor": "policypatch",
+    "stableAnchor": "h-455cad6c325d",
+    "startLine": 168,
+    "endLine": 168,
+    "textDigest": "36695f40c8dcd1f98944f0e05e72217b0e13d6bbc80aa925e4c8923448349989",
+    "sample": "PolicyPatch",
+    "sectionPayloadDigest": "d7523921a319dfd86a405c8cf0b90377abdc65d9a380522f5d1eaee2938db475",
+    "followingBlockDigest": "846b9708d0b2e720a661902b68dede79f61adc4354a6023e656720fdd1295b95",
+    "identityFingerprint": "8d9591dd214d768b3ccaff35e9c65dfe9222a203128a06f956c30893df973e8a",
+    "ancestry": [
+      "Dispatch Control Plane",
+      "Contracts"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_0548f4c5eada0527c365b6d10bc62b65",
+    "sourceUnitDigest": "3583305de78b7cdc72b5867540aaa0a18573358477c8db746e6c36ef1aa3d05d",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/dispatch-control-plane.md:172-181#unheaded-block-19 (current lines); unit SHA256 3583305de78b7cdc72b5867540aaa0a18573358477c8db746e6c36ef1aa3d05d.\nTarget: docs/platform/agent-coordination/architecture/dispatch-control-plane.md:168-168#policypatch (current lines); unit SHA256 36695f40c8dcd1f98944f0e05e72217b0e13d6bbc80aa925e4c8923448349989.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 36695f40c8dcd1f98944f0e05e72217b0e13d6bbc80aa925e4c8923448349989 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 19\" → \"PolicyPatch\".\nWhole direct section differs; depth block → 3; 0 distinct link changes; normalized line order differs; 10 removed and 30 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-19 under docs/platform/agent-coordination/architecture/dispatch-control-plane.md#policypatch; source context \"Dispatch Control Plane / Contracts / PolicyPatch\", target context \"Dispatch Control Plane / Contracts\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+    "targetAnchor": "policypatch",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "36695f40c8dcd1f98944f0e05e72217b0e13d6bbc80aa925e4c8923448349989",
+    "targetAncestry": [
+      "Dispatch Control Plane",
+      "Contracts"
+    ]
+  }
+}
+```
+
+## Entry rationale-037
+
+```json
+{
+  "entryId": "rationale-037",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_6ac14c8dfb68eb863ccd6513576a1b9a",
+  "before": {
+    "claimId": "claim_6ac14c8dfb68eb863ccd6513576a1b9a",
+    "sourceUnitDigest": "63a4fbd17351a5c00639252f11e139f33cbb60bbef50e0975fc2336029db422a",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/dispatch-control-plane.md:212-219#unheaded-block-23 (current lines); unit SHA256 63a4fbd17351a5c00639252f11e139f33cbb60bbef50e0975fc2336029db422a.\nTarget: docs/platform/agent-coordination/architecture/dispatch-control-plane.md:202-202#dispatchplan-core-runtime (current lines); unit SHA256 a45ae72abffaf471700451bb238774e045b81bbd3818512a9709af2b54c02567.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest a45ae72abffaf471700451bb238774e045b81bbd3818512a9709af2b54c02567 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 23\" → \"DispatchPlan (core → runtime)\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-23 under docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatchplan-core-runtime; source context \"Dispatch Control Plane / Contracts / DispatchPlan (core → runtime)\", target context \"Dispatch Control Plane / Contracts\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+    "targetAnchor": "dispatchplan-core-runtime",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "deep: read full source block (**Implementation status.** Implemented for dispatchable...) against target section 'DispatchPlan (core → runtime)' (h3); 0 of 8 source lines appear verbatim in the target section, the rest is rewritten current wording, so supersede with a named successor is truthful and no carried claim is made; Heading depth and Links lines (0/0) verified; digests differ as stated and both recomputed; anchor checked; last-reviewed digest present at 947f6169e.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-04-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "a45ae72abffaf471700451bb238774e045b81bbd3818512a9709af2b54c02567",
+    "targetAncestry": [
+      "Dispatch Control Plane",
+      "Contracts"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_6ac14c8dfb68eb863ccd6513576a1b9a",
+    "sourceUnitDigest": "63a4fbd17351a5c00639252f11e139f33cbb60bbef50e0975fc2336029db422a",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/dispatch-control-plane.md:212-219#unheaded-block-23 (current lines); unit SHA256 63a4fbd17351a5c00639252f11e139f33cbb60bbef50e0975fc2336029db422a.\nTarget: docs/platform/agent-coordination/architecture/dispatch-control-plane.md:202-202#dispatchplan-core-runtime (current lines); unit SHA256 a45ae72abffaf471700451bb238774e045b81bbd3818512a9709af2b54c02567.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest a45ae72abffaf471700451bb238774e045b81bbd3818512a9709af2b54c02567 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 23\" → \"DispatchPlan (core → runtime)\".\nWhole direct section differs; depth block → 3; 0 distinct link changes; normalized line order differs; 8 removed and 43 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-23 under docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatchplan-core-runtime; source context \"Dispatch Control Plane / Contracts / DispatchPlan (core → runtime)\", target context \"Dispatch Control Plane / Contracts\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+    "targetAnchor": "dispatchplan-core-runtime",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "a45ae72abffaf471700451bb238774e045b81bbd3818512a9709af2b54c02567",
+    "targetAncestry": [
+      "Dispatch Control Plane",
+      "Contracts"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 36,
+  "factsSHA256": "ab2714d63e4314a7b9d34bb13575ec4a6aa3b8ec010e5cf774e6f61ea896cb76",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-23",
+    "githubAnchor": "unheaded-block-23",
+    "stableAnchor": "unheaded-block-23",
+    "title": "Unheaded block 23",
+    "startLine": 212,
+    "endLine": 219,
+    "textDigest": "63a4fbd17351a5c00639252f11e139f33cbb60bbef50e0975fc2336029db422a",
+    "sample": "**Implementation status.** Implemented for dispatchable plans.\n`compileDispatchPlan()` (`src/runner/dispatch/plan.mjs`) returns the legacy\nselector/mechanism fields plus `bindingSo",
+    "identityFingerprint": "0f192e893366878d7cb93ec4e8fa70f7f04c88243ea91489c13fff6b0c735e5d",
+    "ancestry": [
+      "Dispatch Control Plane",
+      "Contracts",
+      "DispatchPlan (core → runtime)"
+    ],
+    "path": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "DispatchPlan (core → runtime)",
+    "anchor": "dispatchplan-core-runtime",
+    "githubAnchor": "dispatchplan-core-runtime",
+    "stableAnchor": "h-0d796ae932d2",
+    "startLine": 202,
+    "endLine": 202,
+    "textDigest": "a45ae72abffaf471700451bb238774e045b81bbd3818512a9709af2b54c02567",
+    "sample": "DispatchPlan (core → runtime)",
+    "sectionPayloadDigest": "da330257c96757b8310e1573d9dc530fb4615bd80a837e90bd66045125adad9c",
+    "followingBlockDigest": "59c7473f25506ec30d7145c4f77001f0f95ff79f35c814b7e83eb24fe7000ed0",
+    "identityFingerprint": "980f67de3e284c6279aad2890906216ab681711e0d2f008b3fb46e38a54c5cb8",
+    "ancestry": [
+      "Dispatch Control Plane",
+      "Contracts"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_6ac14c8dfb68eb863ccd6513576a1b9a",
+    "sourceUnitDigest": "63a4fbd17351a5c00639252f11e139f33cbb60bbef50e0975fc2336029db422a",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/dispatch-control-plane.md:212-219#unheaded-block-23 (current lines); unit SHA256 63a4fbd17351a5c00639252f11e139f33cbb60bbef50e0975fc2336029db422a.\nTarget: docs/platform/agent-coordination/architecture/dispatch-control-plane.md:202-202#dispatchplan-core-runtime (current lines); unit SHA256 a45ae72abffaf471700451bb238774e045b81bbd3818512a9709af2b54c02567.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest a45ae72abffaf471700451bb238774e045b81bbd3818512a9709af2b54c02567 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 23\" → \"DispatchPlan (core → runtime)\".\nWhole direct section differs; depth block → 3; 0 distinct link changes; normalized line order differs; 8 removed and 43 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-23 under docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatchplan-core-runtime; source context \"Dispatch Control Plane / Contracts / DispatchPlan (core → runtime)\", target context \"Dispatch Control Plane / Contracts\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+    "targetAnchor": "dispatchplan-core-runtime",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "a45ae72abffaf471700451bb238774e045b81bbd3818512a9709af2b54c02567",
+    "targetAncestry": [
+      "Dispatch Control Plane",
+      "Contracts"
+    ]
+  }
+}
+```
+
+## Entry rationale-038
+
+```json
+{
+  "entryId": "rationale-038",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_317581a1ee7c63342e2015d6ef43ec99",
+  "before": {
+    "claimId": "claim_317581a1ee7c63342e2015d6ef43ec99",
+    "sourceUnitDigest": "2686eec825341d5a13dae16a78affdf85f050be78ac38a4b3fc62c3d39001171",
+    "claimKind": "decision",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/dispatch-control-plane.md:221-233#unheaded-block-24 (current lines); unit SHA256 2686eec825341d5a13dae16a78affdf85f050be78ac38a4b3fc62c3d39001171.\nTarget: docs/platform/agent-coordination/architecture/dispatch-control-plane.md:202-202#dispatchplan-core-runtime (current lines); unit SHA256 a45ae72abffaf471700451bb238774e045b81bbd3818512a9709af2b54c02567.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest a45ae72abffaf471700451bb238774e045b81bbd3818512a9709af2b54c02567 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 24\" → \"DispatchPlan (core → runtime)\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-24 under docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatchplan-core-runtime; source context \"Dispatch Control Plane / Contracts / DispatchPlan (core → runtime)\", target context \"Dispatch Control Plane / Contracts\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+    "targetAnchor": "dispatchplan-core-runtime",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "deep: read full source block (For a real Assignment, policy resolution failure or a d...) against target section 'DispatchPlan (core → runtime)' (h3); 4 of 13 source lines appear verbatim in the target section, the rest is rewritten current wording, so supersede with a named successor is truthful and no carried claim is made; Heading depth and Links lines (0/0) verified; digests differ as stated and both recomputed; anchor checked; last-reviewed digest present at 947f6169e.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-04-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "a45ae72abffaf471700451bb238774e045b81bbd3818512a9709af2b54c02567",
+    "targetAncestry": [
+      "Dispatch Control Plane",
+      "Contracts"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_317581a1ee7c63342e2015d6ef43ec99",
+    "sourceUnitDigest": "2686eec825341d5a13dae16a78affdf85f050be78ac38a4b3fc62c3d39001171",
+    "claimKind": "decision",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/dispatch-control-plane.md:221-233#unheaded-block-24 (current lines); unit SHA256 2686eec825341d5a13dae16a78affdf85f050be78ac38a4b3fc62c3d39001171.\nTarget: docs/platform/agent-coordination/architecture/dispatch-control-plane.md:202-202#dispatchplan-core-runtime (current lines); unit SHA256 a45ae72abffaf471700451bb238774e045b81bbd3818512a9709af2b54c02567.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest a45ae72abffaf471700451bb238774e045b81bbd3818512a9709af2b54c02567 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 24\" → \"DispatchPlan (core → runtime)\".\nWhole direct section differs; depth block → 3; 0 distinct link changes; normalized line order differs; 9 removed and 39 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-24 under docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatchplan-core-runtime; source context \"Dispatch Control Plane / Contracts / DispatchPlan (core → runtime)\", target context \"Dispatch Control Plane / Contracts\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+    "targetAnchor": "dispatchplan-core-runtime",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "a45ae72abffaf471700451bb238774e045b81bbd3818512a9709af2b54c02567",
+    "targetAncestry": [
+      "Dispatch Control Plane",
+      "Contracts"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 37,
+  "factsSHA256": "06bf425e3f2f7fee2967c10857dd8b212c225ac1f476d99f595bf2f0fc0edea0",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-24",
+    "githubAnchor": "unheaded-block-24",
+    "stableAnchor": "unheaded-block-24",
+    "title": "Unheaded block 24",
+    "startLine": 221,
+    "endLine": 233,
+    "textDigest": "2686eec825341d5a13dae16a78affdf85f050be78ac38a4b3fc62c3d39001171",
+    "sample": "For a real Assignment, policy resolution failure or a\ndecided-executor-versus-policy-executor mismatch remains a hard\n`RunnerConfigError`. For a non-Assignment compatibility reques",
+    "identityFingerprint": "d45d4d4e34c97cbd7ddd8425e2ed462868eb90d95cb6ef79579ce7f7e4f217c2",
+    "ancestry": [
+      "Dispatch Control Plane",
+      "Contracts",
+      "DispatchPlan (core → runtime)"
+    ],
+    "path": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "DispatchPlan (core → runtime)",
+    "anchor": "dispatchplan-core-runtime",
+    "githubAnchor": "dispatchplan-core-runtime",
+    "stableAnchor": "h-0d796ae932d2",
+    "startLine": 202,
+    "endLine": 202,
+    "textDigest": "a45ae72abffaf471700451bb238774e045b81bbd3818512a9709af2b54c02567",
+    "sample": "DispatchPlan (core → runtime)",
+    "sectionPayloadDigest": "da330257c96757b8310e1573d9dc530fb4615bd80a837e90bd66045125adad9c",
+    "followingBlockDigest": "59c7473f25506ec30d7145c4f77001f0f95ff79f35c814b7e83eb24fe7000ed0",
+    "identityFingerprint": "980f67de3e284c6279aad2890906216ab681711e0d2f008b3fb46e38a54c5cb8",
+    "ancestry": [
+      "Dispatch Control Plane",
+      "Contracts"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_317581a1ee7c63342e2015d6ef43ec99",
+    "sourceUnitDigest": "2686eec825341d5a13dae16a78affdf85f050be78ac38a4b3fc62c3d39001171",
+    "claimKind": "decision",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/dispatch-control-plane.md:221-233#unheaded-block-24 (current lines); unit SHA256 2686eec825341d5a13dae16a78affdf85f050be78ac38a4b3fc62c3d39001171.\nTarget: docs/platform/agent-coordination/architecture/dispatch-control-plane.md:202-202#dispatchplan-core-runtime (current lines); unit SHA256 a45ae72abffaf471700451bb238774e045b81bbd3818512a9709af2b54c02567.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest a45ae72abffaf471700451bb238774e045b81bbd3818512a9709af2b54c02567 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 24\" → \"DispatchPlan (core → runtime)\".\nWhole direct section differs; depth block → 3; 0 distinct link changes; normalized line order differs; 9 removed and 39 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-24 under docs/platform/agent-coordination/architecture/dispatch-control-plane.md#dispatchplan-core-runtime; source context \"Dispatch Control Plane / Contracts / DispatchPlan (core → runtime)\", target context \"Dispatch Control Plane / Contracts\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+    "targetAnchor": "dispatchplan-core-runtime",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "a45ae72abffaf471700451bb238774e045b81bbd3818512a9709af2b54c02567",
+    "targetAncestry": [
+      "Dispatch Control Plane",
+      "Contracts"
+    ]
+  }
+}
+```
+
+## Entry rationale-039
+
+```json
+{
+  "entryId": "rationale-039",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_3eb1d76cbee05b14310c7bf9188db06d",
+  "before": {
+    "claimId": "claim_3eb1d76cbee05b14310c7bf9188db06d",
+    "sourceUnitDigest": "554e6357c8a41fbf5f65e9ff2e5534e6dfb594c24c27a9e55c229e8081c5ca2c",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/executor-health-and-fallback.md:20-28#unheaded-block-4 (current lines); unit SHA256 554e6357c8a41fbf5f65e9ff2e5534e6dfb594c24c27a9e55c229e8081c5ca2c.\nTarget: docs/platform/agent-coordination/architecture/executor-health-and-fallback.md:39-39#1-responsibility-and-inputs (current lines); unit SHA256 f97c6b9e2271690437b10e8b0557b6c0afc97b598e3dcf1e527f30d8e4129ac0.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest f97c6b9e2271690437b10e8b0557b6c0afc97b598e3dcf1e527f30d8e4129ac0 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 4\" → \"1. Responsibility And Inputs\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/executor-health-and-fallback.md#unheaded-block-4 under docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#1-responsibility-and-inputs; source context \"Executor Fallback And Effect Eligibility / 1. Responsibility And Inputs\", target context \"Executor Fallback And Effect Eligibility\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+    "targetAnchor": "1-responsibility-and-inputs",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "deep: read full source block (/ Stage / Owner / Output / /---/---/---/ / Worker resul...) against target section '1. Responsibility And Inputs' (h2); 8 of 9 source lines appear verbatim in the target section, the rest is rewritten current wording, so supersede with a named successor is truthful and no carried claim is made; Heading depth and Links lines (0/0) verified; digests differ as stated and both recomputed; anchor checked; last-reviewed digest present at 947f6169e. hand-recomputed by independent python.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-04-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "f97c6b9e2271690437b10e8b0557b6c0afc97b598e3dcf1e527f30d8e4129ac0",
+    "targetAncestry": [
+      "Executor Fallback And Effect Eligibility"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_3eb1d76cbee05b14310c7bf9188db06d",
+    "sourceUnitDigest": "554e6357c8a41fbf5f65e9ff2e5534e6dfb594c24c27a9e55c229e8081c5ca2c",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/executor-health-and-fallback.md:20-28#unheaded-block-4 (current lines); unit SHA256 554e6357c8a41fbf5f65e9ff2e5534e6dfb594c24c27a9e55c229e8081c5ca2c.\nTarget: docs/platform/agent-coordination/architecture/executor-health-and-fallback.md:39-39#1-responsibility-and-inputs (current lines); unit SHA256 f97c6b9e2271690437b10e8b0557b6c0afc97b598e3dcf1e527f30d8e4129ac0.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest f97c6b9e2271690437b10e8b0557b6c0afc97b598e3dcf1e527f30d8e4129ac0 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 4\" → \"1. Responsibility And Inputs\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 1 removed and 17 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/executor-health-and-fallback.md#unheaded-block-4 under docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#1-responsibility-and-inputs; source context \"Executor Fallback And Effect Eligibility / 1. Responsibility And Inputs\", target context \"Executor Fallback And Effect Eligibility\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+    "targetAnchor": "1-responsibility-and-inputs",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "f97c6b9e2271690437b10e8b0557b6c0afc97b598e3dcf1e527f30d8e4129ac0",
+    "targetAncestry": [
+      "Executor Fallback And Effect Eligibility"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 38,
+  "factsSHA256": "4db07a7148635cea4a0589c9c8f9800e73676b676756850ab3c66d7928439fb1",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-4",
+    "githubAnchor": "unheaded-block-4",
+    "stableAnchor": "unheaded-block-4",
+    "title": "Unheaded block 4",
+    "startLine": 20,
+    "endLine": 28,
+    "textDigest": "554e6357c8a41fbf5f65e9ff2e5534e6dfb594c24c27a9e55c229e8081c5ca2c",
+    "sample": "| Stage | Owner | Output |\n|---|---|---|\n| Worker result interpretation | Existing normalizer/evaluator | Per-Run result; not an executor-health judgment. |\n| Liveness classificati",
+    "identityFingerprint": "0a78051755ff714a7b685d22ceeb063a21285e356d4689e2c82289404512bf6e",
+    "ancestry": [
+      "Executor Fallback And Effect Eligibility",
+      "1. Responsibility And Inputs"
+    ],
+    "path": "docs/architect/agent-coordination/architecture/executor-health-and-fallback.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "1. Responsibility And Inputs",
+    "anchor": "1-responsibility-and-inputs",
+    "githubAnchor": "1-responsibility-and-inputs",
+    "stableAnchor": "h-694085c2bfc1",
+    "startLine": 39,
+    "endLine": 39,
+    "textDigest": "f97c6b9e2271690437b10e8b0557b6c0afc97b598e3dcf1e527f30d8e4129ac0",
+    "sample": "1. Responsibility And Inputs",
+    "sectionPayloadDigest": "9ba7344f844702c2514e79590823412b05b1f11e38789cda8af7aa5c2fdbfeab",
+    "followingBlockDigest": "e17d652a1f662653fac6a1104c78fd462f847e3416e20b8fe665a1ec0c5c77af",
+    "identityFingerprint": "57912177f4f2b85c7d0bacf4e354960da653dfc67cad9d6bbd751eb0bd0009c1",
+    "ancestry": [
+      "Executor Fallback And Effect Eligibility"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_3eb1d76cbee05b14310c7bf9188db06d",
+    "sourceUnitDigest": "554e6357c8a41fbf5f65e9ff2e5534e6dfb594c24c27a9e55c229e8081c5ca2c",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/executor-health-and-fallback.md:20-28#unheaded-block-4 (current lines); unit SHA256 554e6357c8a41fbf5f65e9ff2e5534e6dfb594c24c27a9e55c229e8081c5ca2c.\nTarget: docs/platform/agent-coordination/architecture/executor-health-and-fallback.md:39-39#1-responsibility-and-inputs (current lines); unit SHA256 f97c6b9e2271690437b10e8b0557b6c0afc97b598e3dcf1e527f30d8e4129ac0.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest f97c6b9e2271690437b10e8b0557b6c0afc97b598e3dcf1e527f30d8e4129ac0 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 4\" → \"1. Responsibility And Inputs\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 1 removed and 17 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/executor-health-and-fallback.md#unheaded-block-4 under docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#1-responsibility-and-inputs; source context \"Executor Fallback And Effect Eligibility / 1. Responsibility And Inputs\", target context \"Executor Fallback And Effect Eligibility\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+    "targetAnchor": "1-responsibility-and-inputs",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "f97c6b9e2271690437b10e8b0557b6c0afc97b598e3dcf1e527f30d8e4129ac0",
+    "targetAncestry": [
+      "Executor Fallback And Effect Eligibility"
+    ]
+  }
+}
+```
+
+## Entry rationale-040
+
+```json
+{
+  "entryId": "rationale-040",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_d8053a7159526a29d5e92f20793b07d5",
+  "before": {
+    "claimId": "claim_d8053a7159526a29d5e92f20793b07d5",
+    "sourceUnitDigest": "d53bfd97c7c9bb4662d383886334ce53d28e853d76e8d7c50d0913a2ed431269",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/executor-health-and-fallback.md:88-93#unheaded-block-12 (current lines); unit SHA256 d53bfd97c7c9bb4662d383886334ce53d28e853d76e8d7c50d0913a2ed431269.\nTarget: docs/platform/agent-coordination/architecture/executor-health-and-fallback.md:96-96#3-coarse-matrix-mapping (current lines); unit SHA256 4f10d6082daebad81a53b4f06c9d44fa3187f4d894791d39783017ff77e5fcbf.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 4f10d6082daebad81a53b4f06c9d44fa3187f4d894791d39783017ff77e5fcbf at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 12\" → \"3. Coarse Matrix Mapping\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/executor-health-and-fallback.md#unheaded-block-12 under docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#3-coarse-matrix-mapping; source context \"Executor Fallback And Effect Eligibility / 3. Coarse Matrix Mapping\", target context \"Executor Fallback And Effect Eligibility\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+    "targetAnchor": "3-coarse-matrix-mapping",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "deep: read full source block ('verify-miss', 'verify-timeout', 'worktree-fail', 'reje...) against target section '3. Coarse Matrix Mapping' (h2); 3 of 6 source lines appear verbatim in the target section, the rest is rewritten current wording, so supersede with a named successor is truthful and no carried claim is made; Heading depth and Links lines (0/0) verified; digests differ as stated and both recomputed; anchor checked; last-reviewed digest present at 947f6169e.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-04-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "4f10d6082daebad81a53b4f06c9d44fa3187f4d894791d39783017ff77e5fcbf",
+    "targetAncestry": [
+      "Executor Fallback And Effect Eligibility"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_d8053a7159526a29d5e92f20793b07d5",
+    "sourceUnitDigest": "d53bfd97c7c9bb4662d383886334ce53d28e853d76e8d7c50d0913a2ed431269",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/executor-health-and-fallback.md:88-93#unheaded-block-12 (current lines); unit SHA256 d53bfd97c7c9bb4662d383886334ce53d28e853d76e8d7c50d0913a2ed431269.\nTarget: docs/platform/agent-coordination/architecture/executor-health-and-fallback.md:96-96#3-coarse-matrix-mapping (current lines); unit SHA256 4f10d6082daebad81a53b4f06c9d44fa3187f4d894791d39783017ff77e5fcbf.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 4f10d6082daebad81a53b4f06c9d44fa3187f4d894791d39783017ff77e5fcbf at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 12\" → \"3. Coarse Matrix Mapping\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 3 removed and 19 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/executor-health-and-fallback.md#unheaded-block-12 under docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#3-coarse-matrix-mapping; source context \"Executor Fallback And Effect Eligibility / 3. Coarse Matrix Mapping\", target context \"Executor Fallback And Effect Eligibility\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+    "targetAnchor": "3-coarse-matrix-mapping",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "4f10d6082daebad81a53b4f06c9d44fa3187f4d894791d39783017ff77e5fcbf",
+    "targetAncestry": [
+      "Executor Fallback And Effect Eligibility"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 39,
+  "factsSHA256": "811a7a1e04d7f967960b005bae5ea5f23735b2f249838f7a741ec0d423da6583",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-12",
+    "githubAnchor": "unheaded-block-12",
+    "stableAnchor": "unheaded-block-12",
+    "title": "Unheaded block 12",
+    "startLine": 88,
+    "endLine": 93,
+    "textDigest": "d53bfd97c7c9bb4662d383886334ce53d28e853d76e8d7c50d0913a2ed431269",
+    "sample": "`verify-miss`, `verify-timeout`, `worktree-fail`, `reject-returned`,\n`stale-doing` and `state-conflict` keep their Work-runner meaning. Do not route\nthem into executor fallback sim",
+    "identityFingerprint": "77957a854a2dd32e9d359e0e307d20de727a829d799b48d26fa8013f6dc4eeff",
+    "ancestry": [
+      "Executor Fallback And Effect Eligibility",
+      "3. Coarse Matrix Mapping"
+    ],
+    "path": "docs/architect/agent-coordination/architecture/executor-health-and-fallback.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "3. Coarse Matrix Mapping",
+    "anchor": "3-coarse-matrix-mapping",
+    "githubAnchor": "3-coarse-matrix-mapping",
+    "stableAnchor": "h-d1e1cd5264d2",
+    "startLine": 96,
+    "endLine": 96,
+    "textDigest": "4f10d6082daebad81a53b4f06c9d44fa3187f4d894791d39783017ff77e5fcbf",
+    "sample": "3. Coarse Matrix Mapping",
+    "sectionPayloadDigest": "c89de300772b5d31491f0b4a28785d380c2d6a52a66362f7450430f2af9ecfee",
+    "followingBlockDigest": "dea58dbee7081504a7127e15c1ba947913bf7bf2950b32169e2e29e5ab804749",
+    "identityFingerprint": "51c7dc9c934aa9a60de9a6e2e5d0399633a3eb44fd76ce09320b12fffc505214",
+    "ancestry": [
+      "Executor Fallback And Effect Eligibility"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_d8053a7159526a29d5e92f20793b07d5",
+    "sourceUnitDigest": "d53bfd97c7c9bb4662d383886334ce53d28e853d76e8d7c50d0913a2ed431269",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/executor-health-and-fallback.md:88-93#unheaded-block-12 (current lines); unit SHA256 d53bfd97c7c9bb4662d383886334ce53d28e853d76e8d7c50d0913a2ed431269.\nTarget: docs/platform/agent-coordination/architecture/executor-health-and-fallback.md:96-96#3-coarse-matrix-mapping (current lines); unit SHA256 4f10d6082daebad81a53b4f06c9d44fa3187f4d894791d39783017ff77e5fcbf.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 4f10d6082daebad81a53b4f06c9d44fa3187f4d894791d39783017ff77e5fcbf at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 12\" → \"3. Coarse Matrix Mapping\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 3 removed and 19 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/executor-health-and-fallback.md#unheaded-block-12 under docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#3-coarse-matrix-mapping; source context \"Executor Fallback And Effect Eligibility / 3. Coarse Matrix Mapping\", target context \"Executor Fallback And Effect Eligibility\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+    "targetAnchor": "3-coarse-matrix-mapping",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "4f10d6082daebad81a53b4f06c9d44fa3187f4d894791d39783017ff77e5fcbf",
+    "targetAncestry": [
+      "Executor Fallback And Effect Eligibility"
+    ]
+  }
+}
+```
+
+## Entry rationale-041
+
+```json
+{
+  "entryId": "rationale-041",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_e373744fe1410b7c47de06bd6a90b6be",
+  "before": {
+    "claimId": "claim_e373744fe1410b7c47de06bd6a90b6be",
+    "sourceUnitDigest": "4f5b345592d0f6896a7498c30cf5ad5c2646819c56a4c14073fea0f4e649b9a6",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/executor-health-and-fallback.md:97-100#unheaded-block-13 (current lines); unit SHA256 4f5b345592d0f6896a7498c30cf5ad5c2646819c56a4c14073fea0f4e649b9a6.\nTarget: docs/platform/agent-coordination/architecture/executor-health-and-fallback.md:122-122#4-one-attempt-history-explicit-caps (current lines); unit SHA256 2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 13\" → \"4. One Attempt History, Explicit Caps\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/executor-health-and-fallback.md#unheaded-block-13 under docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#4-one-attempt-history-explicit-caps; source context \"Executor Fallback And Effect Eligibility / 4. One Attempt History, Explicit Caps\", target context \"Executor Fallback And Effect Eligibility\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+    "targetAnchor": "4-one-attempt-history-explicit-caps",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "deep: read full source block (Canonical count A = number of committed admissions for ...) against target section '4. One Attempt History, Explicit Caps' (h2); 0 of 4 source lines appear verbatim in the target section, the rest is rewritten current wording, so supersede with a named successor is truthful and no carried claim is made; Heading depth and Links lines (0/0) verified; digests differ as stated and both recomputed; anchor checked; last-reviewed digest present at 947f6169e.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-04-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc",
+    "targetAncestry": [
+      "Executor Fallback And Effect Eligibility"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_e373744fe1410b7c47de06bd6a90b6be",
+    "sourceUnitDigest": "4f5b345592d0f6896a7498c30cf5ad5c2646819c56a4c14073fea0f4e649b9a6",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/executor-health-and-fallback.md:97-100#unheaded-block-13 (current lines); unit SHA256 4f5b345592d0f6896a7498c30cf5ad5c2646819c56a4c14073fea0f4e649b9a6.\nTarget: docs/platform/agent-coordination/architecture/executor-health-and-fallback.md:122-122#4-one-attempt-history-explicit-caps (current lines); unit SHA256 2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 13\" → \"4. One Attempt History, Explicit Caps\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 4 removed and 21 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/executor-health-and-fallback.md#unheaded-block-13 under docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#4-one-attempt-history-explicit-caps; source context \"Executor Fallback And Effect Eligibility / 4. One Attempt History, Explicit Caps\", target context \"Executor Fallback And Effect Eligibility\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+    "targetAnchor": "4-one-attempt-history-explicit-caps",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc",
+    "targetAncestry": [
+      "Executor Fallback And Effect Eligibility"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 40,
+  "factsSHA256": "482bd90cf61032b96d515d1772229ebaaad3d7402037bfb45addd56bdc0ac63f",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-13",
+    "githubAnchor": "unheaded-block-13",
+    "stableAnchor": "unheaded-block-13",
+    "title": "Unheaded block 13",
+    "startLine": 97,
+    "endLine": 100,
+    "textDigest": "4f5b345592d0f6896a7498c30cf5ad5c2646819c56a4c14073fea0f4e649b9a6",
+    "sample": "Canonical count A = number of committed admissions for the Assignment, including\nadmitted attempts that failed before launch. It never resets on restart, changed\nexecutor, changed ",
+    "identityFingerprint": "fdd2816662616cdc7466c7a7eb3afd6e875109b1cdc215d50d8b263f82e02f26",
+    "ancestry": [
+      "Executor Fallback And Effect Eligibility",
+      "4. One Attempt History, Explicit Caps"
+    ],
+    "path": "docs/architect/agent-coordination/architecture/executor-health-and-fallback.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "4. One Attempt History, Explicit Caps",
+    "anchor": "4-one-attempt-history-explicit-caps",
+    "githubAnchor": "4-one-attempt-history-explicit-caps",
+    "stableAnchor": "h-e3503ea9d18d",
+    "startLine": 122,
+    "endLine": 122,
+    "textDigest": "2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc",
+    "sample": "4. One Attempt History, Explicit Caps",
+    "sectionPayloadDigest": "5fa1c1d9adccec52ab0a3a3702c6e154d659dfdc28bb454fef6941343d75cc6a",
+    "followingBlockDigest": "45eb2c3f056d30141e5d53b6c349a7b8d46092bfc87346e0b2dd841f8b2081b9",
+    "identityFingerprint": "2bad5e7463a8fc523189960274b0f1a5642d9863208b554c666c4b4c02e4eb24",
+    "ancestry": [
+      "Executor Fallback And Effect Eligibility"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_e373744fe1410b7c47de06bd6a90b6be",
+    "sourceUnitDigest": "4f5b345592d0f6896a7498c30cf5ad5c2646819c56a4c14073fea0f4e649b9a6",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/executor-health-and-fallback.md:97-100#unheaded-block-13 (current lines); unit SHA256 4f5b345592d0f6896a7498c30cf5ad5c2646819c56a4c14073fea0f4e649b9a6.\nTarget: docs/platform/agent-coordination/architecture/executor-health-and-fallback.md:122-122#4-one-attempt-history-explicit-caps (current lines); unit SHA256 2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 13\" → \"4. One Attempt History, Explicit Caps\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 4 removed and 21 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/executor-health-and-fallback.md#unheaded-block-13 under docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#4-one-attempt-history-explicit-caps; source context \"Executor Fallback And Effect Eligibility / 4. One Attempt History, Explicit Caps\", target context \"Executor Fallback And Effect Eligibility\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+    "targetAnchor": "4-one-attempt-history-explicit-caps",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc",
+    "targetAncestry": [
+      "Executor Fallback And Effect Eligibility"
+    ]
+  }
+}
+```
+
+## Entry rationale-042
+
+```json
+{
+  "entryId": "rationale-042",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_f5bffd709d33a00b0aa159f55fbb1a8b",
+  "before": {
+    "claimId": "claim_f5bffd709d33a00b0aa159f55fbb1a8b",
+    "sourceUnitDigest": "c06867e1d5ad0eafdb6e2cc1dbbf368b1d229e4604c31ea33eb287de111198a3",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/executor-health-and-fallback.md:102-105#unheaded-block-14 (current lines); unit SHA256 c06867e1d5ad0eafdb6e2cc1dbbf368b1d229e4604c31ea33eb287de111198a3.\nTarget: docs/platform/agent-coordination/architecture/executor-health-and-fallback.md:122-122#4-one-attempt-history-explicit-caps (current lines); unit SHA256 2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 14\" → \"4. One Attempt History, Explicit Caps\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/executor-health-and-fallback.md#unheaded-block-14 under docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#4-one-attempt-history-explicit-caps; source context \"Executor Fallback And Effect Eligibility / 4. One Attempt History, Explicit Caps\", target context \"Executor Fallback And Effect Eligibility\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+    "targetAnchor": "4-one-attempt-history-explicit-caps",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "deep: read full source block (For executor e, E(e) counts those same admissions selec...) against target section '4. One Attempt History, Explicit Caps' (h2); 0 of 4 source lines appear verbatim in the target section, the rest is rewritten current wording, so supersede with a named successor is truthful and no carried claim is made; Heading depth and Links lines (0/0) verified; digests differ as stated and both recomputed; anchor checked; last-reviewed digest present at 947f6169e.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-04-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc",
+    "targetAncestry": [
+      "Executor Fallback And Effect Eligibility"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_f5bffd709d33a00b0aa159f55fbb1a8b",
+    "sourceUnitDigest": "c06867e1d5ad0eafdb6e2cc1dbbf368b1d229e4604c31ea33eb287de111198a3",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/executor-health-and-fallback.md:102-105#unheaded-block-14 (current lines); unit SHA256 c06867e1d5ad0eafdb6e2cc1dbbf368b1d229e4604c31ea33eb287de111198a3.\nTarget: docs/platform/agent-coordination/architecture/executor-health-and-fallback.md:122-122#4-one-attempt-history-explicit-caps (current lines); unit SHA256 2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 14\" → \"4. One Attempt History, Explicit Caps\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 4 removed and 21 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/executor-health-and-fallback.md#unheaded-block-14 under docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#4-one-attempt-history-explicit-caps; source context \"Executor Fallback And Effect Eligibility / 4. One Attempt History, Explicit Caps\", target context \"Executor Fallback And Effect Eligibility\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+    "targetAnchor": "4-one-attempt-history-explicit-caps",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc",
+    "targetAncestry": [
+      "Executor Fallback And Effect Eligibility"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 41,
+  "factsSHA256": "e54ddfd0fc844cd920f289b088901e36e5032b78d24e599a16521bdc484d06fc",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-14",
+    "githubAnchor": "unheaded-block-14",
+    "stableAnchor": "unheaded-block-14",
+    "title": "Unheaded block 14",
+    "startLine": 102,
+    "endLine": 105,
+    "textDigest": "c06867e1d5ad0eafdb6e2cc1dbbf368b1d229e4604c31ea33eb287de111198a3",
+    "sample": "For executor e, E(e) counts those same admissions selecting e.\nRetry count R = max(0, A - 1). Session retry declarations may reserve the next\nattempt before it is admitted; a pendi",
+    "identityFingerprint": "881699beb796761e0b096ff07f11522995ab433cc450877262f1ec7ee1871bc0",
+    "ancestry": [
+      "Executor Fallback And Effect Eligibility",
+      "4. One Attempt History, Explicit Caps"
+    ],
+    "path": "docs/architect/agent-coordination/architecture/executor-health-and-fallback.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "4. One Attempt History, Explicit Caps",
+    "anchor": "4-one-attempt-history-explicit-caps",
+    "githubAnchor": "4-one-attempt-history-explicit-caps",
+    "stableAnchor": "h-e3503ea9d18d",
+    "startLine": 122,
+    "endLine": 122,
+    "textDigest": "2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc",
+    "sample": "4. One Attempt History, Explicit Caps",
+    "sectionPayloadDigest": "5fa1c1d9adccec52ab0a3a3702c6e154d659dfdc28bb454fef6941343d75cc6a",
+    "followingBlockDigest": "45eb2c3f056d30141e5d53b6c349a7b8d46092bfc87346e0b2dd841f8b2081b9",
+    "identityFingerprint": "2bad5e7463a8fc523189960274b0f1a5642d9863208b554c666c4b4c02e4eb24",
+    "ancestry": [
+      "Executor Fallback And Effect Eligibility"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_f5bffd709d33a00b0aa159f55fbb1a8b",
+    "sourceUnitDigest": "c06867e1d5ad0eafdb6e2cc1dbbf368b1d229e4604c31ea33eb287de111198a3",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/executor-health-and-fallback.md:102-105#unheaded-block-14 (current lines); unit SHA256 c06867e1d5ad0eafdb6e2cc1dbbf368b1d229e4604c31ea33eb287de111198a3.\nTarget: docs/platform/agent-coordination/architecture/executor-health-and-fallback.md:122-122#4-one-attempt-history-explicit-caps (current lines); unit SHA256 2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 14\" → \"4. One Attempt History, Explicit Caps\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 4 removed and 21 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/executor-health-and-fallback.md#unheaded-block-14 under docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#4-one-attempt-history-explicit-caps; source context \"Executor Fallback And Effect Eligibility / 4. One Attempt History, Explicit Caps\", target context \"Executor Fallback And Effect Eligibility\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+    "targetAnchor": "4-one-attempt-history-explicit-caps",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc",
+    "targetAncestry": [
+      "Executor Fallback And Effect Eligibility"
+    ]
+  }
+}
+```
+
+## Entry rationale-043
+
+```json
+{
+  "entryId": "rationale-043",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_07dad543c4bb6b7ce874e8466f2a09c6",
+  "before": {
+    "claimId": "claim_07dad543c4bb6b7ce874e8466f2a09c6",
+    "sourceUnitDigest": "ceebada3611071e2438d0b4edb36ff1b583f1ab012e449e5891243d8a9fd682b",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/executor-health-and-fallback.md:107-115#unheaded-block-15 (current lines); unit SHA256 ceebada3611071e2438d0b4edb36ff1b583f1ab012e449e5891243d8a9fd682b.\nTarget: docs/platform/agent-coordination/architecture/executor-health-and-fallback.md:122-122#4-one-attempt-history-explicit-caps (current lines); unit SHA256 2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 15\" → \"4. One Attempt History, Explicit Caps\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/executor-health-and-fallback.md#unheaded-block-15 under docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#4-one-attempt-history-explicit-caps; source context \"Executor Fallback And Effect Eligibility / 4. One Attempt History, Explicit Caps\", target context \"Executor Fallback And Effect Eligibility\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+    "targetAnchor": "4-one-attempt-history-explicit-caps",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "deep: read full source block (Default policy is a derived view of effective DispatchR...) against target section '4. One Attempt History, Explicit Caps' (h2); 0 of 9 source lines appear verbatim in the target section, the rest is rewritten current wording, so supersede with a named successor is truthful and no carried claim is made; Heading depth and Links lines (0/0) verified; digests differ as stated and both recomputed; anchor checked; last-reviewed digest present at 947f6169e.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-04-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc",
+    "targetAncestry": [
+      "Executor Fallback And Effect Eligibility"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_07dad543c4bb6b7ce874e8466f2a09c6",
+    "sourceUnitDigest": "ceebada3611071e2438d0b4edb36ff1b583f1ab012e449e5891243d8a9fd682b",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/executor-health-and-fallback.md:107-115#unheaded-block-15 (current lines); unit SHA256 ceebada3611071e2438d0b4edb36ff1b583f1ab012e449e5891243d8a9fd682b.\nTarget: docs/platform/agent-coordination/architecture/executor-health-and-fallback.md:122-122#4-one-attempt-history-explicit-caps (current lines); unit SHA256 2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 15\" → \"4. One Attempt History, Explicit Caps\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 9 removed and 21 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/executor-health-and-fallback.md#unheaded-block-15 under docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#4-one-attempt-history-explicit-caps; source context \"Executor Fallback And Effect Eligibility / 4. One Attempt History, Explicit Caps\", target context \"Executor Fallback And Effect Eligibility\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+    "targetAnchor": "4-one-attempt-history-explicit-caps",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc",
+    "targetAncestry": [
+      "Executor Fallback And Effect Eligibility"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 42,
+  "factsSHA256": "6223da219f7c66eb0d5656282315eb5b104cbf9852d46914a1b3ed7cb6fcad70",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-15",
+    "githubAnchor": "unheaded-block-15",
+    "stableAnchor": "unheaded-block-15",
+    "title": "Unheaded block 15",
+    "startLine": 107,
+    "endLine": 115,
+    "textDigest": "ceebada3611071e2438d0b4edb36ff1b583f1ab012e449e5891243d8a9fd682b",
+    "sample": "Default policy is a derived view of effective DispatchRequest/PolicyPatch:\n- candidates = unique `[selected primary, ...fallbackExecutors]`, preserving order;\n- maxAttemptsPerExecu",
+    "identityFingerprint": "eb23304622fdaf2a8dea3dac49f21b11192d6f39f09fb3f0ddc0d533caf0cbe9",
+    "ancestry": [
+      "Executor Fallback And Effect Eligibility",
+      "4. One Attempt History, Explicit Caps"
+    ],
+    "path": "docs/architect/agent-coordination/architecture/executor-health-and-fallback.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "4. One Attempt History, Explicit Caps",
+    "anchor": "4-one-attempt-history-explicit-caps",
+    "githubAnchor": "4-one-attempt-history-explicit-caps",
+    "stableAnchor": "h-e3503ea9d18d",
+    "startLine": 122,
+    "endLine": 122,
+    "textDigest": "2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc",
+    "sample": "4. One Attempt History, Explicit Caps",
+    "sectionPayloadDigest": "5fa1c1d9adccec52ab0a3a3702c6e154d659dfdc28bb454fef6941343d75cc6a",
+    "followingBlockDigest": "45eb2c3f056d30141e5d53b6c349a7b8d46092bfc87346e0b2dd841f8b2081b9",
+    "identityFingerprint": "2bad5e7463a8fc523189960274b0f1a5642d9863208b554c666c4b4c02e4eb24",
+    "ancestry": [
+      "Executor Fallback And Effect Eligibility"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_07dad543c4bb6b7ce874e8466f2a09c6",
+    "sourceUnitDigest": "ceebada3611071e2438d0b4edb36ff1b583f1ab012e449e5891243d8a9fd682b",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/executor-health-and-fallback.md:107-115#unheaded-block-15 (current lines); unit SHA256 ceebada3611071e2438d0b4edb36ff1b583f1ab012e449e5891243d8a9fd682b.\nTarget: docs/platform/agent-coordination/architecture/executor-health-and-fallback.md:122-122#4-one-attempt-history-explicit-caps (current lines); unit SHA256 2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 15\" → \"4. One Attempt History, Explicit Caps\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 9 removed and 21 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/executor-health-and-fallback.md#unheaded-block-15 under docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#4-one-attempt-history-explicit-caps; source context \"Executor Fallback And Effect Eligibility / 4. One Attempt History, Explicit Caps\", target context \"Executor Fallback And Effect Eligibility\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+    "targetAnchor": "4-one-attempt-history-explicit-caps",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc",
+    "targetAncestry": [
+      "Executor Fallback And Effect Eligibility"
+    ]
+  }
+}
+```
+
+## Entry rationale-044
+
+```json
+{
+  "entryId": "rationale-044",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_6d43b086d10f2df86b53ddcec381df1a",
+  "before": {
+    "claimId": "claim_6d43b086d10f2df86b53ddcec381df1a",
+    "sourceUnitDigest": "8351d265484b0dd81108f0aa35df62589eb3292ab052cf6dffe7fa9a2d14214c",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/executor-health-and-fallback.md:117-123#unheaded-block-16 (current lines); unit SHA256 8351d265484b0dd81108f0aa35df62589eb3292ab052cf6dffe7fa9a2d14214c.\nTarget: docs/platform/agent-coordination/architecture/executor-health-and-fallback.md:122-122#4-one-attempt-history-explicit-caps (current lines); unit SHA256 2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 16\" → \"4. One Attempt History, Explicit Caps\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/executor-health-and-fallback.md#unheaded-block-16 under docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#4-one-attempt-history-explicit-caps; source context \"Executor Fallback And Effect Eligibility / 4. One Attempt History, Explicit Caps\", target context \"Executor Fallback And Effect Eligibility\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+    "targetAnchor": "4-one-attempt-history-explicit-caps",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "deep: read full source block (A candidate can be admitted only if A < maxAttemptsPerA...) against target section '4. One Attempt History, Explicit Caps' (h2); 0 of 7 source lines appear verbatim in the target section, the rest is rewritten current wording, so supersede with a named successor is truthful and no carried claim is made; Heading depth and Links lines (0/0) verified; digests differ as stated and both recomputed; anchor checked; last-reviewed digest present at 947f6169e.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-04-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc",
+    "targetAncestry": [
+      "Executor Fallback And Effect Eligibility"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_6d43b086d10f2df86b53ddcec381df1a",
+    "sourceUnitDigest": "8351d265484b0dd81108f0aa35df62589eb3292ab052cf6dffe7fa9a2d14214c",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/executor-health-and-fallback.md:117-123#unheaded-block-16 (current lines); unit SHA256 8351d265484b0dd81108f0aa35df62589eb3292ab052cf6dffe7fa9a2d14214c.\nTarget: docs/platform/agent-coordination/architecture/executor-health-and-fallback.md:122-122#4-one-attempt-history-explicit-caps (current lines); unit SHA256 2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 16\" → \"4. One Attempt History, Explicit Caps\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 7 removed and 21 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/executor-health-and-fallback.md#unheaded-block-16 under docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#4-one-attempt-history-explicit-caps; source context \"Executor Fallback And Effect Eligibility / 4. One Attempt History, Explicit Caps\", target context \"Executor Fallback And Effect Eligibility\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+    "targetAnchor": "4-one-attempt-history-explicit-caps",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc",
+    "targetAncestry": [
+      "Executor Fallback And Effect Eligibility"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 43,
+  "factsSHA256": "faee9a5f6b3d1e5022e0c463b2d28a153abd894890a3fab42747b363942210bb",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-16",
+    "githubAnchor": "unheaded-block-16",
+    "stableAnchor": "unheaded-block-16",
+    "title": "Unheaded block 16",
+    "startLine": 117,
+    "endLine": 123,
+    "textDigest": "8351d265484b0dd81108f0aa35df62589eb3292ab052cf6dffe7fa9a2d14214c",
+    "sample": "A candidate can be admitted only if A < maxAttemptsPerAssignment and\nE(candidate) < maxAttemptsPerExecutor. With maxAttempts=2, initial Run 1 fails,\nRun 2 may use the next candidat",
+    "identityFingerprint": "4e4b72cfcf763bcae3f74e291a1fff8c23d920fd29bff98f8dd7601518a1c804",
+    "ancestry": [
+      "Executor Fallback And Effect Eligibility",
+      "4. One Attempt History, Explicit Caps"
+    ],
+    "path": "docs/architect/agent-coordination/architecture/executor-health-and-fallback.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "4. One Attempt History, Explicit Caps",
+    "anchor": "4-one-attempt-history-explicit-caps",
+    "githubAnchor": "4-one-attempt-history-explicit-caps",
+    "stableAnchor": "h-e3503ea9d18d",
+    "startLine": 122,
+    "endLine": 122,
+    "textDigest": "2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc",
+    "sample": "4. One Attempt History, Explicit Caps",
+    "sectionPayloadDigest": "5fa1c1d9adccec52ab0a3a3702c6e154d659dfdc28bb454fef6941343d75cc6a",
+    "followingBlockDigest": "45eb2c3f056d30141e5d53b6c349a7b8d46092bfc87346e0b2dd841f8b2081b9",
+    "identityFingerprint": "2bad5e7463a8fc523189960274b0f1a5642d9863208b554c666c4b4c02e4eb24",
+    "ancestry": [
+      "Executor Fallback And Effect Eligibility"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_6d43b086d10f2df86b53ddcec381df1a",
+    "sourceUnitDigest": "8351d265484b0dd81108f0aa35df62589eb3292ab052cf6dffe7fa9a2d14214c",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/executor-health-and-fallback.md:117-123#unheaded-block-16 (current lines); unit SHA256 8351d265484b0dd81108f0aa35df62589eb3292ab052cf6dffe7fa9a2d14214c.\nTarget: docs/platform/agent-coordination/architecture/executor-health-and-fallback.md:122-122#4-one-attempt-history-explicit-caps (current lines); unit SHA256 2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 16\" → \"4. One Attempt History, Explicit Caps\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 7 removed and 21 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/executor-health-and-fallback.md#unheaded-block-16 under docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#4-one-attempt-history-explicit-caps; source context \"Executor Fallback And Effect Eligibility / 4. One Attempt History, Explicit Caps\", target context \"Executor Fallback And Effect Eligibility\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+    "targetAnchor": "4-one-attempt-history-explicit-caps",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc",
+    "targetAncestry": [
+      "Executor Fallback And Effect Eligibility"
+    ]
+  }
+}
+```
+
+## Entry rationale-045
+
+```json
+{
+  "entryId": "rationale-045",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_dfe4002bbb3b81c40896dc2d7647c0bc",
+  "before": {
+    "claimId": "claim_dfe4002bbb3b81c40896dc2d7647c0bc",
+    "sourceUnitDigest": "2591a85c59e7bd2ddc86f8251405aba66e1fc9dcb6f5bd99f8666180c20a82a1",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/executor-health-and-fallback.md:125-130#unheaded-block-17 (current lines); unit SHA256 2591a85c59e7bd2ddc86f8251405aba66e1fc9dcb6f5bd99f8666180c20a82a1.\nTarget: docs/platform/agent-coordination/architecture/executor-health-and-fallback.md:122-122#4-one-attempt-history-explicit-caps (current lines); unit SHA256 2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 17\" → \"4. One Attempt History, Explicit Caps\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/executor-health-and-fallback.md#unheaded-block-17 under docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#4-one-attempt-history-explicit-caps; source context \"Executor Fallback And Effect Eligibility / 4. One Attempt History, Explicit Caps\", target context \"Executor Fallback And Effect Eligibility\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+    "targetAnchor": "4-one-attempt-history-explicit-caps",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "deep: read full source block (The runtime projection consumes the SAME recovery table...) against target section '4. One Attempt History, Explicit Caps' (h2); 0 of 6 source lines appear verbatim in the target section, the rest is rewritten current wording, so supersede with a named successor is truthful and no carried claim is made; Heading depth and Links lines (0/0) verified; digests differ as stated and both recomputed; anchor checked; last-reviewed digest present at 947f6169e.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-04-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc",
+    "targetAncestry": [
+      "Executor Fallback And Effect Eligibility"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_dfe4002bbb3b81c40896dc2d7647c0bc",
+    "sourceUnitDigest": "2591a85c59e7bd2ddc86f8251405aba66e1fc9dcb6f5bd99f8666180c20a82a1",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/executor-health-and-fallback.md:125-130#unheaded-block-17 (current lines); unit SHA256 2591a85c59e7bd2ddc86f8251405aba66e1fc9dcb6f5bd99f8666180c20a82a1.\nTarget: docs/platform/agent-coordination/architecture/executor-health-and-fallback.md:122-122#4-one-attempt-history-explicit-caps (current lines); unit SHA256 2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 17\" → \"4. One Attempt History, Explicit Caps\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 6 removed and 21 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/executor-health-and-fallback.md#unheaded-block-17 under docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#4-one-attempt-history-explicit-caps; source context \"Executor Fallback And Effect Eligibility / 4. One Attempt History, Explicit Caps\", target context \"Executor Fallback And Effect Eligibility\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+    "targetAnchor": "4-one-attempt-history-explicit-caps",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc",
+    "targetAncestry": [
+      "Executor Fallback And Effect Eligibility"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 44,
+  "factsSHA256": "9832ba1c8392ee2117f75477bd6affb35e5902b3ce2327d0472253a0e1e9723e",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-17",
+    "githubAnchor": "unheaded-block-17",
+    "stableAnchor": "unheaded-block-17",
+    "title": "Unheaded block 17",
+    "startLine": 125,
+    "endLine": 130,
+    "textDigest": "2591a85c59e7bd2ddc86f8251405aba66e1fc9dcb6f5bd99f8666180c20a82a1",
+    "sample": "The runtime projection consumes the SAME recovery table's action/default limit,\nusing Assignment admission history as its counter input; it does not reset on\nclass changes. Existin",
+    "identityFingerprint": "508b4ab37539538991da7ce001f5b7c4bfeeaa3bd721c3d48411f995cc438387",
+    "ancestry": [
+      "Executor Fallback And Effect Eligibility",
+      "4. One Attempt History, Explicit Caps"
+    ],
+    "path": "docs/architect/agent-coordination/architecture/executor-health-and-fallback.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "4. One Attempt History, Explicit Caps",
+    "anchor": "4-one-attempt-history-explicit-caps",
+    "githubAnchor": "4-one-attempt-history-explicit-caps",
+    "stableAnchor": "h-e3503ea9d18d",
+    "startLine": 122,
+    "endLine": 122,
+    "textDigest": "2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc",
+    "sample": "4. One Attempt History, Explicit Caps",
+    "sectionPayloadDigest": "5fa1c1d9adccec52ab0a3a3702c6e154d659dfdc28bb454fef6941343d75cc6a",
+    "followingBlockDigest": "45eb2c3f056d30141e5d53b6c349a7b8d46092bfc87346e0b2dd841f8b2081b9",
+    "identityFingerprint": "2bad5e7463a8fc523189960274b0f1a5642d9863208b554c666c4b4c02e4eb24",
+    "ancestry": [
+      "Executor Fallback And Effect Eligibility"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_dfe4002bbb3b81c40896dc2d7647c0bc",
+    "sourceUnitDigest": "2591a85c59e7bd2ddc86f8251405aba66e1fc9dcb6f5bd99f8666180c20a82a1",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/executor-health-and-fallback.md:125-130#unheaded-block-17 (current lines); unit SHA256 2591a85c59e7bd2ddc86f8251405aba66e1fc9dcb6f5bd99f8666180c20a82a1.\nTarget: docs/platform/agent-coordination/architecture/executor-health-and-fallback.md:122-122#4-one-attempt-history-explicit-caps (current lines); unit SHA256 2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 17\" → \"4. One Attempt History, Explicit Caps\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 6 removed and 21 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/executor-health-and-fallback.md#unheaded-block-17 under docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#4-one-attempt-history-explicit-caps; source context \"Executor Fallback And Effect Eligibility / 4. One Attempt History, Explicit Caps\", target context \"Executor Fallback And Effect Eligibility\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+    "targetAnchor": "4-one-attempt-history-explicit-caps",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "2f23cfb828da8d49550ee62f606921a1b0c87b974326553ee6c7afb59dff9fbc",
+    "targetAncestry": [
+      "Executor Fallback And Effect Eligibility"
+    ]
+  }
+}
+```
+
+## Entry rationale-046
+
+```json
+{
+  "entryId": "rationale-046",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_c89663c837918676821535861c41b485",
+  "before": {
+    "claimId": "claim_c89663c837918676821535861c41b485",
+    "sourceUnitDigest": "971881e56230e867df9e3128911645fdea0daf5002ef793a8a77efd91a1df36c",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/executor-health-and-fallback.md:140-150#unheaded-block-19 (current lines); unit SHA256 971881e56230e867df9e3128911645fdea0daf5002ef793a8a77efd91a1df36c.\nTarget: docs/platform/agent-coordination/architecture/executor-health-and-fallback.md:148-148#5-effectguaranteeport (current lines); unit SHA256 b1d381bbc887443b7cf100e3487266740edf4f45898aec8b14065bfa410ef8b5.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest b1d381bbc887443b7cf100e3487266740edf4f45898aec8b14065bfa410ef8b5 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 19\" → \"5. EffectGuaranteePort\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/executor-health-and-fallback.md#unheaded-block-19 under docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#5-effectguaranteeport; source context \"Executor Fallback And Effect Eligibility / 5. EffectGuaranteePort\", target context \"Executor Fallback And Effect Eligibility\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+    "targetAnchor": "5-effectguaranteeport",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "deep: read full source block (The operation contract declares repeat mode explicitly:...) against target section '5. EffectGuaranteePort' (h2); 3 of 11 source lines appear verbatim in the target section, the rest is rewritten current wording, so supersede with a named successor is truthful and no carried claim is made; Heading depth and Links lines (0/0) verified; digests differ as stated and both recomputed; anchor checked; last-reviewed digest present at 947f6169e.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-04-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "b1d381bbc887443b7cf100e3487266740edf4f45898aec8b14065bfa410ef8b5",
+    "targetAncestry": [
+      "Executor Fallback And Effect Eligibility"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_c89663c837918676821535861c41b485",
+    "sourceUnitDigest": "971881e56230e867df9e3128911645fdea0daf5002ef793a8a77efd91a1df36c",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/executor-health-and-fallback.md:140-150#unheaded-block-19 (current lines); unit SHA256 971881e56230e867df9e3128911645fdea0daf5002ef793a8a77efd91a1df36c.\nTarget: docs/platform/agent-coordination/architecture/executor-health-and-fallback.md:148-148#5-effectguaranteeport (current lines); unit SHA256 b1d381bbc887443b7cf100e3487266740edf4f45898aec8b14065bfa410ef8b5.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest b1d381bbc887443b7cf100e3487266740edf4f45898aec8b14065bfa410ef8b5 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 19\" → \"5. EffectGuaranteePort\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 8 removed and 33 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/executor-health-and-fallback.md#unheaded-block-19 under docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#5-effectguaranteeport; source context \"Executor Fallback And Effect Eligibility / 5. EffectGuaranteePort\", target context \"Executor Fallback And Effect Eligibility\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+    "targetAnchor": "5-effectguaranteeport",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "b1d381bbc887443b7cf100e3487266740edf4f45898aec8b14065bfa410ef8b5",
+    "targetAncestry": [
+      "Executor Fallback And Effect Eligibility"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 45,
+  "factsSHA256": "598a6a533bfe2b5b84e2336ca25a10ccc0ec1d00ea0c8c9a40e50eed56ba155b",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-19",
+    "githubAnchor": "unheaded-block-19",
+    "stableAnchor": "unheaded-block-19",
+    "title": "Unheaded block 19",
+    "startLine": 140,
+    "endLine": 150,
+    "textDigest": "971881e56230e867df9e3128911645fdea0daf5002ef793a8a77efd91a1df36c",
+    "sample": "The operation contract declares repeat mode explicitly: before-delivery-only,\nread-only, idempotent, dedup-keyed or never. The first protocol profile declares\n`repeatMode: read-onl",
+    "identityFingerprint": "9094f9a7da4c997ab7c4963dc2ffd5afbee5af61e468fd7442bc6ad5dafb8ba7",
+    "ancestry": [
+      "Executor Fallback And Effect Eligibility",
+      "5. EffectGuaranteePort"
+    ],
+    "path": "docs/architect/agent-coordination/architecture/executor-health-and-fallback.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "5. EffectGuaranteePort",
+    "anchor": "5-effectguaranteeport",
+    "githubAnchor": "5-effectguaranteeport",
+    "stableAnchor": "h-0c9633ac39a1",
+    "startLine": 148,
+    "endLine": 148,
+    "textDigest": "b1d381bbc887443b7cf100e3487266740edf4f45898aec8b14065bfa410ef8b5",
+    "sample": "5. EffectGuaranteePort",
+    "sectionPayloadDigest": "7b878e8d64fe78c5170d1e8be004a731b74ef7f4ed6affb4907c7a2ca9691f66",
+    "followingBlockDigest": "85ff8118e32844c2d7229b9b6762994b3003eadb8ccd8c042075546d12d6ccb6",
+    "identityFingerprint": "55d3601fda0b692b37169cb26734e83548f9b1bd7cb462414ce56d61c98840e9",
+    "ancestry": [
+      "Executor Fallback And Effect Eligibility"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_c89663c837918676821535861c41b485",
+    "sourceUnitDigest": "971881e56230e867df9e3128911645fdea0daf5002ef793a8a77efd91a1df36c",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/executor-health-and-fallback.md:140-150#unheaded-block-19 (current lines); unit SHA256 971881e56230e867df9e3128911645fdea0daf5002ef793a8a77efd91a1df36c.\nTarget: docs/platform/agent-coordination/architecture/executor-health-and-fallback.md:148-148#5-effectguaranteeport (current lines); unit SHA256 b1d381bbc887443b7cf100e3487266740edf4f45898aec8b14065bfa410ef8b5.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest b1d381bbc887443b7cf100e3487266740edf4f45898aec8b14065bfa410ef8b5 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 19\" → \"5. EffectGuaranteePort\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 8 removed and 33 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/executor-health-and-fallback.md#unheaded-block-19 under docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#5-effectguaranteeport; source context \"Executor Fallback And Effect Eligibility / 5. EffectGuaranteePort\", target context \"Executor Fallback And Effect Eligibility\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+    "targetAnchor": "5-effectguaranteeport",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "b1d381bbc887443b7cf100e3487266740edf4f45898aec8b14065bfa410ef8b5",
+    "targetAncestry": [
+      "Executor Fallback And Effect Eligibility"
+    ]
+  }
+}
+```
+
+## Entry rationale-047
+
+```json
+{
+  "entryId": "rationale-047",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_92b8f4c6b79700a469ef0a7194d216b2",
+  "before": {
+    "claimId": "claim_92b8f4c6b79700a469ef0a7194d216b2",
+    "sourceUnitDigest": "27030b44550e90c380e68d859f65041ca081f66b7b4f999cafc2e0969d8b5ca9",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md:145-147#unheaded-block-17 (current lines); unit SHA256 27030b44550e90c380e68d859f65041ca081f66b7b4f999cafc2e0969d8b5ca9.\nTarget: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:126-126#a-keep-only-fgos-group-thinking (current lines); unit SHA256 3c18ab212ee8c63a137e1ab4cf6e4b210b7dbd2c9470ddb340f6243744e1d53f.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 3c18ab212ee8c63a137e1ab4cf6e4b210b7dbd2c9470ddb340f6243744e1d53f at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 17\" → \"A. Keep only `fgos-group-thinking`\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-17 under docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#a-keep-only-fgos-group-thinking; source context \"Group Thinking Trigger Surface / Alternatives Considered / A. Keep only `fgos-group-thinking`\", target context \"Group Thinking Trigger Surface / Alternatives Considered\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+    "targetAnchor": "a-keep-only-fgos-group-thinking",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "deep: read full source block (Smallest file change, but preserves the central failure...) against target section 'A. Keep only 'fgos-group-thinking'' (h3); 0 of 3 source lines appear verbatim in the target section, the rest is rewritten current wording, so supersede with a named successor is truthful and no carried claim is made; Heading depth and Links lines (0/0) verified; digests differ as stated and both recomputed; anchor checked; last-reviewed digest present at 947f6169e.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-04-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "3c18ab212ee8c63a137e1ab4cf6e4b210b7dbd2c9470ddb340f6243744e1d53f",
+    "targetAncestry": [
+      "Group Thinking Trigger Surface",
+      "Alternatives Considered"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_92b8f4c6b79700a469ef0a7194d216b2",
+    "sourceUnitDigest": "27030b44550e90c380e68d859f65041ca081f66b7b4f999cafc2e0969d8b5ca9",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md:145-147#unheaded-block-17 (current lines); unit SHA256 27030b44550e90c380e68d859f65041ca081f66b7b4f999cafc2e0969d8b5ca9.\nTarget: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:126-126#a-keep-only-fgos-group-thinking (current lines); unit SHA256 3c18ab212ee8c63a137e1ab4cf6e4b210b7dbd2c9470ddb340f6243744e1d53f.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 3c18ab212ee8c63a137e1ab4cf6e4b210b7dbd2c9470ddb340f6243744e1d53f at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 17\" → \"A. Keep only `fgos-group-thinking`\".\nWhole direct section differs; depth block → 3; 0 distinct link changes; normalized line order differs; 3 removed and 4 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-17 under docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#a-keep-only-fgos-group-thinking; source context \"Group Thinking Trigger Surface / Alternatives Considered / A. Keep only `fgos-group-thinking`\", target context \"Group Thinking Trigger Surface / Alternatives Considered\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+    "targetAnchor": "a-keep-only-fgos-group-thinking",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "3c18ab212ee8c63a137e1ab4cf6e4b210b7dbd2c9470ddb340f6243744e1d53f",
+    "targetAncestry": [
+      "Group Thinking Trigger Surface",
+      "Alternatives Considered"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 46,
+  "factsSHA256": "9f5fe83d53ef628469b3c8adc03463a6b243faeadfbe036693288297712bb962",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-17",
+    "githubAnchor": "unheaded-block-17",
+    "stableAnchor": "unheaded-block-17",
+    "title": "Unheaded block 17",
+    "startLine": 145,
+    "endLine": 147,
+    "textDigest": "27030b44550e90c380e68d859f65041ca081f66b7b4f999cafc2e0969d8b5ca9",
+    "sample": "Smallest file change, but preserves the central failure: its pack gate correctly\nrequires an explicit id from its caller. Teaching protocol ids in examples would\nmake the person le",
+    "identityFingerprint": "6ab3adc57cd73df1c421be13e8535c07517e0cc3a9fb5ecd9e83db8bca5dff9c",
+    "ancestry": [
+      "Group Thinking Trigger Surface",
+      "Alternatives Considered",
+      "A. Keep only `fgos-group-thinking`"
+    ],
+    "path": "docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "A. Keep only `fgos-group-thinking`",
+    "anchor": "a-keep-only-fgos-group-thinking",
+    "githubAnchor": "a-keep-only-fgos-group-thinking",
+    "stableAnchor": "h-388b2e268ea3",
+    "startLine": 126,
+    "endLine": 126,
+    "textDigest": "3c18ab212ee8c63a137e1ab4cf6e4b210b7dbd2c9470ddb340f6243744e1d53f",
+    "sample": "A. Keep only `fgos-group-thinking`",
+    "sectionPayloadDigest": "f1f9a41424ce27fd89f0829116816b8e04ada607633273a4ac44acd239e51588",
+    "followingBlockDigest": "f1f9a41424ce27fd89f0829116816b8e04ada607633273a4ac44acd239e51588",
+    "identityFingerprint": "3472fe8364dd5588aa653d7dfcfe6d662fba94b5c131b38173a5d45846a2e3fc",
+    "ancestry": [
+      "Group Thinking Trigger Surface",
+      "Alternatives Considered"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_92b8f4c6b79700a469ef0a7194d216b2",
+    "sourceUnitDigest": "27030b44550e90c380e68d859f65041ca081f66b7b4f999cafc2e0969d8b5ca9",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md:145-147#unheaded-block-17 (current lines); unit SHA256 27030b44550e90c380e68d859f65041ca081f66b7b4f999cafc2e0969d8b5ca9.\nTarget: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:126-126#a-keep-only-fgos-group-thinking (current lines); unit SHA256 3c18ab212ee8c63a137e1ab4cf6e4b210b7dbd2c9470ddb340f6243744e1d53f.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 3c18ab212ee8c63a137e1ab4cf6e4b210b7dbd2c9470ddb340f6243744e1d53f at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 17\" → \"A. Keep only `fgos-group-thinking`\".\nWhole direct section differs; depth block → 3; 0 distinct link changes; normalized line order differs; 3 removed and 4 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-17 under docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#a-keep-only-fgos-group-thinking; source context \"Group Thinking Trigger Surface / Alternatives Considered / A. Keep only `fgos-group-thinking`\", target context \"Group Thinking Trigger Surface / Alternatives Considered\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+    "targetAnchor": "a-keep-only-fgos-group-thinking",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "3c18ab212ee8c63a137e1ab4cf6e4b210b7dbd2c9470ddb340f6243744e1d53f",
+    "targetAncestry": [
+      "Group Thinking Trigger Surface",
+      "Alternatives Considered"
+    ]
+  }
+}
+```
+
+## Entry rationale-048
+
+```json
+{
+  "entryId": "rationale-048",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_6ccb120b3660788aa96def3f9c9488f0",
+  "before": {
+    "claimId": "claim_6ccb120b3660788aa96def3f9c9488f0",
+    "sourceUnitDigest": "0e1f77c31747156af1b8f026abfb2b1f6d86862ee268fa77ca7f0b9c181f7072",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md:157-161#unheaded-block-19 (current lines); unit SHA256 0e1f77c31747156af1b8f026abfb2b1f6d86862ee268fa77ca7f0b9c181f7072.\nTarget: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:138-138#c-rename-or-deprecate-the-existing-skills (current lines); unit SHA256 4d282049017d6b3a1c8b0995d30cccb8a6895bbe607b2205ad5a094fbaf5d27c.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 4d282049017d6b3a1c8b0995d30cccb8a6895bbe607b2205ad5a094fbaf5d27c at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 19\" → \"C. Rename or deprecate the existing skills\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-19 under docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#c-rename-or-deprecate-the-existing-skills; source context \"Group Thinking Trigger Surface / Alternatives Considered / C. Rename or deprecate the existing skills\", target context \"Group Thinking Trigger Surface / Alternatives Considered\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+    "targetAnchor": "c-rename-or-deprecate-the-existing-skills",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "deep: read full source block (Rejected for now. 'fgos-group-thinking' is an accurate ...) against target section 'C. Rename or deprecate the existing skills' (h3); 0 of 5 source lines appear verbatim in the target section, the rest is rewritten current wording, so supersede with a named successor is truthful and no carried claim is made; Heading depth and Links lines (0/0) verified; digests differ as stated and both recomputed; anchor checked; last-reviewed digest present at 947f6169e.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-04-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "4d282049017d6b3a1c8b0995d30cccb8a6895bbe607b2205ad5a094fbaf5d27c",
+    "targetAncestry": [
+      "Group Thinking Trigger Surface",
+      "Alternatives Considered"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_6ccb120b3660788aa96def3f9c9488f0",
+    "sourceUnitDigest": "0e1f77c31747156af1b8f026abfb2b1f6d86862ee268fa77ca7f0b9c181f7072",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md:157-161#unheaded-block-19 (current lines); unit SHA256 0e1f77c31747156af1b8f026abfb2b1f6d86862ee268fa77ca7f0b9c181f7072.\nTarget: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:138-138#c-rename-or-deprecate-the-existing-skills (current lines); unit SHA256 4d282049017d6b3a1c8b0995d30cccb8a6895bbe607b2205ad5a094fbaf5d27c.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 4d282049017d6b3a1c8b0995d30cccb8a6895bbe607b2205ad5a094fbaf5d27c at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 19\" → \"C. Rename or deprecate the existing skills\".\nWhole direct section differs; depth block → 3; 0 distinct link changes; normalized line order differs; 5 removed and 6 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-19 under docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#c-rename-or-deprecate-the-existing-skills; source context \"Group Thinking Trigger Surface / Alternatives Considered / C. Rename or deprecate the existing skills\", target context \"Group Thinking Trigger Surface / Alternatives Considered\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+    "targetAnchor": "c-rename-or-deprecate-the-existing-skills",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "4d282049017d6b3a1c8b0995d30cccb8a6895bbe607b2205ad5a094fbaf5d27c",
+    "targetAncestry": [
+      "Group Thinking Trigger Surface",
+      "Alternatives Considered"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 47,
+  "factsSHA256": "5937467df5af39f7eda4369572a2d273a088fe087541b6c9fe302d5a510367f3",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-19",
+    "githubAnchor": "unheaded-block-19",
+    "stableAnchor": "unheaded-block-19",
+    "title": "Unheaded block 19",
+    "startLine": 157,
+    "endLine": 161,
+    "textDigest": "0e1f77c31747156af1b8f026abfb2b1f6d86862ee268fa77ca7f0b9c181f7072",
+    "sample": "Rejected for now. `fgos-group-thinking` is an accurate internal gate name,\n`fgos-architecture-panel` is already a strong specialist surface, and\n`fgos-code-panel` has a distinct mu",
+    "identityFingerprint": "2acbdba2af24e422139d40dcec974012743347a651eef02b0636e4bcef326d20",
+    "ancestry": [
+      "Group Thinking Trigger Surface",
+      "Alternatives Considered",
+      "C. Rename or deprecate the existing skills"
+    ],
+    "path": "docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "C. Rename or deprecate the existing skills",
+    "anchor": "c-rename-or-deprecate-the-existing-skills",
+    "githubAnchor": "c-rename-or-deprecate-the-existing-skills",
+    "stableAnchor": "h-7f97cb86f284",
+    "startLine": 138,
+    "endLine": 138,
+    "textDigest": "4d282049017d6b3a1c8b0995d30cccb8a6895bbe607b2205ad5a094fbaf5d27c",
+    "sample": "C. Rename or deprecate the existing skills",
+    "sectionPayloadDigest": "3d50fb225e2c762e81ebf3ce66cc27a877d7a3f372660184ab6235eecebd4477",
+    "followingBlockDigest": "3d50fb225e2c762e81ebf3ce66cc27a877d7a3f372660184ab6235eecebd4477",
+    "identityFingerprint": "9c96ca5eebbb48a3271f2c9cdc39d5e3e7f35d4199de32b41fe940d5fe439cb1",
+    "ancestry": [
+      "Group Thinking Trigger Surface",
+      "Alternatives Considered"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_6ccb120b3660788aa96def3f9c9488f0",
+    "sourceUnitDigest": "0e1f77c31747156af1b8f026abfb2b1f6d86862ee268fa77ca7f0b9c181f7072",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md:157-161#unheaded-block-19 (current lines); unit SHA256 0e1f77c31747156af1b8f026abfb2b1f6d86862ee268fa77ca7f0b9c181f7072.\nTarget: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:138-138#c-rename-or-deprecate-the-existing-skills (current lines); unit SHA256 4d282049017d6b3a1c8b0995d30cccb8a6895bbe607b2205ad5a094fbaf5d27c.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 4d282049017d6b3a1c8b0995d30cccb8a6895bbe607b2205ad5a094fbaf5d27c at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 19\" → \"C. Rename or deprecate the existing skills\".\nWhole direct section differs; depth block → 3; 0 distinct link changes; normalized line order differs; 5 removed and 6 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-19 under docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#c-rename-or-deprecate-the-existing-skills; source context \"Group Thinking Trigger Surface / Alternatives Considered / C. Rename or deprecate the existing skills\", target context \"Group Thinking Trigger Surface / Alternatives Considered\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+    "targetAnchor": "c-rename-or-deprecate-the-existing-skills",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "4d282049017d6b3a1c8b0995d30cccb8a6895bbe607b2205ad5a094fbaf5d27c",
+    "targetAncestry": [
+      "Group Thinking Trigger Surface",
+      "Alternatives Considered"
+    ]
+  }
+}
+```
+
+## Entry rationale-049
+
+```json
+{
+  "entryId": "rationale-049",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_d025ea86a4c37a1d545a30405c95c10e",
+  "before": {
+    "claimId": "claim_d025ea86a4c37a1d545a30405c95c10e",
+    "sourceUnitDigest": "4de01935c05e1015b7a52cba8cea0f52b31e6637adbfcd97ec6185e84ca3e0be",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/protocol-model.md:20-22#unheaded-block-3 (current lines); unit SHA256 4de01935c05e1015b7a52cba8cea0f52b31e6637adbfcd97ec6185e84ca3e0be.\nTarget: docs/platform/agent-coordination/architecture/protocol-model.md:25-25#planning-sources (current lines); unit SHA256 29205425e672bf450568296cebc7af19a9f88e89736a712f24cc06d01903f0f6.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 29205425e672bf450568296cebc7af19a9f88e89736a712f24cc06d01903f0f6 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 1, target 0; 1 changed spellings/labels, 0 destination changes; 0 added, 1 removed.\nLink 1: \"Agent Coordination Foundation Vision\" (../vision.md) → \"none\" (none); resolved docs/architect/agent-coordination/vision.md → none.\nHeading depth: not a heading → 2; title \"Unheaded block 3\" → \"Planning Sources\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/protocol-model.md#unheaded-block-3 under docs/platform/agent-coordination/architecture/protocol-model.md#planning-sources; source context \"Coordination Protocol Model / Planning Sources\", target context \"Coordination Protocol Model\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/protocol-model.md",
+    "targetAnchor": "planning-sources",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "deep: read full source block (Per the [Agent Coordination Foundation Vision](../visio...) against target section 'Planning Sources' (h2); 0 of 3 source lines appear verbatim in the target section, the rest is rewritten current wording, so supersede with a named successor is truthful and no carried claim is made; Heading depth and Links lines (1/0) verified; digests differ as stated and both recomputed; anchor checked; last-reviewed digest present at 947f6169e.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-04-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "29205425e672bf450568296cebc7af19a9f88e89736a712f24cc06d01903f0f6",
+    "targetAncestry": [
+      "Coordination Protocol Model"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_d025ea86a4c37a1d545a30405c95c10e",
+    "sourceUnitDigest": "4de01935c05e1015b7a52cba8cea0f52b31e6637adbfcd97ec6185e84ca3e0be",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/protocol-model.md:20-22#unheaded-block-3 (current lines); unit SHA256 4de01935c05e1015b7a52cba8cea0f52b31e6637adbfcd97ec6185e84ca3e0be.\nTarget: docs/platform/agent-coordination/architecture/protocol-model.md:25-25#planning-sources (current lines); unit SHA256 29205425e672bf450568296cebc7af19a9f88e89736a712f24cc06d01903f0f6.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 29205425e672bf450568296cebc7af19a9f88e89736a712f24cc06d01903f0f6 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 1, target 0; 1 changed spellings/labels, 0 destination changes; 0 added, 1 removed.\nLink 1: \"Agent Coordination Foundation Vision\" (../vision.md) → \"none\" (none); resolved docs/architect/agent-coordination/vision.md → none.\nHeading depth: not a heading → 2; title \"Unheaded block 3\" → \"Planning Sources\".\nWhole direct section differs; depth block → 2; 1 distinct link changes; normalized line order differs; 3 removed and 15 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/protocol-model.md#unheaded-block-3 under docs/platform/agent-coordination/architecture/protocol-model.md#planning-sources; source context \"Coordination Protocol Model / Planning Sources\", target context \"Coordination Protocol Model\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/protocol-model.md",
+    "targetAnchor": "planning-sources",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "29205425e672bf450568296cebc7af19a9f88e89736a712f24cc06d01903f0f6",
+    "targetAncestry": [
+      "Coordination Protocol Model"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 48,
+  "factsSHA256": "b77566d7da00c2c9923769d3b94edac4400d5bbd592c4586313d922e41c9804d",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-3",
+    "githubAnchor": "unheaded-block-3",
+    "stableAnchor": "unheaded-block-3",
+    "title": "Unheaded block 3",
+    "startLine": 20,
+    "endLine": 22,
+    "textDigest": "4de01935c05e1015b7a52cba8cea0f52b31e6637adbfcd97ec6185e84ca3e0be",
+    "sample": "Per the [Agent Coordination Foundation Vision](../vision.md), a predeclared\nWorkflow or Coordination Protocol is optional. Coordination may obtain planning\nand constraints from one",
+    "identityFingerprint": "1e85ef2f6bbe4a34a444f954a55f688f6ee2f237b85dc737a8e3dfd37ae06e0b",
+    "ancestry": [
+      "Coordination Protocol Model",
+      "Planning Sources"
+    ],
+    "path": "docs/architect/agent-coordination/architecture/protocol-model.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "Planning Sources",
+    "anchor": "planning-sources",
+    "githubAnchor": "planning-sources",
+    "stableAnchor": "h-234f71fb6f6a",
+    "startLine": 25,
+    "endLine": 25,
+    "textDigest": "29205425e672bf450568296cebc7af19a9f88e89736a712f24cc06d01903f0f6",
+    "sample": "Planning Sources",
+    "sectionPayloadDigest": "102ef1188df6ea558ff3aedc92f906d78a72fcc45c2f639c10f10ded6e48eb4c",
+    "followingBlockDigest": "bd0e6f9beec788a0629686ef8e44c602ec383f65f84cecab162946809c70239f",
+    "identityFingerprint": "3836e9b44e2694a3fc2fec9d429e6a6a5fd8b53abe1a9dc92a26f50c3375415f",
+    "ancestry": [
+      "Coordination Protocol Model"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/protocol-model.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_d025ea86a4c37a1d545a30405c95c10e",
+    "sourceUnitDigest": "4de01935c05e1015b7a52cba8cea0f52b31e6637adbfcd97ec6185e84ca3e0be",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/protocol-model.md:20-22#unheaded-block-3 (current lines); unit SHA256 4de01935c05e1015b7a52cba8cea0f52b31e6637adbfcd97ec6185e84ca3e0be.\nTarget: docs/platform/agent-coordination/architecture/protocol-model.md:25-25#planning-sources (current lines); unit SHA256 29205425e672bf450568296cebc7af19a9f88e89736a712f24cc06d01903f0f6.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 29205425e672bf450568296cebc7af19a9f88e89736a712f24cc06d01903f0f6 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 1, target 0; 1 changed spellings/labels, 0 destination changes; 0 added, 1 removed.\nLink 1: \"Agent Coordination Foundation Vision\" (../vision.md) → \"none\" (none); resolved docs/architect/agent-coordination/vision.md → none.\nHeading depth: not a heading → 2; title \"Unheaded block 3\" → \"Planning Sources\".\nWhole direct section differs; depth block → 2; 1 distinct link changes; normalized line order differs; 3 removed and 15 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/protocol-model.md#unheaded-block-3 under docs/platform/agent-coordination/architecture/protocol-model.md#planning-sources; source context \"Coordination Protocol Model / Planning Sources\", target context \"Coordination Protocol Model\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/protocol-model.md",
+    "targetAnchor": "planning-sources",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "29205425e672bf450568296cebc7af19a9f88e89736a712f24cc06d01903f0f6",
+    "targetAncestry": [
+      "Coordination Protocol Model"
+    ]
+  }
+}
+```
+
+## Entry rationale-050
+
+```json
+{
+  "entryId": "rationale-050",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_3baa17b96efa5b2e4471ab115b0d7c17",
+  "before": {
+    "claimId": "claim_3baa17b96efa5b2e4471ab115b0d7c17",
+    "sourceUnitDigest": "e7573044163f4c72029fe7924af03aeeb083e5932f03761a1c858406ffa339ae",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/protocol-model.md:24-33#unheaded-block-4 (current lines); unit SHA256 e7573044163f4c72029fe7924af03aeeb083e5932f03761a1c858406ffa339ae.\nTarget: docs/platform/agent-coordination/architecture/protocol-model.md:25-25#planning-sources (current lines); unit SHA256 29205425e672bf450568296cebc7af19a9f88e89736a712f24cc06d01903f0f6.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 29205425e672bf450568296cebc7af19a9f88e89736a712f24cc06d01903f0f6 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 4\" → \"Planning Sources\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/protocol-model.md#unheaded-block-4 under docs/platform/agent-coordination/architecture/protocol-model.md#planning-sources; source context \"Coordination Protocol Model / Planning Sources\", target context \"Coordination Protocol Model\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/protocol-model.md",
+    "targetAnchor": "planning-sources",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "deep: read full source block ('''txt Agent-led   objective -> coordinator reasoning -...) against target section 'Planning Sources' (h2); 5 of 8 source lines appear verbatim in the target section, the rest is rewritten current wording, so supersede with a named successor is truthful and no carried claim is made; Heading depth and Links lines (0/0) verified; digests differ as stated and both recomputed; anchor checked; last-reviewed digest present at 947f6169e.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-04-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "29205425e672bf450568296cebc7af19a9f88e89736a712f24cc06d01903f0f6",
+    "targetAncestry": [
+      "Coordination Protocol Model"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_3baa17b96efa5b2e4471ab115b0d7c17",
+    "sourceUnitDigest": "e7573044163f4c72029fe7924af03aeeb083e5932f03761a1c858406ffa339ae",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/protocol-model.md:24-33#unheaded-block-4 (current lines); unit SHA256 e7573044163f4c72029fe7924af03aeeb083e5932f03761a1c858406ffa339ae.\nTarget: docs/platform/agent-coordination/architecture/protocol-model.md:25-25#planning-sources (current lines); unit SHA256 29205425e672bf450568296cebc7af19a9f88e89736a712f24cc06d01903f0f6.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 29205425e672bf450568296cebc7af19a9f88e89736a712f24cc06d01903f0f6 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 4\" → \"Planning Sources\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 3 removed and 10 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/protocol-model.md#unheaded-block-4 under docs/platform/agent-coordination/architecture/protocol-model.md#planning-sources; source context \"Coordination Protocol Model / Planning Sources\", target context \"Coordination Protocol Model\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/protocol-model.md",
+    "targetAnchor": "planning-sources",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "29205425e672bf450568296cebc7af19a9f88e89736a712f24cc06d01903f0f6",
+    "targetAncestry": [
+      "Coordination Protocol Model"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 49,
+  "factsSHA256": "5b4a300bbebed311bfe58d0cdf481ba4337219e7ba84d69f4243f7bd6db488fd",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-4",
+    "githubAnchor": "unheaded-block-4",
+    "stableAnchor": "unheaded-block-4",
+    "title": "Unheaded block 4",
+    "startLine": 24,
+    "endLine": 33,
+    "textDigest": "e7573044163f4c72029fe7924af03aeeb083e5932f03761a1c858406ffa339ae",
+    "sample": "```txt\nAgent-led\n  objective -> coordinator reasoning -> dynamic semantic task/Assignment\n\nDeclared\n  Workflow / Coordination Protocol -> legal graph and operations\n\nDomain-assiste",
+    "identityFingerprint": "1c4566157b06f158b420beac8dec4dca9ce2a492c81e51fc7dd031832c3bc3ed",
+    "ancestry": [
+      "Coordination Protocol Model",
+      "Planning Sources"
+    ],
+    "path": "docs/architect/agent-coordination/architecture/protocol-model.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "Planning Sources",
+    "anchor": "planning-sources",
+    "githubAnchor": "planning-sources",
+    "stableAnchor": "h-234f71fb6f6a",
+    "startLine": 25,
+    "endLine": 25,
+    "textDigest": "29205425e672bf450568296cebc7af19a9f88e89736a712f24cc06d01903f0f6",
+    "sample": "Planning Sources",
+    "sectionPayloadDigest": "102ef1188df6ea558ff3aedc92f906d78a72fcc45c2f639c10f10ded6e48eb4c",
+    "followingBlockDigest": "bd0e6f9beec788a0629686ef8e44c602ec383f65f84cecab162946809c70239f",
+    "identityFingerprint": "3836e9b44e2694a3fc2fec9d429e6a6a5fd8b53abe1a9dc92a26f50c3375415f",
+    "ancestry": [
+      "Coordination Protocol Model"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/protocol-model.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_3baa17b96efa5b2e4471ab115b0d7c17",
+    "sourceUnitDigest": "e7573044163f4c72029fe7924af03aeeb083e5932f03761a1c858406ffa339ae",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/protocol-model.md:24-33#unheaded-block-4 (current lines); unit SHA256 e7573044163f4c72029fe7924af03aeeb083e5932f03761a1c858406ffa339ae.\nTarget: docs/platform/agent-coordination/architecture/protocol-model.md:25-25#planning-sources (current lines); unit SHA256 29205425e672bf450568296cebc7af19a9f88e89736a712f24cc06d01903f0f6.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 29205425e672bf450568296cebc7af19a9f88e89736a712f24cc06d01903f0f6 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 4\" → \"Planning Sources\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 3 removed and 10 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/protocol-model.md#unheaded-block-4 under docs/platform/agent-coordination/architecture/protocol-model.md#planning-sources; source context \"Coordination Protocol Model / Planning Sources\", target context \"Coordination Protocol Model\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/protocol-model.md",
+    "targetAnchor": "planning-sources",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "29205425e672bf450568296cebc7af19a9f88e89736a712f24cc06d01903f0f6",
+    "targetAncestry": [
+      "Coordination Protocol Model"
+    ]
+  }
+}
+```
+
+## Entry rationale-051
+
+```json
+{
+  "entryId": "rationale-051",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_41f39b5ae50c28f205b44cedf2042c53",
+  "before": {
+    "claimId": "claim_41f39b5ae50c28f205b44cedf2042c53",
+    "sourceUnitDigest": "f3122a52ffc80c8160aa2a51efbecd8948873d2da3be559bf551f1991cecbc14",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/protocol-model.md:41-50#unheaded-block-6 (current lines); unit SHA256 f3122a52ffc80c8160aa2a51efbecd8948873d2da3be559bf551f1991cecbc14.\nTarget: docs/platform/agent-coordination/architecture/protocol-model.md:46-46#declared-model (current lines); unit SHA256 54d3b4be1e06f2ac02712f7b8774bc763c5f411f5d40bd0bbc61c3e0256889ff.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 54d3b4be1e06f2ac02712f7b8774bc763c5f411f5d40bd0bbc61c3e0256889ff at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 6\" → \"Declared Model\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/protocol-model.md#unheaded-block-6 under docs/platform/agent-coordination/architecture/protocol-model.md#declared-model; source context \"Coordination Protocol Model / Declared Model\", target context \"Coordination Protocol Model\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/protocol-model.md",
+    "targetAnchor": "declared-model",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "deep: read full source block ('''txt Workflow   -> Stage graph     -> Stage Protocol ...) against target section 'Declared Model' (h2); 7 of 10 source lines appear verbatim in the target section, the rest is rewritten current wording, so supersede with a named successor is truthful and no carried claim is made; Heading depth and Links lines (0/0) verified; digests differ as stated and both recomputed; anchor checked; last-reviewed digest present at 947f6169e.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-04-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "54d3b4be1e06f2ac02712f7b8774bc763c5f411f5d40bd0bbc61c3e0256889ff",
+    "targetAncestry": [
+      "Coordination Protocol Model"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_41f39b5ae50c28f205b44cedf2042c53",
+    "sourceUnitDigest": "f3122a52ffc80c8160aa2a51efbecd8948873d2da3be559bf551f1991cecbc14",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/protocol-model.md:41-50#unheaded-block-6 (current lines); unit SHA256 f3122a52ffc80c8160aa2a51efbecd8948873d2da3be559bf551f1991cecbc14.\nTarget: docs/platform/agent-coordination/architecture/protocol-model.md:46-46#declared-model (current lines); unit SHA256 54d3b4be1e06f2ac02712f7b8774bc763c5f411f5d40bd0bbc61c3e0256889ff.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 54d3b4be1e06f2ac02712f7b8774bc763c5f411f5d40bd0bbc61c3e0256889ff at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 6\" → \"Declared Model\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 7 removed and 10 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/protocol-model.md#unheaded-block-6 under docs/platform/agent-coordination/architecture/protocol-model.md#declared-model; source context \"Coordination Protocol Model / Declared Model\", target context \"Coordination Protocol Model\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/protocol-model.md",
+    "targetAnchor": "declared-model",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "54d3b4be1e06f2ac02712f7b8774bc763c5f411f5d40bd0bbc61c3e0256889ff",
+    "targetAncestry": [
+      "Coordination Protocol Model"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 50,
+  "factsSHA256": "eff2f9a5d3f4561361fd00fe5d8d02cfadb32669f282cda36327982387b75f82",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-6",
+    "githubAnchor": "unheaded-block-6",
+    "stableAnchor": "unheaded-block-6",
+    "title": "Unheaded block 6",
+    "startLine": 41,
+    "endLine": 50,
+    "textDigest": "f3122a52ffc80c8160aa2a51efbecd8948873d2da3be559bf551f1991cecbc14",
+    "sample": "```txt\nWorkflow\n  -> Stage graph\n    -> Stage Protocol\n      -> Stage Operation\n        -> TaskSpec\n        -> Skill(s)\n        -> Role\n        -> policy hints\n```",
+    "identityFingerprint": "55d2902a054d3541ae4bf41acfe58e36f785af29d49e348190c73eb9c6f4c7af",
+    "ancestry": [
+      "Coordination Protocol Model",
+      "Declared Model"
+    ],
+    "path": "docs/architect/agent-coordination/architecture/protocol-model.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "Declared Model",
+    "anchor": "declared-model",
+    "githubAnchor": "declared-model",
+    "stableAnchor": "h-40790eb5be18",
+    "startLine": 46,
+    "endLine": 46,
+    "textDigest": "54d3b4be1e06f2ac02712f7b8774bc763c5f411f5d40bd0bbc61c3e0256889ff",
+    "sample": "Declared Model",
+    "sectionPayloadDigest": "5267dfcb4bc850d3db66a05132e7e92c00e144e3706eb9b8f1e33407d8d1329e",
+    "followingBlockDigest": "30ae9fbd8e0feeff87fbe07925b5bff2fb52e20d0a9358c8dfb4a702d3ae028d",
+    "identityFingerprint": "2082159533266259693c33a19258af26526676bd73f8a950a57908f1c66faa27",
+    "ancestry": [
+      "Coordination Protocol Model"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/protocol-model.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_41f39b5ae50c28f205b44cedf2042c53",
+    "sourceUnitDigest": "f3122a52ffc80c8160aa2a51efbecd8948873d2da3be559bf551f1991cecbc14",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/protocol-model.md:41-50#unheaded-block-6 (current lines); unit SHA256 f3122a52ffc80c8160aa2a51efbecd8948873d2da3be559bf551f1991cecbc14.\nTarget: docs/platform/agent-coordination/architecture/protocol-model.md:46-46#declared-model (current lines); unit SHA256 54d3b4be1e06f2ac02712f7b8774bc763c5f411f5d40bd0bbc61c3e0256889ff.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 54d3b4be1e06f2ac02712f7b8774bc763c5f411f5d40bd0bbc61c3e0256889ff at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 6\" → \"Declared Model\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 7 removed and 10 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/protocol-model.md#unheaded-block-6 under docs/platform/agent-coordination/architecture/protocol-model.md#declared-model; source context \"Coordination Protocol Model / Declared Model\", target context \"Coordination Protocol Model\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/protocol-model.md",
+    "targetAnchor": "declared-model",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "54d3b4be1e06f2ac02712f7b8774bc763c5f411f5d40bd0bbc61c3e0256889ff",
+    "targetAncestry": [
+      "Coordination Protocol Model"
+    ]
+  }
+}
+```
+
+## Entry rationale-052
+
+```json
+{
+  "entryId": "rationale-052",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_9ff39ce2352aa1a1450c05755bcb4b4b",
+  "before": {
+    "claimId": "claim_9ff39ce2352aa1a1450c05755bcb4b4b",
+    "sourceUnitDigest": "1571c801405554789b25bc8a8d2bc3fda183369bf53165399b302af5fa69f459",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/protocol-model.md:52-54#unheaded-block-7 (current lines); unit SHA256 1571c801405554789b25bc8a8d2bc3fda183369bf53165399b302af5fa69f459.\nTarget: docs/platform/agent-coordination/architecture/protocol-model.md:46-46#declared-model (current lines); unit SHA256 54d3b4be1e06f2ac02712f7b8774bc763c5f411f5d40bd0bbc61c3e0256889ff.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 54d3b4be1e06f2ac02712f7b8774bc763c5f411f5d40bd0bbc61c3e0256889ff at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 7\" → \"Declared Model\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/protocol-model.md#unheaded-block-7 under docs/platform/agent-coordination/architecture/protocol-model.md#declared-model; source context \"Coordination Protocol Model / Declared Model\", target context \"Coordination Protocol Model\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/protocol-model.md",
+    "targetAnchor": "declared-model",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "deep: read full source block (The same hard-and-soft shape may be used by a standalon...) against target section 'Declared Model' (h2); 0 of 3 source lines appear verbatim in the target section, the rest is rewritten current wording, so supersede with a named successor is truthful and no carried claim is made; Heading depth and Links lines (0/0) verified; digests differ as stated and both recomputed; anchor checked; last-reviewed digest present at 947f6169e.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-04-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "54d3b4be1e06f2ac02712f7b8774bc763c5f411f5d40bd0bbc61c3e0256889ff",
+    "targetAncestry": [
+      "Coordination Protocol Model"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_9ff39ce2352aa1a1450c05755bcb4b4b",
+    "sourceUnitDigest": "1571c801405554789b25bc8a8d2bc3fda183369bf53165399b302af5fa69f459",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/protocol-model.md:52-54#unheaded-block-7 (current lines); unit SHA256 1571c801405554789b25bc8a8d2bc3fda183369bf53165399b302af5fa69f459.\nTarget: docs/platform/agent-coordination/architecture/protocol-model.md:46-46#declared-model (current lines); unit SHA256 54d3b4be1e06f2ac02712f7b8774bc763c5f411f5d40bd0bbc61c3e0256889ff.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 54d3b4be1e06f2ac02712f7b8774bc763c5f411f5d40bd0bbc61c3e0256889ff at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 7\" → \"Declared Model\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 3 removed and 13 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/protocol-model.md#unheaded-block-7 under docs/platform/agent-coordination/architecture/protocol-model.md#declared-model; source context \"Coordination Protocol Model / Declared Model\", target context \"Coordination Protocol Model\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/protocol-model.md",
+    "targetAnchor": "declared-model",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "54d3b4be1e06f2ac02712f7b8774bc763c5f411f5d40bd0bbc61c3e0256889ff",
+    "targetAncestry": [
+      "Coordination Protocol Model"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 51,
+  "factsSHA256": "0eb74f0f044d30d4b1ddbc58c03420ae54a1a670dba7072285a5d97c203fb8d5",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-7",
+    "githubAnchor": "unheaded-block-7",
+    "stableAnchor": "unheaded-block-7",
+    "title": "Unheaded block 7",
+    "startLine": 52,
+    "endLine": 54,
+    "textDigest": "1571c801405554789b25bc8a8d2bc3fda183369bf53165399b302af5fa69f459",
+    "sample": "The same hard-and-soft shape may be used by a standalone Coordination Protocol\nwhen repeatability, auditability, or reusable doctrine justifies a predeclared\ngraph. A session is no",
+    "identityFingerprint": "8c69db5069802b8b3b42301392a52b890875db39489179925b092c4034096b20",
+    "ancestry": [
+      "Coordination Protocol Model",
+      "Declared Model"
+    ],
+    "path": "docs/architect/agent-coordination/architecture/protocol-model.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "Declared Model",
+    "anchor": "declared-model",
+    "githubAnchor": "declared-model",
+    "stableAnchor": "h-40790eb5be18",
+    "startLine": 46,
+    "endLine": 46,
+    "textDigest": "54d3b4be1e06f2ac02712f7b8774bc763c5f411f5d40bd0bbc61c3e0256889ff",
+    "sample": "Declared Model",
+    "sectionPayloadDigest": "5267dfcb4bc850d3db66a05132e7e92c00e144e3706eb9b8f1e33407d8d1329e",
+    "followingBlockDigest": "30ae9fbd8e0feeff87fbe07925b5bff2fb52e20d0a9358c8dfb4a702d3ae028d",
+    "identityFingerprint": "2082159533266259693c33a19258af26526676bd73f8a950a57908f1c66faa27",
+    "ancestry": [
+      "Coordination Protocol Model"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/protocol-model.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_9ff39ce2352aa1a1450c05755bcb4b4b",
+    "sourceUnitDigest": "1571c801405554789b25bc8a8d2bc3fda183369bf53165399b302af5fa69f459",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/protocol-model.md:52-54#unheaded-block-7 (current lines); unit SHA256 1571c801405554789b25bc8a8d2bc3fda183369bf53165399b302af5fa69f459.\nTarget: docs/platform/agent-coordination/architecture/protocol-model.md:46-46#declared-model (current lines); unit SHA256 54d3b4be1e06f2ac02712f7b8774bc763c5f411f5d40bd0bbc61c3e0256889ff.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 54d3b4be1e06f2ac02712f7b8774bc763c5f411f5d40bd0bbc61c3e0256889ff at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 7\" → \"Declared Model\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 3 removed and 13 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/protocol-model.md#unheaded-block-7 under docs/platform/agent-coordination/architecture/protocol-model.md#declared-model; source context \"Coordination Protocol Model / Declared Model\", target context \"Coordination Protocol Model\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/protocol-model.md",
+    "targetAnchor": "declared-model",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "54d3b4be1e06f2ac02712f7b8774bc763c5f411f5d40bd0bbc61c3e0256889ff",
+    "targetAncestry": [
+      "Coordination Protocol Model"
+    ]
+  }
+}
+```
+
+## Entry rationale-053
+
+```json
+{
+  "entryId": "rationale-053",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_7d36c00eba15b11cc07b5583187a1e8e",
+  "before": {
+    "claimId": "claim_7d36c00eba15b11cc07b5583187a1e8e",
+    "sourceUnitDigest": "abc22b88ed9d6c86a2f5efec953fbb9486c18cc849ed8a99a085ef10a5779a97",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/protocol-model.md:58-66#unheaded-block-8 (current lines); unit SHA256 abc22b88ed9d6c86a2f5efec953fbb9486c18cc849ed8a99a085ef10a5779a97.\nTarget: docs/platform/agent-coordination/architecture/protocol-model.md:62-62#responsibility-split (current lines); unit SHA256 b279b9ea1b355531ab48f2f3c849c20e2c95cdf4c6f18b7786adda380a0bf57a.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest b279b9ea1b355531ab48f2f3c849c20e2c95cdf4c6f18b7786adda380a0bf57a at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 8\" → \"Responsibility Split\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/protocol-model.md#unheaded-block-8 under docs/platform/agent-coordination/architecture/protocol-model.md#responsibility-split; source context \"Coordination Protocol Model / Responsibility Split\", target context \"Coordination Protocol Model\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/protocol-model.md",
+    "targetAnchor": "responsibility-split",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "deep: read full source block (/ Element / Responsibility / /---/---/ / Workflow/graph...) against target section 'Responsibility Split' (h2); 6 of 9 source lines appear verbatim in the target section, the rest is rewritten current wording, so supersede with a named successor is truthful and no carried claim is made; Heading depth and Links lines (0/0) verified; digests differ as stated and both recomputed; anchor checked; last-reviewed digest present at 947f6169e.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-04-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "b279b9ea1b355531ab48f2f3c849c20e2c95cdf4c6f18b7786adda380a0bf57a",
+    "targetAncestry": [
+      "Coordination Protocol Model"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_7d36c00eba15b11cc07b5583187a1e8e",
+    "sourceUnitDigest": "abc22b88ed9d6c86a2f5efec953fbb9486c18cc849ed8a99a085ef10a5779a97",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/protocol-model.md:58-66#unheaded-block-8 (current lines); unit SHA256 abc22b88ed9d6c86a2f5efec953fbb9486c18cc849ed8a99a085ef10a5779a97.\nTarget: docs/platform/agent-coordination/architecture/protocol-model.md:62-62#responsibility-split (current lines); unit SHA256 b279b9ea1b355531ab48f2f3c849c20e2c95cdf4c6f18b7786adda380a0bf57a.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest b279b9ea1b355531ab48f2f3c849c20e2c95cdf4c6f18b7786adda380a0bf57a at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 8\" → \"Responsibility Split\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 3 removed and 10 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/protocol-model.md#unheaded-block-8 under docs/platform/agent-coordination/architecture/protocol-model.md#responsibility-split; source context \"Coordination Protocol Model / Responsibility Split\", target context \"Coordination Protocol Model\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/protocol-model.md",
+    "targetAnchor": "responsibility-split",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "b279b9ea1b355531ab48f2f3c849c20e2c95cdf4c6f18b7786adda380a0bf57a",
+    "targetAncestry": [
+      "Coordination Protocol Model"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 52,
+  "factsSHA256": "3a5ddbe3d9123f32a4cc20f4a6d0c9887748c039e78d7f882f2f71f91f1f70bb",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-8",
+    "githubAnchor": "unheaded-block-8",
+    "stableAnchor": "unheaded-block-8",
+    "title": "Unheaded block 8",
+    "startLine": 58,
+    "endLine": 66,
+    "textDigest": "abc22b88ed9d6c86a2f5efec953fbb9486c18cc849ed8a99a085ef10a5779a97",
+    "sample": "| Element | Responsibility |\n|---|---|\n| Workflow/graph | Legal stage transitions and structural boundaries. |\n| Stage Protocol | Coordination doctrine active in one stage. |\n| Sta",
+    "identityFingerprint": "1d1c67e1649cfaeb8022aff16dfdaf296ad0bfe54d48be425ecd3aae8ef2d9fc",
+    "ancestry": [
+      "Coordination Protocol Model",
+      "Responsibility Split"
+    ],
+    "path": "docs/architect/agent-coordination/architecture/protocol-model.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "Responsibility Split",
+    "anchor": "responsibility-split",
+    "githubAnchor": "responsibility-split",
+    "stableAnchor": "h-bc4741d1c48c",
+    "startLine": 62,
+    "endLine": 62,
+    "textDigest": "b279b9ea1b355531ab48f2f3c849c20e2c95cdf4c6f18b7786adda380a0bf57a",
+    "sample": "Responsibility Split",
+    "sectionPayloadDigest": "47f524b97a15e2a6b66ad5227cb091e63055bc243920169a11775b24c4cb9e80",
+    "followingBlockDigest": "9ad07edb1881c56fb3a1a4f81ebcfcef40b7cd1120b156c2fa8e8a18455bf001",
+    "identityFingerprint": "3f2b65cada5d1efc04b7c9abee1da359fe6eb64f373aba594089fcf4c526a668",
+    "ancestry": [
+      "Coordination Protocol Model"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/protocol-model.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_7d36c00eba15b11cc07b5583187a1e8e",
+    "sourceUnitDigest": "abc22b88ed9d6c86a2f5efec953fbb9486c18cc849ed8a99a085ef10a5779a97",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/protocol-model.md:58-66#unheaded-block-8 (current lines); unit SHA256 abc22b88ed9d6c86a2f5efec953fbb9486c18cc849ed8a99a085ef10a5779a97.\nTarget: docs/platform/agent-coordination/architecture/protocol-model.md:62-62#responsibility-split (current lines); unit SHA256 b279b9ea1b355531ab48f2f3c849c20e2c95cdf4c6f18b7786adda380a0bf57a.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest b279b9ea1b355531ab48f2f3c849c20e2c95cdf4c6f18b7786adda380a0bf57a at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 8\" → \"Responsibility Split\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 3 removed and 10 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/protocol-model.md#unheaded-block-8 under docs/platform/agent-coordination/architecture/protocol-model.md#responsibility-split; source context \"Coordination Protocol Model / Responsibility Split\", target context \"Coordination Protocol Model\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/protocol-model.md",
+    "targetAnchor": "responsibility-split",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "b279b9ea1b355531ab48f2f3c849c20e2c95cdf4c6f18b7786adda380a0bf57a",
+    "targetAncestry": [
+      "Coordination Protocol Model"
+    ]
+  }
+}
+```
+
+## Entry rationale-054
+
+```json
+{
+  "entryId": "rationale-054",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_906538d95e180ed10d9fdc235eea846f",
+  "before": {
+    "claimId": "claim_906538d95e180ed10d9fdc235eea846f",
+    "sourceUnitDigest": "0d894dbefdac385fc550b8f1f161ec3f3e9335813dc1dcbbdd74c963e69129cb",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/protocol-model.md:68-72#unheaded-block-9 (current lines); unit SHA256 0d894dbefdac385fc550b8f1f161ec3f3e9335813dc1dcbbdd74c963e69129cb.\nTarget: docs/platform/agent-coordination/architecture/protocol-model.md:62-62#responsibility-split (current lines); unit SHA256 b279b9ea1b355531ab48f2f3c849c20e2c95cdf4c6f18b7786adda380a0bf57a.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest b279b9ea1b355531ab48f2f3c849c20e2c95cdf4c6f18b7786adda380a0bf57a at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 9\" → \"Responsibility Split\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/protocol-model.md#unheaded-block-9 under docs/platform/agent-coordination/architecture/protocol-model.md#responsibility-split; source context \"Coordination Protocol Model / Responsibility Split\", target context \"Coordination Protocol Model\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/protocol-model.md",
+    "targetAnchor": "responsibility-split",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "deep: read full source block (For agent-led planning, the coordinator supplies adapti...) against target section 'Responsibility Split' (h2); 0 of 5 source lines appear verbatim in the target section, the rest is rewritten current wording, so supersede with a named successor is truthful and no carried claim is made; Heading depth and Links lines (0/0) verified; digests differ as stated and both recomputed; anchor checked; last-reviewed digest present at 947f6169e. hand-recomputed by independent python.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-04-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "b279b9ea1b355531ab48f2f3c849c20e2c95cdf4c6f18b7786adda380a0bf57a",
+    "targetAncestry": [
+      "Coordination Protocol Model"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_906538d95e180ed10d9fdc235eea846f",
+    "sourceUnitDigest": "0d894dbefdac385fc550b8f1f161ec3f3e9335813dc1dcbbdd74c963e69129cb",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/protocol-model.md:68-72#unheaded-block-9 (current lines); unit SHA256 0d894dbefdac385fc550b8f1f161ec3f3e9335813dc1dcbbdd74c963e69129cb.\nTarget: docs/platform/agent-coordination/architecture/protocol-model.md:62-62#responsibility-split (current lines); unit SHA256 b279b9ea1b355531ab48f2f3c849c20e2c95cdf4c6f18b7786adda380a0bf57a.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest b279b9ea1b355531ab48f2f3c849c20e2c95cdf4c6f18b7786adda380a0bf57a at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 9\" → \"Responsibility Split\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 5 removed and 16 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/protocol-model.md#unheaded-block-9 under docs/platform/agent-coordination/architecture/protocol-model.md#responsibility-split; source context \"Coordination Protocol Model / Responsibility Split\", target context \"Coordination Protocol Model\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/protocol-model.md",
+    "targetAnchor": "responsibility-split",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "b279b9ea1b355531ab48f2f3c849c20e2c95cdf4c6f18b7786adda380a0bf57a",
+    "targetAncestry": [
+      "Coordination Protocol Model"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 53,
+  "factsSHA256": "1c4922548f6fb310d24e287084ea8333eb2404a5d0bd2801168e6ad531a37ae2",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-9",
+    "githubAnchor": "unheaded-block-9",
+    "stableAnchor": "unheaded-block-9",
+    "title": "Unheaded block 9",
+    "startLine": 68,
+    "endLine": 72,
+    "textDigest": "0d894dbefdac385fc550b8f1f161ec3f3e9335813dc1dcbbdd74c963e69129cb",
+    "sample": "For agent-led planning, the coordinator supplies adaptive planning and proposes\na dynamic execution contract. Foundation policy and any selected domain harness\nvalidate its objecti",
+    "identityFingerprint": "f2f5de2b8589e5fa9936ed31cb4bdd0a74e6541245dcc886d54d253cc8f6f056",
+    "ancestry": [
+      "Coordination Protocol Model",
+      "Responsibility Split"
+    ],
+    "path": "docs/architect/agent-coordination/architecture/protocol-model.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "Responsibility Split",
+    "anchor": "responsibility-split",
+    "githubAnchor": "responsibility-split",
+    "stableAnchor": "h-bc4741d1c48c",
+    "startLine": 62,
+    "endLine": 62,
+    "textDigest": "b279b9ea1b355531ab48f2f3c849c20e2c95cdf4c6f18b7786adda380a0bf57a",
+    "sample": "Responsibility Split",
+    "sectionPayloadDigest": "47f524b97a15e2a6b66ad5227cb091e63055bc243920169a11775b24c4cb9e80",
+    "followingBlockDigest": "9ad07edb1881c56fb3a1a4f81ebcfcef40b7cd1120b156c2fa8e8a18455bf001",
+    "identityFingerprint": "3f2b65cada5d1efc04b7c9abee1da359fe6eb64f373aba594089fcf4c526a668",
+    "ancestry": [
+      "Coordination Protocol Model"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/protocol-model.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_906538d95e180ed10d9fdc235eea846f",
+    "sourceUnitDigest": "0d894dbefdac385fc550b8f1f161ec3f3e9335813dc1dcbbdd74c963e69129cb",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/protocol-model.md:68-72#unheaded-block-9 (current lines); unit SHA256 0d894dbefdac385fc550b8f1f161ec3f3e9335813dc1dcbbdd74c963e69129cb.\nTarget: docs/platform/agent-coordination/architecture/protocol-model.md:62-62#responsibility-split (current lines); unit SHA256 b279b9ea1b355531ab48f2f3c849c20e2c95cdf4c6f18b7786adda380a0bf57a.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest b279b9ea1b355531ab48f2f3c849c20e2c95cdf4c6f18b7786adda380a0bf57a at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 9\" → \"Responsibility Split\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 5 removed and 16 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/protocol-model.md#unheaded-block-9 under docs/platform/agent-coordination/architecture/protocol-model.md#responsibility-split; source context \"Coordination Protocol Model / Responsibility Split\", target context \"Coordination Protocol Model\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/protocol-model.md",
+    "targetAnchor": "responsibility-split",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "b279b9ea1b355531ab48f2f3c849c20e2c95cdf4c6f18b7786adda380a0bf57a",
+    "targetAncestry": [
+      "Coordination Protocol Model"
+    ]
+  }
+}
+```
+
+## Entry rationale-055
+
+```json
+{
+  "entryId": "rationale-055",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_0e9e0ab53bbc4bdfb7b06b60033e2cc0",
+  "before": {
+    "claimId": "claim_0e9e0ab53bbc4bdfb7b06b60033e2cc0",
+    "sourceUnitDigest": "672b4eb44591d3566f6019f9ac30e09eb818a3f4ef39b61915d1286d1b98fb24",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/README.md:18-51#unheaded-block-4 (current lines); unit SHA256 672b4eb44591d3566f6019f9ac30e09eb818a3f4ef39b61915d1286d1b98fb24.\nTarget: docs/platform/agent-coordination/architecture/README.md:38-38#documents (current lines); unit SHA256 49356260560f2832cf7a255dea7b0b249ea812951557ae23a39df4cef1b3b9f0.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 49356260560f2832cf7a255dea7b0b249ea812951557ae23a39df4cef1b3b9f0 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 12, target 14; 5 changed spellings/labels, 3 destination changes; 2 added, 0 removed.\nLink 1: \"none\" (none) → \"Agent Coordination Foundation Vision\" (../vision.md); resolved none → docs/platform/agent-coordination/vision.md.\nLink 2: \"System Context\" (system-context.md) → \"System Context\" (../history/retired-engine/files/architecture/system-context.md#literal-snapshot); resolved docs/architect/agent-coordination/architecture/system-context.md → docs/platform/agent-coordination/history/retired-engine/files/architecture/system-context.md#literal-snapshot.\nLink 3: \"Coordination Foundation Baseline\" (coordination-foundation-baseline.md) → \"Coordination Foundation Baseline\" (../history/retired-engine/files/architecture/coordination-foundation-baseline.md#literal-snapshot); resolved docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md → docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md#literal-snapshot.\nLink 11: \"Coordination Continuation And Recovery\" (coordination-continuation-recovery.md) → \"Coordination Continuation And Recovery\" (../history/retired-engine/files/architecture/coordination-continuation-recovery.md#literal-snapshot); resolved docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md → docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-continuation-recovery.md#literal-snapshot.\nLink 14: \"none\" (none) → \"Run Phases And Admission\" (../contracts/assignment-run-runresult.md#run-phases-and-admission); resolved none → docs/platform/agent-coordination/contracts/assignment-run-runresult.md#run-phases-and-admission.\nHeading depth: not a heading → 2; title \"Unheaded block 4\" → \"Documents\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/README.md#unheaded-block-4 under docs/platform/agent-coordination/architecture/README.md#documents; source context \"Agent Coordination Architecture / Documents\", target context \"Agent Coordination Architecture\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/README.md",
+    "targetAnchor": "documents",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "deep: read full source block (1. [System Context](system-context.md) defines system p...) against target section 'Documents' (h2); 25 of 34 source lines appear verbatim in the target section, the rest is rewritten current wording, so supersede with a named successor is truthful and no carried claim is made; Heading depth and Links lines (12/14) verified; digests differ as stated and both recomputed; anchor checked; last-reviewed digest present at 947f6169e.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-04-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "49356260560f2832cf7a255dea7b0b249ea812951557ae23a39df4cef1b3b9f0",
+    "targetAncestry": [
+      "Agent Coordination Architecture"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_0e9e0ab53bbc4bdfb7b06b60033e2cc0",
+    "sourceUnitDigest": "672b4eb44591d3566f6019f9ac30e09eb818a3f4ef39b61915d1286d1b98fb24",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/README.md:18-51#unheaded-block-4 (current lines); unit SHA256 672b4eb44591d3566f6019f9ac30e09eb818a3f4ef39b61915d1286d1b98fb24.\nTarget: docs/platform/agent-coordination/architecture/README.md:38-38#documents (current lines); unit SHA256 49356260560f2832cf7a255dea7b0b249ea812951557ae23a39df4cef1b3b9f0.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 49356260560f2832cf7a255dea7b0b249ea812951557ae23a39df4cef1b3b9f0 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 12, target 14; 5 changed spellings/labels, 3 destination changes; 2 added, 0 removed.\nLink 1: \"none\" (none) → \"Agent Coordination Foundation Vision\" (../vision.md); resolved none → docs/platform/agent-coordination/vision.md.\nLink 2: \"System Context\" (system-context.md) → \"System Context\" (../history/retired-engine/files/architecture/system-context.md#literal-snapshot); resolved docs/architect/agent-coordination/architecture/system-context.md → docs/platform/agent-coordination/history/retired-engine/files/architecture/system-context.md#literal-snapshot.\nLink 3: \"Coordination Foundation Baseline\" (coordination-foundation-baseline.md) → \"Coordination Foundation Baseline\" (../history/retired-engine/files/architecture/coordination-foundation-baseline.md#literal-snapshot); resolved docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md → docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md#literal-snapshot.\nLink 11: \"Coordination Continuation And Recovery\" (coordination-continuation-recovery.md) → \"Coordination Continuation And Recovery\" (../history/retired-engine/files/architecture/coordination-continuation-recovery.md#literal-snapshot); resolved docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md → docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-continuation-recovery.md#literal-snapshot.\nLink 14: \"none\" (none) → \"Run Phases And Admission\" (../contracts/assignment-run-runresult.md#run-phases-and-admission); resolved none → docs/platform/agent-coordination/contracts/assignment-run-runresult.md#run-phases-and-admission.\nHeading depth: not a heading → 2; title \"Unheaded block 4\" → \"Documents\".\nWhole direct section differs; depth block → 2; 5 distinct link changes; normalized line order differs; 9 removed and 11 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/README.md#unheaded-block-4 under docs/platform/agent-coordination/architecture/README.md#documents; source context \"Agent Coordination Architecture / Documents\", target context \"Agent Coordination Architecture\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/README.md",
+    "targetAnchor": "documents",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "49356260560f2832cf7a255dea7b0b249ea812951557ae23a39df4cef1b3b9f0",
+    "targetAncestry": [
+      "Agent Coordination Architecture"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 54,
+  "factsSHA256": "7955f3fed42c6d16bfba4cf13b649e447fffcbc77753bd7079e2188f823b2a9b",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-4",
+    "githubAnchor": "unheaded-block-4",
+    "stableAnchor": "unheaded-block-4",
+    "title": "Unheaded block 4",
+    "startLine": 18,
+    "endLine": 51,
+    "textDigest": "672b4eb44591d3566f6019f9ac30e09eb818a3f4ef39b61915d1286d1b98fb24",
+    "sample": "1. [System Context](system-context.md) defines system purpose and major\n   authority boundaries.\n2. [Coordination Foundation Baseline](coordination-foundation-baseline.md)\n   summa",
+    "identityFingerprint": "c112cf9ccbe613049322e4059032971db9c4a6be7cd4bf60bdc276279766d1eb",
+    "ancestry": [
+      "Agent Coordination Architecture",
+      "Documents"
+    ],
+    "path": "docs/architect/agent-coordination/architecture/README.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "Documents",
+    "anchor": "documents",
+    "githubAnchor": "documents",
+    "stableAnchor": "h-5e4e6f7a01d6",
+    "startLine": 38,
+    "endLine": 38,
+    "textDigest": "49356260560f2832cf7a255dea7b0b249ea812951557ae23a39df4cef1b3b9f0",
+    "sample": "Documents",
+    "sectionPayloadDigest": "a6bab3ccf8967d59b92af4f8841ea0b77d2b684d1a89d5b6d825558bae315301",
+    "followingBlockDigest": "3947f7af996a98f40b0df4c778f1bc122fe742cce6b8dde7cc743105b33c4468",
+    "identityFingerprint": "c1c1cb92062e9d6f3acc77660f0cffb33c1220377d75a6a055cc2fb59a1ca7b4",
+    "ancestry": [
+      "Agent Coordination Architecture"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/README.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_0e9e0ab53bbc4bdfb7b06b60033e2cc0",
+    "sourceUnitDigest": "672b4eb44591d3566f6019f9ac30e09eb818a3f4ef39b61915d1286d1b98fb24",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/README.md:18-51#unheaded-block-4 (current lines); unit SHA256 672b4eb44591d3566f6019f9ac30e09eb818a3f4ef39b61915d1286d1b98fb24.\nTarget: docs/platform/agent-coordination/architecture/README.md:38-38#documents (current lines); unit SHA256 49356260560f2832cf7a255dea7b0b249ea812951557ae23a39df4cef1b3b9f0.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 49356260560f2832cf7a255dea7b0b249ea812951557ae23a39df4cef1b3b9f0 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 12, target 14; 5 changed spellings/labels, 3 destination changes; 2 added, 0 removed.\nLink 1: \"none\" (none) → \"Agent Coordination Foundation Vision\" (../vision.md); resolved none → docs/platform/agent-coordination/vision.md.\nLink 2: \"System Context\" (system-context.md) → \"System Context\" (../history/retired-engine/files/architecture/system-context.md#literal-snapshot); resolved docs/architect/agent-coordination/architecture/system-context.md → docs/platform/agent-coordination/history/retired-engine/files/architecture/system-context.md#literal-snapshot.\nLink 3: \"Coordination Foundation Baseline\" (coordination-foundation-baseline.md) → \"Coordination Foundation Baseline\" (../history/retired-engine/files/architecture/coordination-foundation-baseline.md#literal-snapshot); resolved docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md → docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md#literal-snapshot.\nLink 11: \"Coordination Continuation And Recovery\" (coordination-continuation-recovery.md) → \"Coordination Continuation And Recovery\" (../history/retired-engine/files/architecture/coordination-continuation-recovery.md#literal-snapshot); resolved docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md → docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-continuation-recovery.md#literal-snapshot.\nLink 14: \"none\" (none) → \"Run Phases And Admission\" (../contracts/assignment-run-runresult.md#run-phases-and-admission); resolved none → docs/platform/agent-coordination/contracts/assignment-run-runresult.md#run-phases-and-admission.\nHeading depth: not a heading → 2; title \"Unheaded block 4\" → \"Documents\".\nWhole direct section differs; depth block → 2; 5 distinct link changes; normalized line order differs; 9 removed and 11 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/README.md#unheaded-block-4 under docs/platform/agent-coordination/architecture/README.md#documents; source context \"Agent Coordination Architecture / Documents\", target context \"Agent Coordination Architecture\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/README.md",
+    "targetAnchor": "documents",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "49356260560f2832cf7a255dea7b0b249ea812951557ae23a39df4cef1b3b9f0",
+    "targetAncestry": [
+      "Agent Coordination Architecture"
+    ]
+  }
+}
+```
+
+## Entry rationale-056
+
+```json
+{
+  "entryId": "rationale-056",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_572b05980d7185a97d83e9167978cfc1",
+  "before": {
+    "claimId": "claim_572b05980d7185a97d83e9167978cfc1",
+    "sourceUnitDigest": "8280357eb2640fa59bf6e606f3347228be1fa52bebd3908f03ae9c75d125dd80",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/README.md:60-84#unheaded-block-7 (current lines); unit SHA256 8280357eb2640fa59bf6e606f3347228be1fa52bebd3908f03ae9c75d125dd80.\nTarget: docs/platform/agent-coordination/architecture/README.md:78-78#runtime-recovery-principles (current lines); unit SHA256 ae39ebfd15d5366bf1f3fdd54205e69a1a908e45bb3eeefc50715cacd36780b2.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest ae39ebfd15d5366bf1f3fdd54205e69a1a908e45bb3eeefc50715cacd36780b2 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 4; 4 changed spellings/labels, 0 destination changes; 4 added, 0 removed.\nLink 1: \"none\" (none) → \"ADR-008\" (../history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md#literal-snapshot); resolved none → docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md#literal-snapshot.\nLink 2: \"none\" (none) → \"ADR-009\" (../history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md#literal-snapshot); resolved none → docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md#literal-snapshot.\nLink 3: \"none\" (none) → \"baseline\" (../history/retired-engine/files/architecture/coordination-foundation-baseline.md#literal-snapshot); resolved none → docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md#literal-snapshot.\nLink 4: \"none\" (none) → \"Group Thinking Trigger Surface\" (group-thinking-trigger-surface.md); resolved none → docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md.\nHeading depth: not a heading → 2; title \"Unheaded block 7\" → \"Runtime Recovery Principles\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/README.md#unheaded-block-7 under docs/platform/agent-coordination/architecture/README.md#runtime-recovery-principles; source context \"Agent Coordination Architecture / Runtime Recovery Principles\", target context \"Agent Coordination Architecture\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/README.md",
+    "targetAnchor": "runtime-recovery-principles",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "deep: read full source block (- An observed incident never creates execution authorit...) against target section 'Runtime Recovery Principles' (h2); 23 of 25 source lines appear verbatim in the target section, the rest is rewritten current wording, so supersede with a named successor is truthful and no carried claim is made; Heading depth and Links lines (0/4) verified; digests differ as stated and both recomputed; anchor checked; last-reviewed digest present at 947f6169e.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-04-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "ae39ebfd15d5366bf1f3fdd54205e69a1a908e45bb3eeefc50715cacd36780b2",
+    "targetAncestry": [
+      "Agent Coordination Architecture"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_572b05980d7185a97d83e9167978cfc1",
+    "sourceUnitDigest": "8280357eb2640fa59bf6e606f3347228be1fa52bebd3908f03ae9c75d125dd80",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/README.md:60-84#unheaded-block-7 (current lines); unit SHA256 8280357eb2640fa59bf6e606f3347228be1fa52bebd3908f03ae9c75d125dd80.\nTarget: docs/platform/agent-coordination/architecture/README.md:78-78#runtime-recovery-principles (current lines); unit SHA256 ae39ebfd15d5366bf1f3fdd54205e69a1a908e45bb3eeefc50715cacd36780b2.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest ae39ebfd15d5366bf1f3fdd54205e69a1a908e45bb3eeefc50715cacd36780b2 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 4; 4 changed spellings/labels, 0 destination changes; 4 added, 0 removed.\nLink 1: \"none\" (none) → \"ADR-008\" (../history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md#literal-snapshot); resolved none → docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md#literal-snapshot.\nLink 2: \"none\" (none) → \"ADR-009\" (../history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md#literal-snapshot); resolved none → docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md#literal-snapshot.\nLink 3: \"none\" (none) → \"baseline\" (../history/retired-engine/files/architecture/coordination-foundation-baseline.md#literal-snapshot); resolved none → docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md#literal-snapshot.\nLink 4: \"none\" (none) → \"Group Thinking Trigger Surface\" (group-thinking-trigger-surface.md); resolved none → docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md.\nHeading depth: not a heading → 2; title \"Unheaded block 7\" → \"Runtime Recovery Principles\".\nWhole direct section differs; depth block → 2; 4 distinct link changes; normalized line order differs; 2 removed and 15 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/README.md#unheaded-block-7 under docs/platform/agent-coordination/architecture/README.md#runtime-recovery-principles; source context \"Agent Coordination Architecture / Runtime Recovery Principles\", target context \"Agent Coordination Architecture\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/README.md",
+    "targetAnchor": "runtime-recovery-principles",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "ae39ebfd15d5366bf1f3fdd54205e69a1a908e45bb3eeefc50715cacd36780b2",
+    "targetAncestry": [
+      "Agent Coordination Architecture"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 55,
+  "factsSHA256": "5a6398e5740a6454eb7f023731f1f0c79e46340ed8aa3468d4ed3d6b9411d061",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-7",
+    "githubAnchor": "unheaded-block-7",
+    "stableAnchor": "unheaded-block-7",
+    "title": "Unheaded block 7",
+    "startLine": 60,
+    "endLine": 84,
+    "textDigest": "8280357eb2640fa59bf6e606f3347228be1fa52bebd3908f03ae9c75d125dd80",
+    "sample": "- An observed incident never creates execution authority. Every new attempt\n  needs a valid admission through the Run contract; a missing RunHandle,\n  an expired retry-after, or a ",
+    "identityFingerprint": "da8f4bfce46bfbf19a370726011d523d1672ad78d9850b1952532a18dd51b989",
+    "ancestry": [
+      "Agent Coordination Architecture",
+      "Runtime Recovery Principles"
+    ],
+    "path": "docs/architect/agent-coordination/architecture/README.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "Runtime Recovery Principles",
+    "anchor": "runtime-recovery-principles",
+    "githubAnchor": "runtime-recovery-principles",
+    "stableAnchor": "h-34f7be396976",
+    "startLine": 78,
+    "endLine": 78,
+    "textDigest": "ae39ebfd15d5366bf1f3fdd54205e69a1a908e45bb3eeefc50715cacd36780b2",
+    "sample": "Runtime Recovery Principles",
+    "sectionPayloadDigest": "61702ee454fe15df18b7a7a80b55d916f5286ddce52a322f2be00602557f38e2",
+    "followingBlockDigest": "190dffc2ae0b62a9178968e03ec952e7680c7dad46534dd92f023f1b05cdc56f",
+    "identityFingerprint": "8e0e4a5bf3a8bd4b0f6df157a9e45e0c4a4b3a5e1cca990d9dcdb2aecf9bef73",
+    "ancestry": [
+      "Agent Coordination Architecture"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/README.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_572b05980d7185a97d83e9167978cfc1",
+    "sourceUnitDigest": "8280357eb2640fa59bf6e606f3347228be1fa52bebd3908f03ae9c75d125dd80",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/README.md:60-84#unheaded-block-7 (current lines); unit SHA256 8280357eb2640fa59bf6e606f3347228be1fa52bebd3908f03ae9c75d125dd80.\nTarget: docs/platform/agent-coordination/architecture/README.md:78-78#runtime-recovery-principles (current lines); unit SHA256 ae39ebfd15d5366bf1f3fdd54205e69a1a908e45bb3eeefc50715cacd36780b2.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest ae39ebfd15d5366bf1f3fdd54205e69a1a908e45bb3eeefc50715cacd36780b2 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 4; 4 changed spellings/labels, 0 destination changes; 4 added, 0 removed.\nLink 1: \"none\" (none) → \"ADR-008\" (../history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md#literal-snapshot); resolved none → docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md#literal-snapshot.\nLink 2: \"none\" (none) → \"ADR-009\" (../history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md#literal-snapshot); resolved none → docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md#literal-snapshot.\nLink 3: \"none\" (none) → \"baseline\" (../history/retired-engine/files/architecture/coordination-foundation-baseline.md#literal-snapshot); resolved none → docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md#literal-snapshot.\nLink 4: \"none\" (none) → \"Group Thinking Trigger Surface\" (group-thinking-trigger-surface.md); resolved none → docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md.\nHeading depth: not a heading → 2; title \"Unheaded block 7\" → \"Runtime Recovery Principles\".\nWhole direct section differs; depth block → 2; 4 distinct link changes; normalized line order differs; 2 removed and 15 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/README.md#unheaded-block-7 under docs/platform/agent-coordination/architecture/README.md#runtime-recovery-principles; source context \"Agent Coordination Architecture / Runtime Recovery Principles\", target context \"Agent Coordination Architecture\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/README.md",
+    "targetAnchor": "runtime-recovery-principles",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "ae39ebfd15d5366bf1f3fdd54205e69a1a908e45bb3eeefc50715cacd36780b2",
+    "targetAncestry": [
+      "Agent Coordination Architecture"
+    ]
+  }
+}
+```
+
+## Entry rationale-057
+
+```json
+{
+  "entryId": "rationale-057",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_7f7eea3837a5a141729c012e44d43903",
+  "before": {
+    "claimId": "claim_7f7eea3837a5a141729c012e44d43903",
+    "sourceUnitDigest": "8b61857ecd1c833898fa45e8ba0ff7aaf8a1eed9e773058c4a180115f6d81fca",
+    "claimKind": "decision",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/README.md:86-95#unheaded-block-8 (current lines); unit SHA256 8b61857ecd1c833898fa45e8ba0ff7aaf8a1eed9e773058c4a180115f6d81fca.\nTarget: docs/platform/agent-coordination/architecture/README.md:78-78#runtime-recovery-principles (current lines); unit SHA256 ae39ebfd15d5366bf1f3fdd54205e69a1a908e45bb3eeefc50715cacd36780b2.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest ae39ebfd15d5366bf1f3fdd54205e69a1a908e45bb3eeefc50715cacd36780b2 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 4, target 4; 4 changed spellings/labels, 4 destination changes; 0 added, 0 removed.\nLink 1: \"ADR-008\" (../decisions/ADR-008-coordination-session-and-mission-deferral.md) → \"ADR-008\" (../history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md#literal-snapshot); resolved docs/architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md → docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md#literal-snapshot.\nLink 2: \"ADR-009\" (../decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md) → \"ADR-009\" (../history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md#literal-snapshot); resolved docs/architect/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md → docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md#literal-snapshot.\nLink 3: \"contracts/\" (../contracts/README.md) → \"baseline\" (../history/retired-engine/files/architecture/coordination-foundation-baseline.md#literal-snapshot); resolved docs/architect/agent-coordination/contracts/README.md → docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md#literal-snapshot.\nLink 4: \"Coordination Foundation Baseline\" (coordination-foundation-baseline.md) → \"Group Thinking Trigger Surface\" (group-thinking-trigger-surface.md); resolved docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md → docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md.\nHeading depth: not a heading → 2; title \"Unheaded block 8\" → \"Runtime Recovery Principles\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/README.md#unheaded-block-8 under docs/platform/agent-coordination/architecture/README.md#runtime-recovery-principles; source context \"Agent Coordination Architecture / Runtime Recovery Principles\", target context \"Agent Coordination Architecture\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/README.md",
+    "targetAnchor": "runtime-recovery-principles",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "deep: read full source block (CoordinationSession's identity/persistence boundary and...) against target section 'Runtime Recovery Principles' (h2); 2 of 10 source lines appear verbatim in the target section, the rest is rewritten current wording, so supersede with a named successor is truthful and no carried claim is made; Heading depth and Links lines (4/4) verified; digests differ as stated and both recomputed; anchor checked; last-reviewed digest present at 947f6169e.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-04-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "ae39ebfd15d5366bf1f3fdd54205e69a1a908e45bb3eeefc50715cacd36780b2",
+    "targetAncestry": [
+      "Agent Coordination Architecture"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_7f7eea3837a5a141729c012e44d43903",
+    "sourceUnitDigest": "8b61857ecd1c833898fa45e8ba0ff7aaf8a1eed9e773058c4a180115f6d81fca",
+    "claimKind": "decision",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/README.md:86-95#unheaded-block-8 (current lines); unit SHA256 8b61857ecd1c833898fa45e8ba0ff7aaf8a1eed9e773058c4a180115f6d81fca.\nTarget: docs/platform/agent-coordination/architecture/README.md:78-78#runtime-recovery-principles (current lines); unit SHA256 ae39ebfd15d5366bf1f3fdd54205e69a1a908e45bb3eeefc50715cacd36780b2.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest ae39ebfd15d5366bf1f3fdd54205e69a1a908e45bb3eeefc50715cacd36780b2 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 4, target 4; 6 changed spellings/labels, 2 destination changes; 2 added, 2 removed.\nLink 1: \"ADR-008\" (../decisions/ADR-008-coordination-session-and-mission-deferral.md) → \"ADR-008\" (../history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md#literal-snapshot); resolved docs/architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md → docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md#literal-snapshot.\nLink 2: \"ADR-009\" (../decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md) → \"ADR-009\" (../history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md#literal-snapshot); resolved docs/architect/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md → docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md#literal-snapshot.\nLink 3: \"contracts/\" (../contracts/README.md) → \"none\" (none); resolved docs/architect/agent-coordination/contracts/README.md → none.\nLink 4: \"Coordination Foundation Baseline\" (coordination-foundation-baseline.md) → \"none\" (none); resolved docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md → none.\nLink 3: \"none\" (none) → \"baseline\" (../history/retired-engine/files/architecture/coordination-foundation-baseline.md#literal-snapshot); resolved none → docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md#literal-snapshot.\nLink 4: \"none\" (none) → \"Group Thinking Trigger Surface\" (group-thinking-trigger-surface.md); resolved none → docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md.\nHeading depth: not a heading → 2; title \"Unheaded block 8\" → \"Runtime Recovery Principles\".\nWhole direct section differs; depth block → 2; 6 distinct link changes; normalized line order differs; 8 removed and 36 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/README.md#unheaded-block-8 under docs/platform/agent-coordination/architecture/README.md#runtime-recovery-principles; source context \"Agent Coordination Architecture / Runtime Recovery Principles\", target context \"Agent Coordination Architecture\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/README.md",
+    "targetAnchor": "runtime-recovery-principles",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "ae39ebfd15d5366bf1f3fdd54205e69a1a908e45bb3eeefc50715cacd36780b2",
+    "targetAncestry": [
+      "Agent Coordination Architecture"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 56,
+  "factsSHA256": "be52511309e2775b4e8df38a690a8564f6b98e6923daadbbffc8b3c89664189c",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-8",
+    "githubAnchor": "unheaded-block-8",
+    "stableAnchor": "unheaded-block-8",
+    "title": "Unheaded block 8",
+    "startLine": 86,
+    "endLine": 95,
+    "textDigest": "8b61857ecd1c833898fa45e8ba0ff7aaf8a1eed9e773058c4a180115f6d81fca",
+    "sample": "CoordinationSession's identity/persistence boundary and the shared\nFlowDefinition graph/operation/policy IR are accepted per\n[ADR-008](../decisions/ADR-008-coordination-session-and",
+    "identityFingerprint": "69a21a74294eebdabb539689aaf312a8231721af235d8e4d93aab5cd22417578",
+    "ancestry": [
+      "Agent Coordination Architecture",
+      "Runtime Recovery Principles"
+    ],
+    "path": "docs/architect/agent-coordination/architecture/README.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "Runtime Recovery Principles",
+    "anchor": "runtime-recovery-principles",
+    "githubAnchor": "runtime-recovery-principles",
+    "stableAnchor": "h-34f7be396976",
+    "startLine": 78,
+    "endLine": 78,
+    "textDigest": "ae39ebfd15d5366bf1f3fdd54205e69a1a908e45bb3eeefc50715cacd36780b2",
+    "sample": "Runtime Recovery Principles",
+    "sectionPayloadDigest": "61702ee454fe15df18b7a7a80b55d916f5286ddce52a322f2be00602557f38e2",
+    "followingBlockDigest": "190dffc2ae0b62a9178968e03ec952e7680c7dad46534dd92f023f1b05cdc56f",
+    "identityFingerprint": "8e0e4a5bf3a8bd4b0f6df157a9e45e0c4a4b3a5e1cca990d9dcdb2aecf9bef73",
+    "ancestry": [
+      "Agent Coordination Architecture"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/README.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_7f7eea3837a5a141729c012e44d43903",
+    "sourceUnitDigest": "8b61857ecd1c833898fa45e8ba0ff7aaf8a1eed9e773058c4a180115f6d81fca",
+    "claimKind": "decision",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/README.md:86-95#unheaded-block-8 (current lines); unit SHA256 8b61857ecd1c833898fa45e8ba0ff7aaf8a1eed9e773058c4a180115f6d81fca.\nTarget: docs/platform/agent-coordination/architecture/README.md:78-78#runtime-recovery-principles (current lines); unit SHA256 ae39ebfd15d5366bf1f3fdd54205e69a1a908e45bb3eeefc50715cacd36780b2.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest ae39ebfd15d5366bf1f3fdd54205e69a1a908e45bb3eeefc50715cacd36780b2 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 4, target 4; 6 changed spellings/labels, 2 destination changes; 2 added, 2 removed.\nLink 1: \"ADR-008\" (../decisions/ADR-008-coordination-session-and-mission-deferral.md) → \"ADR-008\" (../history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md#literal-snapshot); resolved docs/architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md → docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md#literal-snapshot.\nLink 2: \"ADR-009\" (../decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md) → \"ADR-009\" (../history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md#literal-snapshot); resolved docs/architect/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md → docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md#literal-snapshot.\nLink 3: \"contracts/\" (../contracts/README.md) → \"none\" (none); resolved docs/architect/agent-coordination/contracts/README.md → none.\nLink 4: \"Coordination Foundation Baseline\" (coordination-foundation-baseline.md) → \"none\" (none); resolved docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md → none.\nLink 3: \"none\" (none) → \"baseline\" (../history/retired-engine/files/architecture/coordination-foundation-baseline.md#literal-snapshot); resolved none → docs/platform/agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md#literal-snapshot.\nLink 4: \"none\" (none) → \"Group Thinking Trigger Surface\" (group-thinking-trigger-surface.md); resolved none → docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md.\nHeading depth: not a heading → 2; title \"Unheaded block 8\" → \"Runtime Recovery Principles\".\nWhole direct section differs; depth block → 2; 6 distinct link changes; normalized line order differs; 8 removed and 36 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/README.md#unheaded-block-8 under docs/platform/agent-coordination/architecture/README.md#runtime-recovery-principles; source context \"Agent Coordination Architecture / Runtime Recovery Principles\", target context \"Agent Coordination Architecture\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/README.md",
+    "targetAnchor": "runtime-recovery-principles",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "ae39ebfd15d5366bf1f3fdd54205e69a1a908e45bb3eeefc50715cacd36780b2",
+    "targetAncestry": [
+      "Agent Coordination Architecture"
+    ]
+  }
+}
+```
+
+## Entry rationale-058
+
+```json
+{
+  "entryId": "rationale-058",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_db593c2dbf2dbde00be1110c70e94583",
+  "before": {
+    "claimId": "claim_db593c2dbf2dbde00be1110c70e94583",
+    "sourceUnitDigest": "1289cb23be8c139e2279838f8575e142606646e62b2c1afce03b40de10749017",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/runtime-recovery-design.md:203-214#unheaded-block-24 (current lines); unit SHA256 1289cb23be8c139e2279838f8575e142606646e62b2c1afce03b40de10749017.\nTarget: docs/platform/agent-coordination/architecture/runtime-recovery-design.md:168-168#7-agent-facing-contract (current lines); unit SHA256 0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68 at 2300d65571968bb3bcb80123a273272586e3f1db.\nLinks: source 0, target 2; 2 changed spellings/labels, 0 destination changes; 2 added, 0 removed.\nLink 1: \"none\" (none) → \"area portal\" (../README.md); resolved none → docs/platform/agent-coordination/README.md.\nLink 2: \"none\" (none) → \"runner spec\" (../../runner/spec.md); resolved none → docs/platform/runner/spec.md.\nHeading depth: not a heading → 2; title \"Unheaded block 24\" → \"7. Agent-Facing Contract\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-24 under docs/platform/agent-coordination/architecture/runtime-recovery-design.md#7-agent-facing-contract; source context \"Runtime Recovery And Work Continuity / 7. Agent-Facing Contract\", target context \"Runtime Recovery And Work Continuity\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+    "targetAnchor": "7-agent-facing-contract",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "deep: supersede runtime-recovery-design.md:203-214#unheaded-block-24@pin -> runtime-recovery-design.md:168-168#7-agent-facing-contract; digests differ and were recomputed by extractor; lines equal the real spans; anchor ok; context equals the real ancestry; links 0/2/2/0/2/0 recomputed independently and equal; 0 correction line(s) checked (after-text in target); 1 residual text hunk(s) beyond links/corrections, which the successor-text sentence discloses; last-reviewed digest backed by a committed ok verdict.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-10-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68",
+    "targetAncestry": [
+      "Runtime Recovery And Work Continuity"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_db593c2dbf2dbde00be1110c70e94583",
+    "sourceUnitDigest": "1289cb23be8c139e2279838f8575e142606646e62b2c1afce03b40de10749017",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/runtime-recovery-design.md:203-214#unheaded-block-24 (current lines); unit SHA256 1289cb23be8c139e2279838f8575e142606646e62b2c1afce03b40de10749017.\nTarget: docs/platform/agent-coordination/architecture/runtime-recovery-design.md:168-168#7-agent-facing-contract (current lines); unit SHA256 0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68 at 2300d65571968bb3bcb80123a273272586e3f1db.\nLinks: source 0, target 2; 2 changed spellings/labels, 0 destination changes; 2 added, 0 removed.\nLink 1: \"none\" (none) → \"area portal\" (../README.md); resolved none → docs/platform/agent-coordination/README.md.\nLink 2: \"none\" (none) → \"runner spec\" (../../runner/spec.md); resolved none → docs/platform/runner/spec.md.\nHeading depth: not a heading → 2; title \"Unheaded block 24\" → \"7. Agent-Facing Contract\".\nWhole direct section differs; depth block → 2; 2 distinct link changes; normalized line order differs; 12 removed and 28 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-24 under docs/platform/agent-coordination/architecture/runtime-recovery-design.md#7-agent-facing-contract; source context \"Runtime Recovery And Work Continuity / 7. Agent-Facing Contract\", target context \"Runtime Recovery And Work Continuity\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+    "targetAnchor": "7-agent-facing-contract",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68",
+    "targetAncestry": [
+      "Runtime Recovery And Work Continuity"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 57,
+  "factsSHA256": "4eca4241f55c3cb336505d14518b913abb2ca3eca36f4851b66cb2ccf88b104a",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-24",
+    "githubAnchor": "unheaded-block-24",
+    "stableAnchor": "unheaded-block-24",
+    "title": "Unheaded block 24",
+    "startLine": 203,
+    "endLine": 214,
+    "textDigest": "1289cb23be8c139e2279838f8575e142606646e62b2c1afce03b40de10749017",
+    "sample": "Extend the existing `coordination run` request door with a proposed recovery\nrequest variant: `{contract, coordinationId, writerId, intent: recover,\ntarget?: {assignmentId}, budget",
+    "identityFingerprint": "a7b7db23513d9a28147927c684e54eefbf20cb80204ea41e9bc64ac9824ff4aa",
+    "ancestry": [
+      "Runtime Recovery And Work Continuity",
+      "7. Agent-Facing Contract"
+    ],
+    "path": "docs/architect/agent-coordination/architecture/runtime-recovery-design.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "7. Agent-Facing Contract",
+    "anchor": "7-agent-facing-contract",
+    "githubAnchor": "7-agent-facing-contract",
+    "stableAnchor": "h-bfb8d2a1c009",
+    "startLine": 168,
+    "endLine": 168,
+    "textDigest": "0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68",
+    "sample": "7. Agent-Facing Contract",
+    "sectionPayloadDigest": "c08ddc1aba4310ba00be33a8df3d66d638d52425ccc77cafe695645671793f24",
+    "followingBlockDigest": "fb6bcd9ac99360a3573de37bb2a970a018a0c2af80fadfe79010835f74a62b70",
+    "identityFingerprint": "d384abb972e4290f0bd5f5e5426320cb7e0dbbbff7e1062682ad58cc583edbac",
+    "ancestry": [
+      "Runtime Recovery And Work Continuity"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_db593c2dbf2dbde00be1110c70e94583",
+    "sourceUnitDigest": "1289cb23be8c139e2279838f8575e142606646e62b2c1afce03b40de10749017",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/runtime-recovery-design.md:203-214#unheaded-block-24 (current lines); unit SHA256 1289cb23be8c139e2279838f8575e142606646e62b2c1afce03b40de10749017.\nTarget: docs/platform/agent-coordination/architecture/runtime-recovery-design.md:168-168#7-agent-facing-contract (current lines); unit SHA256 0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68 at 2300d65571968bb3bcb80123a273272586e3f1db.\nLinks: source 0, target 2; 2 changed spellings/labels, 0 destination changes; 2 added, 0 removed.\nLink 1: \"none\" (none) → \"area portal\" (../README.md); resolved none → docs/platform/agent-coordination/README.md.\nLink 2: \"none\" (none) → \"runner spec\" (../../runner/spec.md); resolved none → docs/platform/runner/spec.md.\nHeading depth: not a heading → 2; title \"Unheaded block 24\" → \"7. Agent-Facing Contract\".\nWhole direct section differs; depth block → 2; 2 distinct link changes; normalized line order differs; 12 removed and 28 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-24 under docs/platform/agent-coordination/architecture/runtime-recovery-design.md#7-agent-facing-contract; source context \"Runtime Recovery And Work Continuity / 7. Agent-Facing Contract\", target context \"Runtime Recovery And Work Continuity\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+    "targetAnchor": "7-agent-facing-contract",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68",
+    "targetAncestry": [
+      "Runtime Recovery And Work Continuity"
+    ]
+  }
+}
+```
+
+## Entry rationale-059
+
+```json
+{
+  "entryId": "rationale-059",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_e79e40a9ee21a51be2d37ee413a5b903",
+  "before": {
+    "claimId": "claim_e79e40a9ee21a51be2d37ee413a5b903",
+    "sourceUnitDigest": "b5104854e5852006e0a118ab4bd69bbfbcdef9750c437c95c8173fd29f02a612",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/runtime-recovery-design.md:216-223#unheaded-block-25 (current lines); unit SHA256 b5104854e5852006e0a118ab4bd69bbfbcdef9750c437c95c8173fd29f02a612.\nTarget: docs/platform/agent-coordination/architecture/runtime-recovery-design.md:168-168#7-agent-facing-contract (current lines); unit SHA256 0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68 at 2300d65571968bb3bcb80123a273272586e3f1db.\nLinks: source 0, target 2; 2 changed spellings/labels, 0 destination changes; 2 added, 0 removed.\nLink 1: \"none\" (none) → \"area portal\" (../README.md); resolved none → docs/platform/agent-coordination/README.md.\nLink 2: \"none\" (none) → \"runner spec\" (../../runner/spec.md); resolved none → docs/platform/runner/spec.md.\nHeading depth: not a heading → 2; title \"Unheaded block 25\" → \"7. Agent-Facing Contract\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-25 under docs/platform/agent-coordination/architecture/runtime-recovery-design.md#7-agent-facing-contract; source context \"Runtime Recovery And Work Continuity / 7. Agent-Facing Contract\", target context \"Runtime Recovery And Work Continuity\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+    "targetAnchor": "7-agent-facing-contract",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "deep: supersede runtime-recovery-design.md:216-223#unheaded-block-25@pin -> runtime-recovery-design.md:168-168#7-agent-facing-contract; digests differ and were recomputed by extractor; lines equal the real spans; anchor ok; context equals the real ancestry; links 0/2/2/0/2/0 recomputed independently and equal; 0 correction line(s) checked (after-text in target); 1 residual text hunk(s) beyond links/corrections, which the successor-text sentence discloses; last-reviewed digest backed by a committed ok verdict.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-10-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68",
+    "targetAncestry": [
+      "Runtime Recovery And Work Continuity"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_e79e40a9ee21a51be2d37ee413a5b903",
+    "sourceUnitDigest": "b5104854e5852006e0a118ab4bd69bbfbcdef9750c437c95c8173fd29f02a612",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/runtime-recovery-design.md:216-223#unheaded-block-25 (current lines); unit SHA256 b5104854e5852006e0a118ab4bd69bbfbcdef9750c437c95c8173fd29f02a612.\nTarget: docs/platform/agent-coordination/architecture/runtime-recovery-design.md:168-168#7-agent-facing-contract (current lines); unit SHA256 0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68 at 2300d65571968bb3bcb80123a273272586e3f1db.\nLinks: source 0, target 2; 2 changed spellings/labels, 0 destination changes; 2 added, 0 removed.\nLink 1: \"none\" (none) → \"area portal\" (../README.md); resolved none → docs/platform/agent-coordination/README.md.\nLink 2: \"none\" (none) → \"runner spec\" (../../runner/spec.md); resolved none → docs/platform/runner/spec.md.\nHeading depth: not a heading → 2; title \"Unheaded block 25\" → \"7. Agent-Facing Contract\".\nWhole direct section differs; depth block → 2; 2 distinct link changes; normalized line order differs; 8 removed and 28 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-25 under docs/platform/agent-coordination/architecture/runtime-recovery-design.md#7-agent-facing-contract; source context \"Runtime Recovery And Work Continuity / 7. Agent-Facing Contract\", target context \"Runtime Recovery And Work Continuity\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+    "targetAnchor": "7-agent-facing-contract",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68",
+    "targetAncestry": [
+      "Runtime Recovery And Work Continuity"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 58,
+  "factsSHA256": "5bebe1c2e02e1b48056288560237a1298e461f59816ba8fde8b1337edf454a43",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-25",
+    "githubAnchor": "unheaded-block-25",
+    "stableAnchor": "unheaded-block-25",
+    "title": "Unheaded block 25",
+    "startLine": 216,
+    "endLine": 223,
+    "textDigest": "b5104854e5852006e0a118ab4bd69bbfbcdef9750c437c95c8173fd29f02a612",
+    "sample": "Return `{outcome: applied | already-applied | waiting | needs-input | refused,\naction, subjectRefs, reasonCode, evidenceRefs, nextCheckAt?}`. A repeated recover\ncall recomputes fac",
+    "identityFingerprint": "b255c327a28137780abfb4bf75bd78acc0637a7cd2627b354217f5f2df3796bd",
+    "ancestry": [
+      "Runtime Recovery And Work Continuity",
+      "7. Agent-Facing Contract"
+    ],
+    "path": "docs/architect/agent-coordination/architecture/runtime-recovery-design.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "7. Agent-Facing Contract",
+    "anchor": "7-agent-facing-contract",
+    "githubAnchor": "7-agent-facing-contract",
+    "stableAnchor": "h-bfb8d2a1c009",
+    "startLine": 168,
+    "endLine": 168,
+    "textDigest": "0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68",
+    "sample": "7. Agent-Facing Contract",
+    "sectionPayloadDigest": "c08ddc1aba4310ba00be33a8df3d66d638d52425ccc77cafe695645671793f24",
+    "followingBlockDigest": "fb6bcd9ac99360a3573de37bb2a970a018a0c2af80fadfe79010835f74a62b70",
+    "identityFingerprint": "d384abb972e4290f0bd5f5e5426320cb7e0dbbbff7e1062682ad58cc583edbac",
+    "ancestry": [
+      "Runtime Recovery And Work Continuity"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_e79e40a9ee21a51be2d37ee413a5b903",
+    "sourceUnitDigest": "b5104854e5852006e0a118ab4bd69bbfbcdef9750c437c95c8173fd29f02a612",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/runtime-recovery-design.md:216-223#unheaded-block-25 (current lines); unit SHA256 b5104854e5852006e0a118ab4bd69bbfbcdef9750c437c95c8173fd29f02a612.\nTarget: docs/platform/agent-coordination/architecture/runtime-recovery-design.md:168-168#7-agent-facing-contract (current lines); unit SHA256 0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68 at 2300d65571968bb3bcb80123a273272586e3f1db.\nLinks: source 0, target 2; 2 changed spellings/labels, 0 destination changes; 2 added, 0 removed.\nLink 1: \"none\" (none) → \"area portal\" (../README.md); resolved none → docs/platform/agent-coordination/README.md.\nLink 2: \"none\" (none) → \"runner spec\" (../../runner/spec.md); resolved none → docs/platform/runner/spec.md.\nHeading depth: not a heading → 2; title \"Unheaded block 25\" → \"7. Agent-Facing Contract\".\nWhole direct section differs; depth block → 2; 2 distinct link changes; normalized line order differs; 8 removed and 28 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-25 under docs/platform/agent-coordination/architecture/runtime-recovery-design.md#7-agent-facing-contract; source context \"Runtime Recovery And Work Continuity / 7. Agent-Facing Contract\", target context \"Runtime Recovery And Work Continuity\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+    "targetAnchor": "7-agent-facing-contract",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68",
+    "targetAncestry": [
+      "Runtime Recovery And Work Continuity"
+    ]
+  }
+}
+```
+
+## Entry rationale-060
+
+```json
+{
+  "entryId": "rationale-060",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_bb98dd8d67f6de65de2b005722ade1fd",
+  "before": {
+    "claimId": "claim_bb98dd8d67f6de65de2b005722ade1fd",
+    "sourceUnitDigest": "157e984f508d4ca3863cb3f03edd4d73ed28ef731058eb503058f7489ab564fc",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/runtime-recovery-design.md:268-270#unheaded-block-31 (current lines); unit SHA256 157e984f508d4ca3863cb3f03edd4d73ed28ef731058eb503058f7489ab564fc.\nTarget: docs/platform/agent-coordination/architecture/runtime-recovery-design.md:234-234#10-proof-matrix (current lines); unit SHA256 f376450edf5fe0f9938c58636ed160d27c633ebdfa090046b7f0ab5ea4d9bce5.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest f376450edf5fe0f9938c58636ed160d27c633ebdfa090046b7f0ab5ea4d9bce5 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 31\" → \"10. Proof Matrix\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-31 under docs/platform/agent-coordination/architecture/runtime-recovery-design.md#10-proof-matrix; source context \"Runtime Recovery And Work Continuity / 10. Proof Matrix\", target context \"Runtime Recovery And Work Continuity\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+    "targetAnchor": "10-proof-matrix",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "deep: read full source block (These are required executable scenarios, not tests clai...) against target section '10. Proof Matrix' (h2); 0 of 3 source lines appear verbatim in the target section, the rest is rewritten current wording, so supersede with a named successor is truthful and no carried claim is made; Heading depth and Links lines (0/0) verified; digests differ as stated and both recomputed; anchor checked; last-reviewed digest present at 947f6169e.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-04-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "f376450edf5fe0f9938c58636ed160d27c633ebdfa090046b7f0ab5ea4d9bce5",
+    "targetAncestry": [
+      "Runtime Recovery And Work Continuity"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_bb98dd8d67f6de65de2b005722ade1fd",
+    "sourceUnitDigest": "157e984f508d4ca3863cb3f03edd4d73ed28ef731058eb503058f7489ab564fc",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/runtime-recovery-design.md:268-270#unheaded-block-31 (current lines); unit SHA256 157e984f508d4ca3863cb3f03edd4d73ed28ef731058eb503058f7489ab564fc.\nTarget: docs/platform/agent-coordination/architecture/runtime-recovery-design.md:234-234#10-proof-matrix (current lines); unit SHA256 f376450edf5fe0f9938c58636ed160d27c633ebdfa090046b7f0ab5ea4d9bce5.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest f376450edf5fe0f9938c58636ed160d27c633ebdfa090046b7f0ab5ea4d9bce5 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 31\" → \"10. Proof Matrix\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 3 removed and 28 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-31 under docs/platform/agent-coordination/architecture/runtime-recovery-design.md#10-proof-matrix; source context \"Runtime Recovery And Work Continuity / 10. Proof Matrix\", target context \"Runtime Recovery And Work Continuity\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+    "targetAnchor": "10-proof-matrix",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "f376450edf5fe0f9938c58636ed160d27c633ebdfa090046b7f0ab5ea4d9bce5",
+    "targetAncestry": [
+      "Runtime Recovery And Work Continuity"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 59,
+  "factsSHA256": "584df568c900ad282d65b2d307c085e6324beb612a9527a127375e9fd3958484",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-31",
+    "githubAnchor": "unheaded-block-31",
+    "stableAnchor": "unheaded-block-31",
+    "title": "Unheaded block 31",
+    "startLine": 268,
+    "endLine": 270,
+    "textDigest": "157e984f508d4ca3863cb3f03edd4d73ed28ef731058eb503058f7489ab564fc",
+    "sample": "These are required executable scenarios, not tests claimed to have passed.\nInitial implementation places them in the existing runner/verbs test families;\nfixtures record inputs, in",
+    "identityFingerprint": "5fa63df38a8512cff074be58ac4276186c845fea6840afe9d02ab0aa23366a77",
+    "ancestry": [
+      "Runtime Recovery And Work Continuity",
+      "10. Proof Matrix"
+    ],
+    "path": "docs/architect/agent-coordination/architecture/runtime-recovery-design.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "10. Proof Matrix",
+    "anchor": "10-proof-matrix",
+    "githubAnchor": "10-proof-matrix",
+    "stableAnchor": "h-13d9b5f81017",
+    "startLine": 234,
+    "endLine": 234,
+    "textDigest": "f376450edf5fe0f9938c58636ed160d27c633ebdfa090046b7f0ab5ea4d9bce5",
+    "sample": "10. Proof Matrix",
+    "sectionPayloadDigest": "6353dfc580866cf82dbe521561482319472544211f9270f7a21832eb85d123cc",
+    "followingBlockDigest": "4d793be31cc1842073d14743ad2639baa1e0a6f62a7eb430dcb6138bfa66f436",
+    "identityFingerprint": "a54ad6c7622b2c90255c6be63281a73c6afb3ad8b95d31ca16dbb649023ce7ce",
+    "ancestry": [
+      "Runtime Recovery And Work Continuity"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_bb98dd8d67f6de65de2b005722ade1fd",
+    "sourceUnitDigest": "157e984f508d4ca3863cb3f03edd4d73ed28ef731058eb503058f7489ab564fc",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/runtime-recovery-design.md:268-270#unheaded-block-31 (current lines); unit SHA256 157e984f508d4ca3863cb3f03edd4d73ed28ef731058eb503058f7489ab564fc.\nTarget: docs/platform/agent-coordination/architecture/runtime-recovery-design.md:234-234#10-proof-matrix (current lines); unit SHA256 f376450edf5fe0f9938c58636ed160d27c633ebdfa090046b7f0ab5ea4d9bce5.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest f376450edf5fe0f9938c58636ed160d27c633ebdfa090046b7f0ab5ea4d9bce5 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 31\" → \"10. Proof Matrix\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 3 removed and 28 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-31 under docs/platform/agent-coordination/architecture/runtime-recovery-design.md#10-proof-matrix; source context \"Runtime Recovery And Work Continuity / 10. Proof Matrix\", target context \"Runtime Recovery And Work Continuity\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+    "targetAnchor": "10-proof-matrix",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "f376450edf5fe0f9938c58636ed160d27c633ebdfa090046b7f0ab5ea4d9bce5",
+    "targetAncestry": [
+      "Runtime Recovery And Work Continuity"
+    ]
+  }
+}
+```
+
+## Entry rationale-061
+
+```json
+{
+  "entryId": "rationale-061",
+  "kind": "round4-rationale-rework",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_358f4471159df6d56b6f9ae689efc338",
+  "before": {
+    "claimId": "claim_358f4471159df6d56b6f9ae689efc338",
+    "sourceUnitDigest": "4e738024bef0fa77ab626479e21257efde2ff73b8d0652c1ce7f275de488949c",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/runtime-recovery-design.md:318-321#unheaded-block-34 (current lines); unit SHA256 4e738024bef0fa77ab626479e21257efde2ff73b8d0652c1ce7f275de488949c.\nTarget: docs/platform/agent-coordination/architecture/runtime-recovery-design.md:265-265#11-review-finding-resolution-and-limits (current lines); unit SHA256 93c25a0d99ce3b063b6a246bf7c11aa06c23d8f8784603627c2454c7054dda55.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 93c25a0d99ce3b063b6a246bf7c11aa06c23d8f8784603627c2454c7054dda55 at 9aa37b12a329abd16900dad73ab98408e6ef3aec.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 34\" → \"11. Review Finding Resolution And Limits\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-34 under docs/platform/agent-coordination/architecture/runtime-recovery-design.md#11-review-finding-resolution-and-limits; source context \"Runtime Recovery And Work Continuity / 11. Review Finding Resolution And Limits\", target context \"Runtime Recovery And Work Continuity\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+    "targetAnchor": "11-review-finding-resolution-and-limits",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "reviewed",
+    "reviewNote": "deep: read full source block (Distributed leases, live partial session transfer, shar...) against target section '11. Review Finding Resolution And Limits' (h2); 0 of 4 source lines appear verbatim in the target section, the rest is rewritten current wording, so supersede with a named successor is truthful and no carried claim is made; Heading depth and Links lines (0/0) verified; digests differ as stated and both recomputed; anchor checked; last-reviewed digest present at 9aa37b12a.",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-04-287a22d33.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "93c25a0d99ce3b063b6a246bf7c11aa06c23d8f8784603627c2454c7054dda55",
+    "targetAncestry": [
+      "Runtime Recovery And Work Continuity"
+    ],
+    "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+  },
+  "after": {
+    "claimId": "claim_358f4471159df6d56b6f9ae689efc338",
+    "sourceUnitDigest": "4e738024bef0fa77ab626479e21257efde2ff73b8d0652c1ce7f275de488949c",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/runtime-recovery-design.md:318-321#unheaded-block-34 (current lines); unit SHA256 4e738024bef0fa77ab626479e21257efde2ff73b8d0652c1ce7f275de488949c.\nTarget: docs/platform/agent-coordination/architecture/runtime-recovery-design.md:265-265#11-review-finding-resolution-and-limits (current lines); unit SHA256 93c25a0d99ce3b063b6a246bf7c11aa06c23d8f8784603627c2454c7054dda55.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 93c25a0d99ce3b063b6a246bf7c11aa06c23d8f8784603627c2454c7054dda55 at 9aa37b12a329abd16900dad73ab98408e6ef3aec.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 34\" → \"11. Review Finding Resolution And Limits\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 4 removed and 31 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-34 under docs/platform/agent-coordination/architecture/runtime-recovery-design.md#11-review-finding-resolution-and-limits; source context \"Runtime Recovery And Work Continuity / 11. Review Finding Resolution And Limits\", target context \"Runtime Recovery And Work Continuity\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+    "targetAnchor": "11-review-finding-resolution-and-limits",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "93c25a0d99ce3b063b6a246bf7c11aa06c23d8f8784603627c2454c7054dda55",
+    "targetAncestry": [
+      "Runtime Recovery And Work Continuity"
+    ]
+  },
+  "authorInputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "tags": [],
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-edits.json",
+  "evidenceIndex": 60,
+  "factsSHA256": "30eaf899b1e05de675eef66ab3e28c571e96fc552747e1e560a6326238c38efa",
+  "sourceWitness": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-34",
+    "githubAnchor": "unheaded-block-34",
+    "stableAnchor": "unheaded-block-34",
+    "title": "Unheaded block 34",
+    "startLine": 318,
+    "endLine": 321,
+    "textDigest": "4e738024bef0fa77ab626479e21257efde2ff73b8d0652c1ce7f275de488949c",
+    "sample": "Distributed leases, live partial session transfer, shared chain-budget allocation,\nhealth store/scoring and generic effect ledger are unsupported in the first writer\nprofile. Their",
+    "identityFingerprint": "54c82d30564cc80e73957e27a64ab7815ed7772e8a39b27ed6bc2b4b7785fb75",
+    "ancestry": [
+      "Runtime Recovery And Work Continuity",
+      "11. Review Finding Resolution And Limits"
+    ],
+    "path": "docs/architect/agent-coordination/architecture/runtime-recovery-design.md"
+  },
+  "targetWitness": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "11. Review Finding Resolution And Limits",
+    "anchor": "11-review-finding-resolution-and-limits",
+    "githubAnchor": "11-review-finding-resolution-and-limits",
+    "stableAnchor": "h-8149ea709320",
+    "startLine": 265,
+    "endLine": 265,
+    "textDigest": "93c25a0d99ce3b063b6a246bf7c11aa06c23d8f8784603627c2454c7054dda55",
+    "sample": "11. Review Finding Resolution And Limits",
+    "sectionPayloadDigest": "accb9794bc806ddbbaf9fd2344d35e02368e3b3d8b138fd6c69536925cdf477a",
+    "followingBlockDigest": "68f6db1a7638efc58e4d8adc8bda563b8cacec6c1c289d790c9919e7fc78b74b",
+    "identityFingerprint": "01d0f7f6831d80cc4da3eb383e7cf73cd5269af10e09330514024800061d1ecb",
+    "ancestry": [
+      "Runtime Recovery And Work Continuity"
+    ],
+    "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md"
+  },
+  "sectionExplanation": null,
+  "mechanicalRequired": true,
+  "deepRequired": true,
+  "reviewScope": "One ordinary pending claim verdict. Full facts and literal section witnesses are immutable at evidenceManifest/changes/evidenceIndex; currentDecision and after come from the content commit. All rationales mechanically regenerated; independent reviewer chooses deep sample.",
+  "currentContentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "authorSession": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_358f4471159df6d56b6f9ae689efc338",
+    "sourceUnitDigest": "4e738024bef0fa77ab626479e21257efde2ff73b8d0652c1ce7f275de488949c",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/runtime-recovery-design.md:318-321#unheaded-block-34 (current lines); unit SHA256 4e738024bef0fa77ab626479e21257efde2ff73b8d0652c1ce7f275de488949c.\nTarget: docs/platform/agent-coordination/architecture/runtime-recovery-design.md:265-265#11-review-finding-resolution-and-limits (current lines); unit SHA256 93c25a0d99ce3b063b6a246bf7c11aa06c23d8f8784603627c2454c7054dda55.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 93c25a0d99ce3b063b6a246bf7c11aa06c23d8f8784603627c2454c7054dda55 at 9aa37b12a329abd16900dad73ab98408e6ef3aec.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 34\" → \"11. Review Finding Resolution And Limits\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 4 removed and 31 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-34 under docs/platform/agent-coordination/architecture/runtime-recovery-design.md#11-review-finding-resolution-and-limits; source context \"Runtime Recovery And Work Continuity / 11. Review Finding Resolution And Limits\", target context \"Runtime Recovery And Work Continuity\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+    "targetAnchor": "11-review-finding-resolution-and-limits",
+    "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "93c25a0d99ce3b063b6a246bf7c11aa06c23d8f8784603627c2454c7054dda55",
+    "targetAncestry": [
+      "Runtime Recovery And Work Continuity"
+    ]
+  }
+}
+```
+

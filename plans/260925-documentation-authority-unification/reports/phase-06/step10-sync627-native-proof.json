@@ -1,0 +1,91 @@
+{
+  "contentCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+  "syncSeconds": 1157.147,
+  "inventoryRecoverySeconds": 659.669,
+  "initialProcessExit": 137,
+  "inventoryRecoveryExit137": 1,
+  "initialInventoryIncomplete": true,
+  "carryForwardCount": 1,
+  "persistenceCount": 1,
+  "inventoryAttempts": 3,
+  "completeInventoryCount": 1,
+  "recovery": "Inventory-only retry with 4096MiB heap after two exit137 interruptions; no second carry-forward or registry write.",
+  "items": 4486,
+  "claims": 91374,
+  "knownBefore": 99553,
+  "knownAfter": 99555,
+  "zeroKnownIDLoss": true,
+  "activeTupleEquality": true,
+  "compact": true,
+  "registryBytes": 62180479,
+  "registrySHA256": "562c2583dfc1e2d9d6e0a7b86679a8d00e53dda09a28fb006ec020667c79227a",
+  "carryForward": {
+    "fromCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+    "toCommit": "62751458b22b47e930dc33b8501d07798b91ace3",
+    "oldUnits": 91374,
+    "newUnits": 91374,
+    "kept": 90996,
+    "paired": 374,
+    "moved": 0,
+    "editedKept": 2,
+    "added": 2,
+    "gaps": 2,
+    "retired": 0,
+    "retiredDocuments": 0
+  },
+  "newUnits": [
+    {
+      "sourcePath": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "unitDigest": "af5da2fe05d1bd41adb3b876f7f6691be48fc28c4740e0cbebe2c64ab2500beb",
+      "identityFingerprint": "af5da2fe05d1bd41adb3b876f7f6691be48fc28c4740e0cbebe2c64ab2500beb",
+      "claimId": "claim_4a2dfdbfa271d8f20b4e581757288988",
+      "sourceAnchor": "unheaded-block-44",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "f03302423020c8beeac177192fbe0952433473b78efd7c17f5eb96b39d67dbca",
+      "claimKind": "procedure",
+      "status": "future",
+      "origin": "added-since-287a22d33a0eaf2d9e47549a1142daf62361bb8c"
+    },
+    {
+      "sourcePath": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+      "unitDigest": "0093aca093c7750ec5c3b0e2bb870a1fba3b1f888cc2292efd9a9d109c023faa",
+      "identityFingerprint": "0093aca093c7750ec5c3b0e2bb870a1fba3b1f888cc2292efd9a9d109c023faa",
+      "claimId": "claim_cfdd80946e57e4ea360ed04c1413f4dd",
+      "sourceAnchor": "unheaded-block-117",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "7486a9e911dc83dd8182817e3d51bccd7b2e95a87b245307e19b3dd1de9fbb34",
+      "claimKind": "procedure",
+      "status": "future",
+      "origin": "added-since-287a22d33a0eaf2d9e47549a1142daf62361bb8c"
+    }
+  ],
+  "newGaps": [
+    {
+      "sourcePath": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "unitDigest": "0f35e2a68dba79e8691a1dbeabc4aae960abfa8664239abf2054bf09473fa0ba",
+      "identityFingerprint": "0f35e2a68dba79e8691a1dbeabc4aae960abfa8664239abf2054bf09473fa0ba",
+      "claimId": "claim_f15e4328e1e5df90c51f535e75da554b",
+      "sourceAnchor": "unheaded-block-44",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "9643a6fe01ce142637dcea09eb07b8690322ab13683212165934615d5aba3ae5",
+      "claimKind": "procedure",
+      "status": "future",
+      "identityStatus": "identity-gap",
+      "gapReason": "edited unit whose anchor unheaded-block-44 is not a stable heading anchor"
+    },
+    {
+      "sourcePath": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+      "unitDigest": "b475398ae494b6c3ef3859fa0d80aa989e3b3ed01789cea21ff41f4ae8e2cec5",
+      "identityFingerprint": "b475398ae494b6c3ef3859fa0d80aa989e3b3ed01789cea21ff41f4ae8e2cec5",
+      "claimId": "claim_9e9d711e331efe5a12c8b8bf50371dc6",
+      "sourceAnchor": "unheaded-block-117",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "087d5cdd477bde5b2bf98882290f0d23d3e44a06f0c6f93b7f15e6bcfa391c63",
+      "claimKind": "procedure",
+      "status": "future",
+      "identityStatus": "identity-gap",
+      "gapReason": "edited unit whose anchor unheaded-block-117 is not a stable heading anchor"
+    }
+  ],
+  "newRetired": []
+}
