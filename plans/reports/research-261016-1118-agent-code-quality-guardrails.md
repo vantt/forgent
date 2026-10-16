@@ -64,6 +64,21 @@ Claude Code nạp `CLAUDE.md` (dòng 6 là `@AGENTS.md`, nên kéo theo AGENTS.m
 
 Hệ quả: khoảng 17 KB luật bị agent đọc hai lần, luật KISS/DRY nằm lọt thỏm giữa khối lặp, và mỗi hook có thể chạy hai lần mỗi lượt. Ngoài ra khối "fgOS Effective Instructions" (AGENTS.md:261) lặp nhẹ vài ý với phần đầu AGENTS.md.
 
+### 2c. Bổ sung 2026-10-16 tối: bộ luật AgentKit nằm ở 4 nơi, và chủ repo dùng 5 CLI cùng lúc
+
+Sau khi báo cáo được viết, kiểm tra thêm cho thấy cùng 8 file luật AgentKit, nội dung giống hệt từng byte (`cmp`), nằm ở **4 nơi** chứ không phải 2. Cả 3 thư mục rules đều bị gitignore (`.gitignore:66,77,78`).
+
+| Nơi | Ai ghi | CLI đọc |
+|---|---|---|
+| `.claude/rules/*.md` | ak target `claude-code` | Claude |
+| `.omp/rules/*.md` | ak target `omp` | omp |
+| `.pi/rules/ak-engineer-*.md` | ak target `pi` | pi (có thể qua extension của ak trong `.pi/extensions`) |
+| Khối `AGENTKIT-OMP` trong `AGENTS.md` | ak target `omp` | codex, omp, pi, có thể agy, **và Claude** qua `@AGENTS.md` |
+
+Chủ repo dùng Claude, pi, omp, codex và agy **cùng lúc**. Vì vậy đích cần đạt không phải "chọn một đích cho ak", mà là **mỗi CLI thấy mỗi luật đúng một lần**. Gỡ target `omp` như bản đầu báo cáo gợi ý sẽ làm codex, omp và pi mất bộ luật. Muốn thiết kế đúng cần một **bảng nạp (load matrix)** đo thật: CLI nào tự đọc file nào (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.omp/rules`, `.pi/rules`, file `@import`, AGENTS.md lồng theo thư mục). Hiện mới chắc chắn cho Claude (đọc trùng) và codex (chỉ đọc `AGENTS.md`); omp, pi và agy cần chạy thử từng CLI để xác minh. Mục backlog `p-7eb9e65b` giữ việc này.
+
+Cùng nguyên nhân gốc còn một lỗi thứ hai: `fgos doctor --fix` chạy toàn bộ 22 fix một lúc, gồm cả việc ghi vào cấu hình của tool khác; nó bỏ qua file JSON hỏng (`src/setup/agent-hooks.mjs:107-108`) nhưng ghi đè cả file lành bằng `JSON.stringify` (`agent-hooks.mjs:35-37`) và không backup. Hai bộ cài cùng coi một file là của mình, và mỗi bên viết lại toàn bộ file đó. Mục backlog `p-68be2ae3` giữ việc này.
+
 ## 3. Cơ chế tự động: cái đã có và chỗ hổng
 
 | Đã có | Chạy ở | Kiểm gì |
@@ -134,7 +149,7 @@ Thêm một dòng tương ứng vào phần Red flags.
 ### P5. Đưa L9–L10 và 3 nguyên tắc còn thiếu vào bề mặt luôn-nạp, đồng thời rút gọn (nguyên tắc 2–4, 7)
 
 - Cho `core/instructions/platform-laws.md` (hoặc `src/setup/instruction-projections.mjs`) **sinh** danh sách luật từ các heading `## Lx` của `docs/platform-foundations.md`, thay vì chép tay. Thêm test fail khi danh sách lệch tài liệu gốc. Sửa các chỗ còn ghi "L1-L8" (AGENTS.md:8, `docs/specs/reading-map.md:3`, `docs/specs/platform-foundations.md`).
-- Sửa ở **nguồn sinh**, không sửa bản sao, vì sửa tay sẽ bị lần chạy tool sau ghi đè. GitNexus và MDView: giữ một bản ở AGENTS.md, CLAUDE.md chỉ còn `@AGENTS.md` cùng phần riêng của Claude, nếu template GitNexus cho phép tắt việc ghi vào CLAUDE.md. AgentKit: chọn một đích cho repo này, hoặc `.claude/rules` hoặc khối AGENTKIT-OMP trong AGENTS.md, không giữ cả hai.
+- Sửa ở **nguồn sinh**, không sửa bản sao, vì sửa tay sẽ bị lần chạy tool sau ghi đè. GitNexus và MDView: giữ một bản ở AGENTS.md, CLAUDE.md chỉ còn `@AGENTS.md` cùng phần riêng của Claude, nếu template GitNexus cho phép tắt việc ghi vào CLAUDE.md. AgentKit: **không** gỡ target nào (xem mục 2c, 5 CLI dùng cùng lúc). Thay vào đó, có một nguồn luật duy nhất, chiếu ra mỗi CLI qua đúng một đường theo bảng nạp đã đo; đích nào đã được một đường khác phủ thì không ghi thêm (ví dụ luật chung đến Claude chỉ qua `@AGENTS.md`, không lặp trong `.claude/rules`). Mở rộng cơ chế projection có sẵn (`src/setup/instruction-projections.mjs`) thay vì dựng cái mới, và cho `fgos doctor` báo khi một CLI nạp trùng (dùng lại script của skill `instruction-audit`). Việc này nằm ở backlog `p-7eb9e65b`.
 - Chốt 7 nguyên tắc của anh thành luật có decision ID trong `docs/platform-foundations.md`, vì đổi luật khoá phải qua supersede, không sửa tại chỗ. Mỗi nguyên tắc chỉ chiếu một dòng mệnh lệnh kèm lệnh hoặc test kiểm chứng. Nguyên tắc nào đã có cổng máy móc thì phần chữ chỉ cần một dòng trỏ tới cổng.
 - Gỡ phần lặp: khối GitNexus/MDView lặp giữa CLAUDE.md và AGENTS.md, và khối AGENTKIT lặp `.claude/rules` (xem Q1). Gỡ luôn câu "chỉ thêm cấu trúc khi có consumer thứ hai" trong worker contract, vì nó mâu thuẫn với ports.
 - Luật theo vùng (Rust gateway, runner, skills) chuyển sang `.claude/rules/*.md` có `paths:` hoặc AGENTS.md lồng theo thư mục để chỉ nạp khi cần.
@@ -147,7 +162,7 @@ Thêm một dòng tương ứng vào phần Red flags.
 
 ### P7. Dọn `.claude/settings.json` (vệ sinh)
 
-Gỡ khoảng 19 đăng ký hook trùng và sửa `statusLine` đang gọi node và script ở hai đường dẫn không tồn tại. Thêm một check nhỏ vào `fgos doctor` (`src/setup/registrations.mjs`) để báo lệnh hook bị đăng ký trùng.
+Gỡ khoảng 19 đăng ký hook trùng và sửa `statusLine` đang gọi node và script ở hai đường dẫn không tồn tại. Thêm một check nhỏ vào `fgos doctor` (`src/setup/registrations.mjs`) để báo lệnh hook bị đăng ký trùng. Dọn tay chỉ có tác dụng tới lần `ak kit refresh` sau; cách bền là hợp đồng phân quyền sở hữu file giữa fgOS và các bộ cài khác (hook nhận diện theo đường dẫn script, mỗi tool chỉ sửa khối của mình) trong backlog `p-7eb9e65b`, cộng với `doctor --fix` an toàn (chạy từng fix, chạy thử, sửa ở mức key, có backup) trong backlog `p-68be2ae3`.
 
 ## 5. Thứ tự làm
 
@@ -161,7 +176,7 @@ Không cần agent nào ghi nhớ thêm điều gì: P1/P2 ép bằng máy, P3/P
 
 ## Câu hỏi chưa giải quyết
 
-- **Q1.** AGENTS.md và `.claude/settings.json` cùng bị ghi lúc 16/10 11:19. Đó có phải lần anh chạy `ak` cho đích omp/Codex không? Nếu đúng, cần chốt AgentKit dùng một đích cho repo này (`.claude/rules` hay khối AGENTKIT-OMP) và gỡ đích còn lại từ phía bộ cài, không sửa tay.
+- **Q1.** ~~Có phải lần chạy `ak` lúc 16/10 11:19 không, và nên giữ đích nào?~~ Đã trả lời: đúng là chủ repo vừa cài ak; nhưng vì 5 CLI được dùng cùng lúc nên không gỡ đích nào (mục 2c). Còn mở: bảng nạp của omp, pi và agy, cần đo bằng cách chạy thử từng CLI.
 - **Q2.** Các worker ngoài tiến trình (pi, agy, Codex) có nạp AGENTS.md không? Nếu không, P3 bắt buộc phải nằm trong worker contract (báo cáo đã đề xuất như vậy).
 - **Q3.** Checker của P1 có đang nằm trong bộ test hoặc canary mà runner chạy trước khi commit mỗi Unit không? Nếu không, cần đưa vào để `--no-verify` và việc commit thẳng lên `main` không lách được.
 - **Q4.** 7 nguyên tắc nên chốt thành luật khoá mới (L11+, có decision ID) hay đưa vào spec dưới dạng guideline không khoá?
