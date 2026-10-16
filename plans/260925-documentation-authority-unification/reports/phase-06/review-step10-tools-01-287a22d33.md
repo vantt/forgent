@@ -1,0 +1,35 @@
+# Review step 10 round 3 tools part 1 (rationale generator, test, rebuild script)
+
+Reviewer: reviewer:claude-session:a4954387@2026-10-14
+Author session: codex-session:unit-run-1792114313040-56132651@2026-10-16
+Review mode: ordinary
+Request commit: bca590a4e
+Content commit: 287a22d33a0eaf2d9e47549a1142daf62361bb8c
+
+## Scope and method
+
+Request reviewed: review-request-step10-tools-01-287a22d33.md and its json sidecar (3 rationale-tooling-diff entries; md blocks equal the sidecar; entry diffs equal git diff between 5035fed52 and 287a22d33 for the two new files, and equal git diff -U5 for scripts/doc-binding-repair.mjs; the file is unchanged between 287a22d33 and bca590a4e). Read-only review worktree at bca590a4e (docs bytes equal the content commit 287a22d33; git diff 345f15d95 bca590a4e over docs shows only the four documents in the documents request, 6 lines). Ordinary review; the request carries no sensitivity pack and none was made (ignored in one line: no sensitivity result is claimed). I never ran the fgos CLI, never read secrets.local.env, and all scripts wrote only to my scratch dir. Checker and tool tests were rerun by me (see below).
+
+Reruns (mine, scratch outputs only): the 473-test command in the request header gave tests 473, pass 473, fail 0, cancelled 0, skipped 0 (TMPDIR set to my scratch dir, CLAUDE_CODE_SESSION_ID unset). The step10-sync287-reproduce.py consistency command hardcodes /tmp/fgos-work and writes into the worktree, so I ran byte-identical copies of the embedded consistency.py and supplement.mjs with only the scratch directory and the output paths changed: original checker over 90 pinned shards (12889 rows, 714 regenerated rationales, legacyFindings 0, generatedFindings 0, sourceWitnessLimits 84) plus unchanged checkLegacyRationale over the 4 native predecessor rows gives rows 12893, shards 91, findings 0, and my all-shards output equals the committed step10-sync287-all-shards-consistency.json key for key. The pinned-only checker command (step10-round3-rationale-rebuild.mjs --check) writes into the worktree reports directory, so I did not run it separately; it is the first stage of the same reproduction.
+
+Mechanical binding check: the checker proves row rationale == generateBindingRationale(facts rebuilt from the current files), so a rationale can only be false if the generator is. I therefore checked the generator semantics against the actual files for the three regenerated rows of my group (see accounting-05) and found two generator gaps recorded under tools-001.
+
+Seed and sample: all 3 entries are tooling entries read in full; no Weak-exact or Judgment claim rows exist in this request, so A36 sampling does not apply. The first cell of each row is the entry id; the target digest is the sha256 of the committed file of the entry.
+
+Result: 2 ok, 1 rework, 0 hold. The rework is on the deep read of 3 entries (33 percent, above 3 percent), so I read the whole pack, which is the 3 entries.
+
+## Verdict table
+
+| Claim | Verdict | Note | Source digest | Target digest |
+|---|---|---|---|---|
+| tools-001 | rework | deep: scripts/doc-binding-repair.mjs read in full (diff equals git diff -U5 5035fed52 287a22d33; +117 lines: generateBindingRationale, checkBindingRationale, checkLegacyRationale, describeBindingLinks, reviewEntryFromCommittedRow, bindingCorrections) and exercised on real rows; the generator is binding-derived and refuses missing facts, but two semantic gaps make it print statements that the bound files do not support. G1: a labelled correction is printed with its before fragment although the before text is never checked against the bound source; for claim_08f9b4c1 the source holds bin/fgos.mjs:4373,4461 while the rationale says the correction replaced 4415,4461 (an intermediate state), and for claim_61244b0a it prints the inverted range 4415-4380 that the source never contained; the 4373 to 4415 refresh is therefore unlabelled in the rationale. G2: the sentence The source text occurs verbatim inside the bound target section tests source.text, which for a heading is only the heading line; of 26 heading rows carrying that sentence in step10-round3-rationale-edits.json I measured that 25 do not have the source section inside the target section and 19 still differ after normalising link destinations (13 of those list no labelled correction), e.g. claim_0686418a whose role cell changed from a check mark to Historical operator role without any listed correction. Fix: use sectionText for level units and say section text differs when it does not hold, require each correction before fragment to occur in the bound source or label it as an intermediate state, add a test for both, then regenerate the affected rows. The 473 tests pass but none covers either case. | none | 58135a9317160295417c6176ef2ac07d0592cf5e35c0ed7e998c942e811f49b1 |
+| tools-002 | ok | deep: test/scripts/doc-rationale.test.mjs (new, 114 lines, diff equals git diff) read in full; 18 tests assert rebuild without appended old text, full-digest equality including heading payload, prefix-expanded last-review digest, spelling versus destination link counts, ranges and anchor and equality alteration detection, historical witness and unavailable-witness wording, composed corrections, committed-row snapshots and unicode anchors; all pass in my 473-test run. Limit: no test drives a correction whose before text is absent from the source or a heading whose section differs, which is why tools-001 gaps went unnoticed; that is recorded on tools-001, not a defect of this file. | none | 2f8d7898b1abbc2588e4dfd8850fd1a3665646507dbe25b75def0f44c9da5ee5 |
+| tools-003 | ok | deep: step10-round3-rationale-rebuild.mjs (new, 136 lines, diff equals git diff) read in full: it resolves source and target from the registry binding and the current files, never feeds the old rationale to the renderer, reopens a rewritten row to pending and strips approval fields, and in --check mode only compares each row with the regenerated text; I reproduced its result through the consistency reproduction (12893 rows, 91 shards, 714 regenerated, 0 findings). Observation: inputCommit and the 345f15d95 request-name pattern are hard-coded, which is fine for a one-shot author tool; the circularity (the checker validates the generator against itself) is why tools-001 matters. | none | d13721d5e183dfe1250137dae5a5dd06f0e332c6900d67b14bc73648005ec9cb |
+
+## Notes
+
+1. The previous round three systemic defects map to this round tools: positional anchors (bindByContent, unchanged and tested), swapped link cells (per-cell relation rule, unchanged) and false boilerplate rationales (this generator). The generator removes boilerplate, but G1 and G2 show it can still state something the bound text does not support.
+2. Suggested hardening is exact: for level units compare source.sectionText with target.sectionText, and fail or label when a correction before fragment is absent from the bound source.
+3. Worktree hygiene: git status --short in the review worktree was empty at the end of my review.
+
+Unresolved: none.
