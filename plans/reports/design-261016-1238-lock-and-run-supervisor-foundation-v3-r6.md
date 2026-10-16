@@ -673,7 +673,7 @@ Mỗi đầu việc: thay đổi, **xoá** (One Door), **bằng chứng trước
 
 **4.0 (W1', đã vào main `e8176287f`, `e27182da4`).** Đã đóng kẹt 180 s và B4. Không đổi.
 
-**4.2 Holder-lock (plan, chi tiết ở `plans/261016-1104-holder-lock-kernel-lock-foundation/`).** Không đụng main checkout, events, claims. Xây **cổng lock 6.0** (`acquire/release/run_borrowed/probe/holders/guarantee`) với driver `flock` cho Linux và macOS (X2 đã xác nhận); **hợp đồng `acquire` gồm luật 6.0.1** (holder chỉ nhả khi miền của mình rỗng; người sau đọc `predecessor.json`, miền trước chưa rỗng thì kết thúc ngay và chờ signaled trong hạn `lock.predecessorKillWaitMs`; Windows cần process giữ job thứ hai và định nghĩa rỗng = `ActiveProcesses == 0` + mọi member signaled) ngay từ driver đầu tiên, dù trên Linux đường mượn git không cần chờ. Driver Windows viết sau khi probe 6.0.1 xanh trên Windows thật (ba probe đã xanh ở lần đo hai; còn `predecessor-all-owners-dead`); giao diện cổng không có thứ gì chỉ đúng với POSIX (không lộ fd hay handle ra caller). Cấu hình `lock.predecessorKillWaitMs` đăng ký vào setup và doctor.
+**4.2 Holder-lock (plan, chi tiết ở `plans/261016-1104-holder-lock-kernel-lock-foundation/`).** Không đụng main checkout, events, claims. Xây **cổng lock 6.0** (`acquire/release/run_borrowed/probe/holders/guarantee`) với driver `flock` cho Linux và macOS (X2 đã xác nhận); **hợp đồng `acquire` gồm luật 6.0.1** (holder chỉ nhả khi miền của mình rỗng; người sau đọc `predecessor.json`, miền trước chưa rỗng thì kết thúc ngay và chờ signaled trong hạn `lock.predecessorKillWaitMs`; Windows cần process giữ job thứ hai và định nghĩa rỗng = `ActiveProcesses == 0` + mọi member signaled) ngay từ driver đầu tiên, dù trên Linux đường mượn git không cần chờ. Driver Windows **đã hết bị chặn**: mọi probe 6.0.1, gồm `predecessor-all-owners-dead`, xanh trên Windows thật (12.12); giao diện cổng không có thứ gì chỉ đúng với POSIX (không lộ fd hay handle ra caller). Cấu hình `lock.predecessorKillWaitMs` đăng ký vào setup và doctor.
 - Thay đổi: crate `fgos-process` (facts + control) và `fgos-holder-lock`; route nội bộ `fgos internal lock-fd`, `fgos internal state-root`; facade Node (`LockScope`, kind, mượn qua fd, kiểm inode, luật description 6.1.1); spec `docs/specs/holder-lock.md`; cập nhật [component-boundary.md](../../docs/platform/component-boundary.md). **Registry lock kèm hình dạng giao thức cũ** (6.8, gồm `porting/events.lock` và `state-lock`); **cưỡng chế `lockProtocolFloor`** ở `fgctl activate`; check doctor `lock-borrow-vectors` (6.1.1 điểm 8, đỏ = FAIL); ma trận khả năng 6.1.2. Chuyển các lock lạnh rủi ro thấp sang kernel lock, mỗi lock một commit, mỗi họ qua quiescence hai pha với đúng hàng rào của hình dạng: gateway, sessions, runner, advance, reconcile, recovery, full-suite (tombstone); account provider, `state-lock` (thế hệ chặn). Dispatch cwd: đổi cơ chế sang kernel lock, giữ phạm vi `fgosDir` (tombstone cả dạng `path.resolve` và `realpath`); phạm vi máy ra khỏi track (6.8 bước 5). Guard resume ở `run.mjs` đổi trong cùng commit.
 - Xoá: bản chép `isPidAlive` ở từng lock; regex composite ở reconcile; GC trade-off của provider-capacity (không còn ledger mutex).
 - Bằng chứng trước writer: probe 12.1 thành test đa process trên crate thật (giữ sau helper thoát, cùng process hai scope, SIGKILL, timeout, mượn qua git thật với `gc.auto=1` + một object rời — lock trống ngay sau khi đóng, anh em bị từ chối, stress có SIGKILL); **test rò description** (6.1.1) trên chính route Rust; tombstone và thế hệ chặn với code v1 thật (gồm `tryAcquireAccountLock`); test cutover hai pha có holder v1 xuất hiện sau lần quét đầu (lịch `r3-cutover` của Astra) phải không cho bật v3; vector state root; một release `FGOS_LOCK_TRACE` cảnh báo thứ tự trước khi bật ném lỗi.
@@ -708,7 +708,7 @@ Mỗi đầu việc: thay đổi, **xoá** (One Door), **bằng chứng trước
 
 **6.5 terminal-control (thiết kế ở đây → plan, cùng 6.3).** Mô-đun Node ngay (2.3, 2.4 với test hợp đồng), crate Rust ở đợt 4; phần layout (7.9): khả năng `layout.geometry` của driver, cổng policy, policy mặc định `measured-split`, cấu hình `terminal.layout.*` đăng ký vào config-merge của `fgos setup` và check doctor in giá trị; đo kích thước tối thiểu của 5 CLI để đặt mặc định; xoá `createBatchTab`, `batchTabFor`, `closeIfEmpty`, nhãn tự chế; `/fgOS:terminal` sang `attach`/`label`. Bằng chứng: vector 7.4 trên herdr thật (5 CLI), ca lỗi 7.7.
 
-**Spike đa nền tảng: X1, X2 đã chạy (12.10, 12.11).** Phần còn lại trước khi viết driver Windows: probe `predecessor-all-owners-dead` của 6.0.1 có 0 vi phạm trên Windows thật. Mô tả gốc của spike:
+**Spike đa nền tảng: X1, X2 đã chạy (12.10, 12.11, 12.12).** Driver Windows của 5.3 và 6.0 **đã hết bị chặn**: `predecessor-all-owners-dead` 0/50 vi phạm trên Windows thật (12.12). Mô tả gốc của spike:
 - **X1 Windows** trên máy thật: Job Object `KILL_ON_JOB_CLOSE` (gate giữ handle, supervisor chết, gate chết, `ActiveProcesses`), process giữ lock `LockFileEx` cho Node (chi phí một process mỗi lock, nhả khi cha chết), `run_borrowed` git for Windows trong job của holder + hook nhận token/tổ tiên. Ra số đo và mức bảo đảm thật trước khi viết driver Windows của 5.3 và 6.0.
 - **X2 macOS** trên máy thật: `flock` trên description kế thừa (helper, git hook), `SCM_RIGHTS`, kill cây theo process group + `proc_listchildpids`, đo đúng các đường thoát (setsid + fork đôi, launchd). Ra mức bảo đảm thật trước khi bật driver macOS.
 - Cách `terminal` trên Windows phụ thuộc herdr có chạy trên Windows; ghi trạng thái herdr vào kết quả X1.
@@ -823,6 +823,20 @@ Báo cáo [implementation-261016-1222-platform-probe-predecessor-check.md](imple
 | `predecessor-drain-timeout` | Contender kết thúc miền, member chết hết rồi mới đi tiếp |
 
 macOS và Linux: cùng probe, không lần nào phải chờ (chờ thêm ≤ 0,2 ms ở đường chính), vì git tự giữ bản sao description.
+
+### 12.12 Lần đo ba: đường dự phòng khi mọi người giữ job đều chết (run `38857403785`, main `493b064cd`)
+
+Luật r6; cả ba nền: 13 pass, 1 skip (herdr không có trên PATH). JSON nguyên văn: [Windows](evidence-261016-1247-platform-probe-all-owners-dead-report-windows.json), [macOS](evidence-261016-1247-platform-probe-all-owners-dead-report-macos.json), [Linux](evidence-261016-1247-platform-probe-all-owners-dead-report-linux.json).
+
+| Probe (Windows) | Kết quả |
+|---|---|
+| `git-borrow-blocking-hook-predecessor-check`, có người giữ job thứ hai | Kết thúc ngay 50/50, 0 vi phạm; chờ thêm p50 5,9 ms, p95 6,9 ms, max 8 ms |
+| `predecessor-all-owners-dead` | Dùng dự phòng Toolhelp 50/50, 0 vi phạm; chờ thêm p50 6,8 ms, p95 8,7 ms, max 9,7 ms |
+| `predecessor-drain-timeout` | Chờ signaled sau khi kết thúc 2,2 ms |
+| `predecessor-record-stale` | Đi tiếp ngay |
+| `...-holder-owned` (cấu hình cũ) | Vẫn tái hiện hazard của r5: 27/50 |
+
+macOS và Linux: mọi probe pass.
 
 ## 13. Khác gì so với bản 2
 
