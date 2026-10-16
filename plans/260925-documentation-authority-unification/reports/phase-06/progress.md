@@ -1,3 +1,13 @@
+# Close stopped — final-pin identity scope requires a new carry-forward
+
+Assignment `unit-run-1792182471757-de11f93c/producer/1`. Applied the committed close c1 verdicts (**3/3 decision rows ok + 22/22 accounting entries ok**) with verbatim Notes and marked the **25/25** identical-unit groups reviewed. Record corrections and the owner queue were updated; A28 remains **1/30 false (3.3%)**, final red-team **0 Critical / 0 High**, checkpoint **ACCEPT**.
+
+The required global rerun then stopped fail-closed. On the sole-sync/content-pin inventory `38672e7f1`, D reports two `decision-review-report-missing` findings because the matching ordinary-review reports were committed later at `efb79d832`. A final-pin inventory cannot be generated from the persisted registry: native identity scope includes root `AGENTS.md`, which changed after `38672e7f1` with the impact-analysis capability gate, so `registryBindsToCommit` is false for both the review commit and HEAD. This disproves the docs-only premise of L10-41 for native identity binding. [Blocker and exact resolution](step10-close-blocker.json), [raw D](step10-close-D-both-blocked.json), [raw generator refusal](step10-close-native-final-pin.log).
+
+**NEXT:** obtain explicit authority for one native carry-forward/registry persistence at a commit containing the reviews, or land a separately reviewed evidence-model correction. Then rerun D both/each, strict E, regenerate expected, require comparator exit 0/`ok=true`/zero differences, and run the remaining close checks. Phase 6 and Step 10 remain open—not awaiting owner review. No promotion, retirement, alias adoption, cutover, main landing or push; no pass was fabricated. Runner owns the commit; no Git write.
+
+---
+
 # Backlog accounting and package complete — independent reviews next
 
 Assignment `unit-run-1792176628519-ac852ba4/producer/1`; docs content/SYNC `38672e7f1`, unchanged. A31/L10-14 now binds the heading, active `claim_127225b8542c701295574b1b00749594` and predecessor gap `claim_9b3b7fac64df06547dd06e05f4f026c5` as ordinary pending by content, never position; no approval carry. The preceding sole native sync remains one 802.964s/62,195,972-byte persistence; registry SHA256 `b20238af95f89cd3a83fbc20dd53ce8df1192153415cd85b9586d53884aa9c2b`. No second carry/persistence.

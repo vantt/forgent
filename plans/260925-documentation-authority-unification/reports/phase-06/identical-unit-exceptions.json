@@ -1,10 +1,10 @@
 {
   "version": 1,
   "candidatePin": "0a41d793e60631aa9073c73a941f641548862b6c",
-  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-identical-exceptions.md",
-  "reviewReportCommit": "bb03cab52579d358015c611fa8b8543062a6e4da",
-  "reviewer": "reviewer:claude-session:4df9e88c@2026-10-08",
-  "reviewScope": "Only the 206 unchanged ok groups are reviewed; 128 corrected groups remain pending re-review.",
+  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-groups-e52831e36.md",
+  "reviewReportCommit": "5673c2068d694c22b84d6d5cc64f853798fdf794",
+  "reviewer": "reviewer:claude-session:a4954387@2026-10-17",
+  "reviewScope": "All 359 groups are independently reviewed: the earlier 334 reviewed groups retain their recorded approvals, and the final 25 groups were deep-read and accepted 25/25 in review-step10-groups-e52831e36.md. Review covers occurrence and owner membership only, not current truth, promotion, or cutover.",
   "groups": [
     {
       "digest": "6ec4937bf794cd505e91b3f2ddbf72808272ca19c206ac14b852c84bddb9a5bc",
@@ -11545,7 +11545,7 @@
         "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md"
       ],
       "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "reason": "The identical block is dated document metadata; the two source documents and their history snapshots keep separate subject/provenance. Contexts: . Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
       "sourceUnits": [
@@ -11580,7 +11580,11 @@
           }
         }
       ],
-      "currentStateAccounting": "step10-author-candidate-accounting.json"
+      "currentStateAccounting": "step10-author-candidate-accounting.json",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-17",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-groups-e52831e36.md",
+      "reviewReportCommit": "5673c2068d694c22b84d6d5cc64f853798fdf794"
     },
     {
       "digest": "5a917998f2dbe6dcf9f8789254ee8e110f93ae02186534a4474dccd3404d7301",
@@ -11589,7 +11593,7 @@
         "docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md"
       ],
       "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "reason": "The repeated short text introduces or qualifies the surrounding local section; each source occurrence retains that local payload at its mapped owner. Contexts: CoordinationSession Persistence And Recovery Contract / Evidence-Preserving Aggregation (MVP7, Step 09); CoordinationSession Persistence And Recovery Contract / Deliberation Contribution Ledger (MVP8, Step 09); CoordinationSession Persistence And Recovery Contract / Specialist Slot Binding (MVP9, Step 09); FlowDefinition And Profile Schema Contract / Profiles / `CoordinationProtocol` / Specialist Slots (Phase 09, Step 09 MVP9). Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
       "sourceUnits": [
@@ -11668,7 +11672,11 @@
           }
         }
       ],
-      "currentStateAccounting": "step10-author-candidate-accounting.json"
+      "currentStateAccounting": "step10-author-candidate-accounting.json",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-17",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-groups-e52831e36.md",
+      "reviewReportCommit": "5673c2068d694c22b84d6d5cc64f853798fdf794"
     },
     {
       "digest": "a2d5fbe6e6e8955d790034a8254970e0c4f74806ead155b673197d4276a112ef",
@@ -11677,7 +11685,7 @@
         "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md"
       ],
       "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "reason": "The identical unit is a heading label reused by separately mapped source sections; section subjects and payloads remain attached to their own source/owner pairs. Contexts: Agent Coordination Documentation Standardization Plan / 4. Source Inventory; Host Invocation Documentation Standardization Plan / 4. Source Inventory. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
       "sourceUnits": [
@@ -11718,7 +11726,11 @@
           }
         }
       ],
-      "currentStateAccounting": "step10-author-candidate-accounting.json"
+      "currentStateAccounting": "step10-author-candidate-accounting.json",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-17",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-groups-e52831e36.md",
+      "reviewReportCommit": "5673c2068d694c22b84d6d5cc64f853798fdf794"
     },
     {
       "digest": "9d4815b7eabf8b722796dc16dd5a8901ef600997df266159d37ab8b843e53ac0",
@@ -11727,7 +11739,7 @@
         "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md"
       ],
       "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "reason": "The repeated block is a contextual list, command example or lifecycle diagram inside separate source/proposal/history sections; retaining it at each mapped owner preserves that section’s local explanation. Contexts: Orchestration Vocabulary Map / 2. Layer Map; Step 00 - Team Dispatch V1 Overview / 1. Purpose. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
       "sourceUnits": [
@@ -11768,7 +11780,11 @@
           }
         }
       ],
-      "currentStateAccounting": "step10-author-candidate-accounting.json"
+      "currentStateAccounting": "step10-author-candidate-accounting.json",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-17",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-groups-e52831e36.md",
+      "reviewReportCommit": "5673c2068d694c22b84d6d5cc64f853798fdf794"
     },
     {
       "digest": "f94e7b2a243f1b8a61718285d93b3c3ddee594c126df0337ede2f80f538c5fd5",
@@ -11777,7 +11793,7 @@
         "docs/platform/proposals/knowledge-registry-redesign.md"
       ],
       "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "reason": "The identical unit is a heading label reused by separately mapped source sections; section subjects and payloads remain attached to their own source/owner pairs. Contexts: Dispatch Control Plane Redesign / 5. Vocabulary; Knowledge Registry Redesign / 5. Vocabulary. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
       "sourceUnits": [
@@ -11818,7 +11834,11 @@
           }
         }
       ],
-      "currentStateAccounting": "step10-author-candidate-accounting.json"
+      "currentStateAccounting": "step10-author-candidate-accounting.json",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-17",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-groups-e52831e36.md",
+      "reviewReportCommit": "5673c2068d694c22b84d6d5cc64f853798fdf794"
     },
     {
       "digest": "ce66db0b0a2af3098ab096d562d4ee576a2ec6c453f933855d79024d6bb7cb46",
@@ -11827,7 +11847,7 @@
         "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md"
       ],
       "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "reason": "The repeated short text introduces or qualifies the surrounding local section; each source occurrence retains that local payload at its mapped owner. Contexts: Dispatch Control Plane Redesign / 16. Implementation Pointers; Step 00 - Team Dispatch V1 Overview / 19. Detailed Scan Update: Harness, Skill, Prose, Dispatch / 19.9 Dispatch Resolver / Execution Surface. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
       "sourceUnits": [
@@ -11869,7 +11889,11 @@
           }
         }
       ],
-      "currentStateAccounting": "step10-author-candidate-accounting.json"
+      "currentStateAccounting": "step10-author-candidate-accounting.json",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-17",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-groups-e52831e36.md",
+      "reviewReportCommit": "5673c2068d694c22b84d6d5cc64f853798fdf794"
     },
     {
       "digest": "88c97d5d078f935960fefa349a515247bbf5ebef8f732e69c5e05d7b1d39709f",
@@ -11878,7 +11902,7 @@
         "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md"
       ],
       "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "reason": "The repeated short text introduces or qualifies the surrounding local section; each source occurrence retains that local payload at its mapped owner. Contexts: Step 07 - CoordinationSession, AdhocTask, And Planning Boundary / 11. Work-Attached Integration Boundary; Step 08 - Standalone Coordination And Optional Protocols / 5. Why Standalone Must Mean No Work Required. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
       "sourceUnits": [
@@ -11919,7 +11943,11 @@
           }
         }
       ],
-      "currentStateAccounting": "step10-author-candidate-accounting.json"
+      "currentStateAccounting": "step10-author-candidate-accounting.json",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-17",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-groups-e52831e36.md",
+      "reviewReportCommit": "5673c2068d694c22b84d6d5cc64f853798fdf794"
     },
     {
       "digest": "674611497bb6224341a363fbb8b91816122c3965af2272ce59719ff9d97d6226",
@@ -11928,7 +11956,7 @@
         "docs/platform/proposals/step-10-coding-domain-adoption.md"
       ],
       "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "reason": "The repeated short text introduces or qualifies the surrounding local section; each source occurrence retains that local payload at its mapped owner. Contexts: Step 08 - Standalone Coordination And Optional Protocols / 1. How To Read This Draft; Step 10 - Coding Domain Adoption Of The Coordination Foundation / 1. How To Read This Draft. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
       "sourceUnits": [
@@ -11969,7 +11997,11 @@
           }
         }
       ],
-      "currentStateAccounting": "step10-author-candidate-accounting.json"
+      "currentStateAccounting": "step10-author-candidate-accounting.json",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-17",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-groups-e52831e36.md",
+      "reviewReportCommit": "5673c2068d694c22b84d6d5cc64f853798fdf794"
     },
     {
       "digest": "b090d4b446b518ef773fe521a1af84257df7ae09f396bbea78ea97af029c2769",
@@ -11978,7 +12010,7 @@
         "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md"
       ],
       "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "reason": "The repeated block is a contextual list, command example or lifecycle diagram inside separate source/proposal/history sections; retaining it at each mapped owner preserves that section’s local explanation. Contexts: Step 00 - Team Dispatch V1 Overview / 1. Purpose; Step 01 - Team Dispatch V1 Rollout / 1. Purpose. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
       "sourceUnits": [
@@ -12019,7 +12051,11 @@
           }
         }
       ],
-      "currentStateAccounting": "step10-author-candidate-accounting.json"
+      "currentStateAccounting": "step10-author-candidate-accounting.json",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-17",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-groups-e52831e36.md",
+      "reviewReportCommit": "5673c2068d694c22b84d6d5cc64f853798fdf794"
     },
     {
       "digest": "e4fa3726fbd2150789677769af22dece7dd5b57a26e1dc4feddd2285e23b5c36",
@@ -12028,7 +12064,7 @@
         "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md"
       ],
       "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "reason": "The repeated block is a contextual list, command example or lifecycle diagram inside separate source/proposal/history sections; retaining it at each mapped owner preserves that section’s local explanation. Contexts: Step 01 - Team Dispatch V1 Rollout / 6. Slice 1 - Operation Registry Only; Step 02 - Workflow Stage Operations / 7. Tests. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
       "sourceUnits": [
@@ -12069,7 +12105,11 @@
           }
         }
       ],
-      "currentStateAccounting": "step10-author-candidate-accounting.json"
+      "currentStateAccounting": "step10-author-candidate-accounting.json",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-17",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-groups-e52831e36.md",
+      "reviewReportCommit": "5673c2068d694c22b84d6d5cc64f853798fdf794"
     },
     {
       "digest": "16005492e57449e7a2fbd37073486971ea386fa8179c541744aa9c691d32a77d",
@@ -12078,7 +12118,7 @@
         "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md"
       ],
       "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "reason": "The repeated block is a contextual list, command example or lifecycle diagram inside separate source/proposal/history sections; retaining it at each mapped owner preserves that section’s local explanation. Contexts: Step 01 - Team Dispatch V1 Rollout / 8. Slice 3 - Assignment Builder; Step 03 - Assignment, Run, And RunResult / 4. Dispatch Integration. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
       "sourceUnits": [
@@ -12119,7 +12159,11 @@
           }
         }
       ],
-      "currentStateAccounting": "step10-author-candidate-accounting.json"
+      "currentStateAccounting": "step10-author-candidate-accounting.json",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-17",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-groups-e52831e36.md",
+      "reviewReportCommit": "5673c2068d694c22b84d6d5cc64f853798fdf794"
     },
     {
       "digest": "f5694fee7b180206807c868f23dbc5ef49efbc9d04a985480897577ec5def122",
@@ -12128,7 +12172,7 @@
         "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md"
       ],
       "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "reason": "The repeated short text introduces or qualifies the surrounding local section; each source occurrence retains that local payload at its mapped owner. Contexts: Step 02 - Workflow Stage Operations / 7. Tests; Step 03 - Assignment, Run, And RunResult / 7. Tests. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
       "sourceUnits": [
@@ -12169,7 +12213,11 @@
           }
         }
       ],
-      "currentStateAccounting": "step10-author-candidate-accounting.json"
+      "currentStateAccounting": "step10-author-candidate-accounting.json",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-17",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-groups-e52831e36.md",
+      "reviewReportCommit": "5673c2068d694c22b84d6d5cc64f853798fdf794"
     },
     {
       "digest": "fd6f97edf98ce6716fa567c1af023f6149a977a91fbfff2f704119881fc938d9",
@@ -12179,7 +12227,7 @@
         "docs/platform/governance.md"
       ],
       "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "reason": "The repeated block is a contextual list, command example or lifecycle diagram inside separate source/proposal/history sections; retaining it at each mapped owner preserves that section’s local explanation. Contexts: Documentation System Design / 3. Target Folder Structure; Documentation System Discussion / Discussion Log / 2026-09-13 — Brainstorm: Spec Khác Architecture Như Thế Nào?; Documentation Governance / 2. Placement Map. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
       "sourceUnits": [
@@ -12239,7 +12287,11 @@
           }
         }
       ],
-      "currentStateAccounting": "step10-author-candidate-accounting.json"
+      "currentStateAccounting": "step10-author-candidate-accounting.json",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-17",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-groups-e52831e36.md",
+      "reviewReportCommit": "5673c2068d694c22b84d6d5cc64f853798fdf794"
     },
     {
       "digest": "c0000ebfd3df6287bae1b1bdb4ce65226e2b20b6459b438f90475e8e0c3f8e07",
@@ -12248,7 +12300,7 @@
         "docs/platform/governance.md"
       ],
       "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "reason": "The repeated block is a contextual list, command example or lifecycle diagram inside separate source/proposal/history sections; retaining it at each mapped owner preserves that section’s local explanation. Contexts: Documentation System Design / 6. Document Model / 6.8. Discussion Scratchpad; Documentation Governance / 7. Discussion Scratchpad Workflow. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
       "sourceUnits": [
@@ -12290,7 +12342,11 @@
           }
         }
       ],
-      "currentStateAccounting": "step10-author-candidate-accounting.json"
+      "currentStateAccounting": "step10-author-candidate-accounting.json",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-17",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-groups-e52831e36.md",
+      "reviewReportCommit": "5673c2068d694c22b84d6d5cc64f853798fdf794"
     },
     {
       "digest": "aa363dc9381146743f854ff9ce3429a15cc15f1c6a56364b34b542e06a9c7add",
@@ -12299,7 +12355,7 @@
         "docs/platform/governance.md"
       ],
       "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "reason": "The repeated short text introduces or qualifies the surrounding local section; each source occurrence retains that local payload at its mapped owner. Contexts: Documentation System Design / 8. Metadata; Documentation Governance / 5. Metadata. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
       "sourceUnits": [
@@ -12340,7 +12396,11 @@
           }
         }
       ],
-      "currentStateAccounting": "step10-author-candidate-accounting.json"
+      "currentStateAccounting": "step10-author-candidate-accounting.json",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-17",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-groups-e52831e36.md",
+      "reviewReportCommit": "5673c2068d694c22b84d6d5cc64f853798fdf794"
     },
     {
       "digest": "024fc3239ffcd85813170a3fe2b8f39d633a70001ff9e187d55de23a2371d818",
@@ -12349,7 +12409,7 @@
         "docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md"
       ],
       "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "reason": "The repeated block is a contextual list, command example or lifecycle diagram inside separate source/proposal/history sections; retaining it at each mapped owner preserves that section’s local explanation. Contexts: Documentation System Design / 8. Metadata; Documentation System Discussion / Discussion Log / 2026-09-13 — Panel Pass: Document Structure And Governance. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
       "sourceUnits": [
@@ -12391,7 +12451,11 @@
           }
         }
       ],
-      "currentStateAccounting": "step10-author-candidate-accounting.json"
+      "currentStateAccounting": "step10-author-candidate-accounting.json",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-17",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-groups-e52831e36.md",
+      "reviewReportCommit": "5673c2068d694c22b84d6d5cc64f853798fdf794"
     },
     {
       "digest": "8763ac2ff0db101fb4b502912c8ba6e49e1974ec45d8595b72a4169f5b517080",
@@ -12400,7 +12464,7 @@
         "docs/platform/governance.md"
       ],
       "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "reason": "The repeated block is a contextual list, command example or lifecycle diagram inside separate source/proposal/history sections; retaining it at each mapped owner preserves that section’s local explanation. Contexts: Documentation System Design / 10. Linking Discipline; Documentation Governance / 11. Linking Discipline. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
       "sourceUnits": [
@@ -12441,7 +12505,11 @@
           }
         }
       ],
-      "currentStateAccounting": "step10-author-candidate-accounting.json"
+      "currentStateAccounting": "step10-author-candidate-accounting.json",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-17",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-groups-e52831e36.md",
+      "reviewReportCommit": "5673c2068d694c22b84d6d5cc64f853798fdf794"
     },
     {
       "digest": "5dd3800d26757119c9d05e45dbe3a83203fc250f37b80390b533ba7f9cd011b4",
@@ -12450,7 +12518,7 @@
         "docs/platform/packaging-distribution/history/distribution-baseline.md"
       ],
       "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "reason": "The repeated short text introduces or qualifies the surrounding local section; each source occurrence retains that local payload at its mapped owner. Contexts: Documentation System Discussion / Discussion Log / 2026-09-13 — Next Step: Design Map + Architect Documentation Governance; Distribution Baseline And Scattered Spec Fragments / 3. Old Design Pressure From `tsk-1fp`. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
       "sourceUnits": [
@@ -12492,7 +12560,11 @@
           }
         }
       ],
-      "currentStateAccounting": "step10-author-candidate-accounting.json"
+      "currentStateAccounting": "step10-author-candidate-accounting.json",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-17",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-groups-e52831e36.md",
+      "reviewReportCommit": "5673c2068d694c22b84d6d5cc64f853798fdf794"
     },
     {
       "digest": "b8b4c9181b9ae69ce03999f53005c4306744238893debf2bf65ec58e2403a9fb",
@@ -12501,7 +12573,7 @@
         "docs/platform/proposals/step-10-coding-domain-adoption.md"
       ],
       "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "reason": "The repeated short text introduces or qualifies the surrounding local section; each source occurrence retains that local payload at its mapped owner. Contexts: Step 10 A0 - Coding Domain Boundary And Facade Plan / 11. Concrete Task List; Step 10 - Coding Domain Adoption Of The Coordination Foundation / 3. High-Level Adoption Plan. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
       "sourceUnits": [
@@ -12542,7 +12614,11 @@
           }
         }
       ],
-      "currentStateAccounting": "step10-author-candidate-accounting.json"
+      "currentStateAccounting": "step10-author-candidate-accounting.json",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-17",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-groups-e52831e36.md",
+      "reviewReportCommit": "5673c2068d694c22b84d6d5cc64f853798fdf794"
     },
     {
       "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
@@ -12553,7 +12629,7 @@
         "docs/platform/work-state/decisions/retired-decision-history.md"
       ],
       "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "reason": "The repeated closing sentence governs amendment of each local decision narrative; all nineteen native occurrences and their contextual owner set are enumerated, replacing the old four-member subset. Contexts: Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0015 — Đổi tên định danh contract C1-C9 thành CTR001-CTR009 / Hệ quả; Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0017 — Đóng audit hệ id/tên gọi (STR47) / Hệ quả; Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0005 — Runner & cô lập worker / Hệ quả; Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0008 — Routing theo audience của từng interface / Hệ quả; Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập) / Hệ quả; Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence / Hệ quả; Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0028 — Đổi tên pinned term `orchestrator` thành `launcher` / Hệ quả; Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị / Hệ quả; Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới / Hệ quả; Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người / Hệ quả; Spec: System Overview / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0016 — Mốc MVP của fgOS / Hệ quả; Spec: System Overview / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0018 — Mốc MVP2 của fgOS / Hệ quả; 0002 — Mô hình việc phẳng / Hệ quả; 0002 — Mô hình việc phẳng / 0003 — Đặt tên & bố cục dữ liệu / Hệ quả; 0002 — Mô hình việc phẳng / 0004 — Phạm vi & non-goal / Hệ quả; 0002 — Mô hình việc phẳng / 0007 — Tiến hoá schema & event / Hệ quả; 0002 — Mô hình việc phẳng / 0011 — Version tường minh cho mọi contract / Hệ quả; 0002 — Mô hình việc phẳng / 0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời / Hệ quả; 0002 — Mô hình việc phẳng / 0024 — Đổi tên status `proposed` thành `awaiting-approval` / Hệ quả. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
       "sourceUnits": [
@@ -12930,7 +13006,11 @@
           }
         }
       ],
-      "currentStateAccounting": "step10-author-candidate-accounting.json"
+      "currentStateAccounting": "step10-author-candidate-accounting.json",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-17",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-groups-e52831e36.md",
+      "reviewReportCommit": "5673c2068d694c22b84d6d5cc64f853798fdf794"
     },
     {
       "digest": "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3",
@@ -12942,7 +13022,7 @@
         "docs/platform/work-state/spec.md"
       ],
       "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "reason": "The identical unit is a heading label reused by separately mapped source sections; section subjects and payloads remain attached to their own source/owner pairs. Contexts: Spec: Decision Citation Drift Check / Behaviors & Operations; Spec: Distribution / Behaviors & Operations; Spec: fgOS Plugin (Claude Code slash-command surface) / Behaviors & Operations; Spec: Runner (vòng tự hành) / Behaviors & Operations; Spec: Work-State (tầng quản việc của forgent) / Behaviors & Operations. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
       "sourceUnits": [
@@ -13037,7 +13117,11 @@
           }
         }
       ],
-      "currentStateAccounting": "step10-author-candidate-accounting.json"
+      "currentStateAccounting": "step10-author-candidate-accounting.json",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-17",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-groups-e52831e36.md",
+      "reviewReportCommit": "5673c2068d694c22b84d6d5cc64f853798fdf794"
     },
     {
       "digest": "e3d926d43e2e72f2211f195fb007e887cc2dfd1d97f6819f80e5bf203d4dfd1b",
@@ -13046,7 +13130,7 @@
         "docs/platform/work-state/spec.md"
       ],
       "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "reason": "The identical unit is a heading label reused by separately mapped source sections; section subjects and payloads remain attached to their own source/owner pairs. Contexts: Spec: Runner (vòng tự hành) / Visuals; Spec: Work-State (tầng quản việc của forgent) / Visuals. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
       "sourceUnits": [
@@ -13087,7 +13171,11 @@
           }
         }
       ],
-      "currentStateAccounting": "step10-author-candidate-accounting.json"
+      "currentStateAccounting": "step10-author-candidate-accounting.json",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-17",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-groups-e52831e36.md",
+      "reviewReportCommit": "5673c2068d694c22b84d6d5cc64f853798fdf794"
     },
     {
       "digest": "b0a0db080dad061ca93e63826e562c4710807db8e6f2c8ca50dc291fc0b69e09",
@@ -13096,7 +13184,7 @@
         "docs/platform/work-state/spec.md"
       ],
       "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "reason": "The repeated short text introduces or qualifies the surrounding local section; each source occurrence retains that local payload at its mapped owner. Contexts: Spec: Runner (vòng tự hành) / Visuals; Spec: Work-State (tầng quản việc của forgent) / Visuals. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
       "sourceUnits": [
@@ -13137,7 +13225,11 @@
           }
         }
       ],
-      "currentStateAccounting": "step10-author-candidate-accounting.json"
+      "currentStateAccounting": "step10-author-candidate-accounting.json",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-17",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-groups-e52831e36.md",
+      "reviewReportCommit": "5673c2068d694c22b84d6d5cc64f853798fdf794"
     },
     {
       "digest": "0e00c9cccba1af1ea5926f1106dd72d535b230294281707303ecd16fbc0a2bea",
@@ -13147,7 +13239,7 @@
         "docs/platform/work-state/decisions/retired-decision-history.md"
       ],
       "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "reason": "The identical unit is a heading label reused by separately mapped source sections; section subjects and payloads remain attached to their own source/owner pairs. Contexts: Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4); Spec: System Overview / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4); Spec: Work-State (tầng quản việc của forgent) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4). Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
       "sourceUnits": [
@@ -13206,7 +13298,11 @@
           }
         }
       ],
-      "currentStateAccounting": "step10-author-candidate-accounting.json"
+      "currentStateAccounting": "step10-author-candidate-accounting.json",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-17",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-groups-e52831e36.md",
+      "reviewReportCommit": "5673c2068d694c22b84d6d5cc64f853798fdf794"
     },
     {
       "digest": "ac2b043c0d4f9fde1e7ecee60609cbe700480b9dd33105f98d30f6c6057ffb5c",
@@ -13216,7 +13312,7 @@
         "docs/platform/work-state/decisions/retired-decision-history.md"
       ],
       "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "reason": "The repeated short text introduces or qualifies the surrounding local section; each source occurrence retains that local payload at its mapped owner. Contexts: Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4); Spec: System Overview / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4); Spec: Work-State (tầng quản việc của forgent) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4). Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
       "sourceUnits": [
@@ -13275,12 +13371,16 @@
           }
         }
       ],
-      "currentStateAccounting": "step10-author-candidate-accounting.json"
+      "currentStateAccounting": "step10-author-candidate-accounting.json",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-17",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-groups-e52831e36.md",
+      "reviewReportCommit": "5673c2068d694c22b84d6d5cc64f853798fdf794"
     }
   ],
   "currentStateReconciliation": {
     "accounting": "step10-author-candidate-accounting.json",
-    "reviewStatus": "pending",
-    "meaning": "Changed groups pending; removed historical receipts preserved in accounting; unchanged per-group approvals retain their original scope."
+    "reviewStatus": "reviewed",
+    "meaning": "All 359 file groups are reviewed; removed historical receipts remain preserved in accounting. Three additional reviewed groups live in the host-invocation and packaging exception files, for 362 total expected groups."
   }
 }

@@ -1,3 +1,45 @@
+# Final owner-review queue — Step 10 close
+
+Queue size: **12 top-level owner-review families**. Subcounts are obligations, not twelve individual rows: A34 partial carries (28), existing promotion-truth wording/successor notes (20), Phase 7/8 groups (32), runner-cutover bindings (14), historical witness limits (66), plus the consumer and alias populations measured by the final rehearsal. No item below authorizes promotion, retirement, alias adoption or cutover.
+
+1. **A34:** review the 28 partial-carry residual representations before cutover; preserve their SHA256-bound remainders and current bindings.
+2. **Current truth:** reconcile candidate-unverified/current-truth notes, frozen reviewed author-time pending tails and the A28/A35/A40/A41 promotion-truth obligations.
+3. **Wording/citation/successor queue:** retain the existing 20 one-line observations below plus every final-review note in the next subsection.
+4. **Phase 7/8 groups:** keep all 32 cross-area groups outside Step 10 item 2b queued; none is silently closed here.
+5. **Runner cutover:** revalidate all 14 historical runner supersede bindings, including the five absent stored digests, before source retirement.
+6. **Inbound consumers:** classify/rewrite or prove non-authority for the rehearsal's 5,213 external consumer edges; the 7,467 unresolved authority-consumer dynamic patterns remain separately visible.
+7. **Non-doc consumers:** carry the executable, shipped-contract, fixture and dynamic consumer queues into Phases 8/9; this close changes no consumer bytes.
+8. **Alias/cutover coverage:** the adopted alias table remains empty; 994 rehearsal legacy paths still have no adopted bare-path alias. Draft validity is not adoption.
+9. **Historical witness limits:** preserve all 66 audit limits; they authenticate historical bindings but do not prove current truth.
+10. **Owner effort:** the owner's token total remains unreported; do not infer it from session or row counts.
+11. **Promotion/cutover authority:** owner must decide whether the evidence is sufficient to enter later promotion/cutover work; Phase 6 itself performs neither.
+12. **Known stale citations and projections:** resolve or explicitly accept the final notes below before promotion; resolved record-correction items remain marked resolved for auditability.
+
+## Final wording and citation notes (one line each)
+
+- `C1-D01`: generated-backlog heading rationale still says native retained-ID confirmation is pending although registry change n12 confirms it.
+- `C1-A01`: `nativeSuccessorId` in the historical recarry receipt still says pending even though n05 identifies `claim_127225b8…`.
+- `C1-R01`: the recovery gate line citation is approximate; refresh it if this rationale is promoted as current truth.
+- `C1-R03`: the heading explanation was copied from x01 and incorrectly calls the unit a paragraph.
+- `C1-R05`: its note says the committed list at HEAD still contains the old tuple; that was true only at the pre-refresh comparator pin.
+- `GRP-LIVE-01`: digests `fd6f97ed`, `c0000ebf`, `024fc323` and `8763ac2f` remain separately owned live-document copies whose consistency must be checked at promotion.
+- `GRP-HEAD-02`: three work-state group members map to reviewed promote rows whose target headings are reworded; re-key if promotion restores or changes those headings.
+- `GRP-SPECS-03`: re-key digests `95a357e2`, `39a803b8`, `e3d926d4`, `b0a0db08`, `0e00c9cc` and `ac2b043c` if the three currently no-row specs later gain decisions with different owners.
+- `TRUTH-15`: `docs/platform/runner/architecture/h-7af1f0242611.md` has stale `runner.md:2172-2180` and `runner.md:2434` self-citations; the current locations are 2470/2602 and 2890.
+- `TRUTH-26`: the link destination resolves, but its visible text still names a missing old path.
+- `TRUTH-27`: the `bin/fgos.mjs:4415,4503` citations are five lines stale; the current cited facts sit at 4410 and 4498.
+- `TRUTH-01`: the 47 KB backlog unit was truth-checked only on the changed rows, not on its unchanged remainder.
+- `F10-08`: check A is green only after Lead-authorized retrospective allowlisting of three tools; retain this authority disclosure in the scorecard.
+- `F10-11`: the carried `EXECUTOR_ADAPTERS` attribution and runner/bin line citations are labelled stale; verify or correct them at promotion.
+- `F10-12`: 1,305 candidate tuples overlap across two or three lists with different metadata; the union is correct but single-list readers see inconsistent review state.
+- `F10-13`: comparator equality proves drift-free agreement since the expected lists were rebuilt from E; it is not independent conservation proof.
+- `F10-07-RESOLVED`: holds record corrected—0 real holds; three Coordination Rings decisions were reviewed and applied.
+- `F10-09-RESOLVED`: `clear-assignment-claim` help defect was resolved on main by `c9026bf8c`; no open code queue remains here.
+- `F10-10`: final group counts use the final rehearsal measure (duplicate 4, semantic 28); the older group-record pin is historical.
+- `F10-14-RESOLVED`: the old package blocker is superseded by the L10-41 accepted combined author/package evidence shape.
+
+---
+
 # Global review wording observations — owner promotion truth queue (L10-37)
 
 From committed f70ecf4ec ordinary reviews; conservation ok verdicts remain applied. Each item is an owner promotion-truth/cutover obligation, not author approval or a new rework.
@@ -512,7 +554,7 @@ Both 1803 reviews applied at matching bindings: 271 ok receipts, six reworks; so
 
 | Item | Owner / scope | Evidence and next action |
 |---|---|---|
-| Reconcile help advertises unsupported clear-assignment-claim | Runner CLI code owner; separate code-defect item, outside this documentation plan | `src/cli/command-registry.mjs:1197`, `src/verbs/dispatch/reconcile.mjs:21`, `bin/fgos.mjs:2666` advertise it; `src/runner/dispatch/reconciliation-planner.mjs:225-233` refuses unsupported action. Correct help/registry and verify refused-action behavior in separate code work. No code touched here. |
+| Reconcile help advertised unsupported clear-assignment-claim — **resolved** | Runner CLI code owner; resolved outside this documentation plan by main `c9026bf8c` | Main removed the unsupported action; only a historical comment remains in `src/verbs/dispatch/recover.mjs`. No open owner action and no code touched here. |
 | Runner cutover revalidation | Atomic cutover owner | All 14 historical reviewed supersedes, not merely four: `step9-l9-9-redecisions.json`. Five stored digests absent: 40aafcee, f033905b, b7876fcb, c2cb6de3, 76d404ea. The 28 new gap decisions include 19 pending supersedes (three full-containment successors and 16 L9-15 contextual-group rows) plus nine partial carries; their source/group bindings also need cutover revalidation and remain separate from the historical reviewed set. |
 | Next bounded review | Migration owner / independent reviewer | Native sync once at this turn’s runner commit, then ONE bounded review of every changed row/entry plus all 28 new gap dispositions. Apply before Step 9 closure; existing closure rules and A34/identity/Rings/final-main/consumer obligations persist. |
 

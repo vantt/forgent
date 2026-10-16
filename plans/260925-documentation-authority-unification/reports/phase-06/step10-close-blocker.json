@@ -1,0 +1,38 @@
+{
+  "status": "blocked",
+  "checkedAt": "2026-10-17",
+  "contentPin": "38672e7f157788cbe1b2bf59511bd61046dce660",
+  "reviewCommit": "efb79d832ef7eb72066d5b45979287bce6b276a1",
+  "head": "925841485fa85406b5a69f091568a024fac04312",
+  "registrySHA256": "b20238af95f89cd3a83fbc20dd53ce8df1192153415cd85b9586d53884aa9c2b",
+  "facts": {
+    "contentPinInventoryD": {
+      "fatalCount": 2,
+      "fatalType": "decision-review-report-missing",
+      "claimIds": [
+        "claim_f0b2a4079764d68b1102ddddb08776ce",
+        "claim_127225b8542c701295574b1b00749594"
+      ],
+      "cause": "The committed ordinary-review reports are descendants of the inventory content pin, so the committed-review lookup correctly refuses them as future evidence for that snapshot.",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-close-D-both-blocked.json"
+    },
+    "finalPinInventory": {
+      "generated": false,
+      "registryBindsToReviewCommit": false,
+      "registryBindsToHead": false,
+      "changedIdentityScopePath": "AGENTS.md",
+      "change": "The impact-analysis capability gate was added after the content pin.",
+      "generatorResult": "fail-closed before inventory generation",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-close-native-final-pin.log"
+    },
+    "identityScope": [
+      "docs",
+      "AGENTS.md",
+      "CLAUDE.md",
+      "plans/260925-documentation-authority-unification/transitional-switchboard.json"
+    ]
+  },
+  "conflict": "L10-41 reasons only from unchanged docs/** bytes, but AGENTS.md is also an identity-scope authority source and changed between the sole registry sync and the committed review. Therefore no allowed run can both preserve the no-second-carry instruction and produce a final-pin inventory whose D/E accepts the review reports.",
+  "stopRuleApplied": "The close stopped before strict E, comparator regeneration, promotion, H, T9, audit/replay/ownership/A/B/I/alias checks, relevant tests, final scorecard, or transition to awaiting owner review. No pass was inferred or fabricated.",
+  "requiredResolution": "An authorized follow-up must either permit one native carry-forward/registry persistence at a commit containing the review reports, or change the governing evidence model/checker in a separately reviewed change. This turn has authority for neither."
+}

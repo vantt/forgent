@@ -1,7 +1,7 @@
-# Step 2 reduced promotion rehearsal — refreshed with Step 10
+# Step 2 reduced promotion rehearsal — final Step 10 run
 
-Content/SYNC `c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be`. The same genuine disposable-clone run as[full rehearsal](rehearsal-step-10.md) separately invokes the unchanged strict-E evaluator with scope`docs/architect/agent-coordination`;native inventory retains all4,486 files/91,388 units. No source/field is omitted to obtain a smaller inventory.
+The same final disposable-clone run recorded in [`step10-package-rehearsal.json`](step10-package-rehearsal.json) separately invoked the unchanged strict-E evaluator for `docs/architect/agent-coordination`. The inventory remained complete: **4,486 files / 91,388 units**.
 
-Actual reduced-scope opens: **identical-units-multiple-owners=342; candidate-blocks-unreferenced=608**. Fatal finding types: **identical-units-multiple-owners, candidate-blocks-unreferenced**. These are actual evaluator outputs,not strict-green or closure claims. The whole-overlay cutover evaluator returns1 with{'pass': 8, 'blocked': 11, 'review': 1};see the full gate-by-gate table. [Raw independent-scope result](step10-package-rehearsal.json).
+Reduced-scope open data: **342 identical-unit multiple-owner groups** and **608 unreferenced candidate units**. Those are the only fatal finding types in this reduced scope. The full-overlay cutover evaluator returned exit **1** with **7 pass / 12 blocked / 1 review**; `claims-reviewed` was blocked by the two backlog rows still pending at rehearsal time.
 
-Started2026-10-16T17:24:19.409Z,finished2026-10-16T17:41:24.498Z;clone removed=True and independently checked absent. First SIGKILL attempt and cleanup remain disclosed separately. There was no native carry-forward/registry persistence,Git state mutation,promotion,source retirement,alias adoption or checker change in either rehearsal attempt. Independent ordinary/checkpoint/current-truth/A34 acceptance and the existing Phase7/8/9 queues remain required.
+Started `2026-10-16T19:16:49.548Z`, finished `2026-10-16T19:32:58.254Z`; clone removed=true. No native carry-forward, registry persistence, Git mutation, promotion, retirement, alias adoption or checker change occurred.

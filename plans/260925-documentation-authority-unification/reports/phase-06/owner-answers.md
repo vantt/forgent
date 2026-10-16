@@ -262,6 +262,9 @@ Lead decisions under A42 for Step 10 (2026-10-15; evidence `step10-evidence.md` 
 - L10-9 The 37 promotion-incomplete headers get header fields only; changed digests are rebound and reviewed.
 - L10-10 R6-6: the switchboard `candidate` route outranks a carried `Draft` header for list eligibility (A28 item 2); recorded in the Step 10 report.
 - L10-11 Step 10 runs no fresh readers (no new area text; Phase 7 owns the cross-area reader review).
+- L10-12 (Lead/A42, 2026-10-16, first Step 10 correction turn): post-review edits authorized by A19/A40/A41 must be logged before rebind; the log is conservation accounting, not promotion or truth approval.
+- L10-13 (Lead/A42, 2026-10-16, first Step 10 correction turn): a link correction or labelled candidate wrapper that changes a bound unit is re-decided against the complete current unit, returned to pending and independently reviewed; no prior approval carries across the changed digest.
+- L10-14 (Lead/A42, 2026-10-16, package/re-carry instruction after the first Step 10 corrections): after a main-boundary sync, every changed upstream source span is conserved under A31 in its mapped carrier and bound by content, never by ordinal. Existing labelled truth corrections may remain in the enclosing candidate unit, but the current source/target or predecessor-gap binding is re-decided and independently reviewed. This authorized the generated `docs/backlog.md` heading/table re-carry and its predecessor-gap row after the two upstream PBI additions; it did not authorize a renderer run, deletion of hand-added rows, backlog truth, promotion, retirement or cutover.
 - Not delegated and not done in Step 10: landing on main, push, Phase 9 cutover (alias table stays empty, no status flips, nothing retired), file deletion. Phase 6 ends at "awaiting owner review"; closing it is the owner's act.
 
 
@@ -374,3 +377,9 @@ Lead instruction in the same assignment: retarget claim_16abc69cd658a382c456cdaf
 ## L10-40 — retain A31 main-diff supersede successors
 
 Lead instruction in the same assignment: claim_cdf8c5562fb083bbdccf7d8c03decb7a and claim_d7fd3778a5cbb74cad9fb5e476708647 remain supersede under A31. Main's own diff is the supersede successor, consistent with earlier accepted corrections; no content/disposition rework. Matching independent ok verdicts apply normally.
+
+## L10-41 — accept the combined 41y author-and-package turn
+
+Lead decision under A42 for the package completed at `38672e7f1` and the follow-up accounting authored in the same runner round: the combined author-and-package turn was valid because the `docs/**` bytes were unchanged after the sole native sync. The later writes changed only Phase 6 decision/accounting/report files, so they required a fresh decision overlay and review but did not require a new content pin, native carry-forward, or registry persistence. Evidence must distinguish the docs content pin (`38672e7f1`) from the runner/package commit that contains the decision overlay; no claim may call the latter a second native sync. This decision authorizes the evidence shape only—no promotion, retirement, alias adoption, cutover, main landing, push, or approval carry.
+
+Close verification found that the factual premise is incomplete: the native identity scope is `docs`, root `AGENTS.md`, root `CLAUDE.md`, and the transitional switchboard. Root `AGENTS.md` changed after `38672e7f1` when the impact-analysis capability gate landed. The persisted registry therefore does not bind either the review commit `efb79d832` or final HEAD `925841485`; conversely, a `38672e7f1` inventory must reject those later review reports. L10-41 remains recorded as the Lead instruction, but it is **not executable as a passing close proof** without either an authorized carry-forward or a separately reviewed evidence-model change. See `step10-close-blocker.json`.

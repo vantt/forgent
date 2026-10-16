@@ -1,0 +1,9 @@
+file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/generate-doc-inventory.mjs:1661
+  if (!registryBindsToCommit(identityRegistry.commit, commitSha, repoRoot)) throw new Error(`identity registry commit ${identityRegistry.commit || '<missing>'} does not match generation commit ${commitSha} and the in-scope tree differs; carry the registry forward with: node scripts/generate-doc-inventory.mjs --refresh --commit ${commitSha}`);
+                                                                                  ^
+
+Error: identity registry commit 38672e7f157788cbe1b2bf59511bd61046dce660 does not match generation commit 925841485fa85406b5a69f091568a024fac04312 and the in-scope tree differs; carry the registry forward with: node scripts/generate-doc-inventory.mjs --refresh --commit 925841485fa85406b5a69f091568a024fac04312
+    at Module.generateInventory (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/generate-doc-inventory.mjs:1661:83)
+    at file:///tmp/fgos-work/step10-close-WAKxo3/inventory-readonly.mjs:4:21
+
+Node.js v24.18.0

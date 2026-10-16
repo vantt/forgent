@@ -1,3 +1,24 @@
+# Close attempt stopped by final-pin identity binding
+
+## Owner summary
+
+Phase 6 has the independent close inputs: 3/3 backlog decisions and 22/22 accounting entries reviewed ok, 25/25 pending identical-unit groups reviewed ok, checkpoint ACCEPT, A28 current-truth draw 1/30 false (3.3%), and final red-team 0 Critical/0 High. This turn applied the verdicts, corrected the rehearsal and records, and consolidated the owner queue. Those results prove the reviewed rows and supplied review samples; they do **not** prove a final-pin native closure.
+
+The required D/E rerun stopped before closure. At the sole-sync pin `38672e7f1`, D correctly rejects two later ordinary-review reports as future evidence. At a commit containing those reports, the persisted registry cannot generate an inventory because root `AGENTS.md`—part of native identity scope—changed after the sync. This makes the docs-only premise of L10-41 insufficient. Exact proof and the two possible resolutions are in [step10-close-blocker.json](step10-close-blocker.json). The owner queue remains [owner-queue.md](owner-queue.md); it has 12 top-level obligation families plus the newly recorded wording/citation observations.
+
+Step 10 and Phase 6 therefore remain **open**, not awaiting owner review. Explicitly not done: no final strict E, regenerated comparator pass, promotion, retirement, alias adoption, cutover, main landing, or push. A follow-up needs explicit authority for one native carry-forward/registry persistence at a commit containing the reviews, or a separately reviewed evidence-model correction. No pass is inferred from earlier package receipts.
+
+## Evidence from this stopped close turn
+
+- Applied review/accounting: [step10-close-review-application.json](step10-close-review-application.json).
+- Raw content-pin D failure: [step10-close-D-both-blocked.json](step10-close-D-both-blocked.json).
+- Raw final-pin generator refusal: [step10-close-native-final-pin.log](step10-close-native-final-pin.log).
+- Consolidated blocker: [step10-close-blocker.json](step10-close-blocker.json).
+- Reviewed group projection and source: [identical-unit-exceptions.md](identical-unit-exceptions.md), [identical-unit-exceptions.json](identical-unit-exceptions.json).
+- Record corrections: [holds.md](holds.md), [post-review-edits.md](post-review-edits.md), [owner-answers.md](owner-answers.md), [owner-queue.md](owner-queue.md).
+
+---
+
 # Backlog accounting closed; package ready for independent review
 
 Assignment `unit-run-1792176628519-ac852ba4/producer/1`; docs content/SYNC `38672e7f157788cbe1b2bf59511bd61046dce660`; package pin is the runner commit containing this report. Docs remain byte-identical to the content pin. Under A31/L10-14, the generated-backlog shard now has ordinary pending, content-bound rows for heading `claim_f0b2a407…`, active table `claim_127225b8…` and predecessor gap `claim_9b3b7fac…`; the deferred native placeholder is removed. No position-based identity, approval carry, renderer permission or truth approval.

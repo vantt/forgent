@@ -2,7 +2,10 @@
   "version": 1,
   "contentCommit": "38672e7f157788cbe1b2bf59511bd61046dce660",
   "assignment": "unit-run-1792174045086-f2aacd25/producer/1",
-  "status": "blocked",
+  "status": "superseded",
+  "supersededBy": "L10-41 and the independently accepted close decisions applied in the final close turn",
+  "supersededAt": "2026-10-17",
+  "historicalOnly": true,
   "stopRule": "Any strict global comparator difference blocks the close path; no relabelling or waiver.",
   "native": {
     "syncSeconds": 802.964,
@@ -75,5 +78,5 @@
     "ordinaryRequest": "not authored",
     "checkpointRequest": "not refreshed"
   },
-  "requiredNext": "Author and independently review an ordinary decision/accounting row for the new docs/backlog.md unheaded block and its predecessor gap, then rerun the package from a new committed content pin."
+  "requiredNext": "Completed: the heading, current table and predecessor gap were independently reviewed ok; docs bytes remained unchanged after the sole native sync, so L10-41 accepts a refreshed overlay at the existing docs content pin without another native carry or persistence."
 }

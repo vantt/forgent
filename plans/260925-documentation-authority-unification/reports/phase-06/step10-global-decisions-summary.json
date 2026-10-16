@@ -1,6 +1,6 @@
 {
   "source": "owner-answers.md",
-  "meaning": "Summary only; does not create, supersede or approve any decision. Missing standalone L10-12..14 definitions remain explicit; their historical references are not invented.",
+  "meaning": "Summary only; authoritative narratives are in owner-answers.md. This file creates, supersedes and approves no decision.",
   "decisions": [
     {
       "id": "L10-1",
@@ -48,15 +48,15 @@
     },
     {
       "id": "L10-12",
-      "summary": "No standalone definition found in current owner-answers.md; historical references are not a substitute for a decision."
+      "summary": "Log every authorized post-review platform edit before rebind; logging grants no truth or promotion approval."
     },
     {
       "id": "L10-13",
-      "summary": "No standalone definition found in current owner-answers.md; historical link-pass references retained as evidence only."
+      "summary": "Changed link/candidate-wrapper units are re-decided and independently reviewed; no digest approval carries."
     },
     {
       "id": "L10-14",
-      "summary": "No standalone definition found in current owner-answers.md; historical A31/main-carry references retained as evidence only."
+      "summary": "A31 main-boundary source changes are conserved and content-bound; generated backlog re-carry grants no renderer/truth/cutover authority."
     },
     {
       "id": "L10-15",
@@ -161,6 +161,10 @@
     {
       "id": "L10-40",
       "summary": "Keep the two A31 main-diff successors as supersede; apply matching committed ok verdicts normally."
+    },
+    {
+      "id": "L10-41",
+      "summary": "Lead accepted the combined author/package evidence because docs/** bytes did not change, but close verification found root AGENTS.md also belongs to identity scope and changed after the sole sync. The instruction is recorded but cannot yield passing final-pin D/E without an authorized carry-forward or evidence-model change."
     }
   ],
   "A43": "Responsibility groups only; no required/planned Orchestrator/Launcher/Router/Driver/Dispatcher entity. Three matching ordinary approvals were applied; current-truth, runtime and cutover obligations remain. Holds=0. Phase 6 reaches awaiting owner review only after checkpoint, A28 truth sampling and final red-team.",

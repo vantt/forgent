@@ -14,12 +14,17 @@
       "disposition": "regenerate-from-source",
       "targetOwner": null,
       "targetAnchor": null,
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792173247556-515f6e95@2026-10-17",
       "rationale": "At SYNC bc7358789, the retained Product Backlog heading resolves locally to source SHA256 5f190b849165ce8115369ebb112a31b286e85237f5c3dd32f8493cc3cfd93d17 after exactly two upstream PBI rows were added. The file remains the generated, non-authority backlog projection at its frozen root path. Keep regenerate-from-source with no platform target; this does not authorize a renderer run, discard hand-added rows, certify status truth, promote, retire or cut over. Exact c3614f4d2..bc7358789 hunk and old/new units are in step10-ordinary-application-and-refresh.json. Native retained-ID confirmation and independent review are pending; no prior approval carries.",
-      "reviewNote": "A31/L10-14 main re-carry: heading section payload changed only because two PBI rows were added. Native retained-ID confirmation and independent ordinary review remain next; no approval carried.",
+      "reviewNote": "deep: heading Product Backlog of the generated backlog; docs/backlog.md differs c3614f4d2 to HEAD by exactly two added table rows (p-68be2ae3 and p-7eb9e65b, lines 20-21, byte-identical to main commit 0abc1c533 and to bc7358789), the heading digest moves 92be08bb to 5f190b84 only because the heading text digest folds in the section payload that includes the table; I recomputed both by hand; regenerate-from-source with null owner matches the vocabulary (generated, no owner, no authority) and the sibling reviewed rows for block-1 (8311fcb7), done-declined (10c0d318) and block-3 (2d178e51) still equal current unit digests; registry unit claim_f0b2 is retained (n12) with the same ID and new digest, no identity graft; wording: the rationale still says native retained-ID confirmation is pending although n12 now confirms it",
       "sourcePath": "docs/backlog.md",
-      "sourceAnchor": "product-backlog"
+      "sourceAnchor": "product-backlog",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-close-c1-s1-e52831e36.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "efb79d832ef7eb72066d5b45979287bce6b276a1"
     },
     {
       "claimId": "claim_127225b8542c701295574b1b00749594",
@@ -28,12 +33,17 @@
       "disposition": "regenerate-from-source",
       "targetOwner": null,
       "targetAnchor": null,
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792176628519-ac852ba4@2026-10-17",
       "rationale": "The persisted native registry binds claim_127225b8542c701295574b1b00749594 by content to the complete current generated backlog table at docs/backlog.md#unheaded-block-2, source SHA256 7d5317616b4b105936b065a213de9cce47e44c3e623d6dd293ffd0d5dc4c84ec, lines 11-54 at content commit 38672e7f1. The c3614f4d2 predecessor remains separately conserved as registry gap claim_9b3b7fac64df06547dd06e05f4f026c5; the successor was not inferred from ordinal or position. Keep regenerate-from-source with no platform target under the A31/L10-14 generated-backlog route. This does not authorize a renderer run, discard hand-added rows, certify backlog truth, promote, retire or cut over. Independent ordinary review is pending; no predecessor or heading approval carries.",
-      "reviewNote": "A31/L10-14 native successor accounting: content-bound to digest 7d531761 at the persisted registry, never position-bound. Independent ordinary review pending; no approval carried.",
+      "reviewNote": "deep: current generated table unheaded-block-2 lines 11-54, digest 7d531761 recomputed by hand and by extractor; it is the 42-line predecessor plus exactly the two main rows p-68be2ae3 and p-7eb9e65b (both present verbatim at HEAD lines 20-21, equal to main commit 0abc1c533); the registry binds this ID by content as a new unit (n05) with sourceUnitDigest 7d531761 and the old ID is separately kept as a gap (d03), so no ordinal graft; regenerate-from-source with null owner and anchor is allowed for the generated class and grants no renderer or truth approval; wording: the claim kind historical-context is the same as the predecessor row",
       "sourcePath": "docs/backlog.md",
-      "sourceAnchor": "unheaded-block-2"
+      "sourceAnchor": "unheaded-block-2",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-close-c1-s2-e52831e36.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "efb79d832ef7eb72066d5b45979287bce6b276a1"
     },
     {
       "claimId": "claim_c295c4c899afa37544bda841421c92e4",
@@ -116,11 +126,16 @@
       "disposition": "regenerate-from-source",
       "targetOwner": null,
       "targetAnchor": null,
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792176628519-ac852ba4@2026-10-17",
       "rationale": "The complete c3614f4d2 generated backlog table, source SHA256 3430068fb5b1687e480e143bc34727fa7d6ada9f1342932c9fdd2f8b23c17da2, is preserved by the persisted native registry as identity gap claim_9b3b7fac64df06547dd06e05f4f026c5. The current table is separately bound by content as claim_127225b8542c701295574b1b00749594 with source SHA256 7d5317616b4b105936b065a213de9cce47e44c3e623d6dd293ffd0d5dc4c84ec; the two added PBI rows are the exact committed difference and all predecessor lines remain verbatim. Keep regenerate-from-source outside platform authority under A31/L10-14. This predecessor accounting is not an ordinal identity graft and grants no renderer permission, truth approval, promotion, retirement or cutover. Independent ordinary review is pending; no prior approval carries.",
-      "reviewNote": "A31/L10-14 predecessor-gap accounting refreshed after native confirmation of the separate current identity. Content binding only; independent ordinary review pending; no approval carried.",
-      "sourceCommit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be"
+      "reviewNote": "deep: predecessor gap row for the c3614f4d2 table digest 3430068f (recomputed from lines 11-52 of the c3614f4d2 blob); registry moved this ID from units (n09 removed) to identityGaps (n14 added with gapReason about the unstable anchor) and the shard carries it under registryGaps with sourceCommit c3614f4d2; every predecessor line is verbatim in the current table so nothing is lost, and the older reviewed gap claim_d7660c15 (digest 57afbc48) is untouched; the stale text in the before row about a successor that native sync must allocate is replaced by the content-bound successor named here",
+      "sourceCommit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-close-c1-s2-e52831e36.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "efb79d832ef7eb72066d5b45979287bce6b276a1"
     }
   ],
   "pendingNativeSuccessors": []

@@ -692,3 +692,21 @@ L10-38 author restoration (logged before edit), 2026-10-16: docs/platform/agent-
 
 
 L10-38 author restoration (logged before edit), 2026-10-16: docs/platform/agent-coordination/architecture/run-handle.md#implementation-and-design-status, claim_8be1f5a856f48c009b2a47816d982eb1. Restore 3 verified live fact paragraphs verbatim in the existing status introductory block (no block/line shifts). Current recovery-planner.mjs:243-266,281-316 and run-lock.mjs:306-334,390-412 checked. All changed target bindings return to pending; no approval carry.
+
+## Final post-review log reconciliation — 2026-10-17
+
+The final red-team path scan found these eleven authorized edits missing from this log. This section records the existing edits; it does not make a new docs edit or carry approval.
+
+| Existing platform file | One-line reason |
+|---|---|
+| `docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md` | A41/L10-24 stale runner citation correction, independently reviewed after rebind. |
+| `docs/platform/runner/subcomponents/h-37aced3896a8/spec.md` | A41/L10-24 stale runner citation correction, independently reviewed after rebind. |
+| `docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md` | A41/L10-24 stale runner citation correction, independently reviewed after rebind. |
+| `docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md` | A41/L10-24 stale runner citation correction, independently reviewed after rebind. |
+| `docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md` | A41/L10-24 stale runner citation correction, independently reviewed after rebind. |
+| `docs/platform/runner/operations/h-51f5cd7279fd.md` | A41 current-truth and citation corrections for live tee/evolve/entropy facts. |
+| `docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md` | A19 reviewed correction of registered-output mapping and candidate label. |
+| `docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md` | A19 reviewed correction of registered-output mapping and candidate label. |
+| `docs/platform/host-invocation-routing/contracts/command-route-descriptor.md` | A40/A31 citation and labelled candidate-binding correction. |
+| `docs/platform/host-invocation-routing/contracts/operation-provider.md` | A40/A31 citation and labelled candidate-binding correction. |
+| `docs/platform/runner/architecture/h-69197b459754.md` | L10-24 labelled runner citation correction, independently reviewed after rebind. |
