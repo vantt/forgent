@@ -91,9 +91,25 @@ test('aliases within the limit still resolve', () => {
   assert.deepEqual(doc.list, [['x'], ['x'], ['x']]);
 });
 
-test('a self-referencing map returns a cyclic object and does not hang', () => {
-  const doc = parseYaml('a: &a {b: *a}');
-  assert.equal(doc.a.b, doc.a);
+test('a self-referencing map is refused as an endless expansion and does not hang', () => {
+  assert.throws(() => parseYaml('a: &a {b: *a}', { filename: 'loop.yaml' }), /loop\.yaml: aliases expand to more than 100000 values/);
+  assert.throws(() => parseYaml('&a [*a]'), /aliases expand to more than/);
+});
+
+test('nested aliases under the alias limit still throw when they expand past the value budget', () => {
+  const lines = ['l0: &l0 [x, x, x, x, x, x, x, x, x]'];
+  for (let i = 1; i <= 9; i++) lines.push(`l${i}: &l${i} [${Array(9).fill(`*l${i - 1}`).join(', ')}]`);
+  const bomb = `${lines.join('\n')}\n`;
+  assert.ok((bomb.match(/\*l/g) ?? []).length < 100, 'the alias count stays under the alias limit');
+  const started = Date.now();
+  assert.throws(() => parseYaml(bomb, { filename: 'bomb.yaml' }), /bomb\.yaml: aliases expand to more than 100000 values/);
+  assert.ok(Date.now() - started < 2000, 'refused quickly');
+});
+
+test('a large flat document under the value budget parses', () => {
+  const items = Array.from({ length: 10000 }, (_, i) => `  - id: ${i}\n    tags: [a, b]`).join('\n');
+  const doc = parseYaml(`items:\n${items}\n`);
+  assert.equal(doc.items.length, 10000);
 });
 
 test('__proto__ and constructor.prototype keys become own keys and never reach Object.prototype', () => {
