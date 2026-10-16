@@ -24,6 +24,7 @@
   "scripts/check-legacy-docs-ratchet.exceptions.json",
   "scripts/doc-link-pass.mjs",
   "scripts/doc-binding-repair.mjs",
+  "scripts/doc-rationale-facts.mjs",
   "test/scripts/",
   "scripts/compare-doc-global-closure.mjs"
 ]
