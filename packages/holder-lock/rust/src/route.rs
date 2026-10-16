@@ -356,6 +356,20 @@ mod quiesce {
         })
     }
 
+    /// Whether a process whose cwd or environ could not be read may still be
+    /// a fgOS process. Its argv stays readable without ptrace access: a
+    /// session helper the user's own service manager runs without ptrace
+    /// access (systemd's `(sd-pam)`) names neither node nor a fgOS binary and
+    /// is not counted, or no systemd machine could ever scan clean. An
+    /// unreadable argv says nothing, so it still counts.
+    fn could_be_fgos(argv: Option<&[String]>) -> bool {
+        let Some(argv) = argv else { return true };
+        let Some(first) = argv.first() else { return false };
+        let base = Path::new(first).file_name().and_then(|n| n.to_str()).unwrap_or("");
+        let versioned_node = base.strip_prefix("node").is_some_and(|rest| rest.is_empty() || rest.starts_with(|c: char| c.is_ascii_digit() || c == '.' || c == '-' || c == 'j'));
+        versioned_node || matches!(base, "bun" | "deno" | "fgos" | "fgos-runner" | "fgos-gateway")
+    }
+
     /// Owner uid of `/proc/<pid>`: a process that made itself non-dumpable
     /// (ssh-agent, gpg-agent) shows as root and is another user's process
     /// for this scan.
@@ -424,7 +438,7 @@ mod quiesce {
                     "matched": matched,
                     "root": root.map(|r| r.to_string_lossy().into_owned()),
                 })),
-                None if !view.unreadable.is_empty() && same_user(view.pid.0) => unreadable += 1,
+                None if !view.unreadable.is_empty() && same_user(view.pid.0) && could_be_fgos(view.cmdline.as_deref()) => unreadable += 1,
                 None => {}
             }
         }
@@ -434,5 +448,31 @@ mod quiesce {
             json!({ "processes": processes, "unreadable": unreadable }),
             if clean { EXIT_OK } else { EXIT_NEGATIVE },
         )
+    }
+
+    #[cfg(test)]
+    mod tests {
+        use super::could_be_fgos;
+
+        fn argv(parts: &[&str]) -> Vec<String> {
+            parts.iter().map(|p| p.to_string()).collect()
+        }
+
+        #[test]
+        fn an_unreadable_process_counts_only_when_its_argv_could_be_fgos() {
+            assert!(could_be_fgos(None), "no argv at all says nothing");
+            assert!(could_be_fgos(Some(&argv(&["node", "bin/fgos.mjs"]))));
+            assert!(could_be_fgos(Some(&argv(&["/usr/bin/node", "--test", "x.mjs"]))));
+            assert!(could_be_fgos(Some(&argv(&["/opt/fgos/bin/fgos", "run"]))));
+            assert!(could_be_fgos(Some(&argv(&["fgos-gateway"]))));
+            assert!(could_be_fgos(Some(&argv(&["nodejs"]))));
+            assert!(could_be_fgos(Some(&argv(&["/usr/bin/node20", "x.mjs"]))));
+            assert!(could_be_fgos(Some(&argv(&["node-22"]))));
+            assert!(could_be_fgos(Some(&argv(&["bun", "run"]))));
+            assert!(could_be_fgos(Some(&argv(&["deno", "run"]))));
+            assert!(!could_be_fgos(Some(&argv(&["nodemon"]))), "a name that only starts with node is something else");
+            assert!(!could_be_fgos(Some(&argv(&["(sd-pam)"]))), "systemd's session helper");
+            assert!(!could_be_fgos(Some(&argv(&[]))), "a zombie or kernel thread has an empty argv");
+        }
     }
 }
