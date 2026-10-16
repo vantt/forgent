@@ -147,7 +147,8 @@
       "v1Shape": "file-link",
       "v1Path": ".fgos/main-checkout.lock",
       "fence": "tombstone",
-      "owner": "4.3"
+      "owner": "4.3",
+      "note": "v1 source: src/runner/main-checkout-lock.mjs; borrowed by git children through contracts/main-checkout-borrow.v1.json"
     },
     {
       "name": "merge-slot",
@@ -158,31 +159,33 @@
       "v1Shape": "file-link",
       "v1Path": ".fgos/merge-slot--<ref>.lock",
       "fence": "tombstone",
-      "owner": "4.3"
+      "owner": "4.3",
+      "fenceNote": "a tombstone for every refs/heads/* that exists at cutover",
+      "note": "<ref> is encodeURIComponent(target ref), as v1 mergeSlotLockFile in src/runner/main-checkout-lock.mjs writes it"
     },
     {
       "name": "state",
       "kind": "hot-mutex",
       "scope": "repo",
       "rank": 60,
-      "v3Path": "<fgosDir>/locks/state.lock",
+      "v3Path": "<fgosDir>/locks/state.hot",
       "v1Shape": "file-link",
       "v1Path": [".fgos/events.lock", ".fgos/runtime/claims.lock"],
       "fence": "tombstone",
       "owner": "4.3",
-      "note": "events and claims merge into one hot mutex"
+      "note": "events and claims merge into one hot mutex; <fgosDir> is the main checkout's .fgos; dead-holder reclaim runs under the kernel lock <fgosDir>/locks/state.reclaim.lock (contracts/hot-lock.v1.json)"
     },
     {
       "name": "porting-events",
       "kind": "hot-mutex",
       "scope": "repo",
       "rank": 60,
-      "v3Path": "<fgosDir>/locks/porting-events.lock",
+      "v3Path": "<fgosDir>/locks/porting-events.hot",
       "v1Shape": "file-link",
       "v1Path": ".fgos/porting/events.lock",
       "fence": "tombstone",
       "owner": "4.3",
-      "note": "v1 source: src/state/porting-store.mjs"
+      "note": "v1 source: src/state/porting-store.mjs; dead-holder reclaim runs under the kernel lock <fgosDir>/locks/porting-events.reclaim.lock (contracts/hot-lock.v1.json)"
     },
     {
       "name": "worktree-admin",
