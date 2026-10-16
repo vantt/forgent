@@ -1,3 +1,30 @@
+# Global review wording observations — owner promotion truth queue (L10-37)
+
+From committed f70ecf4ec ordinary reviews; conservation ok verdicts remain applied. Each item is an owner promotion-truth/cutover obligation, not author approval or a new rework.
+
+- `claim_2f7cbb5fabfc5e77f7014c54f020c524`: Manifest rationale omits removed dispatch-log entry and two infra→use-case reclassifications; verify promotion truth. Source: `review-step10-global-pending-03-s1-f70ecf4ec.md`.
+- `claim_4b96f4f42ea417623dcc794155fa17ce`: Sibling manifest rationale describes additions only; omitted removal/reclassifications remain at the historical witness. Source: `review-step10-global-pending-04-s1-f70ecf4ec.md`.
+- `claim_979ec4a61acca9e1b6a0a3967b1d0c88`: Last-reviewed wording cites a rework digest; current target already had ok verdicts at 62751458b and 287a22d33. Source: `review-step10-global-pending-04-s1-f70ecf4ec.md`.
+- `claim_5a944093894be93c5792a1c5e14990c6`: Rationale omits inline labelled table-row 9/10 changes; removed text is in spec.md#unheaded-block-7. Source: `review-step10-global-pending-04-s1-f70ecf4ec.md`.
+- `claim_add6d13e14df87ad5d5bd46cc5bb98d4`: No-labelled-corrections wording misses the inline Gate A evolve operator correction; historical row is carried. Source: `review-step10-global-pending-04-s1-f70ecf4ec.md`.
+- `claim_d7660c15ae6c2d2e7d610c1aa571101c`: Identify b6763388b explicitly as source-digest witness, rather than implying HEAD matches it. Source: `review-step10-global-pending-04-s2-f70ecf4ec.md`.
+- `claim_03ef50e87178220032a3eebe5c5d89d9`: Stale native-transition-owed wording and claimKind specification vs sibling contract mismatch; truth queue, no conservation rework. Source: `review-step10-global-pending-04-s2-f70ecf4ec.md`.
+- `claim_7d5937c751aa5fa0db3a489560c25b6b`: Rationale omits witness commit 2636ba229 and line spans already recorded in reconciliation. Source: `review-step10-global-pending-04-s3-f70ecf4ec.md`.
+- `claim_f0b2a4079764d68b1102ddddb08776ce`: Earlier evidence sentences on generated backlog/bee absence omitted from rationale; verify current truth at promotion. Source: `review-step10-global-pending-03-s2-f70ecf4ec.md`.
+- `claim_8c5b5c481eb8db2b10b341da7ba8be18`: Exact opt-in-by-version wording is historical; verify live assignment-run.v2/unchanged schema-1/unknown-version rule at promotion. Source: `review-step10-global-06-f70ecf4ec.md`.
+- `claim_3a312830ec57de7ad0a902a0a84de7ce`: Attempt-budget, lost-RunHandle and cancellation bullets survive in history; verify current admission obligations at promotion. Source: `review-step10-global-06-f70ecf4ec.md`.
+- `claim_a4673b603685b632659a43ff50a3f2c4`: Verify live-rule prose for expectedRunId refusal and fsynced publication, currently mostly table evidence. Source: `review-step10-global-06-f70ecf4ec.md`.
+- `claim_26f62a1ae1abc17d0f02706788bfd399`: A34 remainder names stale primary target digest 59297ed6; current bound unit is 00a3412a; representation acceptance remains pending. Source: `review-step10-global-pending-0102-s2-f70ecf4ec.md`.
+- `claim_4eeb2f406288458e61bad21531966ab1`: Supersede-vs-move wording: Data Dictionary payload differs only in heading depth; conservation ok retained. Source: `review-step10-global-pending-0102-s3-f70ecf4ec.md`.
+- `claim_a1a323052194c5140b628b5f3861fa05`: Supersede-vs-move wording: decision-history payload differs only in heading depth; conservation ok retained. Source: `review-step10-global-pending-0102-s3-f70ecf4ec.md`.
+- `claim_f2f1dadddff0c5440195d8c00b74d56e`: Cutover owner: legacy distribution.md successor will retire; platform spec carriage is claim_daaf3726. Source: `review-step10-global-pending-03-s1-f70ecf4ec.md`.
+- `claim_f9c135d80cce2e8cf98c8b3b5b0db4ad`: Cutover owner: legacy manifest successor will retire; platform copy carriage is claim_35a5dbff. Source: `review-step10-global-pending-04-s1-f70ecf4ec.md`.
+- `claim_b19630ef4dcf1330c9807fc226a90e7b`: Cutover owner: legacy manifest successor will retire; platform copy carriage is claim_35a5dbff. Source: `review-step10-global-pending-04-s1-f70ecf4ec.md`.
+- `claim_099eb566c825967cf35f9397f2d7b947`: Verify bin/fgos.mjs citation freshness, 4415→4410 (and 4503→4498 in related labelled corrections); name the evidence commit for promotion truth.
+- `claim_36f4a3c4ae623f3a348faadd747dcba7`: Verify bin/fgos.mjs citation freshness, 4415→4410 (and 4503→4498 in related labelled corrections); name the evidence commit for promotion truth.
+
+---
+
 # Runner promotion truth check — Lead L9-17 accepted
 
 Accepted by Lead on 2026-10-15: `truth-03` uses `canAdvanceEdge` wording slightly more broadly than `src/runner/loop.mjs:1689-1695`: the non-assignment branch still calls `resolvePlan` directly with the caller verdict. Both review Notes were read. This accepted observation is queued for the mandatory promotion truth check; it does not require candidate-doc edits or reopen the accepted truth-correction verdict. See `review-runner-bounded-rereview-b80e8c16c-part2.md`, truth-03 and Notes. Preserve the separate existing reconcile-help code-defect queue entry and the unrelated operations Afterwards sentence outside the reviewed corrections.

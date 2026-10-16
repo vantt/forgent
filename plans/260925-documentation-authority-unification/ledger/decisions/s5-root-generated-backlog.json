@@ -14,12 +14,17 @@
       "disposition": "regenerate-from-source",
       "targetOwner": null,
       "targetAnchor": null,
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
       "rationale": "At SYNC 498048c1a, the retained native product-backlog heading has source SHA256 92be08bb7b0a9af07f2d36307db6a7891545c2ab4590dcbb77074d46c2c8dfbe. The file is a generated, non-authority backlog projection and remains at its existing path under the frozen root authority map. The complete current heading is re-decided regenerate-from-source, with no platform target and no approval inherited from its previous wording. This is a disposition of the projection, not evidence that its store, renderer or status values are current, and does not authorize regeneration, deletion, retirement, promotion or cutover. See step10-round7-main-carry.json for the independently reviewable generated-file/source mapping; this turn edits no docs bytes.",
-      "reviewNote": "Native source digest changed at SYNC 498048c1a; current complete heading requires independent ordinary review. No approval carried.",
+      "reviewNote": "deep: heading Product Backlog at HEAD (92be08bb) recomputed by extractor and by hand from heading, section payload and following block. The digest moved from 80073210 because the section now holds two more PBI rows (p-3e6b1a52 and p-8d04c7f1, upstream f64c68c1d). regenerate-from-source with no target matches the frozen root map row for docs/backlog.md (area-map-root-authorities.md L36, product-backlog exception) and the file stays in place. wording: the new rationale drops the evidence sentences of the earlier reviewed one (no .bee/backlog.jsonl, bee not installed, hand-added rows); they are still true here (no .bee directory, bee not on PATH). No approval carried.",
       "sourcePath": "docs/backlog.md",
-      "sourceAnchor": "product-backlog"
+      "sourceAnchor": "product-backlog",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-03-s2-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     },
     {
       "claimId": "claim_c295c4c899afa37544bda841421c92e4",
@@ -81,10 +86,15 @@
       "disposition": "regenerate-from-source",
       "targetOwner": null,
       "targetAnchor": null,
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
       "rationale": "The complete current generated product-backlog table is retained at docs/backlog.md#unheaded-block-2, native source SHA256 3430068fb5b1687e480e143bc34727fa7d6ada9f1342932c9fdd2f8b23c17da2. The upstream main table update is an event-sourced product-backlog projection, outside platform authority under the frozen root map. Its predecessor native identity remains as a separate pending registryGap decision; this new identity is not grafted onto that predecessor. Keep the current bytes at their existing path. Regenerate-from-source describes its owning future workflow, not permission to run a renderer, discard manually introduced rows, certify status truth, copy product backlog into a candidate spec, retire a source or cut over readers. Header/source mapping and the exact main hunk are in step10-round7-main-carry.json. Independent ordinary disposition review is pending; no approval inherited.",
-      "reviewNote": "New native generated table unit at final SYNC, authored pending for the same bounded ordinary request. No renderer run or truth approval."
+      "reviewNote": "deep: unheaded-block-2 of docs/backlog.md at HEAD L11-52 (3430068f) recomputed by extractor and by hand; against the predecessor block at b6763388b L11-50 (57afbc48) the diff is exactly two added PBI table rows (p-3e6b1a52, p-8d04c7f1), nothing removed or changed. regenerate-from-source with no target is consistent with the frozen map; the rationale is right that the predecessor identity stays a separate gap (claim_d7660c15). The new native id matches step10-global-native-proof newUnits.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-03-s2-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     }
   ],
   "registryGaps": [
@@ -95,12 +105,17 @@
       "disposition": "regenerate-from-source",
       "targetOwner": null,
       "targetAnchor": null,
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
       "rationale": "The complete unheaded-block-2 unit is part of the non-authority generated product-backlog projection. Its header names bee backlog render and the event-sourced PBI input; the frozen root map retains the backlog outside platform authority. Keep the projection at its existing path and regenerate through its owning source workflow when that workflow changes, rather than hand-copying PBI statuses into a candidate spec or treating an exact source-to-itself match as carriage. Full current text and native digest are supplied for independent disposition review. This approves no renderer run, underlying store freshness, historical status truth, retirement, reader cutover or platform promotion. The renderer input .bee/backlog.jsonl is not in the repository and the bee tool is not installed. Commit b6763388b added PBI rows p-c3a41d07, p-c7e90b52 and p-cf1280a6 by hand to docs/backlog.md. docs/backlog.md stays at its existing path and must not be deleted or regenerated at cutover until a real source exists; regenerate-from-source is a future workflow disposition, not permission to discard these bytes.",
-      "reviewNote": "Native predecessor gap; independent review pending; no approval carried.",
+      "reviewNote": "deep: native predecessor gap; digest 57afbc48 occurs in docs/backlog.md history only at b6763388b (block-2 L11-50, recomputed by hand), not at HEAD, where block-2 is 3430068f (claim_9b3b7fac). Every predecessor line is present verbatim in the current block (diff is two added rows) and the file stays in place, so the predecessor is conserved. wording: the rationale is the earlier reviewed text; it says full current text and native digest are supplied and cites b6763388b only for the hand-added rows, never as the witness of 57afbc48, so a reader must search history to authenticate the digest.",
       "sourcePath": "docs/backlog.md",
-      "sourceAnchor": "unheaded-block-2"
+      "sourceAnchor": "unheaded-block-2",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-04-s2-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     }
   ]
 }

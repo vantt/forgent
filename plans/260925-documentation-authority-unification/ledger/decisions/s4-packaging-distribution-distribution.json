@@ -720,10 +720,15 @@
         "Spec: Distribution"
       ],
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
       "rationale": "Source: docs/specs/distribution.md:55-55#data-dictionary (current lines); unit SHA256 fcbd92b190383feb2779a6eec9d86e6f67e881b30840fa490b7230c69c09e09d.\nTarget: docs/platform/packaging-distribution/spec.md:515-515#data-dictionary (current lines); unit SHA256 aa3ecf1c73f2625a3f371a732ad4a4468c9c5e5a3e74ac693e9af0d507454720.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 4; title \"Data Dictionary\" → \"Data Dictionary\".\nWhole direct section differs; depth 2 → 4; 0 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: upstream changed content is carried verbatim in its mapped candidate; surrounding candidate corrections and placement remain. Native identity resolved at SYNC 498048c1a by exact path/anchor/full source digest. No approval inherited.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "reviewNote": "Current native source binding; independent ordinary review pending."
+      "reviewNote": "deep: Data Dictionary heading. Hand-recomputed both heading digests (fcbd92b1 level 2, aa3ecf1c level 4) from the files; section payloads (20115 and 20117 chars) are equal after the heading line, so only the heading depth 2 to 4 differs, which is an allowed structural change. Native tuple at SYNC (units, fcbd92b1) matches the retained-current-redecision receipt. wording: disposition is supersede with a rationale saying changed content is carried verbatim, move would also fit. Anchors ok.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-0102-s3-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     },
     {
       "claimId": "claim_a1a323052194c5140b628b5f3861fa05",
@@ -740,10 +745,15 @@
         "Spec: Distribution"
       ],
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
       "rationale": "Source: docs/specs/distribution.md:322-322#lịch-sử-quyết-định (current lines); unit SHA256 bf462051b1d0486a12178695e54518b61a46423454a45f2d7a9ecd4e1e90d5bf.\nTarget: docs/platform/packaging-distribution/spec.md:706-706#lịch-sử-quyết-định (current lines); unit SHA256 aa23ac1936263d65e45dba048c4949930715c52c31a30290b3eff845d39200fa.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 4; title \"Lịch sử quyết định\" → \"Lịch sử quyết định\".\nWhole direct section differs; depth 2 → 4; 0 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: upstream changed content is carried verbatim in its mapped candidate; surrounding candidate corrections and placement remain. Native identity resolved at SYNC 498048c1a by exact path/anchor/full source digest. No approval inherited.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "reviewNote": "Current native source binding; independent ordinary review pending."
+      "reviewNote": "deep: Lịch sử quyết định heading, source 322 (bf462051) to packaging spec 706 (aa23ac19). Section payloads equal after the heading line (6360 vs 6362 chars, difference is the deeper heading marker), heading depth 2 to 4 only. Native tuple (units, bf462051, status current) matches the redecision receipt. Anchors ok.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-0102-s3-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     }
   ],
   "files": [
@@ -765,7 +775,7 @@
       "targetAnchor": "unheaded-block-85",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
       "rationale": "Source: docs/specs/distribution.md:57-73#unheaded-block-5 (historical witness at 7df21d6ca2eceeeefb0d9fbcfc8752964b041941); unit SHA256 648a2fee27dd55616a3ca003e9bb21fc11827ca1947dbf7463dbec2538f113b6.\nTarget: docs/platform/packaging-distribution/spec.md:517-533#unheaded-block-85 (current lines); unit SHA256 00a3412a5974cb6c7e2d4f51aadd36437162cdc3bf4a92e4dc781ec0f334ed1d.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: this historical predecessor remains conserved at the exact cited git witness. Its current mapped candidate incorporates the upstream doctor-check/YAML decision or manifest additions. Unique complete-file identity, exact retained decision-list prefix, or the unique Doctor-check table establishes the successor by content. Current text is pending independent review; no prior approval or identity is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "sourcePath": "docs/specs/distribution.md",
@@ -776,7 +786,13 @@
         "Retained Distribution Source Detail",
         "Spec: Distribution",
         "Data Dictionary"
-      ]
+      ],
+      "reviewNote": "deep: witness 7df21d6ca digest 648a2fee confirmed (distribution.md 57-73). Word diff to platform packaging-distribution spec block 85 (517-533, 00a3412a): only 'YAML-free' to 'precompiled' plus new text on the compiled-registry check, executor-posture-coverage, writer-identity-resolvable and runner-generated-paths; nothing dropped. Target equals the current source block, carried by move row claim_9d97a24e, so a whole-unit supersede into an equal-digest block is accurate. Anchor ok.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-0102-s2-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     },
     {
       "claimId": "claim_bdeaa6f1cce78532047ba6bf959cc43a",
@@ -811,7 +827,7 @@
       "targetAnchor": "unheaded-block-92",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
       "rationale": "Source: docs/specs/distribution.md:324-325#unheaded-block-15 (historical witness at bc7bb3f009445b5f71875b7897d676a23d9daa47); unit SHA256 b1e15730d97d645508d833b30133c31d6ac119466d80377b70c7815d0b8e08b3.\nTarget: docs/platform/packaging-distribution/spec.md:708-710#unheaded-block-92 (current lines); unit SHA256 87f98a72908fb6991a3cd9bdf8c1407373d72b039ad1b3e83a35a89a2a87d299.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: this historical predecessor remains conserved at the exact cited git witness. Its current mapped candidate incorporates the upstream doctor-check/YAML decision or manifest additions. Unique complete-file identity, exact retained decision-list prefix, or the unique Doctor-check table establishes the successor by content. Current text is pending independent review; no prior approval or identity is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "sourcePath": "docs/specs/distribution.md",
@@ -822,7 +838,13 @@
         "Retained Distribution Source Detail",
         "Spec: Distribution",
         "Lịch sử quyết định"
-      ]
+      ],
+      "reviewNote": "deep: witness bc7bb3f00 digest b1e15730 confirmed (distribution.md 324-325). Target packaging spec unheaded-block-92 (708-710, 87f98a72) contains both source lines unchanged plus the 2026-10-14 fgctl upgrade follow-up and the 2026-10-16 YAML parser decision bullet, which are the upstream main additions also present in the current source block 15 (move row claim_580793ae, equal digest). Nothing lost; nothing candidate-authored added. Anchor ok.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-0102-s2-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     },
     {
       "claimId": "claim_8d6b06dae659395981e196d4f7d33c15",

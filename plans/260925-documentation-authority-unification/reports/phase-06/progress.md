@@ -1,3 +1,21 @@
+# Global review applied; author rework complete — package turn next
+
+Assignment `unit-run-1792169199615-02803e61/producer/1`; request `f70ecf4ec`; SYNC `8c788a9c5` (no docs delta); reviews `f323249f9`. **15 reports /113 rows: applied all108 ok, Notes verbatim;5 rework fixed;0 hold/0 changed-after-pin refusals.** 24 claims+34 gaps via ordinary applier;50 retired rows via established committed-verdict stamps (loader fails: missing required field `shard`), all independently validated. All13 legacy/missing ok authors resolved from original retired-unit records.
+
+**13 explicit pending decisions:**5 repaired reworks+6 reopened work-state footer siblings+2 unchanged reading-map gap rows from28ded7633. `96c405c9`→history literal snapshot;`2d9ccc77`/`8be1f5a8` keep supersede with2/3 verified fact paragraphs restored;`ac8c8092`→live block141;`16abc69c`→footer2/7 block121. All7 footer gaps occurrence/context matched, pending. L10-38/39/40 recorded;two A31 main-diff supersedes retained/applied.20 wording/citation/legacy-successor items queued for owner promotion truth/cutover.
+
+**Audit+consistency12,904 rows/93 shards/0 findings (66 witness limits);ownership0 new active pairs/0 native duplicates/0 live drift;replay366+98+4 clean;A/B/H clean;promotion160/160;tests507/507.** Registry unchanged. Two content restorations change exactly4 native units;anchors/line spans unchanged, no approval carry. Prior28ded7633 list/group/header changes remain pending. [Report](step-10-report.md),[verdict accounting](step10-global-review-application.json),[rework](step10-global-review-rework.json),[final proof+pending population](step10-global-review-final-audit.json),[reproduction](step10-global-review-reproduction.json).
+
+**NEXT=package after runner commit:**native sync once;global D/E;comparator zero unexplained differences;checkpoint refresh;rehearsal recheck if inputs changed;small independent request for EVERY changed entry in28ded7633+this turn (all13 pending decisions/list/group/header/4 native units/accounting);checkpoint request refresh. No author blocker;package/global/independent acceptance outstanding. Phase6 remains open. No native sync/global D/E/checkpoint/rehearsal/review packaging/fgOS CLI/Git/protected-tool/vocabulary/extractor/baseline/workspace.fgos writes this author turn;runner commits. No MDView external write.
+
+---
+
+# Review application and content rework in progress — package next
+
+Assignment `unit-run-1792169199615-02803e61/producer/1`; request `f70ecf4ec`; SYNC `8c788a9c5` (no docs delta), committed reviews `f323249f9`. Applying matching ordinary ok verdicts with verbatim Notes; changed bindings stay pending. L10-38/39 rework only; no native sync/global D/E/checkpoint/rehearsal or review packaging. Runner commits.
+
+---
+
 # Author reconciliation complete — package turn next
 
 Input/request `f70ecf4ec`; assignment `unit-run-1792168391979-ad740169/producer/1`. **71 list rebinds /95 adds /67 native-gap removals** (60/95/54 distinct tuples); all **138 historical occurrences resolved**, none open. Proofs: native carried id63, explicit authored successor7, unique same-path content1. Lead count113 same path/anchor and54 same claim verified; path/ordinal alone is never identity proof. **2,334 current reverse tuples exactly covered.** Owner groups **+25/−10 =362**, all additions pending. Two reading-map gaps reclassified outside platform scope in a new pending ordinary shard. Session Identity eight-field header complete; Implementation value retained, all body bytes identical; promoted/post-review logs written before edit.

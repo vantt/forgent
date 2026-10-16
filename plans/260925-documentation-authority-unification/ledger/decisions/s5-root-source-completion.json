@@ -2180,7 +2180,7 @@
       "sourceUnitDigest": "c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
       "targetOwner": "docs/platform/contracts/architecture-manifest.json",
       "targetAnchor": "file-block",
@@ -2188,7 +2188,13 @@
       "sourcePath": "docs/architecture-manifest.json",
       "sourceAnchor": "file-block",
       "targetUnitDigest": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
-      "targetAncestry": []
+      "targetAncestry": [],
+      "reviewNote": "deep: gap supersede docs/architecture-manifest.json L1-260 at witness 1b818c586 (c1c23046, same bytes as the platform witness of claim_2f7cbb5f) to the platform copy L1-272 (74762f5c); the same 13 added entries, one removed (src/runner/dispatch-log.mjs, deleted by 5cf4fd52f) and two infra to use-case reclassifications; digests recomputed by extractor and by hand. wording: as for the sibling gap, the rationale speaks of manifest additions only; no conservation loss because the old lines stay at the cited witness. Entry-level author codex-session:22@2026-10-14 is the first record's author; the shard row authoredBy is 4191f728.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-04-s1-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     }
   ]
 }

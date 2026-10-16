@@ -14,7 +14,7 @@
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
       "targetAnchor": "unheaded-block-85",
       "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source: docs/platform/packaging-distribution/spec.md:517-533#unheaded-block-85 (historical witness at aa43c29a15bf74c0cd4b6767e28f322a522d29b5); unit SHA256 0ce5ce17cd290a31a55e9a63872f96732a0cd0d096c4aa29693105768629ba90.\nTarget: docs/platform/packaging-distribution/spec.md:517-533#unheaded-block-85 (current lines); unit SHA256 00a3412a5974cb6c7e2d4f51aadd36437162cdc3bf4a92e4dc781ec0f334ed1d.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: this historical predecessor remains conserved at the exact cited git witness. Its current mapped candidate incorporates the upstream doctor-check/YAML decision or manifest additions. Unique complete-file identity, exact retained decision-list prefix, or the unique Doctor-check table establishes the successor by content. Current text is pending independent review; no prior approval or identity is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "00a3412a5974cb6c7e2d4f51aadd36437162cdc3bf4a92e4dc781ec0f334ed1d",
       "targetAncestry": [
@@ -22,7 +22,13 @@
         "Retained Distribution Source Detail",
         "Spec: Distribution",
         "Data Dictionary"
-      ]
+      ],
+      "reviewNote": "deep: whole-file candidate predecessor (witness aa43c29a1, packaging-distribution/spec.md 517-533, digest 0ce5ce17 confirmed). Current same-anchor block 85 (00a3412a) differs only by an extended credential-copies warn clause, 'YAML-free' to 'precompiled', and added executor-posture-coverage, writer-identity-resolvable, runner-generated-paths and the credential-copies fix text, all copied from the upstream source block; no word of the predecessor is dropped. Source and target are the same file and anchor, which is correct for a native predecessor gap with a same-anchor successor. Shard authorSession is codex-session:15, row authoredBy is the 4191f728 session.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-0102-s2-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     },
     {
       "claimId": "claim_04703f011b22383992b94545055b9e56",
@@ -55,13 +61,19 @@
       "targetOwner": "docs/specs/distribution.md",
       "targetAnchor": "unheaded-block-5",
       "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source: docs/specs/distribution.md:57-73#unheaded-block-5 (historical witness at 806d8946b75eca7a862b3207b50081e2c2f44414); unit SHA256 0ce5ce17cd290a31a55e9a63872f96732a0cd0d096c4aa29693105768629ba90.\nTarget: docs/specs/distribution.md:57-73#unheaded-block-5 (current lines); unit SHA256 00a3412a5974cb6c7e2d4f51aadd36437162cdc3bf4a92e4dc781ec0f334ed1d.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: this historical predecessor remains conserved at the exact cited git witness. Its current mapped candidate incorporates the upstream doctor-check/YAML decision or manifest additions. Unique complete-file identity, exact retained decision-list prefix, or the unique Doctor-check table establishes the successor by content. Current text is pending independent review; no prior approval or identity is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "00a3412a5974cb6c7e2d4f51aadd36437162cdc3bf4a92e4dc781ec0f334ed1d",
       "targetAncestry": [
         "Spec: Distribution",
         "Data Dictionary"
-      ]
+      ],
+      "reviewNote": "deep: gap supersede distribution.md#unheaded-block-5 at witness 806d8946b (L57-73, 0ce5ce17) to the same file at HEAD block-5 (L57-73, 00a3412a); both digests recomputed by extractor and by hand. Token diff read: only rows 7 and 7b change (doctor-check list gains executor-posture-coverage, writer-identity-resolvable, runner-generated-paths, credential-copies-retained widened, domain-registry-compiled reworded from YAML-free to precompiled); nothing else differs, so the predecessor is conserved at the witness and the successor is real. The same bytes are carried in the platform spec by claim_daaf3726 (packaging-distribution/spec.md L517-533 is byte-equal to distribution.md L57-73). Target owner is the retiring legacy path, the same shape the earlier reviewed row had. Entry-level author codex-session:15@2026-10-14 is the first record's author; the shard row authoredBy is 4191f728, which the header follows.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-03-s1-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     },
     {
       "claimId": "claim_f033905b059f073c62ec27f0ee6da620",

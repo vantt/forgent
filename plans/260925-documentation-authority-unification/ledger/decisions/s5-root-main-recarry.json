@@ -62,10 +62,16 @@
       "targetOwner": "docs/architecture-manifest.json",
       "targetAnchor": "file-block",
       "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source: docs/architecture-manifest.json:1-267#file-block (historical witness at d924f22ca44307ece579169fa2a2d459d5c0197e); unit SHA256 70c00c205578fc34084e5bf8701a6bde0999cb6f05a1b58f8424ad95ed4c28d4.\nTarget: docs/architecture-manifest.json:1-272#file-block (current lines); unit SHA256 74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: this historical predecessor remains conserved at the exact cited git witness. Its current mapped candidate incorporates the upstream doctor-check/YAML decision or manifest additions. Unique complete-file identity, exact retained decision-list prefix, or the unique Doctor-check table establishes the successor by content. Current text is pending independent review; no prior approval or identity is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
-      "targetAncestry": []
+      "targetAncestry": [],
+      "reviewNote": "deep: gap supersede docs/architecture-manifest.json L1-267 at witness d924f22ca (70c00c20) to the same path at HEAD L1-272 (74762f5c); diff read: 5 entries added (main-checkout-activity, flag-check, host-bin-path, yaml, third-party js-yaml), none removed; digests recomputed by extractor and by hand (seeded sample). The target owner is the retiring legacy path; its bytes equal the platform copy carried by move claim_35a5dbff (cmp), so carriage exists, and the earlier reviewed row had the same target.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-04-s1-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     },
     {
       "claimId": "claim_b19630ef4dcf1330c9807fc226a90e7b",
@@ -76,10 +82,16 @@
       "targetOwner": "docs/architecture-manifest.json",
       "targetAnchor": "file-block",
       "rationale": "Source: docs/architecture-manifest.json:1-268#file-block (historical witness at e27182da4cf6c6e496d9d931e82eee7759db4ed2); unit SHA256 92391ce631b0c3602a5e22947a73182a6fd37f148e4b052cb4749a55b7657a6d.\nTarget: docs/architecture-manifest.json:1-272#file-block (current lines); unit SHA256 74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: this historical predecessor remains conserved at the exact cited git witness. Its current mapped candidate incorporates the upstream doctor-check/YAML decision or manifest additions. Unique complete-file identity, exact retained decision-list prefix, or the unique Doctor-check table establishes the successor by content. Current text is pending independent review; no prior approval or identity is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
       "targetUnitDigest": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
-      "targetAncestry": []
+      "targetAncestry": [],
+      "reviewNote": "deep: gap supersede docs/architecture-manifest.json L1-268 at witness e27182da4 (92391ce6) to the same path at HEAD L1-272 (74762f5c); diff read: 4 entries added (flag-check, host-bin-path, yaml, third-party js-yaml), none removed; digests recomputed by extractor and by hand. Target is the retiring legacy path whose bytes equal the platform copy carried by claim_35a5dbff.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-04-s1-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     },
     {
       "claimId": "claim_03ef50e87178220032a3eebe5c5d89d9",
@@ -88,14 +100,19 @@
       "sourceUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
       "rationale": "Source: docs/architecture-manifest.json:1-269#file-block (historical witness at 0f60e2f1db7af15581a152e307d0835fc6e510e5); unit SHA256 2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a.\nTarget: docs/platform/contracts/architecture-manifest.json:1-272#file-block (current lines); unit SHA256 74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f supersedes this retained predecessor with the changed current source carried in the mapped candidate. The predecessor source digest and history stay intact; the current-source draft is separately enumerated in step10-round7-new-unit-drafts.json. No identity graft or review carry; native transition owed next package.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetOwner": "docs/platform/contracts/architecture-manifest.json",
       "targetAnchor": "file-block",
       "targetUnitDigest": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
       "targetAncestry": [],
-      "reviewNote": "Native predecessor gap; independent review pending; no approval carried."
+      "reviewNote": "deep: gap supersede docs/architecture-manifest.json L1-269 at witness 0f60e2f1d (2d55be82) to the platform copy L1-272 (74762f5c); diff read: 3 entries added (flag-check, yaml, third-party js-yaml), none removed; digests recomputed by extractor and by hand. wording: the rationale ends with native transition owed next package, which step10-global-native-reconciliation shows is done (claim to native gap), and the row claimKind is specification while its siblings for the same manifest say contract.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-04-s2-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     }
   ]
 }

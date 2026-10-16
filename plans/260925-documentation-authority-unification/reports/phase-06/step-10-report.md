@@ -1,3 +1,51 @@
+# Global review verdicts applied; content/binding rework complete — package next
+
+Assignment `unit-run-1792169199615-02803e61/producer/1`; ordinary request `f70ecf4ecc508b491897988d1f0e1c37290f9d4a`; committed independent reviews `f323249f9b0490599c156a8a673513319eea8431`. **SYNC `8c788a9c5`**, no docs delta from `28ded7633`. Runner owns commits. This is the author turn only; Phase 6 stays open.
+
+**All 15 reports and every Notes section read: 108 ok /5 rework /0 hold across 113 rows. Applied all 108 ok verdicts, Notes verbatim, pinned to the f70ecf4ec request and committed review evidence:** 24 ordinary claims, 34 registry-gap decisions, 50 retired-unit rows. All 113 request rows were unchanged after the request pin; **zero withheld because of 28ded7633**, zero author/applier refusals left pending. The previous turn's list/group changes, two gap dispositions and header completion remain pending independent review. [Every row, exact note, original author record and application method](step10-global-review-application.json).
+
+For `legacy/missing` report headers, all 13 ok rows resolve to **`codex-session:1@2026-10-10` from their original `ledger/retired-unit-decisions.json#rows/<claimId>` records**, individually named in the application receipt. The remaining legacy/missing row is the rework `claim_16abc69c`, whose original b-files gap has no author; this turn authors its corrected binding explicitly. No report header is rewritten.
+
+**Exact frozen loader failure:** `decision shard plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json: missing required field "shard"`. That historical collection uses `rows`, not the ordinary shard shape. Its 50 ok verdicts use the established earlier retired-unit procedure: write the exact independent ordinary-verdict stamps into the original rows, retain source identity/provenance, and validate every stamp through unchanged `validateManualReview` against the committed report. For the 34 registry gaps, call unchanged `applyReviewVerdicts` on a single-row claims projection and merge the result back into its original `registryGaps` collection. No applier, loader, gate or reviewer report changed.
+
+## Rework outcomes and Lead decisions
+
+**L10-38, L10-39 and L10-40 recorded in [owner answers](owner-answers.md).** All 11 changed decisions are pending with the current author identity and every former approval stamp removed; no approval carries. [Complete before/after rows and content witnesses](step10-global-review-rework.json).
+
+| Claim | Outcome and evidence |
+|---|---|
+| `claim_96c405c9cefaa4b7c63e40bdaac18330` | `move` rebound to `docs/platform/agent-coordination/history/retired-engine/files/proposals/dispatch-control-plane-redesign.md#literal-snapshot`; the complete original sentence survives verbatim there. Rationale names the original source pin and explains why rewritten current block-67 is not an identical primitive carry. |
+| `claim_2d9ccc774d84c91978163a37739aaa26` | Keep `supersede`; restore both original planner/apply fact paragraphs verbatim in the existing Implementation And Design Status introduction. Code still proves recommendation/park/needs-input (`recovery-planner.mjs:243-266`) and action-key, snapshot-hash, epoch, expiry and legality re-checks (`281-316`). Whole current-scope obligation retained, no remainder needed. |
+| `claim_8be1f5a856f48c009b2a47816d982eb1` | Keep `supersede`; restore all three original run-control paragraphs verbatim in the status introduction. Code proves expected-epoch/settled-generation refusal and dead-holder-only reclaim (`run-lock.mjs:306-334`), plus epoch/token-checked settled-generation publication (`390-412`). Whole obligation retained, no remainder needed. |
+| `claim_ac8c8092219e244b8a9001337c1d8310` | `supersede` rebound to live `docs/specs/confinement-authority.md#unheaded-block-141`, digest `0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc`. Rationale describes per-CLI credentialSources, leased-account trust and per-hook private-home trust. Old block-140 revision is not used as a witness; its anchor holds another unit now. |
+| `claim_16abc69cd658a382c456cdaf23f64d87` | `supersede` rebound to work-state.md block-121, footer occurrence 2/7. Add both full digests, authoredBy and pending status. Original d480a05b5 exact footer text, occurrence and enclosing heading context authenticate the match. |
+
+**L10-39 six reviewed sibling gaps reopened:** `dd06c255→117`, `9c7e133e→126`, `7a077631→138`, `35d0f259→144`, `aace4a1d→150`, `1d724afb→174` (target unheaded-block suffixes). Together with `16abc69c→121`, the seven footer matches preserve original occurrence order 1–7 and identical enclosing context; no positional +2 shortcut. All source/target unit digests equal `95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104`. Original native gap records and full corrected rows are in the rework receipt.
+
+**L10-40:** `claim_cdf8c5562fb083bbdccf7d8c03decb7a` and `claim_d7fd3778a5cbb74cad9fb5e476708647` keep their A31 `supersede` disposition and unchanged rationale/target; matching ok verdicts applied. Main's own diff is the successor, consistent with the earlier accepted corrections.
+
+**Current explicit pending manual population: 13 rows** = five repaired reworks +six reopened footer siblings +the two reading-map gap rows from 28ded7633. The latter remain unchanged and unapproved. This count excludes pending candidate-list/group/header entries, which remain separately enumerated in the prior author accounting; no approval is inferred for them. [Full pending population and final checks](step10-global-review-final-audit.json).
+
+## Content consequences and wording queue
+
+Both content restorations were logged in promoted-edits.md and post-review-edits.md before editing. Each appends the original fact sentences to one existing paragraph line: unit count, numbered anchors and line spans remain unchanged. Exactly **four native units change**: the Implementation And Design Status heading and unheaded-block-3 in each of the two files. Full before/after native unit digests and original native predecessors are in the final audit. No other current manual target binding changes. Old native classifications/receipts bind only their historical bytes; they do not approve these new digests. Next package must reconcile all four with the genuine native sync, preserving every predecessor identity and leaving changed units pending.
+
+**20 one-line owner queue entries** cover all supplied L10-37 wording observations, the `03ef50e8` claimKind mismatch, live-rule wording, stale remainder, supersede-vs-move comments, two bin/fgos.mjs citation freshness observations (4415→4410), and legacy successors `f2f1dadd`, `f9c135d8`, `b19630ef` for the cutover owner. [Owner promotion truth queue](owner-queue.md). These conservation-ok observations grant no promotion truth approval and trigger no further wording rewrite this turn.
+
+## Verification and next turn
+
+- **Independent audit and rationale-consistency checker: 12,904 rows /93 shards /0 findings**. Existing source-witness limits now 66 (previously 69); no blanket historical-identity clearance. Both read-only entry points executed. [Audit](step10-global-review-independent-audit.json), [consistency](step10-global-review-consistency.json).
+- **Ownership:** 256 reference groups, zero new active-source pair collisions, zero native duplicate platform identities, zero live target digest drift. Six newly enumerated historical gap-reference groups remain explicit, not silently waived. [Ownership](step10-global-review-ownership.json).
+- **Link replay:** 366 original +98 later +4 labelled edits, zero findings. [Replay](step10-global-review-replay.json).
+- **A/B/H pass**, zero working scope violations, protected bytes unchanged; H 609 files /217 checked /0 findings. Reader routes equal HEAD; frozen I baseline unchanged, with its previously disclosed historical difference retained. [Checks](step10-global-review-checks.json).
+- **Promotion 160/160 complete**, zero headerless/incomplete; **tool tests 507/507 pass**, zero failures/skips. Tests run with `env -u CLAUDE_CODE_SESSION_ID` and scratch TMPDIR. `git diff --check` clean. [Promotion](step10-global-review-promotion.log), [tests](step10-global-review-tests.log), [portable reproduction](step10-global-review-reproduction.json).
+
+**NEXT = package turn after this runner commit:** native sync ONCE; reconcile all four changed native units and prior header effects without approval carry; global D/E; unchanged comparator must show zero unexplained differences against explicit current expectations; checkpoint refresh; rehearsal recheck if inputs changed. Build a small independent review request covering **every entry changed in 28ded7633 and this turn**, including the 13 pending decisions, all prior list/group changes, header, the four changed native units, and this verdict/rework accounting. Refresh the checkpoint request. Existing A34/promotion-truth/cutover/consumer/group obligations remain; Phase 6 is open.
+
+No author blocker remains. Package/global proof and independent acceptance remain outstanding; no global-green, cutover or closure claim. No native sync/global D/E/checkpoint/rehearsal/review packaging, fgOS CLI, Git write, protected tool/vocabulary/extractor/baseline change or workspace .fgos write. Required external outbox is the only scope exception. MDView external preview would write beyond this assignment's scope, so no preview URL was created.
+
+---
+
 # Author reconciliation complete — package turn next
 
 Assignment `unit-run-1792168391979-ad740169/producer/1`; input/content/request commit `f70ecf4ecc508b491897988d1f0e1c37290f9d4a`. Runner owns the commit. This author turn changes only scoped candidate accounting, owner-group exceptions, two new gap decisions and the Session Identity header. Native registry, saved global E/applied rows, gates/checkers/vocabulary/extractor/baselines and all 113 rows in the outstanding review request remain unchanged.

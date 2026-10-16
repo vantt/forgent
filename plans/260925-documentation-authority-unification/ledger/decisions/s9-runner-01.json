@@ -256,13 +256,19 @@
       "targetAnchor": "data-dictionary",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
       "rationale": "Source: docs/specs/runner.md:68-68#data-dictionary (current lines); unit SHA256 b91663aeb373f3e9759bda7e8edf97edc512497d6d3adbf55ebdb6b8c7af5187.\nTarget: docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md:25-25#data-dictionary (current lines); unit SHA256 3ffc347bf68707fd1a1b4d6d8673db7d38467fae324107ddf64e6151d03a3c41.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 3ffc347bf68707fd1a1b4d6d8673db7d38467fae324107ddf64e6151d03a3c41 at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 2; title \"Data Dictionary\" → \"Data Dictionary\".\nWhole direct section differs; depth 2 → 2; 0 distinct link changes; normalized line order differs; 2 removed and 2 added nonblank lines after heading/link/correction normalization.\nSection accounting (existing-labelled-successor-correction): Existing correction labels A41 at immutable account 9b0526380:plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json; Removed direct-section lines have distinct live carrier witnesses docs/platform/runner/spec.md#historical-source-section-552ef3d6, docs/platform/runner/spec.md#unheaded-block-7. Added lines are explicit candidate declarations or labelled corrections in the bound target; these are additions, not source-carriage evidence.  Exact normalized nonblank line delta: removed [\"| 9 | Candidate (Gate A, self-improve loop STR13 Slice 1) | Một việc mang ít nhất một bản ghi friction chưa ngã-ngũ, xếp hạng làm ứng viên tự cải thiện — dẫn xuất TỪ friction đã ghi, không phải một bản ghi độc lập, không bền qua lần `evolve` khác | id, disposition, errorClass, layer, detail, attempts (tất cả lấy từ bản ghi friction MỚI NHẤT theo dấu thời gian của id đó khi id có nhiều bản ghi chưa ngã-ngũ), score (cộng dồn TOÀN BỘ bản ghi chưa ngã-ngũ của id đó, không chỉ bản mới nhất) | — | dẫn xuất mỗi lần gọi `evolve` |\",\"| 10 | Phán quyết Iron Law (self-improve loop STR13 Slice 2/3) | Kết quả của phép tính hai-cửa (module + từ khóa) trên MỘT candidate fix — dẫn xuất thuần từ đầu vào truyền vào, không bền. Gọi từ bên trong `approve` nguồn `runner` (Cổng duyệt PR nội bộ), ngay trước bước kiểm cây sạch, cho MỌI đề xuất nguồn runner đang land LÊN TRUNK (thu hẹp về ranh giới trunk per `0032`) — xem \\\"Cổng duyệt PR nội bộ\\\" và \\\"Iron Law\\\" dưới, Business Rules RUL36 (`evolve --submit` là hành động ghi duy nhất trên bề mặt evolve, tái dùng chính cửa `submit`)/RUL37 (Iron Law hỏi ở đúng một ranh giới — trunk — cho mọi đề xuất nguồn runner tới đó)/RUL64 (`ironLaw.level` — key config riêng của cổng Iron Law, fail-closed về `ask`) | required (có/không cần chứng minh test-đỏ-trước), matchedFlags (danh sách từ khóa rủi ro nặng khớp trong mô tả fix), matchedModules (danh sách file khớp danh sách module minh họa) | — | required mặc định `false` khi cả hai phép thử đều không khớp |\"]; added [\"| 9 | Candidate (former Gate A; Added in candidate: `evolve` removed in `120af6b3d`, `bin/fgos.mjs:4415`) | Một việc mang ít nhất một bản ghi friction chưa ngã-ngũ, xếp hạng làm ứng viên tự cải thiện — dẫn xuất TỪ friction đã ghi, không phải một bản ghi độc lập, không bền qua lần `evolve` khác | id, disposition, errorClass, layer, detail, attempts (tất cả lấy từ bản ghi friction MỚI NHẤT theo dấu thời gian của id đó khi id có nhiều bản ghi chưa ngã-ngũ), score (cộng dồn TOÀN BỘ bản ghi chưa ngã-ngũ của id đó, không chỉ bản mới nhất) | — | former derivation on `evolve`; no current CLI entry |\",\"| 10 | Phán quyết Iron Law (self-improve loop STR13 Slice 2/3) | Kết quả của phép tính hai-cửa (module + từ khóa) trên MỘT candidate fix — dẫn xuất thuần từ đầu vào truyền vào, không bền. Gọi từ bên trong `approve` nguồn `runner` (Cổng duyệt PR nội bộ), ngay trước bước kiểm cây sạch, cho MỌI đề xuất nguồn runner đang land LÊN TRUNK (thu hẹp về ranh giới trunk per `0032`) — xem \\\"Cổng duyệt PR nội bộ\\\" và \\\"Iron Law\\\" dưới, Business Rules RUL36 (former `evolve --submit` contract; Added in candidate: door removed in `120af6b3d`, `bin/fgos.mjs:4415`)/RUL37 (Iron Law hỏi ở đúng một ranh giới — trunk — cho mọi đề xuất nguồn runner tới đó)/RUL64 (`ironLaw.level` — key config riêng của cổng Iron Law, fail-closed về `ask`) | required (có/không cần chứng minh test-đỏ-trước), matchedFlags (danh sách từ khóa rủi ro nặng khớp trong mô tả fix), matchedModules (danh sách file khớp danh sách module minh họa) | — | required mặc định `false` khi cả hai phép thử đều không khớp |\"].\nApplicable labelled corrections:\nA41 F-D: capacity lock is a directory: \"lock ở `~/.fgos/runtime/provider-capacity/state.lock`\" → \"lock là thư mục `~/.fgos/runtime/provider-capacity/state-lock`\"; evidence step9-truth-corrections.json; src/runner/dispatch/provider-capacity.mjs:44-49 (evidence commit 24be6cb1d).\nA41 F-D: recovery has 14 classes: \"8 lớp: hỏng-spawn, quá-giờ, chấm-trượt, hỏng-worktree, nhật-ký-hỏng, đề-xuất-bị-trả, việc-kẹt-do-crash, tranh-chấp-ghi\" → \"14 lớp: `worker-spawn-fail`, `worker-timeout`, `verify-miss`, `verify-timeout`, `worktree-fail`, `corrupt-log`, `reject-returned`, `stale-doing`, `state-conflict`, `dispatch-in-flight`, `dispatch-depth-exceeded`, `provider-limit`, `worker-failed`, `no-executor`\"; evidence step9-truth-corrections.json; src/runner/recovery.mjs:126-141 (evidence commit 24be6cb1d).\nA41 F-E: item log receives pointer and settled output: \"Cùng file còn nhận chunk stdout/stderr LIVE khi worker đang chạy (STR39, xem \\\"Xem live output worker khi đang chạy\\\") — `tail -f` thấy được ngay, không đợi khối kết-cục cuối\" → \"Trong lúc worker chạy, file nhận con trỏ tới capture của Unit run; khối output được nối sau khi run kết thúc\"; evidence step9-truth-corrections.json; src/runner/loop.mjs:349-351 (evidence commit 24be6cb1d); src/runner/loop.mjs:1110-1112 (evidence commit 24be6cb1d); src/runner/loop.mjs:1150-1163 (evidence commit 24be6cb1d).\nA41 F-E: remove raw live-chunk claim: \"xen giữa các khối kết-cục là chunk thô không bọc, ghi ngay khi đến\" → \"con trỏ Unit run được ghi khi run được tạo\"; evidence step9-truth-corrections.json; src/runner/loop.mjs:1110-1112 (evidence commit 24be6cb1d).\nDisposition supersede: Account for docs/specs/runner.md#data-dictionary under docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md#data-dictionary; source context \"Spec: Runner (vòng tự hành)\", target context \"Added in candidate: Runner Data Dictionary\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "3ffc347bf68707fd1a1b4d6d8673db7d38467fae324107ddf64e6151d03a3c41",
       "targetAncestry": [
         "Added in candidate: Runner Data Dictionary"
-      ]
+      ],
+      "reviewNote": "deep: heading Data Dictionary, runner.md L68 (b91663ae) to subcomponents/h-02842f76ffd2/spec.md#data-dictionary L25 (3ffc347b); both recomputed by extractor. Word diff of the 18-line sections read: exactly the four listed A41 corrections (state-lock directory, 14 recovery classes with their names, item-log pointer wording) plus rows 9 and 10 of the table reworded with inline Added in candidate labels; the removed row 9 and 10 text is verbatim in docs/platform/runner/spec.md (found once each) and the two cited carrier anchors exist; the 14 recovery classes match src/runner/recovery.mjs L126-141. 3ffc347b had committed ok verdicts at 62751458b.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-04-s1-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     },
     {
       "claimId": "claim_5a944093894be93c5792a1c5e14990c6",
@@ -271,14 +277,20 @@
       "targetAnchor": "unheaded-block-3",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
       "rationale": "Source: docs/specs/runner.md:70-84#unheaded-block-9 (current lines); unit SHA256 43f03eb4dffdeff420f464531d60be7e37e13192429963b10ba302be1e9b777e.\nTarget: docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md:27-41#unheaded-block-3 (current lines); unit SHA256 417a56fd2a82950722e3a35187fe79050d444a85b8b55a4106d3e45059fa1b39.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 417a56fd2a82950722e3a35187fe79050d444a85b8b55a4106d3e45059fa1b39 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nA41 F-D: capacity lock is a directory: \"lock ở `~/.fgos/runtime/provider-capacity/state.lock`\" → \"lock là thư mục `~/.fgos/runtime/provider-capacity/state-lock`\"; evidence step9-truth-corrections.json; src/runner/dispatch/provider-capacity.mjs:44-49 (evidence commit 24be6cb1d).\nA41 F-D: recovery has 14 classes: \"8 lớp: hỏng-spawn, quá-giờ, chấm-trượt, hỏng-worktree, nhật-ký-hỏng, đề-xuất-bị-trả, việc-kẹt-do-crash, tranh-chấp-ghi\" → \"14 lớp: `worker-spawn-fail`, `worker-timeout`, `verify-miss`, `verify-timeout`, `worktree-fail`, `corrupt-log`, `reject-returned`, `stale-doing`, `state-conflict`, `dispatch-in-flight`, `dispatch-depth-exceeded`, `provider-limit`, `worker-failed`, `no-executor`\"; evidence step9-truth-corrections.json; src/runner/recovery.mjs:126-141 (evidence commit 24be6cb1d).\nA41 F-E: item log receives pointer and settled output: \"Cùng file còn nhận chunk stdout/stderr LIVE khi worker đang chạy (STR39, xem \\\"Xem live output worker khi đang chạy\\\") — `tail -f` thấy được ngay, không đợi khối kết-cục cuối\" → \"Trong lúc worker chạy, file nhận con trỏ tới capture của Unit run; khối output được nối sau khi run kết thúc\"; evidence step9-truth-corrections.json; src/runner/loop.mjs:349-351 (evidence commit 24be6cb1d); src/runner/loop.mjs:1110-1112 (evidence commit 24be6cb1d); src/runner/loop.mjs:1150-1163 (evidence commit 24be6cb1d).\nA41 F-E: remove raw live-chunk claim: \"xen giữa các khối kết-cục là chunk thô không bọc, ghi ngay khi đến\" → \"con trỏ Unit run được ghi khi run được tạo\"; evidence step9-truth-corrections.json; src/runner/loop.mjs:1110-1112 (evidence commit 24be6cb1d).\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-9 under docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md#unheaded-block-3; source context \"Spec: Runner (vòng tự hành) / Data Dictionary\", target context \"Added in candidate: Runner Data Dictionary / Data Dictionary\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "417a56fd2a82950722e3a35187fe79050d444a85b8b55a4106d3e45059fa1b39",
       "targetAncestry": [
         "Added in candidate: Runner Data Dictionary",
         "Data Dictionary"
-      ]
+      ],
+      "reviewNote": "deep: block-9 of runner.md L70-84 (43f03eb4) to subcomponents/h-02842f76ffd2/spec.md#unheaded-block-3 L27-41 (417a56fd); both recomputed. Same word diff as the heading row: four listed A41 corrections verified before and after. wording: the target also rewrites table rows 9 and 10 (Gate A candidate row and the RUL36 mention) with inline Added in candidate labels, which this rationale does not list; they are disclosed only in the delta of heading row claim_552ef3d6, and the removed text is verbatim in the carrier spec.md#unheaded-block-7. 417a56fd had committed ok verdicts at 345f15d95.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-04-s1-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     },
     {
       "claimId": "claim_2c3300909e21da9dd0feb02e991c5f0a",
@@ -1348,14 +1360,20 @@
       "targetAnchor": "gate-a-xếp-hạng-candidate-bắc-cầu-sang-việc-thật-evolve",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
       "rationale": "Source: docs/specs/runner.md:545-545#gate-a-xếp-hạng-candidate-bắc-cầu-sang-việc-thật-evolve (current lines); unit SHA256 52a283ef3e1356d53fc5ae6efb44c1c8c687858b70009ef970c11e151b896b6d.\nTarget: docs/platform/runner/operations/h-51f5cd7279fd.md:454-454#gate-a-xếp-hạng-candidate-bắc-cầu-sang-việc-thật-evolve (current lines); unit SHA256 445c152056e209d17110ce712ff081e8adc824b2abba8197069b59ad8fcc37ab.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 445c152056e209d17110ce712ff081e8adc824b2abba8197069b59ad8fcc37ab at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 3 → 3; title \"Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\" → \"Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\".\nWhole direct section differs; depth 3 → 3; 0 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (heading-and-links): Complete direct sections differ only in heading, link spellings/labels or authenticated exact corrections. Exact normalized nonblank line delta: removed []; added [].\nApplicable labelled corrections:\nA41 F-C: evolve/ranking is absent: \"    - `fgos evolve` — xếp hạng MỖI id còn friction chưa ngã-ngũ\\n (`src/evolve/candidates.mjs`'s `rankCandidates`, tái dùng cơ học\\n      `listUnsettledFrictionsByWork`/`WEIGHTS.frictionUnsettled` của\\n      `entropy.mjs`, không tự định nghĩa lại \\\"chưa ngã-ngũ\\\" hay trọng số\\n      riêng) rồi in TOÀN BỘ danh sách — mỗi dòng mang đủ id/score/\\n      disposition/errorClass/layer/attempts/detail, không cắt bớt (cùng kỷ\\n      luật \\\"mọi trường người cần để phán\\\" như phần friction của `check`).\\n      Không friction chưa ngã-ngũ nào → một thông điệp trạng-thái-rỗng rõ\\n      ràng, exit 0 — chưa khởi tạo `.fgos/` nếu nó chưa tồn tại, giữ đúng hợp\\n      đồng đọc-thuần của `ready`/`list`.\" → \"    - CLI hiện hành không có verb `fgos evolve`; module `src/evolve/candidates.mjs` đã bị xoá và không có hàm `rankCandidates` đang chạy.\"; evidence step9-truth-corrections.json; bin/fgos.mjs:4373-4380 (evidence commit 24be6cb1d); bin/fgos.mjs:4640-4643 (evidence commit 24be6cb1d).\nA41 F-C: scope the old Gate A contract explicitly; unavailable verb is not described as current: \"- **Runs when:** người vận hành gọi `fgos evolve`\" → \"- **Runs when:** CLI hiện hành không có `fgos evolve`; phần còn lại của mục này lưu hợp đồng Gate A trước khi module ranking bị xoá, không mô tả hành vi hiện hành. Theo hợp đồng cũ, người vận hành gọi `fgos evolve`\"; evidence step9-truth-corrections.json; bin/fgos.mjs:4373-4380 (evidence commit 24be6cb1d); git show 120af6b3d -- src/evolve/candidates.mjs.\nA41 addition under Lead A42: scope remaining present-tense Gate A introduction to removed legacy evolve surface (composed with L10-24/citation-refuseHelp): \"Bước vào của vòng tự cải thiện (self-improve loop, STR13 — CONTEXT.md):\\nfgOS xếp hạng chính friction chưa ngã-ngũ của nó thành\\nmột danh sách candidate, người chọn đúng một hoặc dừng (Slice 1), rồi có thể\\nbắc cầu candidate đã chọn sang một việc thật để runner thi công (Slice 3,\\n`--submit`). Loop này chỉ nhắm vào chính `repo/src` của fgOS — không\\nphải một tính năng mở cho host project ngoài — và chạy khi người gọi tay,\\nkhông bao giờ là một nhánh tự động của vòng dispatch thường. Vòng khép\\nkín đầy đủ: `evolve` (liệt kê) → `evolve --pick` (xem một candidate, đọc-thuần)\\n→ `evolve --submit` (bắc cầu, HÀNH ĐỘNG GHI duy nhất của cả bề mặt evolve) →\\nrunner dispatch việc mới như mọi việc khác → `review`/`approve` qua cổng duyệt\\nPR nội bộ, với `approve` chạy thêm phán Iron Law (xem dưới) trước khi merge.\" → \"Added in candidate — A41/A42 correction: CLI hiện hành không có verb `evolve` (`bin/fgos.mjs:4415,4503`; `evolve --help` trả \\\"unknown verb\\\"). Module ranking đã bị xoá ở commit `120af6b3d`. Đoạn dưới ghi lại hợp đồng Gate A trước khi bị gỡ, không xác nhận triển khai hiện hành; full truth check owed at promotion.\\nBước vào trước đây của vòng tự cải thiện (self-improve loop, STR13 — CONTEXT.md):\\nTheo hợp đồng cũ, fgOS xếp hạng chính friction chưa ngã-ngũ của nó thành\\nmột danh sách candidate, người chọn đúng một hoặc dừng (Slice 1), rồi có thể\\nbắc cầu candidate đã chọn sang một việc thật để runner thi công (Slice 3,\\n`--submit`). Loop này chỉ nhắm vào chính `repo/src` của fgOS — không\\nphải một tính năng mở cho host project ngoài — và chạy khi người gọi tay,\\nkhông bao giờ là một nhánh tự động của vòng dispatch thường. Vòng khép\\nkín đầy đủ: `evolve` (liệt kê) → `evolve --pick` (xem một candidate, đọc-thuần)\\n→ `evolve --submit` (bắc cầu, HÀNH ĐỘNG GHI duy nhất của cả bề mặt evolve) →\\nrunner dispatch việc mới như mọi việc khác → `review`/`approve` qua cổng duyệt\\nPR nội bộ, với `approve` chạy thêm phán Iron Law (xem dưới) trước khi merge.\"; evidence step9-truth-corrections.json; bin/fgos.mjs:4373 (evidence commit 24be6cb1d); bin/fgos.mjs:4461 (evidence commit 24be6cb1d); 120af6b3d; single CLI evidence probe, env -u CLAUDE_CODE_SESSION_ID node bin/fgos.mjs evolve --help.\nL10-24/citation-refuseHelp [intermediate state; witness 19ca8de23]: \"bin/fgos.mjs:4373,4461\" → \"bin/fgos.mjs:4415,4503\"; evidence step10-round3-doc-edits.json; bin/fgos.mjs:4414-4417,4503 (evidence commit 5035fed52e60254ecbe034cc987553feb24616f4).\nDisposition supersede: Account for docs/specs/runner.md#gate-a-xếp-hạng-candidate-bắc-cầu-sang-việc-thật-evolve under docs/platform/runner/operations/h-51f5cd7279fd.md#gate-a-xếp-hạng-candidate-bắc-cầu-sang-việc-thật-evolve; source context \"Spec: Runner (vòng tự hành) / Behaviors & Operations\", target context \"Added in candidate: Runner Behaviors & Operations / Behaviors & Operations\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "445c152056e209d17110ce712ff081e8adc824b2abba8197069b59ad8fcc37ab",
       "targetAncestry": [
         "Added in candidate: Runner Behaviors & Operations",
         "Behaviors & Operations"
-      ]
+      ],
+      "reviewNote": "deep: heading Gate A in runner.md L545 (52a283ef) to operations/h-51f5cd7279fd.md L454 (445c1520); both recomputed. Sections of 88 and 80 lines word-diffed: the intro paragraph is rewritten with an Added in candidate removal notice and past-tense reframing, the Runs-when sentence is scoped to the old contract, and the 10-line fgos evolve bullet is replaced by one line saying the CLI has no such verb; this is exactly the four listed corrections, and nothing else differs. The removed bullet text is preserved as the before-text in the rationale and at the legacy source. The bin/fgos.mjs line pins (4415, 4503) are tied to evidence commit 5035fed52 and have drifted by 7 lines at HEAD; truth is left to the promotion check, as the target says.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-04-s1-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     },
     {
       "claimId": "claim_979ec4a61acca9e1b6a0a3967b1d0c88",
@@ -1364,7 +1382,7 @@
       "targetAnchor": "unheaded-block-26",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
       "rationale": "Source: docs/specs/runner.md:547-557#unheaded-block-38 (current lines); unit SHA256 c7182f609c029616bc8c23ef95b7fb69ade8fc943ebf7aba8f339003c4437459.\nTarget: docs/platform/runner/operations/h-51f5cd7279fd.md:456-467#unheaded-block-26 (current lines); unit SHA256 0f61fde6bc880cb19623ecde63a6a137571884e4b6ae2f8b24b8a585b25d600a.\nSource and target unit digests differ.\nTarget changed since last reviewed digest 0dce2b78b5d497ab9dbe1b9cc6d0d8a00ad2ff468b97fe5964c8e86464b0a3b2 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nA41 addition under Lead A42: scope remaining present-tense Gate A introduction to removed legacy evolve surface (composed with L10-24/citation-refuseHelp): \"Bước vào của vòng tự cải thiện (self-improve loop, STR13 — CONTEXT.md):\\nfgOS xếp hạng chính friction chưa ngã-ngũ của nó thành\\nmột danh sách candidate, người chọn đúng một hoặc dừng (Slice 1), rồi có thể\\nbắc cầu candidate đã chọn sang một việc thật để runner thi công (Slice 3,\\n`--submit`). Loop này chỉ nhắm vào chính `repo/src` của fgOS — không\\nphải một tính năng mở cho host project ngoài — và chạy khi người gọi tay,\\nkhông bao giờ là một nhánh tự động của vòng dispatch thường. Vòng khép\\nkín đầy đủ: `evolve` (liệt kê) → `evolve --pick` (xem một candidate, đọc-thuần)\\n→ `evolve --submit` (bắc cầu, HÀNH ĐỘNG GHI duy nhất của cả bề mặt evolve) →\\nrunner dispatch việc mới như mọi việc khác → `review`/`approve` qua cổng duyệt\\nPR nội bộ, với `approve` chạy thêm phán Iron Law (xem dưới) trước khi merge.\" → \"Added in candidate — A41/A42 correction: CLI hiện hành không có verb `evolve` (`bin/fgos.mjs:4415,4503`; `evolve --help` trả \\\"unknown verb\\\"). Module ranking đã bị xoá ở commit `120af6b3d`. Đoạn dưới ghi lại hợp đồng Gate A trước khi bị gỡ, không xác nhận triển khai hiện hành; full truth check owed at promotion.\\nBước vào trước đây của vòng tự cải thiện (self-improve loop, STR13 — CONTEXT.md):\\nTheo hợp đồng cũ, fgOS xếp hạng chính friction chưa ngã-ngũ của nó thành\\nmột danh sách candidate, người chọn đúng một hoặc dừng (Slice 1), rồi có thể\\nbắc cầu candidate đã chọn sang một việc thật để runner thi công (Slice 3,\\n`--submit`). Loop này chỉ nhắm vào chính `repo/src` của fgOS — không\\nphải một tính năng mở cho host project ngoài — và chạy khi người gọi tay,\\nkhông bao giờ là một nhánh tự động của vòng dispatch thường. Vòng khép\\nkín đầy đủ: `evolve` (liệt kê) → `evolve --pick` (xem một candidate, đọc-thuần)\\n→ `evolve --submit` (bắc cầu, HÀNH ĐỘNG GHI duy nhất của cả bề mặt evolve) →\\nrunner dispatch việc mới như mọi việc khác → `review`/`approve` qua cổng duyệt\\nPR nội bộ, với `approve` chạy thêm phán Iron Law (xem dưới) trước khi merge.\"; evidence step9-truth-corrections.json; bin/fgos.mjs:4373 (evidence commit 24be6cb1d); bin/fgos.mjs:4461 (evidence commit 24be6cb1d); 120af6b3d; single CLI evidence probe, env -u CLAUDE_CODE_SESSION_ID node bin/fgos.mjs evolve --help.\nL10-24/citation-refuseHelp [intermediate state; witness 19ca8de23]: \"bin/fgos.mjs:4373,4461\" → \"bin/fgos.mjs:4415,4503\"; evidence step10-round3-doc-edits.json; bin/fgos.mjs:4414-4417,4503 (evidence commit 5035fed52e60254ecbe034cc987553feb24616f4).\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-38 under docs/platform/runner/operations/h-51f5cd7279fd.md#unheaded-block-26; source context \"Spec: Runner (vòng tự hành) / Behaviors & Operations / Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\", target context \"Added in candidate: Runner Behaviors & Operations / Behaviors & Operations / Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "0f61fde6bc880cb19623ecde63a6a137571884e4b6ae2f8b24b8a585b25d600a",
@@ -1372,7 +1390,13 @@
         "Added in candidate: Runner Behaviors & Operations",
         "Behaviors & Operations",
         "Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)"
-      ]
+      ],
+      "reviewNote": "deep: block-38 of runner.md L547-557 (c7182f60) to operations/h-51f5cd7279fd.md#unheaded-block-26 L456-467 (0f61fde6); both recomputed. Word diff read: the introductory paragraph gains an Added in candidate notice and the old text is reframed as the earlier contract, which is exactly the two listed corrections. wording: the rationale says the target changed since last reviewed digest 0dce2b78 at 345f15d95, but that digest was a rework verdict there; the current digest 0f61fde6 had committed ok verdicts at 62751458b and 287a22d33, so the target is unchanged since its last review.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-04-s1-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     },
     {
       "claimId": "claim_d55d7b0f484d74f056db873f5466dca5",
@@ -1997,13 +2021,19 @@
       "targetAnchor": "actors-access",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
       "rationale": "Source: docs/specs/runner.md:947-947#actors-access (current lines); unit SHA256 3f682e32dc04d19e654abc927f8a3570f8ed866f17711e4ff18302e2840461e7.\nTarget: docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md:25-25#actors-access (current lines); unit SHA256 704500af02588d8c934f08e738fc13445896cc4feba37d83c162b866d7d59e42.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 704500af02588d8c934f08e738fc13445896cc4feba37d83c162b866d7d59e42 at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 2; title \"Actors & Access\" → \"Actors & Access\".\nWhole direct section differs; depth 2 → 2; 0 distinct link changes; normalized line order differs; 1 removed and 1 added nonblank lines after heading/link/correction normalization.\nSection accounting (split-or-corrected-section): Removed direct-section lines have distinct live carrier witnesses docs/platform/runner/spec.md#historical-source-section-0686418a, docs/platform/runner/spec.md#unheaded-block-9. Added lines are explicit candidate declarations or labelled corrections in the bound target; these are additions, not source-carriage evidence.  Exact normalized nonblank line delta: removed [\"| Xếp hạng/xem candidate tự cải thiện (Gate A, `evolve`) | ✓ | — | — |\"]; added [\"| Xếp hạng/xem candidate tự cải thiện (Gate A, former `evolve`; Added in candidate: door removed in `120af6b3d`, `bin/fgos.mjs:4415`) | Historical operator role | — | — |\"].\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#actors-access under docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md#actors-access; source context \"Spec: Runner (vòng tự hành)\", target context \"Added in candidate: Runner Actors & Access\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "704500af02588d8c934f08e738fc13445896cc4feba37d83c162b866d7d59e42",
       "targetAncestry": [
         "Added in candidate: Runner Actors & Access"
-      ]
+      ],
+      "reviewNote": "deep: heading Actors and Access, runner.md L947 (3f682e32) to subcomponents/h-6df5686d0d54/spec.md#actors-access L25 (704500af); both recomputed. One table row changes: the Gate A evolve operator row has its check mark replaced by Historical operator role and the label gains former and Added in candidate door-removed text; the removed row is verbatim in docs/platform/runner/spec.md (found once) and both carrier anchors exist; the rest equal. 704500af had committed ok verdicts at 62751458b.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-04-s1-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     },
     {
       "claimId": "claim_add6d13e14df87ad5d5bd46cc5bb98d4",
@@ -2012,14 +2042,20 @@
       "targetAnchor": "unheaded-block-3",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
       "rationale": "Source: docs/specs/runner.md:949-956#unheaded-block-60 (current lines); unit SHA256 81c2724820c499b40d0e4d2964c798263c2ad99a479582176a95ee13b7f4d24e.\nTarget: docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md:27-34#unheaded-block-3 (current lines); unit SHA256 6ee82017c754d1ebcfed7fcd146851cdd954235737f350c0dbd70a9629516110.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 6ee82017c754d1ebcfed7fcd146851cdd954235737f350c0dbd70a9629516110 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-60 under docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md#unheaded-block-3; source context \"Spec: Runner (vòng tự hành) / Actors & Access\", target context \"Added in candidate: Runner Actors & Access / Actors & Access\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "6ee82017c754d1ebcfed7fcd146851cdd954235737f350c0dbd70a9629516110",
       "targetAncestry": [
         "Added in candidate: Runner Actors & Access",
         "Actors & Access"
-      ]
+      ],
+      "reviewNote": "deep: block-60 of runner.md L949-956 (81c27248) to subcomponents/h-6df5686d0d54/spec.md#unheaded-block-3 L27-34 (6ee82017); both recomputed. wording: the rationale says no labelled corrections apply, but the block holds the one changed Gate A evolve operator row (check mark replaced by Historical operator role, label gains Added in candidate) that heading row claim_0686418a discloses; the change is labelled inline in the target and the removed row is verbatim in the carrier, so nothing is lost or unlabelled. 6ee82017 had committed ok verdicts at 345f15d95.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-04-s1-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     },
     {
       "claimId": "claim_32d366486b72925c171d9fefc84179e2",
@@ -2797,13 +2833,19 @@
       "targetAnchor": "edge-cases-settled",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
       "rationale": "Source: docs/specs/runner.md:1129-1129#edge-cases-settled (current lines); unit SHA256 c1c87e9a7f22cc4d3693c5d83d5ecac2fd90fa0386e03fb890638cf059c10de4.\nTarget: docs/platform/runner/subcomponents/h-37aced3896a8/spec.md:25-25#edge-cases-settled (current lines); unit SHA256 8fbc6ed74d8d0c274acc53ef231e5bdb2172c02bd6c16f6aadf861a096623f9e.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 8fbc6ed74d8d0c274acc53ef231e5bdb2172c02bd6c16f6aadf861a096623f9e at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 2; title \"Edge Cases Settled\" → \"Edge Cases Settled\".\nWhole direct section differs; depth 2 → 2; 0 distinct link changes; normalized line order differs; 1 removed and 1 added nonblank lines after heading/link/correction normalization.\nSection accounting (split-or-corrected-section): Removed direct-section lines have distinct live carrier witnesses docs/platform/runner/spec.md#historical-source-section-099eb566, docs/platform/runner/spec.md#unheaded-block-11. Added lines are explicit candidate declarations or labelled corrections in the bound target; these are additions, not source-carriage evidence.  Exact normalized nonblank line delta: removed [\"- Vòng đủ tự-cải-thiện (self-improve loop STR13): một bản ghi friction chưa ngã-ngũ mang từ khóa rủi ro nặng → `evolve` (liệt kê, candidate hiện đủ trường) → `evolve --pick` (đọc-thuần, byte-compare nhật ký trước/sau xác nhận không sự kiện nào bị thêm) → `evolve --submit` (đúng một việc mới, mô tả mang từ khóa) → runner dispatch việc mới đó tới `awaiting-approval` → `review` (source: runner) → `approve` KHÔNG `--acknowledge-iron-law` (item không cha nên target là trunk, và `ironLaw.level` mặc định `ask` — từ chối cứng, nêu tên từ khóa khớp, HEAD không đổi, nhánh còn sống) → `approve --acknowledge-iron-law` (merge, verify xanh, `awaiting-approval → done`, settlement role human, nhánh/worktree dọn sạch) — chứng minh bằng e2e qua binary + git thật, mọi bước tự chạy trong CÙNG file, không dựa vào tham chiếu chéo sang test của cell khác. Hai điều kiện trong ngoặc là điều `0032` làm thành tường minh: cùng diff ấy trên một leaf land vào `fgw/<root>`, hoặc ở `ironLaw.level = \\\"warn\\\"`, không dừng ở bước từ chối.\"]; added [\"- Added in candidate: historical e2e scenario for the former `evolve` door, removed in `120af6b3d` (`bin/fgos.mjs:4415`); no current e2e coverage claim. Vòng đủ tự-cải-thiện (self-improve loop STR13): một bản ghi friction chưa ngã-ngũ mang từ khóa rủi ro nặng → `evolve` (liệt kê, candidate hiện đủ trường) → `evolve --pick` (đọc-thuần, byte-compare nhật ký trước/sau xác nhận không sự kiện nào bị thêm) → `evolve --submit` (đúng một việc mới, mô tả mang từ khóa) → runner dispatch việc mới đó tới `awaiting-approval` → `review` (source: runner) → `approve` KHÔNG `--acknowledge-iron-law` (item không cha nên target là trunk, và `ironLaw.level` mặc định `ask` — từ chối cứng, nêu tên từ khóa khớp, HEAD không đổi, nhánh còn sống) → `approve --acknowledge-iron-law` (merge, verify xanh, `awaiting-approval → done`, settlement role human, nhánh/worktree dọn sạch) — chứng minh bằng e2e qua binary + git thật, mọi bước tự chạy trong CÙNG file, không dựa vào tham chiếu chéo sang test của cell khác. Hai điều kiện trong ngoặc là điều `0032` làm thành tường minh: cùng diff ấy trên một leaf land vào `fgw/<root>`, hoặc ở `ironLaw.level = \\\"warn\\\"`, không dừng ở bước từ chối.\"].\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#edge-cases-settled under docs/platform/runner/subcomponents/h-37aced3896a8/spec.md#edge-cases-settled; source context \"Spec: Runner (vòng tự hành)\", target context \"Added in candidate: Runner Edge Cases Settled\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "8fbc6ed74d8d0c274acc53ef231e5bdb2172c02bd6c16f6aadf861a096623f9e",
       "targetAncestry": [
         "Added in candidate: Runner Edge Cases Settled"
-      ]
+      ],
+      "reviewNote": "deep: supersede of Edge Cases Settled heading (48 nonblank lines) read both directions with a line diff; 47 lines are byte-equal and in order, the one changed bullet is the source bullet verbatim behind a labelled Added-in-candidate prefix (former evolve door, removed in 120af6b3d); the removed line is contained verbatim in both cited carriers (runner/spec.md historical-source-section-099eb566 and unheaded-block-11, 0 lines missing); digests recomputed by extractor equal the row, anchors ok, target digest equal at last-reviewed 62751458b; wording: the cited bin/fgos.mjs:4415 is the unknown-verb throw only at upstream commits c9026bf8c and a0ca617ea and is 4410 at HEAD, citation freshness is a promotion truth item.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-05-s1b-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     },
     {
       "claimId": "claim_3332d3ab8fadd91605a8a92da08091b7",
@@ -2856,14 +2898,20 @@
       "targetAnchor": "unheaded-block-5",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
       "rationale": "Source: docs/specs/runner.md:1178-1179#unheaded-block-97 (current lines); unit SHA256 153dc43f02108c3b79c7f21ae6c9814edbf96f84e14c4988eb6c802a90f6e073.\nTarget: docs/platform/runner/subcomponents/h-37aced3896a8/spec.md:74-75#unheaded-block-5 (current lines); unit SHA256 b4abd2b685fe57f6a2616db1b22d4ddc28196279ade0c0307087370b59671964.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest b4abd2b685fe57f6a2616db1b22d4ddc28196279ade0c0307087370b59671964 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-97 under docs/platform/runner/subcomponents/h-37aced3896a8/spec.md#unheaded-block-5; source context \"Spec: Runner (vòng tự hành) / Edge Cases Settled\", target context \"Added in candidate: Runner Edge Cases Settled / Edge Cases Settled\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "b4abd2b685fe57f6a2616db1b22d4ddc28196279ade0c0307087370b59671964",
       "targetAncestry": [
         "Added in candidate: Runner Edge Cases Settled",
         "Edge Cases Settled"
-      ]
+      ],
+      "reviewNote": "deep: supersede of unheaded-block-97 (L1178-1179) to subcomponent unheaded-block-5 (L74-75); same single labelled prefix on the self-improve bullet (rest of the bullet verbatim) and the second bullet byte-equal, nothing else added or lost; digests recomputed, target digest equal at last-reviewed 345f15d95; wording: the rationale says the successor has different direct text without printing the one-line delta, the delta itself is labelled in the target.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-05-s1b-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     },
     {
       "claimId": "claim_faf7be822c2140f22e6d5a5882f84595",
@@ -3004,13 +3052,19 @@
       "targetOwner": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
       "targetAnchor": "pointers-implementation",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
       "rationale": "Source: docs/specs/runner.md:1217-1217#pointers-implementation (current lines); unit SHA256 4bed9c69a1de3312aca4a42931d4d848718ce35f6e8ee2c964b4395748e3cf10.\nTarget: docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md:25-25#pointers-implementation (current lines); unit SHA256 850878a688f3b9c613114ddcb166a7fd1038b2865e113b41b99251817f40721e.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 850878a688f3b9c613114ddcb166a7fd1038b2865e113b41b99251817f40721e at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 2; title \"Pointers (implementation)\" → \"Pointers (implementation)\".\nWhole direct section differs; depth 2 → 2; 0 distinct link changes; normalized line order differs; 1 removed and 1 added nonblank lines after heading/link/correction normalization.\nSection accounting (existing-labelled-successor-correction): Existing correction labels A41 at immutable account 9b0526380:plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json; Removed direct-section lines have distinct live carrier witnesses docs/platform/runner/spec.md#historical-source-section-4efee765, docs/platform/runner/spec.md#unheaded-block-13. Added lines are explicit candidate declarations or labelled corrections in the bound target; these are additions, not source-carriage evidence.  Exact normalized nonblank line delta: removed [\"- `bin/fgos.mjs` verb `evolve` — bề mặt CLI của Gate A (xem \\\"Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\\\" trên cho hợp đồng đầy đủ): `evolve`/`evolve --pick <id>` hai bước đọc-thuần, KHÔNG BAO GIỜ stdin tương tác — không `--pick` thì liệt kê, `--pick <id>` thì in bản ghi friction đầy đủ của đúng id đó, tái dùng formatter friction sẵn có của `check` (`formatFrictionSection`, không formatter mới); `evolve --submit <id>` (STR13 Slice 3) soạn mô tả từ candidate rồi gọi `submitWork` (cùng cửa `fgos submit` dùng) — hành động ghi duy nhất của bề mặt này. Đọc view qua `listWork(dir)` DUY NHẤT — không bao giờ `rebuild`/`refreshView`/`initStore`.\"]; added [\"- `bin/fgos.mjs` verb `evolve` — Added in candidate: former CLI contract, removed in `120af6b3d`; current CLI rejects `evolve` (`bin/fgos.mjs:4415`). Historical description of Gate A (xem \\\"Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\\\" trên cho hợp đồng đầy đủ): `evolve`/`evolve --pick <id>` hai bước đọc-thuần, KHÔNG BAO GIỜ stdin tương tác — không `--pick` thì liệt kê, `--pick <id>` thì in bản ghi friction đầy đủ của đúng id đó, tái dùng formatter friction sẵn có của `check` (`formatFrictionSection`, không formatter mới); `evolve --submit <id>` (STR13 Slice 3) soạn mô tả từ candidate rồi gọi `submitWork` (cùng cửa `fgos submit` dùng) — hành động ghi duy nhất của bề mặt này. Đọc view qua `listWork(dir)` DUY NHẤT — không bao giờ `rebuild`/`refreshView`/`initStore`.\"].\nApplicable labelled corrections:\nA41 F2: replace deleted entropy pointer: \"- `src/report/entropy.mjs` — thuần, không fs/Date.now(): `computeEntropy(view)` → `{score, parts}` (5 tín hiệu có trọng số, mỗi phần giải thích được); `computeCounts(view)` → tổng phẳng outcome/friction/settlement cho seal-digest; đọc/ghi lịch sử xu hướng (`.fgos/logs/entropy-history.jsonl`, gitignored, kể từ phase-01 plans/260825-0842-fgos-logs-dir-bucketing) và định dạng seal-digest là việc của `bin/fgos.mjs`'s verb `check`, không phải module này\" → \"- `packages/observe/rust/src/metrics_cli/entropy.rs` — handler hiện hành cho `fgos metrics entropy`, tính score/parts và delta từ snapshot; `src/report/entropy.mjs` và CLI `check` cũ đã bị xoá.\"; evidence step9-truth-corrections.json; packages/observe/rust/src/metrics_cli/entropy.rs:1-8 (evidence commit 24be6cb1d); packages/observe/rust/src/metrics_cli/entropy.rs:107-127 (evidence commit 24be6cb1d).\nA41 F1: replace deleted ranking pointer: \"- `src/evolve/candidates.mjs` — Gate A candidate ranking (self-improve loop STR13 Slice 1): thuần (`rankCandidates(view)`), không fs/Date.now, tái dùng `entropy.mjs`'s `listUnsettledFrictionsByWork`/`WEIGHTS.frictionUnsettled` (không tự định nghĩa \\\"chưa ngã-ngũ\\\" hay trọng số riêng); một candidate mỗi id còn friction chưa ngã-ngũ, trường hiển thị lấy từ bản ghi MỚI NHẤT theo `ts`, `score` cộng dồn TOÀN BỘ bản ghi chưa ngã-ngũ của id đó, sắp xếp score giảm dần rồi id tăng dần (tie-break). Manifest layer: domain.\" → \"- `src/evolve/candidates.mjs` đã bị xoá; CLI hiện hành không có verb `evolve`, và `rankCandidates` chỉ còn được nhắc trong comment của entrypoint.\"; evidence step9-truth-corrections.json; bin/fgos.mjs:4640-4643 (evidence commit 24be6cb1d); bin/fgos.mjs:4373-4380 (evidence commit 24be6cb1d).\nDisposition supersede: Account for docs/specs/runner.md#pointers-implementation under docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md#pointers-implementation; source context \"Spec: Runner (vòng tự hành)\", target context \"Added in candidate: Runner Pointers (implementation)\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "850878a688f3b9c613114ddcb166a7fd1038b2865e113b41b99251817f40721e",
       "targetAncestry": [
         "Added in candidate: Runner Pointers (implementation)"
-      ]
+      ],
+      "reviewNote": "deep: supersede of Pointers (implementation) heading (52 nonblank lines); 49 lines byte-equal in order, 3 differ: the deleted-module pointers src/report/entropy.mjs and src/evolve/candidates.mjs are replaced by the labelled A41 corrections and the evolve CLI bullet gets an Added-in-candidate label; all 3 before-texts occur in the source and all 3 after-texts in the target (script), the 3 removed lines are verbatim in runner/spec.md historical-source-section-4efee765 and unheaded-block-13, the A41 account exists at 9b0526380 and the cited entropy.rs and bin/fgos.mjs lines exist at evidence commit 24be6cb1d; digests, anchors and last-reviewed digest equal.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-05-s1b-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     },
     {
       "claimId": "claim_49a878f920dd60fd0449e74d71b5fc1b",
@@ -11300,14 +11354,20 @@
       "targetOwner": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
       "targetAnchor": "unheaded-block-3",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
       "rationale": "Source: docs/specs/runner.md:1219-1269#unheaded-block-102 (current lines); unit SHA256 29fd80cd85f3529f3dcc99950563df4461655efc9d0550abe9dc52b199d07854.\nTarget: docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md:27-77#unheaded-block-3 (current lines); unit SHA256 853cf58afec64a9d7b507305bfadf959cf0f88ef17e3b90b199a85bf3ed71c43.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 853cf58afec64a9d7b507305bfadf959cf0f88ef17e3b90b199a85bf3ed71c43 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nA41 F2: replace deleted entropy pointer: \"- `src/report/entropy.mjs` — thuần, không fs/Date.now(): `computeEntropy(view)` → `{score, parts}` (5 tín hiệu có trọng số, mỗi phần giải thích được); `computeCounts(view)` → tổng phẳng outcome/friction/settlement cho seal-digest; đọc/ghi lịch sử xu hướng (`.fgos/logs/entropy-history.jsonl`, gitignored, kể từ phase-01 plans/260825-0842-fgos-logs-dir-bucketing) và định dạng seal-digest là việc của `bin/fgos.mjs`'s verb `check`, không phải module này\" → \"- `packages/observe/rust/src/metrics_cli/entropy.rs` — handler hiện hành cho `fgos metrics entropy`, tính score/parts và delta từ snapshot; `src/report/entropy.mjs` và CLI `check` cũ đã bị xoá.\"; evidence step9-truth-corrections.json; packages/observe/rust/src/metrics_cli/entropy.rs:1-8 (evidence commit 24be6cb1d); packages/observe/rust/src/metrics_cli/entropy.rs:107-127 (evidence commit 24be6cb1d).\nA41 F1: replace deleted ranking pointer: \"- `src/evolve/candidates.mjs` — Gate A candidate ranking (self-improve loop STR13 Slice 1): thuần (`rankCandidates(view)`), không fs/Date.now, tái dùng `entropy.mjs`'s `listUnsettledFrictionsByWork`/`WEIGHTS.frictionUnsettled` (không tự định nghĩa \\\"chưa ngã-ngũ\\\" hay trọng số riêng); một candidate mỗi id còn friction chưa ngã-ngũ, trường hiển thị lấy từ bản ghi MỚI NHẤT theo `ts`, `score` cộng dồn TOÀN BỘ bản ghi chưa ngã-ngũ của id đó, sắp xếp score giảm dần rồi id tăng dần (tie-break). Manifest layer: domain.\" → \"- `src/evolve/candidates.mjs` đã bị xoá; CLI hiện hành không có verb `evolve`, và `rankCandidates` chỉ còn được nhắc trong comment của entrypoint.\"; evidence step9-truth-corrections.json; bin/fgos.mjs:4640-4643 (evidence commit 24be6cb1d); bin/fgos.mjs:4373-4380 (evidence commit 24be6cb1d).\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-102 under docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md#unheaded-block-3; source context \"Spec: Runner (vòng tự hành) / Pointers (implementation)\", target context \"Added in candidate: Runner Pointers (implementation) / Pointers (implementation)\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "853cf58afec64a9d7b507305bfadf959cf0f88ef17e3b90b199a85bf3ed71c43",
       "targetAncestry": [
         "Added in candidate: Runner Pointers (implementation)",
         "Pointers (implementation)"
-      ]
+      ],
+      "reviewNote": "deep: supersede of runner.md unheaded-block-102 (L1219-1269, 51 lines) to Pointers unheaded-block-3 (L27-77); 48 lines byte-equal including the STR65 lock lines and the unit-sync and run-timeout pointers that came from main, the 3 differing lines are exactly the A41 corrections of the previous row (before and after texts verified, removed lines in both carriers); source digest equals the current main text, target digest equal at last-reviewed 345f15d95.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-05-s1b-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     },
     {
       "claimId": "claim_40c0caf4bd105994712dd37578f27746",
@@ -11372,10 +11432,15 @@
         "Dispatch runtime inspection"
       ],
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
       "rationale": "Source: docs/specs/runner.md:13-13#guard-reconciliation (current lines); unit SHA256 42ab966efc78e26589453160b8a631996c393b84c94d6acd46e78e19029b63d6.\nTarget: docs/platform/runner/architecture/h-e53a3a9829a8.md:27-27#guard-reconciliation (current lines); unit SHA256 42ab966efc78e26589453160b8a631996c393b84c94d6acd46e78e19029b63d6.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 3 → 3; title \"Guard reconciliation\" → \"Guard reconciliation\".\nWhole direct section equal; depth 3 → 3; 0 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: A31 SYNC a9a2b079f: upstream changed content is carried verbatim in its mapped candidate; surrounding candidate corrections and placement remain. Native identity resolved at SYNC 498048c1a by exact path/anchor/full source digest. No approval inherited.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "reviewNote": "Current native source binding; independent ordinary review pending."
+      "reviewNote": "deep: main re-carry, move of the Guard reconciliation heading (L13, 33-line section) to architecture h-e53a3a9829a8 L27; section text is byte-equal (the candidate already said Three actions) and both digests equal; the only change to runner.md since 0f60e2f1d is main commit c9026bf8c (3 insertions, 6 deletions) and the native tuple equals the retained-current-redecision in the native reconciliation and the rebindings; both digests hand-recomputed from raw lines (seed sample).",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-05-s1a-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     },
     {
       "claimId": "claim_8af62b949d9d3e77433b7fc8f72917cc",
@@ -11392,10 +11457,15 @@
         "Guard reconciliation"
       ],
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
       "rationale": "Source: docs/specs/runner.md:21-33#unheaded-block-3 (current lines); unit SHA256 bed7c5ea3ed1a7241f9271b44d6a8253d4ea89c082745eed076d3c5ab703d789.\nTarget: docs/platform/runner/architecture/h-e53a3a9829a8.md:35-47#unheaded-block-4 (current lines); unit SHA256 bed7c5ea3ed1a7241f9271b44d6a8253d4ea89c082745eed076d3c5ab703d789.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: A31 SYNC a9a2b079f: upstream changed content is carried verbatim in its mapped candidate; surrounding candidate corrections and placement remain. Native identity resolved at SYNC 498048c1a by exact path/anchor/full source digest. No approval inherited.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "reviewNote": "Current native source binding; independent ordinary review pending."
+      "reviewNote": "deep: new native unit from the same main edit, move of unheaded-block-3 (L21-33) to h-e53a3a9829a8 unheaded-block-4 (L35-47); 13 lines byte-equal, digests equal, anchor ok, equals the new-current-decision in the native reconciliation and carries no inherited approval.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-05-s1a-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     },
     {
       "claimId": "claim_55b85c1d204ea6a7b336fd6b066fc4f1",
@@ -11410,10 +11480,15 @@
         "Added in candidate: Runner Dispatch operability implementation slice (2026-09-16)"
       ],
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
       "rationale": "Source: docs/specs/runner.md:1422-1422#dispatch-operability-implementation-slice-2026-09-16 (current lines); unit SHA256 020a15e1469e9d8f87b2295cc7ea3ca73da8fdda1dd62ff82b49a403fdb086f5.\nTarget: docs/platform/runner/architecture/h-69197b459754.md:25-25#dispatch-operability-implementation-slice-2026-09-16 (current lines); unit SHA256 c7040697a3027c20e21f5ded2fc574689980ee6b1f5016fdbfc7bbef87ea7db5.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 3, target 3; 3 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nLink 1: \"`assignment-layout.mjs`\" (../../src/runner/dispatch/assignment-layout.mjs) → \"`assignment-layout.mjs`\" (../../../../src/runner/dispatch/assignment-layout.mjs); resolved src/runner/dispatch/assignment-layout.mjs → src/runner/dispatch/assignment-layout.mjs.\nLink 2: \"`test/fixtures/run-layout/expected.json`\" (../../test/fixtures/run-layout/expected.json) → \"`test/fixtures/run-layout/expected.json`\" (../../../../test/fixtures/run-layout/expected.json); resolved test/fixtures/run-layout/expected.json → test/fixtures/run-layout/expected.json.\nLink 3: \"Prior-art report\" (../../plans/reports/observe-unit-summary-stance-prior-art-261005.md) → \"Prior-art report\" (../../../../plans/reports/observe-unit-summary-stance-prior-art-261005.md); resolved plans/reports/observe-unit-summary-stance-prior-art-261005.md → plans/reports/observe-unit-summary-stance-prior-art-261005.md.\nHeading depth: 2 → 2; title \"Dispatch operability implementation slice (2026-09-16)\" → \"Dispatch operability implementation slice (2026-09-16)\".\nWhole direct section differs; depth 2 → 2; 3 distinct link changes; normalized line order differs; 2 removed and 4 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: upstream changed content is carried verbatim in its mapped candidate; surrounding candidate corrections and placement remain. Native identity resolved at SYNC 498048c1a by exact path/anchor/full source digest. No approval inherited.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "reviewNote": "Current native source binding; independent ordinary review pending."
+      "reviewNote": "deep: supersede of the Dispatch operability slice heading (165 source lines, 167 target); a word diff after masking link destinations shows only two inserted Added-in-candidate labels on the retired session-engine and headless-adapter paths (removed in 2180b4e72, matches A15); the three link destinations are only rebased from ../../ to ../../../../ and resolve to the same repo files; the upstream edit (L1445-1451, Four to Three actions) is carried verbatim inside the section; digests, anchor and rebinding equal; wording: the rationale says no labelled corrections although the two inline labels exist.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-05-s1a-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     },
     {
       "claimId": "claim_3883003faea82c5a23d576a5fd4d627c",
@@ -11429,10 +11504,15 @@
         "Dispatch operability implementation slice (2026-09-16)"
       ],
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
       "rationale": "Source: docs/specs/runner.md:1442-1448#unheaded-block-119 (current lines); unit SHA256 75a73f547e8e94133e10c4e8a503a4be54ab173417f1b7fe4b8bf54555507a53.\nTarget: docs/platform/runner/architecture/h-69197b459754.md:45-51#unheaded-block-5 (current lines); unit SHA256 75a73f547e8e94133e10c4e8a503a4be54ab173417f1b7fe4b8bf54555507a53.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: A31 SYNC a9a2b079f: upstream changed content is carried verbatim in its mapped candidate; surrounding candidate corrections and placement remain. Native identity resolved at SYNC 498048c1a by exact path/anchor/full source digest. No approval inherited.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "reviewNote": "Current native source binding; independent ordinary review pending."
+      "reviewNote": "deep: new native unit, move of unheaded-block-119 (L1442-1448) to h-69197b459754 unheaded-block-5 (L45-51); 7 lines byte-equal, digests equal, carries the upstream removal of clear-assignment-claim from the action list verbatim; equals the new-current-decision in the native reconciliation.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-05-s1a-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     }
   ],
   "registryGaps": [
@@ -11441,7 +11521,7 @@
       "sourcePath": "docs/specs/runner.md",
       "sourceUnitDigest": "3f6a59c3d3764c1b978073ad68eb16ce1b0382d6bf362815f45ad79dd1625224",
       "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
       "targetAnchor": "unheaded-block-102",
@@ -11452,7 +11532,13 @@
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Pointers (implementation)"
-      ]
+      ],
+      "reviewNote": "deep: registry gap; supersede of the predecessor block at 8b4be4fcf (L1208-1256) to the current runner.md unheaded-block-102 (L1219-1269); delta read both directions: 2 lines rewritten by main (STR65 lock and pre-commit hook, before and after texts verified in source and target) and 2 pointer lines (unit-sync, run-timeout) inserted by main, nothing dropped; the target digest equals the one reviewed ok before (29fd80cd) so only the line span and author moved; the target is a transitional legacy owner whose candidate carriage is claim_4599d55c9 in this round, queued for cutover rebinding.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-05-s1b-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     },
     {
       "claimId": "claim_f64fa4a36030f89feab71dc5943015c0",
@@ -15300,7 +15386,7 @@
       "targetAnchor": "unheaded-block-4",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
       "rationale": "Source: docs/specs/runner.md:21-36#unheaded-block-3 (historical witness at 0f60e2f1db7af15581a152e307d0835fc6e510e5); unit SHA256 026046f0b0c9dff4fa16ad675837105849db185678d8263e091270e599c0ba72.\nTarget: docs/platform/runner/architecture/h-e53a3a9829a8.md:35-47#unheaded-block-4 (current lines); unit SHA256 bed7c5ea3ed1a7241f9271b44d6a8253d4ea89c082745eed076d3c5ab703d789.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f supersedes this retained predecessor with the changed current source carried in the mapped candidate. The predecessor source digest and history stay intact; the current-source draft is separately enumerated in step10-round7-new-unit-drafts.json. No identity graft or review carry; native transition owed next package.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "bed7c5ea3ed1a7241f9271b44d6a8253d4ea89c082745eed076d3c5ab703d789",
@@ -15311,7 +15397,12 @@
       ],
       "sourcePath": "docs/specs/runner.md",
       "sourceAnchor": "unheaded-block-3",
-      "reviewNote": "Native predecessor gap; independent review pending; no approval carried."
+      "reviewNote": "deep: registry gap; supersede of the pre-sync block at 0f60e2f1d (L21-36, digest hand-recomputed from raw lines) to h-e53a3a9829a8 unheaded-block-4; the only delta is main commit c9026bf8c: Four to Three and the clear-assignment-claim sentence removed, a clause now carried nowhere under docs (grep) so the strict vocabulary reads partial-carry, but main diff is the supersede target under A31 and the same removal was accepted as a labelled correction in the b80e8c16c and 26f5f6119 reviews, so ok; wording: the rationale does not name the dropped clause.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-05-s1a-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     },
     {
       "claimId": "claim_d7fd3778a5cbb74cad9fb5e476708647",
@@ -15320,7 +15411,7 @@
       "targetAnchor": "unheaded-block-5",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
       "rationale": "Source: docs/specs/runner.md:1445-1451#unheaded-block-119 (historical witness at 0f60e2f1db7af15581a152e307d0835fc6e510e5); unit SHA256 1c77f2b68620610ff91f742d28ff88584c190c8af2ade3ac6818b67a6f054288.\nTarget: docs/platform/runner/architecture/h-69197b459754.md:45-51#unheaded-block-5 (current lines); unit SHA256 75a73f547e8e94133e10c4e8a503a4be54ab173417f1b7fe4b8bf54555507a53.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f supersedes this retained predecessor with the changed current source carried in the mapped candidate. The predecessor source digest and history stay intact; the current-source draft is separately enumerated in step10-round7-new-unit-drafts.json. No identity graft or review carry; native transition owed next package.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "75a73f547e8e94133e10c4e8a503a4be54ab173417f1b7fe4b8bf54555507a53",
@@ -15330,7 +15421,12 @@
       ],
       "sourcePath": "docs/specs/runner.md",
       "sourceAnchor": "unheaded-block-119",
-      "reviewNote": "Native predecessor gap; independent review pending; no approval carried."
+      "reviewNote": "deep: registry gap; supersede of the pre-sync block 119 (0f60e2f1d L1445-1451) to h-69197b459754 unheaded-block-5; the only delta is the removed clear-assignment-claim list entry, same main commit and same treatment as the previous gap row (dropped token carried nowhere, accepted under A31 and earlier labelled-correction reviews); digests recomputed, anchors ok, rebinding equal.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-05-s1a-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     }
   ],
   "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-rationale-rereview-b80e8c16c.md"

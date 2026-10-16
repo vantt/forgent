@@ -23,10 +23,15 @@
         "Data Dictionary"
       ],
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
       "rationale": "Source: docs/specs/distribution.md:57-73#unheaded-block-5 (current lines); unit SHA256 00a3412a5974cb6c7e2d4f51aadd36437162cdc3bf4a92e4dc781ec0f334ed1d.\nTarget: docs/platform/packaging-distribution/spec.md:517-533#unheaded-block-85 (current lines); unit SHA256 00a3412a5974cb6c7e2d4f51aadd36437162cdc3bf4a92e4dc781ec0f334ed1d.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: A31 SYNC a9a2b079f: upstream changed content is carried verbatim in its mapped candidate; surrounding candidate corrections and placement remain. Native identity resolved at SYNC 498048c1a by exact path/anchor/full source digest. No approval inherited.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "reviewNote": "Current native source binding; independent ordinary review pending."
+      "reviewNote": "deep: main re-carried move. distribution.md#unheaded-block-5 (57-73) and packaging-distribution/spec.md#unheaded-block-85 (517-533) both digest 00a3412a, so the text is byte-identical; rationale statement of equal digests is true; native tuple is a new current unit in the registry. Hand-checked the unit text by line range and sha256. Ancestry under Data Dictionary is right. Anchors ok.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-0102-s3-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     },
     {
       "claimId": "claim_580793ae55c06a4891f1f902939145c4",
@@ -44,10 +49,15 @@
         "Lịch sử quyết định"
       ],
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
       "rationale": "Source: docs/specs/distribution.md:324-326#unheaded-block-15 (current lines); unit SHA256 87f98a72908fb6991a3cd9bdf8c1407373d72b039ad1b3e83a35a89a2a87d299.\nTarget: docs/platform/packaging-distribution/spec.md:708-710#unheaded-block-92 (current lines); unit SHA256 87f98a72908fb6991a3cd9bdf8c1407373d72b039ad1b3e83a35a89a2a87d299.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: A31 SYNC a9a2b079f: upstream changed content is carried verbatim in its mapped candidate; surrounding candidate corrections and placement remain. Native identity resolved at SYNC 498048c1a by exact path/anchor/full source digest. No approval inherited.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "reviewNote": "Current native source binding; independent ordinary review pending."
+      "reviewNote": "deep: main re-carried move. distribution.md#unheaded-block-15 (324-326) and packaging spec#unheaded-block-92 (708-710) both digest 87f98a72, byte-identical; the unit contains the fgctl upgrade follow-up and the 2026-10-16 YAML parser bullet, which are source text, not candidate additions. Native tuple is a new current unit. Anchors ok.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-0102-s3-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     }
   ],
   "registryGaps": [
@@ -60,14 +70,20 @@
       "targetOwner": "docs/specs/distribution.md",
       "targetAnchor": "unheaded-block-5",
       "rationale": "Source: docs/specs/distribution.md:57-73#unheaded-block-5 (historical witness at 242bf705a7d1a3203a75f47906c3032560fc46bc); unit SHA256 034305c494ee289535b1b4121c8b90ed9d2eb5b850364e1c2a63e936221d40e3.\nTarget: docs/specs/distribution.md:57-73#unheaded-block-5 (current lines); unit SHA256 00a3412a5974cb6c7e2d4f51aadd36437162cdc3bf4a92e4dc781ec0f334ed1d.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: this historical predecessor remains conserved at the exact cited git witness. Its current mapped candidate incorporates the upstream doctor-check/YAML decision or manifest additions. Unique complete-file identity, exact retained decision-list prefix, or the unique Doctor-check table establishes the successor by content. Current text is pending independent review; no prior approval or identity is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
       "remainder": "Verbatim historical residual in plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json, claim claim_26f62a1ae1abc17d0f02706788bfd399, residual SHA256 4894dcf4de3a1254ebc5e89c78ffed0afafc58859c82fa2b2781ac8216b08424. Source 034305c494ee289535b1b4121c8b90ed9d2eb5b850364e1c2a63e936221d40e3; primary target 59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e. Residual file SHA256 recorded in step10-sync19-predecessor-reconciliation.json. A34 independent acceptance pending; cutover blocked.",
       "targetUnitDigest": "00a3412a5974cb6c7e2d4f51aadd36437162cdc3bf4a92e4dc781ec0f334ed1d",
       "targetAncestry": [
         "Spec: Distribution",
         "Data Dictionary"
-      ]
+      ],
+      "reviewNote": "deep: witness 242bf705a digest 034305c4 confirmed. Current distribution.md block 5 (00a3412a) keeps every source word except 'YAML-free' now 'precompiled' and adds the compiled-registry sentence and writer-identity-resolvable, so the supersede is accurate. The remainder cites the verbatim row-7 text in step10-sync19-predecessor-residuals.json: sourceText sha256 equals 034305c4, residualText sha256 equals 4894dcf4, residual is a contiguous part of the source, so the history is safe. wording: the remainder still names primary target 59297ed6 which is no longer the bound unit (00a3412a), and the row is stricter than needed; A34 acceptance stays pending. Same successor-of-record note as 0f4d968b (carrier is move row claim_9d97a24e).",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-0102-s2-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     },
     {
       "claimId": "claim_d9185072d68925b4c020b13ba6c4d74f",
@@ -76,7 +92,7 @@
       "sourceUnitDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
       "rationale": "Source: docs/specs/distribution.md:57-73#unheaded-block-5 (historical witness at 0f60e2f1db7af15581a152e307d0835fc6e510e5); unit SHA256 59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e.\nTarget: docs/platform/packaging-distribution/spec.md:517-533#unheaded-block-85 (current lines); unit SHA256 00a3412a5974cb6c7e2d4f51aadd36437162cdc3bf4a92e4dc781ec0f334ed1d.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f supersedes this retained predecessor with the changed current source carried in the mapped candidate. The predecessor source digest and history stay intact; the current-source draft is separately enumerated in step10-round7-new-unit-drafts.json. No identity graft or review carry; native transition owed next package.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
@@ -88,7 +104,12 @@
         "Spec: Distribution",
         "Data Dictionary"
       ],
-      "reviewNote": "Native predecessor gap; independent review pending; no approval carried."
+      "reviewNote": "deep: native predecessor gap (claim to gap receipt). Witness 0f60e2f1d digest 59297ed6 confirmed (distribution.md 57-73). Target block 85 of the packaging spec differs from the source only by the 'YAML-free' to 'precompiled' change and one inserted sentence on the registry check, so nothing is lost and the supersede is accurate. Native gap tuple matches registry (identity-gap, anchor unheaded-block-5). Anchor ok.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-0102-s3-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     }
   ]
 }

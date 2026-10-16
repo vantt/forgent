@@ -361,3 +361,16 @@ Lead instruction in package assignment `unit-run-1792130920095-4c562e4f/producer
 
 A43 (owner-decided 2026-10-16, option A of the Coordination Rings question): adopt the responsibility model. The coordination rings name responsibility groups only; no Orchestrator/Launcher/Router/Driver/Dispatcher class or entity is required or planned. The three held claims (`claim_bd4897029d5fdbab80b1b7ccee475e12`, `claim_d6db58a3090422d42154f240f54c9f5a`, `claim_f11410ffab23bcae1d89e8b6cbedf8bc`) leave hold: the ring-to-entity table is superseded by the true responsibility-model paragraph (owners `src/workflow/runner.mjs`, `src/runner/execution/patterns`, `src/runner/dispatch`); their decisions go through ordinary independent review. The A23/A27 hold list becomes empty.
 Owner also agreed (2026-10-16) that Phase 6 stops at "awaiting owner review" after the Step 10 checkpoint, and that the `dispatch reconcile` help defect (`clear-assignment-claim`) is handled by another agent outside this plan (owner queue: handed off).
+
+
+## L10-38 — repair content/binding defects from global ordinary review
+
+Lead instruction in assignment `unit-run-1792169199615-02803e61/producer/1`, committed reviews `f323249f9`, request `f70ecf4ec`: rebind claim_96c405c9cefaa4b7c63e40bdaac18330 to the dispatch-control-plane-redesign history literal snapshot; restore the missing planner/apply and run-control sentences for claim_2d9ccc774d84c91978163a37739aaa26 and claim_8be1f5a856f48c009b2a47816d982eb1 if current code still proves them, otherwise use partial-carry with a named remainder and owner. Rebind claim_ac8c8092219e244b8a9001337c1d8310 to the live confinement recipe block-141 (0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc), describing its extra credential/trust content. Old block-140 is not a historical witness because its anchor now holds another unit. All changed rows return to pending, with binding-derived rationales and no approval carry. This records the supplied Lead decision.
+
+## L10-39 — reopen and occurrence-match work-state footer gaps
+
+Lead instruction in the same assignment: retarget claim_16abc69cd658a382c456cdaf23f64d87 to work-state.md#unheaded-block-121 (footer occurrence 2 of 7), add both unit digests, authoredBy, pending status and a binding-derived rationale. Reopen the six already-reviewed sibling work-state.md gap rows with the same stale-anchor pattern; match exact footer content, original occurrence and heading context, never positional shifts. Every changed binding stays pending; existing footer promote rows are separate conservation owners.
+
+## L10-40 — retain A31 main-diff supersede successors
+
+Lead instruction in the same assignment: claim_cdf8c5562fb083bbdccf7d8c03decb7a and claim_d7fd3778a5cbb74cad9fb5e476708647 remain supersede under A31. Main's own diff is the supersede successor, consistent with earlier accepted corrections; no content/disposition rework. Matching independent ok verdicts apply normally.

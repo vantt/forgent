@@ -1,0 +1,388 @@
+{
+  "head": "f323249f9b0490599c156a8a673513319eea8431",
+  "SYNC": "8c788a9c5",
+  "SYNCdocsDelta": "",
+  "reportsRead": 15,
+  "requestRows": 113,
+  "applied": 108,
+  "byCollection": {
+    "claims": 24,
+    "registryGaps": 34,
+    "retiredRows": 50
+  },
+  "changedAfterPin": 0,
+  "allExplicitPendingPopulation": [
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "collection": "registryGaps",
+      "claimId": "claim_dd06c2555dc0e81c54c80376fee8ff91"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "collection": "registryGaps",
+      "claimId": "claim_16abc69cd658a382c456cdaf23f64d87"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "collection": "registryGaps",
+      "claimId": "claim_9c7e133ec44851189185dbb7b04a78a0"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "collection": "registryGaps",
+      "claimId": "claim_7a0776311f7105750a4f234681f513a3"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "collection": "registryGaps",
+      "claimId": "claim_35d0f259a0c0828577dcfd003821fb3a"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "collection": "registryGaps",
+      "claimId": "claim_aace4a1d3e3df2ac329d0930b81bd9f4"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "collection": "registryGaps",
+      "claimId": "claim_1d724afb521915455a45db2b1f3b34cd"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-reading-map-global-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_fdcd01e8f20dd83c584b1eb782bebf3a"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-reading-map-global-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_9c5cef506f44e46a8e66ba64f14499cb"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "collection": "rows",
+      "claimId": "claim_96c405c9cefaa4b7c63e40bdaac18330"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "collection": "rows",
+      "claimId": "claim_2d9ccc774d84c91978163a37739aaa26"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "collection": "rows",
+      "claimId": "claim_8be1f5a856f48c009b2a47816d982eb1"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "collection": "rows",
+      "claimId": "claim_ac8c8092219e244b8a9001337c1d8310"
+    }
+  ],
+  "pendingRows": [
+    {
+      "claimId": "claim_2d9ccc774d84c91978163a37739aaa26",
+      "reason": "L10-38 verified live sentences restored; supersede retains whole source scope"
+    },
+    {
+      "claimId": "claim_8be1f5a856f48c009b2a47816d982eb1",
+      "reason": "L10-38 verified live sentences restored; supersede retains whole source scope"
+    },
+    {
+      "claimId": "claim_96c405c9cefaa4b7c63e40bdaac18330",
+      "reason": "L10-38 history carrier replaces rewritten block-67"
+    },
+    {
+      "claimId": "claim_ac8c8092219e244b8a9001337c1d8310",
+      "reason": "L10-38 live recipe and extra credential/trust content bound"
+    },
+    {
+      "claimId": "claim_dd06c2555dc0e81c54c80376fee8ff91",
+      "reason": "L10-39 footer matched by exact text, occurrence and enclosing context"
+    },
+    {
+      "claimId": "claim_16abc69cd658a382c456cdaf23f64d87",
+      "reason": "L10-39 footer matched by exact text, occurrence and enclosing context"
+    },
+    {
+      "claimId": "claim_9c7e133ec44851189185dbb7b04a78a0",
+      "reason": "L10-39 footer matched by exact text, occurrence and enclosing context"
+    },
+    {
+      "claimId": "claim_7a0776311f7105750a4f234681f513a3",
+      "reason": "L10-39 footer matched by exact text, occurrence and enclosing context"
+    },
+    {
+      "claimId": "claim_35d0f259a0c0828577dcfd003821fb3a",
+      "reason": "L10-39 footer matched by exact text, occurrence and enclosing context"
+    },
+    {
+      "claimId": "claim_aace4a1d3e3df2ac329d0930b81bd9f4",
+      "reason": "L10-39 footer matched by exact text, occurrence and enclosing context"
+    },
+    {
+      "claimId": "claim_1d724afb521915455a45db2b1f3b34cd",
+      "reason": "L10-39 footer matched by exact text, occurrence and enclosing context"
+    }
+  ],
+  "footerReopenedReviewed": 6,
+  "footerLegacyPending": 1,
+  "nativeChangedUnits": 4,
+  "changedUnits": [
+    {
+      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "anchor": "implementation-and-design-status",
+      "before": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Implementation And Design Status",
+        "anchor": "implementation-and-design-status",
+        "githubAnchor": "implementation-and-design-status",
+        "stableAnchor": "h-963e9db1f355",
+        "startLine": 25,
+        "endLine": 25,
+        "textDigest": "4fc22267739453739992bd7673b29eaa711de810b721bd915c28f58ec555cc0c",
+        "sample": "Implementation And Design Status",
+        "sectionPayloadDigest": "8d306333a9bf8b9c637c3ac3e1d8487374116828c6f5d4a9ee99dd3134f5d796",
+        "followingBlockDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
+        "identityFingerprint": "714e354d9336c412274465ea94730678e45384fc7541502d4d3e3defcbcdf024"
+      },
+      "after": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Implementation And Design Status",
+        "anchor": "implementation-and-design-status",
+        "githubAnchor": "implementation-and-design-status",
+        "stableAnchor": "h-963e9db1f355",
+        "startLine": 25,
+        "endLine": 25,
+        "textDigest": "e9987e41f961ef6c8dc9e9e2b204eafc3ee98883460e98c0c18606ac0cc3a046",
+        "sample": "Implementation And Design Status",
+        "sectionPayloadDigest": "358e928cbbe6aa3f0790c2cb866fe0ea10acff0c53ee1d780903c8e6f6531d88",
+        "followingBlockDigest": "59d70c7fd04f6212e5c8909a4bf8bca340c7aeb0f372547419ca80fbc74dd78a",
+        "identityFingerprint": "275e80f633d4ea169fb1ab51a863af7332b8244e2ec85f9a4d7fd7d8b596bd0a"
+      },
+      "nativePredecessors": [
+        {
+          "sourcePath": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+          "unitDigest": "2ef32787bed31abb089e8a71ad65e598717f83aef5f59c0f9f47736c5bc752df",
+          "identityFingerprint": "714e354d9336c412274465ea94730678e45384fc7541502d4d3e3defcbcdf024",
+          "claimId": "claim_b6963c89796864ca59f82467d506f348",
+          "sourceAnchor": "implementation-and-design-status",
+          "unitKind": "heading",
+          "sourceUnitDigest": "4fc22267739453739992bd7673b29eaa711de810b721bd915c28f58ec555cc0c",
+          "claimKind": "architecture",
+          "status": "future"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "anchor": "unheaded-block-3",
+      "before": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 27,
+        "endLine": 27,
+        "textDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
+        "sample": "The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those inter",
+        "identityFingerprint": "1a00d82edc7c6ea7214949d37aea4e0150f91057666c93f2ffb8a7e6a5175a53"
+      },
+      "after": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 27,
+        "endLine": 27,
+        "textDigest": "59d70c7fd04f6212e5c8909a4bf8bca340c7aeb0f372547419ca80fbc74dd78a",
+        "sample": "The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those inter",
+        "identityFingerprint": "30148b4c0e53a517416cfc5fb1b22bc8dd7b6301c5f7f69ba51cb1a5cd4025ca"
+      },
+      "nativePredecessors": [
+        {
+          "sourcePath": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+          "unitDigest": "1a00d82edc7c6ea7214949d37aea4e0150f91057666c93f2ffb8a7e6a5175a53",
+          "identityFingerprint": "1a00d82edc7c6ea7214949d37aea4e0150f91057666c93f2ffb8a7e6a5175a53",
+          "claimId": "claim_35b6d8008541bef15edc061dade28c06",
+          "sourceAnchor": "unheaded-block-3",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
+          "claimKind": "architecture",
+          "status": "future"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/run-handle.md",
+      "anchor": "implementation-and-design-status",
+      "before": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Implementation And Design Status",
+        "anchor": "implementation-and-design-status",
+        "githubAnchor": "implementation-and-design-status",
+        "stableAnchor": "h-963e9db1f355",
+        "startLine": 25,
+        "endLine": 25,
+        "textDigest": "bef0ccaa8745300be2bf165c8d136047af133c064637af821eed0a95b23d04fe",
+        "sample": "Implementation And Design Status",
+        "sectionPayloadDigest": "ffabf17a2e027f608498133cbd93bc7c5a870edf4334fd49316eeb851ac5ea8e",
+        "followingBlockDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
+        "identityFingerprint": "07add88cb496d1b67c021019e81c72a8db58c725e146286f1d1233e783571ca4"
+      },
+      "after": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Implementation And Design Status",
+        "anchor": "implementation-and-design-status",
+        "githubAnchor": "implementation-and-design-status",
+        "stableAnchor": "h-963e9db1f355",
+        "startLine": 25,
+        "endLine": 25,
+        "textDigest": "565cf67de33a96a867f31b05e3ef2330415d5c6385df5a355e92b6d4d5a38421",
+        "sample": "Implementation And Design Status",
+        "sectionPayloadDigest": "4c1539098f365985dc0cbb6ce035d16c318b83f32e5a69e458364459c1532944",
+        "followingBlockDigest": "1f25a51f75e78cb32b002b7ccb303a916191d96c495a81235ebf1b7a8608f694",
+        "identityFingerprint": "fe1cafe68efb9af38993d05e2171d902f7d9d7e0be304a2c7fdd20f862207645"
+      },
+      "nativePredecessors": [
+        {
+          "sourcePath": "docs/platform/agent-coordination/architecture/run-handle.md",
+          "unitDigest": "660240a3617d2444b6ad07151342f136439005270deae66460949db1bec8e81c",
+          "identityFingerprint": "07add88cb496d1b67c021019e81c72a8db58c725e146286f1d1233e783571ca4",
+          "claimId": "claim_f1c6ef52a41ee978ba72a88733520c60",
+          "sourceAnchor": "implementation-and-design-status",
+          "unitKind": "heading",
+          "sourceUnitDigest": "bef0ccaa8745300be2bf165c8d136047af133c064637af821eed0a95b23d04fe",
+          "claimKind": "architecture",
+          "status": "future"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/run-handle.md",
+      "anchor": "unheaded-block-3",
+      "before": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 27,
+        "endLine": 27,
+        "textDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
+        "sample": "The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those inter",
+        "identityFingerprint": "1a00d82edc7c6ea7214949d37aea4e0150f91057666c93f2ffb8a7e6a5175a53"
+      },
+      "after": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 27,
+        "endLine": 27,
+        "textDigest": "1f25a51f75e78cb32b002b7ccb303a916191d96c495a81235ebf1b7a8608f694",
+        "sample": "The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those inter",
+        "identityFingerprint": "fc59912d35eb78157c56d47b46235aa9955bf2e27ba7016f353a3a28de61ee1b"
+      },
+      "nativePredecessors": [
+        {
+          "sourcePath": "docs/platform/agent-coordination/architecture/run-handle.md",
+          "unitDigest": "1a00d82edc7c6ea7214949d37aea4e0150f91057666c93f2ffb8a7e6a5175a53",
+          "identityFingerprint": "1a00d82edc7c6ea7214949d37aea4e0150f91057666c93f2ffb8a7e6a5175a53",
+          "claimId": "claim_2e2938c719ad58a967857c76c72850f1",
+          "sourceAnchor": "unheaded-block-3",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
+          "claimKind": "architecture",
+          "status": "future"
+        }
+      ]
+    }
+  ],
+  "nativeRegistryUnchanged": true,
+  "checks": {
+    "ABH": true,
+    "ownership": true,
+    "independentAudit": {
+      "rows": 12904,
+      "shards": 93,
+      "findings": 0,
+      "witnessLimits": 66
+    },
+    "rationaleConsistency": true,
+    "replay": {
+      "original": 366,
+      "later": 98,
+      "labelled": 4,
+      "findings": 0
+    },
+    "tests": {
+      "exitCode": 0,
+      "tests": 507,
+      "pass": 507
+    },
+    "promotion": {
+      "complete": 160,
+      "headerless": 0,
+      "incomplete": 0
+    }
+  },
+  "wordingQueueLines": 20,
+  "scopePaths": [
+    "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+    "docs/platform/agent-coordination/architecture/run-handle.md",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-generated-backlog.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-source-completion.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-predecessor.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+    "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+    "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/owner-answers.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/post-review-edits.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/progress.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/promoted-edits.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-global-review-application.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-global-review-checks.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-global-review-consistency.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-global-review-independent-audit.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-global-review-ownership.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-global-review-replay.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-global-review-rework.json"
+  ],
+  "protectedHashes": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "sha256": "b7b7c94cca23f863ab3d5bb052d9ef0f66fd754bed9cd09de95b757b3b5116ac"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.json",
+      "sha256": "b330d32d5aae06ce64a508fd054a908e5024c43ced2f29195b4b9b9d9898e7cb"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/minimum-constitution.json",
+      "sha256": "cb83849c0ec657badc28726a2a25727de4c6631de1dc659199664dfda97da39c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/reader-links-baseline.txt",
+      "sha256": "7bb39c1cf3fbf49119bd5f9d05c79f210641562e2a84ff959ecb2602edefd6a1"
+    }
+  ],
+  "noGlobalDE": true,
+  "noNativeSync": true,
+  "noReviewRequest": true,
+  "ok": true
+}

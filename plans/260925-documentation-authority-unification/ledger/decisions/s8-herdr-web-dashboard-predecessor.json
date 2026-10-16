@@ -14,13 +14,19 @@
       "targetOwner": "docs/specs/herdr-web-dashboard.md",
       "targetAnchor": "unheaded-block-21",
       "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "A40 explicit authorization of A22/A34 dashboard predecessor accounting. The complete same-file current successor adds answer/move --approve forwarding; full old/current text and native successor are in step8-predecessor-reconciliation.json. Accounting only, no identity graft, no approval carry, no source edit. Include in the next bounded truth re-review.",
       "targetUnitDigest": "7d9e2d425937e495926bbff08bacc8e77e9781253b5c83692215e62cf6da2913",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Business Rules"
-      ]
+      ],
+      "reviewNote": "deep: gap supersede herdr-web-dashboard.md block-21 at witness 2636ba229 L200-243 (dfb39fed) to HEAD block-21 L200-244 (7d9e2d42); both recomputed by extractor and by hand, anchor ok. Diff read: only rule R2 changes, it now says answer and move forward --approve when approve is true; the rest is verbatim, so the predecessor is conserved at the witness and the successor only adds that clause. wording: the rationale cites step8-predecessor-reconciliation.json but names neither the witness commit nor line ranges; the witness 2636ba229 is recorded in that file and matches. Own authoredBy a8237dd4@2026-10-15.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-04-s3-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     }
   ]
 }

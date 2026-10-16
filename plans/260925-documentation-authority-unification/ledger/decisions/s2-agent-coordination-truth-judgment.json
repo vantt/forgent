@@ -8720,13 +8720,19 @@
       "targetAnchor": "coordination-rings",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
       "rationale": "Source: docs/architect/agent-coordination/vocabulary/concept-relationships.md:131-131#coordination-rings (current lines); unit SHA256 631c2b459e76ccb130e41afdc78c2fc296b342d641450632df8e33baeac22459.\nTarget: docs/platform/agent-coordination/vocabulary/concept-relationships.md:95-95#coordination-rings (current lines); unit SHA256 c1a3107f359fb34010a0f09ad1156aaa2be077954106517f738f6cbc073ad579.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 2; title \"Coordination Rings\" → \"Coordination Rings\".\nWhole direct section differs; depth 2 → 2; 0 distinct link changes; normalized line order differs; 6 removed and 11 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A43 supersedes the ring-to-entity architecture with the true responsibility model in this complete section: Workflow runner sequences, Execution Core binding and patterns execute Units, dispatch adapters own attempts. No Orchestrator/Launcher/Router/Driver/Dispatcher class or entity is required or planned. The responsibility-boundary sentence is retained verbatim in the sibling target block; source history retains the former typed mapping. Pending ordinary independent review.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "c1a3107f359fb34010a0f09ad1156aaa2be077954106517f738f6cbc073ad579",
       "targetAncestry": [
         "Agent Coordination Concept Relationships"
-      ]
+      ],
+      "reviewNote": "deep: A43 settled so only carriage and bindings reviewed. Hand-recomputed source heading digest (631c2b45, heading+level+title+payload+following block 13) and target (c1a3107f) from the files, both equal the pack and the native extractor. Source section 131-141 is fully accounted: heading here, code block 133-138 (f11410ff supersede), sentence 140-141 (bd489702 move). Target section holds the responsibility-model paragraph that supersedes the typed mapping, the A43 adoption paragraph and the owners paragraph (both labelled Added in candidate) and the verbatim boundary sentence. Anchors checked.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-0102-s2-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     },
     {
       "claimId": "claim_cbedb41c7a00cb4db2b9e3840a028b36",
@@ -9279,11 +9285,17 @@
       "targetOwner": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
       "targetAnchor": "coordination-rings",
       "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "targetUnitDigest": "c1a3107f359fb34010a0f09ad1156aaa2be077954106517f738f6cbc073ad579",
       "targetAncestry": [
         "Agent Coordination Concept Relationships"
-      ]
+      ],
+      "reviewNote": "deep: A43 settled. Source code block (Strategic ring = Orchestrator, Activation = Launcher, Flow = Router + Driver, Execution = Dispatcher) lines 133-138 digest 1f83d272 recomputed equal at HEAD; superseding it by the coordination-rings heading unit (c1a3107f, shared legitimately with d6db58a3) is the owner-decided removal of the ring-to-entity table. The mapping is intentionally not carried in the target; it survives in the retained source file docs/architect/.../concept-relationships.md and git history, and the target names the four ring names and the five entity names as retired vocabulary. No remainder is needed under A43.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-0102-s2-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     },
     {
       "claimId": "claim_bd4897029d5fdbab80b1b7ccee475e12",
@@ -9294,12 +9306,18 @@
       "targetOwner": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
       "targetAnchor": "unheaded-block-14",
       "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "targetUnitDigest": "67f9f91fe484e41c014e151aaee4856f8aba43c473e42ffa3428d00e693db22c",
       "targetAncestry": [
         "Agent Coordination Concept Relationships",
         "Coordination Rings"
-      ]
+      ],
+      "reviewNote": "deep: move of the responsibility-boundary sentence (source 140-141 unheaded-block-14, target 107-108 unheaded-block-14 under Coordination Rings). Source and target digests are both 67f9f91f and the text is byte-identical including the line wrap; anchors check in both files; target ancestry matches. Nothing added or lost in this unit; the neighbouring A43 paragraphs are labelled Added in candidate.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-0102-s2-f70ecf4ec.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     },
     {
       "claimId": "claim_371515038b57bcd114632a79a36a922e",
