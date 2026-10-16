@@ -1,0 +1,177 @@
+{
+  "arch": "x86_64",
+  "durationMs": 20119.1,
+  "git": "git version 2.56.0.windows.2",
+  "os": "windows",
+  "osVersion": "Microsoft Windows [Version 10.0.26100.33438]",
+  "probe": "fgos-platform-probe",
+  "startedUnix": 1792127937,
+  "summary": {
+    "fail": 1,
+    "pass": 7,
+    "skip": 1
+  },
+  "tempDirFilesystem": "NTFS",
+  "tests": [
+    {
+      "data": {
+        "heldWhileHolderAlive": true,
+        "releaseMsAfterTerminate": 0.1
+      },
+      "durationMs": 8.4,
+      "expect": "LockFileEx lock is visible while held and is released when the holder is hard-terminated (TerminateProcess)",
+      "name": "lockfileex-released-on-terminate",
+      "note": "lock visible while held, released on TerminateProcess",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "heldWhileAlive": true,
+        "holderExitMsAfterParentTerminated": 2.9,
+        "lockFreeMsAfterParentTerminated": 3.0
+      },
+      "durationMs": 14.9,
+      "expect": "a holder that waits on its parent's handle exits when the parent is terminated, and its lock is then free",
+      "name": "holder-exits-when-parent-dies",
+      "note": "holder exited with its parent and released the lock",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "childAliveAfterParentTerminated": true,
+        "heldBeforeKill": true,
+        "lockFreeAfterChildKilled": true,
+        "lockFreeMsAfterParentDied": 0.2,
+        "lockStillHeldAfterParentDied": false,
+        "semantics": "lock is owned by the locking process; an inherited handle does not keep it"
+      },
+      "durationMs": 15.6,
+      "expect": "documents borrow semantics: design assumes a handle inherited by a child does NOT keep the lock after the locking process dies (so a job-scoped holder process is needed)",
+      "name": "lockfileex-inherited-handle-after-parent-death",
+      "note": "confirms: lock dies with the locking process even if a child holds an inherited handle",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "allAliveBeforeOwnerDeath": true,
+        "allDeadMsAfterOwnerDeath": 4.0,
+        "breakawayAttempt": "denied os_error=Some(5)",
+        "processesInJob": 5,
+        "survivors": []
+      },
+      "durationMs": 33.0,
+      "expect": "closing the job (owner dies) kills child, grandchild and a DETACHED_PROCESS child; CREATE_BREAKAWAY_FROM_JOB is denied",
+      "name": "job-kill-on-close-whole-tree",
+      "note": "job close killed child, grandchild and the detached child; breakaway denied",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "activeProcessesBefore": 5,
+        "activeZeroMsAfterTerminateJob": 2.0,
+        "breakawayAttempt": "denied os_error=Some(5)",
+        "expectedActive": 5
+      },
+      "durationMs": 324.6,
+      "expect": "QueryInformationJobObject ActiveProcesses equals the tree size and reaches 0 after the job is terminated",
+      "name": "job-active-process-count",
+      "note": "ActiveProcesses matched the tree and reached 0",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "ancestorChain": [
+          8284,
+          3180,
+          2044,
+          7772,
+          4864,
+          5560,
+          9932,
+          6300,
+          9604,
+          4020,
+          10168,
+          2592,
+          992,
+          872,
+          760
+        ],
+        "leafPid": 5224,
+        "probePid": 2044,
+        "processesInSnapshot": 150,
+        "snapshotMs": 2.6
+      },
+      "durationMs": 21.1,
+      "expect": "a Toolhelp snapshot yields the parent chain from a grandchild up to the probe, fast enough for a per-call ancestry check",
+      "name": "toolhelp-ancestry",
+      "note": "ancestry chain from grandchild reaches the probe",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "allWatchedProcessesDeadMs": 3.9,
+        "autoGcObservedRunning": false,
+        "autoGcPid": null,
+        "firstLockFreeObservedMs": 0.2,
+        "gitPid": 2544,
+        "holderKillMs": 2.2,
+        "holderMechanism": "job-ok",
+        "holderPid": 1432,
+        "hookBackgroundPid": 9308,
+        "hookForegroundPid": 6576,
+        "lockFreeAfterObserve": true,
+        "lockFreeWhileGitOrChildAliveViolations": 1,
+        "lockHeldBeforeKill": true,
+        "lockReleasedMsAfterOrphansKilled": null,
+        "looseObjectsInDir17": 4,
+        "mode": "block",
+        "orphanPids": [],
+        "orphansSurvivedHolderDeath": false,
+        "samples": 2
+      },
+      "durationMs": 10701.9,
+      "expect": "kill the holder while git is blocked in a hook: lock is never observed free while git or its hook children are alive (windows: they all die with the job; unix: lock stays held through the inherited fd)",
+      "name": "git-borrow-blocking-hook",
+      "note": "lock observed free while git or a child was still alive",
+      "status": "fail"
+    },
+    {
+      "data": {
+        "allWatchedProcessesDeadMs": 0.2,
+        "autoGcObservedRunning": false,
+        "autoGcPid": null,
+        "firstLockFreeObservedMs": 0.2,
+        "gitPid": 1032,
+        "holderKillMs": 1.4,
+        "holderMechanism": "job-ok",
+        "holderPid": 9724,
+        "hookBackgroundPid": 8188,
+        "hookForegroundPid": null,
+        "lockFreeAfterObserve": true,
+        "lockFreeWhileGitOrChildAliveViolations": 0,
+        "lockHeldBeforeKill": true,
+        "lockReleasedMsAfterOrphansKilled": null,
+        "looseObjectsInDir17": 4,
+        "mode": "noblock",
+        "orphanPids": [],
+        "orphansSurvivedHolderDeath": false,
+        "samples": 1
+      },
+      "durationMs": 8936.9,
+      "expect": "same invariant with gc.auto=1 and loose objects, killing the holder as soon as git returns while a detached gc and a background hook child may still run",
+      "name": "git-borrow-auto-gc",
+      "note": "lock never free while git or its children were alive",
+      "status": "pass"
+    },
+    {
+      "data": null,
+      "durationMs": 11.7,
+      "expect": "informational: whether the terminal-pane transport can exist on this OS",
+      "name": "herdr-on-path",
+      "note": "herdr is not on PATH",
+      "status": "skip"
+    }
+  ],
+  "version": "0.1.0"
+}
