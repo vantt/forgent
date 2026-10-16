@@ -6,6 +6,8 @@
 // names during runner config loading) and transport.mjs (which imports
 // RunnerConfigError from config.mjs).
 
+import { resolveStateRoot } from '../../holder-lock/state-root.mjs';
+
 export const DEFAULT_ADAPTER = 'cli-spawn';
 
 export const EXECUTOR_ADAPTER_NAMES = Object.freeze([
@@ -95,6 +97,12 @@ export function currentDispatchDepth() {
  * `PI_CONFIG_FILES`). The agent's hooks call the project shim, and a nested host refuses (exit 1)
  * whenever that guard is inherited; an inherited `OMP_PROFILE`/`PI_PROFILE` makes a child `omp`
  * ignore its own `PI_CODING_AGENT_DIR` (private home), and `OMPCODE=1` disables `herdr-omp-agent-state`.
+ *
+ * Lock authority never crosses this boundary: `FGOS_LOCK_FD` (a borrowed description's slot, useless
+ * without the description and wrong if believed) and `FGOS_MAIN_LOCK_HOLDER_PID` are dropped. The
+ * state root is pinned to this process's own resolved root (`FGOS_STATE_ROOT`), so a worker with a
+ * sandbox HOME still shares the machine-scope locks of its parent instead of moving them; when no
+ * host can resolve that root the pin is left out rather than failing the spawn.
  */
 export function workerBaseEnv(baseEnv = process.env) {
   const {
@@ -103,9 +111,23 @@ export function workerBaseEnv(baseEnv = process.env) {
     OMP_PROFILE: _ompProfile,
     PI_PROFILE: _piProfile,
     PI_CONFIG_FILES: _piConfigFiles,
+    FGOS_LOCK_FD: _lockFd,
+    FGOS_MAIN_LOCK_HOLDER_PID: _mainLockHolderPid,
+    FGOS_STATE_ROOT: _inheritedStateRoot,
     ...rest
   } = baseEnv;
-  return rest;
+  let stateRoot;
+  try {
+    stateRoot = resolveStateRoot().stateRoot;
+  } catch (err) {
+    // No host here can name the root (no binary, or an activated release
+    // older than the state-root route): the worker gets no pin. It cannot
+    // take a kernel lock either -- the same host answers it, and the lock
+    // facade fails by name -- so nothing it holds can land in another root.
+    if (err?.code === 'lock-driver-unavailable') return rest;
+    throw err;
+  }
+  return { ...rest, FGOS_STATE_ROOT: stateRoot };
 }
 
 export function resolveExecutorEnv(rawEnv, baseEnv = process.env) {
