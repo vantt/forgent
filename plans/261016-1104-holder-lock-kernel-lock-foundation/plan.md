@@ -3,7 +3,7 @@ title: "4.2 Holder-lock: cổng lock trung lập OS, kernel lock cho các lock l
 description: "Crate fgos-process + fgos-holder-lock, route nội bộ, facade Node LockScope, cutover dừng-toàn-bộ cho lock lạnh, doctor báo mức bảo đảm"
 status: pending
 priority: P1
-effort: 50h
+effort: 52h
 branch: worktree-agent-ab1a2b989b430bd4e
 tags: [holder-lock, kernel-lock, rust, cross-platform, cutover]
 created: 2026-10-16
@@ -11,17 +11,17 @@ created: 2026-10-16
 
 # Plan 4.2: Holder-lock — kernel lock cho các lock lạnh
 
-- **Thực hiện thiết kế r4**: [design-261016-1107-...-v3-r4.md](../reports/design-261016-1107-lock-and-run-supervisor-foundation-v3-r4.md) §11 entry 4.2, §6.0 cổng lock, §6.1.1 luật description, §6.1.2 mức bảo đảm, §6.9 state root. Đã gồm phản biện [kongming vòng 3](../reports/red-team-kongming-261016-1018-lock-and-run-supervisor-foundation-v3-r3-review.md): M4 (`lock-borrow-vectors`, đỏ = FAIL), N6 (`probe` dùng `LOCK_SH`), cwd giữ phạm vi `fgosDir`.
-- **Quyết định của anh 2026-10-16 (thay một phần r4, ghi lại ở đây):**
+- **Thực hiện thiết kế r5**: [design-261016-1220-...-v3-r5.md](../reports/design-261016-1220-lock-and-run-supervisor-foundation-v3-r5.md) (main `42bf4c283`) §11 entry 4.2, §6.0 cổng lock, **§6.0.1 miền của holder trước phải rỗng** (`acquire` chỉ trả khi giữ kernel lock **và** miền đã khai trong `predecessor.json` rỗng; chờ có hạn `lock.predecessorDrainMs`, mặc định 2000 ms, quá hạn thì `kill_all` rồi `held` có tên), §6.1.1 luật description, §6.1.2 mức bảo đảm (macOS `flock` đã đo bằng X2), §6.9 state root. Đã gồm phản biện [kongming vòng 3](../reports/red-team-kongming-261016-1018-lock-and-run-supervisor-foundation-v3-r3-review.md): M4 (`lock-borrow-vectors`, đỏ = FAIL), N6 (`probe` dùng `LOCK_SH`), cwd giữ phạm vi `fgosDir`.
+- **Quyết định của anh 2026-10-16 (thay một phần r4/r5, ghi lại ở đây; r5 chưa gộp chúng):**
   - **A1. Cutover dừng-toàn-bộ thay R-dual + quiescence hai pha (r4 §6.8).** fgOS chỉ có anh dùng, state xoá làm lại được. Quiesce mọi writer và cả ba workspace (forgentX, mdview, mcp-skill-hub), chuyển mỗi lock sang v3 và **xoá đường v1 trong cùng phase**. Không marker họ, không sàn `lockProtocolFloor`, không phase xoá v1 riêng.
-  - **A2. Windows:** chưa có driver 4.4 thì các lock này báo `unsupported`, không lùi về v1. macOS: bật driver `flock` ngay, chặn ở activate bằng `lock-borrow-vectors` + probe ngữ nghĩa; số đo máy thật lấy từ probe binary chạy trên runner macOS của GitHub Actions (P14, X2). Windows: anh có máy thật (X1).
+  - **A2. Windows:** chưa có driver 4.4 thì các lock này báo `unsupported`, không lùi về v1; driver Windows chỉ viết sau khi ba probe 6.0.1 xanh trên máy thật của anh (r5). macOS: bật driver `flock` ngay (X2 đã đo trên runner GitHub Actions), vẫn chặn ở activate bằng `lock-borrow-vectors` + probe ngữ nghĩa.
   - **A3. Sai thứ tự lock ném lỗi ngay** (không lịch trace → cảnh báo → ném của r4 §6.5). Full `npm test` + dogfood lộ vi phạm; sửa ngay trong phase gây ra. Gác `exec-under-hot-lock` (kongming M5) thuộc 4.3; plan 4.3 tự áp quyết định này nếu cùng lý do.
 - Không work item. Impact-analysis: 0 provider → inactive; trích dẫn trong phase là grep có số dòng.
 - Component boundary: có đổi (process-facts/control, holder-lock), cập nhật ở P11.
 
 ## Phạm vi
 
-Trong 4.2: crate `fgos-process`, crate `fgos-holder-lock` (cổng 6.0, driver `flock` Linux + macOS, Windows `unsupported`), route `fgos internal lock-fd|state-root|quiesce-scan|lock-borrow-vectors`, facade Node `LockScope`, registry lock, hàng rào cho binary cũ, cổng activate trong `fgctl`, cutover và xoá v1 của gateway, sessions, runner, advance, reconcile, recovery, full-suite, account provider, `state-lock`, dispatch cwd; doctor/setup/spec/CHANGELOG; landing.
+Trong 4.2: crate `fgos-process`, crate `fgos-holder-lock` (cổng 6.0 gồm luật 6.0.1, driver `flock` Linux + macOS, Windows `unsupported`), route `fgos internal lock-fd|state-root|quiesce-scan|lock-borrow-vectors`, facade Node `LockScope`, registry lock, hàng rào cho binary cũ, cổng activate trong `fgctl`, cutover và xoá v1 của gateway, sessions, runner, advance, reconcile, recovery, full-suite, account provider, `state-lock`, dispatch cwd; doctor/setup (gồm khoá cấu hình `lock.predecessorDrainMs`)/spec/CHANGELOG; landing.
 
 Ngoài: `main-checkout.lock`, `merge-slot--*`, `events.lock`, `claims.lock`, `porting/events.lock`, hook (4.3); driver Windows, `lock.rs`, `install.lock`, observe (4.4).
 
@@ -45,6 +45,7 @@ Ngoài: `main-checkout.lock`, `merge-slot--*`, `events.lock`, `claims.lock`, `po
 | D4 | `fgctl` chạy borrow vectors + probe ngữ nghĩa bằng crate nó tự link, trước publish | Preflight không chạy gì dưới `candidate_dir` ([`init.rs:441-447`](../../packages/distribution/rust/src/init.rs)) |
 | D5 | Route nội bộ kiểm `--protocol 1`, lệch → `host-version-mismatch` | Đủ cho "cùng release" |
 | D6 | Account lock giữ bất biến "con probe còn sống thì không giành" bằng `runBorrowed` thay `recordChild` | Cơ chế kernel tương đương ([`provider-credential-renewal.mjs:1078`](../../src/runner/dispatch/provider-credential-renewal.mjs)) |
+| D8 | Luật 6.0.1 cài một lần trong lõi cổng (P02) + route; ở 4.2 chỉ miền `linux-gate` có cài đặt (`judge(gate) == dead`, `kill_all` = SIGKILL theo identity); không writer 4.2 nào khai miền trên Linux vì `run_borrowed` không tạo miền | r5 §11/4.2: hợp đồng có 6.0.1 từ driver đầu; consumer khai miền là 6.2 (attempt) và 4.4 (Windows) |
 | D7 | Bỏ `lockProtocolFloor` và trường `lockProtocol` của manifest | A1: hàng rào đã làm binary cũ fail to tiếng; sàn chỉ thêm thông báo đẹp hơn |
 
 ## Phase và phụ thuộc
@@ -53,7 +54,7 @@ Ngoài: `main-checkout.lock`, `merge-slot--*`, `events.lock`, `claims.lock`, `po
 |---|---|---|---|---|
 | [00](phase-00-contracts-and-registry.md) | Contract cổng, route, registry, vector | — | 0 | 3 |
 | [01](phase-01-process-crate.md) | Crate `fgos-process` + leaf Node | 00 | 1 | 6 |
-| [02](phase-02-holder-lock-crate-and-internal-routes.md) | Crate `fgos-holder-lock`, routes, state root, borrow vectors | 00; 01 | 1 | 8 |
+| [02](phase-02-holder-lock-crate-and-internal-routes.md) | Crate `fgos-holder-lock` + luật 6.0.1, routes, state root, borrow vectors | 00; 01 | 1 | 10 |
 | [03](phase-03-node-facade-lockscope.md) | Facade Node, `LockScope` (ném ngay), `runBorrowed`, env | 00; 02 | 1 | 5 |
 | [04](phase-04-fences-and-cutover-check.md) | Đặt hàng rào + kiểm dừng-toàn-bộ (thân check `lock-fences`) | 00; 02 | 1 | 4 |
 | [05](phase-05-fgctl-activate-gate.md) | `fgctl` activate: borrow vectors + probe ngữ nghĩa | 00; 02 | 1 | 3 |
@@ -64,7 +65,7 @@ Ngoài: `main-checkout.lock`, `merge-slot--*`, `events.lock`, `claims.lock`, `po
 | [10](phase-10-cutover-dispatch-cwd-and-reconcile.md) | dispatch cwd, reconcile, guard resume | 03 | 2 | 4 |
 | [11](phase-11-doctor-setup-spec-changelog.md) | Doctor, setup, spec, boundary, CHANGELOG | 02–04 (check); docs từ wave 1 | 1–2 | 5 |
 | [12](phase-12-integration-landing-activation.md) | Tích hợp, full test, dừng-toàn-bộ, activate 3 workspace, hàng rào | 00–11 | 3 | 3 (Lead) |
-| [14](phase-14-cross-platform-drivers-handoff.md) | X1 Windows (máy anh), X2 macOS (GitHub Actions), driver Windows | 12 | track riêng | — |
+| [14](phase-14-cross-platform-drivers-handoff.md) | Ba probe 6.0.1 trên Windows thật, rồi driver Windows (X1, X2 đã chạy) | 12 | track riêng | — |
 
 ```text
 wave 0: P00
@@ -82,12 +83,13 @@ Nhánh tích hợp `holder-lock/integration` (worktree `.claude/worktrees/hl-int
 
 1. `cargo test -p fgos-process -p fgos-holder-lock -p fgos -p fgos-distribution -p fgctl` xanh; `cargo check -p fgos-process -p fgos-holder-lock` xanh cho `x86_64-pc-windows-msvc` và `aarch64-apple-darwin`.
 2. Test đa process trên crate/route thật: giữ sau helper thoát, hai description cùng process, SIGKILL, timeout, stress 8 process có SIGKILL (0 vi phạm), mượn qua git thật với `gc.auto=1` + object rời (trống ngay khi git và owner đóng; anh em bị từ chối), rò description trên route Rust.
+2b. Luật 6.0.1 trên Linux với process thật: contender không bao giờ đi tiếp khi miền `linux-gate` của holder trước còn sống (50 lần, 0 vi phạm); record cũ → đi tiếp ngay; quá `drainMs` → giết rồi đi tiếp, không giết được → `held (predecessor-domain-not-empty)`.
 3. Hàng rào chạy với code v1 thật lấy từ commit gốc (`git show <base>:<path>`): mọi acquire v1 sau hàng rào thất bại to tiếng; `tryAcquireAccountLock` → `null`.
 4. Kiểm dừng-toàn-bộ: còn process fgOS khác hoặc file v1 đang có → từ chối, không đặt hàng rào nửa vời.
 5. `rg` trong `src/ scripts/` không còn đường v1 của 10 lock 4.2 (bảng xoá trong từng phase).
 6. Sai thứ tự lock trong một scope ném lỗi; full `npm test` xanh (không vi phạm nào).
 7. `fgctl` từ chối activate khi borrow vectors hoặc probe ngữ nghĩa đỏ; Windows báo `unsupported` cho các lock này.
-8. Doctor có `lock-kernel-semantics`, `lock-borrow-vectors`, `lock-holders`, `lock-fences`, `state-root`; setup tạo thư mục lock.
+8. Doctor có `lock-kernel-semantics`, `lock-borrow-vectors`, `lock-holders`, `lock-fences`, `lock-predecessor-drain`, `state-root`; setup tạo thư mục lock và đăng ký `lock.predecessorDrainMs` vào config-merge.
 9. Full `npm test` xanh trên nhánh tích hợp với `env -u CLAUDE_CODE_SESSION_ID -u CODEX_THREAD_ID -u FGOS_SESSION_ID FGOS_HOST_BIN=<binary build từ nhánh tích hợp>`; sau landing doctor xanh ở cả ba workspace.
 
 ## Rủi ro chính

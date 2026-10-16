@@ -4,11 +4,11 @@ Wave 2. Nhánh `holder-lock/p10-dispatch-cwd`, worktree `.claude/worktrees/hl-p1
 
 ## Yêu cầu
 
-**Dispatch cwd** (phạm vi `fgosDir` giữ nguyên; phạm vi máy ra khỏi track, r4 §6.8 bước 5):
+**Dispatch cwd** (phạm vi `fgosDir` giữ nguyên; phạm vi máy ra khỏi track, r5 §6.8 bước 5):
 
 | Chỗ | Hôm nay | v3 |
 |---|---|---|
-| [`dispatch/cli.mjs:725-774`](../../src/runner/dispatch/cli.mjs) | `acquireMainCheckoutLock({identity:"pid:ts:rand", ttlMs, lockFile: dispatchLockFile(cwd)})` + heartbeat | lease `<fgosDir>/locks/dispatch-cwd--<dev>-<ino>.lock` (`dev:ino` sau `realpath`, r4 §6.9); không TTL, không heartbeat; `sharedCwd` vẫn không lấy lock |
+| [`dispatch/cli.mjs:725-774`](../../src/runner/dispatch/cli.mjs) | `acquireMainCheckoutLock({identity:"pid:ts:rand", ttlMs, lockFile: dispatchLockFile(cwd)})` + heartbeat | lease `<fgosDir>/locks/dispatch-cwd--<dev>-<ino>.lock` (`dev:ino` sau `realpath`, r5 §6.9); không TTL, không heartbeat; `sharedCwd` vẫn không lấy lock |
 | [`assignment-runner.mjs:2216-2253`, `:2785-2786`](../../src/runner/dispatch/assignment-runner.mjs) | như trên | như trên; thứ tự acquire giữ như hôm nay (đổi sang attempt→cwd là việc 6.2) |
 | Guard resume [`execution/run.mjs:342-362`](../../src/runner/execution/run.mjs) | đọc record, `catch` → coi như không có holder (fail-open trên tombstone) | `probe(dispatch-cwd)`; `held` → từ chối resume |
 | Reconcile [`reconciliation-planner.mjs:126,197,225-240`](../../src/runner/dispatch/reconciliation-planner.mjs) | luật composite riêng, chép tên file | `probe`; không phán sống/chết |
