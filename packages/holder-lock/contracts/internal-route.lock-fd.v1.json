@@ -49,7 +49,8 @@
   },
   "invariants": [
     "after --try/--wait-ms with result acquired, the lock lives on the caller's description; helper exit must not release it",
-    "on held, timeout and unavailable no lock is left on the description",
+    "on held (kernel-lock-held), timeout and unavailable the helper never took a lock on the description",
+    "on held (predecessor-domain-not-empty) the kernel lock was taken on the caller's description before the predecessor rule ran; the helper cannot drop it without LOCK_UN, so the caller's close releases it",
     "the helper never calls LOCK_UN",
     "the helper never leaves fd 3 open in a child it spawns (it spawns none)"
   ],
@@ -57,6 +58,7 @@
     "timeout": "wait with spawnSync and killSignal SIGKILL; when it returns the helper is dead and reaped; close the fd; the result is not-acquired unless the stdout line says acquired",
     "afterAcquire": "check fstat(fd).ino == stat(path).ino; otherwise close and retry",
     "release": "close(fd)",
+    "notAcquired": "close fd 3 on every result other than acquired (required for held predecessor-domain-not-empty, harmless otherwise); never retry on the same description",
     "resolution": "exec the binary named by FGOS_HOST_BIN or the activation, resolved once per process; never through a shim; never inside a hot lock"
   }
 }

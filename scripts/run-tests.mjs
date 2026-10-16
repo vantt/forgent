@@ -115,10 +115,13 @@ export function buildTestArgv(files, forwardedArgs = []) {
  * - no inherited NODE_TEST_CONTEXT: an enclosing `node --test` sets it, and a
  *   nested run that inherits it reports to a parent that is not listening
  *   and exits 0 without running a single test;
+ * - no inherited FGOS_STATE_ROOT: the host pins it into every payload it
+ *   runs, and a suite started under fgOS would otherwise send every fixture
+ *   that sets only FGOS_STATE_HOME to the real machine state root;
  * - on darwin, TMPDIR/TMP/TEMP resolved through realpath (/var -> /private/var).
  */
 export function buildTestEnv(env = process.env) {
-  const { NODE_TEST_CONTEXT: _enclosingRunner, ...rest } = env;
+  const { NODE_TEST_CONTEXT: _enclosingRunner, FGOS_STATE_ROOT: _pinnedStateRoot, ...rest } = env;
   const childEnv = { ...rest, FGOS_DISABLE_OPPORTUNISTIC_CHECKS: '1' };
   if (process.platform === 'darwin') {
     const tempRoot = env.TMPDIR || os.tmpdir();

@@ -72,8 +72,8 @@ test('resolveHolderLiveness: recorded bootId differs from the current boot -> de
   assert.equal(resolveHolderLiveness(holder, true), HAS_BOOT_ID ? 'dead' : 'held');
 });
 
-test('resolveHolderLiveness: no pid at all -> dead, regardless of isAlive', () => {
-  assert.equal(resolveHolderLiveness({ id: 'no-pid' }, true), 'dead');
-  assert.equal(resolveHolderLiveness(null, true), 'dead');
-  assert.equal(resolveHolderLiveness(undefined, false), 'dead');
+test('resolveHolderLiveness: no pid at all -> held, regardless of isAlive (a record that cannot be disproven is never reclaimed)', () => {
+  assert.equal(resolveHolderLiveness({ id: 'no-pid' }, true), 'held');
+  assert.equal(resolveHolderLiveness(null, true), 'held');
+  assert.equal(resolveHolderLiveness(undefined, false), 'held');
 });
