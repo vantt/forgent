@@ -45,6 +45,8 @@ import path from 'node:path';
 import { resolveTaskSpecPath } from '../paths.mjs';
 
 import { RunnerConfigError } from './config.mjs';
+import { describeYamlError, parseYaml } from '../../util/yaml.mjs';
+import { projectPersona } from '../agent-definitions.mjs';
 import {
   NORMALIZER_VERSION,
   READ_ONLY_ROLES,
@@ -633,7 +635,12 @@ function buildInlineAssignment({ provenance, workId, createdBy, options = {} }) 
   return Object.freeze(assignment);
 }
 
-function parseSimplePersonaYaml(raw) {
+// The line-based reader that rendered personas before definitions were read with a real YAML parser.
+// It exists only for text pinned into a run record by a release that predates that change: such text
+// may hold lines the real parser rejects (`voice: direct: no hedging`), and a run resumed from it must
+// seat the same persona it was started with. Text read fresh from a file never uses it. Remove it,
+// with its fallback in renderPersonaSection, once no run pinned by those releases can still resume.
+function legacyPersonaProjection(raw) {
   try {
     const result = { persona: {}, decision_boundary: { can_decide: [], must_escalate: [] } };
     const lines = raw.split('\n');
@@ -688,14 +695,22 @@ function renderPersonaSection(personaRef, options = {}) {
   const root = options.repoRoot ?? options.cwd ?? process.cwd();
   const personaFile = path.join(root, 'core', 'agents', `${personaRef}.yaml`);
   let content = null;
+  let parseFailure = null;
   // Text a caller pinned when it bound the persona wins over any file: the same definition
   // reaches every attempt and every resume, whatever the file says by then.
   const pinned = options.persona?.pinnedText;
   if (typeof pinned === 'string') {
-    content = parseSimplePersonaYaml(pinned);
+    try {
+      content = projectPersona(parseYaml(pinned, { filename: `${personaRef}.yaml` }));
+    } catch {
+      content = legacyPersonaProjection(pinned);
+    }
   } else if (fs.existsSync(personaFile)) {
-    const raw = fs.readFileSync(personaFile, 'utf8');
-    content = parseSimplePersonaYaml(raw);
+    try {
+      content = projectPersona(parseYaml(fs.readFileSync(personaFile, 'utf8'), { filename: `${personaRef}.yaml` }));
+    } catch (error) {
+      parseFailure = `Persona "${personaRef}" could not be parsed: ${describeYamlError(error)}`;
+    }
   }
 
   const lines = [
@@ -705,6 +720,7 @@ function renderPersonaSection(personaRef, options = {}) {
     'shape tone, emphasis, and judgment calls for this assignment, without',
     'overriding the Role, Objective, or Constraints stated elsewhere in this prompt.',
   ];
+  if (parseFailure) lines.push(parseFailure);
 
   if (content && typeof content === 'object') {
     if (content.description) {
