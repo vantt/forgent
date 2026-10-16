@@ -11,7 +11,7 @@ import path from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { resolveActiveHostBin } from '../../src/util/host-bin-path.mjs';
-import { acquireSync, probe, createLockScope, HolderLockError } from '../../src/holder-lock/index.mjs';
+import { acquire, acquireSync, probe, createLockScope, HolderLockError } from '../../src/holder-lock/index.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const FACADE_URL = pathToFileURL(path.join(root, 'src', 'holder-lock', 'index.mjs')).href;
@@ -259,6 +259,28 @@ test('a malformed lock.predecessorKillWaitMs is refused, never guessed around', 
     fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ lock: { predecessorKillWaitMs: '2s' } }));
     assert.throws(() => acquireSync(createLockScope('x'), LOCK, { fgosDir }), (err) => err.code === 'lock-config-invalid' && err.key === 'lock.predecessorKillWaitMs');
     assert.equal(fs.existsSync(path.join(fgosDir, 'locks')), false, 'refused before any lock file was touched');
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('the async acquire polls a held lock to timeout, then takes it once the holder releases', { skip: NEEDS_HOST }, async () => {
+  const { dir, fgosDir } = makeProject();
+  try {
+    const held = acquireSync(createLockScope('first'), LOCK, { fgosDir });
+    assert.equal(held.result, 'acquired');
+    assert.deepEqual(await acquire(createLockScope('second'), LOCK, { fgosDir }), { result: 'held', reason: 'kernel-lock-held' }, 'no wait asked: held at once');
+    const started = Date.now();
+    const waited = await acquire(createLockScope('second'), LOCK, { fgosDir }, { waitMs: 200, pollMs: 20 });
+    const elapsed = Date.now() - started;
+    assert.equal(waited.result, 'timeout');
+    assert.ok(elapsed >= 150 && elapsed < 3000, `waited ${elapsed} ms for a 200 ms bound`);
+    setTimeout(() => held.handle.release(), 100);
+    const taken = await acquire(createLockScope('second'), LOCK, { fgosDir }, { waitMs: 3000, pollMs: 20 });
+    assert.equal(taken.result, 'acquired', 'taken once the first holder closed its description');
+    assert.deepEqual(probe(LOCK, { fgosDir }), { result: 'held' });
+    taken.handle.release();
+    assert.deepEqual(probe(LOCK, { fgosDir }), { result: 'free' });
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }

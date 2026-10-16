@@ -14,6 +14,7 @@ import { acquireSync, createLockScope, HolderLockError } from '../../src/holder-
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const FACADE_URL = pathToFileURL(path.join(root, 'src', 'holder-lock', 'index.mjs')).href;
+const ADAPTERS_URL = pathToFileURL(path.join(root, 'src', 'runner', 'dispatch', 'adapters.mjs')).href;
 const { bin: HOST_BIN } = resolveActiveHostBin({ fgosDir: path.join(root, '.fgos') });
 const NEEDS_HOST = HOST_BIN ? false : 'no fgos host binary: set FGOS_HOST_BIN to a host built with the internal lock-fd route';
 
@@ -33,6 +34,10 @@ try { lock.acquireSync(scope, 'main-checkout', { fgosDir }); out.acquireSync = '
 try { await lock.acquire(scope, 'main-checkout', { fgosDir }, { waitMs: 50 }); out.acquire = 'returned'; } catch (err) { out.acquire = record(err); }
 try { lock.probe('main-checkout', { fgosDir }); out.probe = 'returned'; } catch (err) { out.probe = record(err); }
 try { lock.resolveStateRoot(); out.stateRoot = 'returned'; } catch (err) { out.stateRoot = record(err); }
+try {
+  const { workerBaseEnv } = await import(${JSON.stringify(ADAPTERS_URL)});
+  out.workerEnv = workerBaseEnv({ PATH: '/usr/bin', FGOS_STATE_ROOT: '/sandbox/state/fgos' });
+} catch (err) { out.workerEnv = record(err); }
 out.locksDirExists = fs.existsSync(fgosDir + '/locks');
 process.stdout.write(JSON.stringify(out));
 `);
@@ -47,6 +52,7 @@ process.stdout.write(JSON.stringify(out));
     }
     assert.ok(out.acquireSync.tried >= 1, 'the error lists where the binary was looked for');
     assert.equal(out.locksDirExists, false, 'no lock directory is created when there is no driver');
+    assert.deepEqual(out.workerEnv, { PATH: '/usr/bin' }, 'a worker spawn still works with no host: no pin, and never the inherited root');
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }

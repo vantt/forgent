@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { resolveActiveHostBin } from '../../src/util/host-bin-path.mjs';
 import { acquireSync, probe, runBorrowed, lockHolders, createLockScope, HolderLockError } from '../../src/holder-lock/index.mjs';
@@ -86,6 +86,7 @@ test('runBorrowed hands the description to git only, kills what the hook left be
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'holder-lock-borrow-'));
   const fgosDir = path.join(dir, '.fgos');
   const repo = path.join(dir, 'repo');
+  let bystander = null;
   try {
     initRepo(repo);
     assert.ok(looseObjectCount(repo) > 0, 'the fixture has loose objects for gc.auto=1 to act on');
@@ -112,6 +113,21 @@ fs.writeFileSync(process.env.HOOK_RESULT, JSON.stringify(result));
     assert.equal(plainChild.status, 0, plainChild.stderr);
     assert.ok(!JSON.parse(plainChild.stdout).some((target) => target.startsWith(fs.realpathSync(handle.path))), 'a plain child inherited the lock description');
 
+    // A bystander that opened the lock file itself (a waiting contender, a
+    // probe, a reader) owns no lock: the leftover sweep must leave it alone.
+    const bystanderReady = path.join(dir, 'bystander.ready');
+    bystander = spawn(process.execPath, ['-e', `
+      const fs = require('node:fs');
+      fs.openSync(${JSON.stringify(handle.path)}, 'r+');
+      fs.writeFileSync(${JSON.stringify(bystanderReady)}, String(process.pid));
+      setInterval(() => {}, 1000);
+    `], { stdio: 'ignore' });
+    const readyBy = Date.now() + 10_000;
+    while (!fs.existsSync(bystanderReady)) {
+      assert.ok(Date.now() < readyBy, 'the bystander never opened the lock file');
+      spawnSync('sleep', ['0.02']);
+    }
+
     fs.writeFileSync(path.join(repo, 'borrowed.txt'), 'borrowed\n');
     git(repo, ['add', 'borrowed.txt']);
     const started = Date.now();
@@ -133,6 +149,7 @@ fs.writeFileSync(process.env.HOOK_RESULT, JSON.stringify(result));
     assert.equal(borrowed.leftoversKilled, 1, 'exactly the hook\'s background process was killed (no gc daemon ran)');
     assert.ok(pidGone(leftoverPid), `background process ${leftoverPid} survived runBorrowed`);
     assert.deepEqual(lockHolders(LOCK, { fgosDir }), { kind: 'list', pids: [process.pid] }, 'only the holder keeps the description');
+    assert.equal(pidGone(bystander.pid), false, 'a process that only opened the lock file was killed by the sweep');
 
     // A sibling with the same env that opens the file itself is not a borrower.
     const sibling = writeScript(dir, 'sibling.mjs', `
@@ -152,6 +169,7 @@ process.stdout.write(JSON.stringify(result));
     assert.deepEqual(lockHolders(LOCK, { fgosDir }), { kind: 'list', pids: [] });
     assert.match(git(repo, ['log', '--oneline', '-1']), /borrowed commit/);
   } finally {
+    bystander?.kill('SIGKILL');
     fs.rmSync(dir, { recursive: true, force: true });
   }
 });

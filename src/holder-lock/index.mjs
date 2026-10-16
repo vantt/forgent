@@ -241,6 +241,15 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 export async function acquire(scope, name, params = {}, { waitMs, pollMs = DEFAULT_POLL_MS } = {}) {
   const wait = normalizeWait(waitMs);
   const prepared = prepareAcquire(scope, name, params);
+  const reservation = scope.reserve(prepared.lock.name, prepared.lock.rank);
+  try {
+    return await acquireLoop(scope, prepared, wait, pollMs);
+  } finally {
+    scope.untrack(reservation);
+  }
+}
+
+async function acquireLoop(scope, prepared, wait, pollMs) {
   const { lock, bin, killWaitMs, env } = prepared;
   const startedAt = Date.now();
   const deadline = wait.kind === 'ms' ? startedAt + wait.ms : null;
@@ -300,6 +309,11 @@ export function probe(name, params = {}) {
     closeQuietly(fd);
   }
   if (line.result === 'free' || line.result === 'held') return { result: line.result };
+  // A probe answers free or held; a helper that hung is an error, never a
+  // `timeout` the caller would have to read as one of those two.
+  if (line.result === 'killed') {
+    throw new HolderLockError('lock-route-error', `${lock.name}: the probe helper did not answer within ${ROUTE_CALL_TIMEOUT_MS} ms and was killed`, { lock: lock.name });
+  }
   return settleNotAcquired(line, lock, { kind: 'try' });
 }
 

@@ -236,18 +236,37 @@ function fdTargetMatches(target, real) {
   return target === real || target === `${real} (deleted)`;
 }
 
+/** Inode numbers named by the `lock:` lines of one fdinfo text, e.g.
+ * `lock:\t1: FLOCK  ADVISORY  WRITE 12345 00:2f:98765 0 EOF`; the
+ * `major:minor:inode` token is the one with two colons. The kernel lists a
+ * lock under a descriptor only when that descriptor's description owns it. */
+function fdinfoLockInodes(info) {
+  const inodes = [];
+  for (const line of info.split('\n')) {
+    if (!line.startsWith('lock:')) continue;
+    const token = line.split(/\s+/).find((part) => part.split(':').length === 3 && !part.endsWith(':'));
+    if (token) inodes.push(token.slice(token.lastIndexOf(':') + 1));
+  }
+  return inodes;
+}
+
 /**
  * The processes that hold a description of `lockPath` right now, as the
- * kernel shows them. Linux: every pid whose /proc/<pid>/fd has an entry
- * pointing at the file (processes of another user are skipped: they cannot
- * have inherited this process's description). Elsewhere: unlistable.
+ * kernel shows them. Linux: every pid with a descriptor on the file whose
+ * fdinfo carries a lock line for its inode, i.e. a copy of the description
+ * that owns the lock. A process that only opened the file itself (a
+ * contender waiting, a probe, a reader) owns no lock and is not listed.
+ * Processes of another user are skipped: they cannot have inherited this
+ * process's description. Elsewhere: unlistable.
  * Returns `{ kind: 'list', pids }` or `{ kind: 'unlistable', reason }`.
  */
 export function descriptionHolders(lockPath, { excludePid } = {}) {
   if (process.platform !== 'linux') return { kind: 'unlistable', reason: `no /proc fd table on ${process.platform}` };
   let real;
+  let ino;
   try {
     real = fs.realpathSync(lockPath);
+    ino = fs.statSync(real, { bigint: true }).ino.toString();
   } catch (err) {
     return { kind: 'unlistable', reason: `cannot resolve ${lockPath}: ${err.code}` };
   }
@@ -275,7 +294,14 @@ export function descriptionHolders(lockPath, { excludePid } = {}) {
       } catch {
         continue;
       }
-      if (fdTargetMatches(target, real)) {
+      if (!fdTargetMatches(target, real)) continue;
+      let info;
+      try {
+        info = fs.readFileSync(`/proc/${entry}/fdinfo/${fd}`, 'utf8');
+      } catch {
+        continue;
+      }
+      if (fdinfoLockInodes(info).includes(ino)) {
         pids.push(pid);
         break;
       }

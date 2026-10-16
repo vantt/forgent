@@ -9,7 +9,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { resolveActiveHostBin } from '../../src/util/host-bin-path.mjs';
-import { LockScope, createLockScope, acquireSync, probe, HolderLockError } from '../../src/holder-lock/index.mjs';
+import { LockScope, createLockScope, acquire, acquireSync, probe, HolderLockError } from '../../src/holder-lock/index.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const { bin: HOST_BIN } = resolveActiveHostBin({ fgosDir: path.join(root, '.fgos') });
@@ -87,6 +87,30 @@ test('a real acquire out of order throws before any lock file is opened', { skip
     sessions.handle.release();
     main.handle.release();
     assert.deepEqual(scope.holding(), []);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('two async acquires started together on one scope are checked against each other', { skip: NEEDS_HOST }, async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'holder-lock-order-async-'));
+  const fgosDir = path.join(dir, '.fgos');
+  try {
+    const scope = createLockScope('async');
+    const [main, gateway] = await Promise.allSettled([
+      acquire(scope, 'main-checkout', { fgosDir }),
+      acquire(scope, 'gateway', { fgosDir }),
+    ]);
+    assert.equal(main.status, 'fulfilled');
+    assert.equal(main.value.result, 'acquired');
+    assert.equal(gateway.status, 'rejected', 'the lower rank started while the higher one was in flight is refused');
+    assert.equal(gateway.reason.code, 'lock-order-violation');
+    assert.deepEqual(scope.holding(), [{ name: 'main-checkout', rank: main.value.handle.rank }], 'no reservation outlives its acquire');
+    main.value.handle.release();
+    assert.deepEqual(scope.holding(), []);
+    const failed = await acquire(createLockScope('other'), 'gateway', { fgosDir });
+    assert.equal(failed.result, 'acquired');
+    failed.handle.release();
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }

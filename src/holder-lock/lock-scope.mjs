@@ -37,12 +37,22 @@ export class LockScope {
     );
   }
 
+  /** Hold `rank` for an acquire that has not finished yet (the async
+   * acquire awaits its helper), so a second acquire started on this scope
+   * meanwhile is checked against it. Returns the token `untrack` drops. */
+  reserve(name, rank) {
+    this.assertCanAcquire(name, rank);
+    const token = Object.freeze({ reservation: name });
+    this.#held.set(token, { name, rank });
+    return token;
+  }
+
   /** Record `handle` as held by this scope (called by the facade after a successful acquire). */
   track(handle) {
     this.#held.set(handle, { name: handle.name, rank: handle.rank });
   }
 
-  /** Forget `handle` (called by the facade on release). */
+  /** Forget `handle` or a reservation (called by the facade on release). */
   untrack(handle) {
     this.#held.delete(handle);
   }
