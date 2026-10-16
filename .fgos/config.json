@@ -1537,7 +1537,7 @@
         "nano": "haiku",
         "standard": "sonnet",
         "advanced": "sonnet",
-        "flagship": "sonnet",
+        "flagship": "opus",
         "frontier": "fable"
       },
       "gemini": {
@@ -1582,7 +1582,7 @@
       "high": "flagship",
       "critical": "frontier"
     },
-    "maxTier": "flagship",
+    "maxTier": "advanced",
     "confinement": {
       "strict": false
     },
