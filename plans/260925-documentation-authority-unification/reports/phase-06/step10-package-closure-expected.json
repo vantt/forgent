@@ -1,5 +1,7 @@
 {
-  "holds": [],
+  "holds": [
+    "claim_f0b2a4079764d68b1102ddddb08776ce"
+  ],
   "identicalUnits": [
     {
       "digest": "ab6730b94dcd1c31dcc6afb6fffd7a83d53310f5850673f5663db952bd87f5c1",
@@ -3471,6 +3473,36 @@
         }
       },
       {
+        "claimId": "claim_b6963c89796864ca59f82467d506f348",
+        "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+        "anchor": "implementation-and-design-status",
+        "unitDigest": "e9987e41f961ef6c8dc9e9e2b204eafc3ee98883460e98c0c18606ac0cc3a046",
+        "status": "candidate-unverified",
+        "fileStatus": {
+          "kind": "architecture",
+          "kindCanonical": true,
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        }
+      },
+      {
+        "claimId": "claim_87f236ae2e3356f5e23e70a7f7224242",
+        "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "59d70c7fd04f6212e5c8909a4bf8bca340c7aeb0f372547419ca80fbc74dd78a",
+        "status": "candidate-unverified",
+        "fileStatus": {
+          "kind": "architecture",
+          "kindCanonical": true,
+          "authorityStatus": "candidate",
+          "designStatus": "Candidate",
+          "canonical": false,
+          "eligibility": "non-promoted Candidate/Draft"
+        }
+      },
+      {
         "claimId": "claim_55005dc915b1c104f51182a494cd9ab9",
         "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
         "anchor": "unheaded-block-8",
@@ -4071,7 +4103,8 @@
         "claimId": "claim_f1c6ef52a41ee978ba72a88733520c60",
         "path": "docs/platform/agent-coordination/architecture/run-handle.md",
         "anchor": "implementation-and-design-status",
-        "unitDigest": "bef0ccaa8745300be2bf165c8d136047af133c064637af821eed0a95b23d04fe",
+        "unitDigest": "565cf67de33a96a867f31b05e3ef2330415d5c6385df5a355e92b6d4d5a38421",
+        "status": "candidate-unverified",
         "fileStatus": {
           "kind": "architecture",
           "kindCanonical": true,
@@ -4079,14 +4112,14 @@
           "designStatus": "Candidate",
           "canonical": false,
           "eligibility": "non-promoted Candidate/Draft"
-        },
-        "status": "candidate-unverified"
+        }
       },
       {
-        "claimId": "claim_2e2938c719ad58a967857c76c72850f1",
+        "claimId": "claim_9d5d0b39286fb978c6de4bbc09e75adb",
         "path": "docs/platform/agent-coordination/architecture/run-handle.md",
         "anchor": "unheaded-block-3",
-        "unitDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
+        "unitDigest": "1f25a51f75e78cb32b002b7ccb303a916191d96c495a81235ebf1b7a8608f694",
+        "status": "candidate-unverified",
         "fileStatus": {
           "kind": "architecture",
           "kindCanonical": true,
@@ -4094,8 +4127,7 @@
           "designStatus": "Candidate",
           "canonical": false,
           "eligibility": "non-promoted Candidate/Draft"
-        },
-        "status": "candidate-unverified"
+        }
       },
       {
         "claimId": "claim_bad34e9c7e80093808e67870fb15900f",
@@ -32501,6 +32533,36 @@
         "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
       },
       {
+        "claimId": "claim_b6963c89796864ca59f82467d506f348",
+        "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+        "anchor": "implementation-and-design-status",
+        "unitDigest": "e9987e41f961ef6c8dc9e9e2b204eafc3ee98883460e98c0c18606ac0cc3a046",
+        "status": "candidate-unverified",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792173247556-515f6e95@2026-10-17",
+        "fileStatus": {
+          "kind": "architecture",
+          "kindCanonical": true,
+          "designStatus": "Candidate",
+          "authorityStatus": "candidate"
+        }
+      },
+      {
+        "claimId": "claim_87f236ae2e3356f5e23e70a7f7224242",
+        "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+        "anchor": "unheaded-block-3",
+        "unitDigest": "59d70c7fd04f6212e5c8909a4bf8bca340c7aeb0f372547419ca80fbc74dd78a",
+        "status": "candidate-unverified",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792173247556-515f6e95@2026-10-17",
+        "fileStatus": {
+          "kind": "architecture",
+          "kindCanonical": true,
+          "designStatus": "Candidate",
+          "authorityStatus": "candidate"
+        }
+      },
+      {
         "claimId": "claim_55005dc915b1c104f51182a494cd9ab9",
         "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
         "anchor": "unheaded-block-8",
@@ -33281,43 +33343,31 @@
         "claimId": "claim_f1c6ef52a41ee978ba72a88733520c60",
         "path": "docs/platform/agent-coordination/architecture/run-handle.md",
         "anchor": "implementation-and-design-status",
-        "unitDigest": "bef0ccaa8745300be2bf165c8d136047af133c064637af821eed0a95b23d04fe",
+        "unitDigest": "565cf67de33a96a867f31b05e3ef2330415d5c6385df5a355e92b6d4d5a38421",
         "status": "candidate-unverified",
-        "reviewStatus": "reviewed",
-        "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792173247556-515f6e95@2026-10-17",
         "fileStatus": {
           "kind": "architecture",
           "kindCanonical": true,
           "designStatus": "Candidate",
           "authorityStatus": "candidate"
-        },
-        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-        "reviewNote": "mechanical: digest recomputed from git blob at the pin (section formula) equals shown digest; tuple byte-equal in the Agent list; file header Design status Candidate / kind architecture; not read in full",
-        "reviewedAt": "2026-10-15",
-        "reviewMode": "ordinary",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
-        "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+        }
       },
       {
-        "claimId": "claim_2e2938c719ad58a967857c76c72850f1",
+        "claimId": "claim_9d5d0b39286fb978c6de4bbc09e75adb",
         "path": "docs/platform/agent-coordination/architecture/run-handle.md",
         "anchor": "unheaded-block-3",
-        "unitDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
+        "unitDigest": "1f25a51f75e78cb32b002b7ccb303a916191d96c495a81235ebf1b7a8608f694",
         "status": "candidate-unverified",
-        "reviewStatus": "reviewed",
-        "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792173247556-515f6e95@2026-10-17",
         "fileStatus": {
           "kind": "architecture",
           "kindCanonical": true,
           "designStatus": "Candidate",
           "authorityStatus": "candidate"
-        },
-        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-        "reviewNote": "mechanical: digest recomputed from git blob at the pin (sha256 of raw block lines) equals shown digest; tuple byte-equal in the Agent list; file header Design status Candidate / kind architecture; not read in full",
-        "reviewedAt": "2026-10-15",
-        "reviewMode": "ordinary",
-        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
-        "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+        }
       },
       {
         "claimId": "claim_bad34e9c7e80093808e67870fb15900f",
@@ -61961,97 +62011,34 @@
     ]
   ],
   "_provenance": {
-    "SYNC": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+    "SYNC": "38672e7f157788cbe1b2bf59511bd61046dce660",
     "realHolds": [],
     "awaitingReview": [
       {
-        "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
-        "collection": "registryGaps",
-        "claimId": "claim_dd06c2555dc0e81c54c80376fee8ff91",
-        "sourcePath": "docs/specs/work-state.md",
-        "sourceAnchor": "unheaded-block-111",
-        "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
-        "disposition": "supersede"
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-generated-backlog.json",
+        "collection": "claims",
+        "claimId": "claim_f0b2a4079764d68b1102ddddb08776ce",
+        "sourcePath": "docs/backlog.md",
+        "sourceAnchor": "product-backlog",
+        "sourceUnitDigest": "5f190b849165ce8115369ebb112a31b286e85237f5c3dd32f8493cc3cfd93d17",
+        "disposition": "regenerate-from-source"
       },
       {
-        "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-generated-backlog.json",
         "collection": "registryGaps",
-        "claimId": "claim_16abc69cd658a382c456cdaf23f64d87",
-        "sourcePath": "docs/specs/work-state.md",
-        "sourceAnchor": "unheaded-block-115",
-        "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
-        "disposition": "supersede"
-      },
-      {
-        "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
-        "collection": "registryGaps",
-        "claimId": "claim_9c7e133ec44851189185dbb7b04a78a0",
-        "sourcePath": "docs/specs/work-state.md",
-        "sourceAnchor": "unheaded-block-120",
-        "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
-        "disposition": "supersede"
-      },
-      {
-        "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
-        "collection": "registryGaps",
-        "claimId": "claim_7a0776311f7105750a4f234681f513a3",
-        "sourcePath": "docs/specs/work-state.md",
-        "sourceAnchor": "unheaded-block-132",
-        "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
-        "disposition": "supersede"
-      },
-      {
-        "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
-        "collection": "registryGaps",
-        "claimId": "claim_35d0f259a0c0828577dcfd003821fb3a",
-        "sourcePath": "docs/specs/work-state.md",
-        "sourceAnchor": "unheaded-block-138",
-        "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
-        "disposition": "supersede"
-      },
-      {
-        "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
-        "collection": "registryGaps",
-        "claimId": "claim_aace4a1d3e3df2ac329d0930b81bd9f4",
-        "sourcePath": "docs/specs/work-state.md",
-        "sourceAnchor": "unheaded-block-144",
-        "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
-        "disposition": "supersede"
-      },
-      {
-        "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
-        "collection": "registryGaps",
-        "claimId": "claim_1d724afb521915455a45db2b1f3b34cd",
-        "sourcePath": "docs/specs/work-state.md",
-        "sourceAnchor": "unheaded-block-168",
-        "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
-        "disposition": "supersede"
-      },
-      {
-        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-reading-map-global-gaps.json",
-        "collection": "registryGaps",
-        "claimId": "claim_fdcd01e8f20dd83c584b1eb782bebf3a",
-        "sourcePath": "docs/reading-map.md",
-        "sourceAnchor": "unheaded-block-15",
-        "sourceUnitDigest": "4d25460103ef8fb3a28a5f34bcb9680e7db43604944c9b3c222b18ffb1c82077",
-        "disposition": "reclassify-out-of-platform-scope"
-      },
-      {
-        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-reading-map-global-gaps.json",
-        "collection": "registryGaps",
-        "claimId": "claim_9c5cef506f44e46a8e66ba64f14499cb",
-        "sourcePath": "docs/reading-map.md",
-        "sourceAnchor": "unheaded-block-16",
-        "sourceUnitDigest": "3cb37dbc28864019579211dcadd7e189fb667783946e770ad45a9a81c2ca5b30",
-        "disposition": "reclassify-out-of-platform-scope"
+        "claimId": "claim_9b3b7fac64df06547dd06e05f4f026c5",
+        "sourcePath": "docs/backlog.md",
+        "sourceAnchor": "unheaded-block-2",
+        "sourceUnitDigest": "3430068fb5b1687e480e143bc34727fa7d6ada9f1342932c9fdd2f8b23c17da2",
+        "disposition": "regenerate-from-source"
       }
     ],
-    "meaning": "The frozen comparator field holds is the union of real holds (0) and explicit current active rows awaiting independent review. Gap decisions awaiting review are listed separately; native claims-not-reviewed does not count gaps. This compatibility input changes no checker or review status. A43 Rings are pending ordinary review, never holds.",
+    "meaning": "The frozen comparator field holds is the union of real holds (0) and explicit current active rows awaiting independent review. Gap decisions awaiting review are listed separately; native claims-not-reviewed does not count gaps. This compatibility input changes no checker or review status.",
     "candidateSources": [
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-agent-coordination.json",
-        "rows": 597,
-        "sha256": "58cc29c29d9793227f7bd5f4c4e884d21bed4bea7b42d2c5f6c6256206d77423"
+        "rows": 599,
+        "sha256": "b00d9bebd21807b07802f06d2b7b79c840712e0b2d2277b743339807a9e03788"
       },
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-host-invocation-routing.json",
@@ -62065,8 +62052,8 @@
       },
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-proposals-redesigns.json",
-        "rows": 651,
-        "sha256": "2045c21d8b91e4ce8dc8241582dd6bf8327c9d380db2b53833f42433632bd86a"
+        "rows": 653,
+        "sha256": "999d40b2c42d142423fc6f386525fdc8e44b3398cc79a15409d84fe07cd22755"
       },
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-root-authorities.json",

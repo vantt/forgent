@@ -15,6 +15,15 @@
       ]
     },
     {
+      "type": "claims-not-reviewed",
+      "message": "claim rows whose reviewStatus is not reviewed",
+      "count": 2,
+      "examples": [
+        "docs/backlog.md#product-backlog",
+        "docs/backlog.md#unheaded-block-2"
+      ]
+    },
+    {
       "type": "identical-units-multiple-owners",
       "message": "identical source units whose rows name different target owners",
       "count": 362,
@@ -22145,7 +22154,7 @@
       "docs/platform/work-state/README.md",
       "docs/platform/work-state/spec.md"
     ],
-    "registryIdentityGapCount": 5912,
+    "registryIdentityGapCount": 5913,
     "retiredWithoutDispositionCount": 0,
     "retiredWithoutDispositionRows": [],
     "duplicateContentGroupCount": 822,

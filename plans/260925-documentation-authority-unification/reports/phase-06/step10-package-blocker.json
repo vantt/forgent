@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "contentCommit": "38672e7f157788cbe1b2bf59511bd61046dce660",
+  "assignment": "unit-run-1792174045086-f2aacd25/producer/1",
+  "status": "blocked",
+  "stopRule": "Any strict global comparator difference blocks the close path; no relabelling or waiver.",
+  "native": {
+    "syncSeconds": 802.964,
+    "registryBytes": 62195972,
+    "registrySHA256": "b20238af95f89cd3a83fbc20dd53ce8df1192153415cd85b9586d53884aa9c2b",
+    "knownBefore": 99584,
+    "knownAfter": 99585,
+    "zeroKnownIDLoss": true,
+    "files": 4486,
+    "activeUnits": 91388,
+    "activeTupleEquality": true,
+    "persistenceCount": 1,
+    "newUnit": {
+      "claimId": "claim_127225b8542c701295574b1b00749594",
+      "sourcePath": "docs/backlog.md",
+      "sourceAnchor": "unheaded-block-2",
+      "sourceUnitDigest": "7d5317616b4b105936b065a213de9cce47e44c3e623d6dd293ffd0d5dc4c84ec",
+      "lines": "11-54",
+      "origin": "added-since-c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be"
+    },
+    "predecessorGap": {
+      "claimId": "claim_9b3b7fac64df06547dd06e05f4f026c5",
+      "sourcePath": "docs/backlog.md",
+      "sourceAnchor": "unheaded-block-2",
+      "sourceUnitDigest": "3430068fb5b1687e480e143bc34727fa7d6ada9f1342932c9fdd2f8b23c17da2"
+    },
+    "wrapperRecovery": "The generator and serialization completed once. A post-serialization Hash.update call rejected the >2 GiB buffer; chunked SHA256 and tuple verification reused the completed transport with no second generation or persistence."
+  },
+  "global": {
+    "scopeFiles": 1045,
+    "claims": 22759,
+    "identityGaps": 2235,
+    "dRuns": [
+      {"prior": "both", "seconds": 233.493, "fatalFindings": 0},
+      {"prior": "identity", "seconds": 348.062, "fatalFindings": 0},
+      {"prior": "phase02", "seconds": 289.8, "fatalFindings": 0}
+    ],
+    "strictESeconds": 466.358,
+    "strictECounts": {
+      "claims-unknown-blocking": 0,
+      "claims-not-reviewed": 2,
+      "identical-units-multiple-owners": 362,
+      "candidate-blocks-unreferenced": 2336,
+      "claims-partial-carry": 28
+    }
+  },
+  "comparator": {
+    "expectedRegeneratedAfterNativeSync": true,
+    "ok": false,
+    "strictGreen": false,
+    "differenceCount": 1,
+    "differences": [
+      "pending holds unexpected: claim_127225b8542c701295574b1b00749594"
+    ],
+    "explanation": "The content turn re-carried the docs/backlog.md heading row claim_f0b2a4079764d68b1102ddddb08776ce, but the sole native sync also created a distinct active unheaded-block-2 identity. No committed claim decision/accounting row names that new active identity, so strict E reports it as not reviewed and the exact expected overlay does not contain it.",
+    "expectedSHA256": "36698feececba363518d017bc4c0dc25be00e0c29ef957f63380d23f08b09576",
+    "comparisonSHA256": "5d4f1b6b2ca21297e9aea72851fa2dc47c8c3208eb8607ea6afa78e769c8ae6c",
+    "strictESHA256": "285227463c0896c5f2bbefeb6dfb882c79898e13c025b30a09d5b4258372ff05"
+  },
+  "stopped": {
+    "promotion": "not run",
+    "checkH": "not run",
+    "T9": "not run in the accepted close path",
+    "mutation": "not run",
+    "auditReplayOwnershipAB": "not run",
+    "rationaleConsistency": "not run",
+    "tests": "not run",
+    "checkpointRefresh": "not run",
+    "rehearsal": "not evaluated",
+    "ordinaryRequest": "not authored",
+    "checkpointRequest": "not refreshed"
+  },
+  "requiredNext": "Author and independently review an ordinary decision/accounting row for the new docs/backlog.md unheaded block and its predecessor gap, then rerun the package from a new committed content pin."
+}

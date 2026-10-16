@@ -766,3 +766,27 @@ Main-created Session Identity spec stays byte-identical to SYNC, **24 units awai
 **Package at this turn’s runner commit: native sync ONCE, preserve every predecessor/retired/gap identity, resolve all provisional drafts and main-created native units, native `--rebind` ALL drift, refresh exact expected/candidate/alias sets, D against both prior registries, and ONE bounded re-review of everything changed since `ab4d6274a`.** No new pack in this docs turn. The pending nine historical rows must be reviewed as historical decisions, not live claims. Existing six historical witness limits, three Rings holds, A34/cutover/consumer/group/truth/T9/rehearsal/checkpoint/scorecard/effort obligations remain; Phase 6 stays open.
 
 Exact final diffs: [edits](step10-review-edits.json). Full check reproduction: [reproduction](step10-review-reproduction.json). No fgOS CLI, git writes, workspace .fgos writes, protected-tool edits, legacy source writes, promotion, retirement, deletion, push or landing.
+# Package rerun at 38672e7f1 — blocked before close checks
+
+Assignment `unit-run-1792174045086-f2aacd25/producer/1`; producer `codex-session:unit-run-1792174045086-f2aacd25@2026-10-17`. HEAD matched content commit `38672e7f157788cbe1b2bf59511bd61046dce660`, the worktree started clean and no docs source differed from that pin.
+
+## Native and global result
+
+Exactly one native carry-forward and compact persistence ran. It took **802.964s**, produced **4,486 files/91,388 active units**, preserved every known ID (**99,584→99,585**) and matched registry/native active tuples exactly. Registry size is **62,195,972 bytes** (below90 MB), SHA256 **`b20238af95f89cd3a83fbc20dd53ce8df1192153415cd85b9586d53884aa9c2b`**. Generation and the 2,301,055,281-byte lossless transport completed once. The author wrapper then passed the full >2 GiB buffer to one `Hash.update`, which Node rejected; chunked hashing and deserialization verified the already-complete transport without rerunning generation, carry-forward or persistence.
+
+D is green with zero fatal findings for both priors together, identity alone and Phase02 alone (**233.493s /348.062s /289.800s**). Strict E ran alone over all **1,045 frozen-map sources**, yielding **22,759 active claims/2,235 scoped identity gaps**, 28 partial carries,362 identical-owner groups,2,336 reverse candidate units and2 not-reviewed claims. Runtime:466.358s.
+
+## Blocking exact comparison
+
+The required expected overlay was regenerated after native sync from the committed candidate lists and actual decision shards. That removed all six stale list/receipt diagnostics resolved by the content turn, but the committed comparator still reports **one exact difference** and `strictGreen:false`:
+
+`pending holds unexpected: claim_127225b8542c701295574b1b00749594`
+
+This is a distinct new active native unit for `docs/backlog.md#unheaded-block-2`, lines11–54, source digest `7d5317616b4b105936b065a213de9cce47e44c3e623d6dd293ffd0d5dc4c84ec`, created by the two main backlog rows. Its predecessor gap is `claim_9b3b7fac64df06547dd06e05f4f026c5` at the same unstable anchor. The content turn authored a pending regenerate-from-source row only for retained heading `claim_f0b2a4079764d68b1102ddddb08776ce`; no committed decision/accounting row names the new body identity. Therefore E sees two not-reviewed active claims, while expected pending holds contains only the heading.
+
+This is not relabelled, explained away or waived. Per Step10's zero-difference rule, the close path stopped immediately. Promotion/H/T9/mutation/audit/replay/ownership/A/B/rationale-consistency/tests, checkpoint population/refresh, rehearsal decision, small ordinary request and checkpoint-request refresh were not run or claimed. A preliminary population/T9/snapshot write made by the wrapper after comparison was restored byte-for-byte to HEAD. Existing scorecard, L10-1..L10-40+A43 summary and effort artifacts remain the content turn's draft; this blocked package does not advance them.
+
+Next: author and independently review an ordinary decision/accounting row for the new backlog body identity and predecessor gap, then rerun package from a new committed content pin. Phase6 stays open and does not move to awaiting owner review. Evidence: [blocker](step10-package-blocker.json), [comparison](step10-package-comparison.json), [native proof](step10-package-native-proof.json), [D summary](step10-package-D-summary.json), [E summary](step10-package-E-summary.json).
+
+---
+

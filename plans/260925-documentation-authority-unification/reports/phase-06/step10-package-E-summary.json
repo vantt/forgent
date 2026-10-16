@@ -1,9 +1,9 @@
 {
-  "pin": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
-  "seconds": 161.179,
+  "pin": "38672e7f157788cbe1b2bf59511bd61046dce660",
+  "seconds": 466.358,
   "scopeFiles": 1045,
   "claims": 22759,
-  "gaps": 2234,
+  "gaps": 2235,
   "applyFindings": [],
   "exactOverlayConservationEquality": true,
   "conservationOpen": [
@@ -17,6 +17,15 @@
         "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
         "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
         "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+      ]
+    },
+    {
+      "type": "claims-not-reviewed",
+      "message": "claim rows whose reviewStatus is not reviewed",
+      "count": 2,
+      "examples": [
+        "docs/backlog.md#product-backlog",
+        "docs/backlog.md#unheaded-block-2"
       ]
     },
     {
@@ -48,6 +57,10 @@
     {
       "type": "claims-partial-carry",
       "message": "28 claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover) (e.g. docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes, docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms, docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol, docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker, docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts)"
+    },
+    {
+      "type": "claims-not-reviewed",
+      "message": "2 claim rows whose reviewStatus is not reviewed (e.g. docs/backlog.md#product-backlog, docs/backlog.md#unheaded-block-2)"
     },
     {
       "type": "identical-units-multiple-owners",

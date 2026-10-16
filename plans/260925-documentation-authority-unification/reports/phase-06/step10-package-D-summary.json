@@ -1,10 +1,10 @@
 {
-  "pin": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+  "pin": "38672e7f157788cbe1b2bf59511bd61046dce660",
   "scopeFiles": 1045,
   "runs": [
     {
       "label": "both",
-      "seconds": 96.195,
+      "seconds": 233.493,
       "fatalFindings": [],
       "conservationOpen": [
         {
@@ -17,6 +17,15 @@
             "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
             "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
             "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 2,
+          "examples": [
+            "docs/backlog.md#product-backlog",
+            "docs/backlog.md#unheaded-block-2"
           ]
         },
         {
@@ -47,7 +56,7 @@
     },
     {
       "label": "identity",
-      "seconds": 99.059,
+      "seconds": 348.062,
       "fatalFindings": [],
       "conservationOpen": [
         {
@@ -60,6 +69,15 @@
             "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
             "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
             "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 2,
+          "examples": [
+            "docs/backlog.md#product-backlog",
+            "docs/backlog.md#unheaded-block-2"
           ]
         },
         {
@@ -90,7 +108,7 @@
     },
     {
       "label": "phase02",
-      "seconds": 96.552,
+      "seconds": 289.8,
       "fatalFindings": [],
       "conservationOpen": [
         {
@@ -103,6 +121,15 @@
             "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
             "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
             "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+          ]
+        },
+        {
+          "type": "claims-not-reviewed",
+          "message": "claim rows whose reviewStatus is not reviewed",
+          "count": 2,
+          "examples": [
+            "docs/backlog.md#product-backlog",
+            "docs/backlog.md#unheaded-block-2"
           ]
         },
         {

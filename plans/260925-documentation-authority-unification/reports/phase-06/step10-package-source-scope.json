@@ -1,6 +1,6 @@
 {
-  "pin": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
-  "method": "Union of EVERY native isLegacySourceItem path, every extant committed legacy-historical-path and EVERY frozen area-map source, including all five reconciliation sources; no expected-ID filtering.",
+  "pin": "38672e7f157788cbe1b2bf59511bd61046dce660",
+  "method": "Union of every native legacy-source path, extant legacy-historical path and every frozen area-map source; no expected-ID filtering.",
   "paths": [
     "AGENTS.md",
     "CLAUDE.md",
