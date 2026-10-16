@@ -2662,17 +2662,11 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           // default (the CLI process's real process.cwd()) applies, same
           // ergonomics as running the command from inside the stuck cwd.
           const runParam = flags.run ?? flags['run-id'];
-          if ((runParam !== undefined || flags.assignment !== undefined) && (!flags.action || flags.action === 'clear-cwd-lock')) {
-            throw new StoreError(
-              'validation',
-              'dispatch reconcile plan with --run or --assignment requires --action (e.g. collect-result, clear-assignment-claim, or repair-projection)',
-            );
-          }
           const cwd = flags.cwd !== undefined ? path.resolve(process.cwd(), flags.cwd) : undefined;
           return invokeDispatchReconcileOperation({
             operationId: 'dispatch.runtime.reconcile', effect: 'write',
             ctx: reconcileCtx,
-            payload: { action: flags.action, runId: runParam, assignmentId: flags.assignment, cwd },
+            payload: { action: flags.action, runId: runParam, cwd },
           });
         }
         if (positional[1] === 'apply') {

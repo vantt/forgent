@@ -1,0 +1,169 @@
+{
+  "arch": "aarch64",
+  "durationMs": 8494.5,
+  "git": "git version 2.55.0",
+  "os": "macos",
+  "osVersion": "macOS 26.6.2 / Darwin 25.6.0 arm64",
+  "probe": "fgos-platform-probe",
+  "startedUnix": 1792127933,
+  "summary": {
+    "fail": 0,
+    "pass": 8,
+    "skip": 1
+  },
+  "tempDirFilesystem": "apfs",
+  "tests": [
+    {
+      "data": {
+        "heldWhileHolderAlive": true,
+        "killMs": 0.3,
+        "releaseMsAfterSigkill": 0.0
+      },
+      "durationMs": 15.2,
+      "expect": "flock held by the holder is visible to others, and is released by the kernel when the holder is SIGKILLed",
+      "name": "flock-released-on-sigkill",
+      "note": "lock visible while held, released on SIGKILL",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "heldAfterParentSigkill": true,
+        "heldBeforeKill": true,
+        "releaseMsAfterChildKilled": 10.8
+      },
+      "durationMs": 642.3,
+      "expect": "a child that inherited the fd keeps the lock after the parent is SIGKILLed (open-file-description semantics); released only when the child dies",
+      "name": "flock-fd-inherited-keeps-lock",
+      "note": "inherited fd keeps the lock after parent death",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "heldAfterSenderSigkill": true,
+        "heldBeforeKill": true,
+        "releasedAfterReceiverClosed": true
+      },
+      "durationMs": 417.7,
+      "expect": "the fd received over a socket keeps the lock after the sender is SIGKILLed; released when the receiver closes it",
+      "name": "flock-fd-passed-by-scm-rights",
+      "note": "SCM_RIGHTS-passed fd keeps the lock",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "allDeadMs": 14.9,
+        "processes": 7
+      },
+      "durationMs": 40.1,
+      "expect": "killpg kills every process of a group, including grandchildren",
+      "name": "process-group-kill",
+      "note": "killpg ended the whole group",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "escapedParentAfterReparent": "1",
+        "escapedParentName": "/sbin/launchd",
+        "escapedPgidDiffersFromGroup": true,
+        "escapedPid": 5721,
+        "escapedSessionDiffers": true,
+        "escaperSurvivedGroupKill": true,
+        "groupMemberKilled": true
+      },
+      "durationMs": 571.9,
+      "expect": "macOS: the escaper SURVIVES the group kill and is reparented to launchd (confirms best-effort level); linux control: same without a PID namespace",
+      "name": "setsid-double-fork-escaper",
+      "note": "escaper survived the group kill (pgroup kill is best-effort)",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "descendantsFoundNative": 39,
+        "descendantsFoundPs": 39,
+        "killAllMsToAllDead": 18.8,
+        "nativeMethod": "proc_listchildpids",
+        "nativeScanMs": 0.6,
+        "processesStarted": 40,
+        "psMethodNote": "ps -axo uses sysctl KERN_PROC on macOS",
+        "psScanMs": 50.0,
+        "stopRescanRounds": 2
+      },
+      "durationMs": 142.7,
+      "expect": "a descendant scan finds every process of a 40-process tree and a stop-rescan-kill pass ends them all; timings are the cost of pgroup-tree kill_all",
+      "name": "tree-scan-and-kill-all",
+      "note": "scan found the full tree and kill_all ended it",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "allWatchedProcessesDeadMs": null,
+        "autoGcObservedRunning": false,
+        "autoGcPid": null,
+        "firstLockFreeObservedMs": null,
+        "gitPid": 5848,
+        "holderKillMs": 0.2,
+        "holderMechanism": "fd-inherited",
+        "holderPid": 5844,
+        "hookBackgroundPid": 5853,
+        "hookForegroundPid": 5854,
+        "lockFreeAfterObserve": false,
+        "lockFreeWhileGitOrChildAliveViolations": 0,
+        "lockHeldBeforeKill": true,
+        "lockReleasedMsAfterOrphansKilled": 18.7,
+        "looseObjectsInDir17": 4,
+        "mode": "block",
+        "orphanPids": [
+          5848,
+          5854,
+          5853
+        ],
+        "orphansSurvivedHolderDeath": true,
+        "samples": 103
+      },
+      "durationMs": 3126.9,
+      "expect": "kill the holder while git is blocked in a hook: lock is never observed free while git or its hook children are alive (windows: they all die with the job; unix: lock stays held through the inherited fd)",
+      "name": "git-borrow-blocking-hook",
+      "note": "lock never free while git or its children were alive",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "allWatchedProcessesDeadMs": null,
+        "autoGcObservedRunning": false,
+        "autoGcPid": null,
+        "firstLockFreeObservedMs": null,
+        "gitPid": 5908,
+        "holderKillMs": 0.3,
+        "holderMechanism": "fd-inherited",
+        "holderPid": 5903,
+        "hookBackgroundPid": 5918,
+        "hookForegroundPid": null,
+        "lockFreeAfterObserve": false,
+        "lockFreeWhileGitOrChildAliveViolations": 0,
+        "lockHeldBeforeKill": true,
+        "lockReleasedMsAfterOrphansKilled": 17.9,
+        "looseObjectsInDir17": 4,
+        "mode": "noblock",
+        "orphanPids": [
+          5918
+        ],
+        "orphansSurvivedHolderDeath": true,
+        "samples": 128
+      },
+      "durationMs": 3445.1,
+      "expect": "same invariant with gc.auto=1 and loose objects, killing the holder as soon as git returns while a detached gc and a background hook child may still run",
+      "name": "git-borrow-auto-gc",
+      "note": "lock never free while git or its children were alive",
+      "status": "pass"
+    },
+    {
+      "data": null,
+      "durationMs": 0.2,
+      "expect": "informational: whether the terminal-pane transport can exist on this OS",
+      "name": "herdr-on-path",
+      "note": "herdr is not on PATH",
+      "status": "skip"
+    }
+  ],
+  "version": "0.1.0"
+}

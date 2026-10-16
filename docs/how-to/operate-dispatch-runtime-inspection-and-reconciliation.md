@@ -44,7 +44,6 @@ Use reconciliation only for local guard/projection repair:
 ```sh
 fgos dispatch reconcile plan --cwd <absolute-worktree-path>
 fgos dispatch reconcile plan --action collect-result --run <runId>
-fgos dispatch reconcile plan --action clear-assignment-claim --assignment <assignmentId>
 fgos dispatch reconcile plan --action repair-projection --run <runId>
 ```
 

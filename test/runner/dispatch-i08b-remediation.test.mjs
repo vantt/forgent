@@ -309,7 +309,7 @@ test('F7: result.json with mismatched runId is flagged contract-corrupt and neve
 
 // ─── 5. F10: reconcile plan without --action Fails with Exit 4 ───────────────
 
-test('F10: reconcile plan with --run or --assignment requires --action before checking cwd lock', () => {
+test('F10: reconcile plan with --run requires --action before checking cwd lock', () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-f10-regression-'));
   // Ensure no cwd lock exists in tmp workspace
   assert.equal(fs.existsSync(path.join(tmp, '.fgos', 'dispatch.lock')), false);
@@ -319,17 +319,12 @@ test('F10: reconcile plan with --run or --assignment requires --action before ch
   assert.equal(resRun.status, 4, `expected exit code 4, got ${resRun.status}\nstderr: ${resRun.stderr}`);
   assert.match(resRun.stderr, /requires --action/);
 
-  // 5b. CLI with --assignment without --action must exit 4
-  const resAsgn = runFgos(['dispatch', 'reconcile', 'plan', '--assignment', 'asgn_f10_test', '--dir', tmp]);
-  assert.equal(resAsgn.status, 4, `expected exit code 4, got ${resAsgn.status}\nstderr: ${resAsgn.stderr}`);
-  assert.match(resAsgn.stderr, /requires --action/);
-
-  // 5c. CLI with --run and --action clear-cwd-lock must exit 4
+  // 5b. CLI with --run and --action clear-cwd-lock must exit 4
   const resClear = runFgos(['dispatch', 'reconcile', 'plan', '--run', 'run_f10_test', '--action', 'clear-cwd-lock', '--dir', tmp]);
   assert.equal(resClear.status, 4, `expected exit code 4, got ${resClear.status}\nstderr: ${resClear.stderr}`);
   assert.match(resClear.stderr, /requires --action/);
 
-  // 5d. reconcilePlanUseCase direct call throws DispatchReconcileError with category 'validation'
+  // 5c. reconcilePlanUseCase direct call throws DispatchReconcileError with category 'validation'
   assert.throws(
     () => reconcilePlanUseCase({ cwd: tmp }, { runId: 'run_f10_test' }),
     (err) => {
