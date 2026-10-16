@@ -1,0 +1,305 @@
+{
+  "arch": "x86_64",
+  "durationMs": 20074.9,
+  "git": "git version 2.55.0",
+  "os": "linux",
+  "osVersion": "Linux 6.17.0-1022-azure #22-Ubuntu SMP Mon Jul 27 17:24:03 UTC 2026",
+  "probe": "fgos-platform-probe",
+  "startedUnix": 1792128810,
+  "summary": {
+    "fail": 0,
+    "pass": 12,
+    "skip": 1
+  },
+  "tempDirFilesystem": "ext2/ext3",
+  "tests": [
+    {
+      "data": {
+        "heldWhileHolderAlive": true,
+        "killMs": 0.1,
+        "releaseMsAfterSigkill": 0.0
+      },
+      "durationMs": 2.6,
+      "expect": "flock held by the holder is visible to others, and is released by the kernel when the holder is SIGKILLed",
+      "name": "flock-released-on-sigkill",
+      "note": "lock visible while held, released on SIGKILL",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "heldAfterParentSigkill": true,
+        "heldBeforeKill": true,
+        "releaseMsAfterChildKilled": 2.1
+      },
+      "durationMs": 506.8,
+      "expect": "a child that inherited the fd keeps the lock after the parent is SIGKILLed (open-file-description semantics); released only when the child dies",
+      "name": "flock-fd-inherited-keeps-lock",
+      "note": "inherited fd keeps the lock after parent death",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "heldAfterSenderSigkill": true,
+        "heldBeforeKill": true,
+        "releasedAfterReceiverClosed": true
+      },
+      "durationMs": 302.9,
+      "expect": "the fd received over a socket keeps the lock after the sender is SIGKILLed; released when the receiver closes it",
+      "name": "flock-fd-passed-by-scm-rights",
+      "note": "SCM_RIGHTS-passed fd keeps the lock",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "allDeadMs": 0.4,
+        "processes": 7
+      },
+      "durationMs": 5.8,
+      "expect": "killpg kills every process of a group, including grandchildren",
+      "name": "process-group-kill",
+      "note": "killpg ended the whole group",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "escapedParentAfterReparent": "1",
+        "escapedParentName": "systemd",
+        "escapedPgidDiffersFromGroup": true,
+        "escapedPid": 2268,
+        "escapedSessionDiffers": true,
+        "escaperSurvivedGroupKill": true,
+        "groupMemberKilled": true
+      },
+      "durationMs": 539.8,
+      "expect": "macOS: the escaper SURVIVES the group kill and is reparented to launchd (confirms best-effort level); linux control: same without a PID namespace",
+      "name": "setsid-double-fork-escaper",
+      "note": "escaper survived the group kill (pgroup kill is best-effort)",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "descendantsFoundNative": 39,
+        "descendantsFoundPs": 39,
+        "killAllMsToAllDead": 10.7,
+        "nativeMethod": "/proc scan",
+        "nativeScanMs": 3.3,
+        "processesStarted": 40,
+        "psMethodNote": "ps -axo uses sysctl KERN_PROC on macOS",
+        "psScanMs": 10.4,
+        "stopRescanRounds": 2
+      },
+      "durationMs": 40.0,
+      "expect": "a descendant scan finds every process of a 40-process tree and a stop-rescan-kill pass ends them all; timings are the cost of pgroup-tree kill_all",
+      "name": "tree-scan-and-kill-all",
+      "note": "scan found the full tree and kill_all ended it",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "allWatchedProcessesDeadMs": null,
+        "autoGcObservedRunning": false,
+        "autoGcPid": null,
+        "firstLockFreeObservedMs": null,
+        "gitPid": 2329,
+        "holderKillMs": 0.1,
+        "holderMechanism": "fd-inherited",
+        "holderPid": 2328,
+        "hookBackgroundPid": 2334,
+        "hookForegroundPid": 2335,
+        "lockFreeAfterObserve": false,
+        "lockFreeWhileGitOrChildAliveViolations": 0,
+        "lockHeldBeforeKill": true,
+        "lockReleasedMsAfterOrphansKilled": 2.1,
+        "looseObjectsInDir17": 4,
+        "mode": "block",
+        "orphanPids": [
+          2329,
+          2335,
+          2334
+        ],
+        "orphansSurvivedHolderDeath": true,
+        "samples": 634
+      },
+      "durationMs": 2275.5,
+      "expect": "kill the holder while git is blocked in a hook: lock is never observed free while git or its hook children are alive (windows: they all die with the job; unix: lock stays held through the inherited fd)",
+      "name": "git-borrow-blocking-hook",
+      "note": "lock never free while git or its children were alive",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "allWatchedProcessesDeadMs": null,
+        "autoGcObservedRunning": false,
+        "autoGcPid": null,
+        "firstLockFreeObservedMs": null,
+        "gitPid": 2352,
+        "holderKillMs": 0.1,
+        "holderMechanism": "fd-inherited",
+        "holderPid": 2351,
+        "hookBackgroundPid": 2357,
+        "hookForegroundPid": null,
+        "lockFreeAfterObserve": false,
+        "lockFreeWhileGitOrChildAliveViolations": 0,
+        "lockHeldBeforeKill": true,
+        "lockReleasedMsAfterOrphansKilled": 2.1,
+        "looseObjectsInDir17": 4,
+        "mode": "noblock",
+        "orphanPids": [
+          2357
+        ],
+        "orphansSurvivedHolderDeath": true,
+        "samples": 641
+      },
+      "durationMs": 2267.0,
+      "expect": "same invariant with gc.auto=1 and loose objects, killing the holder as soon as git returns while a detached gc and a background hook child may still run",
+      "name": "git-borrow-auto-gc",
+      "note": "lock never free while git or its children were alive",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "contenderTerminatedDomain": 0,
+        "domainKind": "process",
+        "domainStillOpenWhenChecked": 0,
+        "drainMs": 2000,
+        "extraWaitMs": {
+          "max": 0.1,
+          "p50": 0.0,
+          "p95": 0.1
+        },
+        "heldReturned": 0,
+        "jobOwner": "supervisor (probe holds the handle)",
+        "lockWaitMsFromContenderStart": {
+          "max": 210.9,
+          "p50": 122.1,
+          "p95": 122.4
+        },
+        "repeats": 50,
+        "violationEvents": [],
+        "violationsProceededWithLiveProcesses": 0
+      },
+      "durationMs": 6904.0,
+      "expect": "50 repeats: a contender that applies the predecessor rule never proceeds while git or its hook children are alive (0 violations); extra wait is small",
+      "name": "git-borrow-blocking-hook-predecessor-check",
+      "note": "0 violations: contender proceeded only after the predecessor domain was empty",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "contenderTerminatedDomain": 0,
+        "domainKind": "process",
+        "domainStillOpenWhenChecked": 0,
+        "drainMs": 2000,
+        "extraWaitMs": {
+          "max": 0.1,
+          "p50": 0.0,
+          "p95": 0.1
+        },
+        "heldReturned": 0,
+        "jobOwner": "holder (its death closes the job)",
+        "lockWaitMsFromContenderStart": {
+          "max": 208.9,
+          "p50": 122.0,
+          "p95": 122.4
+        },
+        "repeats": 50,
+        "violationEvents": [
+          {
+            "contenderTerminated": false,
+            "domainOpenedWhenChecked": false,
+            "extraWaitMs": 0.1,
+            "lockWaitMs": 120.8,
+            "members": [
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 2876,
+                "role": "git"
+              },
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 2881,
+                "role": "hook-foreground"
+              },
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 2880,
+                "role": "hook-background"
+              }
+            ],
+            "msFromHolderKillToReturn": 100.9,
+            "repeat": 10,
+            "stateAtDecision": [
+              {
+                "aliveAtDecision": true,
+                "deadMsAfterDecision": 0.0,
+                "pid": 2876,
+                "stateAtDecision": "dead"
+              },
+              {
+                "aliveAtDecision": false,
+                "deadMsAfterDecision": null,
+                "pid": 2881,
+                "stateAtDecision": "dead"
+              },
+              {
+                "aliveAtDecision": false,
+                "deadMsAfterDecision": null,
+                "pid": 2880,
+                "stateAtDecision": "dead"
+              }
+            ]
+          }
+        ],
+        "violationsProceededWithLiveProcesses": 1
+      },
+      "durationMs": 6897.7,
+      "expect": "documents the hazard: when only the holder owns the job, its name can vanish (open fails = looks empty) while members are still terminating; informational, never fails",
+      "name": "git-borrow-blocking-hook-predecessor-check-holder-owned",
+      "note": "holder-owned job: 1/50 repeats proceeded while members were still dying (job name already gone in 50 of them)",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "domainKind": "process",
+        "extraWaitMs": {
+          "max": 0.0,
+          "p50": 0.0,
+          "p95": 0.0
+        },
+        "repeats": 20,
+        "unexpectedOutcomes": 0
+      },
+      "durationMs": 9.4,
+      "expect": "a record pointing to an already-destroyed domain lets the contender proceed immediately",
+      "name": "predecessor-record-stale",
+      "note": "stale record: contender proceeded immediately",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "aliveAtProceed": [],
+        "contenderTerminatedDomain": true,
+        "domainKind": "process",
+        "drainMs": 300,
+        "extraWaitMs": 304.2,
+        "heldReason": null,
+        "membersDeadAfterwards": true,
+        "proceeded": true
+      },
+      "durationMs": 304.6,
+      "expect": "members that do not die within the drain window are terminated by the contender, which then proceeds with nothing alive (or returns held); it never proceeds with live members",
+      "name": "predecessor-drain-timeout",
+      "note": "drain expired, contender terminated the members and proceeded with nothing alive",
+      "status": "pass"
+    },
+    {
+      "data": null,
+      "durationMs": 0.2,
+      "expect": "informational: whether the terminal-pane transport can exist on this OS",
+      "name": "herdr-on-path",
+      "note": "herdr is not on PATH",
+      "status": "skip"
+    }
+  ],
+  "version": "0.1.0"
+}
