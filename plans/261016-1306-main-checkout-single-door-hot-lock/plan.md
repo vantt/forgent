@@ -23,7 +23,7 @@ created: 2026-10-16
 > **TẠM GIỮ một phần plan, chờ hội đồng thiết kế component Git (quyết định của anh, 2026-10-16 22:50).**
 > Anh quyết tách một **component Git riêng** (crate Rust, ngang hàng Workflow và Execution Core, domain nào cũng dùng). Mọi thao tác ghi lên repo git sẽ gom về đó: worktree, sync, land có verify/abort, trusted commit, và **khoá repo của plan này**. Hình thái do một hội đồng kiến trúc thiết kế trước; sau đó mới cắt lại 4.3.
 > - **Chưa bắt đầu** P03 (main door, checkpoint, hook), P05 (land/promote/sync-root/approve dưới slot), P06 (`worktree-admin`), P08 (`fgctl` bỏ đọc v1 main), phần reset-trong-mutex của P07, và phần tương ứng của P00/P09/P10. Các phần này dự kiến chuyển sang component Git; hội đồng có thể đổi ranh giới.
-> - **Có thể tiến khi 4.2 đã land:** P01 (hot-lock core) và P02 (gộp claims vào `state`). P04 chờ main door của component Git.
+> - **Cập nhật 2026-10-17 00:57 (quyết định của anh sau hội đồng `wf-run-1792170289706-0e3ce52d`): tạm giữ TOÀN BỘ 4.3**, kể cả P01/P02. Lý do: P01 cần contract của P00, mà P00 đang giữ chung với phần khoá; nhánh tích hợp còn được phép đỏ ở test claim từ P01 tới P04 (dòng thứ tự merge bên dưới). 4.2 chưa land nên không mất ngày nào. Thân plan sẽ được cắt và viết lại một lần khi spec component Git chốt (Rust là lõi sống từ đầu).
 > - Bối cảnh: [roadmap-261016-2212-fgos-cook-and-git-component.md](../reports/roadmap-261016-2212-fgos-cook-and-git-component.md), [research-261016-2158-work-harness-reuse-and-ak-cook-worker.md](../reports/research-261016-2158-work-harness-reuse-and-ak-cook-worker.md). Kết luận hội đồng sẽ được ghi vào đây khi có.
 
 ## Phạm vi
