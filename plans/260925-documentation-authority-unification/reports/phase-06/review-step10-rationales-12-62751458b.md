@@ -1,0 +1,35 @@
+# Review: Step 10 rationale re-review part 12 (content 62751458b)
+
+Reviewer: reviewer:claude-session:a4954387@2026-10-14
+Author session: codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16
+Review mode: ordinary
+Request commit: f1f414b02
+Content commit: 62751458b22b47e930dc33b8501d07798b91ace3
+
+## Scope and method
+
+Request: review-request-step10-rationales-12-62751458b.md and its sidecar, 6 pending claim verdicts, read in the detached read-only worktree at f1f414b02 (docs bytes equal 62751458b). No sensitivity pack was requested or produced.
+
+Reproduction, scratch-only (the worktree stayed clean): the rationale-consistency checker was run from a copy of the rebuild script with the scratch path substituted and printed scanned 12895, shards 92, generated 836, legacyFindings 0, generatedFindings 0, ok true; the doc tool tests ran 490 tests, 490 pass, 0 fail with the exact node --test globs of the header. The inventory, verify, ownership and link replay scripts of the header were not run (they write under /tmp/fgos-work outside my scratch dir); I replaced them with my own checks below.
+
+Mechanical checks on all 42 pending rows of the three parts (this part's rows are in the table): the committed decision in the shard at HEAD equals the request currentDecision and after (42 of 42, status pending, no review fields); digests of the bound source and target units recomputed with extractMarkdownConservationUnits (current files, and git show at the historical witness commit for the four historical-source rows 256, 257, 291, 292); unit lines, anchors, ancestry and context strings in each rationale equal the real files; equal or differ claim equals the digest comparison; link counts and every 'Link N' resolved path recomputed from the file directories (63 links, 0 mismatches, every resolved target exists); heading depth lines; each 'Target unchanged/changed since last reviewed digest at <commit>' checked by finding that digest in the target file at that commit (all consistent, including the 4 changed-target rows); every anchor with node scripts/list-doc-anchors.mjs --check (41 unique target anchors, 0 failures); each bound digest occurs exactly once in its file so the occurrence binding is unambiguous; every labelled correction line was parsed and its before-text searched in the source unit/section (historical text for historical rows) and its after-text in the target.
+
+Sampling (A36): population is the 42 pending claims of parts 10 to 12, all judgment rows; 15 percent would be 6.3 so the minimum of 10 applies and I read more. Deep reads: every row whose source and target digests differ (22 rows: 255-260, 281-296) plus a seeded sample of 6 of the 20 equal-digest move rows. Seed 2026101609, python3 random.seed then random.sample over the 20 equal-digest claim IDs sorted ascending, drew: claim_39c40cef341e227d936ea768b12ba435, claim_7aede254166851de375089f4b0160ca6, claim_7e17ce226062d06a53b940f64b9d5cdb, claim_bed90dbb7de2a5782fafcdb4a3d6e0da, claim_dc8b5bc2507201dd705fcd64deba8224, claim_fefb1bf47fc375b9e83089dc6059326c. Hand recomputation of digests with my own Python sha256 implementation (not the extractor formula): seed 2026101610, random.sample of the 42 entry IDs sorted, drew rationale-292, 275, 268, 295, 273, 272, 286, 279 (16 digests, all equal to the committed values). Deep rework rate in the whole 42-row set is 0 percent, so no escalation to a full read.
+
+## Verdicts
+
+| Claim | Verdict | Note | Source digest | Target digest |
+|---|---|---|---|---|
+| claim_0145c13614b75e7da1321473afa8a0f1 | ok | deep: historical witness d23045c2d unheaded-block-10 (106-114, user-phrase to route table, digest and ancestry Happy Path Routing recomputed) superseded by current Surface Taxonomy section 70, which says the route map moved to core/skills/fgos-advise/references/request-kinds-and-routes.md; Happy Path Routing no longer exists in the target, the two added links resolve, and the rationale names 09fe3ab32 and f4ed59997 which are ancestors of HEAD; prior target digest 0c50fe16 verified at 947f6169e and ce575996f; the dropped table lives in the named successor, accepted as a supersede. | 1162040b79db2beccc2fe163e3f008e931b8f6ce13d15113a3f2838abb9df2a5 | acfa27bd06c8c37b033b7a44209aa880627f7de384684846e6f8bed12129c4f6 |
+| claim_deb1e4063a1eabf13dd8ed523748039f | ok | deep: historical block d23045c2d unheaded-block-20 (193-195, B. Add fgos-panel Selected paragraph) superseded by the current B. Add fgos-advise heading (132); the rewrite drops the pack-gate sentences and the specialist-skills sentence, which is the stated upstream rename; counts 3 removed and 4 added match; prior digest 255adc34 verified at 947f6169e. | 6bea20cb9a1aa9d19c5c6e9ef6e1ccf1f7ec636b964c2aaa50521ba3c14d73d5 | bb1ae7699ab58ef15b7ea30bf4d78b57cdd8eb69b9a4ef6a7713e83e50f9eb3c |
+| claim_53ebf4b541ff8f6a2c40e3b95304d6b7 | ok | deep: docs/README.md 1. Read First against the docs-portal carrier; 8 links only rebased relative, one destination change (doc-governance.md to docs/platform/governance.md); I recomputed each resolved path from the file directories and all exist; after stripping link destinations the section is identical. | 2aff5e7721a256efce78953c498af0839f56f0bb5b9918290a36bbc072659eb1 | 16929d439319f41461ebf8f9278446e233b23a3b2450a9b9bd4295b12e1052db |
+| claim_53d2f5742d24e980328f8cee963fb73b | ok | deep: the link block under 1. Read First (unheaded-block-3, 7 lines) with the same 8 links and the same single governance repoint; resolved paths recomputed, no other text difference, lines 25-31 and 26-32 equal the real spans. | dd493e9c64c0caf205f6acc1617c588a0f6710dc0a4f5922d58551efaf63e579 | 1b6544779a1b1b2aea1f57d5e9f59d5831cbbb499161f8ed90e23e16e3a7f134 |
+| claim_2ae0cd4fc1cf487f7caa4d77d46e9682 | ok | deep: 4. Related Files heading; 4 links rebased, one destination change to platform governance; the only raw diff is one extra blank line inside the section which the trimmed payload digest ignores; rationale link list recomputed equal. | 93e63d0c77140732f2db5dcff67c39869f924d501e3556dfb36a9d48cc73ed8d | 6dcde68b9663bbcefb3354897ee57514583ac7767a09df3f74a615011844a828 |
+| claim_0f63a4c33bd9ab4d707e6ea459868a91 | ok | deep: unheaded-block-6 under 4. Related Files, 4 links, same governance repoint, resolved paths recomputed and existing, text otherwise identical. | 30081b87c5f3fa70b025b187fa5dd4cc947c337d5c005aec01a17fd48d6652ef | 10836db6663f77db9404e1d2502532f3928bef5224306570368ddb4fceb59d15 |
+
+## Notes
+
+- Rows 291 and 292 are the re-decided historical supersedes: the sources are historical witnesses and the successors are the renamed current sections; the rationale correctly carries no unchanged-target assertion and no historical approval, as the settled decision requires.
+- Rows 293-296 are link-only rebases into the documentation portal carrier; the single destination change is the governance page now living at docs/platform/governance.md.
+
+Unresolved: none blocking; only the optional rationale naming suggestion for rows 256 and 257 above.

@@ -1,0 +1,39 @@
+# Review step 10 accounting part 3 (bounded re-review, round 5)
+
+Reviewer: reviewer:claude-session:a4954387@2026-10-14
+Author session: codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16
+Review mode: ordinary
+Request commit: f1f414b02
+Content commit: 62751458b22b47e930dc33b8501d07798b91ace3
+
+## Scope and method
+
+Request: review-request-step10-accounting-03-62751458b.md and sidecar (9 entries, 9 distinct claims, all native predecessor gap rows that supersede into the same-section successor). Rationales unchanged; I recomputed before and after text myself from the 19ca8de23 and HEAD units and compared with step10-sync345-predecessor-reconciliation.json.
+
+Worktree: read-only /home/vantt/projects/forgentX-s8-review at f1f414b02 (git status --short empty at the end). No sensitivity pack was requested or made (ordinary review). I never ran the fgos CLI and never read secrets.local.env. A36: every claim row got the mechanical checks (shard row equals the request after row, full digest recompute by extractor at the commit the row binds, anchors, target ancestry, approval fields against the committed report for reviewed rows, source file sha for retain rows). Because the group is small (36 distinct claims, all Judgment rows) I read every claim row in full in both directions, so all notes start with deep. Seed for the hand recompute of digests: random.Random(20261016).sample(sorted claim ids, 5) gave claim_6516c429, claim_74263242, claim_a6c4d74f, claim_1882794b, claim_2bf5e30d; all five source and target digests (where a target exists) recompute by hand as sha256 of the trimmed line range and equal the rows (14 percent of the rows). Rework rate on deep rows: 1 of 36 (2.8 percent), at or below the 3 percent line, and the group is already fully read, so no extension was needed.
+
+Reruns (mine, scratch outputs only): the 490-test command passed (tests 490, pass 490, fail 0, cancelled 0, skipped 0, TMPDIR in my scratch dir). The consistency command ran unchanged from the worktree root with output under /tmp/fgos-work/review627-x3/ (the script requires /tmp/fgos-work and writes only its --output file; I used a private subdirectory because other reviewers run the same commands): rows 12895, shards 92, generated 836, legacyFindings 0, generatedFindings 0, sourceWitnessLimits 84, ok true; my raw output sha256 equals the committed rawReportSHA256 65c11dbe8f04e5e5 and the interned witnesses expand to my raw output for all 3498 heading comparisons. The embedded read-only scripts were written to the same private subdirectory with only the directory name changed, and inventory, D (three runs), ownership, ownership audit and link replay were run sequentially: D raw files, target-ownership and link-replay outputs are byte identical to the committed ones, D summary equal except the seconds fields.
+
+Anchors: all anchors of this group were checked with list-doc-anchors (35 distinct values in my three groups; the two JSON file-block anchors are not markdown anchors and were checked with the extractor instead).
+
+## Verdict table
+
+| Claim | Verdict | Note | Source digest | Target digest |
+|---|---|---|---|---|
+| claim_0cf686172891ae94a83c1993dab8e1f5 | ok | deep: legacy-payload.md unheaded-block-9 L55-60; before text at 19ca8de23 equals the committed reconciliation record and the current unit equals the target digest 14c1c0ac; the only delta is the legacy transition link cell (destination and label pair restored to ../architecture/legacy-cli-transition.md), one of the three named causes, so the generic cause sentence is true but names all three | 62d185bdf7449fb6b6664260598e25aebbbd33ef6f868b97809bab5c88b28d62 | 14c1c0ac5e7be57002c04a3c0beed23bc3afcb963eb9f6ece2afe2dbcb29e015 |
+| claim_a93bd8da295ccacefb41a101085b898e | ok | deep: source-preservation-audit.md unheaded-block-6 L37-44; delta is three table rows whose label and destination pairs are swapped back (external-provider-protocol, legacy-cli-transition, node-to-rust-component-migration), a link-cell restoration, nothing else added or lost; before and after equal the reconciliation record, digests recompute | 6bad0fe97aa355df9cb36c5956d863ab1a101cfa982bdbe724e4224952c2cd04 | bde5207b515b4be800ca245741a3c524e97067e3c96e39853879a1995d7c2ed0 |
+| claim_12b5a84382034e873673bfc9cb09734c | ok | deep: h-51f5cd7279fd.md unheaded-block-2 L23; the only changed words are the pointer pair bin/fgos.mjs:4373-4380 and 4640-4643 becoming 4414-4417, the evolve code-line citation correction the rationale names; reconciliation record before and after equal the units; digests recompute at 19ca8de23 and HEAD | 25e5d283f7df610fc091c31b8ef48b747a8f5fa54530ff8b1b84a92da3887d09 | 3fab723eb054be1c1007c12f347887b98f4d864a5ae24d84527fa3eca45e3446 |
+| claim_e0fc704182450d959f8452cc09da5f20 | ok | deep: h-02842f76ffd2 spec.md unheaded-block-3 L27-41; delta is bin/fgos.mjs:4373 becoming 4415 in two table cells (evolve citation correction), no other word differs; before text equals the reconciliation record and current text equals the target digest | fb31e222bd67854fd1f83cc81922b2000b03d972159a7c2b390a993e38177894 | 417a56fd2a82950722e3a35187fe79050d444a85b8b55a4106d3e45059fa1b39 |
+| claim_8e43ff23542c1a2386d7ce3d2bf5e30d | ok | deep: h-37aced3896a8 spec.md unheaded-block-5 L74-75; the only delta is bin/fgos.mjs:4373 becoming 4415 (evolve citation correction); digests recomputed by extractor and by hand (seed 20261016) at 19ca8de23 and HEAD | 2e0561425f15bad2d92bbd21e6b7f837523159beb3b8de7fe250e67cbed1a27c | b4abd2b685fe57f6a2616db1b22d4ddc28196279ade0c0307087370b59671964 |
+| claim_5c067230bc1c324d3691dc880edb2578 | ok | deep: h-6df5686d0d54 spec.md unheaded-block-3 L27-34; single changed token bin/fgos.mjs:4373 to 4415 in one table cell, matches the named citation cause; target digest 6ee82017 equals the reconciliation current text | 69f0927ed54ab08aa5fc1e9f43beca35a3ad76e034a98945ea39674b4dc4cb2f | 6ee82017c754d1ebcfed7fcd146851cdd954235737f350c0dbd70a9629516110 |
+| claim_792117ae3e90dcc79bb2522f59773b89 | ok | deep: h-ce5b9771a26a spec.md unheaded-block-2 L23; only change is the pointer pair 4373-4380 and 4640-4643 to 4414-4417 in the correction list; both before and after equal the reconciliation record; anchor and digests ok | f88931593c55ac2afc6ae60cd52a96dda07aa2b673d169b001205b302ef544b4 | 3405ed4f32704ce2e17c155d22d3366a75bdf88bc026b500d66ed59f11314445 |
+| claim_09ce5c9968f21e0b39b0f23170433a9b | ok | deep: h-f34e0d170d89 spec.md unheaded-block-3 L27-77; the only delta is bin/fgos.mjs:4373 to 4415 in the evolve verb bullet (current CLI rejects evolve at that line); digests eb280e49 and 853cf58a recompute | eb280e498fa6fc523bdcb534532de95023a5a82ec1ffaa2be5f5f36a4e618891 | 853cf58afec64a9d7b507305bfadf959cf0f88ef17e3b90b199a85bf3ed71c43 |
+| claim_cb4a2f19d067a329bce233f6e2252729 | ok | deep: work-state README.md unheaded-block-7 L61; sentence-order restoration, the two links swap places so the retained source docs/work-item-lifecycle-vision.md comes first and the platform vision ../vision.md second; I checked both files exist and that the after sentence is the correct one, so the delta is within the named causes | 4452faaea1546e83431eedbc99837a462b2ddce67c1466025d0e3fc185020898 | 4ec367b6fb47b2dc7705caa2b3ae458f74136f697291ee505a2e884233efd793 |
+
+## Notes
+
+1. Counts: 9 ok, 0 rework, 0 hold.
+2. Stale tails such as pending independent review on reviewed rows are the frozen author-time tails of L10-28; the status field is authoritative, so I did not treat them as defects.
+3. Important limit: the unchanged checker reports 0 findings although claim_4eeb2f406288458e61bad21531966ab1 carries a label sentence that is false for its row (see its verdict), so zero checker findings does not prove rationale truth; the checks above are my own recomputation.
+
+Unresolved: none for this group.
