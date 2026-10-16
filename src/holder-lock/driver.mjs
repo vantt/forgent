@@ -206,11 +206,14 @@ export function assertDriverUsable(lockPath, opts = {}) {
   return guarantee;
 }
 
-/** Run `fgos internal state-root` once and return `{ stateRoot, lockRoot, source }`. */
-export function runStateRootRoute({ fgosDir, env = routeEnv() } = {}) {
+/** Run `fgos internal state-root` once and return `{ stateRoot, lockRoot, source }`.
+ * `env` is the environment the root is resolved FROM (the caller's, by
+ * default this process's); it reaches the route minus the invocation
+ * record path, like every other route call. */
+export function runStateRootRoute({ fgosDir, env = process.env } = {}) {
   const bin = hostBin({ fgosDir });
   const res = spawnSync(bin, ['internal', 'state-root', '--protocol', String(PROTOCOL)], {
-    env,
+    env: routeEnv(env),
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
     timeout: ROUTE_CALL_TIMEOUT_MS,
