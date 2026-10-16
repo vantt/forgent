@@ -1,0 +1,769 @@
+{
+  "contentCommit": "4d363436049120ffc9b94dd5269f06a026a827fd",
+  "mechanicalEntries": 81,
+  "deepRequired": [
+    {
+      "entryId": "rationale-01",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-01-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_08f9b4c140ce931a064c131c2bd4e014",
+      "A36": [
+        "changed-last-reviewed-account"
+      ]
+    },
+    {
+      "entryId": "rationale-02",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-01-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_61244b0a84842a2771f7cdb493ebb699",
+      "A36": [
+        "changed-last-reviewed-account"
+      ]
+    },
+    {
+      "entryId": "rationale-03",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-01-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_bb161d438c5c39236401c04ce56ef08d",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-04",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-01-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_fb92651ea85a64c0b6e806926e51a4b2",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-05",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-01-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_ccfcc4bcb24e4f5a31aa634b44e95c7f",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-06",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-01-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_0261291ac389be7c598690a1c40ef56a",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-07",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-01-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_af6831310fe9fcdaa7c8e69902e3c767",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-08",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-01-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_d5dd5fbdb3483914743a14791a5f02a8",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-09",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-01-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_8066684d5e7c7159d6f58caeef26d8cc",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-10",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-01-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_9a5781f0086209a17330035ff0e58638",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-11",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-01-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_80fe1621540d25e5e4f6968bea7e0a0b",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-12",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-01-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_76dfcba31d147e73488ea3abeade7ef1",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-13",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-01-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_080c5cdacf820ed661ab372086ca7e41",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-14",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-01-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_7b3c9cdf89fe70d17f3f526bbdffa385",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-15",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-01-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_04f0605dc840e350f63e53d0e1e96843",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-16",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_b1e44493c254c54dc18efa2088b0018a",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-17",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_c072318ec582affe5e0e6936961fadc4",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-18",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_e960a05c0b656d0dae2cffd3daee5a0d",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-19",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_ac2177776d1a367f2d8e81699b04fc63",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-20",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_5766225be2d76d6239e116a664aec7cf",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-21",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_088af18a5796ed72fe6d33ff2cc5d05c",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-22",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_163988c8973416bdd64781cc7c667f65",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-23",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_4eeb2f406288458e61bad21531966ab1",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-24",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_66f7be3b79ca1fe458ce0416ba1adf89",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-25",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_53ebf4b541ff8f6a2c40e3b95304d6b7",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-26",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_2ae0cd4fc1cf487f7caa4d77d46e9682",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-27",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_239931ca8e26fd3b19bf970e30e2ae4b",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-28",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_c1741ef08c45e88d276f75b668de7452",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-29",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_cd345b6c8a7da2451c2acf04ba8c5292",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-30",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_9a1cd05f74418890fbca8955aa76b378",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-31",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_2c080a72c195a28a1ca8efb0e1187f11",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-32",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_3770d5a0b897fbd8c1393a38c48c3333",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-33",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_96b54d15ac01f69e7df991151c2268be",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-34",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_1ef2bc00c79bc7a40787b62a4943f0df",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-35",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_7aacf43ab14386fce6c4a5a8a0519402",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-36",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_9168d8af609c58932a87918d4a49b8aa",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-37",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_78563a2491b11f7a0b412c5b900a7414",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-38",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_dc8b5bc2507201dd705fcd64deba8224",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-39",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_b532b9a9eb7f76d041c343e2d45bf859",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-40",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_e793bd095f4a872b0bc08757c827359f",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-41",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_7aede254166851de375089f4b0160ca6",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-42",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_39c40cef341e227d936ea768b12ba435",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-43",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_bed90dbb7de2a5782fafcdb4a3d6e0da",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-44",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_3f1a1bbd362edb4ff925ff6de3cbd823",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-45",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_06e68651628b7a731b974ec5c34c9743",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-46",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_1d1eb2ce98dcf1855678b2cf86c2ee67",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-47",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_fefb1bf47fc375b9e83089dc6059326c",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-48",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_7e17ce226062d06a53b940f64b9d5cdb",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-49",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_b2a51d5d39832d330879947bdbbcb227",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-50",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_552ef3d6e22bac10c24cc31e48463d50",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-51",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_224b5f54d28b453f1e3feaced0468399",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-52",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_0686418ae7571d82eade8059c698709d",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-53",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-04-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_099eb566c825967cf35f9397f2d7b947",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "rationale-54",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-04-4d3634360.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_4efee765e5a47fc42f4d9cccc7a53191",
+      "A36": [
+        "whole-direct-section"
+      ]
+    },
+    {
+      "entryId": "carrier-552ef3d6",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-04-4d3634360.md",
+      "kind": "historical-section-preservation",
+      "claimId": "claim_552ef3d6e22bac10c24cc31e48463d50",
+      "A36": [
+        "deep-required",
+        "historical-source-vs-distinct-live-carrier",
+        "complete-line-preservation"
+      ]
+    },
+    {
+      "entryId": "carrier-0686418a",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-04-4d3634360.md",
+      "kind": "historical-section-preservation",
+      "claimId": "claim_0686418ae7571d82eade8059c698709d",
+      "A36": [
+        "deep-required",
+        "historical-source-vs-distinct-live-carrier",
+        "complete-line-preservation"
+      ]
+    },
+    {
+      "entryId": "carrier-099eb566",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-04-4d3634360.md",
+      "kind": "historical-section-preservation",
+      "claimId": "claim_099eb566c825967cf35f9397f2d7b947",
+      "A36": [
+        "deep-required",
+        "historical-source-vs-distinct-live-carrier",
+        "complete-line-preservation"
+      ]
+    },
+    {
+      "entryId": "carrier-4efee765",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-04-4d3634360.md",
+      "kind": "historical-section-preservation",
+      "claimId": "claim_4efee765e5a47fc42f4d9cccc7a53191",
+      "A36": [
+        "deep-required",
+        "historical-source-vs-distinct-live-carrier",
+        "complete-line-preservation"
+      ]
+    },
+    {
+      "entryId": "tool-01",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-04-4d3634360.md",
+      "kind": "tool-test-change",
+      "claimId": null,
+      "A36": [
+        "deep-required",
+        "independent-file-derived-checker-vs-author-regeneration"
+      ]
+    },
+    {
+      "entryId": "tool-02",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-04-4d3634360.md",
+      "kind": "tool-test-change",
+      "claimId": null,
+      "A36": [
+        "deep-required",
+        "independent-file-derived-checker-vs-author-regeneration"
+      ]
+    },
+    {
+      "entryId": "tool-03",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-04-4d3634360.md",
+      "kind": "tool-test-change",
+      "claimId": null,
+      "A36": [
+        "deep-required",
+        "independent-file-derived-checker-vs-author-regeneration"
+      ]
+    },
+    {
+      "entryId": "tool-04",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-04-4d3634360.md",
+      "kind": "tool-test-change",
+      "claimId": null,
+      "A36": [
+        "deep-required",
+        "independent-file-derived-checker-vs-author-regeneration"
+      ]
+    },
+    {
+      "entryId": "tool-05",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-04-4d3634360.md",
+      "kind": "tool-test-change",
+      "claimId": null,
+      "A36": [
+        "deep-required",
+        "independent-file-derived-checker-vs-author-regeneration"
+      ]
+    },
+    {
+      "entryId": "tool-06",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-04-4d3634360.md",
+      "kind": "tool-test-change",
+      "claimId": null,
+      "A36": [
+        "deep-required",
+        "independent-file-derived-checker-vs-author-regeneration"
+      ]
+    },
+    {
+      "entryId": "tool-07",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-04-4d3634360.md",
+      "kind": "reproduction-command-change",
+      "claimId": null,
+      "A36": [
+        "deep-required",
+        "independent-file-derived-checker-vs-author-regeneration"
+      ]
+    },
+    {
+      "entryId": "tool-08",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-04-4d3634360.md",
+      "kind": "reproduction-command-change",
+      "claimId": null,
+      "A36": [
+        "deep-required",
+        "independent-file-derived-checker-vs-author-regeneration"
+      ]
+    },
+    {
+      "entryId": "tool-09",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-04-4d3634360.md",
+      "kind": "reproduction-command-change",
+      "claimId": null,
+      "A36": [
+        "deep-required",
+        "independent-file-derived-checker-vs-author-regeneration"
+      ]
+    },
+    {
+      "entryId": "tool-10",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-04-4d3634360.md",
+      "kind": "reproduction-command-change",
+      "claimId": null,
+      "A36": [
+        "deep-required",
+        "independent-file-derived-checker-vs-author-regeneration"
+      ]
+    },
+    {
+      "entryId": "tool-11",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-04-4d3634360.md",
+      "kind": "reproduction-command-change",
+      "claimId": null,
+      "A36": [
+        "deep-required",
+        "independent-file-derived-checker-vs-author-regeneration"
+      ]
+    },
+    {
+      "entryId": "native-001",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-04-4d3634360.md",
+      "kind": "native-transition",
+      "claimId": "claim_d5e5139015078092355b369260cee249",
+      "A36": [
+        "deep-required",
+        "native-identity-conservation"
+      ]
+    },
+    {
+      "entryId": "native-002",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-04-4d3634360.md",
+      "kind": "native-transition",
+      "claimId": "claim_982fa232e8267691441436f1d7d48b22",
+      "A36": [
+        "deep-required",
+        "native-identity-conservation"
+      ]
+    },
+    {
+      "entryId": "native-003",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-04-4d3634360.md",
+      "kind": "native-transition",
+      "claimId": "claim_f97b02893c6b8f2554062dfea5f5df2c",
+      "A36": [
+        "deep-required",
+        "native-identity-conservation"
+      ]
+    },
+    {
+      "entryId": "native-004",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-05-4d3634360.md",
+      "kind": "native-transition",
+      "claimId": "claim_847f0e0c56a6695d4097fb1e537ea1bc",
+      "A36": [
+        "deep-required",
+        "native-identity-conservation"
+      ]
+    },
+    {
+      "entryId": "native-005",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-05-4d3634360.md",
+      "kind": "native-transition",
+      "claimId": "claim_ee99b0951090e8a9aeabd89bf2982f05",
+      "A36": [
+        "deep-required",
+        "native-identity-conservation"
+      ]
+    },
+    {
+      "entryId": "native-006",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-05-4d3634360.md",
+      "kind": "native-transition",
+      "claimId": "claim_90fb9245a91d2389ba25704be807be20",
+      "A36": [
+        "deep-required",
+        "native-identity-conservation"
+      ]
+    },
+    {
+      "entryId": "native-007",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-05-4d3634360.md",
+      "kind": "native-transition",
+      "claimId": "claim_c321de74b624d639e56cb4dc77169655",
+      "A36": [
+        "deep-required",
+        "native-identity-conservation"
+      ]
+    },
+    {
+      "entryId": "native-008",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-05-4d3634360.md",
+      "kind": "native-transition",
+      "claimId": "claim_d8a2c7490367e214b55e86913275bd1b",
+      "A36": [
+        "deep-required",
+        "native-identity-conservation"
+      ]
+    },
+    {
+      "entryId": "native-009",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-05-4d3634360.md",
+      "kind": "native-transition",
+      "claimId": "claim_6598b0201d76ee564e11e9fd1f6da0a2",
+      "A36": [
+        "deep-required",
+        "native-identity-conservation"
+      ]
+    },
+    {
+      "entryId": "native-010",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-05-4d3634360.md",
+      "kind": "native-transition",
+      "claimId": "claim_0876da817dfa1682359c8d1823d92452",
+      "A36": [
+        "deep-required",
+        "native-identity-conservation"
+      ]
+    },
+    {
+      "entryId": "native-011",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-05-4d3634360.md",
+      "kind": "native-transition",
+      "claimId": "claim_9e9010f284010e4ee3fbc67deed8e8f1",
+      "A36": [
+        "deep-required",
+        "native-identity-conservation"
+      ]
+    },
+    {
+      "entryId": "native-012",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-05-4d3634360.md",
+      "kind": "native-transition",
+      "claimId": "claim_4494775f2688c7b3ef05ffb458dd628a",
+      "A36": [
+        "deep-required",
+        "native-identity-conservation"
+      ]
+    }
+  ],
+  "producerSeed": null,
+  "producerVerdicts": null,
+  "reviewerObligation": "Reviewer independently chooses and records seed/sample/verdicts under A36; marked deep lists do not waive full mechanical review."
+}

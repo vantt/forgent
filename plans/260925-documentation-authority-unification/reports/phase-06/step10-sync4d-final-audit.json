@@ -1,0 +1,118 @@
+{
+  "contentCommit": "4d363436049120ffc9b94dd5269f06a026a827fd",
+  "assignment": "unit-run-1792127410542-c10a1e4e/producer/1",
+  "authorSession": "codex-session:unit-run-1792127410542-c10a1e4e@2026-10-16",
+  "nativeProof": "step10-sync4d-native-proof.json",
+  "singleSync": true,
+  "singleCompactPersistence": true,
+  "inventoryRecovery": {
+    "seconds": 642.0113508300781,
+    "initialTransportError": {
+      "code": "ERR_OUT_OF_RANGE",
+      "bytes": 2163103851,
+      "limit": 2147483647
+    },
+    "inventoryAttempts": 2,
+    "completeSavedInventories": 1
+  },
+  "registrySHA256": "3ead3b5244f88f956f2e9a535d3f93f9c4f352ecea6c1bf219690a2cb4c25abc",
+  "knownIDLoss": 0,
+  "nativeTransitions": 12,
+  "bindingsChecked": 9210,
+  "rebinds": 0,
+  "D": [
+    {
+      "label": "both",
+      "seconds": 90.063,
+      "fatal": 0
+    },
+    {
+      "label": "identity",
+      "seconds": 90.286,
+      "fatal": 0
+    },
+    {
+      "label": "phase02",
+      "seconds": 92.421,
+      "fatal": 0
+    }
+  ],
+  "independent": {
+    "rows": 12895,
+    "shards": 92,
+    "findings": 0,
+    "historicalWitnessLimits": 70
+  },
+  "tests": {
+    "pass": 500,
+    "fail": 0,
+    "method": "490 document-tool tests plus 10 verify-phase-02/next-doc-id tests, same env-unset/TMPDIR grant"
+  },
+  "ownership": {
+    "newActivePairs": 0,
+    "nativeDuplicates": 0,
+    "targetDrift": 0,
+    "referenceGroups": 254
+  },
+  "linkReplay": {
+    "original": 366,
+    "later": 98,
+    "round3": 4,
+    "findings": 0
+  },
+  "A": {
+    "historicalOffenders": [
+      "plans/260925-documentation-authority-unification/phase-06-transform-all-platform-areas-as-candidate-material.md",
+      "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md",
+      "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+      "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.json",
+      "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.md",
+      "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/open-questions.md",
+      "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-07-draft.md",
+      "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-08-draft.md",
+      "scripts/doc-rationale-facts.mjs"
+    ],
+    "historicalEqual": false,
+    "newWorkingViolations": [],
+    "ok": false
+  },
+  "B": true,
+  "H": 0,
+  "I": {
+    "equal": false,
+    "links": [
+      "docs/platform/**",
+      "docs/platform/<area",
+      "docs/platform/README.md",
+      "docs/platform/packaging-distribution/README.md",
+      "docs/platform/packaging-distribution/vision.md",
+      "docs/platform/session-identity/spec.md"
+    ],
+    "equalToHEAD": true,
+    "frozenBaselineUnchanged": true
+  },
+  "package": {
+    "index": "review-request-step10-index-4d3634360.md",
+    "entries": 81,
+    "files": 5,
+    "counts": [
+      15,
+      19,
+      18,
+      20,
+      9
+    ],
+    "maxBytes": 389933,
+    "committedBeforeAfterEquality": true,
+    "producerSeedOrVerdict": false
+  },
+  "scope": "Only plan files changed; docs/scripts/test bytes untouched. No CLI, git writes, workspace .fgos writes, protected edits or baseline edits. Runner owns commit.",
+  "limitations": [
+    "Raw A historical allowlist comparison false after new doc-rationale-facts.mjs was committed; zero working scope violations. Lead reconciliation remains open.",
+    "I retains historical baseline delta; current reader links equal content pin and frozen baseline unchanged.",
+    "Broad-suite failures are Lead-confirmed environment/pre-existing; both files byte-identical to main.",
+    "Independent ordinary review/global E/A34/truth/consumer/cutover/checkpoint/scorecard remain open; package completion is not closure.",
+    "No callable MDView tool; external CLI registration would exceed assignment write scope."
+  ],
+  "createdAt": "2026-10-16T05:38:55.378730+00:00"
+}

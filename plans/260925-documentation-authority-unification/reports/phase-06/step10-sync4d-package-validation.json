@@ -1,0 +1,16 @@
+{
+  "entries": 81,
+  "unique": true,
+  "parts": 5,
+  "counts": [
+    15,
+    19,
+    18,
+    20,
+    9
+  ],
+  "maxBytes": 389933,
+  "all54BeforeAfterCommittedEquality": true,
+  "producerSeeds": false,
+  "producerVerdicts": false
+}

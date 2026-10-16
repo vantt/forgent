@@ -1,0 +1,8 @@
+{
+  "byteIdenticalToMain": {
+    "test/scripts/run-tests.test.mjs": true,
+    "test/scripts/test-select-mutate.test.mjs": true
+  },
+  "leadEvidence": "Lead assignment states mutant integration also fails on main; fixture-root test fails where expected environment variable is unset. Environment/pre-existing, not blockers. Broad suite was not rerun by package turn.",
+  "A": "Raw unchanged A historical allowlist comparison is false: eight prior disclosed paths plus scripts/doc-rationale-facts.mjs newly committed at 4d3634360; zero current working violations. Native gate/checker/extractor/vocabulary/baseline bytes remain unchanged. Lead allowlist reconciliation remains open."
+}

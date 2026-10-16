@@ -1,0 +1,12 @@
+node:internal/crypto/hash:148
+  if (!this[kHandle].update(data, encoding))
+                     ^
+
+RangeError: data is too long
+    at Hash.update (node:internal/crypto/hash:148:22)
+    at readInventory (file:///tmp/fgos-work/package4d/verify.mjs:2:365)
+    at file:///tmp/fgos-work/package4d/verify.mjs:4:319 {
+  code: 'ERR_OUT_OF_RANGE'
+}
+
+Node.js v24.18.0

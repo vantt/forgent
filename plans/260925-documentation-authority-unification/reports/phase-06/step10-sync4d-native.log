@@ -1,0 +1,15 @@
+Native carry start 2026-10-16T05:10:51.167Z 62751458b22b47e930dc33b8501d07798b91ace3 99555
+Persisted compact once 2026-10-16T05:10:54.750Z {"fromCommit":"62751458b22b47e930dc33b8501d07798b91ace3","toCommit":"4d363436049120ffc9b94dd5269f06a026a827fd","oldUnits":91374,"newUnits":91386,"kept":91000,"paired":374,"moved":0,"editedKept":0,"added":12,"gaps":0,"retired":0,"retiredDocuments":0}
+Generated 2026-10-16T05:22:07.147Z 4486 91386
+node:fs:905
+    validateOffsetLengthWrite(offset, length, buffer.byteLength);
+    ^
+
+RangeError [ERR_OUT_OF_RANGE]: The value of "length" is out of range. It must be >= 0 && <= 2147483647. Received 2163103851
+    at Object.writeSync (node:fs:905:5)
+    at Object.writeFileSync (node:fs:2442:26)
+    at file:///tmp/fgos-work/package4d/sync.mjs:7:174 {
+  code: 'ERR_OUT_OF_RANGE'
+}
+
+Node.js v24.18.0

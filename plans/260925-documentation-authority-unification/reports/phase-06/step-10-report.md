@@ -1,3 +1,35 @@
+# Changed-only package at 4d3634360 complete — independent review next
+
+Assignment `unit-run-1792127410542-c10a1e4e/producer/1`; Package Author session `codex-session:unit-run-1792127410542-c10a1e4e@2026-10-16`. Content/SYNC `4d363436049120ffc9b94dd5269f06a026a827fd`; preceding merge `1d92a7229` changed plan files only. No additional merge or docs-source delta. Runner commits; Phase 6 remains open.
+
+One background native carry-forward and **one compact registry persistence**, **1355.558s complete sync/recovery span** including genuine inventory generation; carry/persistence alone **3.583s**. Known IDs **99,555 → 99,567**, zero loss; **4,486 files / 91,386 active units**, exact active tuple equality. **12 added native units**, zero new gaps/retirements; all twelve belong to the four historical carriers. Initial generation completed, but its 2,163,103,851-byte transport exceeded the single-call Node I/O limit and exited1. The sole inventory-only retry took **642.011s**, using lossless16MiB chunk writes/reads; two complete generations /one saved genuine inventory, **one carry-forward /one persistence**. The first reader also stopped before D at the same2GiB limit in Hash.update; hashing is now chunked too, without another inventory generation. [Reader transport log](step10-sync4d-D-transport-error.log). No registry re-sync occurred. [Recovery log](step10-sync4d-inventory-recovery.log). Registry SHA256 `3ead3b5244f88f956f2e9a535d3f93f9c4f352ecea6c1bf219690a2cb4c25abc`. [Native proof](step10-sync4d-native-proof.json), [own log](step10-sync4d-native.log), [all transitions](step10-sync4d-native-transitions.json).
+
+**9,210 live claim/gap bindings; zero drift / zero content rebinds / zero native --rebind calls.** Actual drift alone would use the existing content-based helper and reopen pending; no positional guess or approval carry occurred. Historical collections are included in the independent audit. [Binding scan](step10-sync4d-rebindings.json).
+
+**D zero fatal against both priors together and each separately.** The unchanged native checker reads the complete genuine inventory serialized via v8; no omitted fields or manufactured inventory. Both priors are the existing identity and Phase 02 registries. [D summary](step10-sync4d-D-summary.json), [own log](step10-sync4d-native-D.log).
+
+| Priors | Seconds | Fatal findings |
+|---|---:|---:|
+| both | 90.063 | 0 |
+| identity | 90.286 | 0 |
+| phase02 | 92.421 | 0 |
+
+**Independent checker: all 12,895 rows / 92 shards, zero findings**; 718 structured source citations, 261 section assertions, 719 link assertions. **70 historical source-witness limits** remain enumerated. This checker derives facts from actual files/git witnesses independently of the renderer; generator agreement is not substituted for truth. [All-shard audit](step10-sync4d-independent-consistency.json).
+
+**Ownership: zero new active-source collision pairs, zero native duplicate target identities, zero target digest drift; 254 historical/reference groups enumerated. Link replay 366+98+4: zero findings.** **500/500 document-tool tests pass** with `env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work` (490+10 separate targeted invocations). [Ownership](step10-sync4d-target-ownership.json), [replay](step10-sync4d-link-replay.json), [tests](step10-sync4d-tests.log).
+
+**Raw A is false, disclosed rather than repaired:** the unchanged historical allowlist comparison now sees the eight previous disclosed paths plus `scripts/doc-rationale-facts.mjs`, newly committed at the content pin. Current working scope violations: zero. The new helper is within the L10-33/L10-34 tool/test re-review; Lead allowlist reconciliation remains open before A/global green. No allowlist, checker or baseline was changed. B protected bytes pass; H has zero candidate findings/unresolved links; I frozen baseline bytes are unchanged and current reader routes equal the content pin, retaining the historical Session Identity baseline delta. [Checks](step10-sync4d-checks.json).
+
+Lead's broad-suite diagnosis is recorded: `test/scripts/run-tests.test.mjs` and `test/scripts/test-select-mutate.test.mjs` are verified byte-identical to main. The mutant integration also fails on main; the fixture-root failure depends on the expected environment variable being unset. Those two failures are **environment/pre-existing, not package blockers**; no broad-suite rerun or blanket npm-test-green claim. [Environment provenance](step10-sync4d-environment.json).
+
+**ONE bounded changed-only set: [index](review-request-step10-index-4d3634360.md), 81 entries / 5 request files**, counts **15, 19, 18, 20, 9**, max **389,933 bytes**, each ≤60 entries /400,000 bytes. Scope exactly **54 regenerated rationales, four complete historical-section preservation changes, six classifier/checker/doc-binding-repair/test changes, five reproduction-command changes and 12 resulting native transitions**. Both before and after of all 54 rationales are loaded from their actual commits and mechanically checked, not copied from intermediate edit-log approval metadata. Original Author sessions and Package Author session are explicit in every header. Unchanged frozen rationales and reviewed-application populations are not resubmitted. Native overlays must bind to the runner package commit before ordinary verdicts. [Validation](step10-sync4d-package-validation.json).
+
+**[A36 deep list](step10-sync4d-A36.json) marks all 81 entries**; every entry requires mechanical verification. Reviewer independently chooses and records seeds, sample IDs and ordinary verdicts. Producer chooses none. Exact scratch-only commands and memory note appear in every request header and the index. [Reproduction manifest](step10-sync4d-reproduction.json) materializes only read-only scripts; independent audit needs about3GiB heap; full native D and optional inventory replay use4GiB/16MiB semi-space. Heavy replay commands run sequentially and never re-sync or persist the registry. All outputs/fixtures stay under `/tmp/fgos-work/`.
+
+No remaining package execution dependency. **Independent ordinary review and raw A allowlist reconciliation remain open**, alongside global E/A34/current-truth/consumer/cutover/checkpoint/scorecard obligations. D is structural conservation evidence, not global E/closure. No docs/source/code/test/protected-tool/vocabulary/extractor/baseline bytes changed; no fgOS CLI, git writes, workspace `.fgos` write, authority flip, alias adoption or lifecycle call. MDView MCP is unavailable; external CLI database registration exceeds the grant, so no preview URL. [Final audit](step10-sync4d-final-audit.json).
+
+---
+
 # Step 10 round-5 author corrections complete — package next
 
 Assignment `unit-run-1792126341980-e0c35701/producer/1`; input `1d92a7229`; reviewed content `62751458b`, request `f1f414b02`, reports `4901bf25c`. Every29 Notes/Concerns read. Lead L10-33/L10-34 recorded under A42. Merge adds plans only: no docs-source delta requiring A31 re-carry.

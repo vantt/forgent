@@ -1,0 +1,7 @@
+Native proof {"contentCommit":"4d363436049120ffc9b94dd5269f06a026a827fd","syncSeconds":1355.5577136230468,"inventoryRecoverySeconds":642.0113508300781,"nativeCarryAndPersistenceSeconds":3.583,"initialInventoryGenerationSeconds":672.397,"initialProcessExit":1,"initialGenerationCompleted":true,"initialTransportError":{"code":"ERR_OUT_OF_RANGE","bytes":2163103851,"limit":2147483647},"inventoryAttempts":2,"completeInventoryGenerations":2,"completeSavedInventories":1,"carryForwardCount":1,"persistenceCount":1,"items":4486,"claims":91386,"knownBefore":99555,"knownAfter":99567,"zeroKnownIDLoss":true,"activeTupleEquality":true,"compact":true,"registryBytes":62185799,"registrySHA256":"3ead3b5244f88f956f2e9a535d3f93f9c4f352ecea6c1bf219690a2cb4c25abc","carryForward":{"fromCommit":"62751458b22b47e930dc33b8501d07798b91ace3","toCommit":"4d363436049120ffc9b94dd5269f06a026a827fd","oldUnits":91374,"newUnits":91386,"kept":91000,"paired":374,"moved":0,"editedKept":0,"added":12,"gaps":0,"retired":0,"retiredDocuments":0},"newUnits":12,"newGaps":0,"newRetired":0,"inventoryTransportSHA256":"5d4117864cfaf905da0db4671793372fb98f5e25985d226156b86ef7f7f5af09","inventoryTransportBytes":2163355241,"transport":"Lossless full v8 bytes, 16 MiB chunk I/O; no omitted fields or overlay inventory."}
+D start both 2026-10-16T05:34:13.494Z
+D result both 0 [] 2026-10-16T05:35:43.557Z
+D start identity 2026-10-16T05:35:43.558Z
+D result identity 0 [] 2026-10-16T05:37:13.844Z
+D start phase02 2026-10-16T05:37:13.845Z
+D result phase02 0 [] 2026-10-16T05:38:46.266Z

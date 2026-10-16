@@ -1,0 +1,319 @@
+# Bounded changed-only re-review at 4d3634360
+
+Author session: `codex-session:unit-run-1792126341980-e0c35701@2026-10-16` (rationales, carriers, tools/tests and original reproduction changes).
+Package Author session: `codex-session:unit-run-1792127410542-c10a1e4e@2026-10-16` (native sync, pending rebinds and package evidence).
+Content commit: `4d363436049120ffc9b94dd5269f06a026a827fd`. Comparison: `1d92a7229af9050b3ce57729c8652b8a836e93b6`.
+Scope: only 54 regenerated rationales, four historical-section preservation changes, classifier/independent-checker/doc-binding-repair and tests, reproduction command changes, and resulting native/binding transitions. Historical wider request sets are references, not this submission. Native/rebind package overlays must bind to the runner package commit before ordinary verdicts.
+
+A36: every entry requires mechanical binding/blob checks; deep-required entries are marked individually, including whole sections, unequal digests, partial carries, historical carriers, tools and native transitions. Reviewer chooses and records seeds, sample IDs and verdicts independently under A36; producer chooses none. Existing global E/A34/truth/consumer/cutover/checkpoint/scorecard obligations remain open.
+
+Scratch-only reproduce commands (run heavy steps sequentially):
+
+Memory note: Run heavy commands sequentially. Independent audit needs approximately 3 GiB heap; full native inventory and D use 4 GiB old-space/16 MiB semi-space. Lossless 16 MiB chunk I/O handles the inventory exceeding the Node 2 GiB single-call limit. Inventory replay is optional, expensive, and never repeats carry-forward or registry persistence. All reproduce outputs and temporary test fixtures stay under /tmp/fgos-work.
+
+```sh
+mkdir -p /tmp/fgos-work/review4d
+python3 - <<'PYREPRO'
+import json,pathlib
+r=pathlib.Path('plans/260925-documentation-authority-unification/reports/phase-06');o=pathlib.Path('/tmp/fgos-work/review4d');o.mkdir(parents=True,exist_ok=True)
+for n,s in json.loads((r/'step10-sync4d-reproduction.json').read_text())['readOnlyScripts'].items():(o/n).write_text(s)
+PYREPRO
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work NODE_OPTIONS=--max-old-space-size=3072 python3 plans/260925-documentation-authority-unification/reports/phase-06/step10-sync287-reproduce.py consistency --output /tmp/fgos-work/review4d/independent.json
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node /tmp/fgos-work/review4d/ownership.mjs --output-dir /tmp/fgos-work/review4d
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node /tmp/fgos-work/review4d/audit-ownership.mjs --output-dir /tmp/fgos-work/review4d
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work python3 /tmp/fgos-work/review4d/replay.py --output-dir /tmp/fgos-work/review4d
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node /tmp/fgos-work/review4d/checks.mjs --output-dir /tmp/fgos-work/review4d
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/scripts/doc-*.test.mjs test/scripts/check-doc-*.test.mjs test/scripts/generate-doc-inventory.test.mjs test/scripts/list-doc-anchors.test.mjs test/scripts/verify-phase-02.test.mjs test/scripts/next-doc-id.test.mjs
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --max-old-space-size=4096 --max-semi-space-size=16 /tmp/fgos-work/review4d/inventory-readonly.mjs --output-dir /tmp/fgos-work/review4d
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --max-old-space-size=4096 --max-semi-space-size=16 /tmp/fgos-work/review4d/verify-readonly.mjs --output-dir /tmp/fgos-work/review4d
+```
+
+Entries: 9
+
+## native-004
+
+```json
+{
+  "entryId": "native-004",
+  "kind": "native-transition",
+  "authorSession": "codex-session:unit-run-1792127410542-c10a1e4e@2026-10-16",
+  "currentContentCommit": "4d363436049120ffc9b94dd5269f06a026a827fd",
+  "packageOverlay": true,
+  "deepRequired": true,
+  "A36": [
+    "deep-required",
+    "native-identity-conservation"
+  ],
+  "claimId": "claim_847f0e0c56a6695d4097fb1e537ea1bc",
+  "before": null,
+  "after": {
+    "kind": "units",
+    "sourcePath": "docs/platform/runner/spec.md",
+    "unitDigest": "77848f3356fff5dd6fc2061dce83971e320dc5ec1ba14deb17f8f67043efa00a",
+    "identityFingerprint": "1f7cd60ee596859e59ac9a48da035c4c253bb060ce98f0330c72ce8fca0a3b2e",
+    "claimId": "claim_847f0e0c56a6695d4097fb1e537ea1bc",
+    "sourceAnchor": "historical-source-section-552ef3d6",
+    "unitKind": "heading",
+    "sourceUnitDigest": "d7474ce22b2aacd3fa972c85a7ab553f0712b9959468763ab90f1bbf91621899",
+    "claimKind": "specification",
+    "status": "future",
+    "origin": "added-since-62751458b22b47e930dc33b8501d07798b91ace3"
+  }
+}
+```
+
+## native-005
+
+```json
+{
+  "entryId": "native-005",
+  "kind": "native-transition",
+  "authorSession": "codex-session:unit-run-1792127410542-c10a1e4e@2026-10-16",
+  "currentContentCommit": "4d363436049120ffc9b94dd5269f06a026a827fd",
+  "packageOverlay": true,
+  "deepRequired": true,
+  "A36": [
+    "deep-required",
+    "native-identity-conservation"
+  ],
+  "claimId": "claim_ee99b0951090e8a9aeabd89bf2982f05",
+  "before": null,
+  "after": {
+    "kind": "units",
+    "sourcePath": "docs/platform/runner/spec.md",
+    "unitDigest": "3f04a25770175d51f86d82739e8ba1134f1395a17dd235a34e5a3c5517c8a757",
+    "identityFingerprint": "3f04a25770175d51f86d82739e8ba1134f1395a17dd235a34e5a3c5517c8a757",
+    "claimId": "claim_ee99b0951090e8a9aeabd89bf2982f05",
+    "sourceAnchor": "unheaded-block-10",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "28d0009fb157647913ed15eaaa21f78a13218cffb6610cda0f0b0d223a61fed6",
+    "claimKind": "specification",
+    "status": "future",
+    "origin": "added-since-62751458b22b47e930dc33b8501d07798b91ace3"
+  }
+}
+```
+
+## native-006
+
+```json
+{
+  "entryId": "native-006",
+  "kind": "native-transition",
+  "authorSession": "codex-session:unit-run-1792127410542-c10a1e4e@2026-10-16",
+  "currentContentCommit": "4d363436049120ffc9b94dd5269f06a026a827fd",
+  "packageOverlay": true,
+  "deepRequired": true,
+  "A36": [
+    "deep-required",
+    "native-identity-conservation"
+  ],
+  "claimId": "claim_90fb9245a91d2389ba25704be807be20",
+  "before": null,
+  "after": {
+    "kind": "units",
+    "sourcePath": "docs/platform/runner/spec.md",
+    "unitDigest": "93eecba606a33431350a611bd22fa7f516ce5d825057520f6a067f1d029d4aec",
+    "identityFingerprint": "93eecba606a33431350a611bd22fa7f516ce5d825057520f6a067f1d029d4aec",
+    "claimId": "claim_90fb9245a91d2389ba25704be807be20",
+    "sourceAnchor": "unheaded-block-11",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "75c5c7028e9031320b63d89f672072416ee952498f10887da01e2bbef4848ed3",
+    "claimKind": "contract",
+    "status": "future",
+    "origin": "added-since-62751458b22b47e930dc33b8501d07798b91ace3"
+  }
+}
+```
+
+## native-007
+
+```json
+{
+  "entryId": "native-007",
+  "kind": "native-transition",
+  "authorSession": "codex-session:unit-run-1792127410542-c10a1e4e@2026-10-16",
+  "currentContentCommit": "4d363436049120ffc9b94dd5269f06a026a827fd",
+  "packageOverlay": true,
+  "deepRequired": true,
+  "A36": [
+    "deep-required",
+    "native-identity-conservation"
+  ],
+  "claimId": "claim_c321de74b624d639e56cb4dc77169655",
+  "before": null,
+  "after": {
+    "kind": "units",
+    "sourcePath": "docs/platform/runner/spec.md",
+    "unitDigest": "06dd4d583816ca7178e9106eade800dadf1087ef98c515b859af17290572b623",
+    "identityFingerprint": "06dd4d583816ca7178e9106eade800dadf1087ef98c515b859af17290572b623",
+    "claimId": "claim_c321de74b624d639e56cb4dc77169655",
+    "sourceAnchor": "unheaded-block-12",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "26cd8fbf0cce5fac3315235ebd00984cd4cc8a7ce80bac342e56f816848a7270",
+    "claimKind": "specification",
+    "status": "future",
+    "origin": "added-since-62751458b22b47e930dc33b8501d07798b91ace3"
+  }
+}
+```
+
+## native-008
+
+```json
+{
+  "entryId": "native-008",
+  "kind": "native-transition",
+  "authorSession": "codex-session:unit-run-1792127410542-c10a1e4e@2026-10-16",
+  "currentContentCommit": "4d363436049120ffc9b94dd5269f06a026a827fd",
+  "packageOverlay": true,
+  "deepRequired": true,
+  "A36": [
+    "deep-required",
+    "native-identity-conservation"
+  ],
+  "claimId": "claim_d8a2c7490367e214b55e86913275bd1b",
+  "before": null,
+  "after": {
+    "kind": "units",
+    "sourcePath": "docs/platform/runner/spec.md",
+    "unitDigest": "1094f99866ee72fdd8a9b9b9e5d77996700afb853e229136cf1dfb301c4a780d",
+    "identityFingerprint": "1094f99866ee72fdd8a9b9b9e5d77996700afb853e229136cf1dfb301c4a780d",
+    "claimId": "claim_d8a2c7490367e214b55e86913275bd1b",
+    "sourceAnchor": "unheaded-block-13",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "16efa16fda7dbea715e869140f384909207de259f0e88effa0b3ad2d106f2798",
+    "claimKind": "specification",
+    "status": "future",
+    "origin": "added-since-62751458b22b47e930dc33b8501d07798b91ace3"
+  }
+}
+```
+
+## native-009
+
+```json
+{
+  "entryId": "native-009",
+  "kind": "native-transition",
+  "authorSession": "codex-session:unit-run-1792127410542-c10a1e4e@2026-10-16",
+  "currentContentCommit": "4d363436049120ffc9b94dd5269f06a026a827fd",
+  "packageOverlay": true,
+  "deepRequired": true,
+  "A36": [
+    "deep-required",
+    "native-identity-conservation"
+  ],
+  "claimId": "claim_6598b0201d76ee564e11e9fd1f6da0a2",
+  "before": null,
+  "after": {
+    "kind": "units",
+    "sourcePath": "docs/platform/runner/spec.md",
+    "unitDigest": "92199296863d6e6cb29bfed46e4c686b1f337aa16a3c8587f23f5ad44e1a50e4",
+    "identityFingerprint": "92199296863d6e6cb29bfed46e4c686b1f337aa16a3c8587f23f5ad44e1a50e4",
+    "claimId": "claim_6598b0201d76ee564e11e9fd1f6da0a2",
+    "sourceAnchor": "unheaded-block-6",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "a271942c1834e8f5b9f8a48c5efc501e69d2fa92ef572059f14b24a91f50ed30",
+    "claimKind": "specification",
+    "status": "future",
+    "origin": "added-since-62751458b22b47e930dc33b8501d07798b91ace3"
+  }
+}
+```
+
+## native-010
+
+```json
+{
+  "entryId": "native-010",
+  "kind": "native-transition",
+  "authorSession": "codex-session:unit-run-1792127410542-c10a1e4e@2026-10-16",
+  "currentContentCommit": "4d363436049120ffc9b94dd5269f06a026a827fd",
+  "packageOverlay": true,
+  "deepRequired": true,
+  "A36": [
+    "deep-required",
+    "native-identity-conservation"
+  ],
+  "claimId": "claim_0876da817dfa1682359c8d1823d92452",
+  "before": null,
+  "after": {
+    "kind": "units",
+    "sourcePath": "docs/platform/runner/spec.md",
+    "unitDigest": "0281188e0e641db30ee0578e3756c344dc917cad5b1a9092ad23b707f971c6f0",
+    "identityFingerprint": "0281188e0e641db30ee0578e3756c344dc917cad5b1a9092ad23b707f971c6f0",
+    "claimId": "claim_0876da817dfa1682359c8d1823d92452",
+    "sourceAnchor": "unheaded-block-7",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "9216be2c3b07fb41d3f5f27307dd16239899a8f1a1207932bd4af7445a38bcdf",
+    "claimKind": "specification",
+    "status": "future",
+    "origin": "added-since-62751458b22b47e930dc33b8501d07798b91ace3"
+  }
+}
+```
+
+## native-011
+
+```json
+{
+  "entryId": "native-011",
+  "kind": "native-transition",
+  "authorSession": "codex-session:unit-run-1792127410542-c10a1e4e@2026-10-16",
+  "currentContentCommit": "4d363436049120ffc9b94dd5269f06a026a827fd",
+  "packageOverlay": true,
+  "deepRequired": true,
+  "A36": [
+    "deep-required",
+    "native-identity-conservation"
+  ],
+  "claimId": "claim_9e9010f284010e4ee3fbc67deed8e8f1",
+  "before": null,
+  "after": {
+    "kind": "units",
+    "sourcePath": "docs/platform/runner/spec.md",
+    "unitDigest": "3b6fd344b75a59794cfc670892719d642f630568235df187e26275e781967c4f",
+    "identityFingerprint": "3b6fd344b75a59794cfc670892719d642f630568235df187e26275e781967c4f",
+    "claimId": "claim_9e9010f284010e4ee3fbc67deed8e8f1",
+    "sourceAnchor": "unheaded-block-8",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "4747175709c4cc34d23b4b59027e00fe31f95728f8f7791d33696ae2cd660861",
+    "claimKind": "specification",
+    "status": "future",
+    "origin": "added-since-62751458b22b47e930dc33b8501d07798b91ace3"
+  }
+}
+```
+
+## native-012
+
+```json
+{
+  "entryId": "native-012",
+  "kind": "native-transition",
+  "authorSession": "codex-session:unit-run-1792127410542-c10a1e4e@2026-10-16",
+  "currentContentCommit": "4d363436049120ffc9b94dd5269f06a026a827fd",
+  "packageOverlay": true,
+  "deepRequired": true,
+  "A36": [
+    "deep-required",
+    "native-identity-conservation"
+  ],
+  "claimId": "claim_4494775f2688c7b3ef05ffb458dd628a",
+  "before": null,
+  "after": {
+    "kind": "units",
+    "sourcePath": "docs/platform/runner/spec.md",
+    "unitDigest": "a012b5f271deee5ee67eb72a82b0cb0583ecee6dd15caac036c34e2e0e9e0589",
+    "identityFingerprint": "a012b5f271deee5ee67eb72a82b0cb0583ecee6dd15caac036c34e2e0e9e0589",
+    "claimId": "claim_4494775f2688c7b3ef05ffb458dd628a",
+    "sourceAnchor": "unheaded-block-9",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "30ad6c3c321a462677fbc037c612520d07495a445dd6a82810f85c1c30d591a9",
+    "claimKind": "specification",
+    "status": "future",
+    "origin": "added-since-62751458b22b47e930dc33b8501d07798b91ace3"
+  }
+}
+```

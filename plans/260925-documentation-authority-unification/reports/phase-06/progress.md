@@ -1,3 +1,33 @@
+# Changed-only package at 4d3634360 complete — independent review next
+
+Assignment unit-run-1792127410542-c10a1e4e/producer/1. **One native sync 1355.558s /one compact persistence; known99,555→99,567, zero loss;4,486 files/91,386 units, active tuple equality;12 additions, zero gaps/retirements.** Inventory-only recovery 642.011s after2GiB I/O-limit failure; one carry/persistence, no re-sync. **9,210 bindings, zero drift/rebinds. D zero fatal both priors together/each. Independent checker12,895 rows/92 shards zero findings;70 historical witness limits explicit. Ownership/replay clean;500/500 tests pass.**
+
+**ONE changed-only set: [81 entries/five files](review-request-step10-index-4d3634360.md)**, counts **15, 19, 18, 20, 9**, max **389,933 bytes**. Covers54 rationales/four carriers/six tools-tests/five reproduction changes/12 native transitions. All54 before/after snapshots equal committed rows. A36 deep lists marked; no producer seeds/verdicts. Every header includes Author sessions and scratch-only commands/memory note.
+
+**Raw A false:** committed new `scripts/doc-rationale-facts.mjs` is outside unchanged historical allowlist; zero current working violations. Lead reconciliation remains open. B/H pass;I frozen/current equality preserved with historical baseline delta disclosed. Two broad-suite failures are Lead-confirmed environment/pre-existing, not blockers; both test files byte-identical to main. [Report](step-10-report.md), [audit](step10-sync4d-final-audit.json), [D](step10-sync4d-D-summary.json), [reproduce](step10-sync4d-reproduction.json).
+
+Next: independent ordinary review, Lead A reconciliation, existing global E/A34/truth/consumer/cutover/checkpoint/scorecard. Package done, Phase6 open. Docs/protected bytes untouched; no CLI/git/workspace.fgos writes. Runner commits. MDView unavailable within grant.
+
+---
+
+# Inventory transport recovery in progress
+
+Content4d3634360; initial native generation completed4,486 files/91,386 units, but saving its2,163,103,851-byte v8 buffer exceeded Node single-call2GiB I/O limit (exit1). Registry persisted once and remains unchanged. Inventory-only retry runs with4096MiB old-space/16MiB semi-space and16MiB chunk I/O; no second carry/persistence. D awaits full saved artifact. Independent/ownership/replay/500 tests already pass; raw A allowlist mismatch disclosed. Current request counts15,19,18,20,9.
+
+---
+
+# Package checks complete; native inventory still running
+
+Content 4d3634360; one compact persistence, known IDs 99,555→99,567, zero loss, 12 added units /zero new gaps or retired units. All 9,210 live claim/gap bindings checked: zero drift/rebinds. Independent checker all 12,895 rows /92 shards: zero findings; 70 historical source-witness limits explicit. Document tests 490+10=500 pass. One changed-only set prepared: 81 entries /five files, counts 14,17,19,20,11; max 383,422 bytes. Native complete inventory and D both priors remain pending. No producer-selected seed/verdict.
+
+---
+
+# Package at 4d3634360 in progress
+
+Assignment unit-run-1792127410542-c10a1e4e/producer/1; Author session codex-session:unit-run-1792127410542-c10a1e4e@2026-10-16. One native sync/persistence, content-based pending drift repair, D both priors, all-shard independent consistency, link replay and ownership, then one bounded changed-only re-review set. Runner commits. Broad-suite failures are environment/pre-existing per Lead, not blockers.
+
+---
+
 # Step 10 round-5 author corrections complete — package next
 
 Assignment `unit-run-1792126341980-e0c35701/producer/1`; input `1d92a7229`; reviewed content `62751458b`, request `f1f414b02`, reports `4901bf25c`. Every29 Notes/Concerns read. Lead L10-33/L10-34 recorded under A42. Merge adds plans only: no docs-source delta requiring A31 re-carry.
