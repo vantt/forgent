@@ -433,7 +433,7 @@ was easy.
 
 ## 7. Constraint Findings — optional manual constraint/critique shape
 
-Registered counterparts: constraint-lens shaping and reviewed critique reports,
+Added in candidate — registered counterparts: constraint-lens shaping and reviewed critique reports,
 not a separate numbered runtime phase or mandatory file.
 
 **Why this exists.** To force ranking and reversibility judgment, which is the

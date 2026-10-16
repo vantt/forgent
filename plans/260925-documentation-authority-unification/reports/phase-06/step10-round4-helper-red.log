@@ -1,0 +1,110 @@
+✖ frozen reviewed rationale survives regeneration until a binding changes (0.454517ms)
+✖ identical source occurrences require their own anchor or authenticated historical ordinal (0.126873ms)
+✖ heading comparison uses complete direct section and detects unlabelled payload loss (0.091885ms)
+✖ heading body equality and link rebases are explained independently of depth (0.079597ms)
+✖ correction before must occur in its own bound source or identify an intermediate witness (0.575796ms)
+✖ removed and added unrelated links are two changes and repeated changes are distinct pairs (0.723893ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 0
+ℹ fail 6
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 43.074334
+
+✖ failing tests:
+
+test at test/scripts/doc-rationale-author.test.mjs:5:1
+✖ frozen reviewed rationale survives regeneration until a binding changes (0.454517ms)
+  TypeError: h.frozenRationale is not a function
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale-author.test.mjs:7:17)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17)
+
+test at test/scripts/doc-rationale-author.test.mjs:10:1
+✖ identical source occurrences require their own anchor or authenticated historical ordinal (0.126873ms)
+  TypeError: h.resolveSourceOccurrence is not a function
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale-author.test.mjs:13:17)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3)
+
+test at test/scripts/doc-rationale-author.test.mjs:17:1
+✖ heading comparison uses complete direct section and detects unlabelled payload loss (0.091885ms)
+  TypeError: h.describeSectionChange is not a function
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale-author.test.mjs:19:17)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7)
+
+test at test/scripts/doc-rationale-author.test.mjs:25:1
+✖ heading body equality and link rebases are explained independently of depth (0.079597ms)
+  TypeError: h.describeSectionChange is not a function
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale-author.test.mjs:27:17)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7)
+
+test at test/scripts/doc-rationale-author.test.mjs:31:1
+✖ correction before must occur in its own bound source or identify an intermediate witness (0.575796ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /before/i. Input:
+  
+  'TypeError: h.validateCorrection is not a function'
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale-author.test.mjs:33:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: TypeError: h.validateCorrection is not a function
+        at file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale-author.test.mjs:33:22
+        at getActual (node:assert:611:5)
+        at strict.throws (node:assert:759:24)
+        at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale-author.test.mjs:33:9)
+        at Test.runInAsyncScope (node:async_hooks:227:14)
+        at Test.run (node:internal/test_runner/test:1325:25)
+        at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+        at Test.postRun (node:internal/test_runner/test:1465:19)
+        at Test.run (node:internal/test_runner/test:1390:12)
+        at async Test.processPendingSubtests (node:internal/test_runner/test:911:7),
+    expected: /before/i,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at test/scripts/doc-rationale-author.test.mjs:37:1
+✖ removed and added unrelated links are two changes and repeated changes are distinct pairs (0.723893ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  1 !== 2
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale-author.test.mjs:40:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 2,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

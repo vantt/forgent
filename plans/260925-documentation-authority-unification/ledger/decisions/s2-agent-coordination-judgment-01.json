@@ -8181,14 +8181,20 @@
       "targetAnchor": "unheaded-block-8",
       "claimKind": "procedure",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "rationale": "Source: docs/architect/agent-coordination/playbooks/architecture-advisory-artifact-templates.md:15-15#unheaded-block-3 (current lines); unit SHA256 616f7bcd284487bf2f6bfdd351d091a8483121aa5b77c8da065ca921bee43c75.\nTarget: docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md:52-52#unheaded-block-8 (current lines); unit SHA256 616f7bcd284487bf2f6bfdd351d091a8483121aa5b77c8da065ca921bee43c75.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 616f7bcd284487bf2f6bfdd351d091a8483121aa5b77c8da065ca921bee43c75 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/playbooks/architecture-advisory-artifact-templates.md#unheaded-block-3 under docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md#unheaded-block-8; source context \"Architecture Advisory Artifact Templates / What These Templates Are For\", target context \"Architecture Advisory Artifact Templates / What These Templates Are For\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "mechanical: source architecture-advisory-artifact-templates.md#unheaded-block-3 and target #unheaded-block-8 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "616f7bcd284487bf2f6bfdd351d091a8483121aa5b77c8da065ca921bee43c75",
       "targetAncestry": [
         "Architecture Advisory Artifact Templates",
         "What These Templates Are For"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_59e01aade327d2028a65e150e838579c",

@@ -14,15 +14,21 @@
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
       "targetAnchor": "unheaded-block-85",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source: docs/platform/packaging-distribution/spec.md:517-533#unheaded-block-85 (historical witness at aa43c29a15bf74c0cd4b6767e28f322a522d29b5); unit SHA256 0ce5ce17cd290a31a55e9a63872f96732a0cd0d096c4aa29693105768629ba90.\nTarget: docs/platform/packaging-distribution/spec.md:517-533#unheaded-block-85 (current lines); unit SHA256 59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/platform/packaging-distribution/spec.md#unheaded-block-85 under docs/platform/packaging-distribution/spec.md#unheaded-block-85; source context \"Spec: Packaging-Distribution / Retained Distribution Source Detail / Spec: Distribution / Data Dictionary\", target context \"Spec: Packaging-Distribution / Retained Distribution Source Detail / Spec: Distribution / Data Dictionary\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "deep: supersede spec.md:517-533#unheaded-block-85@aa43c29a1 -> spec.md:517-533#unheaded-block-85; digests differ and were recomputed by extractor; lines equal the real spans; anchor ok; context equals the real ancestry; links 0/0/0/0/0/0 recomputed independently and equal; 0 correction line(s) checked (after-text in target); 1 residual text hunk(s) beyond links/corrections, which the successor-text sentence discloses; last-reviewed digest backed by a committed ok verdict.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-11-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution",
         "Data Dictionary"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_04703f011b22383992b94545055b9e56",
@@ -32,14 +38,20 @@
       "targetOwner": "docs/specs/confinement-authority.md",
       "targetAnchor": "unheaded-block-145",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source: docs/specs/confinement-authority.md:1369-1370#unheaded-block-144 (historical witness at 8098d7be256c49dc5d5debcfe51e5941520f36ea); unit SHA256 12018d6ddfb98564eca2e0dbd9267ffa859e1e5e69c11db3f506886fa0ab717c.\nTarget: docs/specs/confinement-authority.md:1371-1372#unheaded-block-145 (current lines); unit SHA256 f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3 at 1276467f37a99d19aff05808d42fafbf40341449.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/confinement-authority.md#unheaded-block-144 under docs/specs/confinement-authority.md#unheaded-block-145; source context \"Spec: Agent Confinement Authority / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items) / 13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược\", target context \"Spec: Agent Confinement Authority / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items) / 13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "deep: supersede confinement-authority.md:1369-1370#unheaded-block-144@8098d7be2 -> confinement-authority.md:1371-1372#unheaded-block-145; digests differ and were recomputed by extractor; lines equal the real spans; anchor ok; context equals the real ancestry; links 0/0/0/0/0/0 recomputed independently and equal; 0 correction line(s) checked (after-text in target); 1 residual text hunk(s) beyond links/corrections, which the successor-text sentence discloses; last-reviewed digest backed by a committed ok verdict. hand-recomputed both digests (seed 2026101608).",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-11-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f0b5e6c1688beadf7d5f7bbe985a9b46c27990ea720f3a6bbbe3a8df9806dad3",
       "targetAncestry": [
         "Spec: Agent Confinement Authority",
         "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
         "13.2 Login được gia hạn trong private home: bản chép là snapshot, bản mới hơn được ghi ngược"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_f2f1dadddff0c5440195d8c00b74d56e",
@@ -49,13 +61,19 @@
       "targetOwner": "docs/specs/distribution.md",
       "targetAnchor": "unheaded-block-5",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source: docs/specs/distribution.md:57-73#unheaded-block-5 (historical witness at 806d8946b75eca7a862b3207b50081e2c2f44414); unit SHA256 0ce5ce17cd290a31a55e9a63872f96732a0cd0d096c4aa29693105768629ba90.\nTarget: docs/specs/distribution.md:57-73#unheaded-block-5 (current lines); unit SHA256 59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/distribution.md#unheaded-block-5 under docs/specs/distribution.md#unheaded-block-5; source context \"Spec: Distribution / Data Dictionary\", target context \"Spec: Distribution / Data Dictionary\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "deep: supersede distribution.md:57-73#unheaded-block-5@806d8946b -> distribution.md:57-73#unheaded-block-5; digests differ and were recomputed by extractor; lines equal the real spans; anchor ok; context equals the real ancestry; links 0/0/0/0/0/0 recomputed independently and equal; 0 correction line(s) checked (after-text in target); 1 residual text hunk(s) beyond links/corrections, which the successor-text sentence discloses; last-reviewed digest backed by a committed ok verdict. hand-recomputed both digests (seed 2026101608).",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-11-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
       "targetAncestry": [
         "Spec: Distribution",
         "Data Dictionary"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_f033905b059f073c62ec27f0ee6da620",

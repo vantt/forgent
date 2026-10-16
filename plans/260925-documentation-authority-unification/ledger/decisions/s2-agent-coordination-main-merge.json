@@ -11,10 +11,10 @@
       "sourceUnitDigest": "6bea20cb9a1aa9d19c5c6e9ef6e1ccf1f7ec636b964c2aaa50521ba3c14d73d5",
       "claimKind": "contract",
       "disposition": "supersede",
-      "rationale": "Source: docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md:151-153#unheaded-block-18 (current lines); unit SHA256 6bea20cb9a1aa9d19c5c6e9ef6e1ccf1f7ec636b964c2aaa50521ba3c14d73d5.\nTarget: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:132-132#b-add-fgos-advise (current lines); unit SHA256 bb1ae7699ab58ef15b7ea30bf4d78b57cdd8eb69b9a4ef6a7713e83e50f9eb3c.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest bb1ae7699ab58ef15b7ea30bf4d78b57cdd8eb69b9a4ef6a7713e83e50f9eb3c at cf5c64ce64263143158540283f7bf5c794e89386.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 18\" → \"B. Add `fgos-advise`\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-18 under docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#b-add-fgos-advise; source context \"Group Thinking Trigger Surface / Alternatives Considered / B. Add `fgos-advise`\", target context \"Group Thinking Trigger Surface / Alternatives Considered\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "rationale": "Source: docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md:151-153#unheaded-block-18 (current lines); unit SHA256 6bea20cb9a1aa9d19c5c6e9ef6e1ccf1f7ec636b964c2aaa50521ba3c14d73d5.\nTarget: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:132-132#b-add-fgos-advise (current lines); unit SHA256 bb1ae7699ab58ef15b7ea30bf4d78b57cdd8eb69b9a4ef6a7713e83e50f9eb3c.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest bb1ae7699ab58ef15b7ea30bf4d78b57cdd8eb69b9a4ef6a7713e83e50f9eb3c at cf5c64ce64263143158540283f7bf5c794e89386.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 18\" → \"B. Add `fgos-advise`\".\nWhole direct section differs; depth block → 3; 0 distinct link changes; normalized line order differs; 3 removed and 4 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-18 under docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#b-add-fgos-advise; source context \"Group Thinking Trigger Surface / Alternatives Considered / B. Add `fgos-advise`\", target context \"Group Thinking Trigger Surface / Alternatives Considered\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "targetAnchor": "b-add-fgos-advise",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
       "reviewStatus": "pending",
       "targetUnitDigest": "bb1ae7699ab58ef15b7ea30bf4d78b57cdd8eb69b9a4ef6a7713e83e50f9eb3c",
       "targetAncestry": [
@@ -31,12 +31,18 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "targetAnchor": "unheaded-block-9",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source group-thinking-trigger-surface.md#unheaded-block-9 and target #unheaded-block-9 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at cf5c64ce6;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "644f9caba7b366600f0b4d7db4f963a289fdd0d7b9871f3799922413e94d8b2e",
       "targetAncestry": [
         "Group Thinking Trigger Surface",
         "Clarification Rules"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_18e8ea8f02a61e1406cf4017733bd0c0",
@@ -47,12 +53,18 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "targetAnchor": "unheaded-block-10",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source group-thinking-trigger-surface.md#unheaded-block-10 and target #unheaded-block-10 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at cf5c64ce6;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "c7cefec2d7f233e5846d2d89f030c53e795008129eac8830b42418a8d72ee0a7",
       "targetAncestry": [
         "Group Thinking Trigger Surface",
         "Clarification Rules"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_18fb16d85bf883f7f18a1b2f55f28c50",
@@ -63,12 +75,18 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "targetAnchor": "unheaded-block-11",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source group-thinking-trigger-surface.md#unheaded-block-11 and target #unheaded-block-11 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at cf5c64ce6;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "a01d8d42f0fac27a0cb98619f0beb74b4c66393f8464d31cb93dc2e97fab9e41",
       "targetAncestry": [
         "Group Thinking Trigger Surface",
         "Clarification Rules"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_49355bf7a0675fc3526ffa2f3624bde3",
@@ -79,12 +97,18 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "targetAnchor": "unheaded-block-12",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source group-thinking-trigger-surface.md#unheaded-block-12 and target #unheaded-block-12 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at cf5c64ce6;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "bef4e1da9be75d6406660ba5f13dfe5a98efc5cd1f83590895b432281b749b5b",
       "targetAncestry": [
         "Group Thinking Trigger Surface",
         "Clarification Rules"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_df9081c32c8fb9275a5e0a8996e01efe",

@@ -313,3 +313,16 @@ Source: assignment `unit-run-1792114313040-56132651/producer/1`, based on commit
 - **L10-27:** Lead commit `51cb843b8` adds `scripts/doc-binding-repair.mjs` and `scripts/doc-link-pass.mjs` to `allowed-paths.json`. Regenerate A directly from that allowlist; only disclosed Lead commits remain. No producer allowlist/baseline change.
 
 Apply all matching committed ok verdicts with verbatim notes. Generate future requests from committed rows, including after snapshots. Author/docs turn only: zero native sync/review packs. Next turn packages one sync and one bounded re-review of changed docs lines, generator/tests, every regenerated rationale with mechanical checking and independent deep sample, and reopened rows. Evidence and remaining obligations: step-10-report.md / step10-round3-*.
+
+
+## L10-28–L10-32 — Lead A42 round-4 author instruction
+
+Relayed in assignment `unit-run-1792118148618-e4fd15ef/producer/1`; reports committed at `0836714ae`, content `287a22d33`, request `bca590a4e`, merge `9b0526380` changes no docs. These record supplied Lead decisions, not producer verdicts.
+
+- **L10-28:** keep frozen author-time pending-review/A34 tails on reviewed rows. Enumerate for promotion truth check in owner-queue; row status remains authoritative.
+- **L10-29:** deliberately written/reviewed rationales are frozen unless binding changes. Maintain frozen list and restore full L10-2 rationale for `claim_5c520fcb1a68ba27e2093341834258c7`, including original lines, all identities/digests, residual and superseded A34 note.
+- **L10-30:** source occurrence follows its own anchor or historical witness, never first digest match. Enforce distinct identical-source occurrences; runner footer claims map to occurrences 1–8; disclose first claim's +6 anchor shift.
+- **L10-31:** correction before-text must occur in its bound source or identify intermediate evidence; compose real citation edits (4373,4461 → 4415,4503; 4640-4643;4373-4380 → 4414-4417). Compare full heading sections; explain depth, links, labels, splits and residuals. Unexplained differences are conservation findings requiring carrier repair. Regenerate every heading row in the reviewed request population and same-defect siblings. Code citations carry evidence commit. Link counts use distinct pairs; unrelated removal/addition stay separate. Reproduction requires explicit external scratch output.
+- **L10-32:** re-decide `claim_0145c13614b75e7da1321473afa8a0f1` and `claim_deb1e4063a1eabf13dd8ed523748039f` as pending supersede to current renamed sections, historical witness under A34 (upstream `09fe3ab32`, `f4ed59997`).
+
+Apply every still-matching ok verdict with verbatim notes; reopen changed rows. Author/docs turn: no native sync or review packs. Next = package, one native sync and one bounded independent re-review of every changed row, parts ≤60 entries. Existing global/cutover/consumer/checkpoint obligations remain.

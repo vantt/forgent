@@ -212,16 +212,16 @@
         ],
         "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
       },
-      "reviewNote": "mechanical: full digests recomputed by the extractor at 345f15d95 and equal to the shard and the pack; anchor active-proposals ok; source and target digests equal (text byte-equal by digest); rationale line ranges equal the live unit ranges; text not read beyond what is stated",
+      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source and target digests recomputed by the extractor and equal to the shard; target ancestry equal; anchor active-proposals ok; rationale source and target path#anchor and line ranges equal the live units; text not read beyond what is stated",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-345f15d95.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-287a22d33.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "35d38e36aa9ae5117a3aba40a90d734ccb07badb2f8c4c7e19984e6f6c0b1b93",
       "targetAncestry": [
         "Architect-Level Proposals"
       ],
-      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_76cd5a79f79a23ddf7bf30b53312aadf",
@@ -255,17 +255,17 @@
         ],
         "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
       },
-      "reviewNote": "mechanical: full digests recomputed by the extractor at 345f15d95 and equal to the shard and the pack; anchor unheaded-block-7 ok; source and target digests equal (text byte-equal by digest); rationale line ranges equal the live unit ranges; text not read beyond what is stated",
+      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source and target digests recomputed by the extractor and equal to the shard; target ancestry equal; anchor unheaded-block-7 ok; rationale source and target path#anchor and line ranges equal the live units; text not read beyond what is stated",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-345f15d95.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-287a22d33.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "949cee59831d5ac67c174f297bcdcc5837dca9532809923571987f7cb12a42b0",
       "targetAncestry": [
         "Architect-Level Proposals",
         "Active Proposals"
       ],
-      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_86499a247b54e7e84a84c9cb0f477242",

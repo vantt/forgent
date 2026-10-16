@@ -81,16 +81,22 @@
       "sourceAnchor": "unheaded-block-14",
       "sourceUnitDigest": "e24cc26161b017265526e8e287d7ddb0777cabce83f1effd56099a3ea79814e5",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-25",
       "rationale": "Source: docs/io-contract.md:83-84#unheaded-block-14 (historical witness at 05d6fc7ca8d48aa18c030908ec8165cb784cac10); unit SHA256 e24cc26161b017265526e8e287d7ddb0777cabce83f1effd56099a3ea79814e5.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:200-201#unheaded-block-25 (current lines); unit SHA256 cb6381a3b69f2fdd99ff81b06cafbce1f45add19c7076005c59ad0e093d49be8.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest cb6381a3b69f2fdd99ff81b06cafbce1f45add19c7076005c59ad0e093d49be8 at 7854cff84d8bcb67075d4f9c09cd0b6d04808ff4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/io-contract.md#unheaded-block-14 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-25; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất / Ngoại lệ có lý do\", target context \"CLI I/O Contract / 5. Reasoned Envelope Exceptions\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "deep: supersede io-contract.md:83-84#unheaded-block-14@05d6fc7ca -> cli-io-contract.md:200-201#unheaded-block-25; digests differ and were recomputed by extractor; lines equal the real spans; anchor ok; context equals the real ancestry; links 0/0/0/0/0/0 recomputed independently and equal; 0 correction line(s) checked (after-text in target); 1 residual text hunk(s) beyond links/corrections, which the successor-text sentence discloses; last-reviewed digest backed by a committed ok verdict.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-11-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "cb6381a3b69f2fdd99ff81b06cafbce1f45add19c7076005c59ad0e093d49be8",
       "targetAncestry": [
         "CLI I/O Contract",
         "5. Reasoned Envelope Exceptions"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_6a8087a3f502f37f9c7b729e871bee9c",
@@ -98,16 +104,22 @@
       "sourceAnchor": "unheaded-block-15",
       "sourceUnitDigest": "74809b036d96332c8fd99e73be67a5abacbef4b899eb741b946b39aed1ce1fa6",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-26",
       "rationale": "Source: docs/io-contract.md:86-95#unheaded-block-15 (historical witness at 05d6fc7ca8d48aa18c030908ec8165cb784cac10); unit SHA256 74809b036d96332c8fd99e73be67a5abacbef4b899eb741b946b39aed1ce1fa6.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:203-217#unheaded-block-26 (current lines); unit SHA256 f58253403717e416cd5aa169d971bc332b43ab40f16ab6845c90d959d4283221.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest f58253403717e416cd5aa169d971bc332b43ab40f16ab6845c90d959d4283221 at 7854cff84d8bcb67075d4f9c09cd0b6d04808ff4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/io-contract.md#unheaded-block-15 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-26; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất / Ngoại lệ có lý do\", target context \"CLI I/O Contract / 5. Reasoned Envelope Exceptions\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "deep: supersede io-contract.md:86-95#unheaded-block-15@05d6fc7ca -> cli-io-contract.md:203-217#unheaded-block-26; digests differ and were recomputed by extractor; lines equal the real spans; anchor ok; context equals the real ancestry; links 0/0/0/0/0/0 recomputed independently and equal; 0 correction line(s) checked (after-text in target); 2 residual text hunk(s) beyond links/corrections, which the successor-text sentence discloses; last-reviewed digest backed by a committed ok verdict. hand-recomputed both digests (seed 2026101608).",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-11-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f58253403717e416cd5aa169d971bc332b43ab40f16ab6845c90d959d4283221",
       "targetAncestry": [
         "CLI I/O Contract",
         "5. Reasoned Envelope Exceptions"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     }
   ]
 }

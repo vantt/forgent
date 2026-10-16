@@ -214,12 +214,18 @@
       "targetOwner": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "targetAnchor": "unheaded-block-7",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 43-52, target 47-56, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (239 chars); anchor unheaded-block-7 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "a711c76df35afcc8ac8b13b22af8e786524ced6ada099fb4490bc7233f23c1ad",
       "targetAncestry": [
         "Coordination Operating Harness",
         "1. Goal"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_cbd42abd35dac36233a87f37ee254160",
@@ -230,12 +236,18 @@
       "targetOwner": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "targetAnchor": "unheaded-block-8",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 54-59, target 58-63, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (426 chars); anchor unheaded-block-8 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "d552df757a93a8589d3a6244d09b9dea448f386bc27fc25881d82251a8580067",
       "targetAncestry": [
         "Coordination Operating Harness",
         "1. Goal"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_4435fbc23775927f045099a8ced17dc5",
@@ -246,12 +258,18 @@
       "targetOwner": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "targetAnchor": "unheaded-block-9",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 61-63, target 65-67, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (178 chars); anchor unheaded-block-9 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "30ab0d7dc11de0e53b02a1be1306bfc8e7ca5ff92d64962cb60994b9888ab8df",
       "targetAncestry": [
         "Coordination Operating Harness",
         "1. Goal"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_d3ed69f34fc43893cf1e7cb60f4ed408",
@@ -262,12 +280,18 @@
       "targetOwner": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "targetAnchor": "unheaded-block-10",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 67-68, target 71-72, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (97 chars); anchor unheaded-block-10 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "3f0940ca6e117efc803deedcfaf6f359561181e7f4b7b186f25964665a7116da",
       "targetAncestry": [
         "Coordination Operating Harness",
         "2. Why This Step Exists"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_8d367b7e90504846bdd3073d1fa37982",
@@ -278,12 +302,18 @@
       "targetOwner": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "targetAnchor": "unheaded-block-11",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 70-76, target 74-80, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (373 chars); anchor unheaded-block-11 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "cad877524a294e30f51094ab6e87deda87593f232209f671c730b6bf925026d8",
       "targetAncestry": [
         "Coordination Operating Harness",
         "2. Why This Step Exists"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_d7301384301bbdf8126dd7643655a8c9",
@@ -294,12 +324,18 @@
       "targetOwner": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "targetAnchor": "unheaded-block-12",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 78-78, target 82-82, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (72 chars); anchor unheaded-block-12 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "585452e01d1b58746010ca03edd16193f07c8884c13d7fa3e9d5b126078b49fe",
       "targetAncestry": [
         "Coordination Operating Harness",
         "2. Why This Step Exists"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_a743c2a084247fd83a11139b30a9b67c",
@@ -310,12 +346,18 @@
       "targetOwner": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "targetAnchor": "unheaded-block-13",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: sampled; rationale lines regenerate equal from the binding (source 80-84, target 84-88, anchors, digests, link counts, context, disposition word), checker clean; source and target text byte-equal (181 chars) and ancestry \"Coordination Operating Harness / 2. Why This Step Exists\" equal to the source; prior digest found in the target at the cited commit; anchor unheaded-block-13 ok; disposition move is the right one for an equal carry.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "cf7bbe94c63820771ac0b2ff56284a380b1840f60b6649e484e200833174d761",
       "targetAncestry": [
         "Coordination Operating Harness",
         "2. Why This Step Exists"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_0122703a7557b25c9eb3051dff577a8f",
@@ -326,12 +368,18 @@
       "targetOwner": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "targetAnchor": "unheaded-block-16",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 100-105, target 104-109, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (608 chars); anchor unheaded-block-16 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "1d492d666ed278e794502dea6ae233cc84aaa166fdd1a3b5681c0637a1ccd123",
       "targetAncestry": [
         "Coordination Operating Harness",
         "4. Role Model"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_9387ad8f993761127abfaf666dd9596a",
@@ -342,12 +390,18 @@
       "targetOwner": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "targetAnchor": "unheaded-block-17",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 107-111, target 111-115, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (214 chars); anchor unheaded-block-17 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "3835aa2f8a3cf4d77ef756c8a91a0850714af7426f36ecdfb37f97d8089c2006",
       "targetAncestry": [
         "Coordination Operating Harness",
         "4. Role Model"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_33517f6e8bac4d544620c8608542b992",
@@ -358,12 +412,18 @@
       "targetOwner": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "targetAnchor": "unheaded-block-18",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 113-114, target 117-118, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (112 chars); anchor unheaded-block-18 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "c22f429f559a6e1079309e76ff44275f4a7ae3a71d4751e8f6d4ecbd31aca435",
       "targetAncestry": [
         "Coordination Operating Harness",
         "4. Role Model"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_e9777311199033a2df28c8c0d077edb4",
@@ -374,12 +434,18 @@
       "targetOwner": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "targetAnchor": "unheaded-block-20",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 131-132, target 135-136, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (89 chars); anchor unheaded-block-20 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve. Digests also hand-recomputed with an independent script: equal.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "a87f8b5590a7649c46f56d04e07de4ccfb81e604f3370b55e0dd30e414fe2386",
       "targetAncestry": [
         "Coordination Operating Harness",
         "5. Trace File Layout"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_9c21ce867d7c3f492ca7dfaa577670a0",
@@ -390,12 +456,18 @@
       "targetOwner": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "targetAnchor": "unheaded-block-21",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 134-136, target 138-140, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (225 chars); anchor unheaded-block-21 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "99345ea056a2abfc0e1bc79efffb7137c18b9c58bca9f9f2770c14ef03180a04",
       "targetAncestry": [
         "Coordination Operating Harness",
         "5. Trace File Layout"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_ccdd6165ab50543f0eaa6b8033426415",
@@ -406,12 +478,18 @@
       "targetOwner": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "targetAnchor": "unheaded-block-22",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 140-140, target 144-144, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (78 chars); anchor unheaded-block-22 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "de91440f6ddf90b4fe1726cbba9424952c09a5f3a86725b33a4cb06be54c5280",
       "targetAncestry": [
         "Coordination Operating Harness",
         "6. Trace Index Contract"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_12da7fbeed710fec784d83fe1b0cd68f",
@@ -422,12 +500,18 @@
       "targetOwner": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "targetAnchor": "unheaded-block-23",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: sampled; rationale lines regenerate equal from the binding (source 142-159, target 146-163, anchors, digests, link counts, context, disposition word), checker clean; source and target text byte-equal (369 chars) and ancestry \"Coordination Operating Harness / 6. Trace Index Contract\" equal to the source; prior digest found in the target at the cited commit; anchor unheaded-block-23 ok; disposition move is the right one for an equal carry.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "7755db2f08fe14fe686ba57efd88a65a2b0fc76ddb4da6a369de85d4fdd183b3",
       "targetAncestry": [
         "Coordination Operating Harness",
         "6. Trace Index Contract"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_6ca5b197393b9ff3eb1c975daefc978c",
@@ -438,12 +522,18 @@
       "targetOwner": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "targetAnchor": "unheaded-block-24",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 161-169, target 165-173, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (330 chars); anchor unheaded-block-24 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "be90b41a6ce1e650b692f22c54ea1c1d58ceb05be43bfdde06e506db3c093688",
       "targetAncestry": [
         "Coordination Operating Harness",
         "6. Trace Index Contract"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_dc1955cdc3d4c7412053ae6829d04df2",
@@ -454,12 +544,18 @@
       "targetOwner": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "targetAnchor": "unheaded-block-25",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 173-173, target 177-177, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (62 chars); anchor unheaded-block-25 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve. Digests also hand-recomputed with an independent script: equal.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "acf47daa568a04a9d8930c4ec794ec5096d86f0dae311f47d7e5f0fe7de45484",
       "targetAncestry": [
         "Coordination Operating Harness",
         "7. Current Cell Contract"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_303170450a2ee821ac8a7ec6e7a7afcf",
@@ -470,12 +566,18 @@
       "targetOwner": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "targetAnchor": "unheaded-block-27",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: sampled; rationale lines regenerate equal from the binding (source 177-214, target 181-218, anchors, digests, link counts, context, disposition word), checker clean; source and target text byte-equal (334 chars) and ancestry \"Coordination Operating Harness / 7. Current Cell Contract\" equal to the source; prior digest found in the target at the cited commit; anchor unheaded-block-27 ok; disposition move is the right one for an equal carry.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "9bc78c7f8e7f979e56959001738d549f94802481292225e213a0938d5e7d033a",
       "targetAncestry": [
         "Coordination Operating Harness",
         "7. Current Cell Contract"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_b556dd1f488898e5d5a0e3dc7e2b8daf",
@@ -486,12 +588,18 @@
       "targetOwner": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "targetAnchor": "unheaded-block-28",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 216-225, target 220-229, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (520 chars); anchor unheaded-block-28 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "1944fecd2d83f313e4b091a543fb770794df760ad6b93accee15029372a2b088",
       "targetAncestry": [
         "Coordination Operating Harness",
         "7. Current Cell Contract"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_2e2346561b753dfa7d5ad0aa553a80e8",
@@ -502,12 +610,18 @@
       "targetOwner": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "targetAnchor": "unheaded-block-29",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 229-229, target 233-233, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (78 chars); anchor unheaded-block-29 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "391706516e06b312851c99e35b0ab2db74f76b0a4958f697a7d2de5222aa92be",
       "targetAncestry": [
         "Coordination Operating Harness",
         "8. Cell Trace Contract"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_6abde1845e791c40a4d1413b26f30953",
@@ -518,12 +632,18 @@
       "targetOwner": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "targetAnchor": "unheaded-block-30",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 231-257, target 235-261, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (395 chars); anchor unheaded-block-30 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "cd8c7e740110648eba063724c66dff236b3ce8c35eaf8ceb571632592d71a857",
       "targetAncestry": [
         "Coordination Operating Harness",
         "8. Cell Trace Contract"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_0742b99ea5b3b0b401c8ae34948492a2",
@@ -534,12 +654,18 @@
       "targetOwner": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "targetAnchor": "unheaded-block-31",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 259-260, target 263-264, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (113 chars); anchor unheaded-block-31 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve. Digests also hand-recomputed with an independent script: equal.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "b52e1a0466fda4aeb194f6800cbbd4c528c72c41ffd5d9b48b34a90da3cfc3e2",
       "targetAncestry": [
         "Coordination Operating Harness",
         "8. Cell Trace Contract"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_01bf4d49fa626fc97f77a7791ed1802f",
@@ -550,12 +676,18 @@
       "targetOwner": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "targetAnchor": "unheaded-block-32",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 264-265, target 268-269, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (106 chars); anchor unheaded-block-32 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e9fce89afd2df125c604cadec85e3f5986e8d85605f9a1989b9b6ccd161c674c",
       "targetAncestry": [
         "Coordination Operating Harness",
         "9. Resume And Idempotency Rules"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_697ca466ba107eb32aa9efc9cff9a071",
@@ -566,12 +698,18 @@
       "targetOwner": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "targetAnchor": "unheaded-block-34",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 283-286, target 287-290, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (247 chars); anchor unheaded-block-34 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "0a32c0060ea9746ec80b664655a02192ac3677c0b13c1d31a9bf510641b46c22",
       "targetAncestry": [
         "Coordination Operating Harness",
         "10. Master Prompt And Internal Roles"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_4b55362a956ddeb24eb2b9dd5477d17a",
@@ -582,12 +720,18 @@
       "targetOwner": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "targetAnchor": "unheaded-block-35",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 288-294, target 292-298, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (166 chars); anchor unheaded-block-35 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "09e0d770b2afb157ebd93ca01dd1f02e0d16a8af161cf1e2db85889841f561a4",
       "targetAncestry": [
         "Coordination Operating Harness",
         "10. Master Prompt And Internal Roles"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_99d4458d8d725c4801b2ead26ee647ef",
@@ -598,12 +742,18 @@
       "targetOwner": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "targetAnchor": "unheaded-block-36",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 296-299, target 300-303, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (254 chars); anchor unheaded-block-36 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "211ed0df867a6cc51c50f40051e56733fa06c619304ad613d279451df9643139",
       "targetAncestry": [
         "Coordination Operating Harness",
         "10. Master Prompt And Internal Roles"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_189b52a1cccbce00053753e2f2c5f414",
@@ -614,12 +764,18 @@
       "targetOwner": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "targetAnchor": "unheaded-block-37",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 301-303, target 305-307, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (220 chars); anchor unheaded-block-37 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2cdf7cb767c72c2eab03b9f43b15bb53203bc5905af5d2805f17f76f4ab214b0",
       "targetAncestry": [
         "Coordination Operating Harness",
         "10. Master Prompt And Internal Roles"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_78fd80b808a458d1fff81d31f0893577",
@@ -630,12 +786,18 @@
       "targetOwner": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "targetAnchor": "unheaded-block-39",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 309-315, target 313-319, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (372 chars); anchor unheaded-block-39 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve. Digests also hand-recomputed with an independent script: equal.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "9beba34f97141d40f95381c3949e5809ca971758faebe2ce1a391727430e7518",
       "targetAncestry": [
         "Coordination Operating Harness",
         "11. Token Budget Rules"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_93143ff7af3d21d35d50096a9711ce80",
@@ -646,12 +808,18 @@
       "targetOwner": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "targetAnchor": "unheaded-block-41",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source coordination-operating-harness.md#unheaded-block-43 and target #unheaded-block-41 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-02-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "747b932c37ff4e93d7ff218b9116fe25f50e7d7a9877c91b801e4170995c11e2",
       "targetAncestry": [
         "Coordination Operating Harness",
         "11. Token Budget Rules"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_e08d794f548044d171e9fcd84c7cc606",
@@ -662,12 +830,18 @@
       "targetOwner": "docs/platform/agent-coordination/playbooks/coordination-operating-harness.md",
       "targetAnchor": "unheaded-block-66",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source coordination-operating-harness.md#unheaded-block-67 and target #unheaded-block-66 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-02-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "4740ea02dea07318640c3c56ba600c80c9d99ed7a6d5b49f8ef9901afc9177bc",
       "targetAncestry": [
         "Coordination Operating Harness",
         "13. Tests And Checks"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_11e42a12a25d4113598c325aaabe9844",
@@ -4837,13 +5011,19 @@
       "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "targetAnchor": "unheaded-block-41",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source dispatch-control-plane-redesign.md#unheaded-block-39 and target #unheaded-block-41 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-02-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "c4d02a1a171c508a616fca4a5ece62d9a4c7d26617cb1c4495eaeeed0a4b51cc",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "6. DispatchPlan",
         "6.2 Selector"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_278d1100651338cc5a0c766736bf75b7",
@@ -4854,13 +5034,19 @@
       "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "targetAnchor": "unheaded-block-46",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source dispatch-control-plane-redesign.md#unheaded-block-44 and target #unheaded-block-46 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21; hand-recomputed by independent python.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-02-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "ffec517d5e97688875ffbf788a60d2570d8041fd4f68bc640b2924de5cb208a7",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "6. DispatchPlan",
         "6.3 Mechanism"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_f8ef71511f125cf47661115556a0d62a",
@@ -4871,12 +5057,18 @@
       "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "targetAnchor": "unheaded-block-48",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source dispatch-control-plane-redesign.md#unheaded-block-48 and target #unheaded-block-48 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-02-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "98ffa2cb7927dbc24e40b4cac542be423fbc5a0edc6a6dbd4b47d57a12746013",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "7. Governance And Egress"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_22fd162742eaf6338625db0b3c891e8c",
@@ -4887,12 +5079,18 @@
       "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "targetAnchor": "unheaded-block-50",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source dispatch-control-plane-redesign.md#unheaded-block-50 and target #unheaded-block-50 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-02-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "c0a65dfe636b80c3abce71e5abd917c8cb3ba823c09ff26b310c560a0e7a7428",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "7. Governance And Egress"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_2f82531f1c9638bde376b54c01b3262a",
@@ -4903,12 +5101,18 @@
       "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "targetAnchor": "unheaded-block-51",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source dispatch-control-plane-redesign.md#unheaded-block-51 and target #unheaded-block-51 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-02-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "7dd6c9fc1a255313fa4e73754430f51969d2f791fd1239e6763be59ed5460f2a",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "7. Governance And Egress"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_ceea50443e5cbb1d8e73d79fd642aacf",
@@ -4919,13 +5123,19 @@
       "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "targetAnchor": "unheaded-block-52",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source dispatch-control-plane-redesign.md#unheaded-block-52 and target #unheaded-block-52 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-02-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "67d32578ac3060b24064b796c8269a33f44d32ef8b0ddd0223500b640b9e349c",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "7. Governance And Egress",
         "7.1 Effective Egress"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_77c6d3f137e4ed610c64eece3accb6f5",
@@ -4936,13 +5146,19 @@
       "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "targetAnchor": "unheaded-block-53",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source dispatch-control-plane-redesign.md#unheaded-block-53 and target #unheaded-block-53 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-02-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "60c1efaa6b2b611f5107db72838dbac2e70a39f4ed2cd23d87f9b67ca6a93b2c",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "7. Governance And Egress",
         "7.1 Effective Egress"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_ea9c89ff9f92e6dc70e304b947626ca2",
@@ -4953,13 +5169,19 @@
       "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "targetAnchor": "unheaded-block-55",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source dispatch-control-plane-redesign.md#unheaded-block-55 and target #unheaded-block-55 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-02-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "fb92ab550408a78e02fa58acfd0992d0da9345e3e0f9fc05d86e633c5c719c53",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "7. Governance And Egress",
         "7.1 Effective Egress"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_242afbaa21db02263501e5495e429797",
@@ -4970,13 +5192,19 @@
       "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "targetAnchor": "unheaded-block-56",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: read source and target text in full, identical byte for byte (script and eyes), starts 'The important rule: command is evidence, not the whole answe'; digests recomputed equal, anchor unheaded-block-56 checked and unique in target, context equal; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-02-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "4ceb9a2ac895c8928f5b09ca96c21250af82a90b826bb865a3ec05bbe2e8b675",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "7. Governance And Egress",
         "7.1 Effective Egress"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_3a427a14f4cfa4dacc52440ea35a2e19",
@@ -4987,13 +5215,19 @@
       "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "targetAnchor": "unheaded-block-57",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source dispatch-control-plane-redesign.md#unheaded-block-57 and target #unheaded-block-57 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-02-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "8576ac7ecaa8cf3f0c0d396a4961f20d131dc3de7f793bb9d28d9c26f65b5eef",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "7. Governance And Egress",
         "7.2 Policy Resolution Before DispatchPlan"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_70903eebe10757eb99fe0397d96ad7d4",
@@ -5004,13 +5238,19 @@
       "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "targetAnchor": "unheaded-block-58",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source dispatch-control-plane-redesign.md#unheaded-block-58 and target #unheaded-block-58 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-02-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2fe514ccf674cf6a634e74dfd063c052f483246bd65327f0cebd511523946ba7",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "7. Governance And Egress",
         "7.2 Policy Resolution Before DispatchPlan"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_4cf4131cd163673e8a28b588cc7eb48f",
@@ -5021,13 +5261,19 @@
       "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "targetAnchor": "unheaded-block-59",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source dispatch-control-plane-redesign.md#unheaded-block-59 and target #unheaded-block-59 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-02-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "cf52761ca0abe1aefd04e618b8d2f8d5707e0b4c1ac9836c509324dcb94a833f",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "7. Governance And Egress",
         "7.2 Policy Resolution Before DispatchPlan"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_370c8997003f37a6534d11591eada7f9",
@@ -5038,13 +5284,19 @@
       "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
       "targetAnchor": "unheaded-block-61",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source dispatch-control-plane-redesign.md#unheaded-block-61 and target #unheaded-block-61 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-02-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "930de1671a1761fd86dcdd3362c0be6ec73191f49a22eaddad934edff0878259",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "7. Governance And Egress",
         "7.2 Policy Resolution Before DispatchPlan"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_11d149c1655503f91604b77b40e6a381",

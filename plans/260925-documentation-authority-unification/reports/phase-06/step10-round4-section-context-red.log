@@ -1,0 +1,51 @@
+✔ frozen reviewed rationale survives regeneration until a binding changes (1.87968ms)
+✔ identical source occurrences require their own anchor or authenticated historical ordinal (0.742321ms)
+✔ heading comparison uses complete direct section and detects unlabelled payload loss (1.601663ms)
+✔ heading body equality and link rebases are explained independently of depth (0.758131ms)
+✔ correction before must occur in its own bound source or identify an intermediate witness (0.433401ms)
+✔ removed and added unrelated links are two changes and repeated changes are distinct pairs (0.423371ms)
+✔ whole-section audit cannot clear an unexplained delta with a generic reason (0.370863ms)
+✔ whole-section comparison reports reordered lines even with identical line multisets (0.191692ms)
+✔ whole-section normalization applies complete corrections before overlapping fragments (0.341507ms)
+✔ a repository directory trailing slash is a spelling change with the same destination (0.353141ms)
+✖ secondary section-accounting carriers do not masquerade as the primary source anchor (2.672691ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 10
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 98.640383
+
+✖ failing tests:
+
+test at test/scripts/doc-rationale-author.test.mjs:67:1
+✖ secondary section-accounting carriers do not masquerade as the primary source anchor (2.672691ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + [
+  +   {
+  +     bound: 'primary',
+  +     cited: 'secondary',
+  +     role: 'source',
+  +     type: 'stale-rationale-anchor'
+  +   }
+  + ]
+  - []
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale-author.test.mjs:69:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ { type: 'stale-rationale-anchor', role: 'source', cited: 'secondary', bound: 'primary' } ],
+    expected: [],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }

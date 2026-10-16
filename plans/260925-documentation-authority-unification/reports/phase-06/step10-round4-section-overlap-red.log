@@ -1,0 +1,44 @@
+✔ frozen reviewed rationale survives regeneration until a binding changes (0.551718ms)
+✔ identical source occurrences require their own anchor or authenticated historical ordinal (0.833152ms)
+✔ heading comparison uses complete direct section and detects unlabelled payload loss (0.892804ms)
+✔ heading body equality and link rebases are explained independently of depth (0.428238ms)
+✔ correction before must occur in its own bound source or identify an intermediate witness (0.236815ms)
+✔ removed and added unrelated links are two changes and repeated changes are distinct pairs (0.207977ms)
+✔ whole-section audit cannot clear an unexplained delta with a generic reason (0.216999ms)
+✔ whole-section comparison reports reordered lines even with identical line multisets (0.199267ms)
+✖ whole-section normalization applies complete corrections before overlapping fragments (0.75578ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 8
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 42.069353
+
+✖ failing tests:
+
+test at test/scripts/doc-rationale-author.test.mjs:55:1
+✖ whole-section normalization applies complete corrections before overlapping fragments (0.75578ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + [
+  +   'new start old end'
+  + ]
+  - []
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale-author.test.mjs:58:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ 'new start old end' ],
+    expected: [],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }

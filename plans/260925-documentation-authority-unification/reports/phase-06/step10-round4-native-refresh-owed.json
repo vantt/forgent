@@ -1,0 +1,38 @@
+{
+  "nativeSyncCount": 0,
+  "registryWritten": false,
+  "changedUnits": [
+    {
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "anchor": "7-constraint-findings-optional-manual-constraintcritique-shape",
+      "before": "fcc54b69666a906c0dfbfd1e3a24f0f6f1679a130c0afa73facbcd34753a0600",
+      "after": "e24524633ae56daa1d8e9a8c4b2956f92d4e08aac51d98f3fe5775b2f9ae3064",
+      "nativeClaim": "claim_c90c0415c20234da816351e16f9903b8",
+      "status": "next package single native sync; preserve historical IDs and independently review new tuples"
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "anchor": "unheaded-block-44",
+      "before": "9643a6fe01ce142637dcea09eb07b8690322ab13683212165934615d5aba3ae5",
+      "after": "f03302423020c8beeac177192fbe0952433473b78efd7c17f5eb96b39d67dbca",
+      "nativeClaim": "claim_f15e4328e1e5df90c51f535e75da554b",
+      "status": "next package single native sync; preserve historical IDs and independently review new tuples"
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+      "anchor": "evidence-and-conduct-boundaries",
+      "before": "82e4b520abf075cde4a91928c894f9c6ec67226ad6d989b89a8faef4a80409ed",
+      "after": "fd599aeb69ec450ccb654795c8db12e37932153fdf60f71c8eeaa7e463b32485",
+      "nativeClaim": "claim_133a4900a601db7cbf1182a96540ef56",
+      "status": "next package single native sync; preserve historical IDs and independently review new tuples"
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+      "anchor": "unheaded-block-117",
+      "before": "087d5cdd477bde5b2bf98882290f0d23d3e44a06f0c6f93b7f15e6bcfa391c63",
+      "after": "7486a9e911dc83dd8182817e3d51bccd7b2e95a87b245307e19b3dd1de9fbb34",
+      "nativeClaim": "claim_9e9d711e331efe5a12c8b8bf50371dc6",
+      "status": "next package single native sync; preserve historical IDs and independently review new tuples"
+    }
+  ]
+}

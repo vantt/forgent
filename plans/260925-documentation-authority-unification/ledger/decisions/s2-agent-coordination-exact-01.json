@@ -1421,12 +1421,18 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
       "targetAnchor": "unheaded-block-33",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 315-323, target 317-325, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (590 chars); anchor unheaded-block-33 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve. Digests also hand-recomputed with an independent script: equal.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "0df18fd195e2299bd4e643da6074605de1b56d3f5f3e551c73102b12c1469f80",
       "targetAncestry": [
         "Dispatch Control Plane",
         "Governance"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_a17f5abca4885a507c7c2af621f4c191",
@@ -1437,12 +1443,18 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
       "targetAnchor": "unheaded-block-35",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: sampled; rationale lines regenerate equal from the binding (source 327-335, target 333-341, anchors, digests, link counts, context, disposition word), checker clean; source and target text byte-equal (368 chars) and ancestry \"Dispatch Control Plane / Separation Of Concerns\" equal to the source; prior digest found in the target at the cited commit; anchor unheaded-block-35 ok; disposition move is the right one for an equal carry.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "b7270cef2f9930aa8c91bcc2c486d2f46c896e3c86304ab529bdd9d8ddd87a4f",
       "targetAncestry": [
         "Dispatch Control Plane",
         "Separation Of Concerns"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_0048419ea3512ca74c2fd495ac685c56",
@@ -1474,12 +1486,18 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
       "targetAnchor": "unheaded-block-36",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 348-350, target 343-345, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (177 chars); anchor unheaded-block-36 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve. Digests also hand-recomputed with an independent script: equal.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "a1e2b01e35173c2caf1d2076d7d17d1fc38e6b434572485d1e2161cf1b9ac7a5",
       "targetAncestry": [
         "Dispatch Control Plane",
         "Separation Of Concerns"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_a2dcdcb4d3218225b3ec1e218dcd395c",
@@ -1774,12 +1792,18 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
       "targetAnchor": "unheaded-block-18",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: sampled; rationale lines regenerate equal from the binding (source 134-138, target 150-154, anchors, digests, link counts, context, disposition word), checker clean; source and target text byte-equal (233 chars) and ancestry \"Executor Fallback And Effect Eligibility / 5. EffectGuaranteePort\" equal to the source; prior digest found in the target at the cited commit; anchor unheaded-block-18 ok; disposition move is the right one for an equal carry. Digests also hand-recomputed with an independent script: equal.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "85ff8118e32844c2d7229b9b6762994b3003eadb8ccd8c042075546d12d6ccb6",
       "targetAncestry": [
         "Executor Fallback And Effect Eligibility",
         "5. EffectGuaranteePort"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_0b15ec00f173b9ada776c29c4487f3f8",
@@ -2050,10 +2074,10 @@
       "sourceUnitDigest": "0a23c312cb146771ef301813d0e6cd0d88a984d6e38599df884ffd99b16dc2f9",
       "claimKind": "contract",
       "disposition": "move",
-      "rationale": "Source: docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md:99-104#unheaded-block-13 (current lines); unit SHA256 0a23c312cb146771ef301813d0e6cd0d88a984d6e38599df884ffd99b16dc2f9.\nTarget: docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md:25-25#literal-snapshot (current lines); unit SHA256 db94cf7b2b9b21d5eb2371632789a49359037830e65e86442fb922d756d859f4.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest db94cf7b2b9b21d5eb2371632789a49359037830e65e86442fb922d756d859f4 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 3; 3 changed spellings/labels, 0 destination changes; 3 added, 0 removed.\nLink 1: \"none\" (none) → \"Protocol Model\" (protocol-model.md); resolved none → docs/platform/agent-coordination/history/retired-engine/files/architecture/protocol-model.md.\nLink 2: \"none\" (none) → \"Dispatch Control Plane\" (dispatch-control-plane.md); resolved none → docs/platform/agent-coordination/history/retired-engine/files/architecture/dispatch-control-plane.md.\nLink 3: \"none\" (none) → \"FlowDefinition Contract\" (../contracts/flow-definition.md); resolved none → docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md.\nHeading depth: not a heading → 2; title \"Unheaded block 13\" → \"Literal Snapshot\".\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-13 under docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md#literal-snapshot; source context \"Group Thinking Trigger Surface / Core / Surface Boundary / Core owns\", target context \"Historical File: Group Thinking Trigger Surface\". The source text occurs verbatim inside the bound target section; section-level unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "rationale": "Source: docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md:99-104#unheaded-block-13 (current lines); unit SHA256 0a23c312cb146771ef301813d0e6cd0d88a984d6e38599df884ffd99b16dc2f9.\nTarget: docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md:25-25#literal-snapshot (current lines); unit SHA256 db94cf7b2b9b21d5eb2371632789a49359037830e65e86442fb922d756d859f4.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest db94cf7b2b9b21d5eb2371632789a49359037830e65e86442fb922d756d859f4 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 3; 3 changed spellings/labels, 0 destination changes; 3 added, 0 removed.\nLink 1: \"none\" (none) → \"Protocol Model\" (protocol-model.md); resolved none → docs/platform/agent-coordination/history/retired-engine/files/architecture/protocol-model.md.\nLink 2: \"none\" (none) → \"Dispatch Control Plane\" (dispatch-control-plane.md); resolved none → docs/platform/agent-coordination/history/retired-engine/files/architecture/dispatch-control-plane.md.\nLink 3: \"none\" (none) → \"FlowDefinition Contract\" (../contracts/flow-definition.md); resolved none → docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md.\nHeading depth: not a heading → 2; title \"Unheaded block 13\" → \"Literal Snapshot\".\nWhole direct section differs; depth block → 2; 3 distinct link changes; normalized line order differs; 0 removed and 164 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-13 under docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md#literal-snapshot; source context \"Group Thinking Trigger Surface / Core / Surface Boundary / Core owns\", target context \"Historical File: Group Thinking Trigger Surface\". The complete source direct section occurs verbatim inside the bound target section; native unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md",
       "targetAnchor": "literal-snapshot",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
       "reviewStatus": "pending",
       "targetUnitDigest": "db94cf7b2b9b21d5eb2371632789a49359037830e65e86442fb922d756d859f4",
       "targetAncestry": [
@@ -2065,10 +2089,10 @@
       "sourceUnitDigest": "e159ad78df9f5fe826408583510527df49b44042d52d00b91aab1f7a32b21607",
       "claimKind": "architecture",
       "disposition": "move",
-      "rationale": "Source: docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md:108-113#unheaded-block-14 (current lines); unit SHA256 e159ad78df9f5fe826408583510527df49b44042d52d00b91aab1f7a32b21607.\nTarget: docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md:25-25#literal-snapshot (current lines); unit SHA256 db94cf7b2b9b21d5eb2371632789a49359037830e65e86442fb922d756d859f4.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest db94cf7b2b9b21d5eb2371632789a49359037830e65e86442fb922d756d859f4 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 3; 3 changed spellings/labels, 0 destination changes; 3 added, 0 removed.\nLink 1: \"none\" (none) → \"Protocol Model\" (protocol-model.md); resolved none → docs/platform/agent-coordination/history/retired-engine/files/architecture/protocol-model.md.\nLink 2: \"none\" (none) → \"Dispatch Control Plane\" (dispatch-control-plane.md); resolved none → docs/platform/agent-coordination/history/retired-engine/files/architecture/dispatch-control-plane.md.\nLink 3: \"none\" (none) → \"FlowDefinition Contract\" (../contracts/flow-definition.md); resolved none → docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md.\nHeading depth: not a heading → 2; title \"Unheaded block 14\" → \"Literal Snapshot\".\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-14 under docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md#literal-snapshot; source context \"Group Thinking Trigger Surface / Core / Surface Boundary / Surface owns\", target context \"Historical File: Group Thinking Trigger Surface\". The source text occurs verbatim inside the bound target section; section-level unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "rationale": "Source: docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md:108-113#unheaded-block-14 (current lines); unit SHA256 e159ad78df9f5fe826408583510527df49b44042d52d00b91aab1f7a32b21607.\nTarget: docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md:25-25#literal-snapshot (current lines); unit SHA256 db94cf7b2b9b21d5eb2371632789a49359037830e65e86442fb922d756d859f4.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest db94cf7b2b9b21d5eb2371632789a49359037830e65e86442fb922d756d859f4 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 3; 3 changed spellings/labels, 0 destination changes; 3 added, 0 removed.\nLink 1: \"none\" (none) → \"Protocol Model\" (protocol-model.md); resolved none → docs/platform/agent-coordination/history/retired-engine/files/architecture/protocol-model.md.\nLink 2: \"none\" (none) → \"Dispatch Control Plane\" (dispatch-control-plane.md); resolved none → docs/platform/agent-coordination/history/retired-engine/files/architecture/dispatch-control-plane.md.\nLink 3: \"none\" (none) → \"FlowDefinition Contract\" (../contracts/flow-definition.md); resolved none → docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md.\nHeading depth: not a heading → 2; title \"Unheaded block 14\" → \"Literal Snapshot\".\nWhole direct section differs; depth block → 2; 3 distinct link changes; normalized line order differs; 0 removed and 164 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-14 under docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md#literal-snapshot; source context \"Group Thinking Trigger Surface / Core / Surface Boundary / Surface owns\", target context \"Historical File: Group Thinking Trigger Surface\". The complete source direct section occurs verbatim inside the bound target section; native unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md",
       "targetAnchor": "literal-snapshot",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
       "reviewStatus": "pending",
       "targetUnitDigest": "db94cf7b2b9b21d5eb2371632789a49359037830e65e86442fb922d756d859f4",
       "targetAncestry": [
@@ -2080,10 +2104,10 @@
       "sourceUnitDigest": "d30d9e41674b27c1056bff1f4922d56e22ba0319285d0ca396bd64181f368fb6",
       "claimKind": "contract",
       "disposition": "move",
-      "rationale": "Source: docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md:117-129#unheaded-block-15 (current lines); unit SHA256 d30d9e41674b27c1056bff1f4922d56e22ba0319285d0ca396bd64181f368fb6.\nTarget: docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md:25-25#literal-snapshot (current lines); unit SHA256 db94cf7b2b9b21d5eb2371632789a49359037830e65e86442fb922d756d859f4.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest db94cf7b2b9b21d5eb2371632789a49359037830e65e86442fb922d756d859f4 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 3; 3 changed spellings/labels, 0 destination changes; 3 added, 0 removed.\nLink 1: \"none\" (none) → \"Protocol Model\" (protocol-model.md); resolved none → docs/platform/agent-coordination/history/retired-engine/files/architecture/protocol-model.md.\nLink 2: \"none\" (none) → \"Dispatch Control Plane\" (dispatch-control-plane.md); resolved none → docs/platform/agent-coordination/history/retired-engine/files/architecture/dispatch-control-plane.md.\nLink 3: \"none\" (none) → \"FlowDefinition Contract\" (../contracts/flow-definition.md); resolved none → docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md.\nHeading depth: not a heading → 2; title \"Unheaded block 15\" → \"Literal Snapshot\".\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-15 under docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md#literal-snapshot; source context \"Group Thinking Trigger Surface / Core / Surface Boundary / Forbidden coupling\", target context \"Historical File: Group Thinking Trigger Surface\". The source text occurs verbatim inside the bound target section; section-level unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "rationale": "Source: docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md:117-129#unheaded-block-15 (current lines); unit SHA256 d30d9e41674b27c1056bff1f4922d56e22ba0319285d0ca396bd64181f368fb6.\nTarget: docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md:25-25#literal-snapshot (current lines); unit SHA256 db94cf7b2b9b21d5eb2371632789a49359037830e65e86442fb922d756d859f4.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest db94cf7b2b9b21d5eb2371632789a49359037830e65e86442fb922d756d859f4 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 3; 3 changed spellings/labels, 0 destination changes; 3 added, 0 removed.\nLink 1: \"none\" (none) → \"Protocol Model\" (protocol-model.md); resolved none → docs/platform/agent-coordination/history/retired-engine/files/architecture/protocol-model.md.\nLink 2: \"none\" (none) → \"Dispatch Control Plane\" (dispatch-control-plane.md); resolved none → docs/platform/agent-coordination/history/retired-engine/files/architecture/dispatch-control-plane.md.\nLink 3: \"none\" (none) → \"FlowDefinition Contract\" (../contracts/flow-definition.md); resolved none → docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md.\nHeading depth: not a heading → 2; title \"Unheaded block 15\" → \"Literal Snapshot\".\nWhole direct section differs; depth block → 2; 3 distinct link changes; normalized line order differs; 0 removed and 157 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-15 under docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md#literal-snapshot; source context \"Group Thinking Trigger Surface / Core / Surface Boundary / Forbidden coupling\", target context \"Historical File: Group Thinking Trigger Surface\". The complete source direct section occurs verbatim inside the bound target section; native unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md",
       "targetAnchor": "literal-snapshot",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
       "reviewStatus": "pending",
       "targetUnitDigest": "db94cf7b2b9b21d5eb2371632789a49359037830e65e86442fb922d756d859f4",
       "targetAncestry": [
@@ -3684,12 +3708,18 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
       "targetAnchor": "unheaded-block-26",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: sampled; rationale lines regenerate equal from the binding (source 234-240, target 208-214, anchors, digests, link counts, context, disposition word), checker clean; source and target text byte-equal (531 chars) and ancestry \"Runtime Recovery And Work Continuity / 8. Compatibility And Rollout\" equal to the source; prior digest found in the target at the cited commit; anchor unheaded-block-26 ok; disposition move is the right one for an equal carry.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "eb975a6c9000060c0237717d885baae09865bdf84f71ef743caa1e9826dbce26",
       "targetAncestry": [
         "Runtime Recovery And Work Continuity",
         "8. Compatibility And Rollout"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_4308153c9756b0d9071e0d50e0753515",
@@ -3700,12 +3730,18 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
       "targetAnchor": "unheaded-block-27",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 242-245, target 216-219, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (305 chars); anchor unheaded-block-27 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "0e2c410323e0f2e72719d8f568f8a5cfd0eb397fa44903c7ade2b31fc27a4951",
       "targetAncestry": [
         "Runtime Recovery And Work Continuity",
         "8. Compatibility And Rollout"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_5b2b5055770385f1fed06df3a229bbe8",
@@ -3821,12 +3857,18 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
       "targetAnchor": "unheaded-block-35",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 331-333, target 298-300, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (196 chars); anchor unheaded-block-35 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "83efc7bb1d8ed7cbf224eb757b19902bb3b4a77647f4b94791b4ec43e2062265",
       "targetAncestry": [
         "Runtime Recovery And Work Continuity",
         "11. Review Finding Resolution And Limits"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_c8a8c7d269631d5a5a3a278ad6cdcfe3",
@@ -4374,12 +4416,18 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/work-integration.md",
       "targetAnchor": "unheaded-block-13",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 69-71, target 90-92, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (227 chars); anchor unheaded-block-13 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e4f81afbd129709ac5736b4c94a240ef32896f6c1c5349177f69439e0ec2e1b6",
       "targetAncestry": [
         "Work Integration Boundaries",
         "Isolation"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_ac14e9ff69ba640a6abd226d96490804",
@@ -4390,12 +4438,18 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/work-integration.md",
       "targetAnchor": "unheaded-block-14",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: sampled; rationale lines regenerate equal from the binding (source 73-74, target 94-95, anchors, digests, link counts, context, disposition word), checker clean; source and target text byte-equal (109 chars) and ancestry \"Work Integration Boundaries / Isolation\" equal to the source; prior digest found in the target at the cited commit; anchor unheaded-block-14 ok; disposition move is the right one for an equal carry. Digests also hand-recomputed with an independent script: equal.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "1627c4e86411c46605d749244ad6d00413360dedbd2d1beb783fa730be338441",
       "targetAncestry": [
         "Work Integration Boundaries",
         "Isolation"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_1a83e4fb94838808b8f24046008e4614",
@@ -4666,13 +4720,19 @@
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "targetAnchor": "unheaded-block-25",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 143-155, target 159-171, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (1139 chars); anchor unheaded-block-25 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e8b8e8545f6f12e5770ef2e60375acd17b3dcd5966f7a82c9166b5f2f501a740",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Run",
         "Proposed Runtime Recovery Amendment"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_436d05aab9ac75398d205d17cf0a0398",
@@ -4683,13 +4743,19 @@
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "targetAnchor": "unheaded-block-26",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 157-163, target 173-179, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (525 chars); anchor unheaded-block-26 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "a06f2788a9dbc9526dfec0d179db0a0af2f4c4bfc898200fa5849916a1116cef",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Run",
         "Proposed Runtime Recovery Amendment"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_5bebe9b972a01c94f4968e0d721d8f7a",
@@ -4700,13 +4766,19 @@
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "targetAnchor": "unheaded-block-27",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 165-174, target 181-190, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (767 chars); anchor unheaded-block-27 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "0dcd9d73d70d1638927e44149d33a5dd42bdefa0f0260a456ec691bff38027d9",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Run",
         "Proposed Runtime Recovery Amendment"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_291c57b61e8c891826da4e2593b50d6f",
@@ -4738,13 +4810,19 @@
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "targetAnchor": "unheaded-block-29",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: sampled; rationale lines regenerate equal from the binding (source 187-191, target 194-198, anchors, digests, link counts, context, disposition word), checker clean; source and target text byte-equal (384 chars) and ancestry \"Assignment, Run, And RunResult Contract / Run / Proposed Runtime Recov...\" equal to the source; prior digest found in the target at the cited commit; anchor unheaded-block-29 ok; disposition move is the right one for an equal carry.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "acba98e4c7e67a551f49ca9c205ee1b8eec81e8ae6ca2962e6b5d3763db7057f",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Run",
         "Proposed Runtime Recovery Amendment"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_b4e7776bf7e5360851b857f10c05ee1e",
@@ -4776,13 +4854,19 @@
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "targetAnchor": "unheaded-block-31",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 203-211, target 210-218, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (818 chars); anchor unheaded-block-31 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "037571490a8ad01e165828745658491e6af4640499660472f00af9be0c5d0292",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Run",
         "Proposed Runtime Recovery Amendment"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_44013f730570bcace75375b6cac5b517",
@@ -4835,13 +4919,19 @@
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "targetAnchor": "unheaded-block-33",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 230-233, target 232-235, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (299 chars); anchor unheaded-block-33 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve. Digests also hand-recomputed with an independent script: equal.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "d06c7574443b0aadd4c8ad00e37d717ef0b35f1f8afb81d4356101f194013da8",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Run",
         "Proposed Runtime Recovery Amendment"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_9176bc8efe3db1009e816ddede12630d",
@@ -4873,12 +4963,18 @@
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "targetAnchor": "unheaded-block-35",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: sampled; rationale lines regenerate equal from the binding (source 245-245, target 241-241, anchors, digests, link counts, context, disposition word), checker clean; source and target text byte-equal (68 chars) and ancestry \"Assignment, Run, And RunResult Contract / RunResult\" equal to the source; prior digest found in the target at the cited commit; anchor unheaded-block-35 ok; disposition move is the right one for an equal carry.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "03dc23a85a4bf61c385247aa08a484bfcc044c51dc56319f08df09410704621f",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "RunResult"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_81cb4d578e22df80989070ca854bf181",
@@ -4889,12 +4985,18 @@
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "targetAnchor": "unheaded-block-36",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 247-254, target 243-250, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (306 chars); anchor unheaded-block-36 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "a2e5819ee575628c2f31b335c4557f6e5373380286619a0b927a2ea29c939c89",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "RunResult"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_b570659f53fe08dee4bf9eda19e761b8",
@@ -4905,12 +5007,18 @@
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "targetAnchor": "unheaded-block-40",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 288-288, target 287-287, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (68 chars); anchor unheaded-block-40 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve. Digests also hand-recomputed with an independent script: equal.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "96d7bd85c9b3ed7aeee722d7edce9b05c7bf6d8390e61a5a33903a41419b797e",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Confidence"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_d63817bd2e829afcaa3ca8e6b0829099",
@@ -4921,12 +5029,18 @@
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "targetAnchor": "unheaded-block-41",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 290-295, target 289-294, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (386 chars); anchor unheaded-block-41 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "0ca283efed4d41f991c27193c2147ea504032aabd6ee4e1873e257d7b38ddef7",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Confidence"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_49bd109f3f24770faae9adfc5b03e415",
@@ -4937,12 +5051,18 @@
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "targetAnchor": "unheaded-block-42",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 299-301, target 298-300, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (240 chars); anchor unheaded-block-42 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve. Digests also hand-recomputed with an independent script: equal.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "1c5ff824ccce43e904bad356347b4718ebebcf1da12129a4ae4cc0e5f249e307",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Evidence Freshness"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_f9845f6ed18802de0c3bd276e4d2778a",
@@ -4974,12 +5094,18 @@
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "targetAnchor": "unheaded-block-46",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: two-line pointer text; only the two link destinations change from the legacy roadmap files to the history copies with #literal-snapshot, as the rationale lists (both files exist, both anchors exist); text otherwise equal; digests differ for that reason; anchor unheaded-block-46 ok. Digests also hand-recomputed with an independent script: equal.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "7ecbfde0b13952ce64d4c6064436ec1734b1d491c54814c38d6a16ff3f10ddcf",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Required Negative Tests"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_d369d32c9415f053acf8ae750f7d0c95",

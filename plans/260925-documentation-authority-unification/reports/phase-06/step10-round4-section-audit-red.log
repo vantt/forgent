@@ -1,0 +1,28 @@
+✔ frozen reviewed rationale survives regeneration until a binding changes (0.519871ms)
+✔ identical source occurrences require their own anchor or authenticated historical ordinal (0.386843ms)
+✔ heading comparison uses complete direct section and detects unlabelled payload loss (1.388092ms)
+✔ heading body equality and link rebases are explained independently of depth (0.39423ms)
+✔ correction before must occur in its own bound source or identify an intermediate witness (0.242072ms)
+✔ removed and added unrelated links are two changes and repeated changes are distinct pairs (0.238666ms)
+✖ whole-section audit cannot clear an unexplained delta with a generic reason (0.139355ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 6
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 43.870411
+
+✖ failing tests:
+
+test at test/scripts/doc-rationale-author.test.mjs:44:1
+✖ whole-section audit cannot clear an unexplained delta with a generic reason (0.139355ms)
+  TypeError: h.checkSectionExplanation is not a function
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale-author.test.mjs:46:14)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7)

@@ -408,8 +408,8 @@
       "claimKind": "decision",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "rationale": "Source: docs/specs/decision-citation-drift.md:98-98#pointers-implementation (current lines); unit SHA256 95e71b5dfa80858cdc6300b28de97966fb7de22d77bdba919c47ad7c9b81d32f.\nTarget: docs/platform/decision-citation-drift/spec.md:119-119#pointers-implementation (current lines); unit SHA256 95e71b5dfa80858cdc6300b28de97966fb7de22d77bdba919c47ad7c9b81d32f.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 95e71b5dfa80858cdc6300b28de97966fb7de22d77bdba919c47ad7c9b81d32f at 1276467f37a99d19aff05808d42fafbf40341449.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 2; title \"Pointers (implementation)\" → \"Pointers (implementation)\".\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/decision-citation-drift.md#pointers-implementation under docs/platform/decision-citation-drift/spec.md#pointers-implementation; source context \"Spec: Decision Citation Drift Check\", target context \"Spec: Decision Citation Drift Check\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+      "rationale": "Source: docs/specs/decision-citation-drift.md:98-98#pointers-implementation (current lines); unit SHA256 95e71b5dfa80858cdc6300b28de97966fb7de22d77bdba919c47ad7c9b81d32f.\nTarget: docs/platform/decision-citation-drift/spec.md:119-119#pointers-implementation (current lines); unit SHA256 95e71b5dfa80858cdc6300b28de97966fb7de22d77bdba919c47ad7c9b81d32f.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 95e71b5dfa80858cdc6300b28de97966fb7de22d77bdba919c47ad7c9b81d32f at 1276467f37a99d19aff05808d42fafbf40341449.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 2; title \"Pointers (implementation)\" → \"Pointers (implementation)\".\nWhole direct section equal; depth 2 → 2; 0 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (existing-labelled-successor-correction): Complete direct section compared to the next native heading. Depth 2 → 2, title \"Pointers (implementation)\" → \"Pointers (implementation)\"; 0 distinct link spelling/label changes; 0 applicable exact labelled corrections. Normalized nonblank line order matches; exact raw-section removed/added line witnesses are accounted below; correction-normalized counts are reported separately. Existing correction labels named corrected successor / truth-ledger-agent-coordination.json at immutable account 9b0526380:plans/260925-documentation-authority-unification/ledger/decisions/s8-decision-citation-drift-01.json; exact section delta: removed []; added []. This records replacement, not byte carriage or current-truth certification.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/decision-citation-drift.md#pointers-implementation under docs/platform/decision-citation-drift/spec.md#pointers-implementation; source context \"Spec: Decision Citation Drift Check\", target context \"Spec: Decision Citation Drift Check\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "95e71b5dfa80858cdc6300b28de97966fb7de22d77bdba919c47ad7c9b81d32f",
       "targetAncestry": [
         "Spec: Decision Citation Drift Check"
@@ -422,14 +422,20 @@
       "targetAnchor": "unheaded-block-12",
       "claimKind": "decision",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "rationale": "Source: docs/specs/decision-citation-drift.md:100-115#unheaded-block-10 (current lines); unit SHA256 b2c59c202dc6de42a01a6cec95a4aeca692960350aee8e0f37198a01c736dacd.\nTarget: docs/platform/decision-citation-drift/spec.md:121-136#unheaded-block-12 (current lines); unit SHA256 b2c59c202dc6de42a01a6cec95a4aeca692960350aee8e0f37198a01c736dacd.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest b2c59c202dc6de42a01a6cec95a4aeca692960350aee8e0f37198a01c736dacd at 1276467f37a99d19aff05808d42fafbf40341449.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/decision-citation-drift.md#unheaded-block-10 under docs/platform/decision-citation-drift/spec.md#unheaded-block-12; source context \"Spec: Decision Citation Drift Check / Pointers (implementation)\", target context \"Spec: Decision Citation Drift Check / Pointers (implementation)\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "mechanical: move decision-citation-drift.md:100-115#unheaded-block-10 -> spec.md:121-136#unheaded-block-12; both digests recomputed by script and equal; lines equal real spans; anchor ok; ancestry equals real chain; links 0/0/0/0/0/0; row equals shard at the pin; last-reviewed digest backed by a committed ok verdict; class Unit-exact.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-12-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "b2c59c202dc6de42a01a6cec95a4aeca692960350aee8e0f37198a01c736dacd",
       "targetAncestry": [
         "Spec: Decision Citation Drift Check",
         "Pointers (implementation)"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     }
   ]
 }

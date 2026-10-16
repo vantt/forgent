@@ -1,0 +1,271 @@
+{
+  "inputCommit": "9b0526380",
+  "reports": 33,
+  "leadDecisions": "L10-28–L10-32 under A42; recorded in owner-answers.md",
+  "rows": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-accounting-01-287a22d33.md",
+      "sha256": "7e943a1f85ed21fd86cb6748f4227671ea6a1459e6f51d15b1d401bb93946654",
+      "notesAndConcerns": [
+        "## Notes\n\n1. Counts: 7 ok, 0 rework, 0 hold. Rework rate 0 percent of deep-read rows, below the 3 percent line, so no extension beyond what I already read was needed.\n2. Observation (not a defect of the binding, Lead decision on cost): reviewed rows whose rationale or remainder was written before approval still end with text such as pending independent review or A34 independent acceptance pending (claims in parts 1 and 2 with such tails). The row status field is authoritative and the tail is frozen from the version I approved; rewriting it would reopen the approval, so I recommend leaving it and fixing it at the promotion truth check if at all.\n3. Observation: the previous round found a reversed range 4415-4380 and a stale 4461 citation in the runner notes; both are fixed at 287a22d33 (all three notes now say 4414-4417, the operations spec cites 4415,4503 and both lines are the unknown-verb refusals in bin/fgos.mjs).\n4. The only tool limitation is the one the request states: the original checker cannot run directly on a shard that did not exist at 5035fed52; the request's supplement audits those rows with the unchanged function and I reproduced it.\n\nUnresolved: none for the claims in this report; observation 2 needs a Lead decision on whether to rewrite stale tails.\n"
+      ],
+      "read": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-accounting-02-287a22d33.md",
+      "sha256": "4154db891615f6a9a29a83a8e04496fd1bc1f054e7a7f465c5d236ef98fbeec1",
+      "notesAndConcerns": [
+        "## Notes\n\n1. Counts: 7 ok, 0 rework, 0 hold. Rework rate 0 percent of deep-read rows, below the 3 percent line, so no extension beyond what I already read was needed.\n2. Observation (not a defect of the binding, Lead decision on cost): reviewed rows whose rationale or remainder was written before approval still end with text such as pending independent review or A34 independent acceptance pending (claims in parts 1 and 2 with such tails). The row status field is authoritative and the tail is frozen from the version I approved; rewriting it would reopen the approval, so I recommend leaving it and fixing it at the promotion truth check if at all.\n3. Observation: the previous round found a reversed range 4415-4380 and a stale 4461 citation in the runner notes; both are fixed at 287a22d33 (all three notes now say 4414-4417, the operations spec cites 4415,4503 and both lines are the unknown-verb refusals in bin/fgos.mjs).\n4. The only tool limitation is the one the request states: the original checker cannot run directly on a shard that did not exist at 5035fed52; the request's supplement audits those rows with the unchanged function and I reproduced it.\n\nUnresolved: none for the claims in this report; observation 2 needs a Lead decision on whether to rewrite stale tails.\n"
+      ],
+      "read": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-accounting-03-287a22d33.md",
+      "sha256": "96b628f17d717bbdccb26ff8418f5b22bb3764a599099238b45039fe0b666075",
+      "notesAndConcerns": [
+        "## Notes\n\n1. Counts: 9 ok, 0 rework, 0 hold. Rework rate 0 percent of deep-read rows, below the 3 percent line, so no extension beyond what I already read was needed.\n2. Observation (not a defect of the binding, Lead decision on cost): reviewed rows whose rationale or remainder was written before approval still end with text such as pending independent review or A34 independent acceptance pending (claims in parts 1 and 2 with such tails). The row status field is authoritative and the tail is frozen from the version I approved; rewriting it would reopen the approval, so I recommend leaving it and fixing it at the promotion truth check if at all.\n3. Observation: the previous round found a reversed range 4415-4380 and a stale 4461 citation in the runner notes; both are fixed at 287a22d33 (all three notes now say 4414-4417, the operations spec cites 4415,4503 and both lines are the unknown-verb refusals in bin/fgos.mjs).\n4. The only tool limitation is the one the request states: the original checker cannot run directly on a shard that did not exist at 5035fed52; the request's supplement audits those rows with the unchanged function and I reproduced it.\n\nUnresolved: none for the claims in this report; observation 2 needs a Lead decision on whether to rewrite stale tails.\n"
+      ],
+      "read": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-accounting-04-287a22d33.md",
+      "sha256": "5361c891ae245a1e9f33ae8335e22b672cadbdd18503f10cef2e4bf2f544323c",
+      "notesAndConcerns": [
+        "## Notes\n\n1. Counts: 7 ok, 0 rework, 0 hold. Rework rate 0 percent of deep-read rows, below the 3 percent line, so no extension beyond what I already read was needed.\n2. Observation (not a defect of the binding, Lead decision on cost): reviewed rows whose rationale or remainder was written before approval still end with text such as pending independent review or A34 independent acceptance pending (claims in parts 1 and 2 with such tails). The row status field is authoritative and the tail is frozen from the version I approved; rewriting it would reopen the approval, so I recommend leaving it and fixing it at the promotion truth check if at all.\n3. Observation: the previous round found a reversed range 4415-4380 and a stale 4461 citation in the runner notes; both are fixed at 287a22d33 (all three notes now say 4414-4417, the operations spec cites 4415,4503 and both lines are the unknown-verb refusals in bin/fgos.mjs).\n4. The only tool limitation is the one the request states: the original checker cannot run directly on a shard that did not exist at 5035fed52; the request's supplement audits those rows with the unchanged function and I reproduced it.\n\nUnresolved: none for the claims in this report; observation 2 needs a Lead decision on whether to rewrite stale tails.\n"
+      ],
+      "read": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-accounting-05-287a22d33.md",
+      "sha256": "27d3cd8b29060aa717adbd842a016fb64da0ebf70ed4ee30f8d90f2e7b95e598",
+      "notesAndConcerns": [
+        "## Notes\n\n1. The two reworks are the same class as the generator gap G1 on tools-001: a correction before fragment that is not in the bound source. Fixing the exact-edit manifest and regenerating also changes the text of the siblings claim_224b5f54 and claim_979ec4a6 (not in my group), which I measured to share the pair.\n2. Approval fields: all three rows are pending with no approval carried, as the request says.\n\nUnresolved: whether the Lead fixes G1 in the generator and regenerates, or only corrects the manifest fragments.\n"
+      ],
+      "read": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-accounting-06-287a22d33.md",
+      "sha256": "cbd680a941bf1dfde2f4cf3a46252b51568e8282257063bde24cef5e994117d6",
+      "notesAndConcerns": [
+        "## Notes\n\n1. The four gap rationales share one sentence. It is true for each row (each applies one of the listed causes) but it is not the binding-derived text of the other regenerated rows and says nothing about which cause applied. This is the same standard I accepted for the 11 gap rows of the previous round; if the Lead regenerates 077 and 082 for tools-001, these four are the natural candidates to render the same way.\n2. Evidence rows are ok for what is stated in each note; fresh-D-summary is a structural check, and H, I and the sub-counts of target ownership were not reproduced.\n\nUnresolved: none.\n"
+      ],
+      "read": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-01-287a22d33.md",
+      "sha256": "a79b2a521b4942be24ec1e9c9b9fc9d20b196a9c57698c4e822bfb9f0e9f7ef6",
+      "notesAndConcerns": [
+        "## Notes\n\n- No rework in this part. The four rework rows of this review round are in part 02 (docs/README.md link counts in the rationales); no row in this part has a false printed count.\n- Carried history, not defects: 27 or more rationales still say \"Review pending\", \"no historical approval is carried\" or \"re-decided pending\" although the rows are now reviewed; and \"Package at ...: pending target rebind\" sentences describe past rebinding events. They describe what happened, but a reader of a reviewed row may read them as current state. I did not mark them rework because the generator facts they state are true.\n- Registry gap rows (13 in part 02): the historical source text is not always recoverable. Ten digests recompute from an AGENTS.md revision (f33612119, 79530b221, 59b9b7087, 120af6b3d or 3d3d32648); three (claim_a55aa524, claim_adc150a4, claim_839bc977) do not recompute from any AGENTS.md revision with the current extractor, matching the disclosed sourceWitnessLimits (84 rows overall). For those the check is shard digest equals registry digest equals the digest printed in the rationale, with target none.\n- Evidence citations of the form coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 refer to the legacy files (the platform copies cite the probe contract at 415 and 35), and harness/enrich-and-validate-contract.mjs is domains/coding/harness/enrich-and-validate-contract.mjs; both are imprecise but true.\n- Anchors: every target anchor in the rows passes `list-doc-anchors --check`; retained and gap rows have no target.\n- decisions-190 source digest is stored as a 16-hex prefix; the table prints the full digest from the extractor.\n\nUnresolved: none for this part; the reproduction command in the request header rewrites step10-sync287-rationale-consistency.json in the repository root (restored in my run).\n"
+      ],
+      "read": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-287a22d33.md",
+      "sha256": "eb4ef2486ba573b9da2b863e13035660cb5d644ae88185b531ded52a067f2ea9",
+      "notesAndConcerns": [
+        "## Notes\n\n- Rework (part 02, four claims: decisions-300, 301, 302, 303, the docs/README.md rows carried into docs-portal.md): the rationale sentence \"This unit includes N documented link spelling adjustment(s)\" is false. The units hold 8, 8, 4 and 4 link destination changes (heading 1 Read First, its table block, heading 4 Related Files, its table block); the rationales print 13, 13, 8 and 8 pairs because each distinct pair is repeated (the table rows twice, the user link twice). Every pair printed is real and in the right direction and no other word differs, so the carriage itself is sound; only the count and the duplicated list need regenerating from the distinct changes. The earlier approval note \"same 13 link pairs checked\" repeated the miscount and is superseded.\n- Carried history, not defects: 27 or more rationales still say \"Review pending\", \"no historical approval is carried\" or \"re-decided pending\" although the rows are now reviewed; and \"Package at ...: pending target rebind\" sentences describe past rebinding events. They describe what happened, but a reader of a reviewed row may read them as current state. I did not mark them rework because the generator facts they state are true.\n- Registry gap rows (13 in part 02): the historical source text is not always recoverable. Ten digests recompute from an AGENTS.md revision (f33612119, 79530b221, 59b9b7087, 120af6b3d or 3d3d32648); three (claim_a55aa524, claim_adc150a4, claim_839bc977) do not recompute from any AGENTS.md revision with the current extractor, matching the disclosed sourceWitnessLimits (84 rows overall). For those the check is shard digest equals registry digest equals the digest printed in the rationale, with target none.\n- Evidence citations of the form coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 refer to the legacy files (the platform copies cite the probe contract at 415 and 35), and harness/enrich-and-validate-contract.mjs is domains/coding/harness/enrich-and-validate-contract.mjs; both are imprecise but true.\n- Anchors: every target anchor in the rows passes `list-doc-anchors --check`; retained and gap rows have no target.\n- decisions-190 source digest is stored as a 16-hex prefix; the table prints the full digest from the extractor.\n\nUnresolved: none beyond the four rework rows; the reproduction command in the request header rewrites step10-sync287-rationale-consistency.json in the repository root (restored in my run).\n"
+      ],
+      "read": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-287a22d33.md",
+      "sha256": "bef090fa3360d3cc3b08ab59c23ce7e6ba71c5e240bbd2dfe426a68e03784cb3",
+      "notesAndConcerns": [
+        "## Notes\n\n- No rework in this part. The four rework rows of this review round are in part 02 (docs/README.md link counts in the rationales); no row in this part has a false printed count.\n- Carried history, not defects: 27 or more rationales still say \"Review pending\", \"no historical approval is carried\" or \"re-decided pending\" although the rows are now reviewed; and \"Package at ...: pending target rebind\" sentences describe past rebinding events. They describe what happened, but a reader of a reviewed row may read them as current state. I did not mark them rework because the generator facts they state are true.\n- Registry gap rows (13 in part 02): the historical source text is not always recoverable. Ten digests recompute from an AGENTS.md revision (f33612119, 79530b221, 59b9b7087, 120af6b3d or 3d3d32648); three (claim_a55aa524, claim_adc150a4, claim_839bc977) do not recompute from any AGENTS.md revision with the current extractor, matching the disclosed sourceWitnessLimits (84 rows overall). For those the check is shard digest equals registry digest equals the digest printed in the rationale, with target none.\n- Evidence citations of the form coordination-capability-envelope.md:388 and coordination-worker-provider-boundary.md:11 refer to the legacy files (the platform copies cite the probe contract at 415 and 35), and harness/enrich-and-validate-contract.mjs is domains/coding/harness/enrich-and-validate-contract.mjs; both are imprecise but true.\n- Anchors: every target anchor in the rows passes `list-doc-anchors --check`; retained and gap rows have no target.\n- decisions-190 source digest is stored as a 16-hex prefix; the table prints the full digest from the extractor.\n\nUnresolved: none for this part; the reproduction command in the request header rewrites step10-sync287-rationale-consistency.json in the repository root (restored in my run).\n"
+      ],
+      "read": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-287a22d33.md",
+      "sha256": "b0094feba6d999550116a7e9ac2941140941785e617368f9ff46cee2eb2d4a85",
+      "notesAndConcerns": [
+        "## Notes\n\n1. The three rows whose parent heading differs (`unheaded-block-144`, `-145`, `-150` to blocks 69, 70, 71) are Weak-exact by their own rationale ('ancestor headings differ'), which is true; the carried 13.x text sits under a candidate-added parent while the original numbered heading 13 stays in `docs/platform/agent-confinement/history/rollout-and-settled-facts.md`. Anchors here were bound by content: every target anchor is the unique unit with the source digest, no position-kept anchors remain.\n2. All seven rationales share one long authoring-time template. Its sentence that the row binding 'remains pending independent review' and the 'Package at aecdc30aa' sentence describe the state at authoring, not the state now; I judged this historical and not false (it was accepted in two earlier rounds and is unchanged since 345f15d95), but an author cleaning the generator could drop it.\n\nUnresolved: none for the ordinary verdicts; the rows I confirm do not close the owner-queue items listed in step10-evidence.md and no sensitivity or checkpoint obligation is touched by this review.\n"
+      ],
+      "read": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-287a22d33.md",
+      "sha256": "071bdcb02e7d84c716f4952310f9f79ef3df6d7dbd031ea739e11f4f00bb90a8",
+      "notesAndConcerns": [
+        "## Notes\n\n1. The three reclassify rows carry no target by design: the historical identity is retained outside platform authority. I verified that AGENTS.md, docs/reading-map.md and docs/specs/reading-map.md at HEAD are byte-identical to 19ca8de23 (`git diff --quiet`), that each historical digest in the rationale equals the full digest recomputed at witness 2300d6557, and that each has a current successor unit as a separate current claim.\n2. The three partial-carry rows and the supersede row share template wording but I checked each factual statement: gap status in the registry, successor claim exists and carries the current text (the successor rows are pending in other shards and are not approved here), my own subsequence residual equals `step10-sync19-predecessor-residuals.json` (3, 1, 1 and 0 lines) and each stored SHA256 recomputes. Two of the predecessor rows share their target unit with other historical predecessor rows of other shards (distribution.md block 5, architecture-manifest file-block); that is by design for gap predecessors and each row keeps its own source digest.\n3. The architecture-manifest row targets the JSON `file-block` unit, which `list-doc-anchors.mjs` does not list (markdown anchors only); the unit digest equals the whole-file sha256 at HEAD, so I treat the anchor as verified by digest instead.\n\nUnresolved: none for the ordinary verdicts; the rows I confirm do not close the owner-queue items listed in step10-evidence.md and no sensitivity or checkpoint obligation is touched by this review.\n"
+      ],
+      "read": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+      "sha256": "cba1b4c7d4a4f99560e5f693cf86709c18e8640a3acb812e20207fbe6f53517c",
+      "notesAndConcerns": [
+        "## Notes\n\n1. Heading rows: the source H4 sections (Bối cảnh, Quyết định, Hệ quả) became H3 and the H3 ADR titles became H2. The heading digest includes level and title, so those digests differ by design; the section payload digest and the payload text are equal on every such row except the two ADR 0002 rows (claim_5412ac73 differs by one link destination, claim_f8e2b48d is the empty-payload second H1 merged into the H2). The rationales name the target level ('frozen H3') but not the source level; I treat the omission as a nit that the rationale is incomplete but not false, as in the two earlier rounds.\n2. claim_5412ac73 says the record text is unchanged while the blockquote under that heading has one link destination rewritten; that rewrite is disclosed on claim_0201a1d6 (its own unit) and verified by my word diff, so I kept ok. claim_f8e2b48d quotes the duplicate H1 title without diacritics, which is cosmetic.\n3. The trailer 'Target digest expanded to full SHA256; source and target content are unchanged' on the b-decisions-first rationales refers to the change of this row since the previous version (a digest expansion), not to byte equality of heading units whose titles differ; read that way it is true. The b-behaviors rationales say 'no link rewrite' and 'byte-identical', both true (equal digests, my diff).\n4. Shared targets: claim_ce947d10 shares cli-io-contract.md block 34 with two historical rows of s5-root-authorities-sc1-gaps; claim_5412ac73 and claim_f8e2b48d share the ADR 0002 H2 by design (promote plus merge). The three identical-footer rows (blocks 7, 11, 16) are bound to their own ADR copy by ancestry; the seventh copy (L1877) belongs to a row outside this request.\n\nUnresolved: none for the ordinary verdicts; the rows I confirm do not close the owner-queue items listed in step10-evidence.md and no sensitivity or checkpoint obligation is touched by this review.\n"
+      ],
+      "read": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+      "sha256": "757a9212b76d5c2f2c02b77cf58f22adb5340f73042ea5bf54f3b0cf35c435ad",
+      "notesAndConcerns": [
+        "## Notes\n\n1. Heading rows follow the same pattern as part 06: H4 to H3 for Bối cảnh, Quyết định, Hệ quả and the two review-fix annotations of ADR 0013, H3 to H2 for the ADR titles; payload digest and payload text equal on all 24 heading rows. The rationale names only the target level, the source level is omitted (nit, not false).\n2. The footer rows for ADR 0007, 0011 and 0012 (blocks 28, 34, 40) are each bound to the copy under their own ADR by ancestry; the target file holds seven identical sentences and the one-per-ADR mapping is consistent in order (L1403, L1430, L1461, L1533, L1587, L1664, L1877).\n3. The b-decisions-first body-block rationales quote the first words and the source line range; every quote and range equals the live unit (checked by script for all 33 block rows).\n\nUnresolved: none for the ordinary verdicts; the rows I confirm do not close the owner-queue items listed in step10-evidence.md and no sensitivity or checkpoint obligation is touched by this review.\n"
+      ],
+      "read": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+      "sha256": "701e384ec868683eea476a840eef2e941ddec34b589972d146947aeb4517f68a",
+      "notesAndConcerns": [
+        "## Notes\n\n- All 60 rows are confirmations of earlier ok verdicts that the author applied: pending to reviewed with the report note copied verbatim (checked per row). 23 rows are heading units whose title is translated and whose level changes; for all of them the section payload digest and following-block digest are equal at both ends, so only the heading line differs, and the rationale says so. The heading rule (English frozen titles) is the established corpus practice, so no rework.\n- Non-blocking, for the cutover owner: several translated headings drop words that exist only in the source heading, for example the seq numbers in \"(seq 18029, 18031)\", \"(seq 18032, 18070, 18058)\", \"(seq 18030)\" and the parenthetical \"(supersede base-workflow-model)\". Most rationales disclose \"seq references dropped\" or \"title shortened\", but decisions-172 (seq 18030) says only \"title translated\". These strings stay in the retained source until the Phase 9 retirement.\n- The rationale sentence \"source and target content are unchanged\" sits next to \"title differs\" on the heading rows; read as the section content, it is true.\n\nUnresolved: whether heading-embedded seq numbers and dates must be carried before the source retires (owner or Lead choice).\n"
+      ],
+      "read": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-09-287a22d33.md",
+      "sha256": "72b0cac2c702cdbb3ee578ef0b98781ebbcc12874eb6e2ad007a7ae3839a51e4",
+      "notesAndConcerns": [
+        "## Notes\n\n- All 19 rows are confirmations of earlier ok verdicts; the six retain-in-place rows have no target and their source files are byte-identical to the pins quoted in the rationales. The rationale of those rows ends with \"Pending independent review\" although the row is reviewed; the sentence is the repo-wide convention for 452 rows and not a false claim about the content.\n- decisions-182 and 184 (history document headings) lose the dates 2026-08-15 and 2026-08-15/16 from the title and the rationales do not say so; the dates stay in the retired-decision-history blockquote and at history line 78 (non-blocking).\n- decisions-189 (supersede of the io-contract input heading): all seven units of the source section have their own rows, so the shorter target heading section strands nothing.\n\nUnresolved: none for these rows; the two dropped heading dates (decisions-182, 184) are for the cutover owner.\n"
+      ],
+      "read": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-10-287a22d33.md",
+      "sha256": "16682428b72f97d4b2d974d5a9b1b79e482f46bcc981b912070f40ff023b5378",
+      "notesAndConcerns": [
+        "## Notes\n\n- All 9 native predecessor rows were read with the actual before and after text. Every digest was found in the file at 19ca8de23 (anchors equal), and each current unit differs only in the way the evidence file step10-sync345-predecessor-reconciliation.json and the Lead decisions describe: three link-cell restorations equal to the first-authored bytes (legacy-payload, source-preservation-audit, work-state README) and the evolve citation corrections to bin/fgos.mjs:4414-4417 or 4415, whose lines at HEAD are the unknown-verb default branch and throw (checked).\n- Non-blocking: the same generic rationale sentence is used for all nine rows and lists \"link-cell restoration, sentence-order restoration or evolve code-line citation correction\" as alternatives; the true cause per row is only in the notes above and in the evidence file.\n\nUnresolved: none.\n"
+      ],
+      "read": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-documents-01-287a22d33.md",
+      "sha256": "1d6bba8ba48abe33259c395700022107b2092570d23ce616fdba392fce4f24f3",
+      "notesAndConcerns": [
+        "## Notes\n\n1. Both reworks of the previous documents report (the 4461 pointer and the descending range) are fixed exactly as I asked: 4415,4503 and 4414-4417.\n2. The pointer 4373 in other runner notes was refreshed to 4415 in the previous round and is unchanged here.\n3. Nothing outside the listed lines changed in the four files (git diff 345f15d95 bca590a4e over docs).\n\nUnresolved: none.\n"
+      ],
+      "read": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-historical-01-287a22d33.md",
+      "sha256": "b11e378f0b33de3ba7622246531aa5fcff043d2034ad86e7ac8a06fe9b657113",
+      "notesAndConcerns": [
+        "## Notes\n\n1. The approval metadata refresh keeps my earlier ok verdict and the earlier note; it does not change what the row accounts for.\n2. Optional: the row rationale says full prior/current diff is shown for review and that approval is not carried, while the row is reviewed; unchanged from the previous round and accepted there.\n\nUnresolved: none.\n"
+      ],
+      "read": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-native-01-287a22d33.md",
+      "sha256": "498975f3a6627e8d0eee0209a126e636473f4e7223bb29d3671fe1182077399c",
+      "notesAndConcerns": [
+        "## Notes\n\n1. The four edited headings keep their claim ids with new digests and a lineage block; the four edited blocks are the only units whose text changed, so the 4 new units and 4 gaps are complete and one to one.\n2. The head registry _binding block still names the previous registry (path, bytes 62181246, sha256 4a559a3b), since a file cannot hold its own hash; the proof file carries the new hash 454d56ea, which equals the committed file.\n3. claimKind in the shard rows for the gaps is specification for all four while the registry holds vision, architecture, procedure and specification; vocabulary difference accepted last round.\n\nUnresolved: none.\n"
+      ],
+      "read": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "sha256": "04cbd367ce3a1c95689be97856cf8f43a5bae24231092ce98b26326effd4dd38",
+      "notesAndConcerns": [
+        "## Notes\n\n- The 56 rows that were reviewed in the previous round return as pending; their decisions (disposition, owner, anchor, digest) are unchanged against 345f15d95 and 5035fed52 except for the one citation-corrected predecessor, and the new rationale is regenerated from binding facts. The link counts, link lines, heading-depth lines and context lines were checked against the real units, not against the old prose.\n- The rework (claim_5c520fcb1a68ba27e2093341834258c7, rationale-007) is the only content loss: the regenerated sentence lacks the L10-2 facts that earlier reviews required and approved. The disposition and the null target are fine. Please restore the facts through the generator (a reason or reference line) rather than hand-editing the row, then rerun the consistency checker.\n- Non-blocking: rationale-004, 005 and 006 are merge or promote rows whose partner io-contract units have their own rows; the new text does not mention the partner. rationale-008 quotes the intermediate round-3 text \"4415-4380\" as the correction before-state, which is the edit-log state, not the 19ca8de23 text.\n- Disclosure: step10-sync287-reproduce.py has the directory /tmp/fgos-work hard-coded inside consistency.py and writes its two result JSON files into the repo reports directory. I redirected what I could to scratch, but the run still created shadow directories under /tmp/fgos-work and rewrote step10-sync287-rationale-consistency.json and step10-sync287-all-shards-consistency.json in the worktree with bytes identical to the committed ones; git status --short is empty after the run.\n\nUnresolved: restore the L10-2 content for claim_5c520fcb1a68ba27e2093341834258c7 and rerun the checker; the heading-date and seq question of the decisions requests is outside this request.\n"
+      ],
+      "read": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-02-287a22d33.md",
+      "sha256": "7380dd803c442489108afe98067b8fbe01bd7c7657f802a13ede458334a378f8",
+      "notesAndConcerns": [
+        "## Notes\n\n- Disposition truth: all move rows carry identical text at a content-matched target (digest equal, text identical, no duplicate twin in the file); all supersede rows are block or heading units whose target is a rewritten section, and the rationale claims no carry for them, only that the heading is not an equal-digest copy. That sentence is accurate but generic: it does not say which source words are not in the target. For the 98 supersede rows the dropped wording survives only in the frozen legacy file, which is still present and byte-equal to the bound digests; I judged that sufficient for a supersede with a named successor and did not ask for per-row loss lists.\n- The ten rows under Team Communication Protocol V1 section 10 show a source and target context that differ by one renamed ancestor heading; this is true and disclosed, the heading rename itself is accounted by another row not in this request.\n- Systemic defects of earlier rounds re-checked on this request: anchors by position (none, all by content and digest), swapped link cells (Link lines parsed and matched to real source and target text, 39 link lines across all four requests, 0 mismatches), false boilerplate (no claim of byte identity or carry on any differing row, equal and differ sentences all correct).\n\nUnresolved: none for this request; the single first-run test failure above is unexplained beyond the shared-worktree timing observation.\n"
+      ],
+      "read": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-287a22d33.md",
+      "sha256": "7898c05d2827af8434dcfdc1c18806b7737315b1d3bce4593f8e28ce63824c1d",
+      "notesAndConcerns": [
+        "## Notes\n\n- Disposition truth: all move rows carry identical text at a content-matched target (digest equal, text identical, no duplicate twin in the file); all supersede rows are block or heading units whose target is a rewritten section, and the rationale claims no carry for them, only that the heading is not an equal-digest copy. That sentence is accurate but generic: it does not say which source words are not in the target. For the 98 supersede rows the dropped wording survives only in the frozen legacy file, which is still present and byte-equal to the bound digests; I judged that sufficient for a supersede with a named successor and did not ask for per-row loss lists.\n- The ten rows under Team Communication Protocol V1 section 10 show a source and target context that differ by one renamed ancestor heading; this is true and disclosed, the heading rename itself is accounted by another row not in this request.\n- Systemic defects of earlier rounds re-checked on this request: anchors by position (none, all by content and digest), swapped link cells (Link lines parsed and matched to real source and target text, 39 link lines across all four requests, 0 mismatches), false boilerplate (no claim of byte identity or carry on any differing row, equal and differ sentences all correct).\n\nUnresolved: none for this request; the single first-run test failure above is unexplained beyond the shared-worktree timing observation.\n"
+      ],
+      "read": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-04-287a22d33.md",
+      "sha256": "ed7cd9db06b52a3c55afefa4a3b0082b59a86bd1b0c3232cce2b7b299083525f",
+      "notesAndConcerns": [
+        "## Notes\n\n- Disposition truth: all move rows carry identical text at a content-matched target (digest equal, text identical, no duplicate twin in the file); all supersede rows are block or heading units whose target is a rewritten section, and the rationale claims no carry for them, only that the heading is not an equal-digest copy. That sentence is accurate but generic: it does not say which source words are not in the target. For the 98 supersede rows the dropped wording survives only in the frozen legacy file, which is still present and byte-equal to the bound digests; I judged that sufficient for a supersede with a named successor and did not ask for per-row loss lists.\n- The ten rows under Team Communication Protocol V1 section 10 show a source and target context that differ by one renamed ancestor heading; this is true and disclosed, the heading rename itself is accounted by another row not in this request.\n- Systemic defects of earlier rounds re-checked on this request: anchors by position (none, all by content and digest), swapped link cells (Link lines parsed and matched to real source and target text, 39 link lines across all four requests, 0 mismatches), false boilerplate (no claim of byte identity or carry on any differing row, equal and differ sentences all correct).\n\nUnresolved: none for this request; the single first-run test failure above is unexplained beyond the shared-worktree timing observation.\n"
+      ],
+      "read": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-05-287a22d33.md",
+      "sha256": "a3d0c0206dacd806f567473b227af2276e12048f28cad7a9c6724960db66b9a9",
+      "notesAndConcerns": [
+        "## Notes\n\n- Disposition truth: all move rows carry identical text at a content-matched target (digest equal, text identical, no duplicate twin in the file); all supersede rows are block or heading units whose target is a rewritten section, and the rationale claims no carry for them, only that the heading is not an equal-digest copy. That sentence is accurate but generic: it does not say which source words are not in the target. For the 98 supersede rows the dropped wording survives only in the frozen legacy file, which is still present and byte-equal to the bound digests; I judged that sufficient for a supersede with a named successor and did not ask for per-row loss lists.\n- The ten rows under Team Communication Protocol V1 section 10 show a source and target context that differ by one renamed ancestor heading; this is true and disclosed, the heading rename itself is accounted by another row not in this request.\n- Systemic defects of earlier rounds re-checked on this request: anchors by position (none, all by content and digest), swapped link cells (Link lines parsed and matched to real source and target text, 39 link lines across all four requests, 0 mismatches), false boilerplate (no claim of byte identity or carry on any differing row, equal and differ sentences all correct).\n\nUnresolved: none for this request; the single first-run test failure above is unexplained beyond the shared-worktree timing observation.\n"
+      ],
+      "read": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-06-287a22d33.md",
+      "sha256": "9a7acca6881237fdcffe441ad9c98e390a13b5233c96fc27b22bbbfb1e329839",
+      "notesAndConcerns": [
+        "## Notes\n\n- Nothing was added to or lost from the source or target text by the regeneration: decision fields other than the rationale are byte-equal to the committed shard rows.\n- Observations without a verdict change: link alignment in the Link n lines is positional, so a removed link next to an added link can show as one changed link; supersede rows record a truth correction, their rationale deliberately says only that the successor differs, and the substance of each successor was checked against the source text here and not against code (current truth needs its own evidence, as the rationale itself says).\n- Counts for this request: 60 ok, 0 rework, 0 hold. Rows for registryGaps tuples (part 7: rationale-412 to 420) are expected to report unknown-claim in the lint.\n\nUnresolved: none that needs the owner; the rework rows need only a regeneration of the source occurrence.\n"
+      ],
+      "read": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-07-287a22d33.md",
+      "sha256": "081413f6e2e187a099e6701ad67a8f20fcd9012198e79c878be75d7e37e49beb",
+      "notesAndConcerns": [
+        "## Notes\n\n- Rework (7 rows, claim_50dca4885019ac5125d941ea5a86f448, claim_07ae72c4d2c93884a120cf2ca12250a8, claim_211f0b98400863f2a0e9b9cdaa2259fe, claim_1d8baa1def0cea7595b62de99846b489, claim_012bfa2639fb107eeb3baee4fb502f54, claim_99806d8b21d05eb7a8e8744d765bea00, claim_a6f43d98b3eebe97802fd01a4ac7863b): docs/specs/runner.md holds eight identical footer sentences (digest 95a357e2, blocks 150 155 167 176 241 250 274 286). The registry gives each claim its own native source anchor (144 149 161 170 235 244 268 280) and the decision rows pair them with target blocks 150 155 167 176 241 250 274 286 in order. The regenerated rationales of the seven later claims still name occurrence 1 (runner.md:1665, block-150, context 0005 Runner and worker isolation) as their source, in the Source line, the Account-for sentence and the source context. The generator took matches[0] when the registry anchor did not resolve in the current file, and the rationale checker cannot see this because all eight digests are equal. Fix: resolve the source occurrence by the claim's own ordinal (or cite a historical witness at the registry source commit), regenerate those three places and rerun the checker; the first claim (claim_97479b13a60800e856813bfd4f0cbb78) is correct by coincidence and also names 150 where the registry says 144, which the regeneration may state as the disclosed shift.\n- Nothing was added to or lost from the source or target text by the regeneration: decision fields other than the rationale are byte-equal to the committed shard rows.\n- Observations without a verdict change: the 11 rows with no prior reviewed digest (rationale-409, 410, 412 to 420) say so and make no unchanged claim, although earlier boundary reports approved the footer rows at older digests; link alignment in the Link n lines is positional (see the notes on rationale-340 and rationale-495); for the heading-source partial-carry rows the sentence that the source text occurs verbatim in the target section is a substring test on the heading line, so the Recorded residual, which I verified, is what carries the payload.\n- Counts for this request: 53 ok, 7 rework, 0 hold. Rows for registryGaps tuples (part 7: rationale-412 to 420) are expected to report unknown-claim in the lint.\n\nUnresolved: none that needs the owner; the rework rows need only a regeneration of the source occurrence.\n"
+      ],
+      "read": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-08-287a22d33.md",
+      "sha256": "ed2ce2530d467ad206544168d0f2d07b99c8bbf3f77598283db5a06bd07eef06",
+      "notesAndConcerns": [
+        "## Notes\n\n- Nothing was added to or lost from the source or target text by the regeneration: decision fields other than the rationale are byte-equal to the committed shard rows.\n- Observations without a verdict change: link alignment in the Link n lines is positional, so a removed link next to an added link can show as one changed link; for the heading-source partial-carry rows the sentence that the source text occurs verbatim in the target section is a substring test on the heading line, so the Recorded residual, which I verified (every named remainder block is found verbatim in its restored section), is what carries the payload.\n- Counts for this request: 60 ok, 0 rework, 0 hold. Rows for registryGaps tuples (part 7: rationale-412 to 420) are expected to report unknown-claim in the lint.\n\nUnresolved: none that needs the owner; the rework rows need only a regeneration of the source occurrence.\n"
+      ],
+      "read": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-09-287a22d33.md",
+      "sha256": "b784c0f59e139ba748e3a6e0f3d8505d1877a752900ba56e0f38e85adc9b2472",
+      "notesAndConcerns": [
+        "## Notes\n\n- Nothing was added to or lost from the source or target text by the regeneration: decision fields other than the rationale are byte-equal to the committed shard rows.\n- Observations without a verdict change: link alignment in the Link n lines is positional, so a removed link next to an added link can show as one changed link; for the heading-source partial-carry rows the sentence that the source text occurs verbatim in the target section is a substring test on the heading line, so the Recorded residual, which I verified (every named remainder block is found verbatim in its restored section), is what carries the payload.\n- Counts for this request: 60 ok, 0 rework, 0 hold. Rows for registryGaps tuples (part 7: rationale-412 to 420) are expected to report unknown-claim in the lint.\n\nUnresolved: none that needs the owner; the rework rows need only a regeneration of the source occurrence.\n"
+      ],
+      "read": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-10-287a22d33.md",
+      "sha256": "fb762e7914a26375e937513133738708929309b85364ad76dd4c264a1cfd9bcc",
+      "notesAndConcerns": [
+        "## Notes\n\n1. Counts for this part: ok 60, rework 0, hold 0.\n2. Evidence-citation drift (observation, not a verdict reason): the corrections cite code lines recorded when each manifest was written; at the content commit 25 cited ranges in bin/fgos.mjs, store.mjs, claim-port.mjs, runner.md no longer show the quoted snippet (for example bin/fgos.mjs:4373-4380 and 4640-4643 in the evolve corrections of 701, 707 and 708 now hold unrelated code; the unknown-verb throw is at 4415 and the evolve comment at 4682). The manifests keep sha-pinned snippets, so nothing is unverifiable, but the generator should print the evidence commit or blob beside each range.\n3. Wording observation: 16 rows whose only difference is link respelling or destination (for example 584, 604 to 607, 609, 610, 612, 614, 616, 618, 620, 629, 659, 661, 576) end with the sentence that the successor has different direct text, which is true but less precise than the Links lines; not a verdict reason.\n4. Row 713 lists corrections whose before text occurs in the other predecessor (714) but not in its own bound source; the lines describe the target lineage and are accurate for the target.\n5. Reverse direction: nothing was added to a target unit without a label; where the target text differs from the source, the difference is either link or depth rewriting, a listed correction, an in-text Added in candidate sentence, or a named remainder (603, 608, 613).\n\nUnresolved: whether the owner wants rows 710 and 711 rebound to the current group-thinking sections or recorded as superseded by the upstream rename; the heading-clause fix needs a generator change and regeneration of every heading row in all requests, not only these.\n"
+      ],
+      "read": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-11-287a22d33.md",
+      "sha256": "09ecc53109c7994b973fcb809eb85bda4cbb67c8620ce97f63123a17f939dd3d",
+      "notesAndConcerns": [
+        "## Notes\n\n1. Counts for this part: ok 49, rework 8, hold 0.\n2. Evidence-citation drift (observation, not a verdict reason): the corrections cite code lines recorded when each manifest was written; at the content commit 25 cited ranges in bin/fgos.mjs, store.mjs, claim-port.mjs, runner.md no longer show the quoted snippet (for example bin/fgos.mjs:4373-4380 and 4640-4643 in the evolve corrections of 701, 707 and 708 now hold unrelated code; the unknown-verb throw is at 4415 and the evolve comment at 4682). The manifests keep sha-pinned snippets, so nothing is unverifiable, but the generator should print the evidence commit or blob beside each range.\n3. Wording observation: 16 rows whose only difference is link respelling or destination (for example 584, 604 to 607, 609, 610, 612, 614, 616, 618, 620, 629, 659, 661, 576) end with the sentence that the successor has different direct text, which is true but less precise than the Links lines; not a verdict reason.\n4. Row 713 lists corrections whose before text occurs in the other predecessor (714) but not in its own bound source; the lines describe the target lineage and are accurate for the target.\n5. Reverse direction: nothing was added to a target unit without a label; where the target text differs from the source, the difference is either link or depth rewriting, a listed correction, an in-text Added in candidate sentence, or a named remainder (603, 608, 613).\n\nUnresolved: whether the owner wants rows 710 and 711 rebound to the current group-thinking sections or recorded as superseded by the upstream rename; the heading-clause fix needs a generator change and regeneration of every heading row in all requests, not only these.\n"
+      ],
+      "read": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-12-287a22d33.md",
+      "sha256": "27acc3f9ea17d2df2eab951c151b3c5f016b2b9abe7e866ab99a05e9639e2105",
+      "notesAndConcerns": [
+        "## Notes\n\n1. Counts for this part: ok 44, rework 8, hold 0.\n2. Evidence-citation drift (observation, not a verdict reason): the corrections cite code lines recorded when each manifest was written; at the content commit 25 cited ranges in bin/fgos.mjs, store.mjs, claim-port.mjs, runner.md no longer show the quoted snippet (for example bin/fgos.mjs:4373-4380 and 4640-4643 in the evolve corrections of 701, 707 and 708 now hold unrelated code; the unknown-verb throw is at 4415 and the evolve comment at 4682). The manifests keep sha-pinned snippets, so nothing is unverifiable, but the generator should print the evidence commit or blob beside each range.\n3. Wording observation: 16 rows whose only difference is link respelling or destination (for example 584, 604 to 607, 609, 610, 612, 614, 616, 618, 620, 629, 659, 661, 576) end with the sentence that the successor has different direct text, which is true but less precise than the Links lines; not a verdict reason.\n4. Row 713 lists corrections whose before text occurs in the other predecessor (714) but not in its own bound source; the lines describe the target lineage and are accurate for the target.\n5. Reverse direction: nothing was added to a target unit without a label; where the target text differs from the source, the difference is either link or depth rewriting, a listed correction, an in-text Added in candidate sentence, or a named remainder (603, 608, 613).\n\nUnresolved: whether the owner wants rows 710 and 711 rebound to the current group-thinking sections or recorded as superseded by the upstream rename; the heading-clause fix needs a generator change and regeneration of every heading row in all requests, not only these.\n"
+      ],
+      "read": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-13-287a22d33.md",
+      "sha256": "24cc2a97c9354c427f71dfa58dff27e84f0381ad0734767af0ee0351a32c635f",
+      "notesAndConcerns": [
+        "## Notes\n\n1. Counts for this part: ok 3, rework 2, hold 0.\n2. Evidence-citation drift (observation, not a verdict reason): the corrections cite code lines recorded when each manifest was written; at the content commit 25 cited ranges in bin/fgos.mjs, store.mjs, claim-port.mjs, runner.md no longer show the quoted snippet (for example bin/fgos.mjs:4373-4380 and 4640-4643 in the evolve corrections of 701, 707 and 708 now hold unrelated code; the unknown-verb throw is at 4415 and the evolve comment at 4682). The manifests keep sha-pinned snippets, so nothing is unverifiable, but the generator should print the evidence commit or blob beside each range.\n3. Wording observation: 16 rows whose only difference is link respelling or destination (for example 584, 604 to 607, 609, 610, 612, 614, 616, 618, 620, 629, 659, 661, 576) end with the sentence that the successor has different direct text, which is true but less precise than the Links lines; not a verdict reason.\n4. Row 713 lists corrections whose before text occurs in the other predecessor (714) but not in its own bound source; the lines describe the target lineage and are accurate for the target.\n5. Reverse direction: nothing was added to a target unit without a label; where the target text differs from the source, the difference is either link or depth rewriting, a listed correction, an in-text Added in candidate sentence, or a named remainder (603, 608, 613).\n\nUnresolved: whether the owner wants rows 710 and 711 rebound to the current group-thinking sections or recorded as superseded by the upstream rename; the heading-clause fix needs a generator change and regeneration of every heading row in all requests, not only these.\n"
+      ],
+      "read": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-tools-01-287a22d33.md",
+      "sha256": "f4dd82787bd483e8c30ac04b443b68dac956bfd3633e2634a25586dd972f31e0",
+      "notesAndConcerns": [
+        "## Notes\n\n1. The previous round three systemic defects map to this round tools: positional anchors (bindByContent, unchanged and tested), swapped link cells (per-cell relation rule, unchanged) and false boilerplate rationales (this generator). The generator removes boilerplate, but G1 and G2 show it can still state something the bound text does not support.\n2. Suggested hardening is exact: for level units compare source.sectionText with target.sectionText, and fail or label when a correction before fragment is absent from the bound source.\n3. Worktree hygiene: git status --short in the review worktree was empty at the end of my review.\n\nUnresolved: none.\n"
+      ],
+      "read": true
+    }
+  ]
+}

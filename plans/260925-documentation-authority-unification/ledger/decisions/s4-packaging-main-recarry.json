@@ -14,18 +14,24 @@
       "sourceUnitDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "rationale": "Source: docs/specs/distribution.md:57-73#unheaded-block-5 (current lines); unit SHA256 59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e.\nTarget: docs/platform/packaging-distribution/spec.md:517-533#unheaded-block-85 (current lines); unit SHA256 59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/distribution.md#unheaded-block-5 under docs/platform/packaging-distribution/spec.md#unheaded-block-85; source context \"Spec: Distribution / Data Dictionary\", target context \"Spec: Packaging-Distribution / Retained Distribution Source Detail / Spec: Distribution / Data Dictionary\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
       "targetAnchor": "unheaded-block-85",
+      "reviewNote": "deep: A36 draw (seed 2026101609); move distribution.md:57-73#unheaded-block-5 -> spec.md:517-533#unheaded-block-85, source and target text opened and identical (starts: / # / Element / Meaning / Values / Required /); classed Weak-exact (ancestor headings differ; document exact share below one half); target context Spec: Distribution / Data Dictionary equals the real heading chain; links 0/0/0/0/0/0; last-reviewed digest backed by a committed ok verdict.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-11-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution",
         "Data Dictionary"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     }
   ],
   "registryGaps": [
@@ -40,18 +46,18 @@
       "rationale": "A22/A31/A34: one native sync at 19ca8de23908e161c34c91626e41041b7813167c preserves this historical predecessor as a gap; current upstream source successor is separately native-accounted and carried to the candidate. Historical lines changed; exact untransferred residual is retained verbatim with SHA256, independent representation review required; cutover remains blocked. Full source/current witnesses and residual: step10-sync19-predecessor-residuals.json. No identity graft or approval carry.",
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
-      "reviewNote": "deep: historical docs/specs/distribution.md#unheaded-block-5 at witness 2300d6557 (L57-73, digest 034305c4 recomputed by extractor and by hand) against successor 59297ed6: the comparison leaves one residual line (the Doctor check row), whose text and SHA256 4894dcf4 equal the residual file, successor carried by claim_d9185072, so partial-carry is accurate; applied approval checked: the shard row equals the pack, the reviewNote equals the Note in my committed 19ca8de23 report byte for byte, reviewedBy/reviewedAt/reviewReport (review-step10-decisions-05-19ca8de23.md at 4a18f35ff) match, and every non-review field equals the row at the request commit of that round (62d147641)",
+      "reviewNote": "deep: historical docs/specs/distribution.md#unheaded-block-5 at witness 2300d6557 (L57-73, digest 034305c4 recomputed by extractor and by hand) against successor 59297ed6 (current L57-73, recomputed): my own subsequence comparison leaves exactly 1 residual line(s) equal to step10-sync19-predecessor-residuals.json, whose SHA256 recomputes by hand; successor claim_d9185072 carries the current text (pending row in another shard), so partial-carry with a named verbatim remainder is accurate; the rationale is shared template wording but each statement in it holds for this row",
       "remainder": "Verbatim historical residual in plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json, claim claim_26f62a1ae1abc17d0f02706788bfd399, residual SHA256 4894dcf4de3a1254ebc5e89c78ffed0afafc58859c82fa2b2781ac8216b08424. Source 034305c494ee289535b1b4121c8b90ed9d2eb5b850364e1c2a63e936221d40e3; primary target 59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e. Residual file SHA256 recorded in step10-sync19-predecessor-reconciliation.json. A34 independent acceptance pending; cutover blocked.",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-345f15d95.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-287a22d33.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
       "targetAncestry": [
         "Spec: Distribution",
         "Data Dictionary"
       ],
-      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     }
   ]
 }

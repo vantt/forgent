@@ -35,13 +35,19 @@
       "targetAnchor": "unheaded-block-4",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source: docs/specs/work-state.md:42-75#unheaded-block-4 (current lines); unit SHA256 1cedade3c4b6ebc117d2a584b597abfb21cfc375afe5d9fc82814ff074eaed37.\nTarget: docs/platform/work-state/spec.md:60-93#unheaded-block-4 (current lines); unit SHA256 1cedade3c4b6ebc117d2a584b597abfb21cfc375afe5d9fc82814ff074eaed37.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 1cedade3c4b6ebc117d2a584b597abfb21cfc375afe5d9fc82814ff074eaed37 at d23045c2de83e3508fda8fd2580b43ece2e1e046.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/specs/work-state.md#unheaded-block-4 under docs/platform/work-state/spec.md#unheaded-block-4; source context \"Spec: Work-State (tầng quản việc của forgent) / Data Dictionary\", target context \"Work State Specification / 3. Work Item Data Dictionary\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "deep: sampled; rationale lines regenerate equal from the binding (source 42-75, target 60-93, anchors, digests, link counts, context, disposition word), checker clean; source and target text byte-equal (22365 chars) and ancestry \"Work State Specification / 3. Work Item Data Dictionary\" equal to the source; prior digest found in the target at the cited commit; anchor unheaded-block-4 ok; disposition promote is the right one for an equal carry.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "1cedade3c4b6ebc117d2a584b597abfb21cfc375afe5d9fc82814ff074eaed37",
       "targetAncestry": [
         "Work State Specification",
         "3. Work Item Data Dictionary"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_f4fb783783bb1ad062f39d73e0165f86",
@@ -484,14 +490,20 @@
       "targetAnchor": "unheaded-block-12",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source: docs/specs/work-state.md:184-191#unheaded-block-20 (current lines); unit SHA256 2d77bba4c7bc7482c07dae5e2af85f29439884bb5f1e2f55533c2bef5aa56b63.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:105-112#unheaded-block-12 (current lines); unit SHA256 2d77bba4c7bc7482c07dae5e2af85f29439884bb5f1e2f55533c2bef5aa56b63.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 2d77bba4c7bc7482c07dae5e2af85f29439884bb5f1e2f55533c2bef5aa56b63 at d23045c2de83e3508fda8fd2580b43ece2e1e046.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/specs/work-state.md#unheaded-block-20 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-12; source context \"Spec: Work-State (tầng quản việc của forgent) / Data Dictionary / Danh tính người ghi (writer) — cá thể, tách bạch khỏi vai (str46-io-contract)\", target context \"CLI I/O Contract / 2. Input Direction Verb And Identity / Writer Resolution Rules\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 184-191, target 105-112, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (747 chars); anchor unheaded-block-12 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2d77bba4c7bc7482c07dae5e2af85f29439884bb5f1e2f55533c2bef5aa56b63",
       "targetAncestry": [
         "CLI I/O Contract",
         "2. Input Direction Verb And Identity",
         "Writer Resolution Rules"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_270cbd193260c5730c24a2c8cbbf21b6",
@@ -1002,14 +1014,20 @@
       "targetAnchor": "unheaded-block-24",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source: docs/specs/work-state.md:341-346#unheaded-block-38 (current lines); unit SHA256 5c9201d70578877abf44602c087ab21de9d8966cca3adf8e3f9531bf324084f7.\nTarget: docs/platform/work-state/spec.md:224-229#unheaded-block-24 (current lines); unit SHA256 5c9201d70578877abf44602c087ab21de9d8966cca3adf8e3f9531bf324084f7.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 5c9201d70578877abf44602c087ab21de9d8966cca3adf8e3f9531bf324084f7 at d23045c2de83e3508fda8fd2580b43ece2e1e046.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/specs/work-state.md#unheaded-block-38 under docs/platform/work-state/spec.md#unheaded-block-24; source context \"Spec: Work-State (tầng quản việc của forgent) / Data Dictionary / Bản ghi cổng discovery\", target context \"Work State Specification / 4. Capture And Evidence Records / Discovery Gate Record\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 341-346, target 224-229, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (434 chars); anchor unheaded-block-24 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "5c9201d70578877abf44602c087ab21de9d8966cca3adf8e3f9531bf324084f7",
       "targetAncestry": [
         "Work State Specification",
         "4. Capture And Evidence Records",
         "Discovery Gate Record"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_d0ae088797942a95c43f0ca52517d9bc",
@@ -1666,14 +1684,20 @@
       "targetAnchor": "unheaded-block-15",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source: docs/specs/work-state.md:624-634#unheaded-block-63 (current lines); unit SHA256 8b3e099723160029770c62469f14db6ce2e484a6f7b4a1354cb4bf34288af9d4.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:133-143#unheaded-block-15 (current lines); unit SHA256 8b3e099723160029770c62469f14db6ce2e484a6f7b4a1354cb4bf34288af9d4.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/specs/work-state.md#unheaded-block-63 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-15; source context \"Spec: Work-State (tầng quản việc của forgent) / Data Dictionary / Phong bì output (envelope) — chuẩn máy-đọc của MỌI verb (per D b2d18cc7, b0da87aa)\", target context \"CLI I/O Contract / 3. Output Direction Unified Envelope / Envelope Shape\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 624-634, target 133-143, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (825 chars); anchor unheaded-block-15 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve. Disposition and ancestry differ from the source by the mapped section only; the io-contract partner unit has its own row; no prior reviewed digest, as stated.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "8b3e099723160029770c62469f14db6ce2e484a6f7b4a1354cb4bf34288af9d4",
       "targetAncestry": [
         "CLI I/O Contract",
         "3. Output Direction Unified Envelope",
         "Envelope Shape"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_140216d27eb5609e8b5d51f718ecf493",
@@ -1683,14 +1707,20 @@
       "targetAnchor": "unheaded-block-19",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source: docs/specs/work-state.md:636-639#unheaded-block-64 (current lines); unit SHA256 5d70ebc5bbf14b4604424fe9dc4e05c75110a85c0c24b6b1cb6e7a998bfaddc4.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:160-163#unheaded-block-19 (current lines); unit SHA256 5d70ebc5bbf14b4604424fe9dc4e05c75110a85c0c24b6b1cb6e7a998bfaddc4.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/specs/work-state.md#unheaded-block-64 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-19; source context \"Spec: Work-State (tầng quản việc của forgent) / Data Dictionary / Phong bì output (envelope) — chuẩn máy-đọc của MỌI verb (per D b2d18cc7, b0da87aa)\", target context \"CLI I/O Contract / 3. Output Direction Unified Envelope / Error Path Is Not Enveloped\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "deep: sampled; rationale lines regenerate equal from the binding (source 636-639, target 160-163, anchors, digests, link counts, context, disposition word), checker clean; source and target text byte-equal (282 chars) and ancestry \"CLI I/O Contract / 3. Output Direction Unified Envelope / Error Path I...\" equal to the source; prior digest found in the target at the cited commit; anchor unheaded-block-19 ok; disposition promote is the right one for an equal carry.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "5d70ebc5bbf14b4604424fe9dc4e05c75110a85c0c24b6b1cb6e7a998bfaddc4",
       "targetAncestry": [
         "CLI I/O Contract",
         "3. Output Direction Unified Envelope",
         "Error Path Is Not Enveloped"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_52b54d49826d7ff8fd38f29925505f2a",
@@ -1700,14 +1730,20 @@
       "targetAnchor": "unheaded-block-20",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source: docs/specs/work-state.md:641-645#unheaded-block-65 (current lines); unit SHA256 75bf5b6af00287e081d243556f44f8e1c495da7238737ccd1b15d2a8191f196b.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:167-171#unheaded-block-20 (current lines); unit SHA256 75bf5b6af00287e081d243556f44f8e1c495da7238737ccd1b15d2a8191f196b.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/specs/work-state.md#unheaded-block-65 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-20; source context \"Spec: Work-State (tầng quản việc của forgent) / Data Dictionary / Phong bì output (envelope) — chuẩn máy-đọc của MỌI verb (per D b2d18cc7, b0da87aa)\", target context \"CLI I/O Contract / 3. Output Direction Unified Envelope / Runner Stdout Envelope\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 641-645, target 167-171, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (401 chars); anchor unheaded-block-20 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve. Disposition and ancestry differ from the source by the mapped section only; the io-contract partner unit has its own row; no prior reviewed digest, as stated. Digests also hand-recomputed with an independent script: equal.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "75bf5b6af00287e081d243556f44f8e1c495da7238737ccd1b15d2a8191f196b",
       "targetAncestry": [
         "CLI I/O Contract",
         "3. Output Direction Unified Envelope",
         "Runner Stdout Envelope"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_9c6c68acbcd413ec5d826804b07650c0",
@@ -1741,10 +1777,10 @@
       "disposition": "supersede",
       "reviewStatus": "reviewed",
       "rationale": "Supersede: the externalEffect sentence replaces the historical claim that only review and approve carry external effects with the fifteen-verb COMMAND_REGISTRY list, excluding coordination. The complete successor is now cli-io-contract.md#unheaded-block-34 after the installation-error insertion; reviewed prior successor text is unchanged. No claim of byte equality to the historical source or current-truth approval.",
-      "reviewNote": "deep: docs/specs/work-state.md#unheaded-block-68 (L679-690) to docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-34 (L310-320): word diff shows exactly one clause replaced ('hôm nay chỉ review và approve mang externalEffect: true' becomes the COMMAND_REGISTRY list of 15 verbs without coordination, with review approve run as examples), everything else byte-equal; the rewritten rationale states that delta, names the successor anchor after the installation-error insertion and disclaims byte equality, which is what the previous round asked for; prior-round anchor fix (block 33 to 34) applied, digest recomputed equal",
+      "reviewNote": "deep: docs/specs/work-state.md#unheaded-block-68 (L679-690) to cli-io-contract.md#unheaded-block-34 (L310-320): word diff shows one clause replaced, 'hôm nay chỉ review và approve mang externalEffect: true' becomes the COMMAND_REGISTRY list (15 verbs, no coordination, examples review approve run); I counted 15 externalEffect: true verbs in src/cli/command-registry.mjs, the rest of the paragraph is byte-equal; the change was logged in post-review-edits.md before the edit; rationale names the replaced clause, the successor anchor and disclaims byte equality; the target is shared with two historical rows of other shards, by design",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-345f15d95.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
       "targetAncestry": [
@@ -1752,7 +1788,7 @@
         "7. Machine-Readable Verb Registry",
         "Entry Fields And Effect Axes"
       ],
-      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_15a24dbb1f2d0470f04cdf8900da67a0",
@@ -1762,13 +1798,19 @@
       "targetAnchor": "unheaded-block-28",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source: docs/specs/work-state.md:692-716#unheaded-block-69 (current lines); unit SHA256 2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:225-249#unheaded-block-28 (current lines); unit SHA256 2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9 at 7854cff84d8bcb67075d4f9c09cd0b6d04808ff4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/specs/work-state.md#unheaded-block-69 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-28; source context \"Spec: Work-State (tầng quản việc của forgent) / Data Dictionary / Sổ verb máy-đọc (manifest) — `--help --json`\", target context \"CLI I/O Contract / 6. Cursor Pagination\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "mechanical: merge work-state.md:692-716#unheaded-block-69 -> cli-io-contract.md:225-249#unheaded-block-28; both digests recomputed by script and equal; lines equal real spans; anchor ok; ancestry equals real chain; links 0/0/0/0/0/0; row equals shard at the pin; last-reviewed digest backed by a committed ok verdict; class Weak-exact.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-10-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9",
       "targetAncestry": [
         "CLI I/O Contract",
         "6. Cursor Pagination"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_5dcb56608e17caeb53c197186ae33827",
@@ -1778,13 +1820,19 @@
       "targetAnchor": "unheaded-block-37",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source: docs/specs/work-state.md:718-725#unheaded-block-70 (current lines); unit SHA256 3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:343-350#unheaded-block-37 (current lines); unit SHA256 3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62 at 7854cff84d8bcb67075d4f9c09cd0b6d04808ff4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/specs/work-state.md#unheaded-block-70 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-37; source context \"Spec: Work-State (tầng quản việc của forgent) / Data Dictionary / Sổ verb máy-đọc (manifest) — `--help --json`\", target context \"CLI I/O Contract / 8. Multi-Value Flag Convention\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "deep: A36 draw (seed 2026101609); merge work-state.md:718-725#unheaded-block-70 -> cli-io-contract.md:343-350#unheaded-block-37, source and target text opened and identical (starts: **Quy ước cờ nhiều-giá-trị (per str46-io-cont); classed Weak-exact (ancestor headings differ; document exact share below one half); target context CLI I/O Contract / 8. Multi-Value Flag Convention equals the real heading chain; links 0/0/0/0/0/0; last-reviewed digest backed by a committed ok verdict.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-10-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
       "targetAncestry": [
         "CLI I/O Contract",
         "8. Multi-Value Flag Convention"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_6fe86521fead9cec7253443e3275a3cf",
@@ -1794,13 +1842,19 @@
       "targetAnchor": "unheaded-block-41",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source: docs/specs/work-state.md:751-762#unheaded-block-73 (current lines); unit SHA256 a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:382-393#unheaded-block-41 (current lines); unit SHA256 a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798 at 7854cff84d8bcb67075d4f9c09cd0b6d04808ff4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/specs/work-state.md#unheaded-block-73 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-41; source context \"Spec: Work-State (tầng quản việc của forgent) / Data Dictionary / Trợ giúp theo từng verb — `fgos <verb> [<sub>] --help|-h [--json]`\", target context \"CLI I/O Contract / 9. Per-Verb Help\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "mechanical: promote work-state.md:751-762#unheaded-block-73 -> cli-io-contract.md:382-393#unheaded-block-41; both digests recomputed by script and equal; lines equal real spans; anchor ok; ancestry equals real chain; links 0/0/0/0/0/0; row equals shard at the pin; last-reviewed digest backed by a committed ok verdict; class Weak-exact.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-10-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
       "targetAncestry": [
         "CLI I/O Contract",
         "9. Per-Verb Help"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_a374334e7c5dc565cac42c0fa641f78f",
@@ -1926,16 +1980,22 @@
       "targetAnchor": "unheaded-block-31",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source: docs/specs/work-state.md:649-663#unheaded-block-66 (historical witness at 2636ba229a054750a370bf5c2e9b83f27492bf3d); unit SHA256 a2e6a5ffa58ec1f13d1321cf4b14d70b2a261fba6ce0f15c0bda50975cf8de04.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:269-284#unheaded-block-31 (current lines); unit SHA256 878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe at 7854cff84d8bcb67075d4f9c09cd0b6d04808ff4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/specs/work-state.md#unheaded-block-66 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-31; source context \"Spec: Work-State (tầng quản việc của forgent) / Data Dictionary / Sổ verb máy-đọc (manifest) — `--help --json`\", target context \"CLI I/O Contract / 7. Machine-Readable Verb Registry / Manifest Shape\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "sourcePath": "docs/specs/work-state.md",
       "sourceAnchor": "unheaded-block-66",
+      "reviewNote": "deep: merge work-state.md:649-663#unheaded-block-66@2636ba229 -> cli-io-contract.md:269-284#unheaded-block-31; digests differ and were recomputed by extractor; lines equal the real spans; anchor ok; context equals the real ancestry; links 0/0/0/0/0/0 recomputed independently and equal; 0 correction line(s) checked (after-text in target); 1 residual text hunk(s) beyond links/corrections, which the successor-text sentence discloses; last-reviewed digest backed by a committed ok verdict. hand-recomputed both digests (seed 2026101608).",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-10-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Manifest Shape"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     }
   ]
 }

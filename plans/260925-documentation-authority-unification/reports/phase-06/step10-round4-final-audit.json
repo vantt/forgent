@@ -1,0 +1,104 @@
+{
+  "linkChecks": [
+    {
+      "claimId": "claim_53ebf4b541ff8f6a2c40e3b95304d6b7",
+      "distinctChanges": 8,
+      "pending": true
+    },
+    {
+      "claimId": "claim_53d2f5742d24e980328f8cee963fb73b",
+      "distinctChanges": 8,
+      "pending": true
+    },
+    {
+      "claimId": "claim_2ae0cd4fc1cf487f7caa4d77d46e9682",
+      "distinctChanges": 4,
+      "pending": true
+    },
+    {
+      "claimId": "claim_0f63a4c33bd9ab4d707e6ea459868a91",
+      "distinctChanges": 4,
+      "pending": true
+    }
+  ],
+  "toolTests": {
+    "tests": 490,
+    "pass": 490,
+    "fail": 0
+  },
+  "inputCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+  "scopeViolations": [],
+  "badDecisionFields": [],
+  "staleAfterObjects": [],
+  "unchanged": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "equal": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.json",
+      "equal": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/minimum-constitution.json",
+      "equal": true
+    },
+    {
+      "path": "scripts/check-doc-inventory-gates.mjs",
+      "equal": true
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "equal": true
+    },
+    {
+      "path": "scripts/propose-doc-decisions.mjs",
+      "equal": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/reader-links-baseline.txt",
+      "equal": true
+    }
+  ],
+  "applicationCounts": {
+    "applied-and-retained": 787,
+    "rework-or-hold": 30,
+    "applied-then-reopened": 266
+  },
+  "rationales": 296,
+  "reopenedReviewed": 270,
+  "consistency": {
+    "ok": true,
+    "rows": 12893,
+    "shards": 91,
+    "sourceWitnessLimits": 84
+  },
+  "nativeRefreshOwed": 4,
+  "noNewDoubleOwnership": true,
+  "targetDigestDrift": 0,
+  "linkReplayOk": true,
+  "fastDZero": true,
+  "A": true,
+  "B": true,
+  "HZero": true,
+  "I": {
+    "equalToHEAD": true,
+    "frozenBaselineUnchanged": true,
+    "historicalBaselineEqual": false
+  },
+  "historicalTargetWitnesses": 40,
+  "historicalTargetFindings": 0,
+  "sourceOccurrenceFamilies": 34,
+  "sourceOccurrences": 116,
+  "wholeHeadingComparisons": 3498,
+  "wholeHeadingFindings": 0,
+  "frozenRationales": 117,
+  "renamedSuccessors": 2,
+  "nativeSyncCount": 0,
+  "nativeRebindCount": 0,
+  "reviewPackCount": 0,
+  "fullFrozenL10_2Restored": true,
+  "frozenRationaleWitness": "5035fed52",
+  "frozenResidualSHA256": "d4bd139d397c007d0f633998319284bfc37073b27ed39f377cd677946fe00a0d",
+  "ok": true
+}

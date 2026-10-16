@@ -1,3 +1,55 @@
+# Round-4 author corrections complete — package next
+
+Assignment `unit-run-1792118148618-e4fd15ef/producer/1`; input `9b0526380`, independent reports `0836714ae`, reviewed content `287a22d33`, request `bca590a4e`. All **33 Notes/Concerns** read; Lead L10-28–L10-32 recorded under A42. This is an author/docs result; Phase 6 remains open.
+
+**1,053 matching ok row instances applied through the unchanged ordinary API, notes verbatim: 787 retained / 266 subsequently reopened.** All 30 rework/hold claim-row instances stay pending. Four older link-count approvals were explicitly revoked after the first frozen-list pass incorrectly included them; they are excluded from the final frozen list. No producer verdict, seed, sensitivity pack or approval was invented. Exact final application: `step10-round4-review-application.json`; revocations: `step10-round4-rework-revocations.json`.
+
+## Authored result
+
+- **296 rationales changed, including 52 source-heading rows; 270 prior reviewed rows reopened** (266 newly applied approvals plus four earlier link-count approvals). All 834 selected outputs are checked, including frozen controls. Every heading from the prior renderer family is recomputed; the retained root Dispatch heading with no target is unchanged. **117 deliberately authored, still-approved rationales are frozen at unchanged complete bindings.** Their section facts are still audited. The full L10-2 rationale is restored verbatim from reviewed commit `5035fed52`, with both AGENTS lines, old digest, b093c6fb/e4e33c14 successor digests, both native identities, residual SHA256 `d4bd139d397c007d0f633998319284bfc37073b27ed39f377cd677946fe00a0d`, and the A34-acceptance-superseded note. Native successors and residual bytes are independently checked by the final audit.
+- **Source occurrences:** own anchor or authenticated historical witness; no ambiguous first-digest fallback. The eight runner footers map to occurrences 1–8; registered anchors 144/149/161/170/235/244/268/280 become current 150/155/167/176/241/250/274/286. This discloses claim_97479b13's +6 shift. Commit `02106766dd6185208187f5fcaca7725cf60da9fe` authenticates their original order. General distinct-occurrence checks cover **34 families / 116 physical occurrences across all shards**, preserving separate historical generations and existing group-only predecessor decisions.
+- **Corrections and sections:** each printed before fragment is present in its bound source, or explicitly labelled as an intermediate state with a committed witness. The actual citation chain is `4373,4461 → 4415,4503`; the scaffold before is `4640-4643; 4373-4380 → 4414-4417`. The two Gate A siblings identify the 19ca8de23 intermediate target lineage where appropriate. Every cited evidence code range carries its evidence commit/blob. Whole native direct sections are compared to the next heading; depth/title, links, merges/splits, snapshots, literal fences, metadata, labelled corrections, owner deferral and residual carriers are stated separately. Missing/added lines and witnesses are exposed; generic disposition prose cannot clear an unexplained delta. Overlapping normalizations use the complete correction before narrower fragments, and line-order differences are reported.
+- **Two carrier conservation labels fixed:** Architecture Advisory Role Doctrine explicitly labels its existing current-Workflow correction and points to the complete historical input; Constraint Findings explicitly labels the existing registered-counterparts addition. Original sections remain in their authenticated historical snapshots. No original source or snapshot bytes were removed. These two same-line edits change **four native units**, queued for the next package's sole sync; five existing manual target bindings were rebound pending.
+- **Links:** distinct pair counts for the four docs-portal rows are **8, 8, 4, 4**, all pending. Repeated identical pairs carry occurrence multiplicity without inflating counts; unrelated removal/addition remain separate. Repository directory trailing-slash rebases preserve the resolved destination.
+- **Renamed retired units:** claim_0145c136 and claim_deb1e406 are pending supersede to current `surface-taxonomy` and `b-add-fgos-advise`. Source witness `d23045c2d`, historical target `ce575996f`, and upstream `09fe3ab32` / `f4ed59997` are explicit. Neither row claims an unchanged current target.
+- **Frozen tails:** 4,007 currently reviewed rows are listed in owner-queue and `step10-round4-promotion-tails.json` for promotion truth checking; their author-time pending language is preserved. Heading-only seq/date observations remain queued for cutover.
+
+## Verification
+
+| Proof | Final result |
+|---|---|
+| Document tool tests, `env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work` | **490/490 pass**, zero fail/cancel/skip/todo |
+| Consistency over every shard and retired collection | **12,893 rows / 91 shards**, 834 selected outputs, zero legacy/generated findings |
+| Whole-section rules | **3,498 resolvable heading mappings**, zero unexplained findings |
+| Distinct-source rules | **34 families / 116 occurrences**, zero collisions |
+| Historical target bindings | **40 exact committed witnesses**, zero missing witnesses; these are historical references, not fresh current owners |
+| Historical source limits | **84 existing source-witness limits explicitly listed**, no invented spans or text |
+| Ownership | Zero current manual target drift, zero new active source-pair collisions, zero duplicate native platform target identity; all **254 historical/reference groups** enumerated |
+| Position/cell-exact link replay | **366 + 98 + 4**, zero findings |
+| A / B / H and strict candidate-status | Pass; only the eight already disclosed Lead A paths; zero new scope violation / candidate finding |
+| I | Frozen baseline unchanged; current reader links equal HEAD. The existing upstream route delta against the historical baseline is still disclosed; no rebaseline |
+| Scoped FAST D, both priors together / each | **Zero fatal** in all three runs |
+| Scoped strict E | Open: 16 partials, 29 not-reviewed, 1 owner group, 2 gaps, 301 reverse units; no strict closure claim |
+| Registry, native gates, vocabulary, extractor, constitution and baseline | Byte unchanged |
+
+Tests-first red/green logs, initial whole-section diagnostics and the final commands are in `tooling.md` / `step10-round4-*`. The consistency artifact losslessly interns repeated witness metadata; its full scratch output hash and reproduction are recorded. Existing snapshots, section splits, labelled corrections and exact historical target pins resolve diagnostic differences; no gate acceptance rule was changed. Secondary section-accounting carriers are checked as their own witnesses rather than mistaken for the primary source anchor.
+
+The reproduction command requires an explicit external output and refuses repository paths, symlink parents/files, dangling symlinks and hardlinks. It writes no decision/report file in the repository:
+
+```sh
+env -u CLAUDE_CODE_SESSION_ID python3 plans/260925-documentation-authority-unification/reports/phase-06/step10-sync287-reproduce.py consistency --output /tmp/fgos-work/round4-review/consistency.json
+```
+
+`step10-round4-final-audit.json` independently checks real final rows, every retained note/report, every rework's pending status, actual final after snapshots, exact 8/8/4/4 counts, the original frozen rationale/residual/native identities, scope/protected hashes, native refresh owed, and the validation results. `step10-round4-reproduction.json` retains author mutation scripts as history; only the command above is the read-only reviewer door. GitNexus tools are unavailable: static helper callsites were inspected, but no graph impact/detect success is claimed. MDView preview was attempted and failed because its database is read-only; no external repair was made.
+
+## Handoff
+
+**NEXT = PACKAGE at this runner commit:** one native sync preserving all IDs and resolving the four changed units, all actual drift rebindings, refreshed dependent truth/classification/accounting projections, and **one bounded independent re-review of every row/entry changed this turn**, parts **≤60 entries**. Load after/currentDecision from the committed rows, never intermediate edit logs. Include generator, author consistency/reproduction and tests; all 296 rationale deltas and reopened rows; both carrier edits; the renamed successors; review-application/revocation metadata and frozen-list/owner-queue evidence; every affected native tuple. Review selection/seed/verdicts belong to the independent reviewer.
+
+No execution blocker inside this author scope. Existing global/A34/holds/group/consumer/cutover/checkpoint/scorecard obligations remain; Phase 6 is open. **Zero native sync / native --rebind / review packs / fgOS CLI / Git writes / workspace .fgos writes / legacy or protected edits.** Required runner outbox acknowledgement/result are the explicit exception. The runner commits.
+
+---
+
 # Step 10 package at287a22d33 — independent re-review next
 
 Assignment `unit-run-1792116045118-73cfbb42/producer/1`; Author session `codex-session:unit-run-1792116045118-73cfbb42@2026-10-16`. **Content/SYNC `287a22d33a0eaf2d9e47549a1142daf62361bb8c`**, author content `0d8c602e2`, input comparison `5035fed52`. Merge includes main; **zero docs delta between0d8c602e2 and287a22d33**, so no Lead-merge re-carry blocker. Runner owns commits. Every workspace write is within this plan. No docs/source/test/checker/gate/extractor/vocabulary/baseline byte changed, fgOS CLI, git write or producer seed/verdict.

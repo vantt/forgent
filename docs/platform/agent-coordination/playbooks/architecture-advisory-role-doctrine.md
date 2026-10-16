@@ -1467,7 +1467,7 @@ looked. Not "our reasoning shows this is wrong".
 
 ### Evidence And Conduct Boundaries
 
-Current packet dispositions require actual evidence when they turn on claims
+Added in candidate — current-Workflow correction; the former driver-specific rules remain in the historical snapshot linked above. Current packet dispositions require actual evidence when they turn on claims
 about PROJECT_ROOT or the panel's artifacts (`SKILL.md:124-128`):
 
 - **Invalidation:** cite a real observation, not the producer's unsupported

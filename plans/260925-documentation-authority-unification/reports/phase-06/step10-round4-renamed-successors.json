@@ -1,0 +1,114 @@
+{
+  "changes": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "collection": "rows",
+      "claimId": "claim_0145c13614b75e7da1321473afa8a0f1",
+      "before": {
+        "claimId": "claim_0145c13614b75e7da1321473afa8a0f1",
+        "sourcePath": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+        "sourceAnchor": "unheaded-block-10",
+        "sourceUnitDigest": "1162040b79db2beccc2fe163e3f008e931b8f6ce13d15113a3f2838abb9df2a5",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+        "targetAnchor": "happy-path-routing",
+        "shownTargetDigest": "6783eba05403033970ee5832ace843ceccf7b816a0b115fa601d31c4921a311a",
+        "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+        "reviewStatus": "pending",
+        "rationale": "Source: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:106-114#unheaded-block-10 (historical witness at d23045c2de83e3508fda8fd2580b43ece2e1e046); unit SHA256 1162040b79db2beccc2fe163e3f008e931b8f6ce13d15113a3f2838abb9df2a5.\nTarget: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:85-85#happy-path-routing (historical witness at ce575996f; absent from current binding location); unit SHA256 0c50fe16d128e763572d7c17246d17511168a21279be7960e8975ff40f91f2be.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 0c50fe16d128e763572d7c17246d17511168a21279be7960e8975ff40f91f2be at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 10\" → \"Happy Path Routing\".\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-10 under docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#happy-path-routing; source context \"Group Thinking Trigger Surface / Happy Path Routing\", target context \"Group Thinking Trigger Surface\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "shownSourceText": "| User phrase | Expected route |\n|---|---|\n| \"run a panel on whether we should split this service\" | `architecture-panel` -> `fgos-architecture-panel` -> architecture advisory protocol -> `advise` |\n| \"compare these 3 implementation options\" | `option-comparison` when the options are concrete; upgrade to `architecture-panel` if repository investigation and a full architecture recommendation are requested |\n| \"red-team this architecture decision\" | `architecture-panel`; red-team remains a declared phase inside that protocol |\n| \"get independent opinions before I commit\" | `independent-feedback`; ask only for the subject if it is absent |\n| \"review this proposal with group thinking\" | `proposal-review`; use the proposal text or artifact already in scope |\n| \"business panel: should we change pricing?\" | `strategy-options` if alternatives must be generated/compared; `business-review` if a concrete pricing proposal exists |\n| \"coding panel: should this be a plugin or core feature?\" | `coding-design-panel` -> `architecture-panel` -> `advise`; never `fgos-code-panel` because no implementation was requested |",
+        "shownSourceDigest": "1162040b79db2beccc2fe163e3f008e931b8f6ce13d15113a3f2838abb9df2a5",
+        "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "targetUnitDigest": "0c50fe16d128e763572d7c17246d17511168a21279be7960e8975ff40f91f2be",
+        "targetAncestry": [
+          "Group Thinking Trigger Surface"
+        ]
+      },
+      "after": {
+        "claimId": "claim_0145c13614b75e7da1321473afa8a0f1",
+        "sourcePath": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+        "sourceAnchor": "unheaded-block-10",
+        "sourceUnitDigest": "1162040b79db2beccc2fe163e3f008e931b8f6ce13d15113a3f2838abb9df2a5",
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+        "targetAnchor": "surface-taxonomy",
+        "shownTargetDigest": "6783eba05403033970ee5832ace843ceccf7b816a0b115fa601d31c4921a311a",
+        "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+        "reviewStatus": "pending",
+        "rationale": "Source: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:106-114#unheaded-block-10 (historical witness at d23045c2de83e3508fda8fd2580b43ece2e1e046); unit SHA256 1162040b79db2beccc2fe163e3f008e931b8f6ce13d15113a3f2838abb9df2a5.\nTarget: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:85-85#happy-path-routing (historical witness at ce575996f; absent from current binding location); unit SHA256 0c50fe16d128e763572d7c17246d17511168a21279be7960e8975ff40f91f2be.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 0c50fe16d128e763572d7c17246d17511168a21279be7960e8975ff40f91f2be at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 10\" → \"Happy Path Routing\".\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-10 under docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#happy-path-routing; source context \"Group Thinking Trigger Surface / Happy Path Routing\", target context \"Group Thinking Trigger Surface\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "shownSourceText": "| User phrase | Expected route |\n|---|---|\n| \"run a panel on whether we should split this service\" | `architecture-panel` -> `fgos-architecture-panel` -> architecture advisory protocol -> `advise` |\n| \"compare these 3 implementation options\" | `option-comparison` when the options are concrete; upgrade to `architecture-panel` if repository investigation and a full architecture recommendation are requested |\n| \"red-team this architecture decision\" | `architecture-panel`; red-team remains a declared phase inside that protocol |\n| \"get independent opinions before I commit\" | `independent-feedback`; ask only for the subject if it is absent |\n| \"review this proposal with group thinking\" | `proposal-review`; use the proposal text or artifact already in scope |\n| \"business panel: should we change pricing?\" | `strategy-options` if alternatives must be generated/compared; `business-review` if a concrete pricing proposal exists |\n| \"coding panel: should this be a plugin or core feature?\" | `coding-design-panel` -> `architecture-panel` -> `advise`; never `fgos-code-panel` because no implementation was requested |",
+        "shownSourceDigest": "1162040b79db2beccc2fe163e3f008e931b8f6ce13d15113a3f2838abb9df2a5",
+        "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "targetUnitDigest": "acfa27bd06c8c37b033b7a44209aa880627f7de384684846e6f8bed12129c4f6",
+        "targetAncestry": [
+          "Group Thinking Trigger Surface"
+        ]
+      },
+      "historicalSourceCommit": "d23045c2d",
+      "historicalTargetCommit": "ce575996f",
+      "renameCommits": [
+        "09fe3ab32",
+        "f4ed59997"
+      ],
+      "reason": "L10-32/A34: upstream current-Workflow rewrite replaces old target section; pending supersede, not byte carry or unchanged target."
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "collection": "rows",
+      "claimId": "claim_deb1e4063a1eabf13dd8ed523748039f",
+      "before": {
+        "claimId": "claim_deb1e4063a1eabf13dd8ed523748039f",
+        "sourcePath": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+        "sourceAnchor": "unheaded-block-20",
+        "sourceUnitDigest": "6bea20cb9a1aa9d19c5c6e9ef6e1ccf1f7ec636b964c2aaa50521ba3c14d73d5",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+        "targetAnchor": "b-add-fgos-panel",
+        "shownTargetDigest": "245116acac90f31a527eca59811652803d0415b74a13e78f1585303b061f086e",
+        "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+        "reviewStatus": "pending",
+        "rationale": "Source: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:193-195#unheaded-block-20 (historical witness at d23045c2de83e3508fda8fd2580b43ece2e1e046); unit SHA256 6bea20cb9a1aa9d19c5c6e9ef6e1ccf1f7ec636b964c2aaa50521ba3c14d73d5.\nTarget: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:148-148#b-add-fgos-panel (historical witness at ce575996f; absent from current binding location); unit SHA256 255adc34ce54db5747cd3c1a8d950b6d92f47a1ee0360648afd326076ae6281c.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 255adc34ce54db5747cd3c1a8d950b6d92f47a1ee0360648afd326076ae6281c at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 20\" → \"B. Add `fgos-panel`\".\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-20 under docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#b-add-fgos-panel; source context \"Group Thinking Trigger Surface / Alternatives Considered / B. Add `fgos-panel`\", target context \"Group Thinking Trigger Surface / Alternatives Considered\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "shownSourceText": "Selected. It gives natural requests one memorable entrypoint, keeps all mapping\nin this canonical table, and delegates unchanged execution to the pack gate and\nregistered protocol. Existing specialist skills remain available.",
+        "shownSourceDigest": "6bea20cb9a1aa9d19c5c6e9ef6e1ccf1f7ec636b964c2aaa50521ba3c14d73d5",
+        "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "targetUnitDigest": "255adc34ce54db5747cd3c1a8d950b6d92f47a1ee0360648afd326076ae6281c",
+        "targetAncestry": [
+          "Group Thinking Trigger Surface",
+          "Alternatives Considered"
+        ]
+      },
+      "after": {
+        "claimId": "claim_deb1e4063a1eabf13dd8ed523748039f",
+        "sourcePath": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+        "sourceAnchor": "unheaded-block-20",
+        "sourceUnitDigest": "6bea20cb9a1aa9d19c5c6e9ef6e1ccf1f7ec636b964c2aaa50521ba3c14d73d5",
+        "claimKind": "architecture",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+        "targetAnchor": "b-add-fgos-advise",
+        "shownTargetDigest": "245116acac90f31a527eca59811652803d0415b74a13e78f1585303b061f086e",
+        "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+        "reviewStatus": "pending",
+        "rationale": "Source: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:193-195#unheaded-block-20 (historical witness at d23045c2de83e3508fda8fd2580b43ece2e1e046); unit SHA256 6bea20cb9a1aa9d19c5c6e9ef6e1ccf1f7ec636b964c2aaa50521ba3c14d73d5.\nTarget: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:148-148#b-add-fgos-panel (historical witness at ce575996f; absent from current binding location); unit SHA256 255adc34ce54db5747cd3c1a8d950b6d92f47a1ee0360648afd326076ae6281c.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 255adc34ce54db5747cd3c1a8d950b6d92f47a1ee0360648afd326076ae6281c at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 20\" → \"B. Add `fgos-panel`\".\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-20 under docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#b-add-fgos-panel; source context \"Group Thinking Trigger Surface / Alternatives Considered / B. Add `fgos-panel`\", target context \"Group Thinking Trigger Surface / Alternatives Considered\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "shownSourceText": "Selected. It gives natural requests one memorable entrypoint, keeps all mapping\nin this canonical table, and delegates unchanged execution to the pack gate and\nregistered protocol. Existing specialist skills remain available.",
+        "shownSourceDigest": "6bea20cb9a1aa9d19c5c6e9ef6e1ccf1f7ec636b964c2aaa50521ba3c14d73d5",
+        "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "targetUnitDigest": "bb1ae7699ab58ef15b7ea30bf4d78b57cdd8eb69b9a4ef6a7713e83e50f9eb3c",
+        "targetAncestry": [
+          "Group Thinking Trigger Surface",
+          "Alternatives Considered"
+        ]
+      },
+      "historicalSourceCommit": "d23045c2d",
+      "historicalTargetCommit": "ce575996f",
+      "renameCommits": [
+        "09fe3ab32",
+        "f4ed59997"
+      ],
+      "reason": "L10-32/A34: upstream current-Workflow rewrite replaces old target section; pending supersede, not byte carry or unchanged target."
+    }
+  ]
+}

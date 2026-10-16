@@ -1,0 +1,106 @@
+{
+  "result": [
+    {
+      "pin": "02106766dd6185208187f5fcaca7725cf60da9fe",
+      "path": "docs/specs/runner.md",
+      "units": [
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-144",
+          "githubAnchor": "unheaded-block-144",
+          "stableAnchor": "unheaded-block-144",
+          "title": "Unheaded block 144",
+          "startLine": 1608,
+          "endLine": 1608,
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+          "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6"
+        },
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-149",
+          "githubAnchor": "unheaded-block-149",
+          "stableAnchor": "unheaded-block-149",
+          "title": "Unheaded block 149",
+          "startLine": 1636,
+          "endLine": 1636,
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+          "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6"
+        },
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-161",
+          "githubAnchor": "unheaded-block-161",
+          "stableAnchor": "unheaded-block-161",
+          "title": "Unheaded block 161",
+          "startLine": 1745,
+          "endLine": 1745,
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+          "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6"
+        },
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-170",
+          "githubAnchor": "unheaded-block-170",
+          "stableAnchor": "unheaded-block-170",
+          "title": "Unheaded block 170",
+          "startLine": 1829,
+          "endLine": 1829,
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+          "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6"
+        },
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-235",
+          "githubAnchor": "unheaded-block-235",
+          "stableAnchor": "unheaded-block-235",
+          "title": "Unheaded block 235",
+          "startLine": 2353,
+          "endLine": 2353,
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+          "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6"
+        },
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-244",
+          "githubAnchor": "unheaded-block-244",
+          "stableAnchor": "unheaded-block-244",
+          "title": "Unheaded block 244",
+          "startLine": 2442,
+          "endLine": 2442,
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+          "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6"
+        },
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-268",
+          "githubAnchor": "unheaded-block-268",
+          "stableAnchor": "unheaded-block-268",
+          "title": "Unheaded block 268",
+          "startLine": 2623,
+          "endLine": 2623,
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+          "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6"
+        },
+        {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-280",
+          "githubAnchor": "unheaded-block-280",
+          "stableAnchor": "unheaded-block-280",
+          "title": "Unheaded block 280",
+          "startLine": 2735,
+          "endLine": 2735,
+          "textDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sample": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+          "identityFingerprint": "296f985e5b54ee8a748bb127a90d0627b6a791eefd97e4cde988251e983780d6"
+        }
+      ]
+    }
+  ]
+}

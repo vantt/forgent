@@ -15,14 +15,20 @@
       "targetAnchor": "unheaded-block-23",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "rationale": "Source: docs/io-contract.md:85-90#unheaded-block-14 (current lines); unit SHA256 d1af2d5a982f5d139fda776a23b4ad0b3776cc40c1fc0177636c44bdc91b968d.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:188-193#unheaded-block-23 (current lines); unit SHA256 d1af2d5a982f5d139fda776a23b4ad0b3776cc40c1fc0177636c44bdc91b968d.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest d1af2d5a982f5d139fda776a23b4ad0b3776cc40c1fc0177636c44bdc91b968d at 7854cff84d8bcb67075d4f9c09cd0b6d04808ff4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/io-contract.md#unheaded-block-14 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-23; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất / Mã thoát (exit code) — một nguồn duy nhất\", target context \"CLI I/O Contract / 4. Exit Codes\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "deep: A36 draw (seed 2026101609); move io-contract.md:85-90#unheaded-block-14 -> cli-io-contract.md:188-193#unheaded-block-23, source and target text opened and identical (starts: `src/state/store.mjs`'s `EXIT_CODES` (2 preco); classed Weak-exact (ancestor headings differ); target context CLI I/O Contract / 4. Exit Codes equals the real heading chain; links 0/0/0/0/0/0; last-reviewed digest backed by a committed ok verdict.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-11-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "d1af2d5a982f5d139fda776a23b4ad0b3776cc40c1fc0177636c44bdc91b968d",
       "targetAncestry": [
         "CLI I/O Contract",
         "4. Exit Codes"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_812873a889bd4222ea0ab3dc9194e1ad",
@@ -31,14 +37,20 @@
       "targetAnchor": "unheaded-block-24",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "rationale": "Source: docs/io-contract.md:92-93#unheaded-block-15 (current lines); unit SHA256 131cc0704d753f35dcbec3ebba7be49a0d103732b6f4ee8c5ecc175d5c46167e.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:195-196#unheaded-block-24 (current lines); unit SHA256 131cc0704d753f35dcbec3ebba7be49a0d103732b6f4ee8c5ecc175d5c46167e.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 131cc0704d753f35dcbec3ebba7be49a0d103732b6f4ee8c5ecc175d5c46167e at 7854cff84d8bcb67075d4f9c09cd0b6d04808ff4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/io-contract.md#unheaded-block-15 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-24; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất / Mã thoát (exit code) — một nguồn duy nhất\", target context \"CLI I/O Contract / 4. Exit Codes\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "mechanical: move io-contract.md:92-93#unheaded-block-15 -> cli-io-contract.md:195-196#unheaded-block-24; both digests recomputed by script and equal; lines equal real spans; anchor ok; ancestry equals real chain; links 0/0/0/0/0/0; row equals shard at the pin; last-reviewed digest backed by a committed ok verdict; class Weak-exact.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-11-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "131cc0704d753f35dcbec3ebba7be49a0d103732b6f4ee8c5ecc175d5c46167e",
       "targetAncestry": [
         "CLI I/O Contract",
         "4. Exit Codes"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_03ef50e87178220032a3eebe5c5d89d9",
@@ -47,13 +59,19 @@
       "sourceUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "rationale": "Source: docs/architecture-manifest.json:1-269#file-block (current lines); unit SHA256 2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a.\nTarget: docs/platform/contracts/architecture-manifest.json:1-269#file-block (current lines); unit SHA256 2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architecture-manifest.json#file-block under docs/platform/contracts/architecture-manifest.json#file-block; source context \"file-block\", target context \"file-block\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetOwner": "docs/platform/contracts/architecture-manifest.json",
       "targetAnchor": "file-block",
+      "reviewNote": "mechanical: move architecture-manifest.json:1-269#file-block -> architecture-manifest.json:1-269#file-block; both digests recomputed by script and equal; lines equal real spans; anchor ok; ancestry equals real chain; links 0/0/0/0/0/0; row equals shard at the pin; last-reviewed digest backed by a committed ok verdict; class Unit-exact.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-11-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
-      "targetAncestry": []
+      "targetAncestry": [],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     }
   ],
   "registryGaps": [
@@ -65,10 +83,16 @@
       "targetOwner": "docs/architecture-manifest.json",
       "targetAnchor": "file-block",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source: docs/architecture-manifest.json:1-267#file-block (historical witness at d924f22ca44307ece579169fa2a2d459d5c0197e); unit SHA256 70c00c205578fc34084e5bf8701a6bde0999cb6f05a1b58f8424ad95ed4c28d4.\nTarget: docs/architecture-manifest.json:1-269#file-block (current lines); unit SHA256 2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architecture-manifest.json#file-block under docs/architecture-manifest.json#file-block; source context \"file-block\", target context \"file-block\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "deep: supersede architecture-manifest.json:1-267#file-block@d924f22ca -> architecture-manifest.json:1-269#file-block; digests differ and were recomputed by extractor; lines equal the real spans; anchor ok; context equals the real ancestry; links 0/0/0/0/0/0 recomputed independently and equal; 0 correction line(s) checked (after-text in target); 2 residual text hunk(s) beyond links/corrections, which the successor-text sentence discloses; last-reviewed digest backed by a committed ok verdict.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-11-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
-      "targetAncestry": []
+      "targetAncestry": [],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_b19630ef4dcf1330c9807fc226a90e7b",
@@ -81,14 +105,14 @@
       "rationale": "A22/A31/A34: one native sync at 19ca8de23908e161c34c91626e41041b7813167c preserves this historical predecessor as a gap; current upstream source successor is separately native-accounted and carried to the candidate. All historical source lines occur verbatim in order in current successor; insertion-only containment. Full source/current witnesses and residual: step10-sync19-predecessor-residuals.json. No identity graft or approval carry.",
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
-      "reviewNote": "deep: historical docs/architecture-manifest.json at witness 2300d6557 (sha256 92391ce6 recomputed) against the current file 2d55be82: 268 historical lines all occur in order in the 269-line successor (one inserted line), the residual is empty (SHA256 e3b0c442 is the empty-string hash, matches the residual file), successor carried by claim_03ef50e8, so supersede with insertion-only containment is accurate; applied approval checked: the shard row equals the pack, the reviewNote equals the Note in my committed 19ca8de23 report byte for byte, reviewedBy/reviewedAt/reviewReport (review-step10-decisions-05-19ca8de23.md at 4a18f35ff) match, and every non-review field equals the row at the request commit of that round (62d147641)",
+      "reviewNote": "deep: historical docs/architecture-manifest.json at witness 2300d6557 (whole file, 268 lines, sha256 recomputed by hand) against current successor 2d55be82 (269 lines): difflib subsequence leaves 0 residual lines, matching the residual file empty text and its e3b0c442 empty-string SHA256, so insertion-only containment and supersede are accurate; successor claim_03ef50e8 exists with its own pending move row; anchor 'file-block' cannot be checked by list-doc-anchors (JSON file, tool lists markdown anchors only), digest matches the file-block unit",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-345f15d95.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-287a22d33.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
       "targetAncestry": [],
-      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     }
   ]
 }

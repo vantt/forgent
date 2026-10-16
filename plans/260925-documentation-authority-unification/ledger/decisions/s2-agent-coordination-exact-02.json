@@ -519,12 +519,18 @@
       "targetOwner": "docs/platform/agent-coordination/decisions/README.md",
       "targetAnchor": "unheaded-block-9",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 45-47, target 61-63, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (223 chars); anchor unheaded-block-9 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "26471c23caf04fd432e5938a6a01baf54c14e49bd56a4cc47b73d61880117c90",
       "targetAncestry": [
         "Agent Coordination Architecture Decisions",
         "Accepted Decisions"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_4a2d082437d31677a4344a224ac8e5a3",

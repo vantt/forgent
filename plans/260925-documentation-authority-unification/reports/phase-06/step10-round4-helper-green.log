@@ -1,0 +1,41 @@
+✔ frozen reviewed rationale survives regeneration until a binding changes (0.664222ms)
+✔ identical source occurrences require their own anchor or authenticated historical ordinal (0.482722ms)
+✔ heading comparison uses complete direct section and detects unlabelled payload loss (0.968667ms)
+✔ heading body equality and link rebases are explained independently of depth (0.444763ms)
+✔ correction before must occur in its own bound source or identify an intermediate witness (0.275037ms)
+✔ removed and added unrelated links are two changes and repeated changes are distinct pairs (0.23588ms)
+✔ whole-section audit cannot clear an unexplained delta with a generic reason (0.244854ms)
+✔ whole-section comparison reports reordered lines even with identical line multisets (0.121176ms)
+✔ whole-section normalization applies complete corrections before overlapping fragments (0.17734ms)
+✔ a repository directory trailing slash is a spelling change with the same destination (0.210842ms)
+✔ reproduction rejects missing or repository output ["consistency"] (27.356748ms)
+✔ reproduction rejects missing or repository output ["consistency","--output","/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/unsafe.json"] (22.552252ms)
+✔ reproduction rejects missing or repository output ["consistency","--output","relative.json"] (28.658614ms)
+✔ direct audit rejects a symlink output before reading the corpus (33.657117ms)
+✔ direct audit rejects a hardlink output before reading the corpus (38.511817ms)
+✔ rationale is rebuilt from bound facts without appending false old text (2.203341ms)
+✔ full unit digest decides equality, including heading section payload (0.293543ms)
+✔ last review comparison accepts digest prefix expansion and reports changes (0.361955ms)
+✔ link count distinguishes actual destination changes from spelling rebases (0.242737ms)
+✔ consistency flags changed ranges, anchors, equality and reviewed digest assertions (0.330901ms)
+✔ historical witness and no-target retain do not invent current source ranges (0.148376ms)
+✔ missing or mismatched binding evidence fails rather than inventing facts (0.808238ms)
+✔ legacy consistency checks contextual ranges, anchors and equality without mistaking header citations for bound spans (1.955442ms)
+✔ legacy audit understands unicode anchors, same-file successors and explicitly quoted prior rationales (0.281826ms)
+✔ unavailable historical text remains an explicit witness limit without invented line numbers (0.204962ms)
+✔ link alignment counts inserted provenance separately from repointed links (0.272894ms)
+✔ bound related citations include their actual lines and exact text (0.208448ms)
+✔ review entry snapshots use the committed row for both after and currentDecision (0.3413ms)
+✔ legacy citation audit distinguishes described links from the unit binding itself (0.163901ms)
+✔ residual sibling references are checked as residual facts rather than the primary unit anchor (0.153141ms)
+✔ a historical target is never presented as a current target or as no mapped copy (0.207958ms)
+✔ declared historical target identity disambiguates same-file source and successor references (0.161737ms)
+✔ overlapping labelled corrections are composed to current bound text before selection (0.189045ms)
+ℹ tests 33
+ℹ suites 0
+ℹ pass 33
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 197.995163

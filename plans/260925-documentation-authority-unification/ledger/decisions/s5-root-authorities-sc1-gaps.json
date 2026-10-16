@@ -14,14 +14,20 @@
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-34",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source: docs/platform/work-state/contracts/cli-io-contract.md:269-279#unheaded-block-31 (historical witness at 9881f8622732e3ba7c8e203097d42674b8aba36d); unit SHA256 857ad2167a0283ad4b9f08a4493f324f899b84211e10234b9d0eddfb9683c63f.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:310-320#unheaded-block-34 (current lines); unit SHA256 0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2 at 7854cff84d8bcb67075d4f9c09cd0b6d04808ff4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-31 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-34; source context \"CLI I/O Contract / 7. Machine-Readable Verb Registry / Entry Fields And Effect Axes\", target context \"CLI I/O Contract / 7. Machine-Readable Verb Registry / Entry Fields And Effect Axes\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "deep: supersede cli-io-contract.md:269-279#unheaded-block-31@9881f8622 -> cli-io-contract.md:310-320#unheaded-block-34; digests differ and were recomputed by extractor; lines equal the real spans; anchor ok; context equals the real ancestry; links 0/0/0/0/0/0 recomputed independently and equal; 0 correction line(s) checked (after-text in target); 1 residual text hunk(s) beyond links/corrections, which the successor-text sentence discloses; last-reviewed digest backed by a committed ok verdict.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-11-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Entry Fields And Effect Axes"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_7333c439fa8d29886b82168e015ca113",
@@ -31,14 +37,20 @@
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-34",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source: docs/platform/work-state/contracts/cli-io-contract.md:269-279#unheaded-block-31 (historical witness at 977509d5f8c49a31c781b54ea53c2b3617f70a13); unit SHA256 97e661532202da60735c985f4cda6302e805d100441b148cd8b0ff05c9c914b2.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:310-320#unheaded-block-34 (current lines); unit SHA256 0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2 at 7854cff84d8bcb67075d4f9c09cd0b6d04808ff4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-31 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-34; source context \"CLI I/O Contract / 7. Machine-Readable Verb Registry / Entry Fields And Effect Axes\", target context \"CLI I/O Contract / 7. Machine-Readable Verb Registry / Entry Fields And Effect Axes\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "deep: supersede cli-io-contract.md:269-279#unheaded-block-31@977509d5f -> cli-io-contract.md:310-320#unheaded-block-34; digests differ and were recomputed by extractor; lines equal the real spans; anchor ok; context equals the real ancestry; links 0/0/0/0/0/0 recomputed independently and equal; 0 correction line(s) checked (after-text in target); 1 residual text hunk(s) beyond links/corrections, which the successor-text sentence discloses; last-reviewed digest backed by a committed ok verdict. hand-recomputed both digests (seed 2026101608).",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-11-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "0b3d8cfa5bd06f2dc735968a1297d8567d8f78a6257cf8aed0b0611067e870a2",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Entry Fields And Effect Axes"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_665eb7f4bfb9bee7ba3f5e58368eaba1",
@@ -48,14 +60,20 @@
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-35",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source: docs/platform/work-state/contracts/cli-io-contract.md:281-291#unheaded-block-32 (historical witness at 977509d5f8c49a31c781b54ea53c2b3617f70a13); unit SHA256 ba9c9d6e641e3049b46d0596077eabd74593dd83e12391cd7336986f7733d796.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:322-336#unheaded-block-35 (current lines); unit SHA256 e013c5b05d6ff58782aa8231ab4a55967bd5ef853dac4015aec8f16f5fcf9c68.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest e013c5b05d6ff58782aa8231ab4a55967bd5ef853dac4015aec8f16f5fcf9c68 at 7854cff84d8bcb67075d4f9c09cd0b6d04808ff4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-32 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-35; source context \"CLI I/O Contract / 7. Machine-Readable Verb Registry / Entry Fields And Effect Axes\", target context \"CLI I/O Contract / 7. Machine-Readable Verb Registry / Entry Fields And Effect Axes\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "deep: supersede cli-io-contract.md:281-291#unheaded-block-32@977509d5f -> cli-io-contract.md:322-336#unheaded-block-35; digests differ and were recomputed by extractor; lines equal the real spans; anchor ok; context equals the real ancestry; links 0/0/0/0/0/0 recomputed independently and equal; 0 correction line(s) checked (after-text in target); 2 residual text hunk(s) beyond links/corrections, which the successor-text sentence discloses; last-reviewed digest backed by a committed ok verdict.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-11-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e013c5b05d6ff58782aa8231ab4a55967bd5ef853dac4015aec8f16f5fcf9c68",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Entry Fields And Effect Axes"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_e597b776163803dcf6e4194962ea4f6e",
@@ -65,14 +83,20 @@
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-35",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source: docs/platform/work-state/contracts/cli-io-contract.md:281-291#unheaded-block-32 (historical witness at 9881f8622732e3ba7c8e203097d42674b8aba36d); unit SHA256 5bed5c61440ab7ef0a9c595d18e3485c47c1952c78cbd07a0ea354db8ad750c3.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:322-336#unheaded-block-35 (current lines); unit SHA256 e013c5b05d6ff58782aa8231ab4a55967bd5ef853dac4015aec8f16f5fcf9c68.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest e013c5b05d6ff58782aa8231ab4a55967bd5ef853dac4015aec8f16f5fcf9c68 at 7854cff84d8bcb67075d4f9c09cd0b6d04808ff4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-32 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-35; source context \"CLI I/O Contract / 7. Machine-Readable Verb Registry / Entry Fields And Effect Axes\", target context \"CLI I/O Contract / 7. Machine-Readable Verb Registry / Entry Fields And Effect Axes\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "deep: supersede cli-io-contract.md:281-291#unheaded-block-32@9881f8622 -> cli-io-contract.md:322-336#unheaded-block-35; digests differ and were recomputed by extractor; lines equal the real spans; anchor ok; context equals the real ancestry; links 0/0/0/0/0/0 recomputed independently and equal; 0 correction line(s) checked (after-text in target); 2 residual text hunk(s) beyond links/corrections, which the successor-text sentence discloses; last-reviewed digest backed by a committed ok verdict.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-11-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e013c5b05d6ff58782aa8231ab4a55967bd5ef853dac4015aec8f16f5fcf9c68",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Entry Fields And Effect Axes"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     }
   ]
 }

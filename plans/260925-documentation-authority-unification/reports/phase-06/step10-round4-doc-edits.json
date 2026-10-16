@@ -1,0 +1,24 @@
+{
+  "inputCommit": "9b0526380",
+  "changes": [
+    {
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
+      "line": 436,
+      "before": "Registered counterparts: constraint-lens shaping and reviewed critique reports,",
+      "after": "Added in candidate — registered counterparts: constraint-lens shaping and reviewed critique reports,",
+      "label": "L10-31/explicit-section-correction",
+      "evidenceCommit": "9b0526380",
+      "historicalPreservation": "Complete pre-rework source is retained verbatim in the document-linked literal-snapshot; previously reviewed current-Workflow rewrite in truth-ledger-agent-coordination.json."
+    },
+    {
+      "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+      "line": 1470,
+      "before": "Current packet dispositions require actual evidence when they turn on claims",
+      "after": "Added in candidate — current-Workflow correction; the former driver-specific rules remain in the historical snapshot linked above. Current packet dispositions require actual evidence when they turn on claims",
+      "label": "L10-31/explicit-section-correction",
+      "evidenceCommit": "9b0526380",
+      "historicalPreservation": "Complete pre-rework source is retained verbatim in the document-linked literal-snapshot; previously reviewed current-Workflow rewrite in truth-ledger-agent-coordination.json."
+    }
+  ],
+  "note": "Make existing reviewed current-Workflow correction explicit in each direct section. No original-source or historical snapshot text removed."
+}

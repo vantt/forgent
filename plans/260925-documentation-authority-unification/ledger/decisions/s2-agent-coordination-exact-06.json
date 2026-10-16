@@ -1508,13 +1508,19 @@
       "targetOwner": "docs/platform/agent-coordination/vision.md",
       "targetAnchor": "unheaded-block-18",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source vision.md#unheaded-block-18 and target #unheaded-block-18 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-02-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "ef34a344283572b4708a79b1c54d26865be553046d2b4846c54a8dd4fb3c4012",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Problems This Vision Resolves",
         "4. Predeclared Structure Has Been Treated As Universally Mandatory"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_b0ba3b41ae0dd07934e68271f5600cc8",
@@ -1525,13 +1531,19 @@
       "targetOwner": "docs/platform/agent-coordination/vision.md",
       "targetAnchor": "unheaded-block-19",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source vision.md#unheaded-block-19 and target #unheaded-block-19 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-02-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "b3e36d0973ab994c18f9034202e4a9bc0f771629ffab6524efcbdce52686f9bb",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Problems This Vision Resolves",
         "4. Predeclared Structure Has Been Treated As Universally Mandatory"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_5a4d6d1690851cf76fac5e243b45073f",
@@ -1564,13 +1576,19 @@
       "targetOwner": "docs/platform/agent-coordination/vision.md",
       "targetAnchor": "unheaded-block-20",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source vision.md#unheaded-block-20 and target #unheaded-block-20 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-02-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "c21e6f7cc7c414eb23178e14cdb0b9d4808bab11301a03e792bf64afa1b60db8",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Problems This Vision Resolves",
         "5. Generic And Domain-Specific Planning Concerns Are Mixed"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_4e83750abf77998315deed0a55b0bb70",
@@ -1581,13 +1599,19 @@
       "targetOwner": "docs/platform/agent-coordination/vision.md",
       "targetAnchor": "unheaded-block-21",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source vision.md#unheaded-block-21 and target #unheaded-block-21 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21; hand-recomputed by independent python.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-02-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "1d394e88c999dcf5af1f980cc200a18f2bcb224da0cf6d0f3803dc418be9168c",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Problems This Vision Resolves",
         "5. Generic And Domain-Specific Planning Concerns Are Mixed"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_fd1d192b4c992dd43976f889fce7b853",
@@ -1598,13 +1622,19 @@
       "targetOwner": "docs/platform/agent-coordination/vision.md",
       "targetAnchor": "unheaded-block-23",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source vision.md#unheaded-block-23 and target #unheaded-block-23 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-02-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e6bfa3210da4ad4e9e7741be2056ee7606f001a6c18aa170a7e451980fd4efa6",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Problems This Vision Resolves",
         "6. The Two Unsafe Extremes"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_536498983b33c9b20470bae82158b7e9",
@@ -1637,13 +1667,19 @@
       "targetOwner": "docs/platform/agent-coordination/vision.md",
       "targetAnchor": "unheaded-block-24",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source vision.md#unheaded-block-24 and target #unheaded-block-24 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-02-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "84de2dc6e3c4745854fb374bce399c3efd68455d7768ef3aa360027cb8b720fe",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Accepted Vision Decisions",
         "V-001: Agent Coordination Is A Foundation Layer"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_d0ac6470bf510da9a3bb0c3b162d0127",
@@ -1676,13 +1712,19 @@
       "targetOwner": "docs/platform/agent-coordination/vision.md",
       "targetAnchor": "unheaded-block-25",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source vision.md#unheaded-block-25 and target #unheaded-block-25 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-02-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "96151e79bc022c8a0ebec5b372543866492b7edb61ca20bd277895f187ae1f5b",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Accepted Vision Decisions",
         "V-002: Work Is Optional Integration, Not System Identity"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_bfaf5269a0c18d3f7bdae49f24f7c76d",
@@ -1777,13 +1819,19 @@
       "targetOwner": "docs/platform/agent-coordination/vision.md",
       "targetAnchor": "unheaded-block-26",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source vision.md#unheaded-block-29 and target #unheaded-block-26 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-02-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "5bd7da0e7f550d61d22aedc4998b12dc9133a67db0771d936175f219cbe4d889",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Accepted Vision Decisions",
         "V-004: Runtime Execution Contracts Are Mandatory"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_b6fcedfc2bf597e1d0b79e04eafc8ecb",
@@ -1794,13 +1842,19 @@
       "targetOwner": "docs/platform/agent-coordination/vision.md",
       "targetAnchor": "unheaded-block-27",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source vision.md#unheaded-block-30 and target #unheaded-block-27 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-02-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "d29e71aafef9dab1b66753428865107c2f18c47e73170fe8e5584d0aac210433",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Accepted Vision Decisions",
         "V-004: Runtime Execution Contracts Are Mandatory"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_21d0792cd728cd874b9aaad308fed0e3",
@@ -1833,13 +1887,19 @@
       "targetOwner": "docs/platform/agent-coordination/vision.md",
       "targetAnchor": "unheaded-block-29",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source vision.md#unheaded-block-32 and target #unheaded-block-29 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-02-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "5ccb8eac01f0039e6d1a0eca7daaec05e45e2e1ecb0249b5fc651b9e382b4513",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Accepted Vision Decisions",
         "V-005: Agents Own Adaptive Reasoning; The Foundation Owns Authority"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_5e34af6c8d8c30a7f8fca418a021638f",
@@ -1850,13 +1910,19 @@
       "targetOwner": "docs/platform/agent-coordination/vision.md",
       "targetAnchor": "unheaded-block-30",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source vision.md#unheaded-block-33 and target #unheaded-block-30 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-02-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "956ad7b232951e9e55062a43fcb313bf181e91a7eeaaecab384510aaf8ef1058",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Accepted Vision Decisions",
         "V-005: Agents Own Adaptive Reasoning; The Foundation Owns Authority"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_0a4e4450d6c9d06979738ec78ce272b4",
@@ -2486,13 +2552,19 @@
       "targetOwner": "docs/platform/agent-coordination/vision.md",
       "targetAnchor": "unheaded-block-49",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source vision.md#unheaded-block-55 and target #unheaded-block-49 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-02-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "a42735dca2f7773f8f270410c0469b666ddb7fe51e43c6a44ccb1287f8f9b80f",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Consequences For Downstream Design",
         "Protocol Model"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_8578eb3520660abdf596e07df634658f",
@@ -2503,13 +2575,19 @@
       "targetOwner": "docs/platform/agent-coordination/vision.md",
       "targetAnchor": "unheaded-block-50",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: read source and target text in full, identical byte for byte (script and eyes), starts 'Assignment remains the immutable semantic request. Downstrea'; digests recomputed equal, anchor unheaded-block-50 checked and unique in target, context equal; links 0/0 match; last-reviewed digest present in target at 96a13ab21; hand-recomputed by independent python.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "b233727aa299288753f61a122ef87c06a19794119daacfe18f5184126aeb662f",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Consequences For Downstream Design",
         "Assignment"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_a20a1b52234600165e4b81168ecfe080",
@@ -2583,13 +2661,19 @@
       "targetOwner": "docs/platform/agent-coordination/vision.md",
       "targetAnchor": "unheaded-block-51",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source vision.md#unheaded-block-60 and target #unheaded-block-51 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "b3362130268b60c5f668a73d275d2c6918de7e57d81b77787387f55556c4d393",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Consequences For Downstream Design",
         "Planning Materialization"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_2dc0bc012109a1c2d1ea7d8659f957cf",
@@ -2600,13 +2684,19 @@
       "targetOwner": "docs/platform/agent-coordination/vision.md",
       "targetAnchor": "unheaded-block-52",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source vision.md#unheaded-block-61 and target #unheaded-block-52 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "97cc4e381c4d07d4aea2c6b7eac6786320e49ac237dee359bc42a2cf94dd0b64",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Consequences For Downstream Design",
         "Extension Design"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_0fef556ca618d0be23ea8b4670f161ef",
@@ -2659,12 +2749,18 @@
       "targetOwner": "docs/platform/agent-coordination/vision.md",
       "targetAnchor": "unheaded-block-56",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source vision.md#unheaded-block-64 and target #unheaded-block-56 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "a4f4f7bdfed979742e3430f5339eac51ee3c16b02da9d10a6b6ec96713d0b8f3",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Open Design Questions Under This Vision"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_40bffb93345a1dc0814d1bb0f8f4e6e5",
@@ -2864,13 +2960,19 @@
       "targetOwner": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
       "targetAnchor": "unheaded-block-8",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source canonical-concepts.md#unheaded-block-18 and target #unheaded-block-8 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "bf0dd9132e0c75530a178ab6f6ee14249893b967dafd445cec3262a1bb4193ff",
       "targetAncestry": [
         "Canonical Agent Coordination Concepts",
         "Protocol Definition Layer",
         "TaskSpec"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_77ecbbd82edfa2add2400f5e5c8de46f",
@@ -2881,13 +2983,19 @@
       "targetOwner": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
       "targetAnchor": "unheaded-block-10",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source canonical-concepts.md#unheaded-block-20 and target #unheaded-block-10 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f050d9d2ea896f8bbf3ae801152ef3f01bb036a3bab1cc5e22cd702a3de49236",
       "targetAncestry": [
         "Canonical Agent Coordination Concepts",
         "Protocol Definition Layer",
         "Skill"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_3fca52027a801e5437f62e12b4eb9b7b",
@@ -2898,13 +3006,19 @@
       "targetOwner": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
       "targetAnchor": "unheaded-block-11",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source canonical-concepts.md#unheaded-block-21 and target #unheaded-block-11 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "b4102c28b130a01ad254f7a4ac3311186106f74167d0c87231e347ae401e4771",
       "targetAncestry": [
         "Canonical Agent Coordination Concepts",
         "Protocol Definition Layer",
         "Role"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_e6e9ecb2851b952ea2c8b83f08af9524",
@@ -3251,13 +3365,19 @@
       "targetOwner": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
       "targetAnchor": "unheaded-block-12",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: read source and target text in full, identical byte for byte (script and eyes), starts 'An immutable semantic request to perform one operation for a'; digests recomputed equal, anchor unheaded-block-12 checked and unique in target, context equal; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "b95f97a5c84890c6c9729c86a41f4917a02b2a81e4830d284024929f718a6798",
       "targetAncestry": [
         "Canonical Agent Coordination Concepts",
         "Coordination Runtime Layer",
         "Assignment"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_c25d81207d38e7f21c102e27ce61bf18",
@@ -3331,13 +3451,19 @@
       "targetOwner": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
       "targetAnchor": "unheaded-block-15",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source canonical-concepts.md#unheaded-block-49 and target #unheaded-block-15 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21; hand-recomputed by independent python.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2cc172fdfe014a42952d4cd871edb7b773f139bb08ac3760c5cee60273e241f4",
       "targetAncestry": [
         "Canonical Agent Coordination Concepts",
         "Dispatch And Execution Layer",
         "DispatchPlan"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_f62d070f9a4550fbd214a4463620b9e9",
@@ -3348,13 +3474,19 @@
       "targetOwner": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
       "targetAnchor": "unheaded-block-16",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source canonical-concepts.md#unheaded-block-50 and target #unheaded-block-16 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "179ad1b9cdc0ee08545afa4d60d6d4b4888d69bd7824db4958bb7ac73a3297dd",
       "targetAncestry": [
         "Canonical Agent Coordination Concepts",
         "Dispatch And Execution Layer",
         "Dispatcher"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_aa5443460af0948fbaf01ca112df6ff0",
@@ -3365,13 +3497,19 @@
       "targetOwner": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
       "targetAnchor": "unheaded-block-17",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source canonical-concepts.md#unheaded-block-51 and target #unheaded-block-17 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f6b0228ffc7befd39e0330d60a572455225053e01e0d93263bb963a8177c9de1",
       "targetAncestry": [
         "Canonical Agent Coordination Concepts",
         "Dispatch And Execution Layer",
         "Executor"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_48f565dc68f9dbf41ac773c5b597dcfc",
@@ -3382,13 +3520,19 @@
       "targetOwner": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
       "targetAnchor": "unheaded-block-18",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source canonical-concepts.md#unheaded-block-52 and target #unheaded-block-18 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2574405b9a5a81064966c99f1bd5be4f673e824db532b6a3fb562b5755553613",
       "targetAncestry": [
         "Canonical Agent Coordination Concepts",
         "Dispatch And Execution Layer",
         "Run"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_ada79ea98a1532eddb6e55b127defcc3",
@@ -3399,13 +3543,19 @@
       "targetOwner": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
       "targetAnchor": "unheaded-block-19",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source canonical-concepts.md#unheaded-block-53 and target #unheaded-block-19 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "98973804553683a242ab005a754a2df271cd61656c57a5bc52373722acbcf317",
       "targetAncestry": [
         "Canonical Agent Coordination Concepts",
         "Dispatch And Execution Layer",
         "RunResult"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_24b02cf8c0f01fb72e700dc933178105",
@@ -3416,13 +3566,19 @@
       "targetOwner": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
       "targetAnchor": "unheaded-block-20",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: read source and target text in full, identical byte for byte (script and eyes), starts 'RunResult is not Work completion and cannot authorize lifecy'; digests recomputed equal, anchor unheaded-block-20 checked and unique in target, context equal; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2805635ecf0e06722c70d25b9f2e24bd373a73d7abd0f266f980bfaa3dd04ac0",
       "targetAncestry": [
         "Canonical Agent Coordination Concepts",
         "Dispatch And Execution Layer",
         "RunResult"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_91c365da1980b105ad5c4615e8a18fec",
@@ -3433,13 +3589,19 @@
       "targetOwner": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
       "targetAnchor": "unheaded-block-21",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source canonical-concepts.md#unheaded-block-55 and target #unheaded-block-21 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "8c9074b2eef73468af2d35e4bbac6412e4eaca13f4176310790990ef96d58bc1",
       "targetAncestry": [
         "Canonical Agent Coordination Concepts",
         "Evidence And Visibility Layer",
         "Evidence"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_7f42fb8bb62bfc97d9d9c5df7dff62d1",
@@ -3450,13 +3612,19 @@
       "targetOwner": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
       "targetAnchor": "unheaded-block-22",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source canonical-concepts.md#unheaded-block-56 and target #unheaded-block-22 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "cf53933c7e4356cedf4ba2ead3a976c75d9d85d1949b021c05a8c56fd95fce87",
       "targetAncestry": [
         "Canonical Agent Coordination Concepts",
         "Evidence And Visibility Layer",
         "Artifact"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_2643bffa34cd1c951224cb313ac51ae1",
@@ -3467,13 +3635,19 @@
       "targetOwner": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
       "targetAnchor": "unheaded-block-23",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source canonical-concepts.md#unheaded-block-57 and target #unheaded-block-23 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21; hand-recomputed by independent python.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "9673adedb24a6c83f7607f0d1b1f5707a308b4f29320bc5ca484d606729f5443",
       "targetAncestry": [
         "Canonical Agent Coordination Concepts",
         "Evidence And Visibility Layer",
         "Herdr"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_9f7fc04826912b000537192c71595dc5",
@@ -3694,13 +3868,19 @@
       "targetOwner": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
       "targetAnchor": "unheaded-block-7",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: read source and target text in full, identical byte for byte (script and eyes), starts 'Avoid as an alias for Assignment. If used in historical mate'; digests recomputed equal, anchor unheaded-block-7 checked and unique in target, context equal; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "d8f56efaa87f50ac3bb2a2331c92fe99998c00034320e842bd2241c4114a8b36",
       "targetAncestry": [
         "Deprecated And Reserved Coordination Terms",
         "Discouraged Or Ambiguous",
         "Exec Packet"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_bc577af0bdb922ec28a7e5acc975f97b",
@@ -3711,13 +3891,19 @@
       "targetOwner": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
       "targetAnchor": "unheaded-block-8",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source deprecated-and-reserved.md#unheaded-block-8 and target #unheaded-block-8 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "5745538544b1b97fc0859f3f448a79ded3ea1eff66b793e9595a101f1c1e00ce",
       "targetAncestry": [
         "Deprecated And Reserved Coordination Terms",
         "Discouraged Or Ambiguous",
         "Worker"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_c02d1e666a031b3ef35d9b0931c01aa4",
@@ -3728,13 +3914,19 @@
       "targetOwner": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
       "targetAnchor": "unheaded-block-9",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source deprecated-and-reserved.md#unheaded-block-9 and target #unheaded-block-9 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "0fc75532827cea57643ffad4fa8fc5df82d66825ed247054e2690dffd487155a",
       "targetAncestry": [
         "Deprecated And Reserved Coordination Terms",
         "Discouraged Or Ambiguous",
         "Agent Result"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_5b5ec1a1d59e2b403d48b94ec9f43015",
@@ -3745,13 +3937,19 @@
       "targetOwner": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
       "targetAnchor": "unheaded-block-10",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source deprecated-and-reserved.md#unheaded-block-10 and target #unheaded-block-10 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "c82a79ff70afb750bc7921d38388579a304dd3edde09840ec8e314ebe9b297d3",
       "targetAncestry": [
         "Deprecated And Reserved Coordination Terms",
         "Discouraged Or Ambiguous",
         "Completion Signal"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_dd6eb97609401d2c54350922576b89a9",
@@ -3783,12 +3981,18 @@
       "targetOwner": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
       "targetAnchor": "unheaded-block-12",
       "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "mechanical: source deprecated-and-reserved.md#unheaded-block-12 and target #unheaded-block-12 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 1/1 match; last-reviewed digest present in target at 96a13ab21;",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-287a22d33.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e21fe5291c9a53e07cf35cc2a9f2de94f5a75fe5f26f598ba1d9d18b0b143b6a",
       "targetAncestry": [
         "Deprecated And Reserved Coordination Terms",
         "Historical Vocabulary"
-      ]
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     },
     {
       "claimId": "claim_f9b8b6d512f6c779b66b25b201132a5a",

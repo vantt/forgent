@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { generateBindingRationale, checkBindingRationale } from '../../scripts/doc-binding-repair.mjs';
 const digest=c=>c.repeat(64);
-const facts=()=>({disposition:'supersede',reason:'Replace the historical behavior with the labelled correction.',source:{path:'docs/old.md',anchor:'old',startLine:12,endLine:14,text:'## Old\n[ref](other.md)',textDigest:digest('a'),level:2},target:{path:'docs/platform/new.md',anchor:'new',startLine:31,endLine:33,text:'### New\n[ref](../other.md)',textDigest:digest('b'),level:3},lastReviewed:{commit:'abc123',targetUnitDigest:digest('b')},links:{sourceCount:1,targetCount:1,changes:[{index:0,before:'docs/other.md',after:'docs/other.md',beforeSpelling:'other.md',afterSpelling:'../other.md',beforeLabel:'ref',afterLabel:'ref'}]},corrections:[{id:'U3',before:'old behavior',after:'durable status',evidence:'src/state/store.mjs:1388-1420'}]});
+const facts=()=>({disposition:'supersede',reason:'Replace the historical behavior with the labelled correction.',source:{path:'docs/old.md',anchor:'old',startLine:12,endLine:14,text:'## Old\n[ref](other.md)\nold behavior',sectionText:'## Old\n[ref](other.md)\nold behavior',textDigest:digest('a'),level:2},target:{path:'docs/platform/new.md',anchor:'new',startLine:31,endLine:33,text:'### New\n[ref](../other.md)\ndurable status',sectionText:'### New\n[ref](../other.md)\ndurable status',textDigest:digest('b'),level:3},lastReviewed:{commit:'abc123',targetUnitDigest:digest('b')},links:{sourceCount:1,targetCount:1,changes:[{index:0,before:'docs/other.md',after:'docs/other.md',beforeSpelling:'other.md',afterSpelling:'../other.md',beforeLabel:'ref',afterLabel:'ref'}]},corrections:[{id:'U3',before:'old behavior',after:'durable status',evidence:'src/state/store.mjs:1388-1420'}]});
 test('rationale is rebuilt from bound facts without appending false old text',()=>{
  const f=facts(),text=generateBindingRationale({...f,rationale:'byte-identical pending native rebind'});
  assert.match(text,/docs\/old.md:12-14#old/);assert.match(text,/docs\/platform\/new.md:31-33#new/);
@@ -33,7 +33,7 @@ test('consistency flags changed ranges, anchors, equality and reviewed digest as
  for(const altered of [t.replace(':12-14#old',':10-12#old'),t.replace('#new','#stale'),t.replace('digests differ','digests equal'),t.replace('unchanged since last reviewed','changed since last reviewed')]) assert.ok(checkBindingRationale(altered,f).length);
 });
 test('historical witness and no-target retain do not invent current source ranges',()=>{
- const f=facts();f.source={...f.source,commit:'old-pin'};f.target=null;f.lastReviewed=null;f.links={sourceCount:1,targetCount:0,changes:[]};f.reason='The instruction file remains its existing owner.';
+ const f=facts();f.source={...f.source,commit:'old-pin'};f.target=null;f.corrections=[];f.lastReviewed=null;f.links={sourceCount:1,targetCount:0,changes:[]};f.reason='The instruction file remains its existing owner.';
  const t=generateBindingRationale(f);assert.match(t,/historical witness at old-pin/);assert.match(t,/Target: none/);assert.doesNotMatch(t,/pending independent review/);
 });
 test('missing or mismatched binding evidence fails rather than inventing facts',()=>{
@@ -53,7 +53,7 @@ test('legacy audit understands unicode anchors, same-file successors and explici
  assert.deepEqual(checkLegacyRationale('Current historical snapshot. Prior rationale: selected unit is byte-equal; docs/old.md#older',f),[]);
 });
 test('unavailable historical text remains an explicit witness limit without invented line numbers',()=>{
- const f=facts();f.source={path:'AGENTS.md',anchor:'old-heading',textDigest:digest('a'),unavailable:true};f.target=null;f.links={sourceCount:null,targetCount:0,changes:[]};f.lastReviewed=null;
+ const f=facts();f.corrections=[];f.source={path:'AGENTS.md',anchor:'old-heading',textDigest:digest('a'),unavailable:true};f.target=null;f.links={sourceCount:null,targetCount:0,changes:[]};f.lastReviewed=null;
  const t=generateBindingRationale(f);assert.match(t,/historical text\/line witness unavailable/);assert.match(t,/AGENTS.md#old-heading/);assert.doesNotMatch(t,/AGENTS.md:1/);
 });
 test('link alignment counts inserted provenance separately from repointed links',async()=>{
@@ -65,7 +65,7 @@ test('link alignment counts inserted provenance separately from repointed links'
  assert.equal(f.changes.filter(x=>!x.before).length,1);
  assert.ok(f.changes.some(x=>x.before==='docs/b.md'&&x.after==='docs/platform/new-b.md'));
  const renamed=describeBindingLinks({path:'docs/old.md',text:'[docs/doc-governance.md](doc-governance.md)'},{path:'docs/platform/new.md',text:'[docs/platform/governance.md](governance.md)'});
- assert.equal(renamed.changes.length,1);assert.equal(renamed.changes[0].after,'docs/platform/governance.md');
+ assert.equal(renamed.changes.length,2);assert.ok(renamed.changes.some(c=>c.after==='docs/platform/governance.md')); // unrelated removal and addition remain distinct
 });
 test('bound related citations include their actual lines and exact text',()=>{
  const f=facts();f.references=[{path:'docs/platform/component-boundary.md',line:46,text:'Draft authority map'}];
@@ -96,7 +96,7 @@ test('residual sibling references are checked as residual facts rather than the 
 test('a historical target is never presented as a current target or as no mapped copy',()=>{
  const f=facts();f.target={...f.target,commit:'historical-pin'};
  let text=generateBindingRationale(f);assert.match(text,/Target:.*historical witness at historical-pin/);
- f.target={path:'docs/platform/new.md',anchor:'removed',textDigest:digest('b'),unavailable:true};f.links.targetCount=null;
+ f.corrections=[];f.target={path:'docs/platform/new.md',anchor:'removed',textDigest:digest('b'),unavailable:true};f.links.targetCount=null;
  text=generateBindingRationale(f);assert.match(text,/Target:.*historical text\/line witness unavailable/);assert.doesNotMatch(text,/Target: none/);
 });
 test('declared historical target identity disambiguates same-file source and successor references',async()=>{

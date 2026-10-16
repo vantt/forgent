@@ -1,3 +1,21 @@
+# Step 10 round-4 author corrections complete — package next
+
+Assignment `unit-run-1792118148618-e4fd15ef/producer/1`; input `9b0526380`, content `287a22d33`, request `bca590a4e`, reports `0836714ae`. All 33 Notes/Concerns read; L10-28–L10-32 executed under A42. **1,053 matching ok instances applied verbatim: 787 retained / 266 reopened; all 30 claim-row reworks pending.** Four older link approvals revoked and excluded from freezing.
+
+**296 rationales changed / 52 source headings / 270 prior reviewed rows reopened.** 117 deliberately reviewed rationales frozen; full L10-2 restored verbatim from 5035fed52 with original lines, identities, digests and residual SHA. Eight source footers use their own historical occurrences, including +6 shift disclosure. Real correction before states / intermediate witnesses / code evidence commits; full direct-section comparisons and explicit splits/residuals/labels; distinct link changes **8,8,4,4**. Two renamed retired units are pending supersede to current sections. Two carrier labels repaired; **four native units owe sync**. 4,007 reviewed author-time pending tails queued for promotion truth check.
+
+**490/490 tool tests pass. All 12,893 rows /91 shards checked, 834 selected outputs, 3,498 heading mappings, 34 duplicate-source families /116 occurrences, 40 historical target witnesses: zero findings.** 84 existing source-witness limits remain explicit. Replay366+98+4 zero; ownership zero target drift/new active collision/native duplicate,254 reference groups enumerated. A/B/H + candidate-status pass; I frozen/current-to-HEAD preserved. **FAST scoped D zero fatal both priors together/each; E remains open16 partial/29 pending/one group/two gaps/301 reverse.** Protected bytes/registry unchanged. [Report](step-10-report.md), [audit](step10-round4-final-audit.json), [consistency](step10-round4-rationale-consistency.json), [reproduction](step10-round4-reproduction.json).
+
+**NEXT = PACKAGE:** one native sync, all actual drift/dependent refreshes, one bounded independent re-review of every changed row/entry/native tuple; files≤60 entries, after snapshots from the runner commit. No seeds/verdicts selected. Existing global/consumer/cutover/checkpoint obligations remain; Phase6 open. No author execution blocker. Zero native sync/review packs/CLI/Git/legacy/protected/workspace.fgos mutation; runner commits. MDView preview unavailable (read-only database), source docs are written.
+
+---
+
+# Step 10 round-4 author corrections in progress
+
+Assignment `unit-run-1792118148618-e4fd15ef/producer/1`; input `9b0526380`, reviewed content `287a22d33`, request `bca590a4e`. Reading all round-4 Notes/Concerns and executing Lead L10-28–L10-32 under A42. Tests-first author generator/consistency repairs; no native sync or review packs this turn. Next = package with one native sync and one bounded re-review of every changed row (parts ≤60 entries). No fgOS CLI, Git writes, legacy/protected/baseline edits or workspace `.fgos` writes; runner commits.
+
+---
+
 # Step 10 package at287a22d33 complete — independent review next
 
 Assignment `unit-run-1792116045118-73cfbb42/producer/1`. **One native sync591.447s;one compact registry persistence**,4,486 files/91,374 units;known IDs99,549→99,553,zero loss/active tuple equality. Eight direct changes=four retained IDs/four new IDs/four pending predecessor gaps. **9,206 bindings/zero drift/zero rebinds**,45 dependent projections refreshed,30 native transitions submitted.

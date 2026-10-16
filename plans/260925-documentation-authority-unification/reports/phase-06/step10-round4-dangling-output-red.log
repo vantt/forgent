@@ -1,0 +1,56 @@
+✔ reproduction rejects missing or repository output ["consistency"] (32.506441ms)
+✔ reproduction rejects missing or repository output ["consistency","--output","/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/unsafe.json"] (30.691485ms)
+✔ reproduction rejects missing or repository output ["consistency","--output","relative.json"] (26.750947ms)
+✔ direct audit rejects a symlink output before reading the corpus (31.307477ms)
+✖ direct audit rejects a dangling-symlink output before reading the corpus (31.822272ms)
+✔ direct audit rejects a hardlink output before reading the corpus (31.42127ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 5
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 231.110778
+
+✖ failing tests:
+
+test at test/scripts/doc-rationale-reproduction.test.mjs:12:61
+✖ direct audit rejects a dangling-symlink output before reading the corpus (31.822272ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /external scratch|unsafe output/i. Input:
+  
+  'node:internal/modules/esm/resolve:271\n' +
+    '    throw new ERR_MODULE_NOT_FOUND(\n' +
+    '          ^\n' +
+    '\n' +
+    "Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/tmp/fgos-work/rationale-output-VlSwwC/cwd/scripts/generate-doc-inventory.mjs' imported from /home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-rebuild.mjs\n" +
+    '    at finalizeResolution (node:internal/modules/esm/resolve:271:11)\n' +
+    '    at moduleResolve (node:internal/modules/esm/resolve:865:10)\n' +
+    '    at defaultResolve (node:internal/modules/esm/resolve:992:11)\n' +
+    '    at #cachedDefaultResolve (node:internal/modules/esm/loader:701:20)\n' +
+    '    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:721:38)\n' +
+    '    at ModuleLoader.resolveSync (node:internal/modules/esm/loader:759:56)\n' +
+    '    at #resolve (node:internal/modules/esm/loader:683:17)\n' +
+    '    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:603:35)\n' +
+    '    at node:internal/modules/esm/loader:632:32\n' +
+    '    at TracingChannel.tracePromise (node:diagnostics_channel:362:14) {\n' +
+    "  code: 'ERR_MODULE_NOT_FOUND',\n" +
+    "  url: 'file:///tmp/fgos-work/rationale-output-VlSwwC/cwd/scripts/generate-doc-inventory.mjs'\n" +
+    '}\n' +
+    '\n' +
+    'Node.js v24.18.0\n'
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale-reproduction.test.mjs:19:37)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: "node:internal/modules/esm/resolve:271\n    throw new ERR_MODULE_NOT_FOUND(\n          ^\n\nError [ERR_MODULE_NOT_FOUND]: Cannot find module '/tmp/fgos-work/rationale-output-VlSwwC/cwd/scripts/generate-doc-inventory.mjs' imported from /home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-rebuild.mjs\n    at finalizeResolution (node:internal/modules/esm/resolve:271:11)\n    at moduleResolve (node:internal/modules/esm/resolve:865:10)\n    at defaultResolve (node:internal/modules/esm/resolve:992:11)\n    at #cachedDefaultResolve (node:internal/modules/esm/loader:701:20)\n    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:721:38)\n    at ModuleLoader.resolveSync (node:internal/modules/esm/loader:759:56)\n    at #resolve (node:internal/modules/esm/loader:683:17)\n    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:603:35)\n    at node:internal/modules/esm/loader:632:32\n    at TracingChannel.tracePromise (node:diagnostics_channel:362:14) {\n  code: 'ERR_MODULE_NOT_FOUND',\n  url: 'file:///tmp/fgos-work/rationale-output-VlSwwC/cwd/scripts/generate-doc-inventory.mjs'\n}\n\nNode.js v24.18.0\n",
+    expected: /external scratch|unsafe output/i,
+    operator: 'match',
+    diff: 'simple'
+  }

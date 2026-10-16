@@ -1,0 +1,89 @@
+✖ reproduction rejects missing or repository output ["consistency"] (7087.956441ms)
+✖ reproduction rejects missing or repository output ["consistency","--output","/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/unsafe.json"] (54.509078ms)
+✖ reproduction rejects missing or repository output ["consistency","--output","relative.json"] (48.54762ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 0
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7229.213646
+
+✖ failing tests:
+
+test at test/scripts/doc-rationale-reproduction.test.mjs:6:141
+✖ reproduction rejects missing or repository output ["consistency"] (7087.956441ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /explicit|external|absolute|scratch/i. Input:
+  
+  'Traceback (most recent call last):\n' +
+    '  File "/tmp/fgos-work/package287-reproduce-h0m2t7ev/consistency.py", line 15, in <module>\n' +
+    '    print(p.stdout,p.stderr);assert p.returncode==0\n' +
+    'AssertionError\n' +
+    'Traceback (most recent call last):\n' +
+    '  File "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-06/step10-sync287-reproduce.py", line 10, in <module>\n' +
+    "    subprocess.run(['python3',str(run/'consistency.py')],env=env,check=True)\n" +
+    '  File "/usr/lib/python3.10/subprocess.py", line 526, in run\n' +
+    '    raise CalledProcessError(retcode, process.args,\n' +
+    "subprocess.CalledProcessError: Command '['python3', '/tmp/fgos-work/package287-reproduce-h0m2t7ev/consistency.py']' returned non-zero exit status 1.\n"
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale-reproduction.test.mjs:8:37)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: `Traceback (most recent call last):\n  File "/tmp/fgos-work/package287-reproduce-h0m2t7ev/consistency.py", line 15, in <module>\n    print(p.stdout,p.stderr);assert p.returncode==0\nAssertionError\nTraceback (most recent call last):\n  File "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-06/step10-sync287-reproduce.py", line 10, in <module>\n    subprocess.run(['python3',str(run/'consistency.py')],env=env,check=True)\n  File "/usr/lib/python3.10/subprocess.py", line 526, in run\n    raise CalledProcessError(retcode, process.args,\nsubprocess.CalledProcessError: Command '['python3', '/tmp/fgos-work/package287-reproduce-h0m2t7ev/consistency.py']' returned non-zero exit status 1.\n`,
+    expected: /explicit|external|absolute|scratch/i,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at test/scripts/doc-rationale-reproduction.test.mjs:6:141
+✖ reproduction rejects missing or repository output ["consistency","--output","/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/unsafe.json"] (54.509078ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /explicit|external|absolute|scratch/i. Input:
+  
+  'Traceback (most recent call last):\n' +
+    '  File "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-06/step10-sync287-reproduce.py", line 4, in <module>\n' +
+    "    assert sys.argv[1:]==['consistency'], 'Usage: python3 <this-file> consistency'\n" +
+    'AssertionError: Usage: python3 <this-file> consistency\n'
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale-reproduction.test.mjs:8:37)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: `Traceback (most recent call last):\n  File "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-06/step10-sync287-reproduce.py", line 4, in <module>\n    assert sys.argv[1:]==['consistency'], 'Usage: python3 <this-file> consistency'\nAssertionError: Usage: python3 <this-file> consistency\n`,
+    expected: /explicit|external|absolute|scratch/i,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at test/scripts/doc-rationale-reproduction.test.mjs:6:141
+✖ reproduction rejects missing or repository output ["consistency","--output","relative.json"] (48.54762ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /explicit|external|absolute|scratch/i. Input:
+  
+  'Traceback (most recent call last):\n' +
+    '  File "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-06/step10-sync287-reproduce.py", line 4, in <module>\n' +
+    "    assert sys.argv[1:]==['consistency'], 'Usage: python3 <this-file> consistency'\n" +
+    'AssertionError: Usage: python3 <this-file> consistency\n'
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale-reproduction.test.mjs:8:37)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: `Traceback (most recent call last):\n  File "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-06/step10-sync287-reproduce.py", line 4, in <module>\n    assert sys.argv[1:]==['consistency'], 'Usage: python3 <this-file> consistency'\nAssertionError: Usage: python3 <this-file> consistency\n`,
+    expected: /explicit|external|absolute|scratch/i,
+    operator: 'match',
+    diff: 'simple'
+  }

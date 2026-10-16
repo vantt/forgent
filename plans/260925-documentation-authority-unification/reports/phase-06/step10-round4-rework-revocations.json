@@ -1,0 +1,186 @@
+{
+  "changes": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-mapped-conservation.json",
+      "collection": "claims",
+      "claimId": "claim_53ebf4b541ff8f6a2c40e3b95304d6b7",
+      "sourceUnitDigest": "2aff5e7721a256efce78953c498af0839f56f0bb5b9918290a36bbc072659eb1",
+      "before": {
+        "claimId": "claim_53ebf4b541ff8f6a2c40e3b95304d6b7",
+        "sourceUnitDigest": "2aff5e7721a256efce78953c498af0839f56f0bb5b9918290a36bbc072659eb1",
+        "targetOwner": "docs/platform/documentation/operations/portals/docs-portal.md",
+        "targetAnchor": "1-read-first",
+        "claimKind": "navigation",
+        "disposition": "supersede",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+        "rationale": "Frozen root map assigns docs/README.md#1-read-first to docs/platform/documentation/operations/portals/docs-portal.md#1-read-first. Carry the complete unit into its candidate portal owner. This unit includes 13 documented link spelling adjustment(s): [doc-governance.md](doc-governance.md) becomes [doc-governance.md](../../../governance.md) (Candidate destination repointed to docs/platform/governance.md; label preserved.); [reading-map.md](reading-map.md) becomes [reading-map.md](../../../../reading-map.md) (Relative spelling changes only; original repository destination conserved.); [platform/README.md](platform/README.md) becomes [platform/README.md](../../../README.md) (Relative spelling changes only; original repository destination conserved.); [specs/reading-map.md](specs/reading-map.md) becomes [specs/reading-map.md](../../../../specs/reading-map.md) (Relative spelling changes only; original repository destination conserved.); [user/](user/) becomes [user/](../../../../user) (Relative spelling changes only; original repository destination conserved.); [how-to/](how-to/) becomes [how-to/](../../../../how-to) (Relative spelling changes only; original repository destination conserved.); [reference/](reference/) becomes [reference/](../../../../reference) (Relative spelling changes only; original repository destination conserved.); [explanation/](explanation/) becomes [explanation/](../../../../explanation) (Relative spelling changes only; original repository destination conserved.); [user/](user/) becomes [user/](../../../../user) (Relative spelling changes only; original repository destination conserved.); [doc-governance.md](doc-governance.md) becomes [doc-governance.md](../../../governance.md) (Candidate destination repointed to docs/platform/governance.md; label preserved.); [reading-map.md](reading-map.md) becomes [reading-map.md](../../../../reading-map.md) (Relative spelling changes only; original repository destination conserved.); [platform/README.md](platform/README.md) becomes [platform/README.md](../../../README.md) (Relative spelling changes only; original repository destination conserved.); [specs/reading-map.md](specs/reading-map.md) becomes [specs/reading-map.md](../../../../specs/reading-map.md) (Relative spelling changes only; original repository destination conserved.). Full source/target text and diff are submitted for independent whole-unit conservation review; wrapping/header/relative-path changes grant no truth approval. No source retirement, promotion or component-boundary change. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10 review correction: the doc-governance link is repointed to docs/platform/governance.md; its original legacy destination is not retained. Label and candidate referent are disclosed; pending independent review.",
+        "reviewNote": "deep: heading 1 Read First; same 13 link pairs checked by script in both directions, no unlisted link change, governance repoint disclosed; anchor ok",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-16",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-345f15d95.md",
+        "reviewMode": "ordinary",
+        "targetUnitDigest": "16929d439319f41461ebf8f9278446e233b23a3b2450a9b9bd4295b12e1052db",
+        "targetAncestry": [
+          "fgOS Documentation"
+        ],
+        "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+      },
+      "after": {
+        "claimId": "claim_53ebf4b541ff8f6a2c40e3b95304d6b7",
+        "sourceUnitDigest": "2aff5e7721a256efce78953c498af0839f56f0bb5b9918290a36bbc072659eb1",
+        "targetOwner": "docs/platform/documentation/operations/portals/docs-portal.md",
+        "targetAnchor": "1-read-first",
+        "claimKind": "navigation",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+        "rationale": "Frozen root map assigns docs/README.md#1-read-first to docs/platform/documentation/operations/portals/docs-portal.md#1-read-first. Carry the complete unit into its candidate portal owner. This unit includes 13 documented link spelling adjustment(s): [doc-governance.md](doc-governance.md) becomes [doc-governance.md](../../../governance.md) (Candidate destination repointed to docs/platform/governance.md; label preserved.); [reading-map.md](reading-map.md) becomes [reading-map.md](../../../../reading-map.md) (Relative spelling changes only; original repository destination conserved.); [platform/README.md](platform/README.md) becomes [platform/README.md](../../../README.md) (Relative spelling changes only; original repository destination conserved.); [specs/reading-map.md](specs/reading-map.md) becomes [specs/reading-map.md](../../../../specs/reading-map.md) (Relative spelling changes only; original repository destination conserved.); [user/](user/) becomes [user/](../../../../user) (Relative spelling changes only; original repository destination conserved.); [how-to/](how-to/) becomes [how-to/](../../../../how-to) (Relative spelling changes only; original repository destination conserved.); [reference/](reference/) becomes [reference/](../../../../reference) (Relative spelling changes only; original repository destination conserved.); [explanation/](explanation/) becomes [explanation/](../../../../explanation) (Relative spelling changes only; original repository destination conserved.); [user/](user/) becomes [user/](../../../../user) (Relative spelling changes only; original repository destination conserved.); [doc-governance.md](doc-governance.md) becomes [doc-governance.md](../../../governance.md) (Candidate destination repointed to docs/platform/governance.md; label preserved.); [reading-map.md](reading-map.md) becomes [reading-map.md](../../../../reading-map.md) (Relative spelling changes only; original repository destination conserved.); [platform/README.md](platform/README.md) becomes [platform/README.md](../../../README.md) (Relative spelling changes only; original repository destination conserved.); [specs/reading-map.md](specs/reading-map.md) becomes [specs/reading-map.md](../../../../specs/reading-map.md) (Relative spelling changes only; original repository destination conserved.). Full source/target text and diff are submitted for independent whole-unit conservation review; wrapping/header/relative-path changes grant no truth approval. No source retirement, promotion or component-boundary change. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10 review correction: the doc-governance link is repointed to docs/platform/governance.md; its original legacy destination is not retained. Label and candidate referent are disclosed; pending independent review.",
+        "targetUnitDigest": "16929d439319f41461ebf8f9278446e233b23a3b2450a9b9bd4295b12e1052db",
+        "targetAncestry": [
+          "fgOS Documentation"
+        ]
+      },
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-287a22d33.md",
+      "reviewNote": "deep: heading 1 Read First section differs from the source only in 8 link destinations (doc-governance, reading-map, platform/README, specs/reading-map, user, how-to, reference, explanation), each resolving to an existing file from the portal path; BUT the rationale says 13 documented adjustments and lists 13 pairs while the unit holds 8 distinct changes (the pairs user and the four table rows are listed twice), so the stated count is false; fix: state 8 and list each pair once"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-mapped-conservation.json",
+      "collection": "claims",
+      "claimId": "claim_53d2f5742d24e980328f8cee963fb73b",
+      "sourceUnitDigest": "dd493e9c64c0caf205f6acc1617c588a0f6710dc0a4f5922d58551efaf63e579",
+      "before": {
+        "claimId": "claim_53d2f5742d24e980328f8cee963fb73b",
+        "sourceUnitDigest": "dd493e9c64c0caf205f6acc1617c588a0f6710dc0a4f5922d58551efaf63e579",
+        "targetOwner": "docs/platform/documentation/operations/portals/docs-portal.md",
+        "targetAnchor": "unheaded-block-3",
+        "claimKind": "navigation",
+        "disposition": "supersede",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+        "rationale": "Frozen root map assigns docs/README.md#unheaded-block-3 to docs/platform/documentation/operations/portals/docs-portal.md#unheaded-block-3. Carry the complete unit into its candidate portal owner. This unit includes 13 documented link spelling adjustment(s): [doc-governance.md](doc-governance.md) becomes [doc-governance.md](../../../governance.md) (Candidate destination repointed to docs/platform/governance.md; label preserved.); [reading-map.md](reading-map.md) becomes [reading-map.md](../../../../reading-map.md) (Relative spelling changes only; original repository destination conserved.); [platform/README.md](platform/README.md) becomes [platform/README.md](../../../README.md) (Relative spelling changes only; original repository destination conserved.); [specs/reading-map.md](specs/reading-map.md) becomes [specs/reading-map.md](../../../../specs/reading-map.md) (Relative spelling changes only; original repository destination conserved.); [user/](user/) becomes [user/](../../../../user) (Relative spelling changes only; original repository destination conserved.); [how-to/](how-to/) becomes [how-to/](../../../../how-to) (Relative spelling changes only; original repository destination conserved.); [reference/](reference/) becomes [reference/](../../../../reference) (Relative spelling changes only; original repository destination conserved.); [explanation/](explanation/) becomes [explanation/](../../../../explanation) (Relative spelling changes only; original repository destination conserved.); [user/](user/) becomes [user/](../../../../user) (Relative spelling changes only; original repository destination conserved.); [doc-governance.md](doc-governance.md) becomes [doc-governance.md](../../../governance.md) (Candidate destination repointed to docs/platform/governance.md; label preserved.); [reading-map.md](reading-map.md) becomes [reading-map.md](../../../../reading-map.md) (Relative spelling changes only; original repository destination conserved.); [platform/README.md](platform/README.md) becomes [platform/README.md](../../../README.md) (Relative spelling changes only; original repository destination conserved.); [specs/reading-map.md](specs/reading-map.md) becomes [specs/reading-map.md](../../../../specs/reading-map.md) (Relative spelling changes only; original repository destination conserved.). Full source/target text and diff are submitted for independent whole-unit conservation review; wrapping/header/relative-path changes grant no truth approval. No source retirement, promotion or component-boundary change. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10 review correction: the doc-governance link is repointed to docs/platform/governance.md; its original legacy destination is not retained. Label and candidate referent are disclosed; pending independent review.",
+        "reviewNote": "deep: unit-3 table of docs/README.md; 13 rationale link pairs all present in source and target in the right direction, no unlisted link change, the doc-governance repoint disclosed; anchor ok",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-16",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-345f15d95.md",
+        "reviewMode": "ordinary",
+        "targetUnitDigest": "1b6544779a1b1b2aea1f57d5e9f59d5831cbbb499161f8ed90e23e16e3a7f134",
+        "targetAncestry": [
+          "fgOS Documentation",
+          "1. Read First"
+        ],
+        "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+      },
+      "after": {
+        "claimId": "claim_53d2f5742d24e980328f8cee963fb73b",
+        "sourceUnitDigest": "dd493e9c64c0caf205f6acc1617c588a0f6710dc0a4f5922d58551efaf63e579",
+        "targetOwner": "docs/platform/documentation/operations/portals/docs-portal.md",
+        "targetAnchor": "unheaded-block-3",
+        "claimKind": "navigation",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+        "rationale": "Frozen root map assigns docs/README.md#unheaded-block-3 to docs/platform/documentation/operations/portals/docs-portal.md#unheaded-block-3. Carry the complete unit into its candidate portal owner. This unit includes 13 documented link spelling adjustment(s): [doc-governance.md](doc-governance.md) becomes [doc-governance.md](../../../governance.md) (Candidate destination repointed to docs/platform/governance.md; label preserved.); [reading-map.md](reading-map.md) becomes [reading-map.md](../../../../reading-map.md) (Relative spelling changes only; original repository destination conserved.); [platform/README.md](platform/README.md) becomes [platform/README.md](../../../README.md) (Relative spelling changes only; original repository destination conserved.); [specs/reading-map.md](specs/reading-map.md) becomes [specs/reading-map.md](../../../../specs/reading-map.md) (Relative spelling changes only; original repository destination conserved.); [user/](user/) becomes [user/](../../../../user) (Relative spelling changes only; original repository destination conserved.); [how-to/](how-to/) becomes [how-to/](../../../../how-to) (Relative spelling changes only; original repository destination conserved.); [reference/](reference/) becomes [reference/](../../../../reference) (Relative spelling changes only; original repository destination conserved.); [explanation/](explanation/) becomes [explanation/](../../../../explanation) (Relative spelling changes only; original repository destination conserved.); [user/](user/) becomes [user/](../../../../user) (Relative spelling changes only; original repository destination conserved.); [doc-governance.md](doc-governance.md) becomes [doc-governance.md](../../../governance.md) (Candidate destination repointed to docs/platform/governance.md; label preserved.); [reading-map.md](reading-map.md) becomes [reading-map.md](../../../../reading-map.md) (Relative spelling changes only; original repository destination conserved.); [platform/README.md](platform/README.md) becomes [platform/README.md](../../../README.md) (Relative spelling changes only; original repository destination conserved.); [specs/reading-map.md](specs/reading-map.md) becomes [specs/reading-map.md](../../../../specs/reading-map.md) (Relative spelling changes only; original repository destination conserved.). Full source/target text and diff are submitted for independent whole-unit conservation review; wrapping/header/relative-path changes grant no truth approval. No source retirement, promotion or component-boundary change. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10 review correction: the doc-governance link is repointed to docs/platform/governance.md; its original legacy destination is not retained. Label and candidate referent are disclosed; pending independent review.",
+        "targetUnitDigest": "1b6544779a1b1b2aea1f57d5e9f59d5831cbbb499161f8ed90e23e16e3a7f134",
+        "targetAncestry": [
+          "fgOS Documentation",
+          "1. Read First"
+        ]
+      },
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-287a22d33.md",
+      "reviewNote": "deep: unheaded-block-3 table differs from source only in the same 8 link destinations, all existing targets and no other word changed; BUT the rationale claims 13 adjustments and lists 13 pairs where only 8 are distinct and present in the unit; fix: state 8 and list each pair once"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-mapped-conservation.json",
+      "collection": "claims",
+      "claimId": "claim_2ae0cd4fc1cf487f7caa4d77d46e9682",
+      "sourceUnitDigest": "93e63d0c77140732f2db5dcff67c39869f924d501e3556dfb36a9d48cc73ed8d",
+      "before": {
+        "claimId": "claim_2ae0cd4fc1cf487f7caa4d77d46e9682",
+        "sourceUnitDigest": "93e63d0c77140732f2db5dcff67c39869f924d501e3556dfb36a9d48cc73ed8d",
+        "targetOwner": "docs/platform/documentation/operations/portals/docs-portal.md",
+        "targetAnchor": "4-related-files",
+        "claimKind": "navigation",
+        "disposition": "supersede",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+        "rationale": "Frozen root map assigns docs/README.md#4-related-files to docs/platform/documentation/operations/portals/docs-portal.md#4-related-files. Carry the complete unit into its candidate portal owner. This unit includes 8 documented link spelling adjustment(s): [doc-governance.md](doc-governance.md) becomes [doc-governance.md](../../../governance.md) (Candidate destination repointed to docs/platform/governance.md; label preserved.); [reading-map.md](reading-map.md) becomes [reading-map.md](../../../../reading-map.md) (Relative spelling changes only; original repository destination conserved.); [platform/README.md](platform/README.md) becomes [platform/README.md](../../../README.md) (Relative spelling changes only; original repository destination conserved.); [specs/reading-map.md](specs/reading-map.md) becomes [specs/reading-map.md](../../../../specs/reading-map.md) (Relative spelling changes only; original repository destination conserved.); [doc-governance.md](doc-governance.md) becomes [doc-governance.md](../../../governance.md) (Candidate destination repointed to docs/platform/governance.md; label preserved.); [reading-map.md](reading-map.md) becomes [reading-map.md](../../../../reading-map.md) (Relative spelling changes only; original repository destination conserved.); [platform/README.md](platform/README.md) becomes [platform/README.md](../../../README.md) (Relative spelling changes only; original repository destination conserved.); [specs/reading-map.md](specs/reading-map.md) becomes [specs/reading-map.md](../../../../specs/reading-map.md) (Relative spelling changes only; original repository destination conserved.). Full source/target text and diff are submitted for independent whole-unit conservation review; wrapping/header/relative-path changes grant no truth approval. No source retirement, promotion or component-boundary change. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10 review correction: the doc-governance link is repointed to docs/platform/governance.md; its original legacy destination is not retained. Label and candidate referent are disclosed; pending independent review.",
+        "reviewNote": "deep: heading 4 Related Files of docs/README.md; same four link respellings as the sibling rows, every rationale pair found in source and target in the right direction, governance repoint disclosed; anchor ok",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-16",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-345f15d95.md",
+        "reviewMode": "ordinary",
+        "targetUnitDigest": "6dcde68b9663bbcefb3354897ee57514583ac7767a09df3f74a615011844a828",
+        "targetAncestry": [
+          "fgOS Documentation"
+        ],
+        "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+      },
+      "after": {
+        "claimId": "claim_2ae0cd4fc1cf487f7caa4d77d46e9682",
+        "sourceUnitDigest": "93e63d0c77140732f2db5dcff67c39869f924d501e3556dfb36a9d48cc73ed8d",
+        "targetOwner": "docs/platform/documentation/operations/portals/docs-portal.md",
+        "targetAnchor": "4-related-files",
+        "claimKind": "navigation",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+        "rationale": "Frozen root map assigns docs/README.md#4-related-files to docs/platform/documentation/operations/portals/docs-portal.md#4-related-files. Carry the complete unit into its candidate portal owner. This unit includes 8 documented link spelling adjustment(s): [doc-governance.md](doc-governance.md) becomes [doc-governance.md](../../../governance.md) (Candidate destination repointed to docs/platform/governance.md; label preserved.); [reading-map.md](reading-map.md) becomes [reading-map.md](../../../../reading-map.md) (Relative spelling changes only; original repository destination conserved.); [platform/README.md](platform/README.md) becomes [platform/README.md](../../../README.md) (Relative spelling changes only; original repository destination conserved.); [specs/reading-map.md](specs/reading-map.md) becomes [specs/reading-map.md](../../../../specs/reading-map.md) (Relative spelling changes only; original repository destination conserved.); [doc-governance.md](doc-governance.md) becomes [doc-governance.md](../../../governance.md) (Candidate destination repointed to docs/platform/governance.md; label preserved.); [reading-map.md](reading-map.md) becomes [reading-map.md](../../../../reading-map.md) (Relative spelling changes only; original repository destination conserved.); [platform/README.md](platform/README.md) becomes [platform/README.md](../../../README.md) (Relative spelling changes only; original repository destination conserved.); [specs/reading-map.md](specs/reading-map.md) becomes [specs/reading-map.md](../../../../specs/reading-map.md) (Relative spelling changes only; original repository destination conserved.). Full source/target text and diff are submitted for independent whole-unit conservation review; wrapping/header/relative-path changes grant no truth approval. No source retirement, promotion or component-boundary change. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10 review correction: the doc-governance link is repointed to docs/platform/governance.md; its original legacy destination is not retained. Label and candidate referent are disclosed; pending independent review.",
+        "targetUnitDigest": "6dcde68b9663bbcefb3354897ee57514583ac7767a09df3f74a615011844a828",
+        "targetAncestry": [
+          "fgOS Documentation"
+        ]
+      },
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-287a22d33.md",
+      "reviewNote": "deep: heading 4 Related Files section differs from source only in 4 link destinations (doc-governance, reading-map, platform/README, specs/reading-map), all existing targets; BUT the rationale says 8 adjustments and lists the same 4 pairs twice; fix: state 4 and list each pair once"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-mapped-conservation.json",
+      "collection": "claims",
+      "claimId": "claim_0f63a4c33bd9ab4d707e6ea459868a91",
+      "sourceUnitDigest": "30081b87c5f3fa70b025b187fa5dd4cc947c337d5c005aec01a17fd48d6652ef",
+      "before": {
+        "claimId": "claim_0f63a4c33bd9ab4d707e6ea459868a91",
+        "sourceUnitDigest": "30081b87c5f3fa70b025b187fa5dd4cc947c337d5c005aec01a17fd48d6652ef",
+        "targetOwner": "docs/platform/documentation/operations/portals/docs-portal.md",
+        "targetAnchor": "unheaded-block-6",
+        "claimKind": "navigation",
+        "disposition": "supersede",
+        "reviewStatus": "reviewed",
+        "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+        "rationale": "Frozen root map assigns docs/README.md#unheaded-block-6 to docs/platform/documentation/operations/portals/docs-portal.md#unheaded-block-6. Carry the complete unit into its candidate portal owner. This unit includes 8 documented link spelling adjustment(s): [doc-governance.md](doc-governance.md) becomes [doc-governance.md](../../../governance.md) (Candidate destination repointed to docs/platform/governance.md; label preserved.); [reading-map.md](reading-map.md) becomes [reading-map.md](../../../../reading-map.md) (Relative spelling changes only; original repository destination conserved.); [platform/README.md](platform/README.md) becomes [platform/README.md](../../../README.md) (Relative spelling changes only; original repository destination conserved.); [specs/reading-map.md](specs/reading-map.md) becomes [specs/reading-map.md](../../../../specs/reading-map.md) (Relative spelling changes only; original repository destination conserved.); [doc-governance.md](doc-governance.md) becomes [doc-governance.md](../../../governance.md) (Candidate destination repointed to docs/platform/governance.md; label preserved.); [reading-map.md](reading-map.md) becomes [reading-map.md](../../../../reading-map.md) (Relative spelling changes only; original repository destination conserved.); [platform/README.md](platform/README.md) becomes [platform/README.md](../../../README.md) (Relative spelling changes only; original repository destination conserved.); [specs/reading-map.md](specs/reading-map.md) becomes [specs/reading-map.md](../../../../specs/reading-map.md) (Relative spelling changes only; original repository destination conserved.). Full source/target text and diff are submitted for independent whole-unit conservation review; wrapping/header/relative-path changes grant no truth approval. No source retirement, promotion or component-boundary change. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10 review correction: the doc-governance link is repointed to docs/platform/governance.md; its original legacy destination is not retained. Label and candidate referent are disclosed; pending independent review.",
+        "reviewNote": "deep: unit-6 of docs/README.md; four link destinations respelled, and the rationale lists every pair in the right direction (source to target, checked by script against both texts) with the doc-governance repoint to platform/governance.md disclosed; no other difference; anchor ok",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-16",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-345f15d95.md",
+        "reviewMode": "ordinary",
+        "targetUnitDigest": "10836db6663f77db9404e1d2502532f3928bef5224306570368ddb4fceb59d15",
+        "targetAncestry": [
+          "fgOS Documentation",
+          "4. Related Files"
+        ],
+        "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+      },
+      "after": {
+        "claimId": "claim_0f63a4c33bd9ab4d707e6ea459868a91",
+        "sourceUnitDigest": "30081b87c5f3fa70b025b187fa5dd4cc947c337d5c005aec01a17fd48d6652ef",
+        "targetOwner": "docs/platform/documentation/operations/portals/docs-portal.md",
+        "targetAnchor": "unheaded-block-6",
+        "claimKind": "navigation",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+        "rationale": "Frozen root map assigns docs/README.md#unheaded-block-6 to docs/platform/documentation/operations/portals/docs-portal.md#unheaded-block-6. Carry the complete unit into its candidate portal owner. This unit includes 8 documented link spelling adjustment(s): [doc-governance.md](doc-governance.md) becomes [doc-governance.md](../../../governance.md) (Candidate destination repointed to docs/platform/governance.md; label preserved.); [reading-map.md](reading-map.md) becomes [reading-map.md](../../../../reading-map.md) (Relative spelling changes only; original repository destination conserved.); [platform/README.md](platform/README.md) becomes [platform/README.md](../../../README.md) (Relative spelling changes only; original repository destination conserved.); [specs/reading-map.md](specs/reading-map.md) becomes [specs/reading-map.md](../../../../specs/reading-map.md) (Relative spelling changes only; original repository destination conserved.); [doc-governance.md](doc-governance.md) becomes [doc-governance.md](../../../governance.md) (Candidate destination repointed to docs/platform/governance.md; label preserved.); [reading-map.md](reading-map.md) becomes [reading-map.md](../../../../reading-map.md) (Relative spelling changes only; original repository destination conserved.); [platform/README.md](platform/README.md) becomes [platform/README.md](../../../README.md) (Relative spelling changes only; original repository destination conserved.); [specs/reading-map.md](specs/reading-map.md) becomes [specs/reading-map.md](../../../../specs/reading-map.md) (Relative spelling changes only; original repository destination conserved.). Full source/target text and diff are submitted for independent whole-unit conservation review; wrapping/header/relative-path changes grant no truth approval. No source retirement, promotion or component-boundary change. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by committed line-diff correspondence with equal unit kind and ancestry (equal). Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. L10 review correction: the doc-governance link is repointed to docs/platform/governance.md; its original legacy destination is not retained. Label and candidate referent are disclosed; pending independent review.",
+        "targetUnitDigest": "10836db6663f77db9404e1d2502532f3928bef5224306570368ddb4fceb59d15",
+        "targetAncestry": [
+          "fgOS Documentation",
+          "4. Related Files"
+        ]
+      },
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-287a22d33.md",
+      "reviewNote": "deep: unheaded-block-6 table differs from source only in 4 link destinations, all existing targets and no other word changed; BUT the rationale says 8 adjustments and lists the same 4 pairs twice; fix: state 4 and list each pair once"
+    }
+  ],
+  "currentReworkRowInstances": 32,
+  "frozenRemaining": 117
+}
