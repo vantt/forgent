@@ -1582,6 +1582,7 @@
       "high": "flagship",
       "critical": "frontier"
     },
+    "maxTier": "advanced",
     "confinement": {
       "strict": false
     },
@@ -1624,7 +1625,7 @@
         ]
       }
     ],
-    "idleTimeoutMs": 1500000
+    "idleTimeoutMs": 5400000
   },
   "gateBypass": {
     "level": "standard"

@@ -66,7 +66,7 @@ Ngoài: cách `terminal`, gate trong pane, adapter interactive, mint writer id (
 
 ## Phase và phụ thuộc
 
-Tiền đề: **4.2 đã land** (bắt đầu P00). **4.3 đã land** trước khi merge P09 (r6 §11 đường găng 4.3 → 6.2: từ 6.2 mọi agent chạy trong PID namespace, record nóng phải có `pidNs`, luật N4).
+Tiền đề: **4.2 đã land** (bắt đầu P00). **4.3 P01 (hot-lock core) + P02 (claims gộp vào `state`) đã land** trước khi merge P09 (phần repo-lock P03–P08 của 4.3 đang tạm giữ chờ component Git, không chặn P09) (r6 §11 đường găng 4.3 → 6.2: từ 6.2 mọi agent chạy trong PID namespace, record nóng phải có `pidNs`, luật N4).
 
 | Phase | Nội dung | Phụ thuộc | Wave | Giờ |
 |---|---|---|---|---|
