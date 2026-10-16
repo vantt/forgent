@@ -195,6 +195,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "fgos-terminal-control"
+version = "0.2.0"
+
+[[package]]
 name = "fgos-work-state"
 version = "0.2.0"
 dependencies = [

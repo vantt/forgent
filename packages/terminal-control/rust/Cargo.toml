@@ -1,0 +1,6 @@
+[package]
+name = "fgos-terminal-control"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]

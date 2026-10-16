@@ -1,0 +1,35 @@
+{
+  "contract": { "id": "terminal-control-driver-capabilities", "version": 1 },
+  "description": "Lower port: a driver declares the capabilities it has; the core returns unsupported for any operation that needs a missing one. Driver errors (timeout, unreadable output) are unknown, never closed or gone.",
+  "capabilities": [
+    { "name": "tab.create", "meaning": "open a new tab whose first pane is the new slot" },
+    { "name": "pane.split", "meaning": "split a live pane in a direction with a ratio" },
+    { "name": "pane.close", "meaning": "close one pane" },
+    { "name": "pane.run", "meaning": "run a command line in a pane's shell" },
+    { "name": "send.text", "meaning": "type literal text into a pane" },
+    { "name": "send.keys", "meaning": "send key presses to a pane" },
+    { "name": "read.screen", "meaning": "read the pane's terminal output" },
+    { "name": "process.info", "meaning": "foreground process group and processes of a pane" },
+    { "name": "activity.state", "meaning": "agent lifecycle state of the pane (idle, working, blocked, done)" },
+    { "name": "label", "meaning": "set display labels of a tab or pane" },
+    { "name": "layout.geometry", "meaning": "real rect of the tab area and of every pane in it" },
+    { "name": "pane.resize", "meaning": "resize a split" },
+    { "name": "pane.swap", "meaning": "swap two panes" },
+    { "name": "pane.move", "meaning": "move a pane" },
+    { "name": "server.incarnation", "meaning": "identity of the multiplexer server process: peer credentials of its socket, then start time and boot id of that pid" }
+  ],
+  "drivers": {
+    "herdr": {
+      "linux": ["tab.create", "pane.split", "pane.close", "pane.run", "send.text", "send.keys", "read.screen", "process.info", "activity.state", "label", "layout.geometry", "pane.resize", "pane.swap", "pane.move", "server.incarnation"],
+      "macos": ["tab.create", "pane.split", "pane.close", "pane.run", "send.text", "send.keys", "read.screen", "process.info", "activity.state", "label", "layout.geometry", "pane.resize", "pane.swap", "pane.move", "server.incarnation"],
+      "windows": [],
+      "absent": [],
+      "notes": [
+        "absent means the herdr binary is not found (ENOENT): every operation is unsupported, direct mode is unaffected",
+        "windows: herdr ships no Windows build today (herdr-plugin.toml declares linux and macos); the driver declares nothing until it does"
+      ]
+    },
+    "tmux": { "status": "deferred; the port has room for it" }
+  },
+  "closeRule": "pane.close requires server.incarnation: the driver reads the incarnation right before and right after the close; a mismatch or an unreadable incarnation makes the result unknown and the pane is never closed a second time"
+}
