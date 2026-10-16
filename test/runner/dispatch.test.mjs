@@ -1250,12 +1250,14 @@ test('the committed .fgos/config.json runner section wires the consolidated gemi
   assert.ok(cfg.modelPolicies.gemini.nano.length > 0);
 });
 
-test('the committed .fgos/config.json runner section grants the worker acceptEdits and nothing else — no tool allowlist, no git write grant (the runner commits)', () => {
+test('the committed .fgos/config.json runner section grants the worker acceptEdits plus test commands only — no git write grant (the runner commits)', () => {
   const cfg = committedRunnerConfig();
   const { args } = cfg.executor;
   assert.ok(args.includes('--permission-mode'));
   assert.equal(args[args.indexOf('--permission-mode') + 1], 'acceptEdits');
-  assert.ok(!args.includes('--allowedTools'), 'a worker holds no git grant, so no allowlist is needed');
+  const allowed = args.includes('--allowedTools') ? args[args.indexOf('--allowedTools') + 1].split(',') : [];
+  const testCommand = /^(Skill|Bash\((rtk (proxy )?)?(cargo (build|check|test|clippy|fmt)|node --test|cargo|node):\*\))$/;
+  for (const tool of allowed) assert.match(tool, testCommand, `allowlist grants only test commands, found ${tool}`);
   assert.ok(!args.some((arg) => /git (add|commit)/.test(arg)), 'no git add/commit grant on the default executor');
   assert.ok(!args.includes('--dangerously-skip-permissions'));
 });
