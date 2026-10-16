@@ -17,6 +17,7 @@ Related:
 - plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md
 - plans/reports/architecture-council-261015-1508-terminal-control-session-identity-process-supervisor.md
 - plans/reports/implementation-261016-1352-terminal-control-herdr-measurements.md
+- plans/261016-1306-terminal-control-rust-core-herdr-driver/plan.md
 ```
 
 ## 1. Purpose
@@ -160,5 +161,5 @@ When the migration lands: `herdr-round.mjs` calls the port instead of `createBat
 
 - 2026-10-15 — The architecture council keeps the tab grouping and the removal of the empty root pane as rules of the core (council sections 2.3 and 2.4, measured on a real herdr with five CLIs), rejects a user verb `fgos terminal`, a layout engine by screen ratio, a layout lock file inside the repo and reading pane labels for state, and keeps the lock for terminal placement as a kind of the shared lock component if it is ever needed. Source: [council](../../../plans/reports/architecture-council-261015-1508-terminal-control-session-identity-process-supervisor.md).
 - 2026-10-15 — The owner makes terminal-control a real foundation component (package `packages/terminal-control`, crate `fgos-terminal-control`), usable outside a run, with a key-addressed upper port and a driver port with declared capabilities; supervisor → terminal-control is one way, and the supervisor never knows panes. The layout becomes measured state plus a pluggable policy. Source: [design, section 7](../../../plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md).
-- 2026-10-16 — The terminal-control plan fixes: the incarnation is checked before and after a close because herdr cannot bind a close to a server instance (D1); the route is internal only and no user verb is added (D2, standing STR40 decision); `maxPanesPerTab` is 8 (D6). Measured numbers and the Lead's chosen defaults: [measurements](../../../plans/reports/implementation-261016-1352-terminal-control-herdr-measurements.md). Plan: `plans/261016-1306-terminal-control-rust-core-herdr-driver/plan.md`.
+- 2026-10-16 — The terminal-control plan fixes: the incarnation is checked before and after a close because herdr cannot bind a close to a server instance (D1); the route is internal only and no user verb is added (D2, standing STR40 decision); `maxPanesPerTab` is 8 (D6). Measured numbers and the Lead's chosen defaults: [measurements](../../../plans/reports/implementation-261016-1352-terminal-control-herdr-measurements.md). Plan: [terminal-control plan](../../../plans/261016-1306-terminal-control-rust-core-herdr-driver/plan.md) (decisions D1-D7, prior art).
 - Prior art removed by the migration: `createBatchTab`, `batchTabFor`, `closeIfEmpty` and the `fgos-lead-<key>-<ts>` labels in `src/runner/dispatch/herdr-round.mjs` and `herdr-agent.mjs`; `FGOS_HERDR_ANCHOR_PANE` becomes `attach` plus `groupKey`. The removal is part of the migration, not done yet.
