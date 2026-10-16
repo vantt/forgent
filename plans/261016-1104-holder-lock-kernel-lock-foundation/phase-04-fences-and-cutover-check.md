@@ -2,7 +2,7 @@
 
 Wave 1. Nhánh `holder-lock/p04-fences`, worktree `.claude/worktrees/hl-p04`. Phụ thuộc: P00 (registry); nghiệm thu sau P02 (route `quiesce-scan`).
 
-Thay engine R-dual hai pha của r4/r5 §6.8 theo quyết định A1 của anh: không marker, không sàn, không revert tự động. Chỉ còn hai việc: kiểm máy đã dừng, rồi đặt hàng rào một lần.
+Thay engine R-dual hai pha của r4–r6 §6.8 theo quyết định A1 của anh: không marker, không sàn, không revert tự động. Chỉ còn hai việc: kiểm máy đã dừng, rồi đặt hàng rào một lần.
 
 ## Yêu cầu
 

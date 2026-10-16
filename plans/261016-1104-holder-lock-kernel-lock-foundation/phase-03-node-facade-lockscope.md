@@ -4,20 +4,20 @@ Wave 1. Nhánh `holder-lock/p03-node-facade`, worktree `.claude/worktrees/hl-p03
 
 ## Yêu cầu
 
-Thư mục component mới `src/holder-lock/` (facade Node của cổng r5 §6.0; caller không bao giờ thấy fd):
+Thư mục component mới `src/holder-lock/` (facade Node của cổng r6 §6.0; caller không bao giờ thấy fd):
 
 - `registry.mjs`: nạp `packages/holder-lock/contracts/lock-registry.v1.json`, giải mẫu đường dẫn (`fgosDir`, `lockRoot`, run dir), trả `{v3Path, v1Path, kind, rank, fence}`.
 - `state-root.mjs`: đọc `FGOS_STATE_ROOT`; vắng (kênh `node bin/fgos.mjs`) thì gọi `fgos internal state-root` một lần mỗi process, cache.
 - `driver.mjs`: tìm binary bằng `resolveActiveHostBin` ([`host-bin-path.mjs:68`](../../src/util/host-bin-path.mjs), cùng luật với identity), một lần mỗi process; hỏi `--guarantee <dir>` một lần mỗi thư mục lock; `exclusion == none` hoặc không có driver → mọi `acquire` trả `unavailable` với mã `lock-driver-unavailable` (Windows tới 4.4 và fs mạng, quyết định A2; không lùi về v1).
 - `index.mjs` — API:
-  - `acquireSync(scope, name, params, {waitMs})` và `acquire(...)` (async: `--try` lặp bằng timer, không chặn event loop). `acquireSync` dùng `spawnSync(..., {killSignal:'SIGKILL', timeout})` với `--wait-ms` (r5 §6.3, B8). Mở file `O_RDWR|O_CREAT` (Node `openSync` đã `O_CLOEXEC`), gọi route với `stdio[3] = fd`, kiểm inode sau acquire.
-  - Luật 6.0.1 (r5): facade không tự cài, chỉ truyền `--drain-ms` = `lock.predecessorDrainMs` (đọc qua bộ đọc cấu hình mà các khoá khác của `fgos setup` dùng, mặc định 2000) và ánh xạ `held` có `reason: predecessor-domain-not-empty` thành lỗi có tên `lock-predecessor-domain-not-empty` kèm miền (fd đã đóng). `acquireSync` cộng `drainMs × 2` vào `timeout` của `spawnSync` để route kịp chờ miền trước.
+  - `acquireSync(scope, name, params, {waitMs})` và `acquire(...)` (async: `--try` lặp bằng timer, không chặn event loop). `acquireSync` dùng `spawnSync(..., {killSignal:'SIGKILL', timeout})` với `--wait-ms` (r6 §6.3, B8). Mở file `O_RDWR|O_CREAT` (Node `openSync` đã `O_CLOEXEC`), gọi route với `stdio[3] = fd`, kiểm inode sau acquire.
+  - Luật 6.0.1 (r6): facade không tự cài, chỉ truyền `--kill-wait-ms` = `lock.predecessorKillWaitMs` (đọc qua bộ đọc cấu hình chung của `fgos setup`, mặc định 2000) và ánh xạ `held` có `reason: predecessor-domain-not-empty` thành lỗi có tên `lock-predecessor-domain-not-empty` kèm miền (fd đã đóng); `borrow-leftover-not-killed` của `runBorrowed` thành lỗi cùng tên. `acquireSync` cộng `killWaitMs` vào `timeout` của `spawnSync`.
   - `handle.release()` = `closeSync(fd)`; idempotent; không bao giờ `LOCK_UN`.
   - `probe(name, params)` → `--shared-try` trên description mới, đóng ngay.
   - `runBorrowed(handle, spec, {sync|async})`: chỉ hàm này được đặt fd lock vào `stdio`; env `FGOS_LOCK_FD=<name>:3`; nếu `spec.command` là git thì chèn `-c gc.auto=0 -c maintenance.auto=false`; bản async trả `ChildProcess` cho caller cần `onSpawn` (account lock, P09).
-  - `LockScope`: object truyền tường minh; chỉ acquire hạng lớn hơn mọi hạng scope đang giữ; cùng hạng bị cấm. Vi phạm **ném ngay** `lock-order-violation` kèm `{held, acquiring}` (quyết định A3 của anh, thay lịch trace → cảnh báo → ném của r5 §6.5). Không env tắt/bật.
+  - `LockScope`: object truyền tường minh; chỉ acquire hạng lớn hơn mọi hạng scope đang giữ; cùng hạng bị cấm. Vi phạm **ném ngay** `lock-order-violation` kèm `{held, acquiring}` (quyết định A3 của anh, thay lịch trace → cảnh báo → ném của r6 §6.5). Không env tắt/bật.
   - Nền không có driver (Windows tới 4.4, fs mạng): `acquire` trả lỗi có tên `lock-driver-unavailable` (Windows: `unsupported`), không lùi về v1 (A2).
-- `adapters.mjs` `workerBaseEnv` ([`:99-109`](../../src/runner/dispatch/adapters.mjs)): bỏ `FGOS_LOCK_FD` (và `FGOS_MAIN_LOCK_HOLDER_PID` theo r5 §6.4 điểm 5); ghim `FGOS_STATE_ROOT` = state root của process cha (r5 §6.9).
+- `adapters.mjs` `workerBaseEnv` ([`:99-109`](../../src/runner/dispatch/adapters.mjs)): bỏ `FGOS_LOCK_FD` (và `FGOS_MAIN_LOCK_HOLDER_PID` theo r6 §6.4 điểm 5); ghim `FGOS_STATE_ROOT` = state root của process cha (r6 §6.9).
 
 ## File sở hữu
 
@@ -33,7 +33,7 @@ Thư mục component mới `src/holder-lock/` (facade Node của cổng r5 §6.0
 1. Đa process Node thật: giữ sau helper thoát; hai `acquireSync` cùng process (hai scope) loại trừ; holder Node bị SIGKILL → trống; `acquireSync` timeout → `timeout`, fd đã đóng, không giữ.
 2. `runBorrowed` với git thật trong repo tạm, `gc.auto=1` + object rời, hook tạo process nền: lock trống ngay khi git và owner đóng; process anh em cùng env tự mở file → `--borrowed-check` từ chối.
 3. Rò: sau `runBorrowed`, con cháu không có inode lock; process Node con spawn thường (không qua `runBorrowed`) không có inode.
-4b. Luật 6.0.1 qua facade: record `predecessor.json` trỏ tới một process `node` thật đang sống → `acquireSync` chỉ trả sau khi process đó chết; `lock.predecessorDrainMs` đặt 200 ms trong config tạm và record trỏ tới pid 1 → lỗi `lock-predecessor-domain-not-empty`, lock trống sau đó.
+4b. Luật 6.0.1 qua facade: record trỏ tới một process `node` thật đang sống → `acquireSync` giết nó ngay và trả sau khi nó chết (ms, không chờ hạn); `lock.predecessorKillWaitMs` = 200 trong config tạm và record trỏ tới pid 1 → `lock-predecessor-domain-not-empty`, lock trống sau đó.
 4. `LockScope`: thứ tự sai → ném `lock-order-violation`; cùng hạng → ném; đúng thứ tự → qua. Hai scope cùng process không ảnh hưởng nhau.
 5. State root: vector P00 qua Node (env có/không, gọi route khi vắng).
 6. Nhánh `unavailable`: (a) không tìm được binary → `lock-driver-unavailable` có tên, không đoán; (b) thư mục lock trên mount NFS/SMB thật nếu máy có → `guarantee.exclusion = none` → `unavailable`. Máy không có mount như vậy: ghi "chưa đo" trong báo cáo, không giả lập. Nhánh Windows đo ở P14.

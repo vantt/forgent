@@ -4,16 +4,16 @@ Wave 0, nối tiếp. Nhánh `holder-lock/p00-contracts`, worktree `.claude/work
 
 ## Đọc trước
 
-- r5 §6.0, **§6.0.1 (miền của holder trước phải rỗng)**, §6.1.1, §6.2, §6.5 (bảng hạng), §6.8 (bảng hình dạng), §6.9; §5.1 (bảng phán).
+- r6 §6.0, **§6.0.1 r6 (miền của holder trước phải rỗng; holder chỉ nhả khi miền của mình rỗng; người sau kết thúc miền còn sót ngay)**, §6.1.1, §6.2, §6.5 (bảng hạng), §6.8 (bảng hình dạng), §6.9; §5.1 (bảng phán).
 - Prior art đã kiểm (`git log -S`): không có holder-lock chung nào từng tồn tại rồi bị gỡ ([kiểm kê §4](../reports/research-261015-1731-lock-inventory-and-standardization.md)); generation ledger (`3c8d518cb`, `58613b1c4`) là thiết kế duy nhất không unlink, giữ cho run control; `f1c315d3f` gỡ "actor lease" vì đọc-rồi-ghi không có gì ở giữa. Executor trước phase chạy lại `git log -S'flock' -S'FGOS_STATE_ROOT' --oneline` và ghi kết quả vào báo cáo phase.
 
 ## File sở hữu
 
 | Hành động | File |
 |---|---|
-| tạo | `packages/holder-lock/contracts/holder-lock.port.v1.json` — thao tác `acquire/release/run_borrowed/probe/holders/guarantee`, kết quả (`acquired\|held\|timeout\|unavailable`; `held` có `reason`: `kernel-lock-held` hoặc `predecessor-domain-not-empty`); `acquire` chỉ trả `acquired` khi giữ được kernel lock **và** miền của holder trước đã rỗng (r5 §6.0.1), hình dạng `guarantee = {driver, exclusion, borrow, holders, platform, notes}` với giá trị `kernel\|kernel-unmeasured\|job-scoped\|unsupported\|none` |
-| tạo | `packages/holder-lock/contracts/predecessor.v1.json` — record `<lockFile>.predecessor.json` cạnh file lock (r5 §6.0.1 bước 1): `{v:1, domainKind: "linux-gate"\|"windows-job"\|"macos-tree", domainId}` (`linux-gate`: tuple host `{host, bootId, pidNs, pid, startTime}`; `windows-job`: tên job có token; `macos-tree`: tuple gốc cây); kết quả `held` có `reason: "predecessor-domain-not-empty"` kèm `domain`; tham số `drainMs` (mặc định 2000, nguồn `lock.predecessorDrainMs`) |
-| tạo | `packages/holder-lock/contracts/internal-route.lock-fd.v1.json` — argv (`--protocol 1`, `--try`, `--wait-ms N`, `--drain-ms N`, `--shared-try`, `--borrowed-check <path>`, `--guarantee <path>`), fd 3 vào, stdout JSON một dòng, mã thoát |
+| tạo | `packages/holder-lock/contracts/holder-lock.port.v1.json` — thao tác `acquire/release/run_borrowed/probe/holders/guarantee`, kết quả (`acquired\|held\|timeout\|unavailable`; `held` có `reason`: `kernel-lock-held` hoặc `predecessor-domain-not-empty`); `acquire` chỉ trả `acquired` khi giữ được kernel lock **và** miền của holder trước đã rỗng (r6 §6.0.1), hình dạng `guarantee = {driver, exclusion, borrow, holders, platform, notes}` với giá trị `kernel\|kernel-unmeasured\|job-scoped\|unsupported\|none` |
+| tạo | `packages/holder-lock/contracts/predecessor.v1.json` — record `<lockFile>.predecessor.json` cạnh file lock (r6 §6.0.1 bước 1): `{v:1, domainKind: "linux-gate"\|"windows-job"\|"macos-tree", domainId}` (`linux-gate`: tuple host `{host, bootId, pidNs, pid, startTime}`; `windows-job`: tên job có token; `macos-tree`: tuple gốc cây); kết quả `held` có `reason: "predecessor-domain-not-empty"` kèm `domain`; tham số `killWaitMs` (mặc định 2000, nguồn `lock.predecessorKillWaitMs`: chỉ giới hạn thời gian chờ process đã bị kết thúc signaled); luật nhả (bước 0): holder chỉ nhả khi miền của chính nó rỗng |
+| tạo | `packages/holder-lock/contracts/internal-route.lock-fd.v1.json` — argv (`--protocol 1`, `--try`, `--wait-ms N`, `--kill-wait-ms N`, `--shared-try`, `--borrowed-check <path>`, `--guarantee <path>`), fd 3 vào, stdout JSON một dòng, mã thoát |
 | tạo | `packages/holder-lock/contracts/internal-route.state-root.v1.json`, `internal-route.quiesce-scan.v1.json`, `internal-route.lock-borrow-vectors.v1.json` |
 | tạo | `packages/holder-lock/contracts/lock-registry.v1.json` (bảng dưới) |
 | tạo | `packages/process/contracts/process-facts.judge.v1.json` — vector của 5.1 (mọi dòng hai bảng, gồm N4) |
@@ -23,7 +23,7 @@ Wave 0, nối tiếp. Nhánh `holder-lock/p00-contracts`, worktree `.claude/work
 
 ## Registry (một dòng mỗi lock)
 
-Trường: `name`, `kind` (`mutex\|lease\|hot-mutex\|beacon`), `scope` (`repo\|machine\|run`), `rank` (bảng r5 §6.5), `v3Path` (mẫu, dưới `<fgosDir>/locks/` hoặc `<lockRoot>/`, `run` dưới thư mục run), `v1Shape` (`file-link\|file-wx\|ledger-dir\|file-by-cwd`), `v1Path` (mẫu), `fence` (`tombstone\|blocking-generation\|none`), `owner` (`4.2\|4.3\|4.4`).
+Trường: `name`, `kind` (`mutex\|lease\|hot-mutex\|beacon`), `scope` (`repo\|machine\|run`), `rank` (bảng r6 §6.5), `v3Path` (mẫu, dưới `<fgosDir>/locks/` hoặc `<lockRoot>/`, `run` dưới thư mục run), `v1Shape` (`file-link\|file-wx\|ledger-dir\|file-by-cwd`), `v1Path` (mẫu), `fence` (`tombstone\|blocking-generation\|none`), `owner` (`4.2\|4.3\|4.4`).
 
 | name | kind | scope | rank | v1 (nguồn) | fence | owner |
 |---|---|---|---|---|---|---|
@@ -60,7 +60,7 @@ Không marker họ, không sàn (quyết định A1, Lead D7 trong plan.md). Hà
 ## Tiêu chí nghiệm thu
 
 - Contract đủ để P01–P05 code độc lập: không phase wave 1 nào cần sửa file ở bảng trên.
-- Vector 5.1 có ít nhất một ca cho mỗi dòng hai bảng r5 §5.1, gồm N4 (người phán ngoài init namespace, record thiếu `pidNs` → `unknown`).
+- Vector 5.1 có ít nhất một ca cho mỗi dòng hai bảng r6 §5.1, gồm N4 (người phán ngoài init namespace, record thiếu `pidNs` → `unknown`).
 
 ## Rủi ro / rollback
 
