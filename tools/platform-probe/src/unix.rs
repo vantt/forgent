@@ -84,11 +84,11 @@ pub fn domain_open(id: &str) -> Option<Dom> {
     if pid_alive(pid) { Some(Dom(pid)) } else { None }
 }
 
-pub fn domain_active(d: &Dom) -> Option<u32> {
+pub fn domain_active(d: &mut Dom) -> Option<u32> {
     Some(u32::from(pid_alive(d.0)))
 }
 
-pub fn domain_kill(d: &Dom) {
+pub fn domain_kill(d: &mut Dom) {
     kill_pid(d.0);
 }
 
@@ -102,6 +102,28 @@ pub fn make_stale_domain(ctx: &Ctx) -> Result<String, String> {
     c.kill().map_err(|e| e.to_string())?;
     let _ = c.wait();
     Ok(pid.to_string())
+}
+
+/// Windows keeps the job alive past the holder with a supervisor-owned handle; unix has no such object.
+pub struct Sup;
+impl Sup {
+    pub fn new() -> Result<Sup, String> {
+        Ok(Sup)
+    }
+    pub fn name(&self) -> &str {
+        ""
+    }
+    pub fn contains(&self, _pid: u32) -> Option<bool> {
+        None
+    }
+}
+
+impl Drop for Sup {
+    fn drop(&mut self) {}
+}
+
+pub fn pid_state(pid: u32) -> String {
+    if pid_alive(pid) { "running".into() } else { "dead".into() }
 }
 
 pub struct Keep;

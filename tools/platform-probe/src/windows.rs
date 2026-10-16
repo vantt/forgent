@@ -19,6 +19,7 @@ use windows_sys::Win32::System::IO::OVERLAPPED;
 
 const JOB_OBJECT_TERMINATE: u32 = 0x0008;
 const JOB_OBJECT_QUERY: u32 = 0x0004;
+const JOB_OBJECT_ASSIGN_PROCESS: u32 = 0x0001;
 const DETACHED_PROCESS: u32 = 0x0000_0008;
 const CREATE_BREAKAWAY_FROM_JOB: u32 = 0x0100_0000;
 
@@ -212,30 +213,136 @@ pub fn try_acquire(path: &Path) -> Option<Guard> {
     }
 }
 
-/// An opened handle to the previous holder's process domain (a named job).
-pub struct Dom(HANDLE);
+/// An opened handle to the previous holder's process domain (a named job), plus
+/// SYNCHRONIZE handles to every member seen so far. A member that has been
+/// terminated can still be running its last instructions after the job already
+/// reports it gone, so "empty" means: job accounting says 0 AND every member
+/// process object is signaled.
+pub struct Dom {
+    job: HANDLE,
+    members: Vec<(u32, HANDLE)>,
+}
 impl Drop for Dom {
     fn drop(&mut self) {
         unsafe {
-            CloseHandle(self.0);
+            for (_, h) in &self.members {
+                CloseHandle(*h);
+            }
+            CloseHandle(self.job);
         }
     }
 }
 
-/// None when the domain no longer exists (open fails): that means empty.
+unsafe fn job_pids(job: HANDLE) -> Vec<u32> {
+    let mut buf = vec![0usize; 1024];
+    let ok = QueryInformationJobObject(
+        job,
+        JobObjectBasicProcessIdList,
+        buf.as_mut_ptr() as *mut std::ffi::c_void,
+        (buf.len() * std::mem::size_of::<usize>()) as u32,
+        std::ptr::null_mut(),
+    );
+    if ok == 0 {
+        return vec![];
+    }
+    let p = buf.as_ptr() as *const JOBOBJECT_BASIC_PROCESS_ID_LIST;
+    let n = ((*p).NumberOfProcessIdsInList as usize).min(buf.len() - 1);
+    let ids = std::ptr::addr_of!((*p).ProcessIdList) as *const usize;
+    (0..n).map(|i| *ids.add(i) as u32).collect()
+}
+
+impl Dom {
+    /// Opens a SYNCHRONIZE handle to every member not yet tracked.
+    fn refresh(&mut self) {
+        unsafe {
+            for pid in job_pids(self.job) {
+                if !self.members.iter().any(|m| m.0 == pid) {
+                    let h = OpenProcess(SYNCHRONIZE, 0, pid);
+                    if !h.is_null() {
+                        self.members.push((pid, h));
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// None when the job no longer exists by name. NOTE: that does not prove its former
+/// members are dead: kill-on-close terminates them asynchronously after the name is gone.
 pub fn domain_open(id: &str) -> Option<Dom> {
     let w: Vec<u16> = id.encode_utf16().chain(std::iter::once(0)).collect();
     let h = unsafe { OpenJobObjectW(JOB_OBJECT_QUERY | JOB_OBJECT_TERMINATE | SYNCHRONIZE, 0, w.as_ptr()) };
-    if h.is_null() { None } else { Some(Dom(h)) }
+    if h.is_null() {
+        return None;
+    }
+    let mut d = Dom { job: h, members: vec![] };
+    d.refresh();
+    Some(d)
 }
 
-pub fn domain_active(d: &Dom) -> Option<u32> {
-    unsafe { job_active(d.0) }
+/// Number of members still alive: job accounting or any tracked member process not yet signaled.
+pub fn domain_active(d: &mut Dom) -> Option<u32> {
+    d.refresh();
+    let acct = unsafe { job_active(d.job) }?;
+    let pending = d.members.iter().filter(|(_, h)| unsafe { WaitForSingleObject(*h, 0) } == WAIT_TIMEOUT).count() as u32;
+    Some(acct.max(pending))
 }
 
-pub fn domain_kill(d: &Dom) {
+pub fn domain_kill(d: &mut Dom) {
+    d.refresh();
     unsafe {
-        TerminateJobObject(d.0, 1);
+        TerminateJobObject(d.job, 1);
+    }
+}
+
+/// Supervisor-owned job: this process holds the handle, so the job survives the holder's death.
+pub struct Sup {
+    h: HANDLE,
+    name: String,
+}
+impl Sup {
+    pub fn new() -> Result<Sup, String> {
+        let name = unique_job_name();
+        let h = unsafe { make_kill_job(Some(&name))? };
+        Ok(Sup { h, name })
+    }
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+    /// Whether the pid is currently a member of this job (None: cannot be determined).
+    pub fn contains(&self, pid: u32) -> Option<bool> {
+        unsafe {
+            let hp = OpenProcess(0x1000 /* PROCESS_QUERY_LIMITED_INFORMATION */, 0, pid);
+            if hp.is_null() {
+                return None;
+            }
+            let mut r = 0;
+            let ok = IsProcessInJob(hp, self.h, &mut r);
+            CloseHandle(hp);
+            if ok == 0 { None } else { Some(r != 0) }
+        }
+    }
+}
+impl Drop for Sup {
+    fn drop(&mut self) {
+        unsafe {
+            CloseHandle(self.h);
+        }
+    }
+}
+
+/// Human-readable process state for evidence: running, or exited with a code, or unopenable.
+pub fn pid_state(pid: u32) -> String {
+    unsafe {
+        let h = OpenProcess(SYNCHRONIZE | 0x1000, 0, pid);
+        if h.is_null() {
+            return "unopenable (gone or reused)".into();
+        }
+        let signaled = WaitForSingleObject(h, 0) != WAIT_TIMEOUT;
+        let mut code = 0u32;
+        GetExitCodeProcess(h, &mut code);
+        CloseHandle(h);
+        if signaled { format!("exited code={code}") } else { format!("running (signaled=false, exitcode={code})") }
     }
 }
 
@@ -402,9 +509,17 @@ pub fn role(name: &str, a: &[String]) -> bool {
                     std::process::exit(3);
                 }
                 // The record is written while the lock is held, before the domain is created.
-                let name = unique_job_name();
+                // With a 5th argument the supervisor owns the job (opened by name); otherwise the holder owns it.
+                let name = a.get(4).cloned().unwrap_or_else(unique_job_name);
                 write_predecessor_record(Path::new(&a[0]), "job", &name);
-                match make_kill_job(Some(&name)) {
+                let job = if a.get(4).is_some() {
+                    let w: Vec<u16> = name.encode_utf16().chain(std::iter::once(0)).collect();
+                    let j = OpenJobObjectW(JOB_OBJECT_ASSIGN_PROCESS | JOB_OBJECT_QUERY, 0, w.as_ptr());
+                    if j.is_null() { Err(format!("OpenJobObjectW failed: {}", GetLastError())) } else { Ok(j) }
+                } else {
+                    make_kill_job(Some(&name))
+                };
+                match job {
                     Ok(job) => {
                         if AssignProcessToJobObject(job, GetCurrentProcess()) == 0 {
                             note = format!("job-assign-error-{}", GetLastError());

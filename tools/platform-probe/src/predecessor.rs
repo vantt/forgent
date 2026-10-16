@@ -19,6 +19,8 @@ pub struct Enter {
     pub domain_opened: bool,
     pub terminated: bool,
     pub alive_at_proceed: Vec<u32>,
+    /// Per watched pid at the decision: state, and how long after the decision it was still running.
+    pub diag: Vec<Value>,
 }
 
 /// Takes the lock (polling), applies the predecessor rule, and reports which watched
@@ -41,26 +43,33 @@ pub fn enter(lock: &Path, record: &Path, drain: Duration, watch: &[u32], wait_lo
         domain_opened: false,
         terminated: false,
         alive_at_proceed: vec![],
+        diag: vec![],
     };
     let rec: Option<Value> = std::fs::read_to_string(record).ok().and_then(|s| serde_json::from_str(&s).ok());
     let id = rec.as_ref().and_then(|r| r["domainId"].as_str()).map(String::from);
     e.record_found = id.is_some();
     let mut empty = true;
     if let Some(id) = id {
-        if let Some(dom) = plat::domain_open(&id) {
+        if let Some(mut dom) = plat::domain_open(&id) {
             e.domain_opened = true;
-            let drained = |d: &plat::Dom| wait_until(drain, || plat::domain_active(d) == Some(0)).is_some();
-            empty = drained(&dom);
+            let drained = |d: &mut plat::Dom| wait_until(drain, || plat::domain_active(d) == Some(0)).is_some();
+            empty = drained(&mut dom);
             if !empty {
-                plat::domain_kill(&dom);
+                plat::domain_kill(&mut dom);
                 e.terminated = true;
-                empty = drained(&dom);
+                empty = drained(&mut dom);
             }
         }
     }
     if empty {
         e.alive_at_proceed = watch.iter().copied().filter(|p| plat::pid_alive(*p)).collect();
         e.proceeded = true;
+        for p in watch {
+            let state = plat::pid_state(*p);
+            let alive = e.alive_at_proceed.contains(p);
+            let dead_after = if alive { wait_until(secs(2), || !plat::pid_alive(*p)).map(ms) } else { None };
+            e.diag.push(json!({"pid": p, "stateAtDecision": state, "aliveAtDecision": alive, "deadMsAfterDecision": dead_after}));
+        }
     } else {
         e.held_reason = Some("predecessor-domain-not-empty".into());
     }
@@ -88,7 +97,13 @@ pub fn tests() -> Vec<Def> {
             name: "git-borrow-blocking-hook-predecessor-check",
             expect: "50 repeats: a contender that applies the predecessor rule never proceeds while git or its hook children are alive (0 violations); extra wait is small",
             timeout_s: 420,
-            f: repeated_check,
+            f: |c| repeated_check(c, true),
+        },
+        Def {
+            name: "git-borrow-blocking-hook-predecessor-check-holder-owned",
+            expect: "documents the hazard: when only the holder owns the job, its name can vanish (open fails = looks empty) while members are still terminating; informational, never fails",
+            timeout_s: 420,
+            f: |c| repeated_check(c, false),
         },
         Def {
             name: "predecessor-record-stale",
@@ -105,7 +120,10 @@ pub fn tests() -> Vec<Def> {
     ]
 }
 
-fn repeated_check(ctx: &Ctx) -> TestResult {
+/// `supervisor_owned`: the probe holds the job handle (the job outlives the holder and the
+/// contender terminates it). Otherwise the holder holds the only handle, so killing the
+/// holder closes the job and its name disappears while members are still dying.
+fn repeated_check(ctx: &Ctx, supervisor_owned: bool) -> TestResult {
     if !which("git") {
         return skip("git is not on PATH");
     }
@@ -116,11 +134,19 @@ fn repeated_check(ctx: &Ctx) -> TestResult {
     let mut extra = vec![];
     let mut lock_wait = vec![];
     let (mut violations, mut held, mut terminated, mut opened) = (0, 0, 0, 0);
+    let mut events: Vec<Value> = vec![];
     for i in 0..REPEATS {
         for f in ["holder.ready", "fg.pid", "bg.pid", "predecessor.json"] {
             let _ = std::fs::remove_file(ctx.p(f));
         }
-        let mut holder = spawn(&mut ctx.role("githolder", &[&ctx.s("lock"), &ctx.s("holder.ready"), &repo.to_string_lossy(), "block"]))?;
+        let sup = if supervisor_owned { Some(plat::Sup::new()?) } else { None };
+        let repo_s = repo.to_string_lossy().into_owned();
+        let (lock_s, ready_s) = (ctx.s("lock"), ctx.s("holder.ready"));
+        let mut args: Vec<&str> = vec![&lock_s, &ready_s, &repo_s, "block"];
+        if let Some(s) = sup.as_ref().filter(|s| !s.name().is_empty()) {
+            args.push(s.name());
+        }
+        let mut holder = spawn(&mut ctx.role("githolder", &args))?;
         if wait_until(secs(30), || ctx.p("holder.ready").exists()).is_none() {
             return Err(format!("repeat {i}: holder never became ready"));
         }
@@ -129,11 +155,20 @@ fn repeated_check(ctx: &Ctx) -> TestResult {
         }
         wait_until(secs(5), || ctx.p("bg.pid").exists());
         let ready = std::fs::read_to_string(ctx.p("holder.ready")).unwrap_or_default();
-        let git_pid: Option<u32> = ready.split_whitespace().nth(1).and_then(|s| s.parse().ok());
-        let watch: Vec<u32> = [git_pid, read_pid(&ctx.p("fg.pid")), read_pid(&ctx.p("bg.pid"))].into_iter().flatten().collect();
+        let named: Vec<(&str, Option<u32>)> = vec![
+            ("git", ready.split_whitespace().nth(1).and_then(|s| s.parse().ok())),
+            ("hook-foreground", read_pid(&ctx.p("fg.pid"))),
+            ("hook-background", read_pid(&ctx.p("bg.pid"))),
+        ];
+        let watch: Vec<u32> = named.iter().filter_map(|n| n.1).collect();
+        let membership: Vec<Value> = named
+            .iter()
+            .filter_map(|(role, p)| p.map(|p| json!({"role": role, "pid": p, "inSupervisorJobBeforeKill": sup.as_ref().and_then(|s| s.contains(p))})))
+            .collect();
         let (l, r, w) = (lock.clone(), record.clone(), watch.clone());
         let contender: std::thread::JoinHandle<Result<Enter, String>> = std::thread::spawn(move || enter(&l, &r, secs(2), &w, secs(30)));
         std::thread::sleep(Duration::from_millis(20)); // contender is polling for the lock
+        let t_kill = Instant::now();
         let _ = holder.kill();
         let _ = holder.wait();
         if cfg!(unix) {
@@ -142,20 +177,36 @@ fn repeated_check(ctx: &Ctx) -> TestResult {
             watch.iter().for_each(|p| plat::kill_pid(*p));
         }
         let e = contender.join().map_err(|_| "contender panicked".to_string())??;
+        let since_kill_ms = ms(t_kill.elapsed());
+        let violated = !e.alive_at_proceed.is_empty();
         if !e.proceeded {
             held += 1;
         }
-        if !e.alive_at_proceed.is_empty() {
+        if violated {
             violations += 1;
+        }
+        if (violated || !e.proceeded) && events.len() < 12 {
+            events.push(json!({
+                "repeat": i,
+                "domainOpenedWhenChecked": e.domain_opened,
+                "contenderTerminated": e.terminated,
+                "lockWaitMs": e.lock_wait_ms,
+                "extraWaitMs": e.extra_wait_ms,
+                "msFromHolderKillToReturn": since_kill_ms,
+                "members": membership,
+                "stateAtDecision": e.diag,
+            }));
         }
         terminated += usize::from(e.terminated);
         opened += usize::from(e.domain_opened);
         extra.push(e.extra_wait_ms);
         lock_wait.push(e.lock_wait_ms);
+        drop(sup);
         watch.iter().for_each(|p| plat::kill_pid(*p));
         wait_until(secs(10), || watch.iter().all(|p| !plat::pid_alive(*p)));
     }
     let data = json!({
+        "jobOwner": if supervisor_owned { "supervisor (probe holds the handle)" } else { "holder (its death closes the job)" },
         "repeats": REPEATS,
         "violationsProceededWithLiveProcesses": violations,
         "heldReturned": held,
@@ -165,7 +216,13 @@ fn repeated_check(ctx: &Ctx) -> TestResult {
         "lockWaitMsFromContenderStart": stats(&lock_wait),
         "drainMs": 2000,
         "domainKind": plat::domain_kind(),
+        "violationEvents": events,
     });
+    if !supervisor_owned {
+        // Hazard documentation: with a holder-owned job the name can vanish before the members are dead.
+        let note = format!("holder-owned job: {violations}/{REPEATS} repeats proceeded while members were still dying (job name already gone in {} of them)", REPEATS - opened);
+        return pass(&note, data);
+    }
     if violations > 0 {
         fail("contender proceeded while git or a child was still alive", data)
     } else if held > 0 {
