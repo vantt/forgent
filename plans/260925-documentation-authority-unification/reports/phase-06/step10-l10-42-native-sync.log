@@ -1,0 +1,3 @@
+Native carry start 2026-10-16T21:01:23.054Z 38672e7f157788cbe1b2bf59511bd61046dce660 3baafff4d7a670b30edac2ff9bcf1594eed4ec95
+Persisted compact once 2026-10-16T21:01:26.027Z {"fromCommit":"38672e7f157788cbe1b2bf59511bd61046dce660","toCommit":"3baafff4d7a670b30edac2ff9bcf1594eed4ec95","oldUnits":91388,"newUnits":91366,"kept":90984,"paired":374,"moved":6,"editedKept":1,"added":1,"gaps":1,"retired":22,"retiredDocuments":0}
+Native inventory generation start 2026-10-16T21:01:26.027Z

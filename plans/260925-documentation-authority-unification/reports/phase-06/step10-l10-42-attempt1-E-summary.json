@@ -1,0 +1,206 @@
+{
+  "pin": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+  "seconds": 261.715,
+  "scopeFiles": 1045,
+  "claims": 22737,
+  "gaps": 2236,
+  "applyFindings": [
+    {
+      "type": "decision-digest-stale",
+      "message": "claim claim_0d2c13615099d78c5e38533379ecf7cc: sourceUnitDigest does not match the current source text (needs at least 16 hex characters of the row's digest)",
+      "path": "CLAUDE.md"
+    },
+    {
+      "type": "decision-claim-unknown",
+      "message": "shard s10-closing-instructions: claim claim_db83a4c14e03868fccf833f00f51f296 is not in the claim ledger"
+    }
+  ],
+  "exactOverlayConservationEquality": true,
+  "conservationOpen": [
+    {
+      "type": "claims-partial-carry",
+      "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+      "count": 28,
+      "examples": [
+        "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+        "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+        "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+        "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+        "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+      ]
+    },
+    {
+      "type": "claims-not-reviewed",
+      "message": "claim rows whose reviewStatus is not reviewed",
+      "count": 7,
+      "examples": [
+        "AGENTS.md#impact-analysis-capability-gate",
+        "AGENTS.md#unheaded-block-33",
+        "AGENTS.md#unheaded-block-34",
+        "AGENTS.md#unheaded-block-35",
+        "AGENTS.md#unheaded-block-36"
+      ]
+    },
+    {
+      "type": "identical-units-multiple-owners",
+      "message": "identical source units whose rows name different target owners",
+      "count": 362,
+      "examples": [
+        "03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+        "5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+        "a2d5fbe6e6e8: docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md, docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+        "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+        "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md"
+      ]
+    },
+    {
+      "type": "candidate-blocks-unreferenced",
+      "message": "candidate conservation units not named by a source decision",
+      "count": 2336,
+      "examples": [
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md#added-in-candidate-confinement-authority-v1",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md#unheaded-block-1",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md#unheaded-block-2",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md#added-in-candidate-confinement-authority-decisions",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md#unheaded-block-1"
+      ]
+    }
+  ],
+  "fatalFindings": [
+    {
+      "type": "decision-digest-stale",
+      "message": "claim claim_0d2c13615099d78c5e38533379ecf7cc: sourceUnitDigest does not match the current source text (needs at least 16 hex characters of the row's digest)",
+      "path": "CLAUDE.md"
+    },
+    {
+      "type": "decision-claim-unknown",
+      "message": "shard s10-closing-instructions: claim claim_db83a4c14e03868fccf833f00f51f296 is not in the claim ledger"
+    },
+    {
+      "type": "retired-row-disposition-missing",
+      "path": "CLAUDE.md",
+      "message": "CLAUDE.md: retired claim claim_79dd88f1fb058d9385445406fbd9296d (always-do) has no vocabulary disposition, so its removal is not recorded"
+    },
+    {
+      "type": "retired-row-disposition-missing",
+      "path": "CLAUDE.md",
+      "message": "CLAUDE.md: retired claim claim_8c2cca9caea197a0601c680f4bfcbb23 (cli) has no vocabulary disposition, so its removal is not recorded"
+    },
+    {
+      "type": "retired-row-disposition-missing",
+      "path": "CLAUDE.md",
+      "message": "CLAUDE.md: retired claim claim_8396a2952ef6cbcae93835afb0a73152 (documentation-viewing-mdview) has no vocabulary disposition, so its removal is not recorded"
+    },
+    {
+      "type": "retired-row-disposition-missing",
+      "path": "CLAUDE.md",
+      "message": "CLAUDE.md: retired claim claim_2f612bbe8e8413b66477d06bf6046ed4 (gitnexus-code-intelligence) has no vocabulary disposition, so its removal is not recorded"
+    },
+    {
+      "type": "retired-row-disposition-missing",
+      "path": "CLAUDE.md",
+      "message": "CLAUDE.md: retired claim claim_b0612b463c58046dea6ba09504d97a82 (never-do) has no vocabulary disposition, so its removal is not recorded"
+    },
+    {
+      "type": "retired-row-disposition-missing",
+      "path": "CLAUDE.md",
+      "message": "CLAUDE.md: retired claim claim_928e5b681c1bbc6c51563c78de0b4f23 (resources) has no vocabulary disposition, so its removal is not recorded"
+    },
+    {
+      "type": "retired-row-disposition-missing",
+      "path": "CLAUDE.md",
+      "message": "CLAUDE.md: retired claim claim_809815d317fc255da84f53b1c30431cf (unheaded-block-10) has no vocabulary disposition, so its removal is not recorded"
+    },
+    {
+      "type": "retired-row-disposition-missing",
+      "path": "CLAUDE.md",
+      "message": "CLAUDE.md: retired claim claim_5010f46edb2e930c7efebd3876a7942d (unheaded-block-11) has no vocabulary disposition, so its removal is not recorded"
+    },
+    {
+      "type": "retired-row-disposition-missing",
+      "path": "CLAUDE.md",
+      "message": "CLAUDE.md: retired claim claim_88fca05f9afd9c63fe14ebb5a08e5094 (unheaded-block-12) has no vocabulary disposition, so its removal is not recorded"
+    },
+    {
+      "type": "retired-row-disposition-missing",
+      "path": "CLAUDE.md",
+      "message": "CLAUDE.md: retired claim claim_7251396790f9d7a220a2c6f8ffde55c3 (unheaded-block-13) has no vocabulary disposition, so its removal is not recorded"
+    },
+    {
+      "type": "retired-row-disposition-missing",
+      "path": "CLAUDE.md",
+      "message": "CLAUDE.md: retired claim claim_d50f2409ac827afeb65163065905a878 (unheaded-block-14) has no vocabulary disposition, so its removal is not recorded"
+    },
+    {
+      "type": "retired-row-disposition-missing",
+      "path": "CLAUDE.md",
+      "message": "CLAUDE.md: retired claim claim_1e109a5e30aba0234c61706edad2c820 (unheaded-block-15) has no vocabulary disposition, so its removal is not recorded"
+    },
+    {
+      "type": "retired-row-disposition-missing",
+      "path": "CLAUDE.md",
+      "message": "CLAUDE.md: retired claim claim_ae71daeca0febe5384359e3ad92443e8 (unheaded-block-16) has no vocabulary disposition, so its removal is not recorded"
+    },
+    {
+      "type": "retired-row-disposition-missing",
+      "path": "CLAUDE.md",
+      "message": "CLAUDE.md: retired claim claim_3f0ed45ecb0952e67c013b52f129fedc (unheaded-block-17) has no vocabulary disposition, so its removal is not recorded"
+    },
+    {
+      "type": "retired-row-disposition-missing",
+      "path": "CLAUDE.md",
+      "message": "CLAUDE.md: retired claim claim_6bd09ad125ddd52d9563117b379ecc60 (unheaded-block-18) has no vocabulary disposition, so its removal is not recorded"
+    },
+    {
+      "type": "retired-row-disposition-missing",
+      "path": "CLAUDE.md",
+      "message": "CLAUDE.md: retired claim claim_05d3c5f6af634e345b6e32290900c232 (unheaded-block-19) has no vocabulary disposition, so its removal is not recorded"
+    },
+    {
+      "type": "retired-row-disposition-missing",
+      "path": "CLAUDE.md",
+      "message": "CLAUDE.md: retired claim claim_50134455b2dca31dc4bd662b22744a21 (unheaded-block-7) has no vocabulary disposition, so its removal is not recorded"
+    },
+    {
+      "type": "retired-row-disposition-missing",
+      "path": "CLAUDE.md",
+      "message": "CLAUDE.md: retired claim claim_fc5de985b938821c067f1a79009368ed (unheaded-block-8) has no vocabulary disposition, so its removal is not recorded"
+    },
+    {
+      "type": "retired-row-disposition-missing",
+      "path": "CLAUDE.md",
+      "message": "CLAUDE.md: retired claim claim_2afb04da34da039e196e613f3262cdec (unheaded-block-9) has no vocabulary disposition, so its removal is not recorded"
+    },
+    {
+      "type": "retired-row-disposition-missing",
+      "path": "CLAUDE.md",
+      "message": "CLAUDE.md: retired claim claim_6540d24a1703d63c0b4645efaaccc891 (using-cli-fallback) has no vocabulary disposition, so its removal is not recorded"
+    },
+    {
+      "type": "retired-row-disposition-missing",
+      "path": "CLAUDE.md",
+      "message": "CLAUDE.md: retired claim claim_e6e4b2ccbaf2497ac1ff7ef374d2821b (using-mcp-preferred) has no vocabulary disposition, so its removal is not recorded"
+    },
+    {
+      "type": "retired-row-disposition-missing",
+      "path": "CLAUDE.md",
+      "message": "CLAUDE.md: retired claim claim_a1fe07b1842007c25172823b1716b586 (when-to-render) has no vocabulary disposition, so its removal is not recorded"
+    },
+    {
+      "type": "claims-partial-carry",
+      "message": "28 claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover) (e.g. docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes, docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms, docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol, docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker, docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts)"
+    },
+    {
+      "type": "claims-not-reviewed",
+      "message": "7 claim rows whose reviewStatus is not reviewed (e.g. AGENTS.md#impact-analysis-capability-gate, AGENTS.md#unheaded-block-33, AGENTS.md#unheaded-block-34, AGENTS.md#unheaded-block-35, AGENTS.md#unheaded-block-36)"
+    },
+    {
+      "type": "identical-units-multiple-owners",
+      "message": "362 identical source units whose rows name different target owners (e.g. 03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md, 5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md, a2d5fbe6e6e8: docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md, docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md, 9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md, 930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md)"
+    },
+    {
+      "type": "candidate-blocks-unreferenced",
+      "message": "2336 candidate conservation units not named by a source decision (e.g. docs/platform/agent-confinement/contracts/confinement-authority-v1.md#added-in-candidate-confinement-authority-v1, docs/platform/agent-confinement/contracts/confinement-authority-v1.md#unheaded-block-1, docs/platform/agent-confinement/contracts/confinement-authority-v1.md#unheaded-block-2, docs/platform/agent-confinement/decisions/confinement-authority-decisions.md#added-in-candidate-confinement-authority-decisions, docs/platform/agent-confinement/decisions/confinement-authority-decisions.md#unheaded-block-1)"
+    }
+  ]
+}

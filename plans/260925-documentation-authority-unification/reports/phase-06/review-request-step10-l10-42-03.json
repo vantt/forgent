@@ -1,0 +1,1114 @@
+{
+  "version": 1,
+  "contentCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+  "packagePin": "runner commit containing this request",
+  "producer": "codex-session:unit-run-1792184405209-31ed32fb@2026-10-17",
+  "mode": "ordinary",
+  "part": 3,
+  "partCount": 3,
+  "entries": [
+    {
+      "entry": "n043",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 42,
+      "proof": {
+        "collection": "units",
+        "key": "claim_a1fe07b1842007c25172823b1716b586",
+        "before": {
+          "sourcePath": "CLAUDE.md",
+          "unitDigest": "3dae37d5d36974bbfdb4a9fe17a2e07d382905b25c6272be1058cdfbd2db26b6",
+          "identityFingerprint": "147222488a836b02a9081f3efb61f8a098a36bc197ecec6248a4ab3b828c5cfe",
+          "claimId": "claim_a1fe07b1842007c25172823b1716b586",
+          "sourceAnchor": "when-to-render",
+          "unitKind": "heading",
+          "sourceUnitDigest": "b8596a3138791147b0ffa9b666027206135a910a94b7c8391467f8559fdb7828",
+          "claimKind": "unclassified",
+          "status": "current"
+        },
+        "after": null
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n044",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 43,
+      "proof": {
+        "collection": "units",
+        "key": "claim_ae5e7954251083afc5130d73333ef771",
+        "before": {
+          "sourcePath": "AGENTS.md",
+          "unitDigest": "767dce734927611abb1a8072262d051f78f233901d809a55cbfa9e4f895da39e",
+          "identityFingerprint": "767dce734927611abb1a8072262d051f78f233901d809a55cbfa9e4f895da39e",
+          "claimId": "claim_ae5e7954251083afc5130d73333ef771",
+          "sourceAnchor": "unheaded-block-33",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "42d278bba4a7ce9c2f7ff755227feb14483587d3ace2b687a5c732999eb053bc",
+          "claimKind": "unclassified",
+          "status": "current"
+        },
+        "after": {
+          "sourcePath": "AGENTS.md",
+          "unitDigest": "767dce734927611abb1a8072262d051f78f233901d809a55cbfa9e4f895da39e",
+          "identityFingerprint": "767dce734927611abb1a8072262d051f78f233901d809a55cbfa9e4f895da39e",
+          "claimId": "claim_ae5e7954251083afc5130d73333ef771",
+          "sourceAnchor": "unheaded-block-38",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "42d278bba4a7ce9c2f7ff755227feb14483587d3ace2b687a5c732999eb053bc",
+          "claimKind": "unclassified",
+          "status": "current"
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n045",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 44,
+      "proof": {
+        "collection": "units",
+        "key": "claim_ae71daeca0febe5384359e3ad92443e8",
+        "before": {
+          "sourcePath": "CLAUDE.md",
+          "unitDigest": "a8494e1a68489007e4644648096c49f64630b92223de2b4076987dbbd9413dbe",
+          "identityFingerprint": "a8494e1a68489007e4644648096c49f64630b92223de2b4076987dbbd9413dbe",
+          "claimId": "claim_ae71daeca0febe5384359e3ad92443e8",
+          "sourceAnchor": "unheaded-block-16",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "e23a5ee9ace2850ec670037d92a358e58770bdd73439c4234c7c5b9f40e24c22",
+          "claimKind": "unclassified",
+          "status": "current"
+        },
+        "after": null
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n046",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 45,
+      "proof": {
+        "collection": "units",
+        "key": "claim_b0612b463c58046dea6ba09504d97a82",
+        "before": {
+          "sourcePath": "CLAUDE.md",
+          "unitDigest": "e873cf37f739248eee0224ea543d02a9977ac6de94f24baae620e4996419e733",
+          "identityFingerprint": "8af2b2f9f6ea42011e3c43d9d4e6c9dea0fbdb647c5d036f260eab9912d97535",
+          "claimId": "claim_b0612b463c58046dea6ba09504d97a82",
+          "sourceAnchor": "never-do",
+          "unitKind": "heading",
+          "sourceUnitDigest": "f081560dd43881074ceded6248a3ead793add48968f3eedf2ff2aa7f6284951e",
+          "claimKind": "unclassified",
+          "status": "current"
+        },
+        "after": null
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n047",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 46,
+      "proof": {
+        "collection": "units",
+        "key": "claim_b70e7c39975314f130e9a2501156721d",
+        "before": {
+          "sourcePath": "AGENTS.md",
+          "unitDigest": "a218f1e2f6e8372a9838d0964cd93896ae9c1fcbe62cb39aaa3bb791b3f6fb7f",
+          "identityFingerprint": "a218f1e2f6e8372a9838d0964cd93896ae9c1fcbe62cb39aaa3bb791b3f6fb7f",
+          "claimId": "claim_b70e7c39975314f130e9a2501156721d",
+          "sourceAnchor": "unheaded-block-49",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "0634893a1881205c0eb9275047c5b3a44f596f2dff7a47fb0d0e10aae07aebb4",
+          "claimKind": "unclassified",
+          "status": "current"
+        },
+        "after": {
+          "sourcePath": "AGENTS.md",
+          "unitDigest": "a218f1e2f6e8372a9838d0964cd93896ae9c1fcbe62cb39aaa3bb791b3f6fb7f",
+          "identityFingerprint": "a218f1e2f6e8372a9838d0964cd93896ae9c1fcbe62cb39aaa3bb791b3f6fb7f",
+          "claimId": "claim_b70e7c39975314f130e9a2501156721d",
+          "sourceAnchor": "unheaded-block-54",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "0634893a1881205c0eb9275047c5b3a44f596f2dff7a47fb0d0e10aae07aebb4",
+          "claimKind": "unclassified",
+          "status": "current"
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n048",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 47,
+      "proof": {
+        "collection": "units",
+        "key": "claim_cace4724d966bb5a40bc0b17768520c1",
+        "before": {
+          "sourcePath": "AGENTS.md",
+          "unitDigest": "70b9f49880a5bfb21a2796e1982c104a3cd0adcef96ccabb4a8ac6c30605b37a",
+          "identityFingerprint": "70b9f49880a5bfb21a2796e1982c104a3cd0adcef96ccabb4a8ac6c30605b37a",
+          "claimId": "claim_cace4724d966bb5a40bc0b17768520c1",
+          "sourceAnchor": "unheaded-block-50",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "7e4431ca6a7e941fe10d3962f79815b135aeb90897d2ab15817a4e7a903bd2a7",
+          "claimKind": "unclassified",
+          "status": "current"
+        },
+        "after": {
+          "sourcePath": "AGENTS.md",
+          "unitDigest": "70b9f49880a5bfb21a2796e1982c104a3cd0adcef96ccabb4a8ac6c30605b37a",
+          "identityFingerprint": "70b9f49880a5bfb21a2796e1982c104a3cd0adcef96ccabb4a8ac6c30605b37a",
+          "claimId": "claim_cace4724d966bb5a40bc0b17768520c1",
+          "sourceAnchor": "unheaded-block-55",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "7e4431ca6a7e941fe10d3962f79815b135aeb90897d2ab15817a4e7a903bd2a7",
+          "claimKind": "unclassified",
+          "status": "current"
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n049",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 48,
+      "proof": {
+        "collection": "units",
+        "key": "claim_d18c939cc9436e830dae9214808c21ae",
+        "before": {
+          "sourcePath": "AGENTS.md",
+          "unitDigest": "b0870e4f3c89405386e3abed54c284c5a54aa30d57417406bbcfb30c9a19566c",
+          "identityFingerprint": "b0870e4f3c89405386e3abed54c284c5a54aa30d57417406bbcfb30c9a19566c",
+          "claimId": "claim_d18c939cc9436e830dae9214808c21ae",
+          "sourceAnchor": "unheaded-block-35",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "9283c37aa6e87094b10f57541497888b092b13116846386cfaf2cdab0e8cae4d",
+          "claimKind": "unclassified",
+          "status": "current"
+        },
+        "after": {
+          "sourcePath": "AGENTS.md",
+          "unitDigest": "b0870e4f3c89405386e3abed54c284c5a54aa30d57417406bbcfb30c9a19566c",
+          "identityFingerprint": "b0870e4f3c89405386e3abed54c284c5a54aa30d57417406bbcfb30c9a19566c",
+          "claimId": "claim_d18c939cc9436e830dae9214808c21ae",
+          "sourceAnchor": "unheaded-block-40",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "9283c37aa6e87094b10f57541497888b092b13116846386cfaf2cdab0e8cae4d",
+          "claimKind": "unclassified",
+          "status": "current"
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n050",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 49,
+      "proof": {
+        "collection": "units",
+        "key": "claim_d50f2409ac827afeb65163065905a878",
+        "before": {
+          "sourcePath": "CLAUDE.md",
+          "unitDigest": "da364888e2bbe78f471164ded231d90c2431b54a78f5434932173e74b8788d2f",
+          "identityFingerprint": "da364888e2bbe78f471164ded231d90c2431b54a78f5434932173e74b8788d2f",
+          "claimId": "claim_d50f2409ac827afeb65163065905a878",
+          "sourceAnchor": "unheaded-block-14",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "39fe4d8d1ecc03cbf722efdf8de807822733f8f4f5cdd40cb10419c65ad79b46",
+          "claimKind": "unclassified",
+          "status": "current"
+        },
+        "after": null
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n051",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 50,
+      "proof": {
+        "collection": "units",
+        "key": "claim_d6a9e43c0997b6993a5d9670af469258",
+        "before": {
+          "sourcePath": "AGENTS.md",
+          "unitDigest": "c9dcc854cd9641cea58ae3b52c4d5c9339f14e7229a6022fad5a39a0e1e8d0c7",
+          "identityFingerprint": "c9dcc854cd9641cea58ae3b52c4d5c9339f14e7229a6022fad5a39a0e1e8d0c7",
+          "claimId": "claim_d6a9e43c0997b6993a5d9670af469258",
+          "sourceAnchor": "unheaded-block-41",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "46ba7c1470400a34fe1ff4796da8a95587bfbe41171b92eb8ba9a4fd38b0d51b",
+          "claimKind": "unclassified",
+          "status": "current"
+        },
+        "after": {
+          "sourcePath": "AGENTS.md",
+          "unitDigest": "c9dcc854cd9641cea58ae3b52c4d5c9339f14e7229a6022fad5a39a0e1e8d0c7",
+          "identityFingerprint": "c9dcc854cd9641cea58ae3b52c4d5c9339f14e7229a6022fad5a39a0e1e8d0c7",
+          "claimId": "claim_d6a9e43c0997b6993a5d9670af469258",
+          "sourceAnchor": "unheaded-block-46",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "46ba7c1470400a34fe1ff4796da8a95587bfbe41171b92eb8ba9a4fd38b0d51b",
+          "claimKind": "unclassified",
+          "status": "current"
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n052",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 51,
+      "proof": {
+        "collection": "units",
+        "key": "claim_db83a4c14e03868fccf833f00f51f296",
+        "before": {
+          "sourcePath": "CLAUDE.md",
+          "unitDigest": "b260c5e12df55b221346adf094cf18cf55a5c5c68f0038b378db55d904aa8963",
+          "identityFingerprint": "b260c5e12df55b221346adf094cf18cf55a5c5c68f0038b378db55d904aa8963",
+          "claimId": "claim_db83a4c14e03868fccf833f00f51f296",
+          "sourceAnchor": "unheaded-block-1",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "5ee1f1a48ddcb69e62623b1abb1c6f3434fae4b31adb2f45cfb28e55736c2aef",
+          "claimKind": "unclassified",
+          "status": "current"
+        },
+        "after": null
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n053",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 52,
+      "proof": {
+        "collection": "units",
+        "key": "claim_e59f80485141f1b75d155dca7272c34e",
+        "before": {
+          "sourcePath": "AGENTS.md",
+          "unitDigest": "9ce1f70b037039c00ea42a1c449a54f3774ecb2595c19a5785275305efd618a0",
+          "identityFingerprint": "9ce1f70b037039c00ea42a1c449a54f3774ecb2595c19a5785275305efd618a0",
+          "claimId": "claim_e59f80485141f1b75d155dca7272c34e",
+          "sourceAnchor": "unheaded-block-53",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "040484693fc054f7b37f6dc489b6295d3ccc3df440c68ceea04c9584ccf4b144",
+          "claimKind": "unclassified",
+          "status": "current"
+        },
+        "after": {
+          "sourcePath": "AGENTS.md",
+          "unitDigest": "9ce1f70b037039c00ea42a1c449a54f3774ecb2595c19a5785275305efd618a0",
+          "identityFingerprint": "9ce1f70b037039c00ea42a1c449a54f3774ecb2595c19a5785275305efd618a0",
+          "claimId": "claim_e59f80485141f1b75d155dca7272c34e",
+          "sourceAnchor": "unheaded-block-58",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "040484693fc054f7b37f6dc489b6295d3ccc3df440c68ceea04c9584ccf4b144",
+          "claimKind": "unclassified",
+          "status": "current"
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n054",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 53,
+      "proof": {
+        "collection": "units",
+        "key": "claim_e6e4b2ccbaf2497ac1ff7ef374d2821b",
+        "before": {
+          "sourcePath": "CLAUDE.md",
+          "unitDigest": "add9ae634458efb15c314541de6a24d7d31d6075f980993b30645461042f9c24",
+          "identityFingerprint": "80bcdb5b6c8e6e58e4a9f9f08e7d0eac18adc118c19dafae2a1271ae0766abca",
+          "claimId": "claim_e6e4b2ccbaf2497ac1ff7ef374d2821b",
+          "sourceAnchor": "using-mcp-preferred",
+          "unitKind": "heading",
+          "sourceUnitDigest": "c1a9ae0dbb63cc6b9d2cdd56221d17c475fa8a12f90a2d9fe4d742ffbeddae51",
+          "claimKind": "unclassified",
+          "status": "current"
+        },
+        "after": null
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n055",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 54,
+      "proof": {
+        "collection": "units",
+        "key": "claim_f0b2a4079764d68b1102ddddb08776ce",
+        "before": {
+          "sourcePath": "docs/backlog.md",
+          "unitDigest": "2e296ac6311f73f661e5228093762d06399ffd6dfa3d2614d6962a13d1bd6d58",
+          "identityFingerprint": "328d730967bfa5ae2d8a7aa98f1eeaa043832830bfc30545833d93f8dfb0adbe",
+          "claimId": "claim_f0b2a4079764d68b1102ddddb08776ce",
+          "sourceAnchor": "product-backlog",
+          "unitKind": "heading",
+          "sourceUnitDigest": "5f190b849165ce8115369ebb112a31b286e85237f5c3dd32f8493cc3cfd93d17",
+          "claimKind": "unclassified",
+          "status": "future",
+          "reviewStatus": "needs-review",
+          "lineage": {
+            "fromCommit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+            "fromUnitDigest": "eb37a0f7bbe5c0d4c4ab5d4b3e9fd1259fc8152c286d9e05041ec7599fbcd69c",
+            "toUnitDigest": "2e296ac6311f73f661e5228093762d06399ffd6dfa3d2614d6962a13d1bd6d58",
+            "fromSourceUnitDigest": "92be08bb7b0a9af07f2d36307db6a7891545c2ab4590dcbb77074d46c2c8dfbe",
+            "toSourceUnitDigest": "5f190b849165ce8115369ebb112a31b286e85237f5c3dd32f8493cc3cfd93d17"
+          }
+        },
+        "after": {
+          "sourcePath": "docs/backlog.md",
+          "unitDigest": "2e296ac6311f73f661e5228093762d06399ffd6dfa3d2614d6962a13d1bd6d58",
+          "identityFingerprint": "328d730967bfa5ae2d8a7aa98f1eeaa043832830bfc30545833d93f8dfb0adbe",
+          "claimId": "claim_f0b2a4079764d68b1102ddddb08776ce",
+          "sourceAnchor": "product-backlog",
+          "unitKind": "heading",
+          "sourceUnitDigest": "5f190b849165ce8115369ebb112a31b286e85237f5c3dd32f8493cc3cfd93d17",
+          "claimKind": "unclassified",
+          "status": "future"
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n056",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 55,
+      "proof": {
+        "collection": "units",
+        "key": "claim_f2afc3a44e09eb918aa8c59d42ffe195",
+        "before": {
+          "sourcePath": "AGENTS.md",
+          "unitDigest": "a8494e1a68489007e4644648096c49f64630b92223de2b4076987dbbd9413dbe",
+          "identityFingerprint": "a8494e1a68489007e4644648096c49f64630b92223de2b4076987dbbd9413dbe",
+          "claimId": "claim_f2afc3a44e09eb918aa8c59d42ffe195",
+          "sourceAnchor": "unheaded-block-42",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "e23a5ee9ace2850ec670037d92a358e58770bdd73439c4234c7c5b9f40e24c22",
+          "claimKind": "unclassified",
+          "status": "current"
+        },
+        "after": {
+          "sourcePath": "AGENTS.md",
+          "unitDigest": "a8494e1a68489007e4644648096c49f64630b92223de2b4076987dbbd9413dbe",
+          "identityFingerprint": "a8494e1a68489007e4644648096c49f64630b92223de2b4076987dbbd9413dbe",
+          "claimId": "claim_f2afc3a44e09eb918aa8c59d42ffe195",
+          "sourceAnchor": "unheaded-block-47",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "e23a5ee9ace2850ec670037d92a358e58770bdd73439c4234c7c5b9f40e24c22",
+          "claimKind": "unclassified",
+          "status": "current"
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n057",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 56,
+      "proof": {
+        "collection": "units",
+        "key": "claim_fc5de985b938821c067f1a79009368ed",
+        "before": {
+          "sourcePath": "CLAUDE.md",
+          "unitDigest": "129d2af46c1244a7331ebb168b0ef6e9ff7663a084dee39d54bf881f2dbf5a7b",
+          "identityFingerprint": "129d2af46c1244a7331ebb168b0ef6e9ff7663a084dee39d54bf881f2dbf5a7b",
+          "claimId": "claim_fc5de985b938821c067f1a79009368ed",
+          "sourceAnchor": "unheaded-block-8",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "c45eed179f4de74f88ec92f86a5647eb5e6625d60cb844671ac83b3f0d1c6694",
+          "claimKind": "unclassified",
+          "status": "current"
+        },
+        "after": null
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n058",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 57,
+      "proof": {
+        "collection": "carriedFromCommit",
+        "key": "carriedFromCommit",
+        "before": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+        "after": "38672e7f157788cbe1b2bf59511bd61046dce660"
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n059",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 58,
+      "proof": {
+        "collection": "identityGaps",
+        "key": "claim_db83a4c14e03868fccf833f00f51f296",
+        "before": null,
+        "after": {
+          "sourcePath": "CLAUDE.md",
+          "unitDigest": "b260c5e12df55b221346adf094cf18cf55a5c5c68f0038b378db55d904aa8963",
+          "identityFingerprint": "b260c5e12df55b221346adf094cf18cf55a5c5c68f0038b378db55d904aa8963",
+          "claimId": "claim_db83a4c14e03868fccf833f00f51f296",
+          "sourceAnchor": "unheaded-block-1",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "5ee1f1a48ddcb69e62623b1abb1c6f3434fae4b31adb2f45cfb28e55736c2aef",
+          "claimKind": "unclassified",
+          "status": "current",
+          "identityStatus": "identity-gap",
+          "gapReason": "edited unit whose anchor unheaded-block-1 is not a stable heading anchor"
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n060",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 59,
+      "proof": {
+        "collection": "retiredUnits",
+        "key": "claim_05d3c5f6af634e345b6e32290900c232",
+        "before": null,
+        "after": {
+          "sourcePath": "CLAUDE.md",
+          "unitDigest": "997ac9a133379d07dbffa20be94e3af97bfff03015a23a4d6f15c603eebce7fc",
+          "identityFingerprint": "997ac9a133379d07dbffa20be94e3af97bfff03015a23a4d6f15c603eebce7fc",
+          "claimId": "claim_05d3c5f6af634e345b6e32290900c232",
+          "sourceAnchor": "unheaded-block-19",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "8ca4c5c61c7f369a197d6118f0a325cc39727dbc792d3c53b1c2b1dd2aa7648a",
+          "claimKind": "architecture",
+          "status": "removed-pending-disposition",
+          "priorStatus": "current",
+          "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+          "retiredReason": "no counterpart in current source"
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n061",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 60,
+      "proof": {
+        "collection": "retiredUnits",
+        "key": "claim_1e109a5e30aba0234c61706edad2c820",
+        "before": null,
+        "after": {
+          "sourcePath": "CLAUDE.md",
+          "unitDigest": "c9dcc854cd9641cea58ae3b52c4d5c9339f14e7229a6022fad5a39a0e1e8d0c7",
+          "identityFingerprint": "c9dcc854cd9641cea58ae3b52c4d5c9339f14e7229a6022fad5a39a0e1e8d0c7",
+          "claimId": "claim_1e109a5e30aba0234c61706edad2c820",
+          "sourceAnchor": "unheaded-block-15",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "46ba7c1470400a34fe1ff4796da8a95587bfbe41171b92eb8ba9a4fd38b0d51b",
+          "claimKind": "unclassified",
+          "status": "removed-pending-disposition",
+          "priorStatus": "current",
+          "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+          "retiredReason": "no counterpart in current source"
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n062",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 61,
+      "proof": {
+        "collection": "retiredUnits",
+        "key": "claim_2afb04da34da039e196e613f3262cdec",
+        "before": null,
+        "after": {
+          "sourcePath": "CLAUDE.md",
+          "unitDigest": "b0870e4f3c89405386e3abed54c284c5a54aa30d57417406bbcfb30c9a19566c",
+          "identityFingerprint": "b0870e4f3c89405386e3abed54c284c5a54aa30d57417406bbcfb30c9a19566c",
+          "claimId": "claim_2afb04da34da039e196e613f3262cdec",
+          "sourceAnchor": "unheaded-block-9",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "9283c37aa6e87094b10f57541497888b092b13116846386cfaf2cdab0e8cae4d",
+          "claimKind": "unclassified",
+          "status": "removed-pending-disposition",
+          "priorStatus": "current",
+          "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+          "retiredReason": "no counterpart in current source"
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n063",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 62,
+      "proof": {
+        "collection": "retiredUnits",
+        "key": "claim_2f612bbe8e8413b66477d06bf6046ed4",
+        "before": null,
+        "after": {
+          "sourcePath": "CLAUDE.md",
+          "unitDigest": "7e21885df02fa86d9033eceab65bd533c10a1d3f2050558e15d06ff344688416",
+          "identityFingerprint": "90f2c0bea757e4b6d760c9285e2e357ff406f5b7e86be8712c375ef5f13385ed",
+          "claimId": "claim_2f612bbe8e8413b66477d06bf6046ed4",
+          "sourceAnchor": "gitnexus-code-intelligence",
+          "unitKind": "heading",
+          "sourceUnitDigest": "150e95a64fd2a52cc454a2386a8dc3aec0b3a47eb54fb1fd8d02576899ea4461",
+          "claimKind": "unclassified",
+          "status": "removed-pending-disposition",
+          "priorStatus": "current",
+          "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+          "retiredReason": "no counterpart in current source"
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n064",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 63,
+      "proof": {
+        "collection": "retiredUnits",
+        "key": "claim_3f0ed45ecb0952e67c013b52f129fedc",
+        "before": null,
+        "after": {
+          "sourcePath": "CLAUDE.md",
+          "unitDigest": "f58061fe68cb3656428115f47420de5b2b91d8c3b41781447ba7dbb2da1b0a15",
+          "identityFingerprint": "f58061fe68cb3656428115f47420de5b2b91d8c3b41781447ba7dbb2da1b0a15",
+          "claimId": "claim_3f0ed45ecb0952e67c013b52f129fedc",
+          "sourceAnchor": "unheaded-block-17",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "6f63dffd5c7d710ca600d3ad22016e4e73cf9729a299b36d624070a87429d6e1",
+          "claimKind": "unclassified",
+          "status": "removed-pending-disposition",
+          "priorStatus": "current",
+          "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+          "retiredReason": "no counterpart in current source"
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n065",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 64,
+      "proof": {
+        "collection": "retiredUnits",
+        "key": "claim_5010f46edb2e930c7efebd3876a7942d",
+        "before": null,
+        "after": {
+          "sourcePath": "CLAUDE.md",
+          "unitDigest": "fbc2f00290b92cfee3c2ba0ab087a4dd8777024bc804524d830d423f77bac29a",
+          "identityFingerprint": "fbc2f00290b92cfee3c2ba0ab087a4dd8777024bc804524d830d423f77bac29a",
+          "claimId": "claim_5010f46edb2e930c7efebd3876a7942d",
+          "sourceAnchor": "unheaded-block-11",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "2ce479d07da3c54df383f1e0441adf783699b2e90e56b9fe6c4e6b56777a7af0",
+          "claimKind": "unclassified",
+          "status": "removed-pending-disposition",
+          "priorStatus": "current",
+          "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+          "retiredReason": "no counterpart in current source"
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n066",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 65,
+      "proof": {
+        "collection": "retiredUnits",
+        "key": "claim_50134455b2dca31dc4bd662b22744a21",
+        "before": null,
+        "after": {
+          "sourcePath": "CLAUDE.md",
+          "unitDigest": "767dce734927611abb1a8072262d051f78f233901d809a55cbfa9e4f895da39e",
+          "identityFingerprint": "767dce734927611abb1a8072262d051f78f233901d809a55cbfa9e4f895da39e",
+          "claimId": "claim_50134455b2dca31dc4bd662b22744a21",
+          "sourceAnchor": "unheaded-block-7",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "42d278bba4a7ce9c2f7ff755227feb14483587d3ace2b687a5c732999eb053bc",
+          "claimKind": "unclassified",
+          "status": "removed-pending-disposition",
+          "priorStatus": "current",
+          "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+          "retiredReason": "no counterpart in current source"
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n067",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 66,
+      "proof": {
+        "collection": "retiredUnits",
+        "key": "claim_6540d24a1703d63c0b4645efaaccc891",
+        "before": null,
+        "after": {
+          "sourcePath": "CLAUDE.md",
+          "unitDigest": "0792cde98de8f0ac84eac0a49f473981a04bb641227e8f1f3d3508fa878a4f69",
+          "identityFingerprint": "ac55ea750c0493c91beb4800994cd142fc91a14dd4a3a5328e6669db560f9c31",
+          "claimId": "claim_6540d24a1703d63c0b4645efaaccc891",
+          "sourceAnchor": "using-cli-fallback",
+          "unitKind": "heading",
+          "sourceUnitDigest": "64aa23ebc68629f08a1537e7c3249b810327ec02c53a5ad2d4c98589bd174a3e",
+          "claimKind": "unclassified",
+          "status": "removed-pending-disposition",
+          "priorStatus": "current",
+          "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+          "retiredReason": "no counterpart in current source"
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n068",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 67,
+      "proof": {
+        "collection": "retiredUnits",
+        "key": "claim_6bd09ad125ddd52d9563117b379ecc60",
+        "before": null,
+        "after": {
+          "sourcePath": "CLAUDE.md",
+          "unitDigest": "34aa5e40911ba6123b6d0707f7695e1442650901433fd5b94a9216d2904827ef",
+          "identityFingerprint": "34aa5e40911ba6123b6d0707f7695e1442650901433fd5b94a9216d2904827ef",
+          "claimId": "claim_6bd09ad125ddd52d9563117b379ecc60",
+          "sourceAnchor": "unheaded-block-18",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "b64e3f9772c143e0d911c16218f5a9f280f96b0c1466f43f52e5aa4d63855221",
+          "claimKind": "unclassified",
+          "status": "removed-pending-disposition",
+          "priorStatus": "current",
+          "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+          "retiredReason": "no counterpart in current source"
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n069",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 68,
+      "proof": {
+        "collection": "retiredUnits",
+        "key": "claim_7251396790f9d7a220a2c6f8ffde55c3",
+        "before": null,
+        "after": {
+          "sourcePath": "CLAUDE.md",
+          "unitDigest": "706320cb3749b6c9eb831ae60d98c72ce1ca08073eb95edbab4eba567080c53b",
+          "identityFingerprint": "706320cb3749b6c9eb831ae60d98c72ce1ca08073eb95edbab4eba567080c53b",
+          "claimId": "claim_7251396790f9d7a220a2c6f8ffde55c3",
+          "sourceAnchor": "unheaded-block-13",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "52ee0c226963abfd99219e552e38ac7b06cbe349e31d31a470fc328c095fd703",
+          "claimKind": "unclassified",
+          "status": "removed-pending-disposition",
+          "priorStatus": "current",
+          "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+          "retiredReason": "no counterpart in current source"
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n070",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 69,
+      "proof": {
+        "collection": "retiredUnits",
+        "key": "claim_79dd88f1fb058d9385445406fbd9296d",
+        "before": null,
+        "after": {
+          "sourcePath": "CLAUDE.md",
+          "unitDigest": "e7fc714a9a73a84cbd1d93c998bc3f55888c9b537891eb0b0caf9771fb8cde98",
+          "identityFingerprint": "c869c48c9abaf53e8f0d5566184b23c92991743b2b6726980b3111dafc540cd4",
+          "claimId": "claim_79dd88f1fb058d9385445406fbd9296d",
+          "sourceAnchor": "always-do",
+          "unitKind": "heading",
+          "sourceUnitDigest": "e51ed959e5aae86e5f000c44f5ef903c202b286098b279fb9e892f8db3a0c1d3",
+          "claimKind": "unclassified",
+          "status": "removed-pending-disposition",
+          "priorStatus": "current",
+          "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+          "retiredReason": "no counterpart in current source"
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n071",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 70,
+      "proof": {
+        "collection": "retiredUnits",
+        "key": "claim_809815d317fc255da84f53b1c30431cf",
+        "before": null,
+        "after": {
+          "sourcePath": "CLAUDE.md",
+          "unitDigest": "e354eba5c22b7204a004ad6a559521216737fcc8287e0314181c6d7851448974",
+          "identityFingerprint": "e354eba5c22b7204a004ad6a559521216737fcc8287e0314181c6d7851448974",
+          "claimId": "claim_809815d317fc255da84f53b1c30431cf",
+          "sourceAnchor": "unheaded-block-10",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "e0bf1a3052c0f3659d2cac6267fcf556c467957bb4de49a27962fa353ec8aec3",
+          "claimKind": "unclassified",
+          "status": "removed-pending-disposition",
+          "priorStatus": "current",
+          "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+          "retiredReason": "no counterpart in current source"
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n072",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 71,
+      "proof": {
+        "collection": "retiredUnits",
+        "key": "claim_8396a2952ef6cbcae93835afb0a73152",
+        "before": null,
+        "after": {
+          "sourcePath": "CLAUDE.md",
+          "unitDigest": "0f88b95c0f0147c03c08add070d474d7ef4c3a939596793c8c59454d131e5012",
+          "identityFingerprint": "a85309a1368c7071897daf4e20c262bcb79dd91fbe446b59da8b88d773bbed8e",
+          "claimId": "claim_8396a2952ef6cbcae93835afb0a73152",
+          "sourceAnchor": "documentation-viewing-mdview",
+          "unitKind": "heading",
+          "sourceUnitDigest": "7d84eb3c654fd06a78b9e1d55f1aac0787beba431be44c4c11800b92f10afb45",
+          "claimKind": "unclassified",
+          "status": "removed-pending-disposition",
+          "priorStatus": "current",
+          "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+          "retiredReason": "no counterpart in current source"
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n073",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 72,
+      "proof": {
+        "collection": "retiredUnits",
+        "key": "claim_88fca05f9afd9c63fe14ebb5a08e5094",
+        "before": null,
+        "after": {
+          "sourcePath": "CLAUDE.md",
+          "unitDigest": "b39c9c5a4047e4ee228f9ad3945c453a573de86c783a9f828d493de9b3c99e04",
+          "identityFingerprint": "b39c9c5a4047e4ee228f9ad3945c453a573de86c783a9f828d493de9b3c99e04",
+          "claimId": "claim_88fca05f9afd9c63fe14ebb5a08e5094",
+          "sourceAnchor": "unheaded-block-12",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "6c33aac3c8d229e5f9e4122d414e1fed0afb9f727868500b7c7c5fb0035268a4",
+          "claimKind": "unclassified",
+          "status": "removed-pending-disposition",
+          "priorStatus": "current",
+          "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+          "retiredReason": "no counterpart in current source"
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n074",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 73,
+      "proof": {
+        "collection": "retiredUnits",
+        "key": "claim_8c2cca9caea197a0601c680f4bfcbb23",
+        "before": null,
+        "after": {
+          "sourcePath": "CLAUDE.md",
+          "unitDigest": "071d72578c3d9b5918351e94257453094051994b8cd49f682c935cf046b0fed4",
+          "identityFingerprint": "81f0ad51435143bb181c3d0d4bc70aecc6a8a74f13515cebfd517b841b1a0a26",
+          "claimId": "claim_8c2cca9caea197a0601c680f4bfcbb23",
+          "sourceAnchor": "cli",
+          "unitKind": "heading",
+          "sourceUnitDigest": "b1a93fca9c3b2fa56e2de420c36fb04c464ff5925c93e4902e70d7f7bd7eb1d3",
+          "claimKind": "unclassified",
+          "status": "removed-pending-disposition",
+          "priorStatus": "current",
+          "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+          "retiredReason": "no counterpart in current source"
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n075",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 74,
+      "proof": {
+        "collection": "retiredUnits",
+        "key": "claim_928e5b681c1bbc6c51563c78de0b4f23",
+        "before": null,
+        "after": {
+          "sourcePath": "CLAUDE.md",
+          "unitDigest": "47c3568ddec4bc9a7f6ec4204979a30b266331dcb09c21d41582d97a07d97b47",
+          "identityFingerprint": "833eaa198037a7b8bb2619b6a371f2efa587939fd9b66541b45b5e8c14a02d93",
+          "claimId": "claim_928e5b681c1bbc6c51563c78de0b4f23",
+          "sourceAnchor": "resources",
+          "unitKind": "heading",
+          "sourceUnitDigest": "14d6f595788e8fc244f48477644d5527eeba45c4172ee04717caf23b04cb172e",
+          "claimKind": "unclassified",
+          "status": "removed-pending-disposition",
+          "priorStatus": "current",
+          "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+          "retiredReason": "no counterpart in current source"
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n076",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 75,
+      "proof": {
+        "collection": "retiredUnits",
+        "key": "claim_a1fe07b1842007c25172823b1716b586",
+        "before": null,
+        "after": {
+          "sourcePath": "CLAUDE.md",
+          "unitDigest": "3dae37d5d36974bbfdb4a9fe17a2e07d382905b25c6272be1058cdfbd2db26b6",
+          "identityFingerprint": "147222488a836b02a9081f3efb61f8a098a36bc197ecec6248a4ab3b828c5cfe",
+          "claimId": "claim_a1fe07b1842007c25172823b1716b586",
+          "sourceAnchor": "when-to-render",
+          "unitKind": "heading",
+          "sourceUnitDigest": "b8596a3138791147b0ffa9b666027206135a910a94b7c8391467f8559fdb7828",
+          "claimKind": "unclassified",
+          "status": "removed-pending-disposition",
+          "priorStatus": "current",
+          "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+          "retiredReason": "no counterpart in current source"
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n077",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 76,
+      "proof": {
+        "collection": "retiredUnits",
+        "key": "claim_ae71daeca0febe5384359e3ad92443e8",
+        "before": null,
+        "after": {
+          "sourcePath": "CLAUDE.md",
+          "unitDigest": "a8494e1a68489007e4644648096c49f64630b92223de2b4076987dbbd9413dbe",
+          "identityFingerprint": "a8494e1a68489007e4644648096c49f64630b92223de2b4076987dbbd9413dbe",
+          "claimId": "claim_ae71daeca0febe5384359e3ad92443e8",
+          "sourceAnchor": "unheaded-block-16",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "e23a5ee9ace2850ec670037d92a358e58770bdd73439c4234c7c5b9f40e24c22",
+          "claimKind": "unclassified",
+          "status": "removed-pending-disposition",
+          "priorStatus": "current",
+          "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+          "retiredReason": "no counterpart in current source"
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n078",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 77,
+      "proof": {
+        "collection": "retiredUnits",
+        "key": "claim_b0612b463c58046dea6ba09504d97a82",
+        "before": null,
+        "after": {
+          "sourcePath": "CLAUDE.md",
+          "unitDigest": "e873cf37f739248eee0224ea543d02a9977ac6de94f24baae620e4996419e733",
+          "identityFingerprint": "8af2b2f9f6ea42011e3c43d9d4e6c9dea0fbdb647c5d036f260eab9912d97535",
+          "claimId": "claim_b0612b463c58046dea6ba09504d97a82",
+          "sourceAnchor": "never-do",
+          "unitKind": "heading",
+          "sourceUnitDigest": "f081560dd43881074ceded6248a3ead793add48968f3eedf2ff2aa7f6284951e",
+          "claimKind": "unclassified",
+          "status": "removed-pending-disposition",
+          "priorStatus": "current",
+          "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+          "retiredReason": "no counterpart in current source"
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n079",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 78,
+      "proof": {
+        "collection": "retiredUnits",
+        "key": "claim_d50f2409ac827afeb65163065905a878",
+        "before": null,
+        "after": {
+          "sourcePath": "CLAUDE.md",
+          "unitDigest": "da364888e2bbe78f471164ded231d90c2431b54a78f5434932173e74b8788d2f",
+          "identityFingerprint": "da364888e2bbe78f471164ded231d90c2431b54a78f5434932173e74b8788d2f",
+          "claimId": "claim_d50f2409ac827afeb65163065905a878",
+          "sourceAnchor": "unheaded-block-14",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "39fe4d8d1ecc03cbf722efdf8de807822733f8f4f5cdd40cb10419c65ad79b46",
+          "claimKind": "unclassified",
+          "status": "removed-pending-disposition",
+          "priorStatus": "current",
+          "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+          "retiredReason": "no counterpart in current source"
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n080",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 79,
+      "proof": {
+        "collection": "retiredUnits",
+        "key": "claim_e6e4b2ccbaf2497ac1ff7ef374d2821b",
+        "before": null,
+        "after": {
+          "sourcePath": "CLAUDE.md",
+          "unitDigest": "add9ae634458efb15c314541de6a24d7d31d6075f980993b30645461042f9c24",
+          "identityFingerprint": "80bcdb5b6c8e6e58e4a9f9f08e7d0eac18adc118c19dafae2a1271ae0766abca",
+          "claimId": "claim_e6e4b2ccbaf2497ac1ff7ef374d2821b",
+          "sourceAnchor": "using-mcp-preferred",
+          "unitKind": "heading",
+          "sourceUnitDigest": "c1a9ae0dbb63cc6b9d2cdd56221d17c475fa8a12f90a2d9fe4d742ffbeddae51",
+          "claimKind": "unclassified",
+          "status": "removed-pending-disposition",
+          "priorStatus": "current",
+          "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+          "retiredReason": "no counterpart in current source"
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n081",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 80,
+      "proof": {
+        "collection": "retiredUnits",
+        "key": "claim_fc5de985b938821c067f1a79009368ed",
+        "before": null,
+        "after": {
+          "sourcePath": "CLAUDE.md",
+          "unitDigest": "129d2af46c1244a7331ebb168b0ef6e9ff7663a084dee39d54bf881f2dbf5a7b",
+          "identityFingerprint": "129d2af46c1244a7331ebb168b0ef6e9ff7663a084dee39d54bf881f2dbf5a7b",
+          "claimId": "claim_fc5de985b938821c067f1a79009368ed",
+          "sourceAnchor": "unheaded-block-8",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "c45eed179f4de74f88ec92f86a5647eb5e6625d60cb844671ac83b3f0d1c6694",
+          "claimKind": "unclassified",
+          "status": "removed-pending-disposition",
+          "priorStatus": "current",
+          "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+          "retiredReason": "no counterpart in current source"
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n082",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 81,
+      "proof": {
+        "collection": "carryForward",
+        "key": "carryForward",
+        "before": {
+          "fromCommit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+          "toCommit": "38672e7f157788cbe1b2bf59511bd61046dce660",
+          "oldUnits": 91388,
+          "newUnits": 91388,
+          "kept": 91012,
+          "paired": 374,
+          "moved": 0,
+          "editedKept": 1,
+          "added": 1,
+          "gaps": 1,
+          "retired": 0,
+          "retiredDocuments": 0
+        },
+        "after": {
+          "fromCommit": "38672e7f157788cbe1b2bf59511bd61046dce660",
+          "toCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+          "oldUnits": 91388,
+          "newUnits": 91366,
+          "kept": 90984,
+          "paired": 374,
+          "moved": 6,
+          "editedKept": 1,
+          "added": 1,
+          "gaps": 1,
+          "retired": 22,
+          "retiredDocuments": 0
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    },
+    {
+      "entry": "n083",
+      "kind": "native-change",
+      "receipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+      "index": 82,
+      "proof": {
+        "collection": "_binding",
+        "key": "_binding",
+        "before": {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+          "bytes": 62196419,
+          "sha256": "6fcd58e6f7a2ea0f17df2b1c4024b2728dfa2d73dfc365278df3c3a1c964018c"
+        },
+        "after": {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+          "bytes": 62195972,
+          "sha256": "b20238af95f89cd3a83fbc20dd53ce8df1192153415cd85b9586d53884aa9c2b"
+        }
+      },
+      "check": "Authenticate exact before value from the committed pre-carry registry and exact after value from the current compact registry; review the full before/after content, not ordinal position."
+    }
+  ]
+}

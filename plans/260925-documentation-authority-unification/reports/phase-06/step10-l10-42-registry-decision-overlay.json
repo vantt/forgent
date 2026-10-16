@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "contentCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+  "reason": "Project the 22 L10-16 retired dispositions into registry.retiredUnits after the initial gate diagnosed missing vocabulary dispositions; no carry-forward, identity allocation or inventory generation.",
+  "retiredProjected": 22,
+  "editedCurrentRow": "claim_0d2c13615099d78c5e38533379ecf7cc",
+  "staleGapClaimCopyRemoved": "claim_db83a4c14e03868fccf833f00f51f296",
+  "registryBytes": 62226100,
+  "registrySHA256": "7b03045ad1d6332a2c0075548a9ae5ee61c998a475693380a6831c47b8053b60"
+}

@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "contentCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+  "assignment": "unit-run-1792184405209-31ed32fb/producer/1",
+  "identitySourceDiffFromHead": [],
+  "writeScopeClean": true,
+  "gitDiffCheck": "pass",
+  "jsonArtifactsParse": true,
+  "native": {
+    "files": 4486,
+    "activeUnits": 91366,
+    "knownBefore": 99585,
+    "knownAfter": 99586,
+    "zeroKnownIdLoss": true,
+    "activeTupleEquality": true,
+    "registryBytes": 62226100,
+    "registrySHA256": "7b03045ad1d6332a2c0075548a9ae5ee61c998a475693380a6831c47b8053b60",
+    "rawChanges": 83
+  },
+  "instructionAccounting": {
+    "pendingDecisionRows": 31,
+    "movedRetained": 6,
+    "editedRetained": 1,
+    "newLive": 1,
+    "predecessorGaps": 1,
+    "newlyRetired": 22,
+    "approvalCarry": 0
+  },
+  "global": {
+    "D": {
+      "bothFatal": 0,
+      "identityFatal": 0,
+      "phase02Fatal": 0
+    },
+    "E": {
+      "activeClaims": 22737,
+      "identityGaps": 2236,
+      "pending": 8,
+      "partialCarries": 28,
+      "identicalOwnerGroups": 362,
+      "reverseCandidateUnits": 2336
+    },
+    "comparator": {
+      "exitCode": 0,
+      "ok": true,
+      "differences": 0
+    }
+  },
+  "reviewRequest": {
+    "index": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-l10-42-index.md",
+    "parts": 3,
+    "partEntryCounts": [31, 42, 41],
+    "entries": 114,
+    "rowAuthPassed": 114,
+    "rowAuthTotal": 114
+  },
+  "next": "Independent ordinary review, then final close without another carry-forward."
+}

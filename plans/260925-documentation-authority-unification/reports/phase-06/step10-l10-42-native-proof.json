@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "contentCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+  "fromCommit": "38672e7f157788cbe1b2bf59511bd61046dce660",
+  "completedAt": "2026-10-16T21:48:24.706Z",
+  "inventoryRecoverySeconds": 609.904,
+  "persistenceCount": 1,
+  "inventoryAttempts": 3,
+  "completeInventories": 2,
+  "initialAttempt": {
+    "result": "process terminated during v8 transport write after carry/persistence; partial scratch transport discarded; no second carry or persistence",
+    "log": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-sync.log"
+  },
+  "diagnosticAttempt": {
+    "result": "complete inventory; D exposed 22 unprojected retired dispositions, one stale edited digest and one stale claim/gap collection copy; receipts retained as attempt1",
+    "log": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-attempt1-global.log"
+  },
+  "recovery": {
+    "mode": "final inventory-only regeneration from the same HEAD identity set after decision metadata projection; no carry-forward and no transport retained",
+    "complete": true
+  },
+  "compact": true,
+  "registryBytes": 62226100,
+  "registrySHA256": "7b03045ad1d6332a2c0075548a9ae5ee61c998a475693380a6831c47b8053b60",
+  "files": 4486,
+  "activeUnits": 91366,
+  "knownBefore": 99585,
+  "knownAfter": 99586,
+  "zeroKnownIDLoss": true,
+  "lostKnownIds": [],
+  "activeTupleEquality": true,
+  "carryForward": {
+    "fromCommit": "38672e7f157788cbe1b2bf59511bd61046dce660",
+    "toCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+    "oldUnits": 91388,
+    "newUnits": 91366,
+    "kept": 90984,
+    "paired": 374,
+    "moved": 6,
+    "editedKept": 1,
+    "added": 1,
+    "gaps": 1,
+    "retired": 22,
+    "retiredDocuments": 0
+  },
+  "rawChangeCount": 83,
+  "rawChangesReceipt": "plans/260925-documentation-authority-unification/reports/phase-06/step10-l10-42-native-changes.json",
+  "identityScope": [
+    "docs",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "plans/260925-documentation-authority-unification/transitional-switchboard.json"
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "contentCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+  "entryCount": 114,
+  "decisionEntries": 31,
+  "nativeChangeEntries": 83,
+  "parts": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-l10-42-01.json",
+      "entries": 31
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-l10-42-02.json",
+      "entries": 42
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-l10-42-03.json",
+      "entries": 41
+    }
+  ],
+  "uniqueEntryIds": true,
+  "allPendingDecisions": true,
+  "allRawChangesCovered": true,
+  "rowAuthPassed": 114,
+  "rowAuthTotal": 114,
+  "ok": true
+}

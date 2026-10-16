@@ -1,0 +1,1748 @@
+{
+  "version": 1,
+  "contentCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+  "fromCommit": "38672e7f157788cbe1b2bf59511bd61046dce660",
+  "toCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+  "identityScope": [
+    "docs",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "plans/260925-documentation-authority-unification/transitional-switchboard.json"
+  ],
+  "changeCount": 83,
+  "identityScopeUnitChangeCount": 75,
+  "changes": [
+    {
+      "collection": "commit",
+      "key": "commit",
+      "before": "38672e7f157788cbe1b2bf59511bd61046dce660",
+      "after": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95"
+    },
+    {
+      "collection": "documents",
+      "key": "AGENTS.md",
+      "before": {
+        "path": "AGENTS.md",
+        "sourceId": "src_94136e4dac4ba90a254c1805a3558f31",
+        "sourceDigest": "47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f",
+        "blobSha": "15aad3fa981b11e53d40b17647bc857fe2958656"
+      },
+      "after": {
+        "path": "AGENTS.md",
+        "sourceId": "src_94136e4dac4ba90a254c1805a3558f31",
+        "sourceDigest": "9aadc2197824c2447658966886a21b77f5010e2ba1a21c1a0315d56509c232bb",
+        "blobSha": "b64be0678bfd8d213f0fa2907bd8a75bd442f9e2"
+      }
+    },
+    {
+      "collection": "documents",
+      "key": "CLAUDE.md",
+      "before": {
+        "path": "CLAUDE.md",
+        "sourceId": "src_2551d4e3332583a2c53ca185998bb49d",
+        "sourceDigest": "473df70d0879413dac335100339bb5157ee58aef78ef08800acacbb9a96db1b5",
+        "blobSha": "0ed93b2b465635aaab24e55ff06f55cdbb5e1780"
+      },
+      "after": {
+        "path": "CLAUDE.md",
+        "sourceId": "src_2551d4e3332583a2c53ca185998bb49d",
+        "sourceDigest": "384fb0e29c88662a86a6eec0334f557a71bb2c533f2f6c2ce137552a90b32568",
+        "blobSha": "212ff3044a5af15792ef63952ea34694908fcddc"
+      }
+    },
+    {
+      "collection": "units",
+      "key": "claim_05d3c5f6af634e345b6e32290900c232",
+      "before": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "997ac9a133379d07dbffa20be94e3af97bfff03015a23a4d6f15c603eebce7fc",
+        "identityFingerprint": "997ac9a133379d07dbffa20be94e3af97bfff03015a23a4d6f15c603eebce7fc",
+        "claimId": "claim_05d3c5f6af634e345b6e32290900c232",
+        "sourceAnchor": "unheaded-block-19",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "8ca4c5c61c7f369a197d6118f0a325cc39727dbc792d3c53b1c2b1dd2aa7648a",
+        "claimKind": "architecture",
+        "status": "current"
+      },
+      "after": null
+    },
+    {
+      "collection": "units",
+      "key": "claim_07e83f30731906c4f25c96625cd95e26",
+      "before": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "0602222a6b64b5c7ddf675a474b8c83ee9ac159bca286dd50d3f543e9e542583",
+        "identityFingerprint": "0602222a6b64b5c7ddf675a474b8c83ee9ac159bca286dd50d3f543e9e542583",
+        "claimId": "claim_07e83f30731906c4f25c96625cd95e26",
+        "sourceAnchor": "unheaded-block-51",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "e9d6edc10b3656ef6f99a50549a6fd76c6a6010c62040c5ea6a8d61c753da3cc",
+        "claimKind": "specification",
+        "status": "current"
+      },
+      "after": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "0602222a6b64b5c7ddf675a474b8c83ee9ac159bca286dd50d3f543e9e542583",
+        "identityFingerprint": "0602222a6b64b5c7ddf675a474b8c83ee9ac159bca286dd50d3f543e9e542583",
+        "claimId": "claim_07e83f30731906c4f25c96625cd95e26",
+        "sourceAnchor": "unheaded-block-56",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "e9d6edc10b3656ef6f99a50549a6fd76c6a6010c62040c5ea6a8d61c753da3cc",
+        "claimKind": "specification",
+        "status": "current"
+      }
+    },
+    {
+      "collection": "units",
+      "key": "claim_08f8581721e89c08f589e3bb8002b6ce",
+      "before": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "da364888e2bbe78f471164ded231d90c2431b54a78f5434932173e74b8788d2f",
+        "identityFingerprint": "da364888e2bbe78f471164ded231d90c2431b54a78f5434932173e74b8788d2f",
+        "claimId": "claim_08f8581721e89c08f589e3bb8002b6ce",
+        "sourceAnchor": "unheaded-block-40",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "39fe4d8d1ecc03cbf722efdf8de807822733f8f4f5cdd40cb10419c65ad79b46",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "da364888e2bbe78f471164ded231d90c2431b54a78f5434932173e74b8788d2f",
+        "identityFingerprint": "da364888e2bbe78f471164ded231d90c2431b54a78f5434932173e74b8788d2f",
+        "claimId": "claim_08f8581721e89c08f589e3bb8002b6ce",
+        "sourceAnchor": "unheaded-block-45",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "39fe4d8d1ecc03cbf722efdf8de807822733f8f4f5cdd40cb10419c65ad79b46",
+        "claimKind": "unclassified",
+        "status": "current"
+      }
+    },
+    {
+      "collection": "units",
+      "key": "claim_0d2c13615099d78c5e38533379ecf7cc",
+      "before": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "523ea659ccfa1e1db11781921e5ccc0496006f3f26483c9e1006faee7ab26173",
+        "identityFingerprint": "5af12b481133fcd13dc1117e73480d91013903422393d2bba04f48e528e4595d",
+        "claimId": "claim_0d2c13615099d78c5e38533379ecf7cc",
+        "sourceAnchor": "project-rules",
+        "unitKind": "heading",
+        "sourceUnitDigest": "8cfd6f83037e10f65f4fab831d75c6b0ef373c7841bc510090b83310b5739537",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "cca86c89e04448a530c8cb304c773ace35b65898fa6af98e3d578901beffaf24",
+        "identityFingerprint": "68ec669a9dde1af70c10857f8628acd0bd5db84f156f1bc5899c85444aca7be3",
+        "claimId": "claim_0d2c13615099d78c5e38533379ecf7cc",
+        "sourceAnchor": "project-rules",
+        "unitKind": "heading",
+        "sourceUnitDigest": "ead3a061cf7d13bce3595a8e0214d0553fd1b0c1da5672fe8759570e0f05d8d0",
+        "claimKind": "unclassified",
+        "status": "current",
+        "reviewStatus": "needs-review",
+        "lineage": {
+          "fromCommit": "38672e7f157788cbe1b2bf59511bd61046dce660",
+          "fromUnitDigest": "523ea659ccfa1e1db11781921e5ccc0496006f3f26483c9e1006faee7ab26173",
+          "toUnitDigest": "cca86c89e04448a530c8cb304c773ace35b65898fa6af98e3d578901beffaf24",
+          "fromSourceUnitDigest": "8cfd6f83037e10f65f4fab831d75c6b0ef373c7841bc510090b83310b5739537",
+          "toSourceUnitDigest": "ead3a061cf7d13bce3595a8e0214d0553fd1b0c1da5672fe8759570e0f05d8d0"
+        }
+      }
+    },
+    {
+      "collection": "units",
+      "key": "claim_11685a19f556cf213ef62e11a1d2d5c6",
+      "before": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "34aa5e40911ba6123b6d0707f7695e1442650901433fd5b94a9216d2904827ef",
+        "identityFingerprint": "34aa5e40911ba6123b6d0707f7695e1442650901433fd5b94a9216d2904827ef",
+        "claimId": "claim_11685a19f556cf213ef62e11a1d2d5c6",
+        "sourceAnchor": "unheaded-block-44",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "b64e3f9772c143e0d911c16218f5a9f280f96b0c1466f43f52e5aa4d63855221",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "34aa5e40911ba6123b6d0707f7695e1442650901433fd5b94a9216d2904827ef",
+        "identityFingerprint": "34aa5e40911ba6123b6d0707f7695e1442650901433fd5b94a9216d2904827ef",
+        "claimId": "claim_11685a19f556cf213ef62e11a1d2d5c6",
+        "sourceAnchor": "unheaded-block-49",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "b64e3f9772c143e0d911c16218f5a9f280f96b0c1466f43f52e5aa4d63855221",
+        "claimKind": "unclassified",
+        "status": "current"
+      }
+    },
+    {
+      "collection": "units",
+      "key": "claim_127225b8542c701295574b1b00749594",
+      "before": {
+        "sourcePath": "docs/backlog.md",
+        "unitDigest": "d65ab03874823983b79507d826dbe801c620f933080b56e6b64483b082e52e6e",
+        "identityFingerprint": "d65ab03874823983b79507d826dbe801c620f933080b56e6b64483b082e52e6e",
+        "claimId": "claim_127225b8542c701295574b1b00749594",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "7d5317616b4b105936b065a213de9cce47e44c3e623d6dd293ffd0d5dc4c84ec",
+        "claimKind": "unclassified",
+        "status": "future",
+        "origin": "added-since-c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be"
+      },
+      "after": {
+        "sourcePath": "docs/backlog.md",
+        "unitDigest": "d65ab03874823983b79507d826dbe801c620f933080b56e6b64483b082e52e6e",
+        "identityFingerprint": "d65ab03874823983b79507d826dbe801c620f933080b56e6b64483b082e52e6e",
+        "claimId": "claim_127225b8542c701295574b1b00749594",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "7d5317616b4b105936b065a213de9cce47e44c3e623d6dd293ffd0d5dc4c84ec",
+        "claimKind": "unclassified",
+        "status": "future"
+      }
+    },
+    {
+      "collection": "units",
+      "key": "claim_1661543368ff1c7e6f57d20e2345cf4d",
+      "before": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "997ac9a133379d07dbffa20be94e3af97bfff03015a23a4d6f15c603eebce7fc",
+        "identityFingerprint": "997ac9a133379d07dbffa20be94e3af97bfff03015a23a4d6f15c603eebce7fc",
+        "claimId": "claim_1661543368ff1c7e6f57d20e2345cf4d",
+        "sourceAnchor": "unheaded-block-45",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "8ca4c5c61c7f369a197d6118f0a325cc39727dbc792d3c53b1c2b1dd2aa7648a",
+        "claimKind": "architecture",
+        "status": "current"
+      },
+      "after": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "997ac9a133379d07dbffa20be94e3af97bfff03015a23a4d6f15c603eebce7fc",
+        "identityFingerprint": "997ac9a133379d07dbffa20be94e3af97bfff03015a23a4d6f15c603eebce7fc",
+        "claimId": "claim_1661543368ff1c7e6f57d20e2345cf4d",
+        "sourceAnchor": "unheaded-block-50",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "8ca4c5c61c7f369a197d6118f0a325cc39727dbc792d3c53b1c2b1dd2aa7648a",
+        "claimKind": "architecture",
+        "status": "current"
+      }
+    },
+    {
+      "collection": "units",
+      "key": "claim_1ac1158b31cf27d233825c9e70232fdb",
+      "before": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "429a4f29dac7ef512da7d79c1d342bf071f8fb22d5e861477bbb0447a8914d6c",
+        "identityFingerprint": "429a4f29dac7ef512da7d79c1d342bf071f8fb22d5e861477bbb0447a8914d6c",
+        "claimId": "claim_1ac1158b31cf27d233825c9e70232fdb",
+        "sourceAnchor": "unheaded-block-47",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "a412a2f5e102f17d8b6b108830fed27c29021381ac59ea9695c43d604e1a6570",
+        "claimKind": "decision",
+        "status": "current"
+      },
+      "after": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "429a4f29dac7ef512da7d79c1d342bf071f8fb22d5e861477bbb0447a8914d6c",
+        "identityFingerprint": "429a4f29dac7ef512da7d79c1d342bf071f8fb22d5e861477bbb0447a8914d6c",
+        "claimId": "claim_1ac1158b31cf27d233825c9e70232fdb",
+        "sourceAnchor": "unheaded-block-52",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "a412a2f5e102f17d8b6b108830fed27c29021381ac59ea9695c43d604e1a6570",
+        "claimKind": "decision",
+        "status": "current"
+      }
+    },
+    {
+      "collection": "units",
+      "key": "claim_1c0fa8ed450e9b4d240269ee06fbb6d2",
+      "before": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "ea404dddeafc115ecadb052516f26f57d720590f44181ba73275fc4711565b48",
+        "identityFingerprint": "ea404dddeafc115ecadb052516f26f57d720590f44181ba73275fc4711565b48",
+        "claimId": "claim_1c0fa8ed450e9b4d240269ee06fbb6d2",
+        "sourceAnchor": "unheaded-block-48",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "1297672f2b5e8ad757858b4c7e8e54e6713cabadc7461f2f561b92e4e17bb16e",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "ea404dddeafc115ecadb052516f26f57d720590f44181ba73275fc4711565b48",
+        "identityFingerprint": "ea404dddeafc115ecadb052516f26f57d720590f44181ba73275fc4711565b48",
+        "claimId": "claim_1c0fa8ed450e9b4d240269ee06fbb6d2",
+        "sourceAnchor": "unheaded-block-53",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "1297672f2b5e8ad757858b4c7e8e54e6713cabadc7461f2f561b92e4e17bb16e",
+        "claimKind": "unclassified",
+        "status": "current"
+      }
+    },
+    {
+      "collection": "units",
+      "key": "claim_1e109a5e30aba0234c61706edad2c820",
+      "before": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "c9dcc854cd9641cea58ae3b52c4d5c9339f14e7229a6022fad5a39a0e1e8d0c7",
+        "identityFingerprint": "c9dcc854cd9641cea58ae3b52c4d5c9339f14e7229a6022fad5a39a0e1e8d0c7",
+        "claimId": "claim_1e109a5e30aba0234c61706edad2c820",
+        "sourceAnchor": "unheaded-block-15",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "46ba7c1470400a34fe1ff4796da8a95587bfbe41171b92eb8ba9a4fd38b0d51b",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": null
+    },
+    {
+      "collection": "units",
+      "key": "claim_2165e8fcd1ec571e64eae458439bb309",
+      "before": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "a85fe9414c1a3cf1695e14b11411af38501670dcd1d04450dba4f35f51f5c697",
+        "identityFingerprint": "a85fe9414c1a3cf1695e14b11411af38501670dcd1d04450dba4f35f51f5c697",
+        "claimId": "claim_2165e8fcd1ec571e64eae458439bb309",
+        "sourceAnchor": "unheaded-block-46",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "1ac5061190836bd1107ae3eb6460b899d1d92486a62077b653cbf7d2016b2101",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "a85fe9414c1a3cf1695e14b11411af38501670dcd1d04450dba4f35f51f5c697",
+        "identityFingerprint": "a85fe9414c1a3cf1695e14b11411af38501670dcd1d04450dba4f35f51f5c697",
+        "claimId": "claim_2165e8fcd1ec571e64eae458439bb309",
+        "sourceAnchor": "unheaded-block-51",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "1ac5061190836bd1107ae3eb6460b899d1d92486a62077b653cbf7d2016b2101",
+        "claimKind": "unclassified",
+        "status": "current"
+      }
+    },
+    {
+      "collection": "units",
+      "key": "claim_2afb04da34da039e196e613f3262cdec",
+      "before": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "b0870e4f3c89405386e3abed54c284c5a54aa30d57417406bbcfb30c9a19566c",
+        "identityFingerprint": "b0870e4f3c89405386e3abed54c284c5a54aa30d57417406bbcfb30c9a19566c",
+        "claimId": "claim_2afb04da34da039e196e613f3262cdec",
+        "sourceAnchor": "unheaded-block-9",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "9283c37aa6e87094b10f57541497888b092b13116846386cfaf2cdab0e8cae4d",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": null
+    },
+    {
+      "collection": "units",
+      "key": "claim_2f612bbe8e8413b66477d06bf6046ed4",
+      "before": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "7e21885df02fa86d9033eceab65bd533c10a1d3f2050558e15d06ff344688416",
+        "identityFingerprint": "90f2c0bea757e4b6d760c9285e2e357ff406f5b7e86be8712c375ef5f13385ed",
+        "claimId": "claim_2f612bbe8e8413b66477d06bf6046ed4",
+        "sourceAnchor": "gitnexus-code-intelligence",
+        "unitKind": "heading",
+        "sourceUnitDigest": "150e95a64fd2a52cc454a2386a8dc3aec0b3a47eb54fb1fd8d02576899ea4461",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": null
+    },
+    {
+      "collection": "units",
+      "key": "claim_32f35a95feb5773ca27979295027897f",
+      "before": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "35b00867ab67601824894f8a2a0994cf8a24e89b9310ba65004187ed722eee0d",
+        "identityFingerprint": "35b00867ab67601824894f8a2a0994cf8a24e89b9310ba65004187ed722eee0d",
+        "claimId": "claim_32f35a95feb5773ca27979295027897f",
+        "sourceAnchor": "unheaded-block-5",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "6607b84c0b5d87053383a57ad03d8ac292df94227bb60eed9f81664ba11ed4ff",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "35b00867ab67601824894f8a2a0994cf8a24e89b9310ba65004187ed722eee0d",
+        "identityFingerprint": "35b00867ab67601824894f8a2a0994cf8a24e89b9310ba65004187ed722eee0d",
+        "claimId": "claim_32f35a95feb5773ca27979295027897f",
+        "sourceAnchor": "unheaded-block-36",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "6607b84c0b5d87053383a57ad03d8ac292df94227bb60eed9f81664ba11ed4ff",
+        "claimKind": "unclassified",
+        "status": "current",
+        "movedFrom": {
+          "sourcePath": "CLAUDE.md",
+          "sourceAnchor": "unheaded-block-5"
+        }
+      }
+    },
+    {
+      "collection": "units",
+      "key": "claim_34e5aadf94d955884ab6041bc388d0b0",
+      "before": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "a2a1fd7502aa8ed938a98e09578cab019f3375335dfd3e3d9b6e0926f2ffe720",
+        "identityFingerprint": "a2a1fd7502aa8ed938a98e09578cab019f3375335dfd3e3d9b6e0926f2ffe720",
+        "claimId": "claim_34e5aadf94d955884ab6041bc388d0b0",
+        "sourceAnchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "226b024897f07907322a11454fbde4c344bb3c0459d235fbb0d79e5b682d1921",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "a2a1fd7502aa8ed938a98e09578cab019f3375335dfd3e3d9b6e0926f2ffe720",
+        "identityFingerprint": "a2a1fd7502aa8ed938a98e09578cab019f3375335dfd3e3d9b6e0926f2ffe720",
+        "claimId": "claim_34e5aadf94d955884ab6041bc388d0b0",
+        "sourceAnchor": "unheaded-block-34",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "226b024897f07907322a11454fbde4c344bb3c0459d235fbb0d79e5b682d1921",
+        "claimKind": "unclassified",
+        "status": "current",
+        "movedFrom": {
+          "sourcePath": "CLAUDE.md",
+          "sourceAnchor": "unheaded-block-3"
+        }
+      }
+    },
+    {
+      "collection": "units",
+      "key": "claim_351eb1f4f67c8aaee59631dad24f99d8",
+      "before": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "fbc2f00290b92cfee3c2ba0ab087a4dd8777024bc804524d830d423f77bac29a",
+        "identityFingerprint": "fbc2f00290b92cfee3c2ba0ab087a4dd8777024bc804524d830d423f77bac29a",
+        "claimId": "claim_351eb1f4f67c8aaee59631dad24f99d8",
+        "sourceAnchor": "unheaded-block-37",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "2ce479d07da3c54df383f1e0441adf783699b2e90e56b9fe6c4e6b56777a7af0",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "fbc2f00290b92cfee3c2ba0ab087a4dd8777024bc804524d830d423f77bac29a",
+        "identityFingerprint": "fbc2f00290b92cfee3c2ba0ab087a4dd8777024bc804524d830d423f77bac29a",
+        "claimId": "claim_351eb1f4f67c8aaee59631dad24f99d8",
+        "sourceAnchor": "unheaded-block-42",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "2ce479d07da3c54df383f1e0441adf783699b2e90e56b9fe6c4e6b56777a7af0",
+        "claimKind": "unclassified",
+        "status": "current"
+      }
+    },
+    {
+      "collection": "units",
+      "key": "claim_3ca28ff7ed502c1bfd8e695a7387f753",
+      "before": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "f58061fe68cb3656428115f47420de5b2b91d8c3b41781447ba7dbb2da1b0a15",
+        "identityFingerprint": "f58061fe68cb3656428115f47420de5b2b91d8c3b41781447ba7dbb2da1b0a15",
+        "claimId": "claim_3ca28ff7ed502c1bfd8e695a7387f753",
+        "sourceAnchor": "unheaded-block-43",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "6f63dffd5c7d710ca600d3ad22016e4e73cf9729a299b36d624070a87429d6e1",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "f58061fe68cb3656428115f47420de5b2b91d8c3b41781447ba7dbb2da1b0a15",
+        "identityFingerprint": "f58061fe68cb3656428115f47420de5b2b91d8c3b41781447ba7dbb2da1b0a15",
+        "claimId": "claim_3ca28ff7ed502c1bfd8e695a7387f753",
+        "sourceAnchor": "unheaded-block-48",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "6f63dffd5c7d710ca600d3ad22016e4e73cf9729a299b36d624070a87429d6e1",
+        "claimKind": "unclassified",
+        "status": "current"
+      }
+    },
+    {
+      "collection": "units",
+      "key": "claim_3f0ed45ecb0952e67c013b52f129fedc",
+      "before": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "f58061fe68cb3656428115f47420de5b2b91d8c3b41781447ba7dbb2da1b0a15",
+        "identityFingerprint": "f58061fe68cb3656428115f47420de5b2b91d8c3b41781447ba7dbb2da1b0a15",
+        "claimId": "claim_3f0ed45ecb0952e67c013b52f129fedc",
+        "sourceAnchor": "unheaded-block-17",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "6f63dffd5c7d710ca600d3ad22016e4e73cf9729a299b36d624070a87429d6e1",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": null
+    },
+    {
+      "collection": "units",
+      "key": "claim_4c8b5dcba297831ece58a92091e942d6",
+      "before": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "f00d38c2a727238520d4481c55505b14c6a1d67c2f2a570b6f30a8239e792616",
+        "identityFingerprint": "f00d38c2a727238520d4481c55505b14c6a1d67c2f2a570b6f30a8239e792616",
+        "claimId": "claim_4c8b5dcba297831ece58a92091e942d6",
+        "sourceAnchor": "unheaded-block-52",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "f4b273ed312216976ee427785fccce89a1aaf29fe108f4af626cab39ee1b70fb",
+        "claimKind": "verification",
+        "status": "current"
+      },
+      "after": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "f00d38c2a727238520d4481c55505b14c6a1d67c2f2a570b6f30a8239e792616",
+        "identityFingerprint": "f00d38c2a727238520d4481c55505b14c6a1d67c2f2a570b6f30a8239e792616",
+        "claimId": "claim_4c8b5dcba297831ece58a92091e942d6",
+        "sourceAnchor": "unheaded-block-57",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "f4b273ed312216976ee427785fccce89a1aaf29fe108f4af626cab39ee1b70fb",
+        "claimKind": "verification",
+        "status": "current"
+      }
+    },
+    {
+      "collection": "units",
+      "key": "claim_5010f46edb2e930c7efebd3876a7942d",
+      "before": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "fbc2f00290b92cfee3c2ba0ab087a4dd8777024bc804524d830d423f77bac29a",
+        "identityFingerprint": "fbc2f00290b92cfee3c2ba0ab087a4dd8777024bc804524d830d423f77bac29a",
+        "claimId": "claim_5010f46edb2e930c7efebd3876a7942d",
+        "sourceAnchor": "unheaded-block-11",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "2ce479d07da3c54df383f1e0441adf783699b2e90e56b9fe6c4e6b56777a7af0",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": null
+    },
+    {
+      "collection": "units",
+      "key": "claim_50134455b2dca31dc4bd662b22744a21",
+      "before": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "767dce734927611abb1a8072262d051f78f233901d809a55cbfa9e4f895da39e",
+        "identityFingerprint": "767dce734927611abb1a8072262d051f78f233901d809a55cbfa9e4f895da39e",
+        "claimId": "claim_50134455b2dca31dc4bd662b22744a21",
+        "sourceAnchor": "unheaded-block-7",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "42d278bba4a7ce9c2f7ff755227feb14483587d3ace2b687a5c732999eb053bc",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": null
+    },
+    {
+      "collection": "units",
+      "key": "claim_5914548c37db472c43bb2fdb9f2b15c2",
+      "before": null,
+      "after": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "4ff6ca1438ab25a1035bfc8bbf8ae1457fbf2813c33c0650993a2df60b7950e8",
+        "identityFingerprint": "4ff6ca1438ab25a1035bfc8bbf8ae1457fbf2813c33c0650993a2df60b7950e8",
+        "claimId": "claim_5914548c37db472c43bb2fdb9f2b15c2",
+        "sourceAnchor": "unheaded-block-1",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "7d97033654aafc4e7056f36abd4d92177b77b74d76db436f60f9521eb7b90a2e",
+        "claimKind": "unclassified",
+        "status": "current",
+        "origin": "added-since-38672e7f157788cbe1b2bf59511bd61046dce660"
+      }
+    },
+    {
+      "collection": "units",
+      "key": "claim_5c07823ad6d47b3e9ac91dfbf41aa56f",
+      "before": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "0db5143cf64ed364d6b5963d60d6bd82cf7224b10e1861510a69755c5cacbdf1",
+        "identityFingerprint": "0db5143cf64ed364d6b5963d60d6bd82cf7224b10e1861510a69755c5cacbdf1",
+        "claimId": "claim_5c07823ad6d47b3e9ac91dfbf41aa56f",
+        "sourceAnchor": "unheaded-block-6",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "ffc67a1eab2b7b0589ff8ebc2b85736441958ade69576583be4c07a0d57ace8c",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "0db5143cf64ed364d6b5963d60d6bd82cf7224b10e1861510a69755c5cacbdf1",
+        "identityFingerprint": "0db5143cf64ed364d6b5963d60d6bd82cf7224b10e1861510a69755c5cacbdf1",
+        "claimId": "claim_5c07823ad6d47b3e9ac91dfbf41aa56f",
+        "sourceAnchor": "unheaded-block-37",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "ffc67a1eab2b7b0589ff8ebc2b85736441958ade69576583be4c07a0d57ace8c",
+        "claimKind": "unclassified",
+        "status": "current",
+        "movedFrom": {
+          "sourcePath": "CLAUDE.md",
+          "sourceAnchor": "unheaded-block-6"
+        }
+      }
+    },
+    {
+      "collection": "units",
+      "key": "claim_6540d24a1703d63c0b4645efaaccc891",
+      "before": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "0792cde98de8f0ac84eac0a49f473981a04bb641227e8f1f3d3508fa878a4f69",
+        "identityFingerprint": "ac55ea750c0493c91beb4800994cd142fc91a14dd4a3a5328e6669db560f9c31",
+        "claimId": "claim_6540d24a1703d63c0b4645efaaccc891",
+        "sourceAnchor": "using-cli-fallback",
+        "unitKind": "heading",
+        "sourceUnitDigest": "64aa23ebc68629f08a1537e7c3249b810327ec02c53a5ad2d4c98589bd174a3e",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": null
+    },
+    {
+      "collection": "units",
+      "key": "claim_6a2cb3a88c1fb4c7faf143fa5ec076f3",
+      "before": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "129d2af46c1244a7331ebb168b0ef6e9ff7663a084dee39d54bf881f2dbf5a7b",
+        "identityFingerprint": "129d2af46c1244a7331ebb168b0ef6e9ff7663a084dee39d54bf881f2dbf5a7b",
+        "claimId": "claim_6a2cb3a88c1fb4c7faf143fa5ec076f3",
+        "sourceAnchor": "unheaded-block-34",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "c45eed179f4de74f88ec92f86a5647eb5e6625d60cb844671ac83b3f0d1c6694",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "129d2af46c1244a7331ebb168b0ef6e9ff7663a084dee39d54bf881f2dbf5a7b",
+        "identityFingerprint": "129d2af46c1244a7331ebb168b0ef6e9ff7663a084dee39d54bf881f2dbf5a7b",
+        "claimId": "claim_6a2cb3a88c1fb4c7faf143fa5ec076f3",
+        "sourceAnchor": "unheaded-block-39",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "c45eed179f4de74f88ec92f86a5647eb5e6625d60cb844671ac83b3f0d1c6694",
+        "claimKind": "unclassified",
+        "status": "current"
+      }
+    },
+    {
+      "collection": "units",
+      "key": "claim_6bd09ad125ddd52d9563117b379ecc60",
+      "before": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "34aa5e40911ba6123b6d0707f7695e1442650901433fd5b94a9216d2904827ef",
+        "identityFingerprint": "34aa5e40911ba6123b6d0707f7695e1442650901433fd5b94a9216d2904827ef",
+        "claimId": "claim_6bd09ad125ddd52d9563117b379ecc60",
+        "sourceAnchor": "unheaded-block-18",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "b64e3f9772c143e0d911c16218f5a9f280f96b0c1466f43f52e5aa4d63855221",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": null
+    },
+    {
+      "collection": "units",
+      "key": "claim_7251396790f9d7a220a2c6f8ffde55c3",
+      "before": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "706320cb3749b6c9eb831ae60d98c72ce1ca08073eb95edbab4eba567080c53b",
+        "identityFingerprint": "706320cb3749b6c9eb831ae60d98c72ce1ca08073eb95edbab4eba567080c53b",
+        "claimId": "claim_7251396790f9d7a220a2c6f8ffde55c3",
+        "sourceAnchor": "unheaded-block-13",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "52ee0c226963abfd99219e552e38ac7b06cbe349e31d31a470fc328c095fd703",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": null
+    },
+    {
+      "collection": "units",
+      "key": "claim_74542e8562e9dd16128fadd8a2dbfaca",
+      "before": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "e354eba5c22b7204a004ad6a559521216737fcc8287e0314181c6d7851448974",
+        "identityFingerprint": "e354eba5c22b7204a004ad6a559521216737fcc8287e0314181c6d7851448974",
+        "claimId": "claim_74542e8562e9dd16128fadd8a2dbfaca",
+        "sourceAnchor": "unheaded-block-36",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "e0bf1a3052c0f3659d2cac6267fcf556c467957bb4de49a27962fa353ec8aec3",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "e354eba5c22b7204a004ad6a559521216737fcc8287e0314181c6d7851448974",
+        "identityFingerprint": "e354eba5c22b7204a004ad6a559521216737fcc8287e0314181c6d7851448974",
+        "claimId": "claim_74542e8562e9dd16128fadd8a2dbfaca",
+        "sourceAnchor": "unheaded-block-41",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "e0bf1a3052c0f3659d2cac6267fcf556c467957bb4de49a27962fa353ec8aec3",
+        "claimKind": "unclassified",
+        "status": "current"
+      }
+    },
+    {
+      "collection": "units",
+      "key": "claim_79dd88f1fb058d9385445406fbd9296d",
+      "before": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "e7fc714a9a73a84cbd1d93c998bc3f55888c9b537891eb0b0caf9771fb8cde98",
+        "identityFingerprint": "c869c48c9abaf53e8f0d5566184b23c92991743b2b6726980b3111dafc540cd4",
+        "claimId": "claim_79dd88f1fb058d9385445406fbd9296d",
+        "sourceAnchor": "always-do",
+        "unitKind": "heading",
+        "sourceUnitDigest": "e51ed959e5aae86e5f000c44f5ef903c202b286098b279fb9e892f8db3a0c1d3",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": null
+    },
+    {
+      "collection": "units",
+      "key": "claim_7cff4d97b31e33a4ca0b8a4b505c8807",
+      "before": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "f06847feee6532c979ac4d0358d4322c29f02b68025c9c57e4c4e70b00f10714",
+        "identityFingerprint": "f06847feee6532c979ac4d0358d4322c29f02b68025c9c57e4c4e70b00f10714",
+        "claimId": "claim_7cff4d97b31e33a4ca0b8a4b505c8807",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "7fd75c1135e7ea9df4294bcee9f875ea87ea1157484a7b6a78180dfb85cd9824",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "f06847feee6532c979ac4d0358d4322c29f02b68025c9c57e4c4e70b00f10714",
+        "identityFingerprint": "f06847feee6532c979ac4d0358d4322c29f02b68025c9c57e4c4e70b00f10714",
+        "claimId": "claim_7cff4d97b31e33a4ca0b8a4b505c8807",
+        "sourceAnchor": "unheaded-block-33",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "7fd75c1135e7ea9df4294bcee9f875ea87ea1157484a7b6a78180dfb85cd9824",
+        "claimKind": "unclassified",
+        "status": "current",
+        "movedFrom": {
+          "sourcePath": "CLAUDE.md",
+          "sourceAnchor": "unheaded-block-2"
+        }
+      }
+    },
+    {
+      "collection": "units",
+      "key": "claim_7e77c676144c5ca6cdc3351f5a5ef632",
+      "before": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "706320cb3749b6c9eb831ae60d98c72ce1ca08073eb95edbab4eba567080c53b",
+        "identityFingerprint": "706320cb3749b6c9eb831ae60d98c72ce1ca08073eb95edbab4eba567080c53b",
+        "claimId": "claim_7e77c676144c5ca6cdc3351f5a5ef632",
+        "sourceAnchor": "unheaded-block-39",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "52ee0c226963abfd99219e552e38ac7b06cbe349e31d31a470fc328c095fd703",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "706320cb3749b6c9eb831ae60d98c72ce1ca08073eb95edbab4eba567080c53b",
+        "identityFingerprint": "706320cb3749b6c9eb831ae60d98c72ce1ca08073eb95edbab4eba567080c53b",
+        "claimId": "claim_7e77c676144c5ca6cdc3351f5a5ef632",
+        "sourceAnchor": "unheaded-block-44",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "52ee0c226963abfd99219e552e38ac7b06cbe349e31d31a470fc328c095fd703",
+        "claimKind": "unclassified",
+        "status": "current"
+      }
+    },
+    {
+      "collection": "units",
+      "key": "claim_809815d317fc255da84f53b1c30431cf",
+      "before": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "e354eba5c22b7204a004ad6a559521216737fcc8287e0314181c6d7851448974",
+        "identityFingerprint": "e354eba5c22b7204a004ad6a559521216737fcc8287e0314181c6d7851448974",
+        "claimId": "claim_809815d317fc255da84f53b1c30431cf",
+        "sourceAnchor": "unheaded-block-10",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "e0bf1a3052c0f3659d2cac6267fcf556c467957bb4de49a27962fa353ec8aec3",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": null
+    },
+    {
+      "collection": "units",
+      "key": "claim_81adf946018de3aee151fbb350719862",
+      "before": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "91789cc35ef1a2e16d2dfa01b05d4d5afc0c35fda51b11ce67512b4fdf70a839",
+        "identityFingerprint": "91789cc35ef1a2e16d2dfa01b05d4d5afc0c35fda51b11ce67512b4fdf70a839",
+        "claimId": "claim_81adf946018de3aee151fbb350719862",
+        "sourceAnchor": "unheaded-block-4",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "bc235f0b750993d157e6192d56c297e4373976d92f32b3322342286165cd06af",
+        "claimKind": "verification",
+        "status": "current"
+      },
+      "after": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "91789cc35ef1a2e16d2dfa01b05d4d5afc0c35fda51b11ce67512b4fdf70a839",
+        "identityFingerprint": "91789cc35ef1a2e16d2dfa01b05d4d5afc0c35fda51b11ce67512b4fdf70a839",
+        "claimId": "claim_81adf946018de3aee151fbb350719862",
+        "sourceAnchor": "unheaded-block-35",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "bc235f0b750993d157e6192d56c297e4373976d92f32b3322342286165cd06af",
+        "claimKind": "verification",
+        "status": "current",
+        "movedFrom": {
+          "sourcePath": "CLAUDE.md",
+          "sourceAnchor": "unheaded-block-4"
+        }
+      }
+    },
+    {
+      "collection": "units",
+      "key": "claim_8396a2952ef6cbcae93835afb0a73152",
+      "before": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "0f88b95c0f0147c03c08add070d474d7ef4c3a939596793c8c59454d131e5012",
+        "identityFingerprint": "a85309a1368c7071897daf4e20c262bcb79dd91fbe446b59da8b88d773bbed8e",
+        "claimId": "claim_8396a2952ef6cbcae93835afb0a73152",
+        "sourceAnchor": "documentation-viewing-mdview",
+        "unitKind": "heading",
+        "sourceUnitDigest": "7d84eb3c654fd06a78b9e1d55f1aac0787beba431be44c4c11800b92f10afb45",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": null
+    },
+    {
+      "collection": "units",
+      "key": "claim_88fca05f9afd9c63fe14ebb5a08e5094",
+      "before": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "b39c9c5a4047e4ee228f9ad3945c453a573de86c783a9f828d493de9b3c99e04",
+        "identityFingerprint": "b39c9c5a4047e4ee228f9ad3945c453a573de86c783a9f828d493de9b3c99e04",
+        "claimId": "claim_88fca05f9afd9c63fe14ebb5a08e5094",
+        "sourceAnchor": "unheaded-block-12",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "6c33aac3c8d229e5f9e4122d414e1fed0afb9f727868500b7c7c5fb0035268a4",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": null
+    },
+    {
+      "collection": "units",
+      "key": "claim_8c2cca9caea197a0601c680f4bfcbb23",
+      "before": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "071d72578c3d9b5918351e94257453094051994b8cd49f682c935cf046b0fed4",
+        "identityFingerprint": "81f0ad51435143bb181c3d0d4bc70aecc6a8a74f13515cebfd517b841b1a0a26",
+        "claimId": "claim_8c2cca9caea197a0601c680f4bfcbb23",
+        "sourceAnchor": "cli",
+        "unitKind": "heading",
+        "sourceUnitDigest": "b1a93fca9c3b2fa56e2de420c36fb04c464ff5925c93e4902e70d7f7bd7eb1d3",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": null
+    },
+    {
+      "collection": "units",
+      "key": "claim_928e5b681c1bbc6c51563c78de0b4f23",
+      "before": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "47c3568ddec4bc9a7f6ec4204979a30b266331dcb09c21d41582d97a07d97b47",
+        "identityFingerprint": "833eaa198037a7b8bb2619b6a371f2efa587939fd9b66541b45b5e8c14a02d93",
+        "claimId": "claim_928e5b681c1bbc6c51563c78de0b4f23",
+        "sourceAnchor": "resources",
+        "unitKind": "heading",
+        "sourceUnitDigest": "14d6f595788e8fc244f48477644d5527eeba45c4172ee04717caf23b04cb172e",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": null
+    },
+    {
+      "collection": "units",
+      "key": "claim_95164f1150b3c485deff5673f7b4ef15",
+      "before": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "b39c9c5a4047e4ee228f9ad3945c453a573de86c783a9f828d493de9b3c99e04",
+        "identityFingerprint": "b39c9c5a4047e4ee228f9ad3945c453a573de86c783a9f828d493de9b3c99e04",
+        "claimId": "claim_95164f1150b3c485deff5673f7b4ef15",
+        "sourceAnchor": "unheaded-block-38",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "6c33aac3c8d229e5f9e4122d414e1fed0afb9f727868500b7c7c5fb0035268a4",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "b39c9c5a4047e4ee228f9ad3945c453a573de86c783a9f828d493de9b3c99e04",
+        "identityFingerprint": "b39c9c5a4047e4ee228f9ad3945c453a573de86c783a9f828d493de9b3c99e04",
+        "claimId": "claim_95164f1150b3c485deff5673f7b4ef15",
+        "sourceAnchor": "unheaded-block-43",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "6c33aac3c8d229e5f9e4122d414e1fed0afb9f727868500b7c7c5fb0035268a4",
+        "claimKind": "unclassified",
+        "status": "current"
+      }
+    },
+    {
+      "collection": "units",
+      "key": "claim_a18fb2712669f362c16aa39841718116",
+      "before": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "f7d4f7bb7d2590a0e23bc5ea3baaf574025eaacee1f49c7d980183a8b45f8877",
+        "identityFingerprint": "25bc24b81e69a17acda8ba8b87d0b559947d0ead224259982ae8cf0f99084386",
+        "claimId": "claim_a18fb2712669f362c16aa39841718116",
+        "sourceAnchor": "impact-analysis-capability-gate",
+        "unitKind": "heading",
+        "sourceUnitDigest": "9f085e90490eabb709bbb9121644075c09d080ce012ee19af7fd656cef02ad4a",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "f7d4f7bb7d2590a0e23bc5ea3baaf574025eaacee1f49c7d980183a8b45f8877",
+        "identityFingerprint": "25bc24b81e69a17acda8ba8b87d0b559947d0ead224259982ae8cf0f99084386",
+        "claimId": "claim_a18fb2712669f362c16aa39841718116",
+        "sourceAnchor": "impact-analysis-capability-gate",
+        "unitKind": "heading",
+        "sourceUnitDigest": "9f085e90490eabb709bbb9121644075c09d080ce012ee19af7fd656cef02ad4a",
+        "claimKind": "unclassified",
+        "status": "current",
+        "movedFrom": {
+          "sourcePath": "CLAUDE.md",
+          "sourceAnchor": "impact-analysis-capability-gate"
+        }
+      }
+    },
+    {
+      "collection": "units",
+      "key": "claim_a1fe07b1842007c25172823b1716b586",
+      "before": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "3dae37d5d36974bbfdb4a9fe17a2e07d382905b25c6272be1058cdfbd2db26b6",
+        "identityFingerprint": "147222488a836b02a9081f3efb61f8a098a36bc197ecec6248a4ab3b828c5cfe",
+        "claimId": "claim_a1fe07b1842007c25172823b1716b586",
+        "sourceAnchor": "when-to-render",
+        "unitKind": "heading",
+        "sourceUnitDigest": "b8596a3138791147b0ffa9b666027206135a910a94b7c8391467f8559fdb7828",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": null
+    },
+    {
+      "collection": "units",
+      "key": "claim_ae5e7954251083afc5130d73333ef771",
+      "before": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "767dce734927611abb1a8072262d051f78f233901d809a55cbfa9e4f895da39e",
+        "identityFingerprint": "767dce734927611abb1a8072262d051f78f233901d809a55cbfa9e4f895da39e",
+        "claimId": "claim_ae5e7954251083afc5130d73333ef771",
+        "sourceAnchor": "unheaded-block-33",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "42d278bba4a7ce9c2f7ff755227feb14483587d3ace2b687a5c732999eb053bc",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "767dce734927611abb1a8072262d051f78f233901d809a55cbfa9e4f895da39e",
+        "identityFingerprint": "767dce734927611abb1a8072262d051f78f233901d809a55cbfa9e4f895da39e",
+        "claimId": "claim_ae5e7954251083afc5130d73333ef771",
+        "sourceAnchor": "unheaded-block-38",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "42d278bba4a7ce9c2f7ff755227feb14483587d3ace2b687a5c732999eb053bc",
+        "claimKind": "unclassified",
+        "status": "current"
+      }
+    },
+    {
+      "collection": "units",
+      "key": "claim_ae71daeca0febe5384359e3ad92443e8",
+      "before": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "a8494e1a68489007e4644648096c49f64630b92223de2b4076987dbbd9413dbe",
+        "identityFingerprint": "a8494e1a68489007e4644648096c49f64630b92223de2b4076987dbbd9413dbe",
+        "claimId": "claim_ae71daeca0febe5384359e3ad92443e8",
+        "sourceAnchor": "unheaded-block-16",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "e23a5ee9ace2850ec670037d92a358e58770bdd73439c4234c7c5b9f40e24c22",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": null
+    },
+    {
+      "collection": "units",
+      "key": "claim_b0612b463c58046dea6ba09504d97a82",
+      "before": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "e873cf37f739248eee0224ea543d02a9977ac6de94f24baae620e4996419e733",
+        "identityFingerprint": "8af2b2f9f6ea42011e3c43d9d4e6c9dea0fbdb647c5d036f260eab9912d97535",
+        "claimId": "claim_b0612b463c58046dea6ba09504d97a82",
+        "sourceAnchor": "never-do",
+        "unitKind": "heading",
+        "sourceUnitDigest": "f081560dd43881074ceded6248a3ead793add48968f3eedf2ff2aa7f6284951e",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": null
+    },
+    {
+      "collection": "units",
+      "key": "claim_b70e7c39975314f130e9a2501156721d",
+      "before": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "a218f1e2f6e8372a9838d0964cd93896ae9c1fcbe62cb39aaa3bb791b3f6fb7f",
+        "identityFingerprint": "a218f1e2f6e8372a9838d0964cd93896ae9c1fcbe62cb39aaa3bb791b3f6fb7f",
+        "claimId": "claim_b70e7c39975314f130e9a2501156721d",
+        "sourceAnchor": "unheaded-block-49",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "0634893a1881205c0eb9275047c5b3a44f596f2dff7a47fb0d0e10aae07aebb4",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "a218f1e2f6e8372a9838d0964cd93896ae9c1fcbe62cb39aaa3bb791b3f6fb7f",
+        "identityFingerprint": "a218f1e2f6e8372a9838d0964cd93896ae9c1fcbe62cb39aaa3bb791b3f6fb7f",
+        "claimId": "claim_b70e7c39975314f130e9a2501156721d",
+        "sourceAnchor": "unheaded-block-54",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "0634893a1881205c0eb9275047c5b3a44f596f2dff7a47fb0d0e10aae07aebb4",
+        "claimKind": "unclassified",
+        "status": "current"
+      }
+    },
+    {
+      "collection": "units",
+      "key": "claim_cace4724d966bb5a40bc0b17768520c1",
+      "before": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "70b9f49880a5bfb21a2796e1982c104a3cd0adcef96ccabb4a8ac6c30605b37a",
+        "identityFingerprint": "70b9f49880a5bfb21a2796e1982c104a3cd0adcef96ccabb4a8ac6c30605b37a",
+        "claimId": "claim_cace4724d966bb5a40bc0b17768520c1",
+        "sourceAnchor": "unheaded-block-50",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "7e4431ca6a7e941fe10d3962f79815b135aeb90897d2ab15817a4e7a903bd2a7",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "70b9f49880a5bfb21a2796e1982c104a3cd0adcef96ccabb4a8ac6c30605b37a",
+        "identityFingerprint": "70b9f49880a5bfb21a2796e1982c104a3cd0adcef96ccabb4a8ac6c30605b37a",
+        "claimId": "claim_cace4724d966bb5a40bc0b17768520c1",
+        "sourceAnchor": "unheaded-block-55",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "7e4431ca6a7e941fe10d3962f79815b135aeb90897d2ab15817a4e7a903bd2a7",
+        "claimKind": "unclassified",
+        "status": "current"
+      }
+    },
+    {
+      "collection": "units",
+      "key": "claim_d18c939cc9436e830dae9214808c21ae",
+      "before": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "b0870e4f3c89405386e3abed54c284c5a54aa30d57417406bbcfb30c9a19566c",
+        "identityFingerprint": "b0870e4f3c89405386e3abed54c284c5a54aa30d57417406bbcfb30c9a19566c",
+        "claimId": "claim_d18c939cc9436e830dae9214808c21ae",
+        "sourceAnchor": "unheaded-block-35",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "9283c37aa6e87094b10f57541497888b092b13116846386cfaf2cdab0e8cae4d",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "b0870e4f3c89405386e3abed54c284c5a54aa30d57417406bbcfb30c9a19566c",
+        "identityFingerprint": "b0870e4f3c89405386e3abed54c284c5a54aa30d57417406bbcfb30c9a19566c",
+        "claimId": "claim_d18c939cc9436e830dae9214808c21ae",
+        "sourceAnchor": "unheaded-block-40",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "9283c37aa6e87094b10f57541497888b092b13116846386cfaf2cdab0e8cae4d",
+        "claimKind": "unclassified",
+        "status": "current"
+      }
+    },
+    {
+      "collection": "units",
+      "key": "claim_d50f2409ac827afeb65163065905a878",
+      "before": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "da364888e2bbe78f471164ded231d90c2431b54a78f5434932173e74b8788d2f",
+        "identityFingerprint": "da364888e2bbe78f471164ded231d90c2431b54a78f5434932173e74b8788d2f",
+        "claimId": "claim_d50f2409ac827afeb65163065905a878",
+        "sourceAnchor": "unheaded-block-14",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "39fe4d8d1ecc03cbf722efdf8de807822733f8f4f5cdd40cb10419c65ad79b46",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": null
+    },
+    {
+      "collection": "units",
+      "key": "claim_d6a9e43c0997b6993a5d9670af469258",
+      "before": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "c9dcc854cd9641cea58ae3b52c4d5c9339f14e7229a6022fad5a39a0e1e8d0c7",
+        "identityFingerprint": "c9dcc854cd9641cea58ae3b52c4d5c9339f14e7229a6022fad5a39a0e1e8d0c7",
+        "claimId": "claim_d6a9e43c0997b6993a5d9670af469258",
+        "sourceAnchor": "unheaded-block-41",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "46ba7c1470400a34fe1ff4796da8a95587bfbe41171b92eb8ba9a4fd38b0d51b",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "c9dcc854cd9641cea58ae3b52c4d5c9339f14e7229a6022fad5a39a0e1e8d0c7",
+        "identityFingerprint": "c9dcc854cd9641cea58ae3b52c4d5c9339f14e7229a6022fad5a39a0e1e8d0c7",
+        "claimId": "claim_d6a9e43c0997b6993a5d9670af469258",
+        "sourceAnchor": "unheaded-block-46",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "46ba7c1470400a34fe1ff4796da8a95587bfbe41171b92eb8ba9a4fd38b0d51b",
+        "claimKind": "unclassified",
+        "status": "current"
+      }
+    },
+    {
+      "collection": "units",
+      "key": "claim_db83a4c14e03868fccf833f00f51f296",
+      "before": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "b260c5e12df55b221346adf094cf18cf55a5c5c68f0038b378db55d904aa8963",
+        "identityFingerprint": "b260c5e12df55b221346adf094cf18cf55a5c5c68f0038b378db55d904aa8963",
+        "claimId": "claim_db83a4c14e03868fccf833f00f51f296",
+        "sourceAnchor": "unheaded-block-1",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "5ee1f1a48ddcb69e62623b1abb1c6f3434fae4b31adb2f45cfb28e55736c2aef",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": null
+    },
+    {
+      "collection": "units",
+      "key": "claim_e59f80485141f1b75d155dca7272c34e",
+      "before": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "9ce1f70b037039c00ea42a1c449a54f3774ecb2595c19a5785275305efd618a0",
+        "identityFingerprint": "9ce1f70b037039c00ea42a1c449a54f3774ecb2595c19a5785275305efd618a0",
+        "claimId": "claim_e59f80485141f1b75d155dca7272c34e",
+        "sourceAnchor": "unheaded-block-53",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "040484693fc054f7b37f6dc489b6295d3ccc3df440c68ceea04c9584ccf4b144",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "9ce1f70b037039c00ea42a1c449a54f3774ecb2595c19a5785275305efd618a0",
+        "identityFingerprint": "9ce1f70b037039c00ea42a1c449a54f3774ecb2595c19a5785275305efd618a0",
+        "claimId": "claim_e59f80485141f1b75d155dca7272c34e",
+        "sourceAnchor": "unheaded-block-58",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "040484693fc054f7b37f6dc489b6295d3ccc3df440c68ceea04c9584ccf4b144",
+        "claimKind": "unclassified",
+        "status": "current"
+      }
+    },
+    {
+      "collection": "units",
+      "key": "claim_e6e4b2ccbaf2497ac1ff7ef374d2821b",
+      "before": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "add9ae634458efb15c314541de6a24d7d31d6075f980993b30645461042f9c24",
+        "identityFingerprint": "80bcdb5b6c8e6e58e4a9f9f08e7d0eac18adc118c19dafae2a1271ae0766abca",
+        "claimId": "claim_e6e4b2ccbaf2497ac1ff7ef374d2821b",
+        "sourceAnchor": "using-mcp-preferred",
+        "unitKind": "heading",
+        "sourceUnitDigest": "c1a9ae0dbb63cc6b9d2cdd56221d17c475fa8a12f90a2d9fe4d742ffbeddae51",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": null
+    },
+    {
+      "collection": "units",
+      "key": "claim_f0b2a4079764d68b1102ddddb08776ce",
+      "before": {
+        "sourcePath": "docs/backlog.md",
+        "unitDigest": "2e296ac6311f73f661e5228093762d06399ffd6dfa3d2614d6962a13d1bd6d58",
+        "identityFingerprint": "328d730967bfa5ae2d8a7aa98f1eeaa043832830bfc30545833d93f8dfb0adbe",
+        "claimId": "claim_f0b2a4079764d68b1102ddddb08776ce",
+        "sourceAnchor": "product-backlog",
+        "unitKind": "heading",
+        "sourceUnitDigest": "5f190b849165ce8115369ebb112a31b286e85237f5c3dd32f8493cc3cfd93d17",
+        "claimKind": "unclassified",
+        "status": "future",
+        "reviewStatus": "needs-review",
+        "lineage": {
+          "fromCommit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+          "fromUnitDigest": "eb37a0f7bbe5c0d4c4ab5d4b3e9fd1259fc8152c286d9e05041ec7599fbcd69c",
+          "toUnitDigest": "2e296ac6311f73f661e5228093762d06399ffd6dfa3d2614d6962a13d1bd6d58",
+          "fromSourceUnitDigest": "92be08bb7b0a9af07f2d36307db6a7891545c2ab4590dcbb77074d46c2c8dfbe",
+          "toSourceUnitDigest": "5f190b849165ce8115369ebb112a31b286e85237f5c3dd32f8493cc3cfd93d17"
+        }
+      },
+      "after": {
+        "sourcePath": "docs/backlog.md",
+        "unitDigest": "2e296ac6311f73f661e5228093762d06399ffd6dfa3d2614d6962a13d1bd6d58",
+        "identityFingerprint": "328d730967bfa5ae2d8a7aa98f1eeaa043832830bfc30545833d93f8dfb0adbe",
+        "claimId": "claim_f0b2a4079764d68b1102ddddb08776ce",
+        "sourceAnchor": "product-backlog",
+        "unitKind": "heading",
+        "sourceUnitDigest": "5f190b849165ce8115369ebb112a31b286e85237f5c3dd32f8493cc3cfd93d17",
+        "claimKind": "unclassified",
+        "status": "future"
+      }
+    },
+    {
+      "collection": "units",
+      "key": "claim_f2afc3a44e09eb918aa8c59d42ffe195",
+      "before": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "a8494e1a68489007e4644648096c49f64630b92223de2b4076987dbbd9413dbe",
+        "identityFingerprint": "a8494e1a68489007e4644648096c49f64630b92223de2b4076987dbbd9413dbe",
+        "claimId": "claim_f2afc3a44e09eb918aa8c59d42ffe195",
+        "sourceAnchor": "unheaded-block-42",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "e23a5ee9ace2850ec670037d92a358e58770bdd73439c4234c7c5b9f40e24c22",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": {
+        "sourcePath": "AGENTS.md",
+        "unitDigest": "a8494e1a68489007e4644648096c49f64630b92223de2b4076987dbbd9413dbe",
+        "identityFingerprint": "a8494e1a68489007e4644648096c49f64630b92223de2b4076987dbbd9413dbe",
+        "claimId": "claim_f2afc3a44e09eb918aa8c59d42ffe195",
+        "sourceAnchor": "unheaded-block-47",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "e23a5ee9ace2850ec670037d92a358e58770bdd73439c4234c7c5b9f40e24c22",
+        "claimKind": "unclassified",
+        "status": "current"
+      }
+    },
+    {
+      "collection": "units",
+      "key": "claim_fc5de985b938821c067f1a79009368ed",
+      "before": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "129d2af46c1244a7331ebb168b0ef6e9ff7663a084dee39d54bf881f2dbf5a7b",
+        "identityFingerprint": "129d2af46c1244a7331ebb168b0ef6e9ff7663a084dee39d54bf881f2dbf5a7b",
+        "claimId": "claim_fc5de985b938821c067f1a79009368ed",
+        "sourceAnchor": "unheaded-block-8",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "c45eed179f4de74f88ec92f86a5647eb5e6625d60cb844671ac83b3f0d1c6694",
+        "claimKind": "unclassified",
+        "status": "current"
+      },
+      "after": null
+    },
+    {
+      "collection": "carriedFromCommit",
+      "key": "carriedFromCommit",
+      "before": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+      "after": "38672e7f157788cbe1b2bf59511bd61046dce660"
+    },
+    {
+      "collection": "identityGaps",
+      "key": "claim_db83a4c14e03868fccf833f00f51f296",
+      "before": null,
+      "after": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "b260c5e12df55b221346adf094cf18cf55a5c5c68f0038b378db55d904aa8963",
+        "identityFingerprint": "b260c5e12df55b221346adf094cf18cf55a5c5c68f0038b378db55d904aa8963",
+        "claimId": "claim_db83a4c14e03868fccf833f00f51f296",
+        "sourceAnchor": "unheaded-block-1",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "5ee1f1a48ddcb69e62623b1abb1c6f3434fae4b31adb2f45cfb28e55736c2aef",
+        "claimKind": "unclassified",
+        "status": "current",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-1 is not a stable heading anchor"
+      }
+    },
+    {
+      "collection": "retiredUnits",
+      "key": "claim_05d3c5f6af634e345b6e32290900c232",
+      "before": null,
+      "after": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "997ac9a133379d07dbffa20be94e3af97bfff03015a23a4d6f15c603eebce7fc",
+        "identityFingerprint": "997ac9a133379d07dbffa20be94e3af97bfff03015a23a4d6f15c603eebce7fc",
+        "claimId": "claim_05d3c5f6af634e345b6e32290900c232",
+        "sourceAnchor": "unheaded-block-19",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "8ca4c5c61c7f369a197d6118f0a325cc39727dbc792d3c53b1c2b1dd2aa7648a",
+        "claimKind": "architecture",
+        "status": "removed-pending-disposition",
+        "priorStatus": "current",
+        "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+        "retiredReason": "no counterpart in current source"
+      }
+    },
+    {
+      "collection": "retiredUnits",
+      "key": "claim_1e109a5e30aba0234c61706edad2c820",
+      "before": null,
+      "after": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "c9dcc854cd9641cea58ae3b52c4d5c9339f14e7229a6022fad5a39a0e1e8d0c7",
+        "identityFingerprint": "c9dcc854cd9641cea58ae3b52c4d5c9339f14e7229a6022fad5a39a0e1e8d0c7",
+        "claimId": "claim_1e109a5e30aba0234c61706edad2c820",
+        "sourceAnchor": "unheaded-block-15",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "46ba7c1470400a34fe1ff4796da8a95587bfbe41171b92eb8ba9a4fd38b0d51b",
+        "claimKind": "unclassified",
+        "status": "removed-pending-disposition",
+        "priorStatus": "current",
+        "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+        "retiredReason": "no counterpart in current source"
+      }
+    },
+    {
+      "collection": "retiredUnits",
+      "key": "claim_2afb04da34da039e196e613f3262cdec",
+      "before": null,
+      "after": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "b0870e4f3c89405386e3abed54c284c5a54aa30d57417406bbcfb30c9a19566c",
+        "identityFingerprint": "b0870e4f3c89405386e3abed54c284c5a54aa30d57417406bbcfb30c9a19566c",
+        "claimId": "claim_2afb04da34da039e196e613f3262cdec",
+        "sourceAnchor": "unheaded-block-9",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "9283c37aa6e87094b10f57541497888b092b13116846386cfaf2cdab0e8cae4d",
+        "claimKind": "unclassified",
+        "status": "removed-pending-disposition",
+        "priorStatus": "current",
+        "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+        "retiredReason": "no counterpart in current source"
+      }
+    },
+    {
+      "collection": "retiredUnits",
+      "key": "claim_2f612bbe8e8413b66477d06bf6046ed4",
+      "before": null,
+      "after": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "7e21885df02fa86d9033eceab65bd533c10a1d3f2050558e15d06ff344688416",
+        "identityFingerprint": "90f2c0bea757e4b6d760c9285e2e357ff406f5b7e86be8712c375ef5f13385ed",
+        "claimId": "claim_2f612bbe8e8413b66477d06bf6046ed4",
+        "sourceAnchor": "gitnexus-code-intelligence",
+        "unitKind": "heading",
+        "sourceUnitDigest": "150e95a64fd2a52cc454a2386a8dc3aec0b3a47eb54fb1fd8d02576899ea4461",
+        "claimKind": "unclassified",
+        "status": "removed-pending-disposition",
+        "priorStatus": "current",
+        "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+        "retiredReason": "no counterpart in current source"
+      }
+    },
+    {
+      "collection": "retiredUnits",
+      "key": "claim_3f0ed45ecb0952e67c013b52f129fedc",
+      "before": null,
+      "after": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "f58061fe68cb3656428115f47420de5b2b91d8c3b41781447ba7dbb2da1b0a15",
+        "identityFingerprint": "f58061fe68cb3656428115f47420de5b2b91d8c3b41781447ba7dbb2da1b0a15",
+        "claimId": "claim_3f0ed45ecb0952e67c013b52f129fedc",
+        "sourceAnchor": "unheaded-block-17",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "6f63dffd5c7d710ca600d3ad22016e4e73cf9729a299b36d624070a87429d6e1",
+        "claimKind": "unclassified",
+        "status": "removed-pending-disposition",
+        "priorStatus": "current",
+        "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+        "retiredReason": "no counterpart in current source"
+      }
+    },
+    {
+      "collection": "retiredUnits",
+      "key": "claim_5010f46edb2e930c7efebd3876a7942d",
+      "before": null,
+      "after": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "fbc2f00290b92cfee3c2ba0ab087a4dd8777024bc804524d830d423f77bac29a",
+        "identityFingerprint": "fbc2f00290b92cfee3c2ba0ab087a4dd8777024bc804524d830d423f77bac29a",
+        "claimId": "claim_5010f46edb2e930c7efebd3876a7942d",
+        "sourceAnchor": "unheaded-block-11",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "2ce479d07da3c54df383f1e0441adf783699b2e90e56b9fe6c4e6b56777a7af0",
+        "claimKind": "unclassified",
+        "status": "removed-pending-disposition",
+        "priorStatus": "current",
+        "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+        "retiredReason": "no counterpart in current source"
+      }
+    },
+    {
+      "collection": "retiredUnits",
+      "key": "claim_50134455b2dca31dc4bd662b22744a21",
+      "before": null,
+      "after": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "767dce734927611abb1a8072262d051f78f233901d809a55cbfa9e4f895da39e",
+        "identityFingerprint": "767dce734927611abb1a8072262d051f78f233901d809a55cbfa9e4f895da39e",
+        "claimId": "claim_50134455b2dca31dc4bd662b22744a21",
+        "sourceAnchor": "unheaded-block-7",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "42d278bba4a7ce9c2f7ff755227feb14483587d3ace2b687a5c732999eb053bc",
+        "claimKind": "unclassified",
+        "status": "removed-pending-disposition",
+        "priorStatus": "current",
+        "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+        "retiredReason": "no counterpart in current source"
+      }
+    },
+    {
+      "collection": "retiredUnits",
+      "key": "claim_6540d24a1703d63c0b4645efaaccc891",
+      "before": null,
+      "after": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "0792cde98de8f0ac84eac0a49f473981a04bb641227e8f1f3d3508fa878a4f69",
+        "identityFingerprint": "ac55ea750c0493c91beb4800994cd142fc91a14dd4a3a5328e6669db560f9c31",
+        "claimId": "claim_6540d24a1703d63c0b4645efaaccc891",
+        "sourceAnchor": "using-cli-fallback",
+        "unitKind": "heading",
+        "sourceUnitDigest": "64aa23ebc68629f08a1537e7c3249b810327ec02c53a5ad2d4c98589bd174a3e",
+        "claimKind": "unclassified",
+        "status": "removed-pending-disposition",
+        "priorStatus": "current",
+        "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+        "retiredReason": "no counterpart in current source"
+      }
+    },
+    {
+      "collection": "retiredUnits",
+      "key": "claim_6bd09ad125ddd52d9563117b379ecc60",
+      "before": null,
+      "after": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "34aa5e40911ba6123b6d0707f7695e1442650901433fd5b94a9216d2904827ef",
+        "identityFingerprint": "34aa5e40911ba6123b6d0707f7695e1442650901433fd5b94a9216d2904827ef",
+        "claimId": "claim_6bd09ad125ddd52d9563117b379ecc60",
+        "sourceAnchor": "unheaded-block-18",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "b64e3f9772c143e0d911c16218f5a9f280f96b0c1466f43f52e5aa4d63855221",
+        "claimKind": "unclassified",
+        "status": "removed-pending-disposition",
+        "priorStatus": "current",
+        "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+        "retiredReason": "no counterpart in current source"
+      }
+    },
+    {
+      "collection": "retiredUnits",
+      "key": "claim_7251396790f9d7a220a2c6f8ffde55c3",
+      "before": null,
+      "after": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "706320cb3749b6c9eb831ae60d98c72ce1ca08073eb95edbab4eba567080c53b",
+        "identityFingerprint": "706320cb3749b6c9eb831ae60d98c72ce1ca08073eb95edbab4eba567080c53b",
+        "claimId": "claim_7251396790f9d7a220a2c6f8ffde55c3",
+        "sourceAnchor": "unheaded-block-13",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "52ee0c226963abfd99219e552e38ac7b06cbe349e31d31a470fc328c095fd703",
+        "claimKind": "unclassified",
+        "status": "removed-pending-disposition",
+        "priorStatus": "current",
+        "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+        "retiredReason": "no counterpart in current source"
+      }
+    },
+    {
+      "collection": "retiredUnits",
+      "key": "claim_79dd88f1fb058d9385445406fbd9296d",
+      "before": null,
+      "after": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "e7fc714a9a73a84cbd1d93c998bc3f55888c9b537891eb0b0caf9771fb8cde98",
+        "identityFingerprint": "c869c48c9abaf53e8f0d5566184b23c92991743b2b6726980b3111dafc540cd4",
+        "claimId": "claim_79dd88f1fb058d9385445406fbd9296d",
+        "sourceAnchor": "always-do",
+        "unitKind": "heading",
+        "sourceUnitDigest": "e51ed959e5aae86e5f000c44f5ef903c202b286098b279fb9e892f8db3a0c1d3",
+        "claimKind": "unclassified",
+        "status": "removed-pending-disposition",
+        "priorStatus": "current",
+        "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+        "retiredReason": "no counterpart in current source"
+      }
+    },
+    {
+      "collection": "retiredUnits",
+      "key": "claim_809815d317fc255da84f53b1c30431cf",
+      "before": null,
+      "after": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "e354eba5c22b7204a004ad6a559521216737fcc8287e0314181c6d7851448974",
+        "identityFingerprint": "e354eba5c22b7204a004ad6a559521216737fcc8287e0314181c6d7851448974",
+        "claimId": "claim_809815d317fc255da84f53b1c30431cf",
+        "sourceAnchor": "unheaded-block-10",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "e0bf1a3052c0f3659d2cac6267fcf556c467957bb4de49a27962fa353ec8aec3",
+        "claimKind": "unclassified",
+        "status": "removed-pending-disposition",
+        "priorStatus": "current",
+        "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+        "retiredReason": "no counterpart in current source"
+      }
+    },
+    {
+      "collection": "retiredUnits",
+      "key": "claim_8396a2952ef6cbcae93835afb0a73152",
+      "before": null,
+      "after": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "0f88b95c0f0147c03c08add070d474d7ef4c3a939596793c8c59454d131e5012",
+        "identityFingerprint": "a85309a1368c7071897daf4e20c262bcb79dd91fbe446b59da8b88d773bbed8e",
+        "claimId": "claim_8396a2952ef6cbcae93835afb0a73152",
+        "sourceAnchor": "documentation-viewing-mdview",
+        "unitKind": "heading",
+        "sourceUnitDigest": "7d84eb3c654fd06a78b9e1d55f1aac0787beba431be44c4c11800b92f10afb45",
+        "claimKind": "unclassified",
+        "status": "removed-pending-disposition",
+        "priorStatus": "current",
+        "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+        "retiredReason": "no counterpart in current source"
+      }
+    },
+    {
+      "collection": "retiredUnits",
+      "key": "claim_88fca05f9afd9c63fe14ebb5a08e5094",
+      "before": null,
+      "after": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "b39c9c5a4047e4ee228f9ad3945c453a573de86c783a9f828d493de9b3c99e04",
+        "identityFingerprint": "b39c9c5a4047e4ee228f9ad3945c453a573de86c783a9f828d493de9b3c99e04",
+        "claimId": "claim_88fca05f9afd9c63fe14ebb5a08e5094",
+        "sourceAnchor": "unheaded-block-12",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "6c33aac3c8d229e5f9e4122d414e1fed0afb9f727868500b7c7c5fb0035268a4",
+        "claimKind": "unclassified",
+        "status": "removed-pending-disposition",
+        "priorStatus": "current",
+        "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+        "retiredReason": "no counterpart in current source"
+      }
+    },
+    {
+      "collection": "retiredUnits",
+      "key": "claim_8c2cca9caea197a0601c680f4bfcbb23",
+      "before": null,
+      "after": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "071d72578c3d9b5918351e94257453094051994b8cd49f682c935cf046b0fed4",
+        "identityFingerprint": "81f0ad51435143bb181c3d0d4bc70aecc6a8a74f13515cebfd517b841b1a0a26",
+        "claimId": "claim_8c2cca9caea197a0601c680f4bfcbb23",
+        "sourceAnchor": "cli",
+        "unitKind": "heading",
+        "sourceUnitDigest": "b1a93fca9c3b2fa56e2de420c36fb04c464ff5925c93e4902e70d7f7bd7eb1d3",
+        "claimKind": "unclassified",
+        "status": "removed-pending-disposition",
+        "priorStatus": "current",
+        "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+        "retiredReason": "no counterpart in current source"
+      }
+    },
+    {
+      "collection": "retiredUnits",
+      "key": "claim_928e5b681c1bbc6c51563c78de0b4f23",
+      "before": null,
+      "after": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "47c3568ddec4bc9a7f6ec4204979a30b266331dcb09c21d41582d97a07d97b47",
+        "identityFingerprint": "833eaa198037a7b8bb2619b6a371f2efa587939fd9b66541b45b5e8c14a02d93",
+        "claimId": "claim_928e5b681c1bbc6c51563c78de0b4f23",
+        "sourceAnchor": "resources",
+        "unitKind": "heading",
+        "sourceUnitDigest": "14d6f595788e8fc244f48477644d5527eeba45c4172ee04717caf23b04cb172e",
+        "claimKind": "unclassified",
+        "status": "removed-pending-disposition",
+        "priorStatus": "current",
+        "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+        "retiredReason": "no counterpart in current source"
+      }
+    },
+    {
+      "collection": "retiredUnits",
+      "key": "claim_a1fe07b1842007c25172823b1716b586",
+      "before": null,
+      "after": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "3dae37d5d36974bbfdb4a9fe17a2e07d382905b25c6272be1058cdfbd2db26b6",
+        "identityFingerprint": "147222488a836b02a9081f3efb61f8a098a36bc197ecec6248a4ab3b828c5cfe",
+        "claimId": "claim_a1fe07b1842007c25172823b1716b586",
+        "sourceAnchor": "when-to-render",
+        "unitKind": "heading",
+        "sourceUnitDigest": "b8596a3138791147b0ffa9b666027206135a910a94b7c8391467f8559fdb7828",
+        "claimKind": "unclassified",
+        "status": "removed-pending-disposition",
+        "priorStatus": "current",
+        "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+        "retiredReason": "no counterpart in current source"
+      }
+    },
+    {
+      "collection": "retiredUnits",
+      "key": "claim_ae71daeca0febe5384359e3ad92443e8",
+      "before": null,
+      "after": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "a8494e1a68489007e4644648096c49f64630b92223de2b4076987dbbd9413dbe",
+        "identityFingerprint": "a8494e1a68489007e4644648096c49f64630b92223de2b4076987dbbd9413dbe",
+        "claimId": "claim_ae71daeca0febe5384359e3ad92443e8",
+        "sourceAnchor": "unheaded-block-16",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "e23a5ee9ace2850ec670037d92a358e58770bdd73439c4234c7c5b9f40e24c22",
+        "claimKind": "unclassified",
+        "status": "removed-pending-disposition",
+        "priorStatus": "current",
+        "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+        "retiredReason": "no counterpart in current source"
+      }
+    },
+    {
+      "collection": "retiredUnits",
+      "key": "claim_b0612b463c58046dea6ba09504d97a82",
+      "before": null,
+      "after": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "e873cf37f739248eee0224ea543d02a9977ac6de94f24baae620e4996419e733",
+        "identityFingerprint": "8af2b2f9f6ea42011e3c43d9d4e6c9dea0fbdb647c5d036f260eab9912d97535",
+        "claimId": "claim_b0612b463c58046dea6ba09504d97a82",
+        "sourceAnchor": "never-do",
+        "unitKind": "heading",
+        "sourceUnitDigest": "f081560dd43881074ceded6248a3ead793add48968f3eedf2ff2aa7f6284951e",
+        "claimKind": "unclassified",
+        "status": "removed-pending-disposition",
+        "priorStatus": "current",
+        "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+        "retiredReason": "no counterpart in current source"
+      }
+    },
+    {
+      "collection": "retiredUnits",
+      "key": "claim_d50f2409ac827afeb65163065905a878",
+      "before": null,
+      "after": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "da364888e2bbe78f471164ded231d90c2431b54a78f5434932173e74b8788d2f",
+        "identityFingerprint": "da364888e2bbe78f471164ded231d90c2431b54a78f5434932173e74b8788d2f",
+        "claimId": "claim_d50f2409ac827afeb65163065905a878",
+        "sourceAnchor": "unheaded-block-14",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "39fe4d8d1ecc03cbf722efdf8de807822733f8f4f5cdd40cb10419c65ad79b46",
+        "claimKind": "unclassified",
+        "status": "removed-pending-disposition",
+        "priorStatus": "current",
+        "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+        "retiredReason": "no counterpart in current source"
+      }
+    },
+    {
+      "collection": "retiredUnits",
+      "key": "claim_e6e4b2ccbaf2497ac1ff7ef374d2821b",
+      "before": null,
+      "after": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "add9ae634458efb15c314541de6a24d7d31d6075f980993b30645461042f9c24",
+        "identityFingerprint": "80bcdb5b6c8e6e58e4a9f9f08e7d0eac18adc118c19dafae2a1271ae0766abca",
+        "claimId": "claim_e6e4b2ccbaf2497ac1ff7ef374d2821b",
+        "sourceAnchor": "using-mcp-preferred",
+        "unitKind": "heading",
+        "sourceUnitDigest": "c1a9ae0dbb63cc6b9d2cdd56221d17c475fa8a12f90a2d9fe4d742ffbeddae51",
+        "claimKind": "unclassified",
+        "status": "removed-pending-disposition",
+        "priorStatus": "current",
+        "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+        "retiredReason": "no counterpart in current source"
+      }
+    },
+    {
+      "collection": "retiredUnits",
+      "key": "claim_fc5de985b938821c067f1a79009368ed",
+      "before": null,
+      "after": {
+        "sourcePath": "CLAUDE.md",
+        "unitDigest": "129d2af46c1244a7331ebb168b0ef6e9ff7663a084dee39d54bf881f2dbf5a7b",
+        "identityFingerprint": "129d2af46c1244a7331ebb168b0ef6e9ff7663a084dee39d54bf881f2dbf5a7b",
+        "claimId": "claim_fc5de985b938821c067f1a79009368ed",
+        "sourceAnchor": "unheaded-block-8",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "c45eed179f4de74f88ec92f86a5647eb5e6625d60cb844671ac83b3f0d1c6694",
+        "claimKind": "unclassified",
+        "status": "removed-pending-disposition",
+        "priorStatus": "current",
+        "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+        "retiredReason": "no counterpart in current source"
+      }
+    },
+    {
+      "collection": "carryForward",
+      "key": "carryForward",
+      "before": {
+        "fromCommit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+        "toCommit": "38672e7f157788cbe1b2bf59511bd61046dce660",
+        "oldUnits": 91388,
+        "newUnits": 91388,
+        "kept": 91012,
+        "paired": 374,
+        "moved": 0,
+        "editedKept": 1,
+        "added": 1,
+        "gaps": 1,
+        "retired": 0,
+        "retiredDocuments": 0
+      },
+      "after": {
+        "fromCommit": "38672e7f157788cbe1b2bf59511bd61046dce660",
+        "toCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+        "oldUnits": 91388,
+        "newUnits": 91366,
+        "kept": 90984,
+        "paired": 374,
+        "moved": 6,
+        "editedKept": 1,
+        "added": 1,
+        "gaps": 1,
+        "retired": 22,
+        "retiredDocuments": 0
+      }
+    },
+    {
+      "collection": "_binding",
+      "key": "_binding",
+      "before": {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+        "bytes": 62196419,
+        "sha256": "6fcd58e6f7a2ea0f17df2b1c4024b2728dfa2d73dfc365278df3c3a1c964018c"
+      },
+      "after": {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+        "bytes": 62195972,
+        "sha256": "b20238af95f89cd3a83fbc20dd53ce8df1192153415cd85b9586d53884aa9c2b"
+      }
+    }
+  ]
+}

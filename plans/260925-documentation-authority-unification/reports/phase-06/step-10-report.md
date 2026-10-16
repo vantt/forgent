@@ -1,3 +1,23 @@
+# L10-42 identity-scope carry-forward complete — ordinary review next
+
+## Owner summary
+
+Assignment `unit-run-1792184405209-31ed32fb/producer/1`; content/native pin `3baafff4d7a670b30edac2ff9bcf1594eed4ec95`. L10-42 records that the prior close stopped correctly: `40c667c83` moved shared instructions between root `CLAUDE.md` and `AGENTS.md`, but L10-41's check considered only `docs/`. The main-sync guard now covers the complete identity scope: `docs/`, root `AGENTS.md`, root `CLAUDE.md`, and the transitional switchboard. This turn changes none of those source bytes.
+
+Exactly one native carry-forward operation advanced the registry from `38672e7f157788cbe1b2bf59511bd61046dce660` to `3baafff4d7a670b30edac2ff9bcf1594eed4ec95`: 91,388→91,366 active units, 6 content moves, 1 edited retained identity, 1 added live identity, 1 predecessor gap and 22 retired identities; known IDs 99,585→99,586 with zero loss. Final compact registry is **62,226,100 bytes**, SHA256 **`7b03045ad1d6332a2c0075548a9ae5ee61c998a475693380a6831c47b8053b60`**; native inventory has **4,486 files /91,366 active units** with exact tuple equality. [Native proof](step10-l10-42-native-proof.json), [all 83 raw changes](step10-l10-42-native-changes.json), [decision metadata projection](step10-l10-42-registry-decision-overlay.json).
+
+Resource/error accounting is explicit. The first process completed carry/persistence but was terminated while writing an optional >1 GiB v8 transport; its partial scratch file was discarded. An inventory-only diagnostic then found 22 unprojected retired dispositions, one edited retained digest and one stale claim/gap collection copy. Those receipts remain under `step10-l10-42-attempt1-*`. The correction changed decision metadata only—no identity allocation, source byte, carry-forward or content classification—and the final inventory-only run completed without a transport. Across three inventory attempts there are two complete inventories and one native carry.
+
+Every `40c667c83` AGENTS/CLAUDE transition is accounted by content in **31 ordinary pending decision rows**: 6 moved retained identities, 1 edited retained heading, 1 new CLAUDE live unit, 1 predecessor gap and 22 historical retired rows in the established L10-16 collection. Retired rows have explicit `reclassify-out-of-platform-scope` dispositions and no live-anchor targets. No review metadata carries. [Complete accounting](step10-l10-42-instruction-accounting.json).
+
+Final global D is **0 fatal** against both priors together and each separately. Strict E covers **22,737 active claims /2,236 gaps**: **8 active pending /28 partial /362 identical-owner groups /2,336 reverse candidate units**. The regenerated expected set contains exactly those 8 active pending rows plus the one pending predecessor gap; the 22 retired pending dispositions remain explicit historical review rows, not active holds. Exact comparator **exit 0, `ok=true`, errors `[]`**. [D summary](step10-l10-42-D-summary.json), [E summary](step10-l10-42-E-summary.json), [expected](step10-l10-42-closure-expected.json), [comparison](step10-l10-42-comparison.json).
+
+ONE [bounded ordinary review request](review-request-step10-l10-42-index.md) contains **114 entries in three small parts (31/42/41)**: all 31 pending decisions and all 83 raw registry changes. The self-contained per-entry helper passed **114/114**; reviewers need no native generation or global D/E. [Validation](step10-l10-42-request-validation.json), [reproduction](step10-l10-42-reproduction.json).
+
+**NEXT:** independent ordinary review of the L10-42 request. Then a final close turn applies only matching verdicts, reruns D both/each + strict E + comparator without a new carry (identity scope remains unchanged), runs the remaining close checks left by the stopped close attempt, and sets Phase 6 to **awaiting owner review** only if every check remains green. Phase 6 remains open now. No promotion, retirement authority, alias adoption, cutover, main landing or push; no docs/root-instruction/switchboard/protected-tool/vocabulary/extractor/comparator/baseline/fgOS CLI/Git write.
+
+---
+
 # Close attempt stopped by final-pin identity binding
 
 ## Owner summary

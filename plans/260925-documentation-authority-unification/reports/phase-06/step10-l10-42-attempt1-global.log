@@ -1,0 +1,11 @@
+Inventory-only recovery start 2026-10-16T21:14:46.573Z
+Inventory-only recovery complete 4486 91366 2026-10-16T21:25:05.749Z
+D start both 2026-10-16T21:25:06.276Z
+D done both 24 2026-10-16T21:27:40.607Z
+D start identity 2026-10-16T21:27:40.608Z
+D done identity 24 2026-10-16T21:30:19.045Z
+D start phase02 2026-10-16T21:30:19.045Z
+D done phase02 24 2026-10-16T21:32:57.834Z
+E start 2026-10-16T21:32:57.835Z
+E done 28 2026-10-16T21:35:35.751Z
+DONE global 2026-10-16T21:37:19.550Z {"D":[["both",24],["identity",24],["phase02",24]],"E":28,"claims":22737,"gaps":2236,"open":[["claims-partial-carry",28],["claims-not-reviewed",7],["identical-units-multiple-owners",362],["candidate-blocks-unreferenced",2336]]}

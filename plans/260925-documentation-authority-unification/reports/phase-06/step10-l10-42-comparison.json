@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "strictGreen": false,
+  "counts": {
+    "claims-unknown-blocking": 0,
+    "claims-not-reviewed": 8,
+    "identical-units-multiple-owners": 362,
+    "candidate-blocks-unreferenced": 2336,
+    "claims-partial-carry": 28
+  },
+  "errors": []
+}

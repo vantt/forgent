@@ -1,3 +1,15 @@
+# L10-42 identity carry complete — independent ordinary review next
+
+Assignment `unit-run-1792184405209-31ed32fb/producer/1`; content/native pin `3baafff4d7a670b30edac2ff9bcf1594eed4ec95`. L10-42 records the prior close's correct stop and expands every future main-sync check to the complete identity scope: `docs/`, root `AGENTS.md`, root `CLAUDE.md`, and the transitional switchboard.
+
+One native carry advanced 91,388→91,366 active units and known IDs 99,585→99,586 with zero loss: 6 moves, 1 edited retained unit, 1 new unit, 1 gap, 22 retired. Final compact registry is 62,226,100 bytes, SHA256 **`7b03045ad1d6332a2c0075548a9ae5ee61c998a475693380a6831c47b8053b60`**; 4,486-file native inventory equals all 91,366 active tuples. Initial optional-transport termination and the first diagnostic gate are retained explicitly; no extra carry ran. All **83 raw changes** are recorded.
+
+Every `40c667c83` AGENTS/CLAUDE change is content-accounted in **31 ordinary pending rows**: 6 moved, 1 edited retained, 1 new live, 1 predecessor gap and 22 L10-16 historical retired rows; no approval carry or live-anchor graft. Final D is **0 fatal** both priors together/identity/phase02. Strict E: **8 pending /28 partial /362 groups /2,336 reverse** across 22,737 active claims/2,236 gaps. Regenerated comparator is **exit0 / `ok=true` / zero differences**.
+
+**ONE [ordinary request](review-request-step10-l10-42-index.md): 114 entries in three small parts (31/42/41)**, covering all 31 decisions and all 83 native changes; row-auth **114/114**. **NEXT:** independent review of that request, then a final close applies matching verdicts, reruns D/E + comparator without a new carry, runs the close checks left by the stopped turn, and sets `awaiting owner review` only if green. Phase 6 remains open. No docs/identity-source/protected-tool/vocabulary/extractor/comparator/baseline/fgOS CLI/Git write; runner commits.
+
+---
+
 # Close stopped — final-pin identity scope requires a new carry-forward
 
 Assignment `unit-run-1792182471757-de11f93c/producer/1`. Applied the committed close c1 verdicts (**3/3 decision rows ok + 22/22 accounting entries ok**) with verbatim Notes and marked the **25/25** identical-unit groups reviewed. Record corrections and the owner queue were updated; A28 remains **1/30 false (3.3%)**, final red-team **0 Critical / 0 High**, checkpoint **ACCEPT**.
