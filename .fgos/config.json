@@ -1582,6 +1582,7 @@
       "high": "flagship",
       "critical": "frontier"
     },
+    "maxTier": "advanced",
     "confinement": {
       "strict": false
     },
