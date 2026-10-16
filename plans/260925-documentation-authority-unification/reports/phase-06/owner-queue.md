@@ -1,6 +1,6 @@
 # Final owner-review queue — Step 10 close
 
-Queue size: **12 top-level owner-review families**. Subcounts are obligations, not twelve individual rows: A34 partial carries (28), existing promotion-truth wording/successor notes (20), Phase 7/8 groups (32), runner-cutover bindings (14), historical witness limits (66), plus the consumer and alias populations measured by the final rehearsal. No item below authorizes promotion, retirement, alias adoption or cutover.
+Queue size: **13 top-level owner-review families**. Subcounts are obligations, not thirteen individual rows: A34 partial carries (28), the existing promotion-truth wording/successor observations plus the L10-42 notes below, Phase 7/8 groups (32), runner-cutover bindings (14), historical witness limits (66), plus the consumer and alias populations measured by the final rehearsal. No item below authorizes promotion, retirement, alias adoption or cutover.
 
 1. **A34:** review the 28 partial-carry residual representations before cutover; preserve their SHA256-bound remainders and current bindings.
 2. **Current truth:** reconcile candidate-unverified/current-truth notes, frozen reviewed author-time pending tails and the A28/A35/A40/A41 promotion-truth obligations.
@@ -14,6 +14,7 @@ Queue size: **12 top-level owner-review families**. Subcounts are obligations, n
 10. **Owner effort:** the owner's token total remains unreported; do not infer it from session or row counts.
 11. **Promotion/cutover authority:** owner must decide whether the evidence is sufficient to enter later promotion/cutover work; Phase 6 itself performs neither.
 12. **Known stale citations and projections:** resolve or explicitly accept the final notes below before promotion; resolved record-correction items remain marked resolved for auditability.
+13. **Root MDView marker defect (main-owned, outside this plan):** root `AGENTS.md` has two `mdview:START` markers and one `mdview:END`; the moved impact-analysis gate is nested inside that managed region. Create a separate main-owned repair item. This plan neither edits root instructions nor treats the defect as authority-unification work.
 
 ## Final wording and citation notes (one line each)
 
@@ -37,6 +38,10 @@ Queue size: **12 top-level owner-review families**. Subcounts are obligations, n
 - `F10-09-RESOLVED`: `clear-assignment-claim` help defect was resolved on main by `c9026bf8c`; no open code queue remains here.
 - `F10-10`: final group counts use the final rehearsal measure (duplicate 4, semantic 28); the older group-record pin is historical.
 - `F10-14-RESOLVED`: the old package blocker is superseded by the L10-41 accepted combined author/package evidence shape.
+- `L10-42-MARKER`: root `AGENTS.md` has duplicate `mdview:START` markers, one `mdview:END`, and the moved impact-analysis gate inside the managed region; this is the separate main-owned family 13 above. Sources: `review-step10-l10-42-i1-47e813732.md`, `review-step10-l10-42-i3-47e813732.md`.
+- `L10-42-CLAIMKIND`: decision overlays use `procedure`, while native raw records use `architecture`, `unclassified` or `verification`; conservation verdicts remain ok, but promotion wording should not imply those labels are identical. Sources: `review-step10-l10-42-i1-47e813732.md`, `review-step10-l10-42-i3-47e813732.md`.
+- `L10-42-CLI`: the `## CLI` witness digest differs because the `AGENTS.md` section now runs into the instruction-projection block; promotion rationale should state that boundary explicitly. Source: `review-step10-l10-42-i1-47e813732.md`.
+- `L10-42-RETIRED-REASON`: retired native rows say no surviving in-scope counterpart, while the decision overlay correctly witnesses their content in `AGENTS.md`; preserve the distinction between native retirement reason and content-overlay proof. Sources: `review-step10-l10-42-i2-47e813732.md`, `review-step10-l10-42-i3-47e813732.md`.
 
 ---
 

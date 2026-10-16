@@ -1,9 +1,14 @@
 {
-  "SYNC": "17b751966",
-  "scope": "Group-only final-tree measurement; no retirement rehearsal or global gate claim",
+  "pin": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4",
+  "scope": "Final-pin group count carried from the final rehearsal measure after an empty identity-source delta guard; no retirement authority is implied.",
+  "identitySourceGuard": "git diff 47e813732 HEAD -- docs AGENTS.md CLAUDE.md plans/260925-documentation-authority-unification/transitional-switchboard.json returned empty",
   "result": {
     "duplicates": 4,
     "mirrors": 814,
     "semantic": 28
-  }
+  },
+  "evidence": [
+    "step10-package-rehearsal.json",
+    "step10-final-close-global-summary.json"
+  ]
 }

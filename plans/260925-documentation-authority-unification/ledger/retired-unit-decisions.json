@@ -1844,9 +1844,14 @@
       "targetOwner": null,
       "targetAnchor": null,
       "rationale": "L10-42/L10-16 historical identity accounting by content: claim_05d3c5f6af634e345b6e32290900c232 is the retired CLAUDE.md#unheaded-block-19 unit at SHA256 8ca4c5c61c7f369a197d6118f0a325cc39727dbc792d3c53b1c2b1dd2aa7648a. Commit 40c667c83 made AGENTS.md the shared instruction owner and removed the duplicate CLAUDE.md copy. Current AGENTS.md preserves the corresponding instruction content at unheaded-block-50 (claim_1661543368ff1c7e6f57d20e2345cf4d, SHA256 8ca4c5c61c7f369a197d6118f0a325cc39727dbc792d3c53b1c2b1dd2aa7648a); this is an informational content witness, not a live target-anchor graft. Reclassify this historical instruction identity outside platform documentation authority; no platform copy, truth approval, promotion, retirement authority or cutover is inferred. Independent ordinary review is pending; no prior approval carries.",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792184405209-31ed32fb@2026-10-17",
-      "reviewNote": "L10-42 content-bound instruction identity accounting; independent ordinary review pending; no approval carried."
+      "reviewNote": "mechanical: retired CLAUDE.md#unheaded-block-19 (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#unheaded-block-50 (claim_16615433) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i1-47e813732.md",
+      "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
     },
     {
       "claimId": "claim_05e9c8987476d91fb6356cfeb285a08d",
@@ -9797,9 +9802,14 @@
       "targetOwner": null,
       "targetAnchor": null,
       "rationale": "L10-42/L10-16 historical identity accounting by content: claim_1e109a5e30aba0234c61706edad2c820 is the retired CLAUDE.md#unheaded-block-15 unit at SHA256 46ba7c1470400a34fe1ff4796da8a95587bfbe41171b92eb8ba9a4fd38b0d51b. Commit 40c667c83 made AGENTS.md the shared instruction owner and removed the duplicate CLAUDE.md copy. Current AGENTS.md preserves the corresponding instruction content at unheaded-block-46 (claim_d6a9e43c0997b6993a5d9670af469258, SHA256 46ba7c1470400a34fe1ff4796da8a95587bfbe41171b92eb8ba9a4fd38b0d51b); this is an informational content witness, not a live target-anchor graft. Reclassify this historical instruction identity outside platform documentation authority; no platform copy, truth approval, promotion, retirement authority or cutover is inferred. Independent ordinary review is pending; no prior approval carries.",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792184405209-31ed32fb@2026-10-17",
-      "reviewNote": "L10-42 content-bound instruction identity accounting; independent ordinary review pending; no approval carried."
+      "reviewNote": "mechanical: retired CLAUDE.md#unheaded-block-15 (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#unheaded-block-46 (claim_d6a9e43c) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i1-47e813732.md",
+      "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
     },
     {
       "claimId": "claim_1e1e456583e0c1d92388a2bcc4f7c980",
@@ -13673,9 +13683,14 @@
       "targetOwner": null,
       "targetAnchor": null,
       "rationale": "L10-42/L10-16 historical identity accounting by content: claim_2afb04da34da039e196e613f3262cdec is the retired CLAUDE.md#unheaded-block-9 unit at SHA256 9283c37aa6e87094b10f57541497888b092b13116846386cfaf2cdab0e8cae4d. Commit 40c667c83 made AGENTS.md the shared instruction owner and removed the duplicate CLAUDE.md copy. Current AGENTS.md preserves the corresponding instruction content at unheaded-block-40 (claim_d18c939cc9436e830dae9214808c21ae, SHA256 9283c37aa6e87094b10f57541497888b092b13116846386cfaf2cdab0e8cae4d); this is an informational content witness, not a live target-anchor graft. Reclassify this historical instruction identity outside platform documentation authority; no platform copy, truth approval, promotion, retirement authority or cutover is inferred. Independent ordinary review is pending; no prior approval carries.",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792184405209-31ed32fb@2026-10-17",
-      "reviewNote": "L10-42 content-bound instruction identity accounting; independent ordinary review pending; no approval carried."
+      "reviewNote": "deep: retired CLAUDE.md#unheaded-block-9 (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#unheaded-block-40 (claim_d18c939c) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Digest also hand-recomputed with sed and sha256sum, not the extractor.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i1-47e813732.md",
+      "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
     },
     {
       "claimId": "claim_2afc8314841ce50a75c2171880cd10dd",
@@ -15246,9 +15261,14 @@
       "targetOwner": null,
       "targetAnchor": null,
       "rationale": "L10-42/L10-16 historical identity accounting by content: claim_2f612bbe8e8413b66477d06bf6046ed4 is the retired CLAUDE.md#gitnexus-code-intelligence unit at SHA256 150e95a64fd2a52cc454a2386a8dc3aec0b3a47eb54fb1fd8d02576899ea4461. Commit 40c667c83 made AGENTS.md the shared instruction owner and removed the duplicate CLAUDE.md copy. Current AGENTS.md preserves the corresponding instruction content at gitnexus-code-intelligence (claim_fd05edc9de6352f95be164482329687d, SHA256 150e95a64fd2a52cc454a2386a8dc3aec0b3a47eb54fb1fd8d02576899ea4461); this is an informational content witness, not a live target-anchor graft. Reclassify this historical instruction identity outside platform documentation authority; no platform copy, truth approval, promotion, retirement authority or cutover is inferred. Independent ordinary review is pending; no prior approval carries.",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792184405209-31ed32fb@2026-10-17",
-      "reviewNote": "L10-42 content-bound instruction identity accounting; independent ordinary review pending; no approval carried."
+      "reviewNote": "mechanical: retired CLAUDE.md#gitnexus-code-intelligence (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#gitnexus-code-intelligence (claim_fd05edc9) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i1-47e813732.md",
+      "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
     },
     {
       "claimId": "claim_2f802591be85a22a3fafa2eab335248a",
@@ -20916,9 +20936,14 @@
       "targetOwner": null,
       "targetAnchor": null,
       "rationale": "L10-42/L10-16 historical identity accounting by content: claim_3f0ed45ecb0952e67c013b52f129fedc is the retired CLAUDE.md#unheaded-block-17 unit at SHA256 6f63dffd5c7d710ca600d3ad22016e4e73cf9729a299b36d624070a87429d6e1. Commit 40c667c83 made AGENTS.md the shared instruction owner and removed the duplicate CLAUDE.md copy. Current AGENTS.md preserves the corresponding instruction content at unheaded-block-48 (claim_3ca28ff7ed502c1bfd8e695a7387f753, SHA256 6f63dffd5c7d710ca600d3ad22016e4e73cf9729a299b36d624070a87429d6e1); this is an informational content witness, not a live target-anchor graft. Reclassify this historical instruction identity outside platform documentation authority; no platform copy, truth approval, promotion, retirement authority or cutover is inferred. Independent ordinary review is pending; no prior approval carries.",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792184405209-31ed32fb@2026-10-17",
-      "reviewNote": "L10-42 content-bound instruction identity accounting; independent ordinary review pending; no approval carried."
+      "reviewNote": "mechanical: retired CLAUDE.md#unheaded-block-17 (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#unheaded-block-48 (claim_3ca28ff7) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i1-47e813732.md",
+      "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
     },
     {
       "claimId": "claim_3f21a2c92652eab45db481faa16e7eca",
@@ -26087,9 +26112,14 @@
       "targetOwner": null,
       "targetAnchor": null,
       "rationale": "L10-42/L10-16 historical identity accounting by content: claim_5010f46edb2e930c7efebd3876a7942d is the retired CLAUDE.md#unheaded-block-11 unit at SHA256 2ce479d07da3c54df383f1e0441adf783699b2e90e56b9fe6c4e6b56777a7af0. Commit 40c667c83 made AGENTS.md the shared instruction owner and removed the duplicate CLAUDE.md copy. Current AGENTS.md preserves the corresponding instruction content at unheaded-block-42 (claim_351eb1f4f67c8aaee59631dad24f99d8, SHA256 2ce479d07da3c54df383f1e0441adf783699b2e90e56b9fe6c4e6b56777a7af0); this is an informational content witness, not a live target-anchor graft. Reclassify this historical instruction identity outside platform documentation authority; no platform copy, truth approval, promotion, retirement authority or cutover is inferred. Independent ordinary review is pending; no prior approval carries.",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792184405209-31ed32fb@2026-10-17",
-      "reviewNote": "L10-42 content-bound instruction identity accounting; independent ordinary review pending; no approval carried."
+      "reviewNote": "deep: retired CLAUDE.md#unheaded-block-11 (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#unheaded-block-42 (claim_351eb1f4) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Digest also hand-recomputed with sed and sha256sum, not the extractor.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i1-47e813732.md",
+      "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
     },
     {
       "sourcePath": "CLAUDE.md",
@@ -26108,9 +26138,14 @@
       "targetOwner": null,
       "targetAnchor": null,
       "rationale": "L10-42/L10-16 historical identity accounting by content: claim_50134455b2dca31dc4bd662b22744a21 is the retired CLAUDE.md#unheaded-block-7 unit at SHA256 42d278bba4a7ce9c2f7ff755227feb14483587d3ace2b687a5c732999eb053bc. Commit 40c667c83 made AGENTS.md the shared instruction owner and removed the duplicate CLAUDE.md copy. Current AGENTS.md preserves the corresponding instruction content at unheaded-block-38 (claim_ae5e7954251083afc5130d73333ef771, SHA256 42d278bba4a7ce9c2f7ff755227feb14483587d3ace2b687a5c732999eb053bc); this is an informational content witness, not a live target-anchor graft. Reclassify this historical instruction identity outside platform documentation authority; no platform copy, truth approval, promotion, retirement authority or cutover is inferred. Independent ordinary review is pending; no prior approval carries.",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792184405209-31ed32fb@2026-10-17",
-      "reviewNote": "L10-42 content-bound instruction identity accounting; independent ordinary review pending; no approval carried."
+      "reviewNote": "mechanical: retired CLAUDE.md#unheaded-block-7 (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#unheaded-block-38 (claim_ae5e7954) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i1-47e813732.md",
+      "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
     },
     {
       "claimId": "claim_5014f10c2094d33da4f9306856a1b8f3",
@@ -32657,9 +32692,14 @@
       "targetOwner": null,
       "targetAnchor": null,
       "rationale": "L10-42/L10-16 historical identity accounting by content: claim_6540d24a1703d63c0b4645efaaccc891 is the retired CLAUDE.md#using-cli-fallback unit at SHA256 64aa23ebc68629f08a1537e7c3249b810327ec02c53a5ad2d4c98589bd174a3e. Commit 40c667c83 made AGENTS.md the shared instruction owner and removed the duplicate CLAUDE.md copy. Current AGENTS.md preserves the corresponding instruction content at using-cli-fallback (claim_33fda3508cbed38745f7b6796ea65709, SHA256 64aa23ebc68629f08a1537e7c3249b810327ec02c53a5ad2d4c98589bd174a3e); this is an informational content witness, not a live target-anchor graft. Reclassify this historical instruction identity outside platform documentation authority; no platform copy, truth approval, promotion, retirement authority or cutover is inferred. Independent ordinary review is pending; no prior approval carries.",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792184405209-31ed32fb@2026-10-17",
-      "reviewNote": "L10-42 content-bound instruction identity accounting; independent ordinary review pending; no approval carried."
+      "reviewNote": "mechanical: retired CLAUDE.md#using-cli-fallback (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#using-cli-fallback (claim_33fda350) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i1-47e813732.md",
+      "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
     },
     {
       "claimId": "claim_654f4420b3984cd45928658dff1d4288",
@@ -34638,9 +34678,14 @@
       "targetOwner": null,
       "targetAnchor": null,
       "rationale": "L10-42/L10-16 historical identity accounting by content: claim_6bd09ad125ddd52d9563117b379ecc60 is the retired CLAUDE.md#unheaded-block-18 unit at SHA256 b64e3f9772c143e0d911c16218f5a9f280f96b0c1466f43f52e5aa4d63855221. Commit 40c667c83 made AGENTS.md the shared instruction owner and removed the duplicate CLAUDE.md copy. Current AGENTS.md preserves the corresponding instruction content at unheaded-block-49 (claim_11685a19f556cf213ef62e11a1d2d5c6, SHA256 b64e3f9772c143e0d911c16218f5a9f280f96b0c1466f43f52e5aa4d63855221); this is an informational content witness, not a live target-anchor graft. Reclassify this historical instruction identity outside platform documentation authority; no platform copy, truth approval, promotion, retirement authority or cutover is inferred. Independent ordinary review is pending; no prior approval carries.",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792184405209-31ed32fb@2026-10-17",
-      "reviewNote": "L10-42 content-bound instruction identity accounting; independent ordinary review pending; no approval carried."
+      "reviewNote": "mechanical: retired CLAUDE.md#unheaded-block-18 (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#unheaded-block-49 (claim_11685a19) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i1-47e813732.md",
+      "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
     },
     {
       "claimId": "claim_6bfeb31815aec16a77273fcc7d7a2af4",
@@ -36796,9 +36841,14 @@
       "targetOwner": null,
       "targetAnchor": null,
       "rationale": "L10-42/L10-16 historical identity accounting by content: claim_7251396790f9d7a220a2c6f8ffde55c3 is the retired CLAUDE.md#unheaded-block-13 unit at SHA256 52ee0c226963abfd99219e552e38ac7b06cbe349e31d31a470fc328c095fd703. Commit 40c667c83 made AGENTS.md the shared instruction owner and removed the duplicate CLAUDE.md copy. Current AGENTS.md preserves the corresponding instruction content at unheaded-block-44 (claim_7e77c676144c5ca6cdc3351f5a5ef632, SHA256 52ee0c226963abfd99219e552e38ac7b06cbe349e31d31a470fc328c095fd703); this is an informational content witness, not a live target-anchor graft. Reclassify this historical instruction identity outside platform documentation authority; no platform copy, truth approval, promotion, retirement authority or cutover is inferred. Independent ordinary review is pending; no prior approval carries.",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792184405209-31ed32fb@2026-10-17",
-      "reviewNote": "L10-42 content-bound instruction identity accounting; independent ordinary review pending; no approval carried."
+      "reviewNote": "deep: retired CLAUDE.md#unheaded-block-13 (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#unheaded-block-44 (claim_7e77c676) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Digest also hand-recomputed with sed and sha256sum, not the extractor.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i1-47e813732.md",
+      "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
     },
     {
       "claimId": "claim_727ca8537017c1d11829cd969265ee8d",
@@ -39628,9 +39678,14 @@
       "targetOwner": null,
       "targetAnchor": null,
       "rationale": "L10-42/L10-16 historical identity accounting by content: claim_79dd88f1fb058d9385445406fbd9296d is the retired CLAUDE.md#always-do unit at SHA256 e51ed959e5aae86e5f000c44f5ef903c202b286098b279fb9e892f8db3a0c1d3. Commit 40c667c83 made AGENTS.md the shared instruction owner and removed the duplicate CLAUDE.md copy. Current AGENTS.md preserves the corresponding instruction content at always-do (claim_0a800ae3d8a50ecdf22bf6c4604167d5, SHA256 e51ed959e5aae86e5f000c44f5ef903c202b286098b279fb9e892f8db3a0c1d3); this is an informational content witness, not a live target-anchor graft. Reclassify this historical instruction identity outside platform documentation authority; no platform copy, truth approval, promotion, retirement authority or cutover is inferred. Independent ordinary review is pending; no prior approval carries.",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792184405209-31ed32fb@2026-10-17",
-      "reviewNote": "L10-42 content-bound instruction identity accounting; independent ordinary review pending; no approval carried."
+      "reviewNote": "mechanical: retired CLAUDE.md#always-do (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#always-do (claim_0a800ae3) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i1-47e813732.md",
+      "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
     },
     {
       "claimId": "claim_79f0a27fc07c9aad99bfc0e728a0940a",
@@ -42017,9 +42072,14 @@
       "targetOwner": null,
       "targetAnchor": null,
       "rationale": "L10-42/L10-16 historical identity accounting by content: claim_809815d317fc255da84f53b1c30431cf is the retired CLAUDE.md#unheaded-block-10 unit at SHA256 e0bf1a3052c0f3659d2cac6267fcf556c467957bb4de49a27962fa353ec8aec3. Commit 40c667c83 made AGENTS.md the shared instruction owner and removed the duplicate CLAUDE.md copy. Current AGENTS.md preserves the corresponding instruction content at unheaded-block-41 (claim_74542e8562e9dd16128fadd8a2dbfaca, SHA256 e0bf1a3052c0f3659d2cac6267fcf556c467957bb4de49a27962fa353ec8aec3); this is an informational content witness, not a live target-anchor graft. Reclassify this historical instruction identity outside platform documentation authority; no platform copy, truth approval, promotion, retirement authority or cutover is inferred. Independent ordinary review is pending; no prior approval carries.",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792184405209-31ed32fb@2026-10-17",
-      "reviewNote": "L10-42 content-bound instruction identity accounting; independent ordinary review pending; no approval carried."
+      "reviewNote": "mechanical: retired CLAUDE.md#unheaded-block-10 (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#unheaded-block-41 (claim_74542e85) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i1-47e813732.md",
+      "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
     },
     {
       "claimId": "claim_80dc7f4a9e8d08719f7b3c8fd4c84fc7",
@@ -43009,9 +43069,14 @@
       "targetOwner": null,
       "targetAnchor": null,
       "rationale": "L10-42/L10-16 historical identity accounting by content: claim_8396a2952ef6cbcae93835afb0a73152 is the retired CLAUDE.md#documentation-viewing-mdview unit at SHA256 7d84eb3c654fd06a78b9e1d55f1aac0787beba431be44c4c11800b92f10afb45. Commit 40c667c83 made AGENTS.md the shared instruction owner and removed the duplicate CLAUDE.md copy. Current AGENTS.md preserves the corresponding instruction content at documentation-viewing-mdview (claim_2e45cfdcd3f2bf602787b37feac667f3, SHA256 7d84eb3c654fd06a78b9e1d55f1aac0787beba431be44c4c11800b92f10afb45); this is an informational content witness, not a live target-anchor graft. Reclassify this historical instruction identity outside platform documentation authority; no platform copy, truth approval, promotion, retirement authority or cutover is inferred. Independent ordinary review is pending; no prior approval carries.",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792184405209-31ed32fb@2026-10-17",
-      "reviewNote": "L10-42 content-bound instruction identity accounting; independent ordinary review pending; no approval carried."
+      "reviewNote": "mechanical: retired CLAUDE.md#documentation-viewing-mdview (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#documentation-viewing-mdview (claim_2e45cfdc) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i1-47e813732.md",
+      "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
     },
     {
       "claimId": "claim_83af16bdf744f922d20d8d51eac1ddbd",
@@ -44464,9 +44529,14 @@
       "targetOwner": null,
       "targetAnchor": null,
       "rationale": "L10-42/L10-16 historical identity accounting by content: claim_88fca05f9afd9c63fe14ebb5a08e5094 is the retired CLAUDE.md#unheaded-block-12 unit at SHA256 6c33aac3c8d229e5f9e4122d414e1fed0afb9f727868500b7c7c5fb0035268a4. Commit 40c667c83 made AGENTS.md the shared instruction owner and removed the duplicate CLAUDE.md copy. Current AGENTS.md preserves the corresponding instruction content at unheaded-block-43 (claim_95164f1150b3c485deff5673f7b4ef15, SHA256 6c33aac3c8d229e5f9e4122d414e1fed0afb9f727868500b7c7c5fb0035268a4); this is an informational content witness, not a live target-anchor graft. Reclassify this historical instruction identity outside platform documentation authority; no platform copy, truth approval, promotion, retirement authority or cutover is inferred. Independent ordinary review is pending; no prior approval carries.",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792184405209-31ed32fb@2026-10-17",
-      "reviewNote": "L10-42 content-bound instruction identity accounting; independent ordinary review pending; no approval carried."
+      "reviewNote": "mechanical: retired CLAUDE.md#unheaded-block-12 (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#unheaded-block-43 (claim_95164f11) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i1-47e813732.md",
+      "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
     },
     {
       "claimId": "claim_88ff8439e7d50034b031db87dc3c61ba",
@@ -45315,9 +45385,14 @@
       "targetOwner": null,
       "targetAnchor": null,
       "rationale": "L10-42/L10-16 historical identity accounting by content: claim_8c2cca9caea197a0601c680f4bfcbb23 is the retired CLAUDE.md#cli unit at SHA256 b1a93fca9c3b2fa56e2de420c36fb04c464ff5925c93e4902e70d7f7bd7eb1d3. Commit 40c667c83 made AGENTS.md the shared instruction owner and removed the duplicate CLAUDE.md copy. Current AGENTS.md preserves the corresponding instruction content at cli (claim_7b36640f7d6ced0d3f089a419f5d26ff, SHA256 ed59f3cfa95f9a1572033e2cafba1fc7e0a12ae65bec9ca0e8740ca99ff2261e); this is an informational content witness, not a live target-anchor graft. Reclassify this historical instruction identity outside platform documentation authority; no platform copy, truth approval, promotion, retirement authority or cutover is inferred. Independent ordinary review is pending; no prior approval carries.",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792184405209-31ed32fb@2026-10-17",
-      "reviewNote": "L10-42 content-bound instruction identity accounting; independent ordinary review pending; no approval carried."
+      "reviewNote": "deep: retired CLAUDE.md#cli (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#cli (claim_7b36640f) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; heading digest differs (ed59f3cf vs b1a93fca) only because the section in AGENTS.md now runs on into the generated instruction projection, the heading line and the following table block 8ca4c5c6 are identical (wording: rationale does not say why the digests differ); no live-anchor target claimed.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i1-47e813732.md",
+      "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
     },
     {
       "claimId": "claim_8c4ef795b1d8e46d6391ae4a77cae431",
@@ -47414,9 +47489,14 @@
       "targetOwner": null,
       "targetAnchor": null,
       "rationale": "L10-42/L10-16 historical identity accounting by content: claim_928e5b681c1bbc6c51563c78de0b4f23 is the retired CLAUDE.md#resources unit at SHA256 14d6f595788e8fc244f48477644d5527eeba45c4172ee04717caf23b04cb172e. Commit 40c667c83 made AGENTS.md the shared instruction owner and removed the duplicate CLAUDE.md copy. Current AGENTS.md preserves the corresponding instruction content at resources (claim_42108ffe5c72a9f3ca2c7ef904fd14ec, SHA256 14d6f595788e8fc244f48477644d5527eeba45c4172ee04717caf23b04cb172e); this is an informational content witness, not a live target-anchor graft. Reclassify this historical instruction identity outside platform documentation authority; no platform copy, truth approval, promotion, retirement authority or cutover is inferred. Independent ordinary review is pending; no prior approval carries.",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792184405209-31ed32fb@2026-10-17",
-      "reviewNote": "L10-42 content-bound instruction identity accounting; independent ordinary review pending; no approval carried."
+      "reviewNote": "mechanical: retired CLAUDE.md#resources (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#resources (claim_42108ffe) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i1-47e813732.md",
+      "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
     },
     {
       "claimId": "claim_929d33596c2ee4914a08e491a4c7ba33",
@@ -52209,9 +52289,14 @@
       "targetOwner": null,
       "targetAnchor": null,
       "rationale": "L10-42/L10-16 historical identity accounting by content: claim_a1fe07b1842007c25172823b1716b586 is the retired CLAUDE.md#when-to-render unit at SHA256 b8596a3138791147b0ffa9b666027206135a910a94b7c8391467f8559fdb7828. Commit 40c667c83 made AGENTS.md the shared instruction owner and removed the duplicate CLAUDE.md copy. Current AGENTS.md preserves the corresponding instruction content at when-to-render (claim_73ca3e1b87514a160d7114e22318f1e9, SHA256 b8596a3138791147b0ffa9b666027206135a910a94b7c8391467f8559fdb7828); this is an informational content witness, not a live target-anchor graft. Reclassify this historical instruction identity outside platform documentation authority; no platform copy, truth approval, promotion, retirement authority or cutover is inferred. Independent ordinary review is pending; no prior approval carries.",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792184405209-31ed32fb@2026-10-17",
-      "reviewNote": "L10-42 content-bound instruction identity accounting; independent ordinary review pending; no approval carried."
+      "reviewNote": "mechanical: retired CLAUDE.md#when-to-render (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#when-to-render (claim_73ca3e1b) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i1-47e813732.md",
+      "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
     },
     {
       "claimId": "claim_a2167643fba2e658afe0fe8e0b17c0a4",
@@ -56598,9 +56683,14 @@
       "targetOwner": null,
       "targetAnchor": null,
       "rationale": "L10-42/L10-16 historical identity accounting by content: claim_ae71daeca0febe5384359e3ad92443e8 is the retired CLAUDE.md#unheaded-block-16 unit at SHA256 e23a5ee9ace2850ec670037d92a358e58770bdd73439c4234c7c5b9f40e24c22. Commit 40c667c83 made AGENTS.md the shared instruction owner and removed the duplicate CLAUDE.md copy. Current AGENTS.md preserves the corresponding instruction content at unheaded-block-47 (claim_f2afc3a44e09eb918aa8c59d42ffe195, SHA256 e23a5ee9ace2850ec670037d92a358e58770bdd73439c4234c7c5b9f40e24c22); this is an informational content witness, not a live target-anchor graft. Reclassify this historical instruction identity outside platform documentation authority; no platform copy, truth approval, promotion, retirement authority or cutover is inferred. Independent ordinary review is pending; no prior approval carries.",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792184405209-31ed32fb@2026-10-17",
-      "reviewNote": "L10-42 content-bound instruction identity accounting; independent ordinary review pending; no approval carried."
+      "reviewNote": "mechanical: retired CLAUDE.md#unheaded-block-16 (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#unheaded-block-47 (claim_f2afc3a4) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i1-47e813732.md",
+      "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
     },
     {
       "claimId": "claim_ae8a7091b7e2abcf463bafae80f31870",
@@ -56985,9 +57075,14 @@
       "targetOwner": null,
       "targetAnchor": null,
       "rationale": "L10-42/L10-16 historical identity accounting by content: claim_b0612b463c58046dea6ba09504d97a82 is the retired CLAUDE.md#never-do unit at SHA256 f081560dd43881074ceded6248a3ead793add48968f3eedf2ff2aa7f6284951e. Commit 40c667c83 made AGENTS.md the shared instruction owner and removed the duplicate CLAUDE.md copy. Current AGENTS.md preserves the corresponding instruction content at never-do (claim_133b6f931d35a06604813e97ac11bd8f, SHA256 f081560dd43881074ceded6248a3ead793add48968f3eedf2ff2aa7f6284951e); this is an informational content witness, not a live target-anchor graft. Reclassify this historical instruction identity outside platform documentation authority; no platform copy, truth approval, promotion, retirement authority or cutover is inferred. Independent ordinary review is pending; no prior approval carries.",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792184405209-31ed32fb@2026-10-17",
-      "reviewNote": "L10-42 content-bound instruction identity accounting; independent ordinary review pending; no approval carried."
+      "reviewNote": "mechanical: retired CLAUDE.md#never-do (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#never-do (claim_133b6f93) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i1-47e813732.md",
+      "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
     },
     {
       "claimId": "claim_b073f8ac5f65271c1980dfe984d357ba",
@@ -68503,9 +68598,14 @@
       "targetOwner": null,
       "targetAnchor": null,
       "rationale": "L10-42/L10-16 historical identity accounting by content: claim_d50f2409ac827afeb65163065905a878 is the retired CLAUDE.md#unheaded-block-14 unit at SHA256 39fe4d8d1ecc03cbf722efdf8de807822733f8f4f5cdd40cb10419c65ad79b46. Commit 40c667c83 made AGENTS.md the shared instruction owner and removed the duplicate CLAUDE.md copy. Current AGENTS.md preserves the corresponding instruction content at unheaded-block-45 (claim_08f8581721e89c08f589e3bb8002b6ce, SHA256 39fe4d8d1ecc03cbf722efdf8de807822733f8f4f5cdd40cb10419c65ad79b46); this is an informational content witness, not a live target-anchor graft. Reclassify this historical instruction identity outside platform documentation authority; no platform copy, truth approval, promotion, retirement authority or cutover is inferred. Independent ordinary review is pending; no prior approval carries.",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792184405209-31ed32fb@2026-10-17",
-      "reviewNote": "L10-42 content-bound instruction identity accounting; independent ordinary review pending; no approval carried."
+      "reviewNote": "mechanical: retired CLAUDE.md#unheaded-block-14 (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#unheaded-block-45 (claim_08f85817) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i1-47e813732.md",
+      "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
     },
     {
       "claimId": "claim_d514d9b483ea4d5713ddf06871e2110a",
@@ -74112,9 +74212,14 @@
       "targetOwner": null,
       "targetAnchor": null,
       "rationale": "L10-42/L10-16 historical identity accounting by content: claim_e6e4b2ccbaf2497ac1ff7ef374d2821b is the retired CLAUDE.md#using-mcp-preferred unit at SHA256 c1a9ae0dbb63cc6b9d2cdd56221d17c475fa8a12f90a2d9fe4d742ffbeddae51. Commit 40c667c83 made AGENTS.md the shared instruction owner and removed the duplicate CLAUDE.md copy. Current AGENTS.md preserves the corresponding instruction content at using-mcp-preferred (claim_9f129b46b75d0c4d4e7119da265c74b0, SHA256 c1a9ae0dbb63cc6b9d2cdd56221d17c475fa8a12f90a2d9fe4d742ffbeddae51); this is an informational content witness, not a live target-anchor graft. Reclassify this historical instruction identity outside platform documentation authority; no platform copy, truth approval, promotion, retirement authority or cutover is inferred. Independent ordinary review is pending; no prior approval carries.",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792184405209-31ed32fb@2026-10-17",
-      "reviewNote": "L10-42 content-bound instruction identity accounting; independent ordinary review pending; no approval carried."
+      "reviewNote": "deep: retired CLAUDE.md#using-mcp-preferred (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#using-mcp-preferred (claim_9f129b46) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i1-47e813732.md",
+      "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
     },
     {
       "claimId": "claim_e6f07686b9f9794a7e57953f80f1a621",
@@ -81969,9 +82074,14 @@
       "targetOwner": null,
       "targetAnchor": null,
       "rationale": "L10-42/L10-16 historical identity accounting by content: claim_fc5de985b938821c067f1a79009368ed is the retired CLAUDE.md#unheaded-block-8 unit at SHA256 c45eed179f4de74f88ec92f86a5647eb5e6625d60cb844671ac83b3f0d1c6694. Commit 40c667c83 made AGENTS.md the shared instruction owner and removed the duplicate CLAUDE.md copy. Current AGENTS.md preserves the corresponding instruction content at unheaded-block-39 (claim_6a2cb3a88c1fb4c7faf143fa5ec076f3, SHA256 c45eed179f4de74f88ec92f86a5647eb5e6625d60cb844671ac83b3f0d1c6694); this is an informational content witness, not a live target-anchor graft. Reclassify this historical instruction identity outside platform documentation authority; no platform copy, truth approval, promotion, retirement authority or cutover is inferred. Independent ordinary review is pending; no prior approval carries.",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792184405209-31ed32fb@2026-10-17",
-      "reviewNote": "L10-42 content-bound instruction identity accounting; independent ordinary review pending; no approval carried."
+      "reviewNote": "mechanical: retired CLAUDE.md#unheaded-block-8 (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#unheaded-block-39 (claim_6a2cb3a8) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i1-47e813732.md",
+      "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
     },
     {
       "claimId": "claim_fc7408a615b3af8fddc7b054d6706fd7",

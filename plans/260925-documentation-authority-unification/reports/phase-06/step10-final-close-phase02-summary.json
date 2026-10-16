@@ -1,0 +1,47 @@
+{
+  "head": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4",
+  "inventoryCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4",
+  "registryCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+  "seconds": 251.196,
+  "scopeFiles": 1045,
+  "fatalCount": 0,
+  "fatalFindings": [],
+  "conservationOpen": [
+    {
+      "type": "claims-partial-carry",
+      "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+      "count": 28,
+      "examples": [
+        "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+        "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+        "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+        "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+        "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+      ]
+    },
+    {
+      "type": "identical-units-multiple-owners",
+      "message": "identical source units whose rows name different target owners",
+      "count": 362,
+      "examples": [
+        "03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+        "5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+        "a2d5fbe6e6e8: docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md, docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+        "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+        "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md"
+      ]
+    },
+    {
+      "type": "candidate-blocks-unreferenced",
+      "message": "candidate conservation units not named by a source decision",
+      "count": 2336,
+      "examples": [
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md#added-in-candidate-confinement-authority-v1",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md#unheaded-block-1",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md#unheaded-block-2",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md#added-in-candidate-confinement-authority-decisions",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md#unheaded-block-1"
+      ]
+    }
+  ]
+}

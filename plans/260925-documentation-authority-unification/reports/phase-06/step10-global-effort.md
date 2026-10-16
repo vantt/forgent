@@ -1,4 +1,17 @@
-# Step 10 effort record — backlog close package
+# Step 10 effort record — final close
+
+Final-close read-only measurements at HEAD `2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4` (no repeated identity carry or registry persistence):
+
+| Final-close stage | Seconds | Evidence |
+|---|---:|---|
+| Global D, both priors | 215.110 | `step10-final-close-both-summary.json` |
+| Global D, identity prior | 243.693 | `step10-final-close-identity-summary.json` |
+| Global D, Phase 02 prior | 251.196 | `step10-final-close-phase02-summary.json` |
+| Strict E alone | 210.928 | `step10-final-close-strict-summary.json` |
+
+The memory-heavy stages ran one at a time. The initial strict-E attempt exhausted its 4 GiB heap and was rerun alone at 6 GiB; only the completed receipt is used as proof. Owner effort remains unreported and is not inferred.
+
+## Earlier package measurements
 
 Docs content/SYNC `38672e7f1`; producer `codex-session:unit-run-1792176628519-ac852ba4@2026-10-17`. No owner token total was supplied, so none is inferred.
 

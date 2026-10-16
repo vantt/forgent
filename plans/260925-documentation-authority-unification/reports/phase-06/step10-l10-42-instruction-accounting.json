@@ -313,5 +313,609 @@
     "retiredProjectionCount": 22,
     "editedClaimId": "claim_0d2c13615099d78c5e38533379ecf7cc",
     "staleGapClaimCopyRemoved": "claim_db83a4c14e03868fccf833f00f51f296"
+  },
+  "reviewApplication": {
+    "requestCommit": "47e813732b7d1564f8ef09a416eedf673f086c9d",
+    "reportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4",
+    "reviewer": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-17",
+    "counts": {
+      "decisions": 31,
+      "nativeAccounting": 83,
+      "total": 114,
+      "ok": 114,
+      "rework": 0,
+      "hold": 0
+    },
+    "reports": [
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i1-47e813732.md",
+        "notes": "## Notes\n\n- wording: 40c667c83 left AGENTS.md with two mdview:START markers and one mdview:END, and the moved gate now sits between the first marker (line 182) and the second (line 224), that is inside the region an mdview installer treats as its own. The gate text is verbatim and the move rows are correct, but a later mdview regeneration could rewrite that region; this is a property of the commit, not of these decisions, so it is not rework.\n- wording: row claimKind is procedure for all rows while the native record says unclassified (d019 native says verification); this is the established routing field and does not affect conservation.\n- wording: the d022 rationale says the witness is at cli without explaining that its digest differs from the retired heading digest; I verified the cause (section payload now extends into the generated projection) so the statement is true.\n- Rationales that say move, content-bound and no approval carried are true for every row checked; no row is a graft onto a live target.\n- Final git status --short in the review worktree is empty (checked below in reply).",
+        "verdicts": [
+          {
+            "id": "claim_05d3c5f6af634e345b6e32290900c232",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#unheaded-block-19 (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#unheaded-block-50 (claim_16615433) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only."
+          },
+          {
+            "id": "claim_0d2c13615099d78c5e38533379ecf7cc",
+            "verdict": "ok",
+            "note": "deep: rewritten heading Project Rules (line 1, section now ends after the import block) keeps claim id; pre digest 8cfd6f83 equals lineage fromSourceUnitDigest and HEAD digest ead3a061 recomputed; reclassify route fits an always-loaded instruction file."
+          },
+          {
+            "id": "claim_1e109a5e30aba0234c61706edad2c820",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#unheaded-block-15 (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#unheaded-block-46 (claim_d6a9e43c) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only."
+          },
+          {
+            "id": "claim_2afb04da34da039e196e613f3262cdec",
+            "verdict": "ok",
+            "note": "deep: retired CLAUDE.md#unheaded-block-9 (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#unheaded-block-40 (claim_d18c939c) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Digest also hand-recomputed with sed and sha256sum, not the extractor."
+          },
+          {
+            "id": "claim_2f612bbe8e8413b66477d06bf6046ed4",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#gitnexus-code-intelligence (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#gitnexus-code-intelligence (claim_fd05edc9) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only."
+          },
+          {
+            "id": "claim_32f35a95feb5773ca27979295027897f",
+            "verdict": "ok",
+            "note": "deep: move CLAUDE.md#unheaded-block-5 (pre lines undefined-undefined) to AGENTS.md#unheaded-block-36 (HEAD lines undefined-undefined); raw unit text byte-equal at both ends, source and target digests recomputed equal, anchor check passes, registry before/after differs only in sourcePath/anchor/movedFrom. Digest also hand-recomputed with sed and sha256sum, not the extractor."
+          },
+          {
+            "id": "claim_34e5aadf94d955884ab6041bc388d0b0",
+            "verdict": "ok",
+            "note": "deep: move CLAUDE.md#unheaded-block-3 (pre lines undefined-undefined) to AGENTS.md#unheaded-block-34 (HEAD lines undefined-undefined); raw unit text byte-equal at both ends, source and target digests recomputed equal, anchor check passes, registry before/after differs only in sourcePath/anchor/movedFrom. Digest also hand-recomputed with sed and sha256sum, not the extractor."
+          },
+          {
+            "id": "claim_3f0ed45ecb0952e67c013b52f129fedc",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#unheaded-block-17 (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#unheaded-block-48 (claim_3ca28ff7) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only."
+          },
+          {
+            "id": "claim_5010f46edb2e930c7efebd3876a7942d",
+            "verdict": "ok",
+            "note": "deep: retired CLAUDE.md#unheaded-block-11 (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#unheaded-block-42 (claim_351eb1f4) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Digest also hand-recomputed with sed and sha256sum, not the extractor."
+          },
+          {
+            "id": "claim_50134455b2dca31dc4bd662b22744a21",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#unheaded-block-7 (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#unheaded-block-38 (claim_ae5e7954) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only."
+          },
+          {
+            "id": "claim_5914548c37db472c43bb2fdb9f2b15c2",
+            "verdict": "ok",
+            "note": "deep: CLAUDE.md lines 3-11 at HEAD is the only new text in 40c667c83 (import-only explanation plus the @AGENTS.md import line); digest recomputed by hand; honestly labelled as a new live unit with added-since origin, and it restates the old backtick rule so no rule is dropped. Digest also hand-recomputed with sed and sha256sum, not the extractor."
+          },
+          {
+            "id": "claim_5c07823ad6d47b3e9ac91dfbf41aa56f",
+            "verdict": "ok",
+            "note": "deep: move CLAUDE.md#unheaded-block-6 (pre lines undefined-undefined) to AGENTS.md#unheaded-block-37 (HEAD lines undefined-undefined); raw unit text byte-equal at both ends, source and target digests recomputed equal, anchor check passes, registry before/after differs only in sourcePath/anchor/movedFrom. Digest also hand-recomputed with sed and sha256sum, not the extractor."
+          },
+          {
+            "id": "claim_6540d24a1703d63c0b4645efaaccc891",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#using-cli-fallback (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#using-cli-fallback (claim_33fda350) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only."
+          },
+          {
+            "id": "claim_6bd09ad125ddd52d9563117b379ecc60",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#unheaded-block-18 (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#unheaded-block-49 (claim_11685a19) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only."
+          },
+          {
+            "id": "claim_7251396790f9d7a220a2c6f8ffde55c3",
+            "verdict": "ok",
+            "note": "deep: retired CLAUDE.md#unheaded-block-13 (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#unheaded-block-44 (claim_7e77c676) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Digest also hand-recomputed with sed and sha256sum, not the extractor."
+          },
+          {
+            "id": "claim_79dd88f1fb058d9385445406fbd9296d",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#always-do (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#always-do (claim_0a800ae3) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only."
+          },
+          {
+            "id": "claim_7cff4d97b31e33a4ca0b8a4b505c8807",
+            "verdict": "ok",
+            "note": "deep: move CLAUDE.md#unheaded-block-2 (pre lines undefined-undefined) to AGENTS.md#unheaded-block-33 (HEAD lines undefined-undefined); raw unit text byte-equal at both ends, source and target digests recomputed equal, anchor check passes, registry before/after differs only in sourcePath/anchor/movedFrom. Digest also hand-recomputed with sed and sha256sum, not the extractor."
+          },
+          {
+            "id": "claim_809815d317fc255da84f53b1c30431cf",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#unheaded-block-10 (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#unheaded-block-41 (claim_74542e85) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only."
+          },
+          {
+            "id": "claim_81adf946018de3aee151fbb350719862",
+            "verdict": "ok",
+            "note": "deep: move CLAUDE.md#unheaded-block-4 (pre lines undefined-undefined) to AGENTS.md#unheaded-block-35 (HEAD lines undefined-undefined); raw unit text byte-equal at both ends, source and target digests recomputed equal, anchor check passes, registry before/after differs only in sourcePath/anchor/movedFrom. Digest also hand-recomputed with sed and sha256sum, not the extractor."
+          },
+          {
+            "id": "claim_8396a2952ef6cbcae93835afb0a73152",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#documentation-viewing-mdview (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#documentation-viewing-mdview (claim_2e45cfdc) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only."
+          },
+          {
+            "id": "claim_88fca05f9afd9c63fe14ebb5a08e5094",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#unheaded-block-12 (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#unheaded-block-43 (claim_95164f11) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only."
+          },
+          {
+            "id": "claim_8c2cca9caea197a0601c680f4bfcbb23",
+            "verdict": "ok",
+            "note": "deep: retired CLAUDE.md#cli (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#cli (claim_7b36640f) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; heading digest differs (ed59f3cf vs b1a93fca) only because the section in AGENTS.md now runs on into the generated instruction projection, the heading line and the following table block 8ca4c5c6 are identical (wording: rationale does not say why the digests differ); no live-anchor target claimed."
+          },
+          {
+            "id": "claim_928e5b681c1bbc6c51563c78de0b4f23",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#resources (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#resources (claim_42108ffe) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only."
+          },
+          {
+            "id": "claim_a18fb2712669f362c16aa39841718116",
+            "verdict": "ok",
+            "note": "deep: move CLAUDE.md#impact-analysis-capability-gate (pre lines undefined-undefined) to AGENTS.md#impact-analysis-capability-gate (HEAD lines undefined-undefined); raw unit text byte-equal at both ends, source and target digests recomputed equal, anchor check passes, registry before/after differs only in sourcePath/anchor/movedFrom."
+          },
+          {
+            "id": "claim_a1fe07b1842007c25172823b1716b586",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#when-to-render (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#when-to-render (claim_73ca3e1b) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only."
+          },
+          {
+            "id": "claim_ae71daeca0febe5384359e3ad92443e8",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#unheaded-block-16 (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#unheaded-block-47 (claim_f2afc3a4) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only."
+          },
+          {
+            "id": "claim_b0612b463c58046dea6ba09504d97a82",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#never-do (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#never-do (claim_133b6f93) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only."
+          },
+          {
+            "id": "claim_d50f2409ac827afeb65163065905a878",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#unheaded-block-14 (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#unheaded-block-45 (claim_08f85817) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only."
+          },
+          {
+            "id": "claim_db83a4c14e03868fccf833f00f51f296",
+            "verdict": "ok",
+            "note": "deep: predecessor gap holds pre-40c667c83 CLAUDE.md lines 3-6 (import paragraph with the backtick rule), digest 5ee1f1a4 recomputed by hand; in the prior registry it was a current unit and is now an identity-gap, units 91388 to 91366 and gaps +1 balance; its successor is d011. Digest also hand-recomputed with sed and sha256sum, not the extractor."
+          },
+          {
+            "id": "claim_e6e4b2ccbaf2497ac1ff7ef374d2821b",
+            "verdict": "ok",
+            "note": "deep: retired CLAUDE.md#using-mcp-preferred (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#using-mcp-preferred (claim_9f129b46) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed."
+          },
+          {
+            "id": "claim_fc5de985b938821c067f1a79009368ed",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#unheaded-block-8 (pre lines undefined-undefined) is gone from HEAD CLAUDE.md; the cited witness AGENTS.md#unheaded-block-39 (claim_6a2cb3a8) exists at HEAD, is the registry claim for that anchor and its unit text is byte-equal to the retired unit; no live-anchor target claimed. Mechanical checks only."
+          }
+        ]
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "notes": "## Notes\n\n- wording: the retired rows say reclassify-out-of-platform-scope in the overlay; that overlay and the predecessor gap db83a4c1 (new in identityGaps) belong to part 01 and part 03 and are not judged here.\n- Native raw counts in the index (6 moves, 1 edited heading, 1 added unit, 22 retired, 21 shifts, 2 documents, commit, plus backlog and gap rows) agree with what I recomputed.\n- git status in the review worktree is empty at the end of the review.",
+        "verdicts": [
+          {
+            "id": "n001",
+            "verdict": "ok",
+            "note": "deep: before 38672e7f1 equals the prior registry commit and carriedFromCommit; after 3baafff4d is the content commit; registry commit field only."
+          },
+          {
+            "id": "n002",
+            "verdict": "ok",
+            "note": "deep: only sourceDigest and blobSha changed; AGENTS.md sha256 and git blob (15aad3f to b64be06) at 38672e7f1 and 3baafff4d match both values; path, counts and other fields unchanged."
+          },
+          {
+            "id": "n003",
+            "verdict": "ok",
+            "note": "deep: only sourceDigest and blobSha changed; CLAUDE.md sha256 and git blob (0ed93b2 to 212ff30) at 38672e7f1 and 3baafff4d match both values; path, counts and other fields unchanged."
+          },
+          {
+            "id": "n004",
+            "verdict": "ok",
+            "note": "mechanical: CLAUDE.md unheaded-block-19 leaves units in the real registry diff and sits in retiredUnits; removed from CLAUDE.md by 40c667c83 and its text is verbatim in AGENTS.md before and after (same text digest as AGENTS.md unheaded-block-50); raw after is none and the pending overlay is judged in the decision part."
+          },
+          {
+            "id": "n005",
+            "verdict": "ok",
+            "note": "mechanical: AGENTS.md anchor shift unheaded-block-51 to unheaded-block-56 only (five units inserted ahead); unit text digest identical in AGENTS.old and AGENTS.new and equal to the registry digest, no other field changed."
+          },
+          {
+            "id": "n006",
+            "verdict": "ok",
+            "note": "mechanical: AGENTS.md anchor shift unheaded-block-40 to unheaded-block-45 only (five units inserted ahead); unit text digest identical in AGENTS.old and AGENTS.new and equal to the registry digest, no other field changed."
+          },
+          {
+            "id": "n007",
+            "verdict": "ok",
+            "note": "deep: Project Rules heading kept with new digests (section text rewritten by 40c667c83); lineage from/to digests equal the registry before row and the real extraction of the committed CLAUDE.md, needs-review is a carry marker not an approval."
+          },
+          {
+            "id": "n008",
+            "verdict": "ok",
+            "note": "deep: AGENTS.md anchor shift unheaded-block-44 to unheaded-block-49 only (five units inserted ahead); unit text digest identical in AGENTS.old and AGENTS.new and equal to the registry digest, no other field changed."
+          },
+          {
+            "id": "n009",
+            "verdict": "ok",
+            "note": "deep: docs/backlog.md unit unchanged between the two pins; only the per-carry origin marker added-since-c3614f4d4 dropped (carry marker fields are reset each carry); digest, anchor and status unchanged."
+          },
+          {
+            "id": "n010",
+            "verdict": "ok",
+            "note": "mechanical: AGENTS.md anchor shift unheaded-block-45 to unheaded-block-50 only (five units inserted ahead); unit text digest identical in AGENTS.old and AGENTS.new and equal to the registry digest, no other field changed."
+          },
+          {
+            "id": "n011",
+            "verdict": "ok",
+            "note": "mechanical: AGENTS.md anchor shift unheaded-block-47 to unheaded-block-52 only (five units inserted ahead); unit text digest identical in AGENTS.old and AGENTS.new and equal to the registry digest, no other field changed."
+          },
+          {
+            "id": "n012",
+            "verdict": "ok",
+            "note": "mechanical: AGENTS.md anchor shift unheaded-block-48 to unheaded-block-53 only (five units inserted ahead); unit text digest identical in AGENTS.old and AGENTS.new and equal to the registry digest, no other field changed."
+          },
+          {
+            "id": "n013",
+            "verdict": "ok",
+            "note": "mechanical: CLAUDE.md unheaded-block-15 leaves units in the real registry diff and sits in retiredUnits; removed from CLAUDE.md by 40c667c83 and its text is verbatim in AGENTS.md before and after (same text digest as AGENTS.md unheaded-block-46); raw after is none and the pending overlay is judged in the decision part."
+          },
+          {
+            "id": "n014",
+            "verdict": "ok",
+            "note": "deep: AGENTS.md anchor shift unheaded-block-46 to unheaded-block-51 only (five units inserted ahead); unit text digest identical in AGENTS.old and AGENTS.new and equal to the registry digest, no other field changed."
+          },
+          {
+            "id": "n015",
+            "verdict": "ok",
+            "note": "mechanical: CLAUDE.md unheaded-block-9 leaves units in the real registry diff and sits in retiredUnits; removed from CLAUDE.md by 40c667c83 and its text is verbatim in AGENTS.md before and after (same text digest as AGENTS.md unheaded-block-40); raw after is none and the pending overlay is judged in the decision part."
+          },
+          {
+            "id": "n016",
+            "verdict": "ok",
+            "note": "deep: CLAUDE.md gitnexus-code-intelligence leaves units in the real registry diff and sits in retiredUnits; removed from CLAUDE.md by 40c667c83 and its text is verbatim in AGENTS.md before and after (same text digest as AGENTS.md gitnexus-code-intelligence); raw after is none and the pending overlay is judged in the decision part."
+          },
+          {
+            "id": "n017",
+            "verdict": "ok",
+            "note": "mechanical: content-preserving move CLAUDE.md unheaded-block-5 to AGENTS.md unheaded-block-36; script-checked: text is identical in the committed files, both digests unchanged, movedFrom records the origin."
+          },
+          {
+            "id": "n018",
+            "verdict": "ok",
+            "note": "mechanical: content-preserving move CLAUDE.md unheaded-block-3 to AGENTS.md unheaded-block-34; script-checked: text is identical in the committed files, both digests unchanged, movedFrom records the origin."
+          },
+          {
+            "id": "n019",
+            "verdict": "ok",
+            "note": "deep: AGENTS.md anchor shift unheaded-block-37 to unheaded-block-42 only (five units inserted ahead); unit text digest identical in AGENTS.old and AGENTS.new and equal to the registry digest, no other field changed."
+          },
+          {
+            "id": "n020",
+            "verdict": "ok",
+            "note": "deep: AGENTS.md anchor shift unheaded-block-43 to unheaded-block-48 only (five units inserted ahead); unit text digest identical in AGENTS.old and AGENTS.new and equal to the registry digest, no other field changed."
+          },
+          {
+            "id": "n021",
+            "verdict": "ok",
+            "note": "mechanical: CLAUDE.md unheaded-block-17 leaves units in the real registry diff and sits in retiredUnits; removed from CLAUDE.md by 40c667c83 and its text is verbatim in AGENTS.md before and after (same text digest as AGENTS.md unheaded-block-48); raw after is none and the pending overlay is judged in the decision part."
+          },
+          {
+            "id": "n022",
+            "verdict": "ok",
+            "note": "deep: AGENTS.md anchor shift unheaded-block-52 to unheaded-block-57 only (five units inserted ahead); unit text digest identical in AGENTS.old and AGENTS.new and equal to the registry digest, no other field changed."
+          },
+          {
+            "id": "n023",
+            "verdict": "ok",
+            "note": "mechanical: CLAUDE.md unheaded-block-11 leaves units in the real registry diff and sits in retiredUnits; removed from CLAUDE.md by 40c667c83 and its text is verbatim in AGENTS.md before and after (same text digest as AGENTS.md unheaded-block-42); raw after is none and the pending overlay is judged in the decision part."
+          },
+          {
+            "id": "n024",
+            "verdict": "ok",
+            "note": "mechanical: CLAUDE.md unheaded-block-7 leaves units in the real registry diff and sits in retiredUnits; removed from CLAUDE.md by 40c667c83 and its text is verbatim in AGENTS.md before and after (same text digest as AGENTS.md unheaded-block-38); raw after is none and the pending overlay is judged in the decision part."
+          },
+          {
+            "id": "n025",
+            "verdict": "ok",
+            "note": "deep: new CLAUDE.md unheaded-block-1 unit (intro paragraph on AGENTS.md as the one shared file); sourceUnitDigest 7d970336 equals the textDigest of the committed block, origin added-since-38672e7f1 as the carry marker, no review status carried."
+          },
+          {
+            "id": "n026",
+            "verdict": "ok",
+            "note": "mechanical: content-preserving move CLAUDE.md unheaded-block-6 to AGENTS.md unheaded-block-37; script-checked: text is identical in the committed files, both digests unchanged, movedFrom records the origin."
+          },
+          {
+            "id": "n027",
+            "verdict": "ok",
+            "note": "mechanical: CLAUDE.md using-cli-fallback leaves units in the real registry diff and sits in retiredUnits; removed from CLAUDE.md by 40c667c83 and its text is verbatim in AGENTS.md before and after (same text digest as AGENTS.md using-cli-fallback); raw after is none and the pending overlay is judged in the decision part."
+          },
+          {
+            "id": "n028",
+            "verdict": "ok",
+            "note": "deep: AGENTS.md anchor shift unheaded-block-34 to unheaded-block-39 only (five units inserted ahead); unit text digest identical in AGENTS.old and AGENTS.new and equal to the registry digest, no other field changed."
+          },
+          {
+            "id": "n029",
+            "verdict": "ok",
+            "note": "mechanical: CLAUDE.md unheaded-block-18 leaves units in the real registry diff and sits in retiredUnits; removed from CLAUDE.md by 40c667c83 and its text is verbatim in AGENTS.md before and after (same text digest as AGENTS.md unheaded-block-49); raw after is none and the pending overlay is judged in the decision part."
+          },
+          {
+            "id": "n030",
+            "verdict": "ok",
+            "note": "mechanical: CLAUDE.md unheaded-block-13 leaves units in the real registry diff and sits in retiredUnits; removed from CLAUDE.md by 40c667c83 and its text is verbatim in AGENTS.md before and after (same text digest as AGENTS.md unheaded-block-44); raw after is none and the pending overlay is judged in the decision part."
+          },
+          {
+            "id": "n031",
+            "verdict": "ok",
+            "note": "mechanical: AGENTS.md anchor shift unheaded-block-36 to unheaded-block-41 only (five units inserted ahead); unit text digest identical in AGENTS.old and AGENTS.new and equal to the registry digest, no other field changed."
+          },
+          {
+            "id": "n032",
+            "verdict": "ok",
+            "note": "mechanical: CLAUDE.md always-do leaves units in the real registry diff and sits in retiredUnits; removed from CLAUDE.md by 40c667c83 and its text is verbatim in AGENTS.md before and after (same text digest as AGENTS.md always-do); raw after is none and the pending overlay is judged in the decision part."
+          },
+          {
+            "id": "n033",
+            "verdict": "ok",
+            "note": "mechanical: content-preserving move CLAUDE.md unheaded-block-2 to AGENTS.md unheaded-block-33; script-checked: text is identical in the committed files, both digests unchanged, movedFrom records the origin."
+          },
+          {
+            "id": "n034",
+            "verdict": "ok",
+            "note": "mechanical: AGENTS.md anchor shift unheaded-block-39 to unheaded-block-44 only (five units inserted ahead); unit text digest identical in AGENTS.old and AGENTS.new and equal to the registry digest, no other field changed."
+          },
+          {
+            "id": "n035",
+            "verdict": "ok",
+            "note": "mechanical: CLAUDE.md unheaded-block-10 leaves units in the real registry diff and sits in retiredUnits; removed from CLAUDE.md by 40c667c83 and its text is verbatim in AGENTS.md before and after (same text digest as AGENTS.md unheaded-block-41); raw after is none and the pending overlay is judged in the decision part."
+          },
+          {
+            "id": "n036",
+            "verdict": "ok",
+            "note": "mechanical: content-preserving move CLAUDE.md unheaded-block-4 to AGENTS.md unheaded-block-35; script-checked: text is identical in the committed files, both digests unchanged, movedFrom records the origin."
+          },
+          {
+            "id": "n037",
+            "verdict": "ok",
+            "note": "mechanical: CLAUDE.md documentation-viewing-mdview leaves units in the real registry diff and sits in retiredUnits; removed from CLAUDE.md by 40c667c83 and its text is verbatim in AGENTS.md before and after (same text digest as AGENTS.md documentation-viewing-mdview); raw after is none and the pending overlay is judged in the decision part."
+          },
+          {
+            "id": "n038",
+            "verdict": "ok",
+            "note": "mechanical: CLAUDE.md unheaded-block-12 leaves units in the real registry diff and sits in retiredUnits; removed from CLAUDE.md by 40c667c83 and its text is verbatim in AGENTS.md before and after (same text digest as AGENTS.md unheaded-block-43); raw after is none and the pending overlay is judged in the decision part."
+          },
+          {
+            "id": "n039",
+            "verdict": "ok",
+            "note": "mechanical: CLAUDE.md cli leaves units in the real registry diff and sits in retiredUnits; removed from CLAUDE.md by 40c667c83 and its text is verbatim in AGENTS.md before and after (heading text verbatim in AGENTS.md anchor cli (section payload digest differs only because AGENTS.md ends the section later)); raw after is none and the pending overlay is judged in the decision part."
+          },
+          {
+            "id": "n040",
+            "verdict": "ok",
+            "note": "mechanical: CLAUDE.md resources leaves units in the real registry diff and sits in retiredUnits; removed from CLAUDE.md by 40c667c83 and its text is verbatim in AGENTS.md before and after (same text digest as AGENTS.md resources); raw after is none and the pending overlay is judged in the decision part."
+          },
+          {
+            "id": "n041",
+            "verdict": "ok",
+            "note": "mechanical: AGENTS.md anchor shift unheaded-block-38 to unheaded-block-43 only (five units inserted ahead); unit text digest identical in AGENTS.old and AGENTS.new and equal to the registry digest, no other field changed."
+          },
+          {
+            "id": "n042",
+            "verdict": "ok",
+            "note": "deep: heading move CLAUDE.md to AGENTS.md at the same anchor impact-analysis-capability-gate; heading and section text byte-identical, digests unchanged, movedFrom records the origin."
+          }
+        ]
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "notes": "## Notes\n\n- Defect outside the registry rows, for the Lead: commit 40c667c83 pasted the gate into AGENTS.md right after the existing `<!-- mdview:START -->` line (line 182) and brought a second `<!-- mdview:START -->` (line 224, the tail of the moved block 6). AGENTS.md now has two START markers and one END marker, and the gate sits inside the mdview-owned marker region, so a tool that rewrites that region would delete it. Conservation holds (the moved block is verbatim), so I did not mark any row rework; a follow-up fix to AGENTS.md is advisable.\n- The 22 retired rows use retiredReason \"no counterpart in current source\" from the carry while the overlay says the content lives in AGENTS.md; the overlay rationale is the truthful one.\n- Overlay claimKind of all 22 retired rows is procedure while the raw rows said architecture or unclassified; wording only.",
+        "verdicts": [
+          {
+            "id": "n043",
+            "verdict": "ok",
+            "note": "mechanical: CLAUDE.md when-to-render leaves live units; row-auth passed and the before row equals the real pre-40c667c83 unit; same claim reappears as retired entry n076, whose content is verbatim in AGENTS.md (checked by text compare)."
+          },
+          {
+            "id": "n044",
+            "verdict": "ok",
+            "note": "deep: AGENTS.md anchor shift unheaded-block-33 to unheaded-block-38; only sourceAnchor changes, digests equal the real post-40c667c83 unit and the unit text is identical before and after (inserted gate shifts numbering by 5)."
+          },
+          {
+            "id": "n045",
+            "verdict": "ok",
+            "note": "mechanical: CLAUDE.md unheaded-block-16 leaves live units; row-auth passed and the before row equals the real pre-40c667c83 unit; same claim reappears as retired entry n077, whose content is verbatim in AGENTS.md (checked by text compare)."
+          },
+          {
+            "id": "n046",
+            "verdict": "ok",
+            "note": "mechanical: CLAUDE.md never-do leaves live units; row-auth passed and the before row equals the real pre-40c667c83 unit; same claim reappears as retired entry n078, whose content is verbatim in AGENTS.md (checked by text compare)."
+          },
+          {
+            "id": "n047",
+            "verdict": "ok",
+            "note": "mechanical: AGENTS.md anchor shift unheaded-block-49 to unheaded-block-54; only sourceAnchor changes, digests equal the real post-40c667c83 unit and the unit text is identical before and after (inserted gate shifts numbering by 5)."
+          },
+          {
+            "id": "n048",
+            "verdict": "ok",
+            "note": "mechanical: AGENTS.md anchor shift unheaded-block-50 to unheaded-block-55; only sourceAnchor changes, digests equal the real post-40c667c83 unit and the unit text is identical before and after (inserted gate shifts numbering by 5)."
+          },
+          {
+            "id": "n049",
+            "verdict": "ok",
+            "note": "mechanical: AGENTS.md anchor shift unheaded-block-35 to unheaded-block-40; only sourceAnchor changes, digests equal the real post-40c667c83 unit and the unit text is identical before and after (inserted gate shifts numbering by 5)."
+          },
+          {
+            "id": "n050",
+            "verdict": "ok",
+            "note": "deep: CLAUDE.md unheaded-block-14 leaves live units; row-auth passed and the before row equals the real pre-40c667c83 unit; same claim reappears as retired entry n079, whose content is verbatim in AGENTS.md (checked by text compare)."
+          },
+          {
+            "id": "n051",
+            "verdict": "ok",
+            "note": "mechanical: AGENTS.md anchor shift unheaded-block-41 to unheaded-block-46; only sourceAnchor changes, digests equal the real post-40c667c83 unit and the unit text is identical before and after (inserted gate shifts numbering by 5)."
+          },
+          {
+            "id": "n052",
+            "verdict": "ok",
+            "note": "mechanical: old CLAUDE.md unheaded-block-1 (import sentence, sha 5ee1f1a4) leaves units and is recorded as identity gap n059 because the paragraph was rewritten; new block-1 carries the backticks warning in reworded form."
+          },
+          {
+            "id": "n053",
+            "verdict": "ok",
+            "note": "mechanical: AGENTS.md anchor shift unheaded-block-53 to unheaded-block-58; only sourceAnchor changes, digests equal the real post-40c667c83 unit and the unit text is identical before and after (inserted gate shifts numbering by 5)."
+          },
+          {
+            "id": "n054",
+            "verdict": "ok",
+            "note": "deep: CLAUDE.md using-mcp-preferred leaves live units; row-auth passed and the before row equals the real pre-40c667c83 unit; same claim reappears as retired entry n080, whose content is verbatim in AGENTS.md (checked by text compare)."
+          },
+          {
+            "id": "n055",
+            "verdict": "ok",
+            "note": "mechanical: backlog Product Backlog heading: digests and status unchanged, only the transient lineage and needs-review marker drop at carry; unit digest recomputed from HEAD docs/backlog.md equals 2e296ac6; row was already reviewed in s5-root-generated-backlog."
+          },
+          {
+            "id": "n056",
+            "verdict": "ok",
+            "note": "mechanical: AGENTS.md anchor shift unheaded-block-42 to unheaded-block-47; only sourceAnchor changes, digests equal the real post-40c667c83 unit and the unit text is identical before and after (inserted gate shifts numbering by 5)."
+          },
+          {
+            "id": "n057",
+            "verdict": "ok",
+            "note": "mechanical: CLAUDE.md unheaded-block-8 leaves live units; row-auth passed and the before row equals the real pre-40c667c83 unit; same claim reappears as retired entry n081, whose content is verbatim in AGENTS.md (checked by text compare)."
+          },
+          {
+            "id": "n058",
+            "verdict": "ok",
+            "note": "mechanical: carriedFromCommit c3614f4d to 38672e7f; 38672e7f is a real commit and equals the registry commit field at 3baafff4d, so the carry chain is consistent."
+          },
+          {
+            "id": "n059",
+            "verdict": "ok",
+            "note": "mechanical: gap row for old CLAUDE.md unheaded-block-1 matches the removed unit row exactly plus identityStatus identity-gap and a truthful gapReason (edited unit, non-heading anchor)."
+          },
+          {
+            "id": "n060",
+            "verdict": "ok",
+            "note": "deep: retired CLAUDE.md#unheaded-block-19 equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending."
+          },
+          {
+            "id": "n061",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#unheaded-block-15 equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending."
+          },
+          {
+            "id": "n062",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#unheaded-block-9 equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending."
+          },
+          {
+            "id": "n063",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#gitnexus-code-intelligence equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending."
+          },
+          {
+            "id": "n064",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#unheaded-block-17 equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending."
+          },
+          {
+            "id": "n065",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#unheaded-block-11 equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending."
+          },
+          {
+            "id": "n066",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#unheaded-block-7 equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending."
+          },
+          {
+            "id": "n067",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#using-cli-fallback equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending."
+          },
+          {
+            "id": "n068",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#unheaded-block-18 equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending."
+          },
+          {
+            "id": "n069",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#unheaded-block-13 equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending."
+          },
+          {
+            "id": "n070",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#always-do equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending."
+          },
+          {
+            "id": "n071",
+            "verdict": "ok",
+            "note": "deep: retired CLAUDE.md#unheaded-block-10 equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending."
+          },
+          {
+            "id": "n072",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#documentation-viewing-mdview equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending."
+          },
+          {
+            "id": "n073",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#unheaded-block-12 equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending."
+          },
+          {
+            "id": "n074",
+            "verdict": "ok",
+            "note": "deep: retired CLAUDE.md#cli equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending. wording: the rationale cites AGENTS.md#cli with a different SHA256 (ed59f3cf) than the source (b1a93fca) without saying why; the AGENTS section is longer (it runs on to the projection block), the CLAUDE section text is contained verbatim in it, so nothing is lost."
+          },
+          {
+            "id": "n075",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#resources equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending."
+          },
+          {
+            "id": "n076",
+            "verdict": "ok",
+            "note": "deep: retired CLAUDE.md#when-to-render equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending."
+          },
+          {
+            "id": "n077",
+            "verdict": "ok",
+            "note": "deep: retired CLAUDE.md#unheaded-block-16 equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending."
+          },
+          {
+            "id": "n078",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#never-do equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending."
+          },
+          {
+            "id": "n079",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#unheaded-block-14 equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending."
+          },
+          {
+            "id": "n080",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#using-mcp-preferred equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending."
+          },
+          {
+            "id": "n081",
+            "verdict": "ok",
+            "note": "mechanical: retired CLAUDE.md#unheaded-block-8 equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending."
+          },
+          {
+            "id": "n082",
+            "verdict": "ok",
+            "note": "mechanical: carryForward counters check out: newUnits 91366 equals the real units count, 91388-22 retired, kept+paired+moved+editedKept+added = 91366, moved 6 and retired 22 equal the real partition of the 30 old CLAUDE units (6 moved, 22 retired, 1 gap, 1 edited kept)."
+          },
+          {
+            "id": "n083",
+            "verdict": "ok",
+            "note": "mechanical: _binding after sha b20238af and 62195972 bytes equal the committed 3baafff4d registry file (the carry input), which is how the carry records provenance; the HEAD file differs only by the pending overlay on the 22 retired rows."
+          }
+        ]
+      }
+    ]
   }
 }

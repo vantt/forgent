@@ -1,3 +1,13 @@
+# Step 10 complete — Phase 6 awaiting owner review
+
+Assignment `unit-run-1792188862877-9ba2ba18/producer/1`; final evidence pin `2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4`. The required identity-source guard from `47e813732` is empty. Applied all 31 L10-42 decision verdicts with Notes verbatim and recorded all 83 native verdicts: **114/114 ok, 0 rework, 0 hold**. No carry or registry persistence was repeated.
+
+Final D is **0 fatal** against both priors together and each separately. Strict E has **0 pending /28 partial /362 identical-owner groups /2,336 reverse candidates** across 22,737 active claims and 2,236 gaps. Regenerated comparator: **exit 0 / `ok=true` /zero differences /`errors=[]`**. Promotion160/160,H0,T9 17/17,mutation12/12,ownership/replay/A/B/H/I/alias/snapshot green; relevant tests **507/507**. The two audit receipts are one author-written audit, not independent confirmations: 12,906 rows/93 shards/0 findings/66 historical witness limits.
+
+Checkpoint durability is current: 125 parts/2,610,715,988 bytes/all hashes verified, aggregate SHA256 `ee74fe86de713a499a47d3fef21a7552f038b9b48c1f4d9bc2e40890c62db2c0`; identity-registry copy SHA256 `7b03045ad1d6332a2c0075548a9ae5ee61c998a475693380a6831c47b8053b60`. The checkpoint request was at `e52831e36`; the L10-42 carry `47e813732` and independent review `2a028cdc9` cover the subsequent delta. Step 10 and Phase 6 are now **awaiting owner review**, not closed. Owner queue: 13 top-level families. No promotion, retirement, alias adoption, cutover, main landing or push; Phase 7 remains unauthorized.
+
+---
+
 # L10-42 identity carry complete — independent ordinary review next
 
 Assignment `unit-run-1792184405209-31ed32fb/producer/1`; content/native pin `3baafff4d7a670b30edac2ff9bcf1594eed4ec95`. L10-42 records the prior close's correct stop and expands every future main-sync check to the complete identity scope: `docs/`, root `AGENTS.md`, root `CLAUDE.md`, and the transitional switchboard.

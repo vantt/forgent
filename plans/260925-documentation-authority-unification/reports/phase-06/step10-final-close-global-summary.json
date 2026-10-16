@@ -1,0 +1,25 @@
+{
+  "head": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4",
+  "inventoryCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4",
+  "registryCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+  "scopeFiles": 1045,
+  "claims": 22737,
+  "gaps": 2236,
+  "pendingClaims": 0,
+  "pendingGaps": 0,
+  "partialCarries": 28,
+  "identicalUnitGroups": 362,
+  "candidateLists": 8,
+  "comparator": {
+    "ok": true,
+    "strictGreen": false,
+    "counts": {
+      "claims-unknown-blocking": 0,
+      "claims-not-reviewed": 0,
+      "identical-units-multiple-owners": 362,
+      "candidate-blocks-unreferenced": 2336,
+      "claims-partial-carry": 28
+    },
+    "errors": []
+  }
+}

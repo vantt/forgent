@@ -165,8 +165,14 @@
     {
       "id": "L10-41",
       "summary": "Lead accepted the combined author/package evidence because docs/** bytes did not change, but close verification found root AGENTS.md also belongs to identity scope and changed after the sole sync. The instruction is recorded but cannot yield passing final-pin D/E without an authorized carry-forward or evidence-model change."
+    },
+    {
+      "id": "L10-42",
+      "summary": "Authorize one complete-identity-scope native carry; bind all 31 AGENTS/CLAUDE decisions and 83 raw native changes to independent ordinary review; repeat no carry once the identity-source guard stays empty. Independent result: 114/114 ok, 0 rework, 0 hold."
     }
   ],
   "A43": "Responsibility groups only; no required/planned Orchestrator/Launcher/Router/Driver/Dispatcher entity. Three matching ordinary approvals were applied; current-truth, runtime and cutover obligations remain. Holds=0. Phase 6 reaches awaiting owner review only after checkpoint, A28 truth sampling and final red-team.",
-  "packageContentCommit": "38672e7f157788cbe1b2bf59511bd61046dce660"
+  "packageContentCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4",
+  "registryCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+  "phaseStatus": "awaiting-owner-review"
 }

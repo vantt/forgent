@@ -1,4 +1,36 @@
-# L10-42 identity-scope carry-forward complete — ordinary review next
+# Step 10 final close — awaiting owner review
+
+## Owner summary
+
+Phase 6 delivered the complete candidate corpus, conservation/ownership records, reviewed decision overlays, durable inventory and identity-registry evidence, and a reproducible Step 10 close package. Final-pin proof at `2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4` is green: the required identity-source delta is empty; L10-42 independent review is **114/114 ok, 0 rework, 0 hold**; D against both priors together and each prior separately is **0 fatal**; strict E has **0 pending**; and the regenerated comparator exits 0 with `ok=true`, zero differences and `errors=[]`. Comparator equality is drift detection against E-derived expectations, not independent conservation proof.
+
+The remaining close checks are also green: promotion **160/160**, H **0 findings**, T9 **17/17**, mutation **12/12**, ownership/replay/A/B/H/I clean, **9,236** draft aliases valid, snapshot **68,441 rows / verify=true / unsealed**, and relevant tests **507/507**. The audit receipts cover **12,906 rows /93 shards /0 findings /66 historical witness limits**; they are two receipts from **one author-written audit command/output**, not two independent confirmations. The durable checkpoint is now current: **125 parts /2,610,715,988 bytes**, aggregate SHA256 `ee74fe86de713a499a47d3fef21a7552f038b9b48c1f4d9bc2e40890c62db2c0`, and the identity-registry copy is byte-identical at SHA256 `7b03045ad1d6332a2c0075548a9ae5ee61c998a475693380a6831c47b8053b60`.
+
+The owner must review the **13 top-level obligation families** in [owner-queue.md](owner-queue.md) and decide whether to close Phase 6 and later authorize the next phase. The checkpoint request was taken at `e52831e36`; the single authorized L10-42 carry at `47e813732` plus its 114-entry independent review committed at `2a028cdc9` cover the later delta. The earlier independent evidence remains standing: c1 **25/25 ok**, current truth **1/30 false (3.3%)**, final red-team **0 Critical /0 High /6 Medium /8 Low**, identical groups **25/25 ok**, and checkpoint **ACCEPT**.
+
+Explicitly **not done**: no promotion, retirement, alias adoption, cutover, main landing or push. Step 10 and Phase 6 are **awaiting owner review**, not closed; Phase 7 remains unauthorized.
+
+## Final scorecard
+
+| Item | Result | Evidence |
+|---|---|---|
+| 1 (1a/1b). Root rows/navigation | L10-42 114/114 reviewed; merge/root-split bindings retained | `step10-l10-42-instruction-accounting.json`; `step10-reading-map-merge-table.json`; `step10-global-decisions-summary.json` |
+| 2 (2b). Link pass/groups | Edits and final groups accounted; later-phase queues retained | `post-review-edits.md`; `step10-group-records.json`; `review-step10-groups-e52831e36.md`; `owner-queue.md` |
+| 3. Global E | D both/each 0 fatal; strict E 0 pending; comparator exit0/zero differences | `step10-final-close-both.json`; `step10-final-close-identity.json`; `step10-final-close-phase02.json`; `step10-final-close-strict.json`; `step10-final-close-comparison.json` |
+| 4. Promotion/H | 160/160; H 0 findings | `step10-final-close-promotion.log`; `step10-final-close-H.json` |
+| 5. Rehearsal | Completed; blockers recorded; clone removed; no cutover | `step10-package-rehearsal.json`; `rehearsal-step-10.md` |
+| 6. Register/T9 | 17/17, 0 findings | `step10-final-close-T9.json` |
+| 7. Alias | 9,236 draft entries valid; not adopted | `step10-final-close-alias.log`; `step10-alias-coverage.json` |
+| 8. Snapshot | 68,441 rows; verified; unsealed | `step10-final-close-snapshot.json` |
+| 9. Checkpoint/mutation | 125-part manifest and registry copy refreshed; mutation 12/12 | `../doc-inventory.json`; `../identity-registry.json`; `step10-final-close-mutation.log`; `review-10-checkpoint.md` |
+
+Decision summary: [step10-global-decisions-summary.json](step10-global-decisions-summary.json). Machine effort: [step10-global-effort.md](step10-global-effort.md). Owner effort remains unreported and is not inferred. Complete machine-readable check list: [step10-final-audit.json](step10-final-audit.json).
+
+---
+
+# Historical execution log
+
+## L10-42 identity-scope carry-forward complete — ordinary review next
 
 ## Owner summary
 

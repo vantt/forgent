@@ -16,7 +16,17 @@
       "collection": "commit",
       "key": "commit",
       "before": "38672e7f157788cbe1b2bf59511bd61046dce660",
-      "after": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95"
+      "after": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
+      "ordinaryReview": {
+        "entry": "n001",
+        "verdict": "ok",
+        "note": "deep: before 38672e7f1 equals the prior registry commit and carriedFromCommit; after 3baafff4d is the content commit; registry commit field only.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
+      }
     },
     {
       "collection": "documents",
@@ -32,6 +42,16 @@
         "sourceId": "src_94136e4dac4ba90a254c1805a3558f31",
         "sourceDigest": "9aadc2197824c2447658966886a21b77f5010e2ba1a21c1a0315d56509c232bb",
         "blobSha": "b64be0678bfd8d213f0fa2907bd8a75bd442f9e2"
+      },
+      "ordinaryReview": {
+        "entry": "n002",
+        "verdict": "ok",
+        "note": "deep: only sourceDigest and blobSha changed; AGENTS.md sha256 and git blob (15aad3f to b64be06) at 38672e7f1 and 3baafff4d match both values; path, counts and other fields unchanged.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -48,6 +68,16 @@
         "sourceId": "src_2551d4e3332583a2c53ca185998bb49d",
         "sourceDigest": "384fb0e29c88662a86a6eec0334f557a71bb2c533f2f6c2ce137552a90b32568",
         "blobSha": "212ff3044a5af15792ef63952ea34694908fcddc"
+      },
+      "ordinaryReview": {
+        "entry": "n003",
+        "verdict": "ok",
+        "note": "deep: only sourceDigest and blobSha changed; CLAUDE.md sha256 and git blob (0ed93b2 to 212ff30) at 38672e7f1 and 3baafff4d match both values; path, counts and other fields unchanged.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -64,7 +94,17 @@
         "claimKind": "architecture",
         "status": "current"
       },
-      "after": null
+      "after": null,
+      "ordinaryReview": {
+        "entry": "n004",
+        "verdict": "ok",
+        "note": "mechanical: CLAUDE.md unheaded-block-19 leaves units in the real registry diff and sits in retiredUnits; removed from CLAUDE.md by 40c667c83 and its text is verbatim in AGENTS.md before and after (same text digest as AGENTS.md unheaded-block-50); raw after is none and the pending overlay is judged in the decision part.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
+      }
     },
     {
       "collection": "units",
@@ -90,6 +130,16 @@
         "sourceUnitDigest": "e9d6edc10b3656ef6f99a50549a6fd76c6a6010c62040c5ea6a8d61c753da3cc",
         "claimKind": "specification",
         "status": "current"
+      },
+      "ordinaryReview": {
+        "entry": "n005",
+        "verdict": "ok",
+        "note": "mechanical: AGENTS.md anchor shift unheaded-block-51 to unheaded-block-56 only (five units inserted ahead); unit text digest identical in AGENTS.old and AGENTS.new and equal to the registry digest, no other field changed.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -116,6 +166,16 @@
         "sourceUnitDigest": "39fe4d8d1ecc03cbf722efdf8de807822733f8f4f5cdd40cb10419c65ad79b46",
         "claimKind": "unclassified",
         "status": "current"
+      },
+      "ordinaryReview": {
+        "entry": "n006",
+        "verdict": "ok",
+        "note": "mechanical: AGENTS.md anchor shift unheaded-block-40 to unheaded-block-45 only (five units inserted ahead); unit text digest identical in AGENTS.old and AGENTS.new and equal to the registry digest, no other field changed.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -150,6 +210,16 @@
           "fromSourceUnitDigest": "8cfd6f83037e10f65f4fab831d75c6b0ef373c7841bc510090b83310b5739537",
           "toSourceUnitDigest": "ead3a061cf7d13bce3595a8e0214d0553fd1b0c1da5672fe8759570e0f05d8d0"
         }
+      },
+      "ordinaryReview": {
+        "entry": "n007",
+        "verdict": "ok",
+        "note": "deep: Project Rules heading kept with new digests (section text rewritten by 40c667c83); lineage from/to digests equal the registry before row and the real extraction of the committed CLAUDE.md, needs-review is a carry marker not an approval.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -176,6 +246,16 @@
         "sourceUnitDigest": "b64e3f9772c143e0d911c16218f5a9f280f96b0c1466f43f52e5aa4d63855221",
         "claimKind": "unclassified",
         "status": "current"
+      },
+      "ordinaryReview": {
+        "entry": "n008",
+        "verdict": "ok",
+        "note": "deep: AGENTS.md anchor shift unheaded-block-44 to unheaded-block-49 only (five units inserted ahead); unit text digest identical in AGENTS.old and AGENTS.new and equal to the registry digest, no other field changed.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -203,6 +283,16 @@
         "sourceUnitDigest": "7d5317616b4b105936b065a213de9cce47e44c3e623d6dd293ffd0d5dc4c84ec",
         "claimKind": "unclassified",
         "status": "future"
+      },
+      "ordinaryReview": {
+        "entry": "n009",
+        "verdict": "ok",
+        "note": "deep: docs/backlog.md unit unchanged between the two pins; only the per-carry origin marker added-since-c3614f4d4 dropped (carry marker fields are reset each carry); digest, anchor and status unchanged.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -229,6 +319,16 @@
         "sourceUnitDigest": "8ca4c5c61c7f369a197d6118f0a325cc39727dbc792d3c53b1c2b1dd2aa7648a",
         "claimKind": "architecture",
         "status": "current"
+      },
+      "ordinaryReview": {
+        "entry": "n010",
+        "verdict": "ok",
+        "note": "mechanical: AGENTS.md anchor shift unheaded-block-45 to unheaded-block-50 only (five units inserted ahead); unit text digest identical in AGENTS.old and AGENTS.new and equal to the registry digest, no other field changed.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -255,6 +355,16 @@
         "sourceUnitDigest": "a412a2f5e102f17d8b6b108830fed27c29021381ac59ea9695c43d604e1a6570",
         "claimKind": "decision",
         "status": "current"
+      },
+      "ordinaryReview": {
+        "entry": "n011",
+        "verdict": "ok",
+        "note": "mechanical: AGENTS.md anchor shift unheaded-block-47 to unheaded-block-52 only (five units inserted ahead); unit text digest identical in AGENTS.old and AGENTS.new and equal to the registry digest, no other field changed.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -281,6 +391,16 @@
         "sourceUnitDigest": "1297672f2b5e8ad757858b4c7e8e54e6713cabadc7461f2f561b92e4e17bb16e",
         "claimKind": "unclassified",
         "status": "current"
+      },
+      "ordinaryReview": {
+        "entry": "n012",
+        "verdict": "ok",
+        "note": "mechanical: AGENTS.md anchor shift unheaded-block-48 to unheaded-block-53 only (five units inserted ahead); unit text digest identical in AGENTS.old and AGENTS.new and equal to the registry digest, no other field changed.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -297,7 +417,17 @@
         "claimKind": "unclassified",
         "status": "current"
       },
-      "after": null
+      "after": null,
+      "ordinaryReview": {
+        "entry": "n013",
+        "verdict": "ok",
+        "note": "mechanical: CLAUDE.md unheaded-block-15 leaves units in the real registry diff and sits in retiredUnits; removed from CLAUDE.md by 40c667c83 and its text is verbatim in AGENTS.md before and after (same text digest as AGENTS.md unheaded-block-46); raw after is none and the pending overlay is judged in the decision part.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
+      }
     },
     {
       "collection": "units",
@@ -323,6 +453,16 @@
         "sourceUnitDigest": "1ac5061190836bd1107ae3eb6460b899d1d92486a62077b653cbf7d2016b2101",
         "claimKind": "unclassified",
         "status": "current"
+      },
+      "ordinaryReview": {
+        "entry": "n014",
+        "verdict": "ok",
+        "note": "deep: AGENTS.md anchor shift unheaded-block-46 to unheaded-block-51 only (five units inserted ahead); unit text digest identical in AGENTS.old and AGENTS.new and equal to the registry digest, no other field changed.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -339,7 +479,17 @@
         "claimKind": "unclassified",
         "status": "current"
       },
-      "after": null
+      "after": null,
+      "ordinaryReview": {
+        "entry": "n015",
+        "verdict": "ok",
+        "note": "mechanical: CLAUDE.md unheaded-block-9 leaves units in the real registry diff and sits in retiredUnits; removed from CLAUDE.md by 40c667c83 and its text is verbatim in AGENTS.md before and after (same text digest as AGENTS.md unheaded-block-40); raw after is none and the pending overlay is judged in the decision part.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
+      }
     },
     {
       "collection": "units",
@@ -355,7 +505,17 @@
         "claimKind": "unclassified",
         "status": "current"
       },
-      "after": null
+      "after": null,
+      "ordinaryReview": {
+        "entry": "n016",
+        "verdict": "ok",
+        "note": "deep: CLAUDE.md gitnexus-code-intelligence leaves units in the real registry diff and sits in retiredUnits; removed from CLAUDE.md by 40c667c83 and its text is verbatim in AGENTS.md before and after (same text digest as AGENTS.md gitnexus-code-intelligence); raw after is none and the pending overlay is judged in the decision part.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
+      }
     },
     {
       "collection": "units",
@@ -385,6 +545,16 @@
           "sourcePath": "CLAUDE.md",
           "sourceAnchor": "unheaded-block-5"
         }
+      },
+      "ordinaryReview": {
+        "entry": "n017",
+        "verdict": "ok",
+        "note": "mechanical: content-preserving move CLAUDE.md unheaded-block-5 to AGENTS.md unheaded-block-36; script-checked: text is identical in the committed files, both digests unchanged, movedFrom records the origin.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -415,6 +585,16 @@
           "sourcePath": "CLAUDE.md",
           "sourceAnchor": "unheaded-block-3"
         }
+      },
+      "ordinaryReview": {
+        "entry": "n018",
+        "verdict": "ok",
+        "note": "mechanical: content-preserving move CLAUDE.md unheaded-block-3 to AGENTS.md unheaded-block-34; script-checked: text is identical in the committed files, both digests unchanged, movedFrom records the origin.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -441,6 +621,16 @@
         "sourceUnitDigest": "2ce479d07da3c54df383f1e0441adf783699b2e90e56b9fe6c4e6b56777a7af0",
         "claimKind": "unclassified",
         "status": "current"
+      },
+      "ordinaryReview": {
+        "entry": "n019",
+        "verdict": "ok",
+        "note": "deep: AGENTS.md anchor shift unheaded-block-37 to unheaded-block-42 only (five units inserted ahead); unit text digest identical in AGENTS.old and AGENTS.new and equal to the registry digest, no other field changed.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -467,6 +657,16 @@
         "sourceUnitDigest": "6f63dffd5c7d710ca600d3ad22016e4e73cf9729a299b36d624070a87429d6e1",
         "claimKind": "unclassified",
         "status": "current"
+      },
+      "ordinaryReview": {
+        "entry": "n020",
+        "verdict": "ok",
+        "note": "deep: AGENTS.md anchor shift unheaded-block-43 to unheaded-block-48 only (five units inserted ahead); unit text digest identical in AGENTS.old and AGENTS.new and equal to the registry digest, no other field changed.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -483,7 +683,17 @@
         "claimKind": "unclassified",
         "status": "current"
       },
-      "after": null
+      "after": null,
+      "ordinaryReview": {
+        "entry": "n021",
+        "verdict": "ok",
+        "note": "mechanical: CLAUDE.md unheaded-block-17 leaves units in the real registry diff and sits in retiredUnits; removed from CLAUDE.md by 40c667c83 and its text is verbatim in AGENTS.md before and after (same text digest as AGENTS.md unheaded-block-48); raw after is none and the pending overlay is judged in the decision part.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
+      }
     },
     {
       "collection": "units",
@@ -509,6 +719,16 @@
         "sourceUnitDigest": "f4b273ed312216976ee427785fccce89a1aaf29fe108f4af626cab39ee1b70fb",
         "claimKind": "verification",
         "status": "current"
+      },
+      "ordinaryReview": {
+        "entry": "n022",
+        "verdict": "ok",
+        "note": "deep: AGENTS.md anchor shift unheaded-block-52 to unheaded-block-57 only (five units inserted ahead); unit text digest identical in AGENTS.old and AGENTS.new and equal to the registry digest, no other field changed.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -525,7 +745,17 @@
         "claimKind": "unclassified",
         "status": "current"
       },
-      "after": null
+      "after": null,
+      "ordinaryReview": {
+        "entry": "n023",
+        "verdict": "ok",
+        "note": "mechanical: CLAUDE.md unheaded-block-11 leaves units in the real registry diff and sits in retiredUnits; removed from CLAUDE.md by 40c667c83 and its text is verbatim in AGENTS.md before and after (same text digest as AGENTS.md unheaded-block-42); raw after is none and the pending overlay is judged in the decision part.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
+      }
     },
     {
       "collection": "units",
@@ -541,7 +771,17 @@
         "claimKind": "unclassified",
         "status": "current"
       },
-      "after": null
+      "after": null,
+      "ordinaryReview": {
+        "entry": "n024",
+        "verdict": "ok",
+        "note": "mechanical: CLAUDE.md unheaded-block-7 leaves units in the real registry diff and sits in retiredUnits; removed from CLAUDE.md by 40c667c83 and its text is verbatim in AGENTS.md before and after (same text digest as AGENTS.md unheaded-block-38); raw after is none and the pending overlay is judged in the decision part.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
+      }
     },
     {
       "collection": "units",
@@ -558,6 +798,16 @@
         "claimKind": "unclassified",
         "status": "current",
         "origin": "added-since-38672e7f157788cbe1b2bf59511bd61046dce660"
+      },
+      "ordinaryReview": {
+        "entry": "n025",
+        "verdict": "ok",
+        "note": "deep: new CLAUDE.md unheaded-block-1 unit (intro paragraph on AGENTS.md as the one shared file); sourceUnitDigest 7d970336 equals the textDigest of the committed block, origin added-since-38672e7f1 as the carry marker, no review status carried.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -588,6 +838,16 @@
           "sourcePath": "CLAUDE.md",
           "sourceAnchor": "unheaded-block-6"
         }
+      },
+      "ordinaryReview": {
+        "entry": "n026",
+        "verdict": "ok",
+        "note": "mechanical: content-preserving move CLAUDE.md unheaded-block-6 to AGENTS.md unheaded-block-37; script-checked: text is identical in the committed files, both digests unchanged, movedFrom records the origin.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -604,7 +864,17 @@
         "claimKind": "unclassified",
         "status": "current"
       },
-      "after": null
+      "after": null,
+      "ordinaryReview": {
+        "entry": "n027",
+        "verdict": "ok",
+        "note": "mechanical: CLAUDE.md using-cli-fallback leaves units in the real registry diff and sits in retiredUnits; removed from CLAUDE.md by 40c667c83 and its text is verbatim in AGENTS.md before and after (same text digest as AGENTS.md using-cli-fallback); raw after is none and the pending overlay is judged in the decision part.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
+      }
     },
     {
       "collection": "units",
@@ -630,6 +900,16 @@
         "sourceUnitDigest": "c45eed179f4de74f88ec92f86a5647eb5e6625d60cb844671ac83b3f0d1c6694",
         "claimKind": "unclassified",
         "status": "current"
+      },
+      "ordinaryReview": {
+        "entry": "n028",
+        "verdict": "ok",
+        "note": "deep: AGENTS.md anchor shift unheaded-block-34 to unheaded-block-39 only (five units inserted ahead); unit text digest identical in AGENTS.old and AGENTS.new and equal to the registry digest, no other field changed.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -646,7 +926,17 @@
         "claimKind": "unclassified",
         "status": "current"
       },
-      "after": null
+      "after": null,
+      "ordinaryReview": {
+        "entry": "n029",
+        "verdict": "ok",
+        "note": "mechanical: CLAUDE.md unheaded-block-18 leaves units in the real registry diff and sits in retiredUnits; removed from CLAUDE.md by 40c667c83 and its text is verbatim in AGENTS.md before and after (same text digest as AGENTS.md unheaded-block-49); raw after is none and the pending overlay is judged in the decision part.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
+      }
     },
     {
       "collection": "units",
@@ -662,7 +952,17 @@
         "claimKind": "unclassified",
         "status": "current"
       },
-      "after": null
+      "after": null,
+      "ordinaryReview": {
+        "entry": "n030",
+        "verdict": "ok",
+        "note": "mechanical: CLAUDE.md unheaded-block-13 leaves units in the real registry diff and sits in retiredUnits; removed from CLAUDE.md by 40c667c83 and its text is verbatim in AGENTS.md before and after (same text digest as AGENTS.md unheaded-block-44); raw after is none and the pending overlay is judged in the decision part.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
+      }
     },
     {
       "collection": "units",
@@ -688,6 +988,16 @@
         "sourceUnitDigest": "e0bf1a3052c0f3659d2cac6267fcf556c467957bb4de49a27962fa353ec8aec3",
         "claimKind": "unclassified",
         "status": "current"
+      },
+      "ordinaryReview": {
+        "entry": "n031",
+        "verdict": "ok",
+        "note": "mechanical: AGENTS.md anchor shift unheaded-block-36 to unheaded-block-41 only (five units inserted ahead); unit text digest identical in AGENTS.old and AGENTS.new and equal to the registry digest, no other field changed.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -704,7 +1014,17 @@
         "claimKind": "unclassified",
         "status": "current"
       },
-      "after": null
+      "after": null,
+      "ordinaryReview": {
+        "entry": "n032",
+        "verdict": "ok",
+        "note": "mechanical: CLAUDE.md always-do leaves units in the real registry diff and sits in retiredUnits; removed from CLAUDE.md by 40c667c83 and its text is verbatim in AGENTS.md before and after (same text digest as AGENTS.md always-do); raw after is none and the pending overlay is judged in the decision part.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
+      }
     },
     {
       "collection": "units",
@@ -734,6 +1054,16 @@
           "sourcePath": "CLAUDE.md",
           "sourceAnchor": "unheaded-block-2"
         }
+      },
+      "ordinaryReview": {
+        "entry": "n033",
+        "verdict": "ok",
+        "note": "mechanical: content-preserving move CLAUDE.md unheaded-block-2 to AGENTS.md unheaded-block-33; script-checked: text is identical in the committed files, both digests unchanged, movedFrom records the origin.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -760,6 +1090,16 @@
         "sourceUnitDigest": "52ee0c226963abfd99219e552e38ac7b06cbe349e31d31a470fc328c095fd703",
         "claimKind": "unclassified",
         "status": "current"
+      },
+      "ordinaryReview": {
+        "entry": "n034",
+        "verdict": "ok",
+        "note": "mechanical: AGENTS.md anchor shift unheaded-block-39 to unheaded-block-44 only (five units inserted ahead); unit text digest identical in AGENTS.old and AGENTS.new and equal to the registry digest, no other field changed.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -776,7 +1116,17 @@
         "claimKind": "unclassified",
         "status": "current"
       },
-      "after": null
+      "after": null,
+      "ordinaryReview": {
+        "entry": "n035",
+        "verdict": "ok",
+        "note": "mechanical: CLAUDE.md unheaded-block-10 leaves units in the real registry diff and sits in retiredUnits; removed from CLAUDE.md by 40c667c83 and its text is verbatim in AGENTS.md before and after (same text digest as AGENTS.md unheaded-block-41); raw after is none and the pending overlay is judged in the decision part.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
+      }
     },
     {
       "collection": "units",
@@ -806,6 +1156,16 @@
           "sourcePath": "CLAUDE.md",
           "sourceAnchor": "unheaded-block-4"
         }
+      },
+      "ordinaryReview": {
+        "entry": "n036",
+        "verdict": "ok",
+        "note": "mechanical: content-preserving move CLAUDE.md unheaded-block-4 to AGENTS.md unheaded-block-35; script-checked: text is identical in the committed files, both digests unchanged, movedFrom records the origin.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -822,7 +1182,17 @@
         "claimKind": "unclassified",
         "status": "current"
       },
-      "after": null
+      "after": null,
+      "ordinaryReview": {
+        "entry": "n037",
+        "verdict": "ok",
+        "note": "mechanical: CLAUDE.md documentation-viewing-mdview leaves units in the real registry diff and sits in retiredUnits; removed from CLAUDE.md by 40c667c83 and its text is verbatim in AGENTS.md before and after (same text digest as AGENTS.md documentation-viewing-mdview); raw after is none and the pending overlay is judged in the decision part.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
+      }
     },
     {
       "collection": "units",
@@ -838,7 +1208,17 @@
         "claimKind": "unclassified",
         "status": "current"
       },
-      "after": null
+      "after": null,
+      "ordinaryReview": {
+        "entry": "n038",
+        "verdict": "ok",
+        "note": "mechanical: CLAUDE.md unheaded-block-12 leaves units in the real registry diff and sits in retiredUnits; removed from CLAUDE.md by 40c667c83 and its text is verbatim in AGENTS.md before and after (same text digest as AGENTS.md unheaded-block-43); raw after is none and the pending overlay is judged in the decision part.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
+      }
     },
     {
       "collection": "units",
@@ -854,7 +1234,17 @@
         "claimKind": "unclassified",
         "status": "current"
       },
-      "after": null
+      "after": null,
+      "ordinaryReview": {
+        "entry": "n039",
+        "verdict": "ok",
+        "note": "mechanical: CLAUDE.md cli leaves units in the real registry diff and sits in retiredUnits; removed from CLAUDE.md by 40c667c83 and its text is verbatim in AGENTS.md before and after (heading text verbatim in AGENTS.md anchor cli (section payload digest differs only because AGENTS.md ends the section later)); raw after is none and the pending overlay is judged in the decision part.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
+      }
     },
     {
       "collection": "units",
@@ -870,7 +1260,17 @@
         "claimKind": "unclassified",
         "status": "current"
       },
-      "after": null
+      "after": null,
+      "ordinaryReview": {
+        "entry": "n040",
+        "verdict": "ok",
+        "note": "mechanical: CLAUDE.md resources leaves units in the real registry diff and sits in retiredUnits; removed from CLAUDE.md by 40c667c83 and its text is verbatim in AGENTS.md before and after (same text digest as AGENTS.md resources); raw after is none and the pending overlay is judged in the decision part.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
+      }
     },
     {
       "collection": "units",
@@ -896,6 +1296,16 @@
         "sourceUnitDigest": "6c33aac3c8d229e5f9e4122d414e1fed0afb9f727868500b7c7c5fb0035268a4",
         "claimKind": "unclassified",
         "status": "current"
+      },
+      "ordinaryReview": {
+        "entry": "n041",
+        "verdict": "ok",
+        "note": "mechanical: AGENTS.md anchor shift unheaded-block-38 to unheaded-block-43 only (five units inserted ahead); unit text digest identical in AGENTS.old and AGENTS.new and equal to the registry digest, no other field changed.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -926,6 +1336,16 @@
           "sourcePath": "CLAUDE.md",
           "sourceAnchor": "impact-analysis-capability-gate"
         }
+      },
+      "ordinaryReview": {
+        "entry": "n042",
+        "verdict": "ok",
+        "note": "deep: heading move CLAUDE.md to AGENTS.md at the same anchor impact-analysis-capability-gate; heading and section text byte-identical, digests unchanged, movedFrom records the origin.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -942,7 +1362,17 @@
         "claimKind": "unclassified",
         "status": "current"
       },
-      "after": null
+      "after": null,
+      "ordinaryReview": {
+        "entry": "n043",
+        "verdict": "ok",
+        "note": "mechanical: CLAUDE.md when-to-render leaves live units; row-auth passed and the before row equals the real pre-40c667c83 unit; same claim reappears as retired entry n076, whose content is verbatim in AGENTS.md (checked by text compare).",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
+      }
     },
     {
       "collection": "units",
@@ -968,6 +1398,16 @@
         "sourceUnitDigest": "42d278bba4a7ce9c2f7ff755227feb14483587d3ace2b687a5c732999eb053bc",
         "claimKind": "unclassified",
         "status": "current"
+      },
+      "ordinaryReview": {
+        "entry": "n044",
+        "verdict": "ok",
+        "note": "deep: AGENTS.md anchor shift unheaded-block-33 to unheaded-block-38; only sourceAnchor changes, digests equal the real post-40c667c83 unit and the unit text is identical before and after (inserted gate shifts numbering by 5).",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -984,7 +1424,17 @@
         "claimKind": "unclassified",
         "status": "current"
       },
-      "after": null
+      "after": null,
+      "ordinaryReview": {
+        "entry": "n045",
+        "verdict": "ok",
+        "note": "mechanical: CLAUDE.md unheaded-block-16 leaves live units; row-auth passed and the before row equals the real pre-40c667c83 unit; same claim reappears as retired entry n077, whose content is verbatim in AGENTS.md (checked by text compare).",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
+      }
     },
     {
       "collection": "units",
@@ -1000,7 +1450,17 @@
         "claimKind": "unclassified",
         "status": "current"
       },
-      "after": null
+      "after": null,
+      "ordinaryReview": {
+        "entry": "n046",
+        "verdict": "ok",
+        "note": "mechanical: CLAUDE.md never-do leaves live units; row-auth passed and the before row equals the real pre-40c667c83 unit; same claim reappears as retired entry n078, whose content is verbatim in AGENTS.md (checked by text compare).",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
+      }
     },
     {
       "collection": "units",
@@ -1026,6 +1486,16 @@
         "sourceUnitDigest": "0634893a1881205c0eb9275047c5b3a44f596f2dff7a47fb0d0e10aae07aebb4",
         "claimKind": "unclassified",
         "status": "current"
+      },
+      "ordinaryReview": {
+        "entry": "n047",
+        "verdict": "ok",
+        "note": "mechanical: AGENTS.md anchor shift unheaded-block-49 to unheaded-block-54; only sourceAnchor changes, digests equal the real post-40c667c83 unit and the unit text is identical before and after (inserted gate shifts numbering by 5).",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -1052,6 +1522,16 @@
         "sourceUnitDigest": "7e4431ca6a7e941fe10d3962f79815b135aeb90897d2ab15817a4e7a903bd2a7",
         "claimKind": "unclassified",
         "status": "current"
+      },
+      "ordinaryReview": {
+        "entry": "n048",
+        "verdict": "ok",
+        "note": "mechanical: AGENTS.md anchor shift unheaded-block-50 to unheaded-block-55; only sourceAnchor changes, digests equal the real post-40c667c83 unit and the unit text is identical before and after (inserted gate shifts numbering by 5).",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -1078,6 +1558,16 @@
         "sourceUnitDigest": "9283c37aa6e87094b10f57541497888b092b13116846386cfaf2cdab0e8cae4d",
         "claimKind": "unclassified",
         "status": "current"
+      },
+      "ordinaryReview": {
+        "entry": "n049",
+        "verdict": "ok",
+        "note": "mechanical: AGENTS.md anchor shift unheaded-block-35 to unheaded-block-40; only sourceAnchor changes, digests equal the real post-40c667c83 unit and the unit text is identical before and after (inserted gate shifts numbering by 5).",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -1094,7 +1584,17 @@
         "claimKind": "unclassified",
         "status": "current"
       },
-      "after": null
+      "after": null,
+      "ordinaryReview": {
+        "entry": "n050",
+        "verdict": "ok",
+        "note": "deep: CLAUDE.md unheaded-block-14 leaves live units; row-auth passed and the before row equals the real pre-40c667c83 unit; same claim reappears as retired entry n079, whose content is verbatim in AGENTS.md (checked by text compare).",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
+      }
     },
     {
       "collection": "units",
@@ -1120,6 +1620,16 @@
         "sourceUnitDigest": "46ba7c1470400a34fe1ff4796da8a95587bfbe41171b92eb8ba9a4fd38b0d51b",
         "claimKind": "unclassified",
         "status": "current"
+      },
+      "ordinaryReview": {
+        "entry": "n051",
+        "verdict": "ok",
+        "note": "mechanical: AGENTS.md anchor shift unheaded-block-41 to unheaded-block-46; only sourceAnchor changes, digests equal the real post-40c667c83 unit and the unit text is identical before and after (inserted gate shifts numbering by 5).",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -1136,7 +1646,17 @@
         "claimKind": "unclassified",
         "status": "current"
       },
-      "after": null
+      "after": null,
+      "ordinaryReview": {
+        "entry": "n052",
+        "verdict": "ok",
+        "note": "mechanical: old CLAUDE.md unheaded-block-1 (import sentence, sha 5ee1f1a4) leaves units and is recorded as identity gap n059 because the paragraph was rewritten; new block-1 carries the backticks warning in reworded form.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
+      }
     },
     {
       "collection": "units",
@@ -1162,6 +1682,16 @@
         "sourceUnitDigest": "040484693fc054f7b37f6dc489b6295d3ccc3df440c68ceea04c9584ccf4b144",
         "claimKind": "unclassified",
         "status": "current"
+      },
+      "ordinaryReview": {
+        "entry": "n053",
+        "verdict": "ok",
+        "note": "mechanical: AGENTS.md anchor shift unheaded-block-53 to unheaded-block-58; only sourceAnchor changes, digests equal the real post-40c667c83 unit and the unit text is identical before and after (inserted gate shifts numbering by 5).",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -1178,7 +1708,17 @@
         "claimKind": "unclassified",
         "status": "current"
       },
-      "after": null
+      "after": null,
+      "ordinaryReview": {
+        "entry": "n054",
+        "verdict": "ok",
+        "note": "deep: CLAUDE.md using-mcp-preferred leaves live units; row-auth passed and the before row equals the real pre-40c667c83 unit; same claim reappears as retired entry n080, whose content is verbatim in AGENTS.md (checked by text compare).",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
+      }
     },
     {
       "collection": "units",
@@ -1212,6 +1752,16 @@
         "sourceUnitDigest": "5f190b849165ce8115369ebb112a31b286e85237f5c3dd32f8493cc3cfd93d17",
         "claimKind": "unclassified",
         "status": "future"
+      },
+      "ordinaryReview": {
+        "entry": "n055",
+        "verdict": "ok",
+        "note": "mechanical: backlog Product Backlog heading: digests and status unchanged, only the transient lineage and needs-review marker drop at carry; unit digest recomputed from HEAD docs/backlog.md equals 2e296ac6; row was already reviewed in s5-root-generated-backlog.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -1238,6 +1788,16 @@
         "sourceUnitDigest": "e23a5ee9ace2850ec670037d92a358e58770bdd73439c4234c7c5b9f40e24c22",
         "claimKind": "unclassified",
         "status": "current"
+      },
+      "ordinaryReview": {
+        "entry": "n056",
+        "verdict": "ok",
+        "note": "mechanical: AGENTS.md anchor shift unheaded-block-42 to unheaded-block-47; only sourceAnchor changes, digests equal the real post-40c667c83 unit and the unit text is identical before and after (inserted gate shifts numbering by 5).",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -1254,13 +1814,33 @@
         "claimKind": "unclassified",
         "status": "current"
       },
-      "after": null
+      "after": null,
+      "ordinaryReview": {
+        "entry": "n057",
+        "verdict": "ok",
+        "note": "mechanical: CLAUDE.md unheaded-block-8 leaves live units; row-auth passed and the before row equals the real pre-40c667c83 unit; same claim reappears as retired entry n081, whose content is verbatim in AGENTS.md (checked by text compare).",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
+      }
     },
     {
       "collection": "carriedFromCommit",
       "key": "carriedFromCommit",
       "before": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
-      "after": "38672e7f157788cbe1b2bf59511bd61046dce660"
+      "after": "38672e7f157788cbe1b2bf59511bd61046dce660",
+      "ordinaryReview": {
+        "entry": "n058",
+        "verdict": "ok",
+        "note": "mechanical: carriedFromCommit c3614f4d to 38672e7f; 38672e7f is a real commit and equals the registry commit field at 3baafff4d, so the carry chain is consistent.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
+      }
     },
     {
       "collection": "identityGaps",
@@ -1278,6 +1858,16 @@
         "status": "current",
         "identityStatus": "identity-gap",
         "gapReason": "edited unit whose anchor unheaded-block-1 is not a stable heading anchor"
+      },
+      "ordinaryReview": {
+        "entry": "n059",
+        "verdict": "ok",
+        "note": "mechanical: gap row for old CLAUDE.md unheaded-block-1 matches the removed unit row exactly plus identityStatus identity-gap and a truthful gapReason (edited unit, non-heading anchor).",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -1297,6 +1887,16 @@
         "priorStatus": "current",
         "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
         "retiredReason": "no counterpart in current source"
+      },
+      "ordinaryReview": {
+        "entry": "n060",
+        "verdict": "ok",
+        "note": "deep: retired CLAUDE.md#unheaded-block-19 equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -1316,6 +1916,16 @@
         "priorStatus": "current",
         "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
         "retiredReason": "no counterpart in current source"
+      },
+      "ordinaryReview": {
+        "entry": "n061",
+        "verdict": "ok",
+        "note": "mechanical: retired CLAUDE.md#unheaded-block-15 equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -1335,6 +1945,16 @@
         "priorStatus": "current",
         "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
         "retiredReason": "no counterpart in current source"
+      },
+      "ordinaryReview": {
+        "entry": "n062",
+        "verdict": "ok",
+        "note": "mechanical: retired CLAUDE.md#unheaded-block-9 equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -1354,6 +1974,16 @@
         "priorStatus": "current",
         "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
         "retiredReason": "no counterpart in current source"
+      },
+      "ordinaryReview": {
+        "entry": "n063",
+        "verdict": "ok",
+        "note": "mechanical: retired CLAUDE.md#gitnexus-code-intelligence equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -1373,6 +2003,16 @@
         "priorStatus": "current",
         "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
         "retiredReason": "no counterpart in current source"
+      },
+      "ordinaryReview": {
+        "entry": "n064",
+        "verdict": "ok",
+        "note": "mechanical: retired CLAUDE.md#unheaded-block-17 equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -1392,6 +2032,16 @@
         "priorStatus": "current",
         "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
         "retiredReason": "no counterpart in current source"
+      },
+      "ordinaryReview": {
+        "entry": "n065",
+        "verdict": "ok",
+        "note": "mechanical: retired CLAUDE.md#unheaded-block-11 equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -1411,6 +2061,16 @@
         "priorStatus": "current",
         "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
         "retiredReason": "no counterpart in current source"
+      },
+      "ordinaryReview": {
+        "entry": "n066",
+        "verdict": "ok",
+        "note": "mechanical: retired CLAUDE.md#unheaded-block-7 equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -1430,6 +2090,16 @@
         "priorStatus": "current",
         "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
         "retiredReason": "no counterpart in current source"
+      },
+      "ordinaryReview": {
+        "entry": "n067",
+        "verdict": "ok",
+        "note": "mechanical: retired CLAUDE.md#using-cli-fallback equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -1449,6 +2119,16 @@
         "priorStatus": "current",
         "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
         "retiredReason": "no counterpart in current source"
+      },
+      "ordinaryReview": {
+        "entry": "n068",
+        "verdict": "ok",
+        "note": "mechanical: retired CLAUDE.md#unheaded-block-18 equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -1468,6 +2148,16 @@
         "priorStatus": "current",
         "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
         "retiredReason": "no counterpart in current source"
+      },
+      "ordinaryReview": {
+        "entry": "n069",
+        "verdict": "ok",
+        "note": "mechanical: retired CLAUDE.md#unheaded-block-13 equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -1487,6 +2177,16 @@
         "priorStatus": "current",
         "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
         "retiredReason": "no counterpart in current source"
+      },
+      "ordinaryReview": {
+        "entry": "n070",
+        "verdict": "ok",
+        "note": "mechanical: retired CLAUDE.md#always-do equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -1506,6 +2206,16 @@
         "priorStatus": "current",
         "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
         "retiredReason": "no counterpart in current source"
+      },
+      "ordinaryReview": {
+        "entry": "n071",
+        "verdict": "ok",
+        "note": "deep: retired CLAUDE.md#unheaded-block-10 equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -1525,6 +2235,16 @@
         "priorStatus": "current",
         "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
         "retiredReason": "no counterpart in current source"
+      },
+      "ordinaryReview": {
+        "entry": "n072",
+        "verdict": "ok",
+        "note": "mechanical: retired CLAUDE.md#documentation-viewing-mdview equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -1544,6 +2264,16 @@
         "priorStatus": "current",
         "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
         "retiredReason": "no counterpart in current source"
+      },
+      "ordinaryReview": {
+        "entry": "n073",
+        "verdict": "ok",
+        "note": "mechanical: retired CLAUDE.md#unheaded-block-12 equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -1563,6 +2293,16 @@
         "priorStatus": "current",
         "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
         "retiredReason": "no counterpart in current source"
+      },
+      "ordinaryReview": {
+        "entry": "n074",
+        "verdict": "ok",
+        "note": "deep: retired CLAUDE.md#cli equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending. wording: the rationale cites AGENTS.md#cli with a different SHA256 (ed59f3cf) than the source (b1a93fca) without saying why; the AGENTS section is longer (it runs on to the projection block), the CLAUDE section text is contained verbatim in it, so nothing is lost.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -1582,6 +2322,16 @@
         "priorStatus": "current",
         "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
         "retiredReason": "no counterpart in current source"
+      },
+      "ordinaryReview": {
+        "entry": "n075",
+        "verdict": "ok",
+        "note": "mechanical: retired CLAUDE.md#resources equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -1601,6 +2351,16 @@
         "priorStatus": "current",
         "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
         "retiredReason": "no counterpart in current source"
+      },
+      "ordinaryReview": {
+        "entry": "n076",
+        "verdict": "ok",
+        "note": "deep: retired CLAUDE.md#when-to-render equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -1620,6 +2380,16 @@
         "priorStatus": "current",
         "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
         "retiredReason": "no counterpart in current source"
+      },
+      "ordinaryReview": {
+        "entry": "n077",
+        "verdict": "ok",
+        "note": "deep: retired CLAUDE.md#unheaded-block-16 equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -1639,6 +2409,16 @@
         "priorStatus": "current",
         "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
         "retiredReason": "no counterpart in current source"
+      },
+      "ordinaryReview": {
+        "entry": "n078",
+        "verdict": "ok",
+        "note": "mechanical: retired CLAUDE.md#never-do equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -1658,6 +2438,16 @@
         "priorStatus": "current",
         "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
         "retiredReason": "no counterpart in current source"
+      },
+      "ordinaryReview": {
+        "entry": "n079",
+        "verdict": "ok",
+        "note": "mechanical: retired CLAUDE.md#unheaded-block-14 equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -1677,6 +2467,16 @@
         "priorStatus": "current",
         "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
         "retiredReason": "no counterpart in current source"
+      },
+      "ordinaryReview": {
+        "entry": "n080",
+        "verdict": "ok",
+        "note": "mechanical: retired CLAUDE.md#using-mcp-preferred equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -1696,6 +2496,16 @@
         "priorStatus": "current",
         "retiredAtCommit": "3baafff4d7a670b30edac2ff9bcf1594eed4ec95",
         "retiredReason": "no counterpart in current source"
+      },
+      "ordinaryReview": {
+        "entry": "n081",
+        "verdict": "ok",
+        "note": "mechanical: retired CLAUDE.md#unheaded-block-8 equals the real pre-commit unit and claim; its text is carried at the AGENTS.md anchor named in the rationale (anchor, claim id and SHA checked against the HEAD registry), reclassify disposition has no live target as L10-16 requires, overlay pending.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -1728,6 +2538,16 @@
         "gaps": 1,
         "retired": 22,
         "retiredDocuments": 0
+      },
+      "ordinaryReview": {
+        "entry": "n082",
+        "verdict": "ok",
+        "note": "mechanical: carryForward counters check out: newUnits 91366 equals the real units count, 91388-22 retired, kept+paired+moved+editedKept+added = 91366, moved 6 and retired 22 equal the real partition of the 30 old CLAUDE units (6 moved, 22 retired, 1 gap, 1 edited kept).",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     },
     {
@@ -1742,7 +2562,28 @@
         "path": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
         "bytes": 62195972,
         "sha256": "b20238af95f89cd3a83fbc20dd53ce8df1192153415cd85b9586d53884aa9c2b"
+      },
+      "ordinaryReview": {
+        "entry": "n083",
+        "verdict": "ok",
+        "note": "mechanical: _binding after sha b20238af and 62195972 bytes equal the committed 3baafff4d registry file (the carry input), which is how the carry records provenance; the HEAD file differs only by the pending overlay on the 22 retired rows.",
+        "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+        "reviewedAt": "2026-10-17",
+        "reviewMode": "ordinary",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md",
+        "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
       }
     }
-  ]
+  ],
+  "reviewApplication": {
+    "total": 83,
+    "ok": 83,
+    "rework": 0,
+    "hold": 0,
+    "reports": [
+      "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i2-47e813732.md",
+      "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i3-47e813732.md"
+    ],
+    "reportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
+  }
 }

@@ -1,0 +1,18 @@
+{
+  "head": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4",
+  "dryRun": true,
+  "sealed": false,
+  "rows": 68441,
+  "sha256": "acf712bffd2a5e4f2bb4f0ef565a1f1a7b11f8a4d1fa02d3c924affa5d4eab6d",
+  "verify": {
+    "ok": true,
+    "rows": 68441,
+    "sha256": "acf712bffd2a5e4f2bb4f0ef565a1f1a7b11f8a4d1fa02d3c924affa5d4eab6d"
+  },
+  "reconstruction": {
+    "source": "plans/260925-documentation-authority-unification/reports/doc-inventory.json",
+    "claimLedger": 91366,
+    "items": 4486,
+    "strippedItemFields": true
+  }
+}

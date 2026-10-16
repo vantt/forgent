@@ -11,10 +11,10 @@ Related:
 - `plans/260925-documentation-authority-unification/plan.md` §7 Phase 02
 ```
 
-- **Commit:** `c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be`
+- **Commit:** `2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4`
 - **Files scanned:** 4486
-- **Claim rows:** 91388
-- **Headings / unheaded blocks / mixed-file blocks:** 27651 / 62555 / 1182
+- **Claim rows:** 91366
+- **Headings / unheaded blocks / mixed-file blocks:** 27642 / 62542 / 1182
 - **Gaps:** 1012 (1012 file/routing gap(s), 0 claim identity-gap blocker(s))
 - **Exact duplicate-content groups:** 822
 - **Semantic conflict groups:** 219
@@ -66,10 +66,10 @@ Related:
 | Value | Count |
 |---|---:|
 | `literal` | 4249 |
-| `glob` | 2515 |
+| `glob` | 2514 |
 | `executable-proof` | 2089 |
-| `fixture` | 1269 |
-| `dynamic` | 262 |
+| `fixture` | 1417 |
+| `dynamic` | 264 |
 | `shipped-contract` | 43 |
 
 ## Duplicate And Conflict Findings
@@ -2167,72 +2167,50 @@ Related:
 | `claim_1c85e6258b0455d9b44d738f833e1bb9` | `AGENTS.md` | `unheaded-block-31` | `unclassified` | `unknown-blocking` |  |
 | `claim_9dd28187a839e2ce10f2e9dd3f020cdf` | `AGENTS.md` | `starting-the-fgos-gateway-one-door-never-a-raw-process` | `unclassified` | `unknown-blocking` |  |
 | `claim_1e668e7697680b80953d4a1bc8bd65e4` | `AGENTS.md` | `unheaded-block-32` | `unclassified` | `unknown-blocking` |  |
+| `claim_a18fb2712669f362c16aa39841718116` | `AGENTS.md` | `impact-analysis-capability-gate` | `unclassified` | `unknown-blocking` |  |
+| `claim_7cff4d97b31e33a4ca0b8a4b505c8807` | `AGENTS.md` | `unheaded-block-33` | `unclassified` | `unknown-blocking` |  |
+| `claim_34e5aadf94d955884ab6041bc388d0b0` | `AGENTS.md` | `unheaded-block-34` | `unclassified` | `unknown-blocking` |  |
+| `claim_81adf946018de3aee151fbb350719862` | `AGENTS.md` | `unheaded-block-35` | `verification` | `unknown-blocking` |  |
+| `claim_32f35a95feb5773ca27979295027897f` | `AGENTS.md` | `unheaded-block-36` | `unclassified` | `unknown-blocking` |  |
+| `claim_5c07823ad6d47b3e9ac91dfbf41aa56f` | `AGENTS.md` | `unheaded-block-37` | `unclassified` | `unknown-blocking` |  |
 | `claim_2e45cfdcd3f2bf602787b37feac667f3` | `AGENTS.md` | `documentation-viewing-mdview` | `unclassified` | `unknown-blocking` |  |
-| `claim_ae5e7954251083afc5130d73333ef771` | `AGENTS.md` | `unheaded-block-33` | `unclassified` | `unknown-blocking` |  |
+| `claim_ae5e7954251083afc5130d73333ef771` | `AGENTS.md` | `unheaded-block-38` | `unclassified` | `unknown-blocking` |  |
 | `claim_9f129b46b75d0c4d4e7119da265c74b0` | `AGENTS.md` | `using-mcp-preferred` | `unclassified` | `unknown-blocking` |  |
-| `claim_6a2cb3a88c1fb4c7faf143fa5ec076f3` | `AGENTS.md` | `unheaded-block-34` | `unclassified` | `unknown-blocking` |  |
-| `claim_d18c939cc9436e830dae9214808c21ae` | `AGENTS.md` | `unheaded-block-35` | `unclassified` | `unknown-blocking` |  |
-| `claim_74542e8562e9dd16128fadd8a2dbfaca` | `AGENTS.md` | `unheaded-block-36` | `unclassified` | `unknown-blocking` |  |
+| `claim_6a2cb3a88c1fb4c7faf143fa5ec076f3` | `AGENTS.md` | `unheaded-block-39` | `unclassified` | `unknown-blocking` |  |
+| `claim_d18c939cc9436e830dae9214808c21ae` | `AGENTS.md` | `unheaded-block-40` | `unclassified` | `unknown-blocking` |  |
+| `claim_74542e8562e9dd16128fadd8a2dbfaca` | `AGENTS.md` | `unheaded-block-41` | `unclassified` | `unknown-blocking` |  |
 | `claim_33fda3508cbed38745f7b6796ea65709` | `AGENTS.md` | `using-cli-fallback` | `unclassified` | `unknown-blocking` |  |
-| `claim_351eb1f4f67c8aaee59631dad24f99d8` | `AGENTS.md` | `unheaded-block-37` | `unclassified` | `unknown-blocking` |  |
+| `claim_351eb1f4f67c8aaee59631dad24f99d8` | `AGENTS.md` | `unheaded-block-42` | `unclassified` | `unknown-blocking` |  |
 | `claim_73ca3e1b87514a160d7114e22318f1e9` | `AGENTS.md` | `when-to-render` | `unclassified` | `unknown-blocking` |  |
-| `claim_95164f1150b3c485deff5673f7b4ef15` | `AGENTS.md` | `unheaded-block-38` | `unclassified` | `unknown-blocking` |  |
-| `claim_7e77c676144c5ca6cdc3351f5a5ef632` | `AGENTS.md` | `unheaded-block-39` | `unclassified` | `unknown-blocking` |  |
+| `claim_95164f1150b3c485deff5673f7b4ef15` | `AGENTS.md` | `unheaded-block-43` | `unclassified` | `unknown-blocking` |  |
+| `claim_7e77c676144c5ca6cdc3351f5a5ef632` | `AGENTS.md` | `unheaded-block-44` | `unclassified` | `unknown-blocking` |  |
 | `claim_fd05edc9de6352f95be164482329687d` | `AGENTS.md` | `gitnexus-code-intelligence` | `unclassified` | `unknown-blocking` |  |
-| `claim_08f8581721e89c08f589e3bb8002b6ce` | `AGENTS.md` | `unheaded-block-40` | `unclassified` | `unknown-blocking` |  |
-| `claim_d6a9e43c0997b6993a5d9670af469258` | `AGENTS.md` | `unheaded-block-41` | `unclassified` | `unknown-blocking` |  |
+| `claim_08f8581721e89c08f589e3bb8002b6ce` | `AGENTS.md` | `unheaded-block-45` | `unclassified` | `unknown-blocking` |  |
+| `claim_d6a9e43c0997b6993a5d9670af469258` | `AGENTS.md` | `unheaded-block-46` | `unclassified` | `unknown-blocking` |  |
 | `claim_0a800ae3d8a50ecdf22bf6c4604167d5` | `AGENTS.md` | `always-do` | `unclassified` | `unknown-blocking` |  |
-| `claim_f2afc3a44e09eb918aa8c59d42ffe195` | `AGENTS.md` | `unheaded-block-42` | `unclassified` | `unknown-blocking` |  |
+| `claim_f2afc3a44e09eb918aa8c59d42ffe195` | `AGENTS.md` | `unheaded-block-47` | `unclassified` | `unknown-blocking` |  |
 | `claim_133b6f931d35a06604813e97ac11bd8f` | `AGENTS.md` | `never-do` | `unclassified` | `unknown-blocking` |  |
-| `claim_3ca28ff7ed502c1bfd8e695a7387f753` | `AGENTS.md` | `unheaded-block-43` | `unclassified` | `unknown-blocking` |  |
+| `claim_3ca28ff7ed502c1bfd8e695a7387f753` | `AGENTS.md` | `unheaded-block-48` | `unclassified` | `unknown-blocking` |  |
 | `claim_42108ffe5c72a9f3ca2c7ef904fd14ec` | `AGENTS.md` | `resources` | `unclassified` | `unknown-blocking` |  |
-| `claim_11685a19f556cf213ef62e11a1d2d5c6` | `AGENTS.md` | `unheaded-block-44` | `unclassified` | `unknown-blocking` |  |
+| `claim_11685a19f556cf213ef62e11a1d2d5c6` | `AGENTS.md` | `unheaded-block-49` | `unclassified` | `unknown-blocking` |  |
 | `claim_7b36640f7d6ced0d3f089a419f5d26ff` | `AGENTS.md` | `cli` | `unclassified` | `unknown-blocking` |  |
-| `claim_1661543368ff1c7e6f57d20e2345cf4d` | `AGENTS.md` | `unheaded-block-45` | `architecture` | `unknown-blocking` |  |
-| `claim_2165e8fcd1ec571e64eae458439bb309` | `AGENTS.md` | `unheaded-block-46` | `unclassified` | `unknown-blocking` |  |
+| `claim_1661543368ff1c7e6f57d20e2345cf4d` | `AGENTS.md` | `unheaded-block-50` | `architecture` | `unknown-blocking` |  |
+| `claim_2165e8fcd1ec571e64eae458439bb309` | `AGENTS.md` | `unheaded-block-51` | `unclassified` | `unknown-blocking` |  |
 | `claim_6acc93d03a89146ebf7f4903938fabd9` | `AGENTS.md` | `fgos-effective-instructions` | `unclassified` | `unknown-blocking` |  |
 | `claim_9474ae42b4d6e079fcf33fec49e746fa` | `AGENTS.md` | `law` | `unclassified` | `unknown-blocking` |  |
 | `claim_a700bf68bba6456dc5d22693e0a42ff4` | `AGENTS.md` | `decision-question-template` | `decision` | `unknown-blocking` |  |
-| `claim_1ac1158b31cf27d233825c9e70232fdb` | `AGENTS.md` | `unheaded-block-47` | `decision` | `unknown-blocking` |  |
+| `claim_1ac1158b31cf27d233825c9e70232fdb` | `AGENTS.md` | `unheaded-block-52` | `decision` | `unknown-blocking` |  |
 | `claim_e922726b8953ed0cc00db6c4cdad3b48` | `AGENTS.md` | `decision-question-template-1` | `decision` | `unknown-blocking` |  |
-| `claim_1c0fa8ed450e9b4d240269ee06fbb6d2` | `AGENTS.md` | `unheaded-block-48` | `unclassified` | `unknown-blocking` |  |
+| `claim_1c0fa8ed450e9b4d240269ee06fbb6d2` | `AGENTS.md` | `unheaded-block-53` | `unclassified` | `unknown-blocking` |  |
 | `claim_fde89656fbadabacb69e8f793b223377` | `AGENTS.md` | `platform-operating-laws` | `unclassified` | `unknown-blocking` |  |
-| `claim_b70e7c39975314f130e9a2501156721d` | `AGENTS.md` | `unheaded-block-49` | `unclassified` | `unknown-blocking` |  |
+| `claim_b70e7c39975314f130e9a2501156721d` | `AGENTS.md` | `unheaded-block-54` | `unclassified` | `unknown-blocking` |  |
 | `claim_8231e682b35899eed43b85ce92dbc6ba` | `AGENTS.md` | `platform-operating-laws-1` | `unclassified` | `unknown-blocking` |  |
-| `claim_cace4724d966bb5a40bc0b17768520c1` | `AGENTS.md` | `unheaded-block-50` | `unclassified` | `unknown-blocking` |  |
-| `claim_07e83f30731906c4f25c96625cd95e26` | `AGENTS.md` | `unheaded-block-51` | `specification` | `unknown-blocking` |  |
-| `claim_4c8b5dcba297831ece58a92091e942d6` | `AGENTS.md` | `unheaded-block-52` | `verification` | `unknown-blocking` |  |
-| `claim_e59f80485141f1b75d155dca7272c34e` | `AGENTS.md` | `unheaded-block-53` | `unclassified` | `unknown-blocking` |  |
+| `claim_cace4724d966bb5a40bc0b17768520c1` | `AGENTS.md` | `unheaded-block-55` | `unclassified` | `unknown-blocking` |  |
+| `claim_07e83f30731906c4f25c96625cd95e26` | `AGENTS.md` | `unheaded-block-56` | `specification` | `unknown-blocking` |  |
+| `claim_4c8b5dcba297831ece58a92091e942d6` | `AGENTS.md` | `unheaded-block-57` | `verification` | `unknown-blocking` |  |
+| `claim_e59f80485141f1b75d155dca7272c34e` | `AGENTS.md` | `unheaded-block-58` | `unclassified` | `unknown-blocking` |  |
 | `claim_0d2c13615099d78c5e38533379ecf7cc` | `CLAUDE.md` | `project-rules` | `unclassified` | `unknown-blocking` |  |
-| `claim_db83a4c14e03868fccf833f00f51f296` | `CLAUDE.md` | `unheaded-block-1` | `unclassified` | `unknown-blocking` |  |
-| `claim_a18fb2712669f362c16aa39841718116` | `CLAUDE.md` | `impact-analysis-capability-gate` | `unclassified` | `unknown-blocking` |  |
-| `claim_7cff4d97b31e33a4ca0b8a4b505c8807` | `CLAUDE.md` | `unheaded-block-2` | `unclassified` | `unknown-blocking` |  |
-| `claim_34e5aadf94d955884ab6041bc388d0b0` | `CLAUDE.md` | `unheaded-block-3` | `unclassified` | `unknown-blocking` |  |
-| `claim_81adf946018de3aee151fbb350719862` | `CLAUDE.md` | `unheaded-block-4` | `verification` | `unknown-blocking` |  |
-| `claim_32f35a95feb5773ca27979295027897f` | `CLAUDE.md` | `unheaded-block-5` | `unclassified` | `unknown-blocking` |  |
-| `claim_5c07823ad6d47b3e9ac91dfbf41aa56f` | `CLAUDE.md` | `unheaded-block-6` | `unclassified` | `unknown-blocking` |  |
-| `claim_8396a2952ef6cbcae93835afb0a73152` | `CLAUDE.md` | `documentation-viewing-mdview` | `unclassified` | `unknown-blocking` |  |
-| `claim_50134455b2dca31dc4bd662b22744a21` | `CLAUDE.md` | `unheaded-block-7` | `unclassified` | `unknown-blocking` |  |
-| `claim_e6e4b2ccbaf2497ac1ff7ef374d2821b` | `CLAUDE.md` | `using-mcp-preferred` | `unclassified` | `unknown-blocking` |  |
-| `claim_fc5de985b938821c067f1a79009368ed` | `CLAUDE.md` | `unheaded-block-8` | `unclassified` | `unknown-blocking` |  |
-| `claim_2afb04da34da039e196e613f3262cdec` | `CLAUDE.md` | `unheaded-block-9` | `unclassified` | `unknown-blocking` |  |
-| `claim_809815d317fc255da84f53b1c30431cf` | `CLAUDE.md` | `unheaded-block-10` | `unclassified` | `unknown-blocking` |  |
-| `claim_6540d24a1703d63c0b4645efaaccc891` | `CLAUDE.md` | `using-cli-fallback` | `unclassified` | `unknown-blocking` |  |
-| `claim_5010f46edb2e930c7efebd3876a7942d` | `CLAUDE.md` | `unheaded-block-11` | `unclassified` | `unknown-blocking` |  |
-| `claim_a1fe07b1842007c25172823b1716b586` | `CLAUDE.md` | `when-to-render` | `unclassified` | `unknown-blocking` |  |
-| `claim_88fca05f9afd9c63fe14ebb5a08e5094` | `CLAUDE.md` | `unheaded-block-12` | `unclassified` | `unknown-blocking` |  |
-| `claim_7251396790f9d7a220a2c6f8ffde55c3` | `CLAUDE.md` | `unheaded-block-13` | `unclassified` | `unknown-blocking` |  |
-| `claim_2f612bbe8e8413b66477d06bf6046ed4` | `CLAUDE.md` | `gitnexus-code-intelligence` | `unclassified` | `unknown-blocking` |  |
-| `claim_d50f2409ac827afeb65163065905a878` | `CLAUDE.md` | `unheaded-block-14` | `unclassified` | `unknown-blocking` |  |
-| `claim_1e109a5e30aba0234c61706edad2c820` | `CLAUDE.md` | `unheaded-block-15` | `unclassified` | `unknown-blocking` |  |
-| `claim_79dd88f1fb058d9385445406fbd9296d` | `CLAUDE.md` | `always-do` | `unclassified` | `unknown-blocking` |  |
-| `claim_ae71daeca0febe5384359e3ad92443e8` | `CLAUDE.md` | `unheaded-block-16` | `unclassified` | `unknown-blocking` |  |
-| `claim_b0612b463c58046dea6ba09504d97a82` | `CLAUDE.md` | `never-do` | `unclassified` | `unknown-blocking` |  |
-| `claim_3f0ed45ecb0952e67c013b52f129fedc` | `CLAUDE.md` | `unheaded-block-17` | `unclassified` | `unknown-blocking` |  |
-| `claim_928e5b681c1bbc6c51563c78de0b4f23` | `CLAUDE.md` | `resources` | `unclassified` | `unknown-blocking` |  |
-| `claim_6bd09ad125ddd52d9563117b379ecc60` | `CLAUDE.md` | `unheaded-block-18` | `unclassified` | `unknown-blocking` |  |
-| `claim_8c2cca9caea197a0601c680f4bfcbb23` | `CLAUDE.md` | `cli` | `unclassified` | `unknown-blocking` |  |
-| `claim_05d3c5f6af634e345b6e32290900c232` | `CLAUDE.md` | `unheaded-block-19` | `architecture` | `unknown-blocking` |  |
+| `claim_5914548c37db472c43bb2fdb9f2b15c2` | `CLAUDE.md` | `unheaded-block-1` | `unclassified` | `unknown-blocking` |  |
 | `claim_81c3b0eacf7f0ab3fbe44476b56419b6` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-1` | `architecture` | `unknown-blocking` |  |
 | `claim_826404d26de265df9c556ab61db2b488` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `coordination-recovery-planning-and-session-continuation` | `architecture` | `unknown-blocking` |  |
 | `claim_6febf72e4de937b588580a52cf4d72ca` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-2` | `architecture` | `unknown-blocking` |  |
@@ -2623,3 +2601,25 @@ Related:
 | `claim_fe9a145fca29a661f8e7fed513d5cccc` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `allowed-uses` | `architecture` | `unknown-blocking` |  |
 | `claim_6a88397b647451041fa2c3a33597038b` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `unheaded-block-11` | `architecture` | `unknown-blocking` |  |
 | `claim_c0db062aa922f74c1b85aee8479a608d` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `forbidden-inferences` | `architecture` | `unknown-blocking` |  |
+| `claim_8e5f6cce78f0590a9ee66586d2de208e` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `unheaded-block-12` | `architecture` | `unknown-blocking` |  |
+| `claim_19d239a2b1605ac96d2ee658bdc5fdc0` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `stability-direction` | `architecture` | `unknown-blocking` |  |
+| `claim_fb7117148388d6f7204601d1ed75fe1e` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `unheaded-block-13` | `architecture` | `unknown-blocking` |  |
+| `claim_fae400884309c195b210acb2d447ec5a` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `unheaded-block-14` | `architecture` | `unknown-blocking` |  |
+| `claim_6ba0183167280a716dbb2280c15a7a07` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `unheaded-block-15` | `architecture` | `unknown-blocking` |  |
+| `claim_2dcf2c49b82067ffb247f7aadc2e118b` | `docs/architect/agent-coordination/architecture/work-integration.md` | `work-integration-boundaries` | `architecture` | `unknown-blocking` |  |
+| `claim_9d23254bf1aa9b922820e8547793a573` | `docs/architect/agent-coordination/architecture/work-integration.md` | `unheaded-block-1` | `architecture` | `unknown-blocking` |  |
+| `claim_7bd82292925aedf322f843511de04746` | `docs/architect/agent-coordination/architecture/work-integration.md` | `unheaded-block-2` | `architecture` | `unknown-blocking` |  |
+| `claim_4bd7c42b0bfa6a8893e438757bab9305` | `docs/architect/agent-coordination/architecture/work-integration.md` | `core-invariant` | `contract` | `unknown-blocking` |  |
+| `claim_064e1c1dfd7e46e36112f737c911b394` | `docs/architect/agent-coordination/architecture/work-integration.md` | `unheaded-block-3` | `architecture` | `unknown-blocking` |  |
+| `claim_1f7afbbdef971d513de11c3bd40fd5c4` | `docs/architect/agent-coordination/architecture/work-integration.md` | `unheaded-block-4` | `architecture` | `unknown-blocking` |  |
+| `claim_2df65f4af9d85b4e641d9052bd62c735` | `docs/architect/agent-coordination/architecture/work-integration.md` | `coordination-may` | `architecture` | `unknown-blocking` |  |
+| `claim_11980b101ef098a18b76be8c2a78b8a5` | `docs/architect/agent-coordination/architecture/work-integration.md` | `unheaded-block-5` | `architecture` | `unknown-blocking` |  |
+| `claim_83f7fc09d5ba85f086d400af59bc35d1` | `docs/architect/agent-coordination/architecture/work-integration.md` | `coordination-may-not` | `architecture` | `unknown-blocking` |  |
+| `claim_f7da49f56bb5406dda1b7a9dc8321353` | `docs/architect/agent-coordination/architecture/work-integration.md` | `unheaded-block-6` | `architecture` | `unknown-blocking` |  |
+| `claim_67f9d0ea41295bbca331fb84aa66ba2a` | `docs/architect/agent-coordination/architecture/work-integration.md` | `child-work` | `architecture` | `unknown-blocking` |  |
+| `claim_ab11b0024b53a7249250c242d68471d7` | `docs/architect/agent-coordination/architecture/work-integration.md` | `unheaded-block-7` | `architecture` | `unknown-blocking` |  |
+| `claim_2994ba9c4e09b4a24e45990a75f72c09` | `docs/architect/agent-coordination/architecture/work-integration.md` | `unheaded-block-8` | `architecture` | `unknown-blocking` |  |
+| `claim_617be84c8e3d790239657cc052131b8a` | `docs/architect/agent-coordination/architecture/work-integration.md` | `work-driver-handoff-to-dispatch` | `architecture` | `unknown-blocking` |  |
+| `claim_7b0b3b8e08dcf64cdb7d758d7d9eb0b5` | `docs/architect/agent-coordination/architecture/work-integration.md` | `unheaded-block-9` | `architecture` | `unknown-blocking` |  |
+| `claim_edee0cf1c7011c8dbdc736cbdad94e2d` | `docs/architect/agent-coordination/architecture/work-integration.md` | `isolation` | `architecture` | `unknown-blocking` |  |
+| `claim_b2e7ba276481b1271c469d12fd614bdf` | `docs/architect/agent-coordination/architecture/work-integration.md` | `unheaded-block-10` | `architecture` | `unknown-blocking` |  |

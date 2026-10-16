@@ -131,10 +131,15 @@
       "targetAnchor": null,
       "claimKind": "procedure",
       "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792184405209-31ed32fb@2026-10-17",
       "rationale": "L10-42 content-bound edit: commit 40c667c83 rewrote the CLAUDE.md#project-rules section so it only explains and imports the shared AGENTS.md instruction source. Native identity claim_0d2c13615099d78c5e38533379ecf7cc is retained with current source SHA256 ead3a061cf7d13bce3595a8e0214d0553fd1b0c1da5672fe8759570e0f05d8d0; predecessor section SHA256 8cfd6f83037e10f65f4fab831d75c6b0ef373c7841bc510090b83310b5739537 is preserved in lineage. Keep reclassify-out-of-platform-scope: CLAUDE.md remains an always-loaded instruction surface, not platform documentation authority. No positional identity, truth approval, promotion, retirement or cutover is inferred; independent ordinary review is pending and no prior approval carries.",
-      "reviewNote": "L10-42 content-bound instruction identity accounting; independent ordinary review pending; no approval carried."
+      "reviewNote": "deep: rewritten heading Project Rules (line 1, section now ends after the import block) keeps claim id; pre digest 8cfd6f83 equals lineage fromSourceUnitDigest and HEAD digest ead3a061 recomputed; reclassify route fits an always-loaded instruction file.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i1-47e813732.md",
+      "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
     },
     {
       "claimId": "claim_11685a19f556cf213ef62e11a1d2d5c6",
@@ -432,10 +437,15 @@
       "targetAnchor": null,
       "claimKind": "procedure",
       "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792184405209-31ed32fb@2026-10-17",
       "rationale": "L10-42 content-bound move: commit 40c667c83 moved the complete 6607b84c0b5d87053383a57ad03d8ac292df94227bb60eed9f81664ba11ed4ff instruction unit from CLAUDE.md#unheaded-block-5 to AGENTS.md#unheaded-block-36 while preserving native identity claim_32f35a95feb5773ca27979295027897f. Keep reclassify-out-of-platform-scope under the established L10-3 route: AGENTS.md remains the always-loaded instruction owner outside platform documentation authority. No positional identity, platform copy, truth approval, promotion, retirement or cutover is inferred; independent ordinary review is pending and no prior approval carries.",
-      "reviewNote": "L10-42 content-bound instruction identity accounting; independent ordinary review pending; no approval carried."
+      "reviewNote": "deep: move CLAUDE.md#unheaded-block-5 (pre lines undefined-undefined) to AGENTS.md#unheaded-block-36 (HEAD lines undefined-undefined); raw unit text byte-equal at both ends, source and target digests recomputed equal, anchor check passes, registry before/after differs only in sourcePath/anchor/movedFrom. Digest also hand-recomputed with sed and sha256sum, not the extractor.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i1-47e813732.md",
+      "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
     },
     {
       "claimId": "claim_33713bd504d89af5cfb1eb5d6fa16d01",
@@ -478,10 +488,15 @@
       "targetAnchor": null,
       "claimKind": "procedure",
       "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792184405209-31ed32fb@2026-10-17",
       "rationale": "L10-42 content-bound move: commit 40c667c83 moved the complete 226b024897f07907322a11454fbde4c344bb3c0459d235fbb0d79e5b682d1921 instruction unit from CLAUDE.md#unheaded-block-3 to AGENTS.md#unheaded-block-34 while preserving native identity claim_34e5aadf94d955884ab6041bc388d0b0. Keep reclassify-out-of-platform-scope under the established L10-3 route: AGENTS.md remains the always-loaded instruction owner outside platform documentation authority. No positional identity, platform copy, truth approval, promotion, retirement or cutover is inferred; independent ordinary review is pending and no prior approval carries.",
-      "reviewNote": "L10-42 content-bound instruction identity accounting; independent ordinary review pending; no approval carried."
+      "reviewNote": "deep: move CLAUDE.md#unheaded-block-3 (pre lines undefined-undefined) to AGENTS.md#unheaded-block-34 (HEAD lines undefined-undefined); raw unit text byte-equal at both ends, source and target digests recomputed equal, anchor check passes, registry before/after differs only in sourcePath/anchor/movedFrom. Digest also hand-recomputed with sed and sha256sum, not the extractor.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i1-47e813732.md",
+      "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
     },
     {
       "claimId": "claim_351e6c4a4690c52f77aee859728d1140",
@@ -627,9 +642,14 @@
       "claimKind": "procedure",
       "disposition": "reclassify-out-of-platform-scope",
       "rationale": "L10-42 content-bound current instruction row: CLAUDE.md#unheaded-block-1 at SHA256 7d97033654aafc4e7056f36abd4d92177b77b74d76db436f60f9521eb7b90a2e is the new import-only explanation created by 40c667c83. CLAUDE.md now delegates all project rules to AGENTS.md and remains an always-loaded instruction surface outside platform documentation authority. No positional identity, platform copy, truth approval, promotion, retirement or cutover is inferred; independent ordinary review is pending and no prior approval carries.",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792184405209-31ed32fb@2026-10-17",
-      "reviewNote": "L10-42 content-bound instruction identity accounting; independent ordinary review pending; no approval carried."
+      "reviewNote": "deep: CLAUDE.md lines 3-11 at HEAD is the only new text in 40c667c83 (import-only explanation plus the @AGENTS.md import line); digest recomputed by hand; honestly labelled as a new live unit with added-since origin, and it restates the old backtick rule so no rule is dropped. Digest also hand-recomputed with sed and sha256sum, not the extractor.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i1-47e813732.md",
+      "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
     },
     {
       "claimId": "claim_5c07823ad6d47b3e9ac91dfbf41aa56f",
@@ -638,10 +658,15 @@
       "targetAnchor": null,
       "claimKind": "procedure",
       "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792184405209-31ed32fb@2026-10-17",
       "rationale": "L10-42 content-bound move: commit 40c667c83 moved the complete ffc67a1eab2b7b0589ff8ebc2b85736441958ade69576583be4c07a0d57ace8c instruction unit from CLAUDE.md#unheaded-block-6 to AGENTS.md#unheaded-block-37 while preserving native identity claim_5c07823ad6d47b3e9ac91dfbf41aa56f. Keep reclassify-out-of-platform-scope under the established L10-3 route: AGENTS.md remains the always-loaded instruction owner outside platform documentation authority. No positional identity, platform copy, truth approval, promotion, retirement or cutover is inferred; independent ordinary review is pending and no prior approval carries.",
-      "reviewNote": "L10-42 content-bound instruction identity accounting; independent ordinary review pending; no approval carried."
+      "reviewNote": "deep: move CLAUDE.md#unheaded-block-6 (pre lines undefined-undefined) to AGENTS.md#unheaded-block-37 (HEAD lines undefined-undefined); raw unit text byte-equal at both ends, source and target digests recomputed equal, anchor check passes, registry before/after differs only in sourcePath/anchor/movedFrom. Digest also hand-recomputed with sed and sha256sum, not the extractor.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i1-47e813732.md",
+      "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
     },
     {
       "claimId": "claim_5f15ada3e8a013ad4b1c962bd082ea68",
@@ -803,10 +828,15 @@
       "targetAnchor": null,
       "claimKind": "procedure",
       "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792184405209-31ed32fb@2026-10-17",
       "rationale": "L10-42 content-bound move: commit 40c667c83 moved the complete 7fd75c1135e7ea9df4294bcee9f875ea87ea1157484a7b6a78180dfb85cd9824 instruction unit from CLAUDE.md#unheaded-block-2 to AGENTS.md#unheaded-block-33 while preserving native identity claim_7cff4d97b31e33a4ca0b8a4b505c8807. Keep reclassify-out-of-platform-scope under the established L10-3 route: AGENTS.md remains the always-loaded instruction owner outside platform documentation authority. No positional identity, platform copy, truth approval, promotion, retirement or cutover is inferred; independent ordinary review is pending and no prior approval carries.",
-      "reviewNote": "L10-42 content-bound instruction identity accounting; independent ordinary review pending; no approval carried."
+      "reviewNote": "deep: move CLAUDE.md#unheaded-block-2 (pre lines undefined-undefined) to AGENTS.md#unheaded-block-33 (HEAD lines undefined-undefined); raw unit text byte-equal at both ends, source and target digests recomputed equal, anchor check passes, registry before/after differs only in sourcePath/anchor/movedFrom. Digest also hand-recomputed with sed and sha256sum, not the extractor.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i1-47e813732.md",
+      "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
     },
     {
       "claimId": "claim_7d42588d114718c42e806e4070f1a22c",
@@ -849,10 +879,15 @@
       "targetAnchor": null,
       "claimKind": "procedure",
       "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792184405209-31ed32fb@2026-10-17",
       "rationale": "L10-42 content-bound move: commit 40c667c83 moved the complete bc235f0b750993d157e6192d56c297e4373976d92f32b3322342286165cd06af instruction unit from CLAUDE.md#unheaded-block-4 to AGENTS.md#unheaded-block-35 while preserving native identity claim_81adf946018de3aee151fbb350719862. Keep reclassify-out-of-platform-scope under the established L10-3 route: AGENTS.md remains the always-loaded instruction owner outside platform documentation authority. No positional identity, platform copy, truth approval, promotion, retirement or cutover is inferred; independent ordinary review is pending and no prior approval carries.",
-      "reviewNote": "L10-42 content-bound instruction identity accounting; independent ordinary review pending; no approval carried."
+      "reviewNote": "deep: move CLAUDE.md#unheaded-block-4 (pre lines undefined-undefined) to AGENTS.md#unheaded-block-35 (HEAD lines undefined-undefined); raw unit text byte-equal at both ends, source and target digests recomputed equal, anchor check passes, registry before/after differs only in sourcePath/anchor/movedFrom. Digest also hand-recomputed with sed and sha256sum, not the extractor.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i1-47e813732.md",
+      "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
     },
     {
       "claimId": "claim_8231e682b35899eed43b85ce92dbc6ba",
@@ -1014,10 +1049,15 @@
       "targetAnchor": null,
       "claimKind": "procedure",
       "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792184405209-31ed32fb@2026-10-17",
       "rationale": "L10-42 content-bound move: commit 40c667c83 moved the complete 9f085e90490eabb709bbb9121644075c09d080ce012ee19af7fd656cef02ad4a instruction unit from CLAUDE.md#impact-analysis-capability-gate to AGENTS.md#impact-analysis-capability-gate while preserving native identity claim_a18fb2712669f362c16aa39841718116. Keep reclassify-out-of-platform-scope under the established L10-3 route: AGENTS.md remains the always-loaded instruction owner outside platform documentation authority. No positional identity, platform copy, truth approval, promotion, retirement or cutover is inferred; independent ordinary review is pending and no prior approval carries.",
-      "reviewNote": "L10-42 content-bound instruction identity accounting; independent ordinary review pending; no approval carried."
+      "reviewNote": "deep: move CLAUDE.md#impact-analysis-capability-gate (pre lines undefined-undefined) to AGENTS.md#impact-analysis-capability-gate (HEAD lines undefined-undefined); raw unit text byte-equal at both ends, source and target digests recomputed equal, anchor check passes, registry before/after differs only in sourcePath/anchor/movedFrom.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i1-47e813732.md",
+      "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
     },
     {
       "claimId": "claim_a700bf68bba6456dc5d22693e0a42ff4",
@@ -1797,9 +1837,14 @@
       "targetOwner": null,
       "targetAnchor": null,
       "rationale": "L10-42 content-bound predecessor gap: claim_db83a4c14e03868fccf833f00f51f296 preserves the pre-40c667c83 CLAUDE.md#unheaded-block-1 import explanation at SHA256 5ee1f1a48ddcb69e62623b1abb1c6f3434fae4b31adb2f45cfb28e55736c2aef. The current import-only explanation is separately bound as claim_5914548c37db472c43bb2fdb9f2b15c2 at SHA256 7d97033654aafc4e7056f36abd4d92177b77b74d76db436f60f9521eb7b90a2e; position is not identity. Reclassify the historical instruction predecessor outside platform documentation authority. No approval, platform copy, truth approval, promotion, retirement or cutover carries; independent ordinary review is pending.",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792184405209-31ed32fb@2026-10-17",
-      "reviewNote": "L10-42 content-bound instruction identity accounting; independent ordinary review pending; no approval carried."
+      "reviewNote": "deep: predecessor gap holds pre-40c667c83 CLAUDE.md lines 3-6 (import paragraph with the backtick rule), digest 5ee1f1a4 recomputed by hand; in the prior registry it was a current unit and is now an identity-gap, units 91388 to 91366 and gaps +1 balance; its successor is d011. Digest also hand-recomputed with sed and sha256sum, not the extractor.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewMode": "ordinary",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-l10-42-i1-47e813732.md",
+      "reviewReportCommit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4"
     },
     {
       "claimId": "claim_f3d9a6f6cc27c52855bc0ce2a3706e2c",

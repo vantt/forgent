@@ -158,5 +158,32 @@
     "cutoverExitCode": 1,
     "cloneRemoved": true
   },
+  "supersededBy": "step10-final-audit.json",
+  "checks": [
+    "identity-source-delta",
+    "l10-42-independent-review",
+    "global-D-both-priors",
+    "global-D-identity-prior",
+    "global-D-phase02-prior",
+    "strict-E",
+    "expected-comparator",
+    "promotion",
+    "H",
+    "T9",
+    "mutation",
+    "author-written-audit",
+    "ownership",
+    "replay",
+    "A-B-H-I",
+    "alias",
+    "snapshot-verify",
+    "relevant-tests",
+    "durable-checkpoint-refresh",
+    "checkpoint-review",
+    "current-truth-sample",
+    "final-red-team",
+    "identical-groups-review",
+    "final-group-counts"
+  ],
   "blockers": []
 }
