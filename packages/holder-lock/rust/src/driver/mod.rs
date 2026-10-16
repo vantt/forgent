@@ -1,0 +1,72 @@
+//! Per-OS drivers behind the port. A driver answers only OS questions (lock
+//! one description, what the filesystem guarantees, who holds a file, what
+//! is left after a borrowing child); the rules built on them live in `port`.
+
+use std::fs::File;
+use std::io;
+use std::path::{Path, PathBuf};
+use std::process::Command;
+use std::time::Duration;
+
+use crate::port::{Guarantee, HoldersList, Mode};
+
+#[cfg(unix)]
+pub mod flock;
+#[cfg(windows)]
+pub mod windows;
+
+/// One non-blocking lock attempt.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TryLock {
+    /// The description holds the lock now.
+    Locked,
+    /// Another description holds a conflicting lock.
+    WouldBlock,
+}
+
+/// Processes still holding a borrowed description after the kill wait.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Leftovers {
+    /// How many were signaled.
+    pub killed: u32,
+    /// Pids (Linux) or the process group id (macOS) still there.
+    pub pids: Vec<u32>,
+}
+
+/// The OS half of the lock port.
+pub trait LockDriver: Sync {
+    /// Whether this platform has a driver at all.
+    fn supported(&self) -> bool;
+    /// Why not, when [`LockDriver::supported`] is false.
+    fn unsupported_detail(&self) -> &'static str;
+    /// One non-blocking attempt to lock `file` in `mode`.
+    fn try_lock(&self, file: &File, mode: Mode) -> io::Result<TryLock>;
+    /// Guarantee for lock files in directory `dir` (the nearest existing
+    /// ancestor is measured when `dir` does not exist yet).
+    fn guarantee(&self, dir: &Path) -> Guarantee;
+    /// Guarantee for the filesystem an open lock file lives on.
+    fn file_guarantee(&self, file: &File) -> io::Result<Guarantee>;
+    /// Path an open description was opened under.
+    fn description_path(&self, file: &File) -> io::Result<PathBuf>;
+    /// Who holds a lock on `file`.
+    fn holders(&self, file: &File) -> HoldersList;
+    /// Shape the borrowing child's command before spawn (macOS: own
+    /// process group, so what it leaves behind can be ended).
+    fn prepare_borrow(&self, cmd: &mut Command);
+    /// After the borrowing child `child_pid` exited: end whatever still
+    /// holds `file`'s description apart from this process and wait up to
+    /// `kill_wait` for it to be gone. `Ok(killed)` when nothing is left.
+    fn end_leftovers(&self, file: &File, child_pid: u32, kill_wait: Duration) -> Result<u32, Leftovers>;
+}
+
+/// The driver of the platform this binary runs on.
+pub fn current() -> &'static dyn LockDriver {
+    #[cfg(unix)]
+    {
+        &flock::FlockDriver
+    }
+    #[cfg(windows)]
+    {
+        &windows::WindowsDriver
+    }
+}

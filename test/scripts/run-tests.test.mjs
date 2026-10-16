@@ -314,6 +314,12 @@ test('buildTestEnv drops an inherited NODE_TEST_CONTEXT so a nested node --test 
   assert.equal(env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS, '1');
 });
 
+test('buildTestEnv drops an inherited FGOS_STATE_ROOT so fixtures that set FGOS_STATE_HOME stay in their own state root', () => {
+  const env = buildTestEnv({ PATH: '/usr/bin', FGOS_STATE_ROOT: '/real/state/fgos', FGOS_STATE_HOME: '/fixture/state' });
+  assert.equal('FGOS_STATE_ROOT' in env, false);
+  assert.equal(env.FGOS_STATE_HOME, '/fixture/state');
+});
+
 // --- per-run temp dir: every fixture the suite mkdtemps lands under one
 // directory that is removed when the run ends, so leaked fixtures can never
 // pile up in the OS temp dir across runs.
