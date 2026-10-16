@@ -152,6 +152,82 @@ Known flaws of the stop-gap:
   window. At minimum, a concurrency cap per expensive tier.
 - **Observability.** Streaming progress for headless claude, so a dead
   expensive run is detected in minutes, not at the idle timeout.
+- **Smart selection, short config.** The intelligence lives in the selection
+  code, not in the config file. The selection must meet every criterion above;
+  the config stays as short and simple as possible, because developers avoid a
+  config that is long or hard to write. Today the project
+  `.fgos/config.json` is 1598 lines (10 executors, 25 invocations, 38
+  capabilities) plus 371 lines of global config. Concretely:
+  - The common case needs only a few lines: declaring "deepseek-v4-pro from
+    service B with these accounts" must not require copying invocations or
+    capability entries.
+  - Every fact is written once. Defaults are inferred where the code can infer
+    them (tier ladders, fallback order, account rotation), and the developer
+    writes only what differs from the default.
+  - Adding the supply layer (§5.1) must make the config shorter, not longer:
+    the per-account invocation duplicates it removes outweigh the source entries
+    it adds.
+  - The effective result stays visible without reading code: a command shows
+    what a (capability, tier) resolves to and why, so a short config never hides
+    the outcome.
+
+### 5.1 Supply layer: who serves a model, separate from what fgOS asks for
+
+Added 2026-10-17 from an owner discussion. The selection mechanism works on
+three layers that today's config mixes into each invocation's id and `env`:
+
+| Layer | Who cares | Today |
+|---|---|---|
+| Capability: model family + tier | fgOS at run time | `modelPolicies.<family>.<tier>` |
+| Supply: service provider, account, key | the developer | partly in global `providers.<p>.accounts`, partly in invocation ids and `env` (`pi-cli-tetnu`, `pi-cli-fgovn`, …) |
+| Harness: binary and adapter | the developer | `executors.<id>.invocations[]`; already solves which harness can talk to which service, so it is out of scope here |
+
+fgOS should only ask "family X at tier T". The developer declares where that
+capability is served from and with which accounts. Neither side needs the other's
+details.
+
+Requirements for the supply layer:
+
+- **Per-tier source.** One family's tiers may come from different service
+  providers, even different companies. Example: `deepseek-v4-flash`
+  (nano/standard) from service A with its own account and key, and
+  `deepseek-v4-pro` (advanced and above) from service B. A (family, tier) may
+  list one or more sources.
+- **Model name per source.** The same model has different ids per service
+  (`deepseek/deepseek-v4-pro` on OpenRouter, `deepseek-v4-pro` on the vendor
+  API). The capability layer keeps one canonical name; each source maps it to
+  its own id.
+- **Change in one place.** Switching the source of one tier, or the harness of
+  one family, is a single edit. No invocation is duplicated per account.
+- **Account rotation per source.** Accounts belong to a source, not to an
+  executor or an invocation id.
+
+What already exists and must be kept (verified in code):
+
+- **Account rotation on the same candidate:** `retrySameCandidate`
+  (`src/runner/execution/bind.mjs`), provenance `kind: 'account-rotation'`.
+  The same executor, invocation and tier run again on another account of the
+  same provider.
+- **Fallback to another family at the same tier:** `nextCandidate`
+  (`src/runner/execution/bind.mjs`), called from `src/runner/execution/run.mjs`
+  and `src/runner/dispatch/assignment-runner.mjs`. On a provider limit it walks
+  to the next entry of `capabilities.<cap>.prefer`, skips families with a
+  credential fault (`excludeFamilies`) and re-runs `bind()` with the same ask, so
+  the tier is kept and the model is read from the new family's ladder (gemini
+  `advanced` exhausted → claude `advanced` = sonnet). Provenance
+  `kind: 'next-candidate'`. `allowCrossProvider` is only the egress permission,
+  not this fallback.
+
+Gaps in that fallback, which the supply layer must close:
+
+- The fallback order is declared per capability (`prefer`), not per tier, so
+  "advanced falls back deepseek-B → gemini → claude" cannot be expressed.
+- "Equivalent intelligence" rests only on equal tier names across family
+  ladders; it is as good as the person who keeps the ladders aligned.
+- There is no step between account rotation and changing family. The required
+  order is: **another account of the same source → another source of the same
+  model → another family at the same tier.** Each step is recorded in the unit's
+  provenance with its own `kind`.
 
 ## 6. Constraints
 
@@ -183,3 +259,13 @@ Known flaws of the stop-gap:
   only estimable from local run logs?
 - Should leads (in-process orchestrators) be capped by the same policy, or by a
   separate "orchestrator" capability?
+- Is the cross-family fallback order declared per tier only, or can a capability
+  still narrow it (for example a review that must never leave claude)?
+- Do supply sources live only in the global config (credentials are per
+  machine), with the project config naming sources by id only?
+- When the provider serving the tier a capability needs is unavailable, may that
+  capability switch straight to another family at the same tier? Today the order
+  is implicit and fixed: rotate accounts within the same family first, change
+  family only after that. Should the order be configurable per capability or per
+  tier (for example "change family first, rotate accounts later"), and who
+  declares it?
