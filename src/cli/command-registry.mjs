@@ -1214,10 +1214,9 @@ export const COMMAND_REGISTRY = [
           properties: {
             mode: { type: 'string', description: 'Positional: plan (default), apply, or provider-capacity.', enum: ['plan', 'apply', 'provider-capacity'] },
             'capacity-action': { type: 'string', description: 'Positional after provider-capacity: quarantine or clear-quarantine.', enum: ['quarantine', 'clear-quarantine'] },
-            action: { type: 'string', description: '"plan" only: the action kind to plan, one of "clear-cwd-lock" (default), "collect-result" (requires --run), "clear-assignment-claim" (requires --assignment), or "repair-projection" (requires --run).' },
+            action: { type: 'string', description: '"plan" only: the action kind to plan, one of "clear-cwd-lock" (default), "collect-result" (requires --run), or "repair-projection" (requires --run).' },
             run: { type: 'string', description: '"plan" only: target runId for collect-result or repair-projection.' },
             'run-id': { type: 'string', description: '"plan" only: same as --run.' },
-            assignment: { type: 'string', description: '"plan" only: target Assignment id for clear-assignment-claim.' },
             cwd: { type: 'string', description: '"plan" only: the working directory whose per-cwd dispatch lock clear-cwd-lock targets (default: the current directory).' },
             plan: { type: 'string', description: '"apply" only: JSON-encoded plan returned by `dispatch reconcile plan`.' },
             provider: { type: 'string', description: 'provider-capacity: provider id as `inspect --provider-capacity` lists it, e.g. openai-codex.' },

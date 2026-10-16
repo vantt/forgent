@@ -18,7 +18,7 @@ export function reconcilePlanUseCase(ctx, payload = {}) {
   const { action, runId, assignmentId, cwd } = payload;
   if ((runId !== undefined || assignmentId !== undefined) && (!action || action === 'clear-cwd-lock')) {
     throw new DispatchReconcileError(
-      'dispatch reconcile plan with --run or --assignment requires --action (e.g. collect-result, clear-assignment-claim, or repair-projection)',
+      'dispatch reconcile plan with --run or --assignment requires --action (e.g. collect-result or repair-projection)',
     );
   }
   return planReconciliation(ctx?.repoRoot ?? ctx?.cwd ?? process.cwd(), { action, runId, assignmentId, cwd });

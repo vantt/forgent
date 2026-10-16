@@ -2665,7 +2665,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           if ((runParam !== undefined || flags.assignment !== undefined) && (!flags.action || flags.action === 'clear-cwd-lock')) {
             throw new StoreError(
               'validation',
-              'dispatch reconcile plan with --run or --assignment requires --action (e.g. collect-result, clear-assignment-claim, or repair-projection)',
+              'dispatch reconcile plan with --run or --assignment requires --action (e.g. collect-result or repair-projection)',
             );
           }
           const cwd = flags.cwd !== undefined ? path.resolve(process.cwd(), flags.cwd) : undefined;
