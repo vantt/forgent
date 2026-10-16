@@ -287,3 +287,7 @@ SYNC `e7393ea3c`. No promotion or authority change. Detailed-map destinations no
  - `.fgos/events.jsonl` — nhật ký sự kiện work-state (truth, committed); `.fgos/state.json` là view gitignored; `.fgos/logs/<id>.log` — bản ghi output cục bộ của trợ lý theo từng việc, gitignored (spec: docs/specs/runner.md)
  - `AGENTS.md`, `CLAUDE.md` — doctrine layer nạp mọi phiên agent (bản sản phẩm — thuần forgent)
 ```
+
+## Session Identity header completion — 2026-10-16 (pending independent review)
+
+Assignment `unit-run-1792168391979-ad740169/producer/1` authorizes the eight missing constitution fields in `docs/platform/session-identity/spec.md`. Map `Implementation status` to `Implementation` with its exact existing value; retain all other existing header values, Accepted/Canonical status, Last reviewed date and every body byte. Add provenance from the existing Source/Contracts fields and introducing commit `6a53e65b5`; define the component scope and exclusions from sections 1–2. Writer type describes agent authorship of this header completion. `Supersedes: None` / `Superseded by: None` records no authority replacement. This is metadata repair only, pending independent review; the next package must show the exact diff and authenticate any native tuple consequence. No prior content approval carries onto the changed header unit. See `step10-author-gap-header-accounting.json`.

@@ -39,7 +39,7 @@
   ],
   "scopeLimit": "Final mapped Step 5 source population; AGENTS.md/CLAUDE.md deferred to Step 10. Review and other closure obligations remain open.",
   "meaning": "Native reverse-open list; candidate-unverified, no truth approval.",
-  "count": 846,
+  "count": 852,
   "rows": [
     {
       "claimId": "claim_d32ffe8c2dcf1fffb004c4087509896f",
@@ -11881,7 +11881,7 @@
       "claimId": "claim_b7c518d75199b375690ee0f92878a42a",
       "path": "docs/platform/vision.md",
       "anchor": "6-related-anchors",
-      "unitDigest": "0f1fb36b7b9c371685c7d818752f200a5314fca16a15a2d833730d518e3dd656",
+      "unitDigest": "582f8e6bcaa5b3b136d0189fd7195284e32b1ae9b7b5b70207a975a756e8eebc",
       "status": "candidate-unverified",
       "fileStatus": {
         "kind": "vision",
@@ -11890,28 +11890,17 @@
         "canonical": false,
         "canonicalHeader": "No",
         "authorityStatus": "candidate"
-      }
-    },
-    {
-      "claimId": "claim_908f25861679e06c2aab8286758c076c",
-      "path": "docs/platform/vision.md",
-      "anchor": "unheaded-block-14",
-      "unitDigest": "47e992413c7b6cbe3b8e2c54b93e7924dc9bb7edd12d047d87c2c368079b4718",
-      "status": "candidate-unverified",
-      "fileStatus": {
-        "kind": "vision",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "canonical": false,
-        "canonicalHeader": "No",
-        "authorityStatus": "candidate"
-      }
+      },
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     },
     {
       "claimId": "claim_fe092189b623cca65c6aa3b2f86ee225",
       "path": "docs/platform/work-state/architecture/implementation-pointers.md",
       "anchor": "work-state-implementation-pointers",
-      "unitDigest": "cb275b793cfe6299aaa442b4021cce113f2dfeb62fee2397f0680acdcb9b56d8",
+      "unitDigest": "3246a5a3e6249062d0d6e668475c491ada3c7535a4f52dcb246e6430defed508",
       "status": "candidate-unverified",
       "fileStatus": {
         "kind": "architecture",
@@ -11920,22 +11909,11 @@
         "canonical": false,
         "canonicalHeader": null,
         "authorityStatus": "candidate"
-      }
-    },
-    {
-      "claimId": "claim_178bb22fcc32ae881dd170c17e2cb2ad",
-      "path": "docs/platform/work-state/architecture/implementation-pointers.md",
-      "anchor": "unheaded-block-1",
-      "unitDigest": "d357d4a5224eaffb265d2bcf57b79347b4d4a7ef3ca5c998d31da3cc9f1d3d5b",
-      "status": "candidate-unverified",
-      "fileStatus": {
-        "kind": "architecture",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "canonical": false,
-        "canonicalHeader": null,
-        "authorityStatus": "candidate"
-      }
+      },
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     },
     {
       "claimId": "claim_ae1f79478cc3028c10094861b3ca9203",
@@ -12001,7 +11979,7 @@
       "claimId": "claim_2f0b0a2f17833506438ae6f6b83eb7fd",
       "path": "docs/platform/work-state/contracts/cli-io-contract.md",
       "anchor": "cli-io-contract",
-      "unitDigest": "ace07b86452f1aa48efa0897defdd839191e5d66ea38aacd51db318afb0bc941",
+      "unitDigest": "d402870da7c60d96c00eb162384d3e6c5f65e4aae549efeb991d5e8a5186bedb",
       "status": "candidate-unverified",
       "fileStatus": {
         "kind": "contract",
@@ -12010,22 +11988,11 @@
         "canonical": false,
         "canonicalHeader": null,
         "authorityStatus": "candidate"
-      }
-    },
-    {
-      "claimId": "claim_66b020a1841dcd96a65ebd9fc32fb3cf",
-      "path": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "anchor": "unheaded-block-1",
-      "unitDigest": "0987d91c6d782d70b13bae3627e042e262c6f3b3a87dfb82997fba01aa7147fb",
-      "status": "candidate-unverified",
-      "fileStatus": {
-        "kind": "contract",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "canonical": false,
-        "canonicalHeader": null,
-        "authorityStatus": "candidate"
-      }
+      },
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     },
     {
       "claimId": "claim_f80f69f4de87e6414f83673fa0010ba6",
@@ -12046,7 +12013,7 @@
       "claimId": "claim_32a411cc1ef34025d21bebdcc0183c3f",
       "path": "docs/platform/work-state/contracts/cli-io-contract.md",
       "anchor": "writer-source-trust-levels",
-      "unitDigest": "987e8f9f71703323f0ba7b5ca63c5dbddb7536ba1f69683e432efd4463da6890",
+      "unitDigest": "4f751accb88f58ecf5884341df15465c2160516e0c84109aef211ad11bee4df8",
       "status": "candidate-unverified",
       "fileStatus": {
         "kind": "contract",
@@ -12055,7 +12022,11 @@
         "canonical": false,
         "canonicalHeader": null,
         "authorityStatus": "candidate"
-      }
+      },
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     },
     {
       "claimId": "claim_d10f877c9fe11dbae43ffc87d62a16e3",
@@ -12076,7 +12047,7 @@
       "claimId": "claim_5f9a6123b5c816fb5fbcd4575a29b75c",
       "path": "docs/platform/work-state/contracts/cli-io-contract.md",
       "anchor": "caller-role",
-      "unitDigest": "befd4c0925c52780e0dff93c01ed25165e6ed23c6bafeba2665f172496b25420",
+      "unitDigest": "8d194e876bac7a54c733916f927346facfe878113904e2e5a2c0745359ed917d",
       "status": "candidate-unverified",
       "fileStatus": {
         "kind": "contract",
@@ -12085,7 +12056,11 @@
         "canonical": false,
         "canonicalHeader": null,
         "authorityStatus": "candidate"
-      }
+      },
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     },
     {
       "claimId": "claim_dd9e99347fb7582d5e53002d16241ac8",
@@ -12211,9 +12186,9 @@
       }
     },
     {
-      "claimId": "claim_c9081814b1f39c068fb76e62b7726390",
+      "claimId": "claim_3a33dd186893d5e3ec604bd468c1466e",
       "path": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "anchor": "unheaded-block-49",
+      "anchor": "unheaded-block-50",
       "unitDigest": "6238a5e1752c22a8bb4a2801757a1e891ae0902e8cec197d7a44d5f7f9eb8ea0",
       "status": "candidate-unverified",
       "fileStatus": {
@@ -12224,13 +12199,16 @@
         "canonicalHeader": null,
         "authorityStatus": "candidate"
       },
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     },
     {
       "claimId": "claim_e7b9adc648921a3b524b621ac615fad6",
       "path": "docs/platform/work-state/decisions/retired-decision-history.md",
       "anchor": "retired-decision-history-work-state",
-      "unitDigest": "b15dec1d66d1ae673352b56ff918b917f9e628294a4ef5124f6face82e91e995",
+      "unitDigest": "d5d453c53327cbd5b342ff12ae04b823728bf24872c5349af5aedc7d0642bd82",
       "status": "candidate-unverified",
       "fileStatus": {
         "kind": "decision",
@@ -12239,22 +12217,11 @@
         "canonical": false,
         "canonicalHeader": null,
         "authorityStatus": "candidate"
-      }
-    },
-    {
-      "claimId": "claim_33eee087ac3e479ed6296daf4c6d143e",
-      "path": "docs/platform/work-state/decisions/retired-decision-history.md",
-      "anchor": "unheaded-block-1",
-      "unitDigest": "1a6db74c9548d91671e8677038c8a3d5cbb338157fa78edab6420ad6555257ac",
-      "status": "candidate-unverified",
-      "fileStatus": {
-        "kind": "decision",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "canonical": false,
-        "canonicalHeader": null,
-        "authorityStatus": "candidate"
-      }
+      },
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     },
     {
       "claimId": "claim_61b042f479508b9e6671ead705da6e76",
@@ -12380,7 +12347,7 @@
       "claimId": "claim_6e7e6c494be10e4791240d2b06d702ca",
       "path": "docs/platform/work-state/README.md",
       "anchor": "work-state",
-      "unitDigest": "2a8b93c172f11f9d2f118fea5a934559964ccb299327b5deb8621632a1d2d98a",
+      "unitDigest": "252bd4bd0b73bb5287d39df62a5d10bd81c7c72b2dc98cddbb464930df613005",
       "status": "candidate-unverified",
       "fileStatus": {
         "kind": "area-portal",
@@ -12389,22 +12356,11 @@
         "canonical": false,
         "canonicalHeader": null,
         "authorityStatus": "candidate"
-      }
-    },
-    {
-      "claimId": "claim_ed518acf009411ce9041b0cd75212b4f",
-      "path": "docs/platform/work-state/README.md",
-      "anchor": "unheaded-block-1",
-      "unitDigest": "402fdee5f2de6e3510907b5bcc86080b6b4f8c1f3b40cbec3bc6cb347ea739ea",
-      "status": "candidate-unverified",
-      "fileStatus": {
-        "kind": "area-portal",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "canonical": false,
-        "canonicalHeader": null,
-        "authorityStatus": "candidate"
-      }
+      },
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     },
     {
       "claimId": "claim_cc394d5b0cb0a9b1279269b3e692b476",
@@ -12590,7 +12546,7 @@
       "claimId": "claim_d0a4a0ba4c7eac82a7694e85effbd735",
       "path": "docs/platform/work-state/spec.md",
       "anchor": "work-state-specification",
-      "unitDigest": "9a658ef61faf272a7f509a32ce47a8778f94d791140af01f0dbdab633456a4aa",
+      "unitDigest": "ecc457c6b9ae1cdb52514eb147f433c0016f38fb121d45e899755cc8d038602f",
       "status": "candidate-unverified",
       "fileStatus": {
         "kind": "spec",
@@ -12599,22 +12555,11 @@
         "canonical": false,
         "canonicalHeader": null,
         "authorityStatus": "candidate"
-      }
-    },
-    {
-      "claimId": "claim_b59a3cdc9f62daead75352fbce112437",
-      "path": "docs/platform/work-state/spec.md",
-      "anchor": "unheaded-block-1",
-      "unitDigest": "48be7e1956a052be73118c1dd9f46ea4380226e957820b79e128011e137c6985",
-      "status": "candidate-unverified",
-      "fileStatus": {
-        "kind": "spec",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "canonical": false,
-        "canonicalHeader": null,
-        "authorityStatus": "candidate"
-      }
+      },
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     },
     {
       "claimId": "claim_8c62d6551e80993c22ab57147c8f81c3",
@@ -12750,6 +12695,138 @@
         "canonicalHeader": null,
         "authorityStatus": "candidate"
       }
+    },
+    {
+      "claimId": "claim_12de66b907dd6ac4b5eeec1461ef4c9f",
+      "path": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "a49b56e4c14198649dee1224ebf0bc991561a1b17a6bbde52b840d7b3c5775e0",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate in persisted global E; absent from every current-state list after authenticated rebindings. No source decision accounts for it; truth and promotion remain unverified.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "claimId": "claim_47659ffca79cf69f840fa3aa3cf6beeb",
+      "path": "docs/platform/vision.md",
+      "anchor": "unheaded-block-14",
+      "unitDigest": "7c239dfc4e2fbc1292583d4d228bb2d9b2a56cf71593fe9b1e010e3c30635ce8",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate in persisted global E; absent from every current-state list after authenticated rebindings. No source decision accounts for it; truth and promotion remain unverified.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "claimId": "claim_552c245d8c6c6cb103b24f0e4498b651",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-11",
+      "unitDigest": "973ee5615eeb755822f8032d8d11c080f21e340bd20a87952b300cde23661e95",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate in persisted global E; absent from every current-state list after authenticated rebindings. No source decision accounts for it; truth and promotion remain unverified.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "claimId": "claim_592e9f4db425e77922270eb850552f93",
+      "path": "docs/platform/work-state/architecture/implementation-pointers.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "dd941d8a99b83ddde55d78fb65e8b4f6576c63310610ecc8ace6a0e95ae0c6d3",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate in persisted global E; absent from every current-state list after authenticated rebindings. No source decision accounts for it; truth and promotion remain unverified.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "claimId": "claim_63a9042d6cfd75192fcbbe16049cf731",
+      "path": "docs/platform/work-state/README.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "34b3a3683fddf06454bc6de3bea4596b63fad84e2bdaff3d901a188e9703f560",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate in persisted global E; absent from every current-state list after authenticated rebindings. No source decision accounts for it; truth and promotion remain unverified.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "claimId": "claim_8c3de7b596ce0cc7705a7402550663d0",
+      "path": "docs/platform/work-state/spec.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "0cb0df2febf325c6cfac0472a318155a06758a35d6f73e2c5784c81767633845",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate in persisted global E; absent from every current-state list after authenticated rebindings. No source decision accounts for it; truth and promotion remain unverified.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "claimId": "claim_993fa29cbbeb28efd41dafeb29510ee7",
+      "path": "docs/platform/agent-confinement/spec.md",
+      "anchor": "unheaded-block-46",
+      "unitDigest": "46a48aa7b43dc72f68eee7332a4dfc62145204e16d4815016396a0bbb0ddb0b6",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate in persisted global E; absent from every current-state list after authenticated rebindings. No source decision accounts for it; truth and promotion remain unverified.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "claimId": "claim_ae866db5c795898e6321e6d78ff85621",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "101030d628745ef104f9ac9c3440c3b0e25db9a5047ec248ac7a2f7820848650",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate in persisted global E; absent from every current-state list after authenticated rebindings. No source decision accounts for it; truth and promotion remain unverified.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "claimId": "claim_b6f647e906e9bb309341e3aa27a3b454",
+      "path": "docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "32501c8d9a3064c8232e7c336d1cc5a69c6b8728fff781bd501e0e3dc6964e62",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate in persisted global E; absent from every current-state list after authenticated rebindings. No source decision accounts for it; truth and promotion remain unverified.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "claimId": "claim_b8c99351fb2a23740539de0afcfdafbf",
+      "path": "docs/platform/component-boundary.md",
+      "anchor": "unheaded-block-13",
+      "unitDigest": "928afdd0d671c1952dd27a83bff8ebbb709abf443d75ecf9018a1096c9d1d18c",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate in persisted global E; absent from every current-state list after authenticated rebindings. No source decision accounts for it; truth and promotion remain unverified.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "claimId": "claim_c30f395c9014a36e28c2724162a0841c",
+      "path": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "82647edef571ef664da3c50af9fb4c36886fff9977adbee1ca2e31c48e30962e",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate in persisted global E; absent from every current-state list after authenticated rebindings. No source decision accounts for it; truth and promotion remain unverified.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "claimId": "claim_f2da2b26518a1b8d568d92d13d967e76",
+      "path": "docs/platform/architecture-map.md",
+      "anchor": "unheaded-block-1",
+      "unitDigest": "62eb4aa69a84b9d0085b8eadc84efe52f4a854ae07a608d5be5071b72823baa2",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate in persisted global E; absent from every current-state list after authenticated rebindings. No source decision accounts for it; truth and promotion remain unverified.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     }
   ],
   "workStateSpecCarriers": [
@@ -18694,5 +18771,17 @@
   "nativeRebindingGlobal": {
     "SYNC": "498048c1a6651556a0ae977a2871135b5ac7c945",
     "method": "Exact native tuple or authenticated retained ID; no expected-ID filtering or inferred approval."
+  },
+  "currentStateReconciliation": {
+    "authorSession": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+    "basisCommit": "498048c1a6651556a0ae977a2871135b5ac7c945",
+    "accounting": "step10-author-candidate-accounting.json",
+    "changes": {
+      "rebind": 9,
+      "remove": 6,
+      "add": 12
+    },
+    "reviewStatus": "pending",
+    "meaning": "Prior list-level review/native-equality receipts describe their historical pins; changed entries require new independent review. Current tuple membership verified against persisted native registry and reverse set, not current implementation truth."
   }
 }

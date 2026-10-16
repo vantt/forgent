@@ -6,7 +6,7 @@
   "scope": [
     "docs/specs/runner.md"
   ],
-  "count": 62,
+  "count": 75,
   "tupleFields": [
     "claimId",
     "path",
@@ -139,11 +139,13 @@
       "claimId": "claim_c868bc8d5e9e5a6f4859364834528dd6",
       "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
       "anchor": "added-in-candidate-runner-lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4",
-      "unitDigest": "742978b083aa9746696bc18a99d5e6d67ebe568eed7ea0dfb77f9d0486ce9ab8",
+      "unitDigest": "fcb4bf6684cf1413e7033d94ba44c4d65cdc51b712bd9346a80505d7688d2812",
       "fileStatus": "Candidate",
-      "shownText": "# Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)\n\n\n```txt\nDocument type: Decision record\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve frozen-map runner content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; implementation truth not certified\nProvenance: docs/specs/runner.md at 63fa6f15266f45c881f610235e0be8d61ff07120; blob ddfa78cc7183cf1f7db8ee64d2339653a0aa0023\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing runner carriage, placement and conservation\nDo not use this for: Canonical behavior, source retirement or current truth proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/runner.md\nSupersedes: None; legacy authority retained\nSuperseded by: None\n```\n\n> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Placement in decisions does not declare the subject retired. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: R9-1: link-only rebase; label and repository referent preserved (docs/specs/confinement-authority.md); R9-1: link-only rebase; label and repository referent preserved (plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/acceptance-herdr.md). The verbatim carried retired heading holds 11 current decision records: 0047, 0052 and 0055–0063; partly superseded clauses keep their dated historical meaning (including 0062 R3_PENDING_WORK_CALLERS, superseded by 0063). Carried `runner.md:<line>` self-citations are stale line references; numbers and historical decision text retained.",
       "shownTextDigest": "a86623f088cf287030a63237de4f2b3f4d18bf51bf2cc3ca265f388cedf1a3ca",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     },
     {
       "claimId": "claim_79517a5f05ccd6be621a18a7c7a98714",
@@ -153,16 +155,6 @@
       "fileStatus": "Candidate",
       "shownText": "```txt\nDocument type: Decision record\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve frozen-map runner content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; implementation truth not certified\nProvenance: docs/specs/runner.md at 63fa6f15266f45c881f610235e0be8d61ff07120; blob ddfa78cc7183cf1f7db8ee64d2339653a0aa0023\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing runner carriage, placement and conservation\nDo not use this for: Canonical behavior, source retirement or current truth proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/runner.md\nSupersedes: None; legacy authority retained\nSuperseded by: None\n```",
       "shownTextDigest": "a80902e9fd1e8e58a631e6d154f773628ec835e290aea82b688e06cc31846a6c",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_98ebe3a997b0c8659ea9f7324520ee5d",
-      "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
-      "anchor": "unheaded-block-2",
-      "unitDigest": "12a5df8d364b96c50c0dc7f473107fb827c25f59b0e1d6cf8bbc7c9f71957412",
-      "fileStatus": "Candidate",
-      "shownText": "> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Placement in decisions does not declare the subject retired. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: R9-1: link-only rebase; label and repository referent preserved (docs/specs/confinement-authority.md); R9-1: link-only rebase; label and repository referent preserved (plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/acceptance-herdr.md). The verbatim carried retired heading holds 11 current decision records: 0047, 0052 and 0055–0063; partly superseded clauses keep their dated historical meaning (including 0062 R3_PENDING_WORK_CALLERS, superseded by 0063). Carried `runner.md:<line>` self-citations are stale line references; numbers and historical decision text retained.",
-      "shownTextDigest": "12a5df8d364b96c50c0dc7f473107fb827c25f59b0e1d6cf8bbc7c9f71957412",
       "reviewStatus": "pending"
     },
     {
@@ -199,11 +191,13 @@
       "claimId": "claim_068de0851cd81c1c38d509d107fd11a3",
       "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
       "anchor": "added-in-candidate-runner-behaviors-operations",
-      "unitDigest": "b48b04eee38eecc530ff296d1b616f123b28db9a8e5b0bb83f0b8383dbc71c3d",
+      "unitDigest": "b25679f99cf830e4a7b2ea4278537d055b0e9114366f9e2101da66404a910b34",
       "fileStatus": "Candidate",
-      "shownText": "# Added in candidate: Runner Behaviors & Operations\n\n\n```txt\nDocument type: Guide / Runbook\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve frozen-map runner content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; implementation truth not certified\nProvenance: docs/specs/runner.md at 63fa6f15266f45c881f610235e0be8d61ff07120; blob ddfa78cc7183cf1f7db8ee64d2339653a0aa0023\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing runner carriage, placement and conservation\nDo not use this for: Canonical behavior, source retirement or current truth proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/runner.md\nSupersedes: None; legacy authority retained\nSuperseded by: None\n```\n\n> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: A41 F-B: remove model-call denial (src/runner/loop.mjs:1641-1655); A41 F-B continuation: validation precedes plan resolution (src/runner/loop.mjs:1641-1678); A41 F-E: replace removed live tee with run capture (src/runner/loop.mjs:349-351; src/runner/loop.mjs:1110-1112; src/runner/loop.mjs:1150-1163); A41 F-E: item-log tail does not stream worker chunks (src/runner/loop.mjs:349-351; src/runner/loop.mjs:1150-1163); A41 F-G: Iron Law has no entropy-module rule (src/evolve/iron-law.mjs:20-45); A41 F-C: evolve/ranking is absent; remaining Gate A contract explicitly scoped to legacy (bin/fgos.mjs:4373-4380; bin/fgos.mjs:4640-4643); R9-5: remove decisions-placement boilerplate from non-decision carrier. The remaining Gate A evolve bullets describe the legacy contract, not a current shipped verb; full truth check owed at promotion.",
       "shownTextDigest": "e4f037100224c5c78459ca123251c3410b78d089434076d4d270106c54f0e39e",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     },
     {
       "claimId": "claim_6f375c15f6d73810511f8228671620f6",
@@ -216,14 +210,16 @@
       "reviewStatus": "pending"
     },
     {
-      "claimId": "claim_12b5a84382034e873673bfc9cb09734c",
+      "claimId": "claim_1238f27d06dc31148ae1d649cf910018",
       "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
       "anchor": "unheaded-block-2",
-      "unitDigest": "25e5d283f7df610fc091c31b8ef48b747a8f5fa54530ff8b1b84a92da3887d09",
+      "unitDigest": "3fab723eb054be1c1007c12f347887b98f4d864a5ae24d84527fa3eca45e3446",
       "fileStatus": "Candidate",
-      "shownText": "> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: A41 F-B: remove model-call denial (src/runner/loop.mjs:1641-1655); A41 F-B continuation: validation precedes plan resolution (src/runner/loop.mjs:1641-1678); A41 F-E: replace removed live tee with run capture (src/runner/loop.mjs:349-351; src/runner/loop.mjs:1110-1112; src/runner/loop.mjs:1150-1163); A41 F-E: item-log tail does not stream worker chunks (src/runner/loop.mjs:349-351; src/runner/loop.mjs:1150-1163); A41 F-G: Iron Law has no entropy-module rule (src/evolve/iron-law.mjs:20-45); A41 F-C: evolve/ranking is absent; remaining Gate A contract explicitly scoped to legacy (bin/fgos.mjs:4373-4380; bin/fgos.mjs:4640-4643); R9-5: remove decisions-placement boilerplate from non-decision carrier. The remaining Gate A evolve bullets describe the legacy contract, not a current shipped verb; full truth check owed at promotion.",
       "shownTextDigest": "25e5d283f7df610fc091c31b8ef48b747a8f5fa54530ff8b1b84a92da3887d09",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     },
     {
       "claimId": "claim_cbdc399021bf4d700ad7f55d34b413f7",
@@ -549,11 +545,13 @@
       "claimId": "claim_54603609b547a6f66e5bac303a3557be",
       "path": "docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md",
       "anchor": "added-in-candidate-runner-entry-points-triggers",
-      "unitDigest": "f2da04a8f6d26763b2e6fd21d0ac10cef8a7d85a453cff7638b7c58d57ca7cd6",
+      "unitDigest": "e7dbacb4c73a3907eef90472f3f447973273eb0995f984016685277d79dae1f4",
       "fileStatus": "Candidate",
-      "shownText": "# Added in candidate: Runner Entry Points & Triggers\n\n\n```txt\nDocument type: Specification\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve frozen-map runner content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; implementation truth not certified\nProvenance: docs/specs/runner.md at 63fa6f15266f45c881f610235e0be8d61ff07120; blob ddfa78cc7183cf1f7db8ee64d2339653a0aa0023\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing runner carriage, placement and conservation\nDo not use this for: Canonical behavior, source retirement or current truth proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/runner.md\nSupersedes: None; legacy authority retained\nSuperseded by: None\n```\n\n> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: A41 F1: remove unavailable entry point (bin/fgos.mjs:4373-4380; bin/fgos.mjs:4640-4643); R9-5: remove decisions-placement boilerplate from non-decision carrier.",
       "shownTextDigest": "a25bf16fb52ffdc5068e507e453d97d12625ebb47791e8c5ecdf3abe05a9e1b0",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     },
     {
       "claimId": "claim_0256872e0f6bca4850be3078e4f573b1",
@@ -566,14 +564,16 @@
       "reviewStatus": "pending"
     },
     {
-      "claimId": "claim_792117ae3e90dcc79bb2522f59773b89",
+      "claimId": "claim_73a0a1df74653030d37e108cfd37218d",
       "path": "docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md",
       "anchor": "unheaded-block-2",
-      "unitDigest": "f88931593c55ac2afc6ae60cd52a96dda07aa2b673d169b001205b302ef544b4",
+      "unitDigest": "3405ed4f32704ce2e17c155d22d3366a75bdf88bc026b500d66ed59f11314445",
       "fileStatus": "Candidate",
-      "shownText": "> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: A41 F1: remove unavailable entry point (bin/fgos.mjs:4373-4380; bin/fgos.mjs:4640-4643); R9-5: remove decisions-placement boilerplate from non-decision carrier.",
       "shownTextDigest": "f88931593c55ac2afc6ae60cd52a96dda07aa2b673d169b001205b302ef544b4",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     },
     {
       "claimId": "claim_1a0a3569f863262c63e2072db1faa392",
@@ -609,11 +609,13 @@
       "claimId": "claim_589f838032f1c0475587257a362d4cc0",
       "path": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
       "anchor": "added-in-candidate-runner-pointers-implementation",
-      "unitDigest": "43760affd7e65f8e020a774625818c670b4fec3f64f50a759d66860ad166bcb6",
+      "unitDigest": "000e9e51e310864054f158972bc706147386a93d2b6c86138a108042a1ca10aa",
       "fileStatus": "Candidate",
-      "shownText": "# Added in candidate: Runner Pointers (implementation)\n\n\n```txt\nDocument type: Specification\nAudience: Documentation migration reviewer, maintainer, agent\nPurpose: Preserve frozen-map runner content for independent conservation review\nDesign status: Candidate\nImplementation: Carriage only; implementation truth not certified\nProvenance: docs/specs/runner.md at 63fa6f15266f45c881f610235e0be8d61ff07120; blob ddfa78cc7183cf1f7db8ee64d2339653a0aa0023\nWriter type: Agent draft writer\nCanonical: No\nCanonical for: None; candidate only\nUse this when: Reviewing runner carriage, placement and conservation\nDo not use this for: Canonical behavior, source retirement or current truth proof\nLast reviewed: Not independently reviewed; authored 2026-10-15\nRelated:\n- docs/specs/runner.md\nSupersedes: None; legacy authority retained\nSuperseded by: None\n```\n\n> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: A41 F2: replace deleted entropy pointer (packages/observe/rust/src/metrics_cli/entropy.rs:1-8; packages/observe/rust/src/metrics_cli/entropy.rs:107-127); A41 F1: replace deleted ranking pointer (bin/fgos.mjs:4640-4643; bin/fgos.mjs:4373-4380); R9-5: remove decisions-placement boilerplate from non-decision carrier.",
       "shownTextDigest": "92eb1eb864b8e796d46db267036492e6b8eb6a27cb3f7d910460267a9ca1ff99",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     },
     {
       "claimId": "claim_09b4f6799a33cebb70d576cb66c676b3",
@@ -626,14 +628,170 @@
       "reviewStatus": "pending"
     },
     {
-      "claimId": "claim_61244b0a84842a2771f7cdb493ebb699",
+      "claimId": "claim_83a11864c376f283107eeca5fe3ffca5",
       "path": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
       "anchor": "unheaded-block-2",
-      "unitDigest": "ae0e268fad727f5deda17cf43d013aa1710f5cea2506fdd844809c3c8e98511f",
+      "unitDigest": "c354e3357585a5cc6bce8dd57d833b0e85d3f19e58ba6e81e9d6f562aca53edc",
       "fileStatus": "Candidate",
-      "shownText": "> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: A41 F2: replace deleted entropy pointer (packages/observe/rust/src/metrics_cli/entropy.rs:1-8; packages/observe/rust/src/metrics_cli/entropy.rs:107-127); A41 F1: replace deleted ranking pointer (bin/fgos.mjs:4640-4643; bin/fgos.mjs:4373-4380); R9-5: remove decisions-placement boilerplate from non-decision carrier.",
       "shownTextDigest": "ae0e268fad727f5deda17cf43d013aa1710f5cea2506fdd844809c3c8e98511f",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "claimId": "claim_0876da817dfa1682359c8d1823d92452",
+      "path": "docs/platform/runner/spec.md",
+      "anchor": "unheaded-block-7",
+      "unitDigest": "9216be2c3b07fb41d3f5f27307dd16239899a8f1a1207932bd4af7445a38bcdf",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate in persisted global E; absent from every current-state list after authenticated rebindings. No source decision accounts for it; truth and promotion remain unverified.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "claimId": "claim_3390e7039e79eb400059e2949c945cf6",
+      "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "anchor": "unheaded-block-189",
+      "unitDigest": "55c5a95220c4486691bd2e55c4cae7af99f9475c621dd4f65d5dcdc9544fbd8d",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate in persisted global E; absent from every current-state list after authenticated rebindings. No source decision accounts for it; truth and promotion remain unverified.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "claimId": "claim_4494775f2688c7b3ef05ffb458dd628a",
+      "path": "docs/platform/runner/spec.md",
+      "anchor": "unheaded-block-9",
+      "unitDigest": "30ad6c3c321a462677fbc037c612520d07495a445dd6a82810f85c1c30d591a9",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate in persisted global E; absent from every current-state list after authenticated rebindings. No source decision accounts for it; truth and promotion remain unverified.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "claimId": "claim_6598b0201d76ee564e11e9fd1f6da0a2",
+      "path": "docs/platform/runner/spec.md",
+      "anchor": "unheaded-block-6",
+      "unitDigest": "a271942c1834e8f5b9f8a48c5efc501e69d2fa92ef572059f14b24a91f50ed30",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate in persisted global E; absent from every current-state list after authenticated rebindings. No source decision accounts for it; truth and promotion remain unverified.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "claimId": "claim_847f0e0c56a6695d4097fb1e537ea1bc",
+      "path": "docs/platform/runner/spec.md",
+      "anchor": "historical-source-section-552ef3d6",
+      "unitDigest": "d7474ce22b2aacd3fa972c85a7ab553f0712b9959468763ab90f1bbf91621899",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate in persisted global E; absent from every current-state list after authenticated rebindings. No source decision accounts for it; truth and promotion remain unverified.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "claimId": "claim_90fb9245a91d2389ba25704be807be20",
+      "path": "docs/platform/runner/spec.md",
+      "anchor": "unheaded-block-11",
+      "unitDigest": "75c5c7028e9031320b63d89f672072416ee952498f10887da01e2bbef4848ed3",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate in persisted global E; absent from every current-state list after authenticated rebindings. No source decision accounts for it; truth and promotion remain unverified.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "claimId": "claim_982fa232e8267691441436f1d7d48b22",
+      "path": "docs/platform/runner/spec.md",
+      "anchor": "historical-source-section-099eb566",
+      "unitDigest": "399fd8b3a421c0c53fd57345fffd92928b0b66557e931ef4c495b185dd8a73e5",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate in persisted global E; absent from every current-state list after authenticated rebindings. No source decision accounts for it; truth and promotion remain unverified.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "claimId": "claim_9e9010f284010e4ee3fbc67deed8e8f1",
+      "path": "docs/platform/runner/spec.md",
+      "anchor": "unheaded-block-8",
+      "unitDigest": "4747175709c4cc34d23b4b59027e00fe31f95728f8f7791d33696ae2cd660861",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate in persisted global E; absent from every current-state list after authenticated rebindings. No source decision accounts for it; truth and promotion remain unverified.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "claimId": "claim_b171f08d544f21d7ba28f0f472e9a232",
+      "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "anchor": "unheaded-block-2",
+      "unitDigest": "79df87736370e5a1aa7700abf07e3f28c6138dd590897da79e166188c0f5997b",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate in persisted global E; absent from every current-state list after authenticated rebindings. No source decision accounts for it; truth and promotion remain unverified.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "claimId": "claim_c321de74b624d639e56cb4dc77169655",
+      "path": "docs/platform/runner/spec.md",
+      "anchor": "unheaded-block-12",
+      "unitDigest": "26cd8fbf0cce5fac3315235ebd00984cd4cc8a7ce80bac342e56f816848a7270",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate in persisted global E; absent from every current-state list after authenticated rebindings. No source decision accounts for it; truth and promotion remain unverified.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "claimId": "claim_d5e5139015078092355b369260cee249",
+      "path": "docs/platform/runner/spec.md",
+      "anchor": "historical-source-section-0686418a",
+      "unitDigest": "0232edaa58949708208a01bab57f0b92fa341bac85d0085530d5909fef47170a",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate in persisted global E; absent from every current-state list after authenticated rebindings. No source decision accounts for it; truth and promotion remain unverified.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "claimId": "claim_d8a2c7490367e214b55e86913275bd1b",
+      "path": "docs/platform/runner/spec.md",
+      "anchor": "unheaded-block-13",
+      "unitDigest": "16efa16fda7dbea715e869140f384909207de259f0e88effa0b3ad2d106f2798",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate in persisted global E; absent from every current-state list after authenticated rebindings. No source decision accounts for it; truth and promotion remain unverified.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "claimId": "claim_ee99b0951090e8a9aeabd89bf2982f05",
+      "path": "docs/platform/runner/spec.md",
+      "anchor": "unheaded-block-10",
+      "unitDigest": "28d0009fb157647913ed15eaaa21f78a13218cffb6610cda0f0b0d223a61fed6",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate in persisted global E; absent from every current-state list after authenticated rebindings. No source decision accounts for it; truth and promotion remain unverified.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "claimId": "claim_f97b02893c6b8f2554062dfea5f5df2c",
+      "path": "docs/platform/runner/spec.md",
+      "anchor": "historical-source-section-4efee765",
+      "unitDigest": "feecc4809f456b2d4201f2527febcdd521ca9eccf64144629268071cea373d0d",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate in persisted global E; absent from every current-state list after authenticated rebindings. No source decision accounts for it; truth and promotion remain unverified.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     }
   ],
   "currentCarriers": {
@@ -4106,5 +4264,17 @@
     "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
     "bindingMatchedAtApplication": true,
     "scope": "Five-field candidate list accounting only; candidate status and promotion truth obligations unchanged."
+  },
+  "currentStateReconciliation": {
+    "authorSession": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+    "basisCommit": "498048c1a6651556a0ae977a2871135b5ac7c945",
+    "accounting": "step10-author-candidate-accounting.json",
+    "changes": {
+      "rebind": 7,
+      "remove": 1,
+      "add": 14
+    },
+    "reviewStatus": "pending",
+    "meaning": "Prior list-level review/native-equality receipts describe their historical pins; changed entries require new independent review. Current tuple membership verified against persisted native registry and reverse set, not current implementation truth."
   }
 }

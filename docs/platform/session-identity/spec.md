@@ -5,8 +5,13 @@ Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent
 Purpose: Define the single authority for "who is the writer of this process"
 Design status: Accepted
-Implementation status: Implemented (activation pending)
+Implementation: Implemented (activation pending)
+Provenance: packages/session-identity/rust; packages/session-identity/contracts/; introduced by 6a53e65b5
+Writer type: Agent draft writer (header completion pending independent review)
 Canonical: Yes
+Canonical for: Session Identity component writer attribution rule and native identity contract
+Use this when: Resolving or reviewing the writer identity of a calling process
+Do not use this for: Authentication, lock authority, worker id creation, process liveness or run supervision
 Owner: Session Identity component
 Source: packages/session-identity/rust
 Contracts: packages/session-identity/contracts/
@@ -16,6 +21,8 @@ Related:
 - docs/platform/component-boundary.md
 - docs/specs/observe.md
 - plans/261015-2102-identity-resolver-rust-crate/plan.md
+Supersedes: None
+Superseded by: None
 ```
 
 ## 1. Purpose

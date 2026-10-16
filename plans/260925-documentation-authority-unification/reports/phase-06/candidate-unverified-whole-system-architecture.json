@@ -20,29 +20,12 @@
       "claimId": "claim_fa634b3e30b51cd9a715a68c66a6c6cd",
       "path": "docs/platform/architecture-map.md",
       "anchor": "architecture-map",
-      "unitDigest": "bcd8d331cdf19bae5bd9e2c905ae105b6602bc14fcbcc49936d94a465648acf0",
+      "unitDigest": "3cbd17c5ad739da3c5f1d5d9895a8289881518833bad2bb7846fcb023b09aafb",
       "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
-      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
-      "reviewMode": "ordinary",
-      "reviewNote": "mechanical: heading section architecture-map of architecture-map.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest ef63545ee3a205a1 equal the request, sidecar and committed bytes; architecture-map.md declares Design status Draft (architecture), not promoted; before and current records identical."
-    },
-    {
-      "claimId": "claim_7b42d1f1ec85abb92f9124fa12ff86e0",
-      "path": "docs/platform/architecture-map.md",
-      "anchor": "unheaded-block-1",
-      "unitDigest": "23c5433eab71eb0bf72530aa096a6fb852745b86503954b0b364a77b3e18670b",
-      "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
-      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
-      "reviewMode": "ordinary",
-      "reviewNote": "mechanical: text block unheaded-block-1 of architecture-map.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 23c5433eab71eb0b equal the request, sidecar and committed bytes; architecture-map.md declares Design status Draft (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     },
     {
       "claimId": "claim_0cac3815f330102dda880aa4a9cee9a9",
@@ -314,29 +297,12 @@
       "claimId": "claim_b3accab399a342e74cfc9f0a80322ab0",
       "path": "docs/platform/component-boundary.md",
       "anchor": "component-boundary",
-      "unitDigest": "6bc383951cb3164cfe0d7eda0a0fda55cbab77c5de19185f0f9e72c3dcba8081",
+      "unitDigest": "a8cffab152a69e4f1e96ef38b85d2aea82d0636a2787d1f6cf96bdc51deef0ea",
       "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
-      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
-      "reviewMode": "ordinary",
-      "reviewNote": "mechanical: heading section component-boundary of component-boundary.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 73669c7b54d0ed4e equal the request, sidecar and committed bytes; component-boundary.md declares Design status Draft (architecture), not promoted; before and current records identical."
-    },
-    {
-      "claimId": "claim_84a933eabe0c7693f8286447605b07dc",
-      "path": "docs/platform/component-boundary.md",
-      "anchor": "unheaded-block-1",
-      "unitDigest": "4440935e581cf4814a9fd23e8fd1c81f854cbd7b40144e05bad405a94bd979ec",
-      "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
-      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
-      "reviewMode": "ordinary",
-      "reviewNote": "mechanical: text block unheaded-block-1 of component-boundary.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 4440935e581cf481 equal the request, sidecar and committed bytes; component-boundary.md declares Design status Draft (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     },
     {
       "claimId": "claim_d75dabab4a879f6c66f46958eaf99ef5",
@@ -496,15 +462,12 @@
       "claimId": "claim_60b200d89cba5da6157ee4c3b7311a2e",
       "path": "docs/platform/component-boundary.md",
       "anchor": "4-current-high-level-components",
-      "unitDigest": "074412d0f27fb46eef0f2f874fa82854cfe3d19f27ec43eb1bceb4234a3c7108",
+      "unitDigest": "fcb4b0a3c668b8d140c18241d29ebe57991a7197a1696903fe93d346bbed7fdd",
       "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
-      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
-      "reviewMode": "ordinary",
-      "reviewNote": "mechanical: heading section 4-current-high-level-components of component-boundary.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 43f73c70cebffac0 equal the request, sidecar and committed bytes; component-boundary.md declares Design status Draft (architecture), not promoted; before and current records identical."
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     },
     {
       "claimId": "claim_4b3482e666dba2d9678b4f8bf0fefcea",
@@ -519,20 +482,6 @@
       "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
       "reviewMode": "ordinary",
       "reviewNote": "mechanical: text block unheaded-block-10 of component-boundary.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 36c91b4a266f2cce equal the request, sidecar and committed bytes; component-boundary.md declares Design status Draft (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
-    },
-    {
-      "claimId": "claim_281124881201e09f11dbb099caeee81c",
-      "path": "docs/platform/component-boundary.md",
-      "anchor": "unheaded-block-11",
-      "unitDigest": "6bea55eabbf3ca711b55d4bee07df1e778082b2c93056e32cd2385c41465f4df",
-      "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
-      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
-      "reviewMode": "ordinary",
-      "reviewNote": "deep: text block unheaded-block-11 of component-boundary.md read in full (4555 chars); component-boundary.md declares Design status Draft (architecture), not promoted; native tuple and shown digest 6bea55eabbf3ca71 equal the request, sidecar and committed bytes at the request commit; before and current records identical so no new text since the earlier accepted review. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
       "claimId": "claim_04ad87d13e4de217b79136140dab35f4",
@@ -566,29 +515,12 @@
       "claimId": "claim_5d3c632ef3e6b7631307307d54682e71",
       "path": "docs/platform/component-boundary.md",
       "anchor": "6-related-files",
-      "unitDigest": "1313f97e7dee44b4db59dac70ff9b0a41c4bc904dde3ca26cac5926a20f19c3a",
+      "unitDigest": "677e131ff3c2e8e607e3296a01cd1ee9371fc9d44ac93a1ad08b6fa54dac97c1",
       "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
-      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
-      "reviewMode": "ordinary",
-      "reviewNote": "mechanical: heading section 6-related-files of component-boundary.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest c2ef85b2529e7d94 equal the request, sidecar and committed bytes; component-boundary.md declares Design status Draft (architecture), not promoted; before and current records identical."
-    },
-    {
-      "claimId": "claim_088901bb1c7d69b87da383ddce95fe18",
-      "path": "docs/platform/component-boundary.md",
-      "anchor": "unheaded-block-13",
-      "unitDigest": "dd9bdd0cd63e539a2ae55a9d73c2ba85351ad2befc50c30551992df9f7efd894",
-      "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
-      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
-      "reviewMode": "ordinary",
-      "reviewNote": "mechanical: text block unheaded-block-13 of component-boundary.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest dd9bdd0cd63e539a equal the request, sidecar and committed bytes; component-boundary.md declares Design status Draft (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     },
     {
       "claimId": "claim_568f01ef849f421829301c6915bb229a",
@@ -1004,7 +936,7 @@
       "reviewNote": "mechanical: text block unheaded-block-3 of system-overview/spec.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest c14e6d885d8ddd0d equal the request, sidecar and committed bytes; system-overview/spec.md declares Design status Candidate (spec), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     }
   ],
-  "count": 67,
+  "count": 63,
   "previousCount": 82,
   "authoredCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
   "nativeRebinding": {
@@ -1337,5 +1269,16 @@
   "nativeRebindingGlobal": {
     "SYNC": "498048c1a6651556a0ae977a2871135b5ac7c945",
     "method": "Exact native tuple or authenticated retained ID; no expected-ID filtering or inferred approval."
+  },
+  "currentStateReconciliation": {
+    "authorSession": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+    "basisCommit": "498048c1a6651556a0ae977a2871135b5ac7c945",
+    "accounting": "step10-author-candidate-accounting.json",
+    "changes": {
+      "rebind": 4,
+      "remove": 4
+    },
+    "reviewStatus": "pending",
+    "meaning": "Prior list-level review/native-equality receipts describe their historical pins; changed entries require new independent review. Current tuple membership verified against persisted native registry and reverse set, not current implementation truth."
   }
 }

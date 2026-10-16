@@ -10823,58 +10823,6 @@
       "reviewNote": "The three header lines Status: done, Date opened: 2026-08-31, Date closed: 2026-08-31 open both step-06-cell-6-scoped-subtask.md and step-06-final-consolidation.md (60 chars each). They are per-document lifecycle metadata of two different cells that happen to match, not a proof observation or a platform rule, so document-scoped metadata is the right kind and separate owners are right."
     },
     {
-      "digest": "03d85305b958b2aac36862cab01a17e4495008170818ab553885106b45dc0146",
-      "representativeClaimId": "claim_01a9d5e31d0f795931b8288588fb71ee",
-      "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "reviewed",
-      "reason": "Identical label/status/limitation text is scoped by distinct documents or ancestor sections, not a second authority for one unqualified claim. Independently verify each contextual subject before accepting.",
-      "sourceUnits": [
-        {
-          "claimId": "claim_01a9d5e31d0f795931b8288588fb71ee",
-          "source": "docs/architect/agent-coordination/architecture/run-handle.md#unheaded-block-1",
-          "owner": "docs/platform/agent-coordination/architecture/run-handle.md#unheaded-block-1",
-          "ancestry": [],
-          "text": "---\narea: agent-coordination-runtime\nupdated: 2026-09-14\ncoverage: substantially-implemented\n---"
-        },
-        {
-          "claimId": "claim_10efd807d18076b78b932cfa85a6e68a",
-          "source": "docs/architect/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-1",
-          "owner": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-1",
-          "ancestry": [],
-          "text": "---\narea: agent-coordination-runtime\nupdated: 2026-09-14\ncoverage: substantially-implemented\n---"
-        }
-      ]
-    },
-    {
-      "digest": "9d4815b7eabf8b722796dc16dd5a8901ef600997df266159d37ab8b843e53ac0",
-      "representativeClaimId": "claim_ffbe3ccb05e3d7efa7f2dc64bc6b773d",
-      "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "reviewed",
-      "reason": "Identical label/status/limitation text is scoped by distinct documents or ancestor sections, not a second authority for one unqualified claim. Independently verify each contextual subject before accepting.",
-      "sourceUnits": [
-        {
-          "claimId": "claim_ffbe3ccb05e3d7efa7f2dc64bc6b773d",
-          "source": "docs/architect/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md#unheaded-block-8",
-          "owner": "docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md#unheaded-block-7",
-          "ancestry": [
-            "Orchestration Vocabulary Map",
-            "2. Layer Map"
-          ],
-          "text": "```txt\nMission -> Work -> Workflow -> Stage -> Stage Protocol -> Stage Operation -> Assignment -> Dispatch -> Runtime -> Evidence -> Visibility\n```"
-        },
-        {
-          "claimId": "claim_8a22a05371afd2e96aded65c2476181c",
-          "source": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md#unheaded-block-4",
-          "owner": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md#unheaded-block-3",
-          "ancestry": [
-            "Step 00 - Team Dispatch V1 Overview",
-            "1. Purpose"
-          ],
-          "text": "```txt\nMission -> Work -> Workflow -> Stage -> Stage Protocol -> Stage Operation -> Assignment -> Dispatch -> Runtime -> Evidence -> Visibility\n```"
-        }
-      ]
-    },
-    {
       "digest": "930de1671a1761fd86dcdd3362c0be6ec73191f49a22eaddad934edff0878259",
       "representativeClaimId": "claim_f0c134e6d316fe9c3fd9796c8db98970",
       "kind": "document-or-section-scoped-repetition",
@@ -10931,232 +10879,6 @@
             "Coordination Rings"
           ],
           "text": "```txt\nStrategic ring  = Orchestrator\nActivation ring = Launcher\nFlow ring       = Router + Driver\nExecution ring  = Dispatcher\n```"
-        }
-      ]
-    },
-    {
-      "digest": "b090d4b446b518ef773fe521a1af84257df7ae09f396bbea78ea97af029c2769",
-      "representativeClaimId": "claim_649d6c1297ae24691b8e78ec6563bff9",
-      "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "reviewed",
-      "reason": "Identical label/status/limitation text is scoped by distinct documents or ancestor sections, not a second authority for one unqualified claim. Independently verify each contextual subject before accepting.",
-      "sourceUnits": [
-        {
-          "claimId": "claim_649d6c1297ae24691b8e78ec6563bff9",
-          "source": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md#unheaded-block-7",
-          "owner": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md#unheaded-block-6",
-          "ancestry": [
-            "Step 00 - Team Dispatch V1 Overview",
-            "1. Purpose"
-          ],
-          "text": "```txt\nWork\nFlow operations\nAssignment\nRun\nRunResult\n```"
-        },
-        {
-          "claimId": "claim_f20285e4acae506cd99e9102535075b2",
-          "source": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-4",
-          "owner": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-3",
-          "ancestry": [
-            "Step 01 - Team Dispatch V1 Rollout",
-            "1. Purpose"
-          ],
-          "text": "```txt\nWork\nFlow operations\nAssignment\nRun\nRunResult\n```"
-        }
-      ]
-    },
-    {
-      "digest": "e4fa3726fbd2150789677769af22dece7dd5b57a26e1dc4feddd2285e23b5c36",
-      "representativeClaimId": "claim_9dddad5aa8a5266b41291d284dcf0190",
-      "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "reviewed",
-      "reason": "Identical label/status/limitation text is scoped by distinct documents or ancestor sections, not a second authority for one unqualified claim. Independently verify each contextual subject before accepting.",
-      "sourceUnits": [
-        {
-          "claimId": "claim_9dddad5aa8a5266b41291d284dcf0190",
-          "source": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-26",
-          "owner": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-25",
-          "ancestry": [
-            "Step 01 - Team Dispatch V1 Rollout",
-            "6. Slice 1 - Operation Registry Only"
-          ],
-          "text": "```bash\nnode --test test/state/workflow-stage-graphs.test.mjs\nnode --test test/setup/registrations.test.mjs\nnode --test test/runner/dispatch.test.mjs\n```"
-        },
-        {
-          "claimId": "claim_01e5997ff9ab83932e77136fa1341efe",
-          "source": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md#unheaded-block-52",
-          "owner": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md#unheaded-block-51",
-          "ancestry": [
-            "Step 02 - Workflow Stage Operations",
-            "7. Tests"
-          ],
-          "text": "```bash\nnode --test test/state/workflow-stage-graphs.test.mjs\nnode --test test/setup/registrations.test.mjs\nnode --test test/runner/dispatch.test.mjs\n```"
-        }
-      ]
-    },
-    {
-      "digest": "5a917998f2dbe6dcf9f8789254ee8e110f93ae02186534a4474dccd3404d7301",
-      "representativeClaimId": "claim_dabaed7b51bdf5fdeaf510dc744a0b0e",
-      "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "reviewed",
-      "reason": "Identical label/status/limitation text is scoped by distinct documents or ancestor sections, not a second authority for one unqualified claim. Independently verify each contextual subject before accepting.",
-      "sourceUnits": [
-        {
-          "claimId": "claim_dabaed7b51bdf5fdeaf510dc744a0b0e",
-          "source": "docs/architect/agent-coordination/contracts/coordination-session.md#unheaded-block-37",
-          "owner": "docs/platform/agent-coordination/contracts/coordination-session.md#unheaded-block-36",
-          "ancestry": [
-            "CoordinationSession Persistence And Recovery Contract",
-            "Evidence-Preserving Aggregation (MVP7, Step 09)"
-          ],
-          "text": "**Named limitations, not omitted.**"
-        },
-        {
-          "claimId": "claim_4a4142d0946a140241ea46bb27bad1ee",
-          "source": "docs/architect/agent-coordination/contracts/coordination-session.md#unheaded-block-45",
-          "owner": "docs/platform/agent-coordination/contracts/coordination-session.md#unheaded-block-44",
-          "ancestry": [
-            "CoordinationSession Persistence And Recovery Contract",
-            "Deliberation Contribution Ledger (MVP8, Step 09)"
-          ],
-          "text": "**Named limitations, not omitted.**"
-        },
-        {
-          "claimId": "claim_1ba7c8521fca5c0280367fafc6d30164",
-          "source": "docs/architect/agent-coordination/contracts/coordination-session.md#unheaded-block-54",
-          "owner": "docs/platform/agent-coordination/contracts/coordination-session.md#unheaded-block-53",
-          "ancestry": [
-            "CoordinationSession Persistence And Recovery Contract",
-            "Specialist Slot Binding (MVP9, Step 09)"
-          ],
-          "text": "**Named limitations, not omitted.**"
-        },
-        {
-          "claimId": "claim_cb3272972a3fb5250bf3b4a01848d7b7",
-          "source": "docs/architect/agent-coordination/contracts/flow-definition.md#unheaded-block-44",
-          "owner": "docs/platform/agent-coordination/contracts/flow-definition.md#unheaded-block-43",
-          "ancestry": [
-            "FlowDefinition And Profile Schema Contract",
-            "Profiles",
-            "`CoordinationProtocol`",
-            "Specialist Slots (Phase 09, Step 09 MVP9)"
-          ],
-          "text": "**Named limitations, not omitted.**"
-        }
-      ]
-    },
-    {
-      "digest": "ce66db0b0a2af3098ab096d562d4ee576a2ec6c453f933855d79024d6bb7cb46",
-      "representativeClaimId": "claim_b22d8e8a3d573b5d0254b3fb04b46ecb",
-      "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "reviewed",
-      "reason": "Identical label/status/limitation text is scoped by distinct documents or ancestor sections, not a second authority for one unqualified claim. Independently verify each contextual subject before accepting.",
-      "sourceUnits": [
-        {
-          "claimId": "claim_b22d8e8a3d573b5d0254b3fb04b46ecb",
-          "source": "docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-148",
-          "owner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-147",
-          "ancestry": [
-            "Dispatch Control Plane Redesign",
-            "16. Implementation Pointers"
-          ],
-          "text": "Current dispatch files:"
-        },
-        {
-          "claimId": "claim_ab3fa8f114925f3c02c61a807f62c440",
-          "source": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md#unheaded-block-178",
-          "owner": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md#unheaded-block-177",
-          "ancestry": [
-            "Step 00 - Team Dispatch V1 Overview",
-            "19. Detailed Scan Update: Harness, Skill, Prose, Dispatch",
-            "19.9 Dispatch Resolver / Execution Surface"
-          ],
-          "text": "Current dispatch files:"
-        }
-      ]
-    },
-    {
-      "digest": "88c97d5d078f935960fefa349a515247bbf5ebef8f732e69c5e05d7b1d39709f",
-      "representativeClaimId": "claim_5bbd88e33e69171df36e111fa8cb86a7",
-      "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "reviewed",
-      "reason": "Identical label/status/limitation text is scoped by distinct documents or ancestor sections, not a second authority for one unqualified claim. Independently verify each contextual subject before accepting.",
-      "sourceUnits": [
-        {
-          "claimId": "claim_5bbd88e33e69171df36e111fa8cb86a7",
-          "source": "docs/architect/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md#unheaded-block-78",
-          "owner": "docs/platform/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md#unheaded-block-77",
-          "ancestry": [
-            "Step 07 - CoordinationSession, AdhocTask, And Planning Boundary",
-            "11. Work-Attached Integration Boundary"
-          ],
-          "text": "**Proposed invariant:**"
-        },
-        {
-          "claimId": "claim_51450419ea9b5e42ecbbfe89d6de5343",
-          "source": "docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#unheaded-block-29",
-          "owner": "docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#unheaded-block-28",
-          "ancestry": [
-            "Step 08 - Standalone Coordination And Optional Protocols",
-            "5. Why Standalone Must Mean No Work Required"
-          ],
-          "text": "**Proposed invariant:**"
-        }
-      ]
-    },
-    {
-      "digest": "16005492e57449e7a2fbd37073486971ea386fa8179c541744aa9c691d32a77d",
-      "representativeClaimId": "claim_e8c53acd61cfc995320d78acf32dd3e3",
-      "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "reviewed",
-      "reason": "Identical label/status/limitation text is scoped by distinct documents or ancestor sections, not a second authority for one unqualified claim. Independently verify each contextual subject before accepting.",
-      "sourceUnits": [
-        {
-          "claimId": "claim_e8c53acd61cfc995320d78acf32dd3e3",
-          "source": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-44",
-          "owner": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-43",
-          "ancestry": [
-            "Step 01 - Team Dispatch V1 Rollout",
-            "8. Slice 3 - Assignment Builder"
-          ],
-          "text": "```txt\nplanning.validate-plan\n```"
-        },
-        {
-          "claimId": "claim_bb0832ff4c70950caa3d84b828512192",
-          "source": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md#unheaded-block-42",
-          "owner": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md#unheaded-block-41",
-          "ancestry": [
-            "Step 03 - Assignment, Run, And RunResult",
-            "4. Dispatch Integration"
-          ],
-          "text": "```txt\nplanning.validate-plan\n```"
-        }
-      ]
-    },
-    {
-      "digest": "f5694fee7b180206807c868f23dbc5ef49efbc9d04a985480897577ec5def122",
-      "representativeClaimId": "claim_90fff0613ac3e8c919c6a57936fd5621",
-      "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "reviewed",
-      "reason": "Identical label/status/limitation text is scoped by distinct documents or ancestor sections, not a second authority for one unqualified claim. Independently verify each contextual subject before accepting.",
-      "sourceUnits": [
-        {
-          "claimId": "claim_90fff0613ac3e8c919c6a57936fd5621",
-          "source": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md#unheaded-block-51",
-          "owner": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md#unheaded-block-50",
-          "ancestry": [
-            "Step 02 - Workflow Stage Operations",
-            "7. Tests"
-          ],
-          "text": "Useful verification commands:"
-        },
-        {
-          "claimId": "claim_5323b24af53575a476c971b752ffc138",
-          "source": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md#unheaded-block-82",
-          "owner": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md#unheaded-block-81",
-          "ancestry": [
-            "Step 03 - Assignment, Run, And RunResult",
-            "7. Tests"
-          ],
-          "text": "Useful verification commands:"
         }
       ]
     },
@@ -11817,76 +11539,1748 @@
       "reviewNote": "mechanical: retained accepted exception group (Outside hard and Inside soft diagram, two sources); only review fields changed in the committed group, equal to my 36d79ddcc verdict; the reason text still says pending contextual review although the status is reviewed (cosmetic, same as accepted)"
     },
     {
-      "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
-      "representativeClaimId": "claim_f7e282b47557154231f0565bd30e5d7d",
+      "digest": "03d85305b958b2aac36862cab01a17e4495008170818ab553885106b45dc0146",
+      "owners": [
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md"
+      ],
       "kind": "document-or-section-scoped-repetition",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:39@2026-10-15",
-      "reason": "The identical closing decision sentence refers to four distinct decision contexts in architecture-map and system-overview. Each occurrence is paired positionally to its own corresponding decision narrative and ancestry; collapsing them would detach their local decision subject. Pending independent contextual exception review; no gate waiver or promotion.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "reason": "The identical block is dated document metadata; the two source documents and their history snapshots keep separate subject/provenance. Contexts: . Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_01a9d5e31d0f795931b8288588fb71ee",
+          "path": "docs/architect/agent-coordination/architecture/run-handle.md",
+          "anchor": "unheaded-block-1",
+          "unitDigest": "03d85305b958b2aac36862cab01a17e4495008170818ab553885106b45dc0146",
+          "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md",
+          "targetAnchor": "literal-snapshot",
+          "targetUnitDigest": "385193dfc5ee87dd8f24e8c125cd621ef8421887aacf83f5cc17bfe677dfcfa9",
+          "sourceWitness": {
+            "startLine": 1,
+            "endLine": 5,
+            "text": "---\narea: agent-coordination-runtime\nupdated: 2026-09-14\ncoverage: substantially-implemented\n---",
+            "ancestry": []
+          }
+        },
+        {
+          "claimId": "claim_10efd807d18076b78b932cfa85a6e68a",
+          "path": "docs/architect/agent-coordination/architecture/runtime-recovery-design.md",
+          "anchor": "unheaded-block-1",
+          "unitDigest": "03d85305b958b2aac36862cab01a17e4495008170818ab553885106b45dc0146",
+          "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+          "targetAnchor": "literal-snapshot",
+          "targetUnitDigest": "580dfc2f724fe297a7443197c18203de2548e150e639376f8853f5cbf255a843",
+          "sourceWitness": {
+            "startLine": 1,
+            "endLine": 5,
+            "text": "---\narea: agent-coordination-runtime\nupdated: 2026-09-14\ncoverage: substantially-implemented\n---",
+            "ancestry": []
+          }
+        }
+      ],
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "digest": "5a917998f2dbe6dcf9f8789254ee8e110f93ae02186534a4474dccd3404d7301",
+      "owners": [
+        "docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md"
+      ],
+      "kind": "document-or-section-scoped-repetition",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "reason": "The repeated short text introduces or qualifies the surrounding local section; each source occurrence retains that local payload at its mapped owner. Contexts: CoordinationSession Persistence And Recovery Contract / Evidence-Preserving Aggregation (MVP7, Step 09); CoordinationSession Persistence And Recovery Contract / Deliberation Contribution Ledger (MVP8, Step 09); CoordinationSession Persistence And Recovery Contract / Specialist Slot Binding (MVP9, Step 09); FlowDefinition And Profile Schema Contract / Profiles / `CoordinationProtocol` / Specialist Slots (Phase 09, Step 09 MVP9). Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_dabaed7b51bdf5fdeaf510dc744a0b0e",
+          "path": "docs/architect/agent-coordination/contracts/coordination-session.md",
+          "anchor": "unheaded-block-37",
+          "unitDigest": "5a917998f2dbe6dcf9f8789254ee8e110f93ae02186534a4474dccd3404d7301",
+          "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md",
+          "targetAnchor": "literal-snapshot",
+          "targetUnitDigest": "2544fffe806d4007375f7d8e43517d235b9315317d60468d7e59fe1be1800cc0",
+          "sourceWitness": {
+            "startLine": 394,
+            "endLine": 394,
+            "text": "**Named limitations, not omitted.**",
+            "ancestry": [
+              "CoordinationSession Persistence And Recovery Contract",
+              "Evidence-Preserving Aggregation (MVP7, Step 09)"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_4a4142d0946a140241ea46bb27bad1ee",
+          "path": "docs/architect/agent-coordination/contracts/coordination-session.md",
+          "anchor": "unheaded-block-45",
+          "unitDigest": "5a917998f2dbe6dcf9f8789254ee8e110f93ae02186534a4474dccd3404d7301",
+          "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md",
+          "targetAnchor": "literal-snapshot",
+          "targetUnitDigest": "2544fffe806d4007375f7d8e43517d235b9315317d60468d7e59fe1be1800cc0",
+          "sourceWitness": {
+            "startLine": 499,
+            "endLine": 499,
+            "text": "**Named limitations, not omitted.**",
+            "ancestry": [
+              "CoordinationSession Persistence And Recovery Contract",
+              "Deliberation Contribution Ledger (MVP8, Step 09)"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_1ba7c8521fca5c0280367fafc6d30164",
+          "path": "docs/architect/agent-coordination/contracts/coordination-session.md",
+          "anchor": "unheaded-block-54",
+          "unitDigest": "5a917998f2dbe6dcf9f8789254ee8e110f93ae02186534a4474dccd3404d7301",
+          "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md",
+          "targetAnchor": "literal-snapshot",
+          "targetUnitDigest": "2544fffe806d4007375f7d8e43517d235b9315317d60468d7e59fe1be1800cc0",
+          "sourceWitness": {
+            "startLine": 609,
+            "endLine": 609,
+            "text": "**Named limitations, not omitted.**",
+            "ancestry": [
+              "CoordinationSession Persistence And Recovery Contract",
+              "Specialist Slot Binding (MVP9, Step 09)"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_cb3272972a3fb5250bf3b4a01848d7b7",
+          "path": "docs/architect/agent-coordination/contracts/flow-definition.md",
+          "anchor": "unheaded-block-44",
+          "unitDigest": "5a917998f2dbe6dcf9f8789254ee8e110f93ae02186534a4474dccd3404d7301",
+          "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+          "targetAnchor": "literal-snapshot",
+          "targetUnitDigest": "0f2cc8e432a3469e3309b0670524326f768fcfcdbb2e5203e847336a2420e900",
+          "sourceWitness": {
+            "startLine": 534,
+            "endLine": 534,
+            "text": "**Named limitations, not omitted.**",
+            "ancestry": [
+              "FlowDefinition And Profile Schema Contract",
+              "Profiles",
+              "`CoordinationProtocol`",
+              "Specialist Slots (Phase 09, Step 09 MVP9)"
+            ]
+          }
+        }
+      ],
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "digest": "a2d5fbe6e6e8955d790034a8254970e0c4f74806ead155b673197d4276a112ef",
+      "owners": [
+        "docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md",
+        "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md"
+      ],
+      "kind": "document-or-section-scoped-repetition",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "reason": "The identical unit is a heading label reused by separately mapped source sections; section subjects and payloads remain attached to their own source/owner pairs. Contexts: Agent Coordination Documentation Standardization Plan / 4. Source Inventory; Host Invocation Documentation Standardization Plan / 4. Source Inventory. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_abd6d05edc7a35adad6540b835349d14",
+          "path": "docs/architect/agent-coordination/documentation-standardization-plan.md",
+          "anchor": "4-source-inventory",
+          "unitDigest": "a2d5fbe6e6e8955d790034a8254970e0c4f74806ead155b673197d4276a112ef",
+          "targetOwner": "docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md",
+          "targetAnchor": "unheaded-block-3",
+          "targetUnitDigest": "ffebe7e5b1ba57550740e3a99b9754cea7a258a6a07874878a1da8263961d98d",
+          "sourceWitness": {
+            "startLine": 91,
+            "endLine": 91,
+            "text": "## 4. Source Inventory",
+            "ancestry": [
+              "Agent Coordination Documentation Standardization Plan",
+              "4. Source Inventory"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_3681cacef3fd5234588449fbe99aa07e",
+          "path": "docs/architect/host-invocation-routing/documentation-standardization-plan.md",
+          "anchor": "4-source-inventory",
+          "unitDigest": "a2d5fbe6e6e8955d790034a8254970e0c4f74806ead155b673197d4276a112ef",
+          "targetOwner": "docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+          "targetAnchor": "unheaded-block-3",
+          "targetUnitDigest": "4c4592d8d6c543c821e98e0775441531fb404c40672ff478e1fd0bace722bb17",
+          "sourceWitness": {
+            "startLine": 81,
+            "endLine": 81,
+            "text": "## 4. Source Inventory",
+            "ancestry": [
+              "Host Invocation Documentation Standardization Plan",
+              "4. Source Inventory"
+            ]
+          }
+        }
+      ],
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "digest": "9d4815b7eabf8b722796dc16dd5a8901ef600997df266159d37ab8b843e53ac0",
+      "owners": [
+        "docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md"
+      ],
+      "kind": "document-or-section-scoped-repetition",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "reason": "The repeated block is a contextual list, command example or lifecycle diagram inside separate source/proposal/history sections; retaining it at each mapped owner preserves that section’s local explanation. Contexts: Orchestration Vocabulary Map / 2. Layer Map; Step 00 - Team Dispatch V1 Overview / 1. Purpose. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_ffbe3ccb05e3d7efa7f2dc64bc6b773d",
+          "path": "docs/architect/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+          "anchor": "unheaded-block-8",
+          "unitDigest": "9d4815b7eabf8b722796dc16dd5a8901ef600997df266159d37ab8b843e53ac0",
+          "targetOwner": "docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md",
+          "targetAnchor": "unheaded-block-7",
+          "targetUnitDigest": "9d4815b7eabf8b722796dc16dd5a8901ef600997df266159d37ab8b843e53ac0",
+          "sourceWitness": {
+            "startLine": 34,
+            "endLine": 36,
+            "text": "```txt\nMission -> Work -> Workflow -> Stage -> Stage Protocol -> Stage Operation -> Assignment -> Dispatch -> Runtime -> Evidence -> Visibility\n```",
+            "ancestry": [
+              "Orchestration Vocabulary Map",
+              "2. Layer Map"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_8a22a05371afd2e96aded65c2476181c",
+          "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md",
+          "anchor": "unheaded-block-4",
+          "unitDigest": "9d4815b7eabf8b722796dc16dd5a8901ef600997df266159d37ab8b843e53ac0",
+          "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+          "targetAnchor": "literal-snapshot",
+          "targetUnitDigest": "a897eba505a065b96ccfdfadda459a18c054347a0ffc87a9c5d906fe0c38faac",
+          "sourceWitness": {
+            "startLine": 21,
+            "endLine": 23,
+            "text": "```txt\nMission -> Work -> Workflow -> Stage -> Stage Protocol -> Stage Operation -> Assignment -> Dispatch -> Runtime -> Evidence -> Visibility\n```",
+            "ancestry": [
+              "Step 00 - Team Dispatch V1 Overview",
+              "1. Purpose"
+            ]
+          }
+        }
+      ],
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "digest": "f94e7b2a243f1b8a61718285d93b3c3ddee594c126df0337ede2f80f538c5fd5",
+      "owners": [
+        "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+        "docs/platform/proposals/knowledge-registry-redesign.md"
+      ],
+      "kind": "document-or-section-scoped-repetition",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "reason": "The identical unit is a heading label reused by separately mapped source sections; section subjects and payloads remain attached to their own source/owner pairs. Contexts: Dispatch Control Plane Redesign / 5. Vocabulary; Knowledge Registry Redesign / 5. Vocabulary. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_dc7237cc5b4f881f982235bcb6d80bbf",
+          "path": "docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "anchor": "5-vocabulary",
+          "unitDigest": "f94e7b2a243f1b8a61718285d93b3c3ddee594c126df0337ede2f80f538c5fd5",
+          "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "targetAnchor": "5-vocabulary",
+          "targetUnitDigest": "f94e7b2a243f1b8a61718285d93b3c3ddee594c126df0337ede2f80f538c5fd5",
+          "sourceWitness": {
+            "startLine": 125,
+            "endLine": 125,
+            "text": "## 5. Vocabulary",
+            "ancestry": [
+              "Dispatch Control Plane Redesign",
+              "5. Vocabulary"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_caba8b164aab919052e346f6f73b2093",
+          "path": "docs/architect/knowledge-registry-redesign.md",
+          "anchor": "5-vocabulary",
+          "unitDigest": "f94e7b2a243f1b8a61718285d93b3c3ddee594c126df0337ede2f80f538c5fd5",
+          "targetOwner": "docs/platform/proposals/knowledge-registry-redesign.md",
+          "targetAnchor": "5-vocabulary",
+          "targetUnitDigest": "f94e7b2a243f1b8a61718285d93b3c3ddee594c126df0337ede2f80f538c5fd5",
+          "sourceWitness": {
+            "startLine": 76,
+            "endLine": 76,
+            "text": "## 5. Vocabulary",
+            "ancestry": [
+              "Knowledge Registry Redesign",
+              "5. Vocabulary"
+            ]
+          }
+        }
+      ],
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "digest": "ce66db0b0a2af3098ab096d562d4ee576a2ec6c453f933855d79024d6bb7cb46",
+      "owners": [
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+        "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md"
+      ],
+      "kind": "document-or-section-scoped-repetition",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "reason": "The repeated short text introduces or qualifies the surrounding local section; each source occurrence retains that local payload at its mapped owner. Contexts: Dispatch Control Plane Redesign / 16. Implementation Pointers; Step 00 - Team Dispatch V1 Overview / 19. Detailed Scan Update: Harness, Skill, Prose, Dispatch / 19.9 Dispatch Resolver / Execution Surface. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_b22d8e8a3d573b5d0254b3fb04b46ecb",
+          "path": "docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "anchor": "unheaded-block-148",
+          "unitDigest": "ce66db0b0a2af3098ab096d562d4ee576a2ec6c453f933855d79024d6bb7cb46",
+          "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+          "targetAnchor": "unheaded-block-144",
+          "targetUnitDigest": "ce66db0b0a2af3098ab096d562d4ee576a2ec6c453f933855d79024d6bb7cb46",
+          "sourceWitness": {
+            "startLine": 840,
+            "endLine": 840,
+            "text": "Current dispatch files:",
+            "ancestry": [
+              "Dispatch Control Plane Redesign",
+              "16. Implementation Pointers"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_ab3fa8f114925f3c02c61a807f62c440",
+          "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md",
+          "anchor": "unheaded-block-178",
+          "unitDigest": "ce66db0b0a2af3098ab096d562d4ee576a2ec6c453f933855d79024d6bb7cb46",
+          "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+          "targetAnchor": "literal-snapshot",
+          "targetUnitDigest": "a897eba505a065b96ccfdfadda459a18c054347a0ffc87a9c5d906fe0c38faac",
+          "sourceWitness": {
+            "startLine": 1195,
+            "endLine": 1195,
+            "text": "Current dispatch files:",
+            "ancestry": [
+              "Step 00 - Team Dispatch V1 Overview",
+              "19. Detailed Scan Update: Harness, Skill, Prose, Dispatch",
+              "19.9 Dispatch Resolver / Execution Surface"
+            ]
+          }
+        }
+      ],
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "digest": "88c97d5d078f935960fefa349a515247bbf5ebef8f732e69c5e05d7b1d39709f",
+      "owners": [
+        "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md"
+      ],
+      "kind": "document-or-section-scoped-repetition",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "reason": "The repeated short text introduces or qualifies the surrounding local section; each source occurrence retains that local payload at its mapped owner. Contexts: Step 07 - CoordinationSession, AdhocTask, And Planning Boundary / 11. Work-Attached Integration Boundary; Step 08 - Standalone Coordination And Optional Protocols / 5. Why Standalone Must Mean No Work Required. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_5bbd88e33e69171df36e111fa8cb86a7",
+          "path": "docs/architect/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md",
+          "anchor": "unheaded-block-78",
+          "unitDigest": "88c97d5d078f935960fefa349a515247bbf5ebef8f732e69c5e05d7b1d39709f",
+          "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md",
+          "targetAnchor": "literal-snapshot",
+          "targetUnitDigest": "dfa3c164d168a4895c914b2764c9eb0e5eaab9adf947c3a11a0cce9a5934f5ba",
+          "sourceWitness": {
+            "startLine": 484,
+            "endLine": 484,
+            "text": "**Proposed invariant:**",
+            "ancestry": [
+              "Step 07 - CoordinationSession, AdhocTask, And Planning Boundary",
+              "11. Work-Attached Integration Boundary"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_51450419ea9b5e42ecbbfe89d6de5343",
+          "path": "docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md",
+          "anchor": "unheaded-block-29",
+          "unitDigest": "88c97d5d078f935960fefa349a515247bbf5ebef8f732e69c5e05d7b1d39709f",
+          "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md",
+          "targetAnchor": "literal-snapshot",
+          "targetUnitDigest": "222204b5317395a9ce2ea050cf70507ab361522df887473af6461dbf7bbe7379",
+          "sourceWitness": {
+            "startLine": 173,
+            "endLine": 173,
+            "text": "**Proposed invariant:**",
+            "ancestry": [
+              "Step 08 - Standalone Coordination And Optional Protocols",
+              "5. Why Standalone Must Mean No Work Required"
+            ]
+          }
+        }
+      ],
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "digest": "674611497bb6224341a363fbb8b91816122c3965af2272ce59719ff9d97d6226",
+      "owners": [
+        "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md",
+        "docs/platform/proposals/step-10-coding-domain-adoption.md"
+      ],
+      "kind": "document-or-section-scoped-repetition",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "reason": "The repeated short text introduces or qualifies the surrounding local section; each source occurrence retains that local payload at its mapped owner. Contexts: Step 08 - Standalone Coordination And Optional Protocols / 1. How To Read This Draft; Step 10 - Coding Domain Adoption Of The Coordination Foundation / 1. How To Read This Draft. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_985ce3b5aa4f34d9bed98d515d792bd7",
+          "path": "docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md",
+          "anchor": "unheaded-block-5",
+          "unitDigest": "674611497bb6224341a363fbb8b91816122c3965af2272ce59719ff9d97d6226",
+          "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md",
+          "targetAnchor": "literal-snapshot",
+          "targetUnitDigest": "222204b5317395a9ce2ea050cf70507ab361522df887473af6461dbf7bbe7379",
+          "sourceWitness": {
+            "startLine": 46,
+            "endLine": 46,
+            "text": "This document uses three labels:",
+            "ancestry": [
+              "Step 08 - Standalone Coordination And Optional Protocols",
+              "1. How To Read This Draft"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_c9c28e6e9b543488b1cb729ebd0b5bf1",
+          "path": "docs/architect/proposals/step-10-coding-domain-adoption.md",
+          "anchor": "unheaded-block-3",
+          "unitDigest": "674611497bb6224341a363fbb8b91816122c3965af2272ce59719ff9d97d6226",
+          "targetOwner": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+          "targetAnchor": "unheaded-block-6",
+          "targetUnitDigest": "674611497bb6224341a363fbb8b91816122c3965af2272ce59719ff9d97d6226",
+          "sourceWitness": {
+            "startLine": 37,
+            "endLine": 37,
+            "text": "This document uses three labels:",
+            "ancestry": [
+              "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+              "1. How To Read This Draft"
+            ]
+          }
+        }
+      ],
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "digest": "b090d4b446b518ef773fe521a1af84257df7ae09f396bbea78ea97af029c2769",
+      "owners": [
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md"
+      ],
+      "kind": "document-or-section-scoped-repetition",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "reason": "The repeated block is a contextual list, command example or lifecycle diagram inside separate source/proposal/history sections; retaining it at each mapped owner preserves that section’s local explanation. Contexts: Step 00 - Team Dispatch V1 Overview / 1. Purpose; Step 01 - Team Dispatch V1 Rollout / 1. Purpose. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_649d6c1297ae24691b8e78ec6563bff9",
+          "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md",
+          "anchor": "unheaded-block-7",
+          "unitDigest": "b090d4b446b518ef773fe521a1af84257df7ae09f396bbea78ea97af029c2769",
+          "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+          "targetAnchor": "literal-snapshot",
+          "targetUnitDigest": "a897eba505a065b96ccfdfadda459a18c054347a0ffc87a9c5d906fe0c38faac",
+          "sourceWitness": {
+            "startLine": 32,
+            "endLine": 38,
+            "text": "```txt\nWork\nFlow operations\nAssignment\nRun\nRunResult\n```",
+            "ancestry": [
+              "Step 00 - Team Dispatch V1 Overview",
+              "1. Purpose"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_f20285e4acae506cd99e9102535075b2",
+          "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+          "anchor": "unheaded-block-4",
+          "unitDigest": "b090d4b446b518ef773fe521a1af84257df7ae09f396bbea78ea97af029c2769",
+          "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md",
+          "targetAnchor": "literal-snapshot",
+          "targetUnitDigest": "68b06f6b8b76669c87e1a75a4e072342481418cac3753fabfc3930885f8dc89f",
+          "sourceWitness": {
+            "startLine": 20,
+            "endLine": 26,
+            "text": "```txt\nWork\nFlow operations\nAssignment\nRun\nRunResult\n```",
+            "ancestry": [
+              "Step 01 - Team Dispatch V1 Rollout",
+              "1. Purpose"
+            ]
+          }
+        }
+      ],
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "digest": "e4fa3726fbd2150789677769af22dece7dd5b57a26e1dc4feddd2285e23b5c36",
+      "owners": [
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md"
+      ],
+      "kind": "document-or-section-scoped-repetition",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "reason": "The repeated block is a contextual list, command example or lifecycle diagram inside separate source/proposal/history sections; retaining it at each mapped owner preserves that section’s local explanation. Contexts: Step 01 - Team Dispatch V1 Rollout / 6. Slice 1 - Operation Registry Only; Step 02 - Workflow Stage Operations / 7. Tests. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_9dddad5aa8a5266b41291d284dcf0190",
+          "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+          "anchor": "unheaded-block-26",
+          "unitDigest": "e4fa3726fbd2150789677769af22dece7dd5b57a26e1dc4feddd2285e23b5c36",
+          "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md",
+          "targetAnchor": "literal-snapshot",
+          "targetUnitDigest": "68b06f6b8b76669c87e1a75a4e072342481418cac3753fabfc3930885f8dc89f",
+          "sourceWitness": {
+            "startLine": 196,
+            "endLine": 200,
+            "text": "```bash\nnode --test test/state/workflow-stage-graphs.test.mjs\nnode --test test/setup/registrations.test.mjs\nnode --test test/runner/dispatch.test.mjs\n```",
+            "ancestry": [
+              "Step 01 - Team Dispatch V1 Rollout",
+              "6. Slice 1 - Operation Registry Only"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_01e5997ff9ab83932e77136fa1341efe",
+          "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+          "anchor": "unheaded-block-52",
+          "unitDigest": "e4fa3726fbd2150789677769af22dece7dd5b57a26e1dc4feddd2285e23b5c36",
+          "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+          "targetAnchor": "literal-snapshot",
+          "targetUnitDigest": "cc6626e546ba03022d2ee41eec7999b80e0d097bae22a8ecde76c7b325b19de4",
+          "sourceWitness": {
+            "startLine": 423,
+            "endLine": 427,
+            "text": "```bash\nnode --test test/state/workflow-stage-graphs.test.mjs\nnode --test test/setup/registrations.test.mjs\nnode --test test/runner/dispatch.test.mjs\n```",
+            "ancestry": [
+              "Step 02 - Workflow Stage Operations",
+              "7. Tests"
+            ]
+          }
+        }
+      ],
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "digest": "16005492e57449e7a2fbd37073486971ea386fa8179c541744aa9c691d32a77d",
+      "owners": [
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md"
+      ],
+      "kind": "document-or-section-scoped-repetition",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "reason": "The repeated block is a contextual list, command example or lifecycle diagram inside separate source/proposal/history sections; retaining it at each mapped owner preserves that section’s local explanation. Contexts: Step 01 - Team Dispatch V1 Rollout / 8. Slice 3 - Assignment Builder; Step 03 - Assignment, Run, And RunResult / 4. Dispatch Integration. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_e8c53acd61cfc995320d78acf32dd3e3",
+          "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+          "anchor": "unheaded-block-44",
+          "unitDigest": "16005492e57449e7a2fbd37073486971ea386fa8179c541744aa9c691d32a77d",
+          "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md",
+          "targetAnchor": "literal-snapshot",
+          "targetUnitDigest": "68b06f6b8b76669c87e1a75a4e072342481418cac3753fabfc3930885f8dc89f",
+          "sourceWitness": {
+            "startLine": 288,
+            "endLine": 290,
+            "text": "```txt\nplanning.validate-plan\n```",
+            "ancestry": [
+              "Step 01 - Team Dispatch V1 Rollout",
+              "8. Slice 3 - Assignment Builder"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_bb0832ff4c70950caa3d84b828512192",
+          "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md",
+          "anchor": "unheaded-block-42",
+          "unitDigest": "16005492e57449e7a2fbd37073486971ea386fa8179c541744aa9c691d32a77d",
+          "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md",
+          "targetAnchor": "literal-snapshot",
+          "targetUnitDigest": "7d6490155c894be62af86db04b65de7a450eb12f7e5d5d99b6252c14ec508510",
+          "sourceWitness": {
+            "startLine": 327,
+            "endLine": 329,
+            "text": "```txt\nplanning.validate-plan\n```",
+            "ancestry": [
+              "Step 03 - Assignment, Run, And RunResult",
+              "4. Dispatch Integration"
+            ]
+          }
+        }
+      ],
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "digest": "f5694fee7b180206807c868f23dbc5ef49efbc9d04a985480897577ec5def122",
+      "owners": [
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+        "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md"
+      ],
+      "kind": "document-or-section-scoped-repetition",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "reason": "The repeated short text introduces or qualifies the surrounding local section; each source occurrence retains that local payload at its mapped owner. Contexts: Step 02 - Workflow Stage Operations / 7. Tests; Step 03 - Assignment, Run, And RunResult / 7. Tests. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_90fff0613ac3e8c919c6a57936fd5621",
+          "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+          "anchor": "unheaded-block-51",
+          "unitDigest": "f5694fee7b180206807c868f23dbc5ef49efbc9d04a985480897577ec5def122",
+          "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+          "targetAnchor": "literal-snapshot",
+          "targetUnitDigest": "cc6626e546ba03022d2ee41eec7999b80e0d097bae22a8ecde76c7b325b19de4",
+          "sourceWitness": {
+            "startLine": 421,
+            "endLine": 421,
+            "text": "Useful verification commands:",
+            "ancestry": [
+              "Step 02 - Workflow Stage Operations",
+              "7. Tests"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_5323b24af53575a476c971b752ffc138",
+          "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md",
+          "anchor": "unheaded-block-82",
+          "unitDigest": "f5694fee7b180206807c868f23dbc5ef49efbc9d04a985480897577ec5def122",
+          "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md",
+          "targetAnchor": "literal-snapshot",
+          "targetUnitDigest": "7d6490155c894be62af86db04b65de7a450eb12f7e5d5d99b6252c14ec508510",
+          "sourceWitness": {
+            "startLine": 704,
+            "endLine": 704,
+            "text": "Useful verification commands:",
+            "ancestry": [
+              "Step 03 - Assignment, Run, And RunResult",
+              "7. Tests"
+            ]
+          }
+        }
+      ],
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "digest": "fd6f97edf98ce6716fa567c1af023f6149a977a91fbfff2f704119881fc938d9",
+      "owners": [
+        "docs/platform/documentation/architecture/documentation-system-design.md",
+        "docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md",
+        "docs/platform/governance.md"
+      ],
+      "kind": "document-or-section-scoped-repetition",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "reason": "The repeated block is a contextual list, command example or lifecycle diagram inside separate source/proposal/history sections; retaining it at each mapped owner preserves that section’s local explanation. Contexts: Documentation System Design / 3. Target Folder Structure; Documentation System Discussion / Discussion Log / 2026-09-13 — Brainstorm: Spec Khác Architecture Như Thế Nào?; Documentation Governance / 2. Placement Map. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_0b2c9b14b17eb9b941ea8400621637aa",
+          "path": "docs/architect/documentation-system-design.md",
+          "anchor": "unheaded-block-18",
+          "unitDigest": "fd6f97edf98ce6716fa567c1af023f6149a977a91fbfff2f704119881fc938d9",
+          "targetOwner": "docs/platform/documentation/architecture/documentation-system-design.md",
+          "targetAnchor": "unheaded-block-21",
+          "targetUnitDigest": "fd6f97edf98ce6716fa567c1af023f6149a977a91fbfff2f704119881fc938d9",
+          "sourceWitness": {
+            "startLine": 143,
+            "endLine": 148,
+            "text": "```txt\ndomains/\n.agents/skills/\nplugins/fgOS/skills/\nplans/\n```",
+            "ancestry": [
+              "Documentation System Design",
+              "3. Target Folder Structure"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_2438d9d8f14f1d26a1b27eaf1262827c",
+          "path": "docs/architect/documentation-system-discussion.md",
+          "anchor": "unheaded-block-68",
+          "unitDigest": "fd6f97edf98ce6716fa567c1af023f6149a977a91fbfff2f704119881fc938d9",
+          "targetOwner": "docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md",
+          "targetAnchor": "unheaded-block-71",
+          "targetUnitDigest": "fd6f97edf98ce6716fa567c1af023f6149a977a91fbfff2f704119881fc938d9",
+          "sourceWitness": {
+            "startLine": 571,
+            "endLine": 576,
+            "text": "```txt\ndomains/\n.agents/skills/\nplugins/fgOS/skills/\nplans/\n```",
+            "ancestry": [
+              "Documentation System Discussion",
+              "Discussion Log",
+              "2026-09-13 — Brainstorm: Spec Khác Architecture Như Thế Nào?"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_46a27d2400e766d10da01aa811865d7b",
+          "path": "docs/doc-governance.md",
+          "anchor": "unheaded-block-12",
+          "unitDigest": "fd6f97edf98ce6716fa567c1af023f6149a977a91fbfff2f704119881fc938d9",
+          "targetOwner": "docs/platform/governance.md",
+          "targetAnchor": "unheaded-block-12",
+          "targetUnitDigest": "fd6f97edf98ce6716fa567c1af023f6149a977a91fbfff2f704119881fc938d9",
+          "sourceWitness": {
+            "startLine": 100,
+            "endLine": 105,
+            "text": "```txt\ndomains/\n.agents/skills/\nplugins/fgOS/skills/\nplans/\n```",
+            "ancestry": [
+              "Documentation Governance",
+              "2. Placement Map"
+            ]
+          }
+        }
+      ],
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "digest": "c0000ebfd3df6287bae1b1bdb4ce65226e2b20b6459b438f90475e8e0c3f8e07",
+      "owners": [
+        "docs/platform/documentation/architecture/documentation-system-design.md",
+        "docs/platform/governance.md"
+      ],
+      "kind": "document-or-section-scoped-repetition",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "reason": "The repeated block is a contextual list, command example or lifecycle diagram inside separate source/proposal/history sections; retaining it at each mapped owner preserves that section’s local explanation. Contexts: Documentation System Design / 6. Document Model / 6.8. Discussion Scratchpad; Documentation Governance / 7. Discussion Scratchpad Workflow. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_32afd8895c195467bb408d10c7c943df",
+          "path": "docs/architect/documentation-system-design.md",
+          "anchor": "unheaded-block-55",
+          "unitDigest": "c0000ebfd3df6287bae1b1bdb4ce65226e2b20b6459b438f90475e8e0c3f8e07",
+          "targetOwner": "docs/platform/documentation/architecture/documentation-system-design.md",
+          "targetAnchor": "unheaded-block-58",
+          "targetUnitDigest": "c0000ebfd3df6287bae1b1bdb4ce65226e2b20b6459b438f90475e8e0c3f8e07",
+          "sourceWitness": {
+            "startLine": 414,
+            "endLine": 418,
+            "text": "Lifecycle:\n\n```txt\nOpen -> Active -> Stabilizing -> Promoting -> Drained -> Delete/Archive\n```",
+            "ancestry": [
+              "Documentation System Design",
+              "6. Document Model",
+              "6.8. Discussion Scratchpad"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_37b48670e7924d49eec710e08d6bcd05",
+          "path": "docs/doc-governance.md",
+          "anchor": "unheaded-block-29",
+          "unitDigest": "c0000ebfd3df6287bae1b1bdb4ce65226e2b20b6459b438f90475e8e0c3f8e07",
+          "targetOwner": "docs/platform/governance.md",
+          "targetAnchor": "unheaded-block-29",
+          "targetUnitDigest": "c0000ebfd3df6287bae1b1bdb4ce65226e2b20b6459b438f90475e8e0c3f8e07",
+          "sourceWitness": {
+            "startLine": 239,
+            "endLine": 243,
+            "text": "Lifecycle:\n\n```txt\nOpen -> Active -> Stabilizing -> Promoting -> Drained -> Delete/Archive\n```",
+            "ancestry": [
+              "Documentation Governance",
+              "7. Discussion Scratchpad Workflow"
+            ]
+          }
+        }
+      ],
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "digest": "aa363dc9381146743f854ff9ce3429a15cc15f1c6a56364b34b542e06a9c7add",
+      "owners": [
+        "docs/platform/documentation/architecture/documentation-system-design.md",
+        "docs/platform/governance.md"
+      ],
+      "kind": "document-or-section-scoped-repetition",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "reason": "The repeated short text introduces or qualifies the surrounding local section; each source occurrence retains that local payload at its mapped owner. Contexts: Documentation System Design / 8. Metadata; Documentation Governance / 5. Metadata. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_b672ea78b4694a80609a491fcae61b82",
+          "path": "docs/architect/documentation-system-design.md",
+          "anchor": "unheaded-block-61",
+          "unitDigest": "aa363dc9381146743f854ff9ce3429a15cc15f1c6a56364b34b542e06a9c7add",
+          "targetOwner": "docs/platform/documentation/architecture/documentation-system-design.md",
+          "targetAnchor": "unheaded-block-64",
+          "targetUnitDigest": "aa363dc9381146743f854ff9ce3429a15cc15f1c6a56364b34b542e06a9c7add",
+          "sourceWitness": {
+            "startLine": 472,
+            "endLine": 472,
+            "text": "Generated docs additionally declare:",
+            "ancestry": [
+              "Documentation System Design",
+              "8. Metadata"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_e5b7adb52fab16ef9f696463b4553181",
+          "path": "docs/doc-governance.md",
+          "anchor": "unheaded-block-25",
+          "unitDigest": "aa363dc9381146743f854ff9ce3429a15cc15f1c6a56364b34b542e06a9c7add",
+          "targetOwner": "docs/platform/governance.md",
+          "targetAnchor": "unheaded-block-25",
+          "targetUnitDigest": "aa363dc9381146743f854ff9ce3429a15cc15f1c6a56364b34b542e06a9c7add",
+          "sourceWitness": {
+            "startLine": 210,
+            "endLine": 210,
+            "text": "Generated docs additionally declare:",
+            "ancestry": [
+              "Documentation Governance",
+              "5. Metadata"
+            ]
+          }
+        }
+      ],
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "digest": "024fc3239ffcd85813170a3fe2b8f39d633a70001ff9e187d55de23a2371d818",
+      "owners": [
+        "docs/platform/documentation/architecture/documentation-system-design.md",
+        "docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md"
+      ],
+      "kind": "document-or-section-scoped-repetition",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "reason": "The repeated block is a contextual list, command example or lifecycle diagram inside separate source/proposal/history sections; retaining it at each mapped owner preserves that section’s local explanation. Contexts: Documentation System Design / 8. Metadata; Documentation System Discussion / Discussion Log / 2026-09-13 — Panel Pass: Document Structure And Governance. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_aa0c35e9c2db3061764c324ad5e3fe6d",
+          "path": "docs/architect/documentation-system-design.md",
+          "anchor": "unheaded-block-62",
+          "unitDigest": "024fc3239ffcd85813170a3fe2b8f39d633a70001ff9e187d55de23a2371d818",
+          "targetOwner": "docs/platform/documentation/architecture/documentation-system-design.md",
+          "targetAnchor": "unheaded-block-65",
+          "targetUnitDigest": "024fc3239ffcd85813170a3fe2b8f39d633a70001ff9e187d55de23a2371d818",
+          "sourceWitness": {
+            "startLine": 474,
+            "endLine": 481,
+            "text": "```txt\nsource_of_truth\ngenerator\ngenerator_version\ngenerated_at\nfreshness_check\ndo_not_edit: true\n```",
+            "ancestry": [
+              "Documentation System Design",
+              "8. Metadata"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_138d646a42ba17da6bfc9ab7087184f5",
+          "path": "docs/architect/documentation-system-discussion.md",
+          "anchor": "unheaded-block-138",
+          "unitDigest": "024fc3239ffcd85813170a3fe2b8f39d633a70001ff9e187d55de23a2371d818",
+          "targetOwner": "docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md",
+          "targetAnchor": "unheaded-block-141",
+          "targetUnitDigest": "024fc3239ffcd85813170a3fe2b8f39d633a70001ff9e187d55de23a2371d818",
+          "sourceWitness": {
+            "startLine": 1180,
+            "endLine": 1187,
+            "text": "```txt\nsource_of_truth\ngenerator\ngenerator_version\ngenerated_at\nfreshness_check\ndo_not_edit: true\n```",
+            "ancestry": [
+              "Documentation System Discussion",
+              "Discussion Log",
+              "2026-09-13 — Panel Pass: Document Structure And Governance"
+            ]
+          }
+        }
+      ],
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "digest": "8763ac2ff0db101fb4b502912c8ba6e49e1974ec45d8595b72a4169f5b517080",
+      "owners": [
+        "docs/platform/documentation/architecture/documentation-system-design.md",
+        "docs/platform/governance.md"
+      ],
+      "kind": "document-or-section-scoped-repetition",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "reason": "The repeated block is a contextual list, command example or lifecycle diagram inside separate source/proposal/history sections; retaining it at each mapped owner preserves that section’s local explanation. Contexts: Documentation System Design / 10. Linking Discipline; Documentation Governance / 11. Linking Discipline. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_0ea3afaf4956a34de3695a838a8c78e2",
+          "path": "docs/architect/documentation-system-design.md",
+          "anchor": "unheaded-block-76",
+          "unitDigest": "8763ac2ff0db101fb4b502912c8ba6e49e1974ec45d8595b72a4169f5b517080",
+          "targetOwner": "docs/platform/documentation/architecture/documentation-system-design.md",
+          "targetAnchor": "unheaded-block-79",
+          "targetUnitDigest": "8763ac2ff0db101fb4b502912c8ba6e49e1974ec45d8595b72a4169f5b517080",
+          "sourceWitness": {
+            "startLine": 558,
+            "endLine": 566,
+            "text": "```txt\ndefines\nconstrains\nimplements\nexplains\nevidenced_by\nsupersedes\nconsumes\n```",
+            "ancestry": [
+              "Documentation System Design",
+              "10. Linking Discipline"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_feb18e656e083a3d7e167be9c38e1464",
+          "path": "docs/doc-governance.md",
+          "anchor": "unheaded-block-54",
+          "unitDigest": "8763ac2ff0db101fb4b502912c8ba6e49e1974ec45d8595b72a4169f5b517080",
+          "targetOwner": "docs/platform/governance.md",
+          "targetAnchor": "unheaded-block-54",
+          "targetUnitDigest": "8763ac2ff0db101fb4b502912c8ba6e49e1974ec45d8595b72a4169f5b517080",
+          "sourceWitness": {
+            "startLine": 426,
+            "endLine": 434,
+            "text": "```txt\ndefines\nconstrains\nimplements\nexplains\nevidenced_by\nsupersedes\nconsumes\n```",
+            "ancestry": [
+              "Documentation Governance",
+              "11. Linking Discipline"
+            ]
+          }
+        }
+      ],
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "digest": "5dd3800d26757119c9d05e45dbe3a83203fc250f37b80390b533ba7f9cd011b4",
+      "owners": [
+        "docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md",
+        "docs/platform/packaging-distribution/history/distribution-baseline.md"
+      ],
+      "kind": "document-or-section-scoped-repetition",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "reason": "The repeated short text introduces or qualifies the surrounding local section; each source occurrence retains that local payload at its mapped owner. Contexts: Documentation System Discussion / Discussion Log / 2026-09-13 — Next Step: Design Map + Architect Documentation Governance; Distribution Baseline And Scattered Spec Fragments / 3. Old Design Pressure From `tsk-1fp`. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_adbc5b755c171c0748bf07c91c2c9d10",
+          "path": "docs/architect/documentation-system-discussion.md",
+          "anchor": "unheaded-block-178",
+          "unitDigest": "5dd3800d26757119c9d05e45dbe3a83203fc250f37b80390b533ba7f9cd011b4",
+          "targetOwner": "docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md",
+          "targetAnchor": "unheaded-block-181",
+          "targetUnitDigest": "5dd3800d26757119c9d05e45dbe3a83203fc250f37b80390b533ba7f9cd011b4",
+          "sourceWitness": {
+            "startLine": 1548,
+            "endLine": 1548,
+            "text": "Current interpretation:",
+            "ancestry": [
+              "Documentation System Discussion",
+              "Discussion Log",
+              "2026-09-13 — Next Step: Design Map + Architect Documentation Governance"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_b10987f227e013b90578a2d5f8fca2f4",
+          "path": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+          "anchor": "unheaded-block-11",
+          "unitDigest": "5dd3800d26757119c9d05e45dbe3a83203fc250f37b80390b533ba7f9cd011b4",
+          "targetOwner": "docs/platform/packaging-distribution/history/distribution-baseline.md",
+          "targetAnchor": "unheaded-block-27",
+          "targetUnitDigest": "5dd3800d26757119c9d05e45dbe3a83203fc250f37b80390b533ba7f9cd011b4",
+          "sourceWitness": {
+            "startLine": 87,
+            "endLine": 87,
+            "text": "Current interpretation:",
+            "ancestry": [
+              "Distribution Baseline And Scattered Spec Fragments",
+              "3. Old Design Pressure From `tsk-1fp`"
+            ]
+          }
+        }
+      ],
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "digest": "b8b4c9181b9ae69ce03999f53005c4306744238893debf2bf65ec58e2403a9fb",
+      "owners": [
+        "docs/platform/proposals/step-10-a0-coding-domain-boundary-facade-plan.md",
+        "docs/platform/proposals/step-10-coding-domain-adoption.md"
+      ],
+      "kind": "document-or-section-scoped-repetition",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "reason": "The repeated short text introduces or qualifies the surrounding local section; each source occurrence retains that local payload at its mapped owner. Contexts: Step 10 A0 - Coding Domain Boundary And Facade Plan / 11. Concrete Task List; Step 10 - Coding Domain Adoption Of The Coordination Foundation / 3. High-Level Adoption Plan. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_abe82f595334183ddcdd9ff67a3781c3",
+          "path": "docs/architect/proposals/step-10-a0-coding-domain-boundary-facade-plan.md",
+          "anchor": "unheaded-block-102",
+          "unitDigest": "b8b4c9181b9ae69ce03999f53005c4306744238893debf2bf65ec58e2403a9fb",
+          "targetOwner": "docs/platform/proposals/step-10-a0-coding-domain-boundary-facade-plan.md",
+          "targetAnchor": "unheaded-block-105",
+          "targetUnitDigest": "b8b4c9181b9ae69ce03999f53005c4306744238893debf2bf65ec58e2403a9fb",
+          "sourceWitness": {
+            "startLine": 624,
+            "endLine": 624,
+            "text": "Recommended execution order:",
+            "ancestry": [
+              "Step 10 A0 - Coding Domain Boundary And Facade Plan",
+              "11. Concrete Task List"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_297959b4b26fd7d081334fc586f8873b",
+          "path": "docs/architect/proposals/step-10-coding-domain-adoption.md",
+          "anchor": "unheaded-block-23",
+          "unitDigest": "b8b4c9181b9ae69ce03999f53005c4306744238893debf2bf65ec58e2403a9fb",
+          "targetOwner": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+          "targetAnchor": "unheaded-block-26",
+          "targetUnitDigest": "b8b4c9181b9ae69ce03999f53005c4306744238893debf2bf65ec58e2403a9fb",
+          "sourceWitness": {
+            "startLine": 214,
+            "endLine": 214,
+            "text": "Recommended execution order:",
+            "ancestry": [
+              "Step 10 - Coding Domain Adoption Of The Coordination Foundation",
+              "3. High-Level Adoption Plan"
+            ]
+          }
+        }
+      ],
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "owners": [
+        "docs/platform/architecture-map.md",
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "docs/platform/system-overview/spec.md",
+        "docs/platform/work-state/decisions/retired-decision-history.md"
+      ],
+      "kind": "document-or-section-scoped-repetition",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "reason": "The repeated closing sentence governs amendment of each local decision narrative; all nineteen native occurrences and their contextual owner set are enumerated, replacing the old four-member subset. Contexts: Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0015 — Đổi tên định danh contract C1-C9 thành CTR001-CTR009 / Hệ quả; Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0017 — Đóng audit hệ id/tên gọi (STR47) / Hệ quả; Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0005 — Runner & cô lập worker / Hệ quả; Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0008 — Routing theo audience của từng interface / Hệ quả; Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập) / Hệ quả; Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence / Hệ quả; Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0028 — Đổi tên pinned term `orchestrator` thành `launcher` / Hệ quả; Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị / Hệ quả; Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới / Hệ quả; Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người / Hệ quả; Spec: System Overview / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0016 — Mốc MVP của fgOS / Hệ quả; Spec: System Overview / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0018 — Mốc MVP2 của fgOS / Hệ quả; 0002 — Mô hình việc phẳng / Hệ quả; 0002 — Mô hình việc phẳng / 0003 — Đặt tên & bố cục dữ liệu / Hệ quả; 0002 — Mô hình việc phẳng / 0004 — Phạm vi & non-goal / Hệ quả; 0002 — Mô hình việc phẳng / 0007 — Tiến hoá schema & event / Hệ quả; 0002 — Mô hình việc phẳng / 0011 — Version tường minh cho mọi contract / Hệ quả; 0002 — Mô hình việc phẳng / 0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời / Hệ quả; 0002 — Mô hình việc phẳng / 0024 — Đổi tên status `proposed` thành `awaiting-approval` / Hệ quả. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
       "sourceUnits": [
         {
           "claimId": "claim_f7e282b47557154231f0565bd30e5d7d",
-          "source": "docs/architecture-map.md#unheaded-block-77",
-          "owner": "docs/platform/architecture-map.md#unheaded-block-91",
-          "ancestry": [
-            "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
-            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
-            "0015 — Đổi tên định danh contract C1-C9 thành CTR001-CTR009",
-            "Hệ quả"
-          ],
-          "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
-          "sourceBlob": "01f2a21eebba99c2b237be650b631168232bcd5e",
-          "targetBlob": "cf4cb69459d749e1d4e258a2ef1846ef66c9d567"
+          "path": "docs/architecture-map.md",
+          "anchor": "unheaded-block-77",
+          "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/architecture-map.md",
+          "targetAnchor": "unheaded-block-91",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sourceWitness": {
+            "startLine": 682,
+            "endLine": 682,
+            "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+            "ancestry": [
+              "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+              "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+              "0015 — Đổi tên định danh contract C1-C9 thành CTR001-CTR009",
+              "Hệ quả"
+            ]
+          }
         },
         {
           "claimId": "claim_15a3179944bc76f990fe1b965e40a9da",
-          "source": "docs/architecture-map.md#unheaded-block-83",
-          "owner": "docs/platform/architecture-map.md#unheaded-block-97",
-          "ancestry": [
-            "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
-            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
-            "0017 — Đóng audit hệ id/tên gọi (STR47)",
-            "Hệ quả"
-          ],
-          "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
-          "sourceBlob": "01f2a21eebba99c2b237be650b631168232bcd5e",
-          "targetBlob": "cf4cb69459d749e1d4e258a2ef1846ef66c9d567"
+          "path": "docs/architecture-map.md",
+          "anchor": "unheaded-block-83",
+          "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/architecture-map.md",
+          "targetAnchor": "unheaded-block-97",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sourceWitness": {
+            "startLine": 763,
+            "endLine": 763,
+            "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+            "ancestry": [
+              "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+              "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+              "0017 — Đóng audit hệ id/tên gọi (STR47)",
+              "Hệ quả"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
+          "path": "docs/specs/runner.md",
+          "anchor": "unheaded-block-150",
+          "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "targetAnchor": "unheaded-block-9",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sourceWitness": {
+            "startLine": 1662,
+            "endLine": 1662,
+            "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+            "ancestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+              "0005 — Runner & cô lập worker",
+              "Hệ quả"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
+          "path": "docs/specs/runner.md",
+          "anchor": "unheaded-block-155",
+          "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "targetAnchor": "unheaded-block-14",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sourceWitness": {
+            "startLine": 1690,
+            "endLine": 1690,
+            "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+            "ancestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+              "0008 — Routing theo audience của từng interface",
+              "Hệ quả"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
+          "path": "docs/specs/runner.md",
+          "anchor": "unheaded-block-167",
+          "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "targetAnchor": "unheaded-block-26",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sourceWitness": {
+            "startLine": 1799,
+            "endLine": 1799,
+            "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+            "ancestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+              "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
+              "Hệ quả"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
+          "path": "docs/specs/runner.md",
+          "anchor": "unheaded-block-176",
+          "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "targetAnchor": "unheaded-block-35",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sourceWitness": {
+            "startLine": 1883,
+            "endLine": 1883,
+            "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+            "ancestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+              "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
+              "Hệ quả"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
+          "path": "docs/specs/runner.md",
+          "anchor": "unheaded-block-241",
+          "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "targetAnchor": "unheaded-block-100",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sourceWitness": {
+            "startLine": 2407,
+            "endLine": 2407,
+            "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+            "ancestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+              "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
+              "Hệ quả"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
+          "path": "docs/specs/runner.md",
+          "anchor": "unheaded-block-250",
+          "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "targetAnchor": "unheaded-block-109",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sourceWitness": {
+            "startLine": 2496,
+            "endLine": 2496,
+            "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+            "ancestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+              "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
+              "Hệ quả"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_825b8970950e755e43c8c1740612eac4",
+          "path": "docs/specs/runner.md",
+          "anchor": "unheaded-block-274",
+          "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "targetAnchor": "unheaded-block-133",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sourceWitness": {
+            "startLine": 2677,
+            "endLine": 2677,
+            "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+            "ancestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+              "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
+              "Hệ quả"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
+          "path": "docs/specs/runner.md",
+          "anchor": "unheaded-block-286",
+          "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "targetAnchor": "unheaded-block-145",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sourceWitness": {
+            "startLine": 2789,
+            "endLine": 2789,
+            "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+            "ancestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+              "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+              "Hệ quả"
+            ]
+          }
         },
         {
           "claimId": "claim_e4b03884bb0c50d641f173b8a74c6501",
-          "source": "docs/specs/system-overview.md#unheaded-block-25",
-          "owner": "docs/platform/system-overview/spec.md#unheaded-block-28",
-          "ancestry": [
-            "Spec: System Overview",
-            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
-            "0016 — Mốc MVP của fgOS",
-            "Hệ quả"
-          ],
-          "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
-          "sourceBlob": "c24c5561dc60cce7e53d0a0c5e34ff97414845ac",
-          "targetBlob": "ebd433bee5dcf0a79ad1daaa3cb3e9b30c802020"
+          "path": "docs/specs/system-overview.md",
+          "anchor": "unheaded-block-25",
+          "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/system-overview/spec.md",
+          "targetAnchor": "unheaded-block-28",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sourceWitness": {
+            "startLine": 104,
+            "endLine": 104,
+            "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+            "ancestry": [
+              "Spec: System Overview",
+              "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+              "0016 — Mốc MVP của fgOS",
+              "Hệ quả"
+            ]
+          }
         },
         {
           "claimId": "claim_ba26d5145625a6a74f3d1f4801c35407",
-          "source": "docs/specs/system-overview.md#unheaded-block-34",
-          "owner": "docs/platform/system-overview/spec.md#unheaded-block-37",
-          "ancestry": [
-            "Spec: System Overview",
-            "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
-            "0018 — Mốc MVP2 của fgOS",
-            "Hệ quả"
-          ],
-          "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
-          "sourceBlob": "c24c5561dc60cce7e53d0a0c5e34ff97414845ac",
-          "targetBlob": "ebd433bee5dcf0a79ad1daaa3cb3e9b30c802020"
+          "path": "docs/specs/system-overview.md",
+          "anchor": "unheaded-block-34",
+          "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/system-overview/spec.md",
+          "targetAnchor": "unheaded-block-37",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sourceWitness": {
+            "startLine": 170,
+            "endLine": 170,
+            "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+            "ancestry": [
+              "Spec: System Overview",
+              "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+              "0018 — Mốc MVP2 của fgOS",
+              "Hệ quả"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_c56e0ea4200729ae5cf5542803b2fe10",
+          "path": "docs/specs/work-state.md",
+          "anchor": "unheaded-block-117",
+          "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "targetAnchor": "unheaded-block-7",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sourceWitness": {
+            "startLine": 1403,
+            "endLine": 1403,
+            "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+            "ancestry": [
+              "0002 — Mô hình việc phẳng",
+              "Hệ quả"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_c57c39536b983d5f172833853e8b3344",
+          "path": "docs/specs/work-state.md",
+          "anchor": "unheaded-block-121",
+          "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "targetAnchor": "unheaded-block-11",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sourceWitness": {
+            "startLine": 1430,
+            "endLine": 1430,
+            "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+            "ancestry": [
+              "0002 — Mô hình việc phẳng",
+              "0003 — Đặt tên & bố cục dữ liệu",
+              "Hệ quả"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_7bc17cd130d9b9600e3a8db9bd57ca88",
+          "path": "docs/specs/work-state.md",
+          "anchor": "unheaded-block-126",
+          "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "targetAnchor": "unheaded-block-16",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sourceWitness": {
+            "startLine": 1461,
+            "endLine": 1461,
+            "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+            "ancestry": [
+              "0002 — Mô hình việc phẳng",
+              "0004 — Phạm vi & non-goal",
+              "Hệ quả"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_576e295be7d60ab95a555f11ada15da5",
+          "path": "docs/specs/work-state.md",
+          "anchor": "unheaded-block-138",
+          "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "targetAnchor": "unheaded-block-28",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sourceWitness": {
+            "startLine": 1533,
+            "endLine": 1533,
+            "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+            "ancestry": [
+              "0002 — Mô hình việc phẳng",
+              "0007 — Tiến hoá schema & event",
+              "Hệ quả"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_08dc68ef23395b8f3f5b095508348e00",
+          "path": "docs/specs/work-state.md",
+          "anchor": "unheaded-block-144",
+          "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "targetAnchor": "unheaded-block-34",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sourceWitness": {
+            "startLine": 1587,
+            "endLine": 1587,
+            "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+            "ancestry": [
+              "0002 — Mô hình việc phẳng",
+              "0011 — Version tường minh cho mọi contract",
+              "Hệ quả"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_a7c2e1310de5bcd152e86f3833e90033",
+          "path": "docs/specs/work-state.md",
+          "anchor": "unheaded-block-150",
+          "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "targetAnchor": "unheaded-block-40",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sourceWitness": {
+            "startLine": 1664,
+            "endLine": 1664,
+            "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+            "ancestry": [
+              "0002 — Mô hình việc phẳng",
+              "0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời",
+              "Hệ quả"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_82f766f5320ab6bbe5174aeda52e710b",
+          "path": "docs/specs/work-state.md",
+          "anchor": "unheaded-block-174",
+          "unitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "targetAnchor": "unheaded-block-64",
+          "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "sourceWitness": {
+            "startLine": 1877,
+            "endLine": 1877,
+            "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+            "ancestry": [
+              "0002 — Mô hình việc phẳng",
+              "0024 — Đổi tên status `proposed` thành `awaiting-approval`",
+              "Hệ quả"
+            ]
+          }
         }
       ],
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-bounded-rereview.md",
-      "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
-      "reviewNote": "mechanical: retained accepted exception group (closing decision sentence, four contexts); only review metadata changed, note and pin equal my 36d79ddcc verdict, four sources and owners unchanged"
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "digest": "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3",
+      "owners": [
+        "docs/platform/claude-plugin/spec.md",
+        "docs/platform/decision-citation-drift/spec.md",
+        "docs/platform/packaging-distribution/spec.md",
+        "docs/platform/runner/operations/h-51f5cd7279fd.md",
+        "docs/platform/work-state/spec.md"
+      ],
+      "kind": "document-or-section-scoped-repetition",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "reason": "The identical unit is a heading label reused by separately mapped source sections; section subjects and payloads remain attached to their own source/owner pairs. Contexts: Spec: Decision Citation Drift Check / Behaviors & Operations; Spec: Distribution / Behaviors & Operations; Spec: fgOS Plugin (Claude Code slash-command surface) / Behaviors & Operations; Spec: Runner (vòng tự hành) / Behaviors & Operations; Spec: Work-State (tầng quản việc của forgent) / Behaviors & Operations. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_293d81b12e6ce78ccc407ec7ac03faff",
+          "path": "docs/specs/decision-citation-drift.md",
+          "anchor": "behaviors-operations",
+          "unitDigest": "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3",
+          "targetOwner": "docs/platform/decision-citation-drift/spec.md",
+          "targetAnchor": "behaviors-operations",
+          "targetUnitDigest": "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3",
+          "sourceWitness": {
+            "startLine": 39,
+            "endLine": 39,
+            "text": "## Behaviors & Operations",
+            "ancestry": [
+              "Spec: Decision Citation Drift Check",
+              "Behaviors & Operations"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_35e55882f79d7ab6b9435f03982beba3",
+          "path": "docs/specs/distribution.md",
+          "anchor": "behaviors-operations",
+          "unitDigest": "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3",
+          "targetOwner": "docs/platform/packaging-distribution/spec.md",
+          "targetAnchor": "behaviors-operations",
+          "targetUnitDigest": "230097c6afa64e84d3eece3ece7407471e6a1bb0576fa4cd4dc5afe77750e6e1",
+          "sourceWitness": {
+            "startLine": 75,
+            "endLine": 75,
+            "text": "## Behaviors & Operations",
+            "ancestry": [
+              "Spec: Distribution",
+              "Behaviors & Operations"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_3ec4250ed3c32495b43a85a96c5cff70",
+          "path": "docs/specs/fgos-plugin.md",
+          "anchor": "behaviors-operations",
+          "unitDigest": "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3",
+          "targetOwner": "docs/platform/claude-plugin/spec.md",
+          "targetAnchor": "behaviors-operations",
+          "targetUnitDigest": "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3",
+          "sourceWitness": {
+            "startLine": 47,
+            "endLine": 47,
+            "text": "## Behaviors & Operations",
+            "ancestry": [
+              "Spec: fgOS Plugin (Claude Code slash-command surface)",
+              "Behaviors & Operations"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_7a21644819481756f27864ae791d992f",
+          "path": "docs/specs/runner.md",
+          "anchor": "behaviors-operations",
+          "unitDigest": "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3",
+          "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+          "targetAnchor": "behaviors-operations",
+          "targetUnitDigest": "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3",
+          "sourceWitness": {
+            "startLine": 98,
+            "endLine": 98,
+            "text": "## Behaviors & Operations",
+            "ancestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Behaviors & Operations"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_3522d44bd7854c70b00c9d5e01f11bf4",
+          "path": "docs/specs/work-state.md",
+          "anchor": "behaviors-operations",
+          "unitDigest": "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3",
+          "targetOwner": "docs/platform/work-state/spec.md",
+          "targetAnchor": "9-behaviors-and-operations",
+          "targetUnitDigest": "a68620a509501efbe707cdffef8d9e9ac2ebdac08ec6c374d1ae789f04aa549b",
+          "sourceWitness": {
+            "startLine": 832,
+            "endLine": 832,
+            "text": "## Behaviors & Operations",
+            "ancestry": [
+              "Spec: Work-State (tầng quản việc của forgent)",
+              "Behaviors & Operations"
+            ]
+          }
+        }
+      ],
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "digest": "e3d926d43e2e72f2211f195fb007e887cc2dfd1d97f6819f80e5bf203d4dfd1b",
+      "owners": [
+        "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+        "docs/platform/work-state/spec.md"
+      ],
+      "kind": "document-or-section-scoped-repetition",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "reason": "The identical unit is a heading label reused by separately mapped source sections; section subjects and payloads remain attached to their own source/owner pairs. Contexts: Spec: Runner (vòng tự hành) / Visuals; Spec: Work-State (tầng quản việc của forgent) / Visuals. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_cc1865a79db0c03c59f4bf30c7a0a97b",
+          "path": "docs/specs/runner.md",
+          "anchor": "visuals",
+          "unitDigest": "e3d926d43e2e72f2211f195fb007e887cc2dfd1d97f6819f80e5bf203d4dfd1b",
+          "targetOwner": "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+          "targetAnchor": "visuals",
+          "targetUnitDigest": "e3d926d43e2e72f2211f195fb007e887cc2dfd1d97f6819f80e5bf203d4dfd1b",
+          "sourceWitness": {
+            "startLine": 1213,
+            "endLine": 1213,
+            "text": "## Visuals",
+            "ancestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Visuals"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_1a9c10544a642b6001a8bacae1b6817b",
+          "path": "docs/specs/work-state.md",
+          "anchor": "visuals",
+          "unitDigest": "e3d926d43e2e72f2211f195fb007e887cc2dfd1d97f6819f80e5bf203d4dfd1b",
+          "targetOwner": "docs/platform/work-state/spec.md",
+          "targetAnchor": "14-presentation-surface",
+          "targetUnitDigest": "267b58ca8eeabc14f6baf905c51e21639d5985d01e2afa253c609993d63701d0",
+          "sourceWitness": {
+            "startLine": 1332,
+            "endLine": 1332,
+            "text": "## Visuals",
+            "ancestry": [
+              "Spec: Work-State (tầng quản việc của forgent)",
+              "Visuals"
+            ]
+          }
+        }
+      ],
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "digest": "b0a0db080dad061ca93e63826e562c4710807db8e6f2c8ca50dc291fc0b69e09",
+      "owners": [
+        "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+        "docs/platform/work-state/spec.md"
+      ],
+      "kind": "document-or-section-scoped-repetition",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "reason": "The repeated short text introduces or qualifies the surrounding local section; each source occurrence retains that local payload at its mapped owner. Contexts: Spec: Runner (vòng tự hành) / Visuals; Spec: Work-State (tầng quản việc của forgent) / Visuals. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_a76db7b113608c6dc589a0acf1050c58",
+          "path": "docs/specs/runner.md",
+          "anchor": "unheaded-block-101",
+          "unitDigest": "b0a0db080dad061ca93e63826e562c4710807db8e6f2c8ca50dc291fc0b69e09",
+          "targetOwner": "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+          "targetAnchor": "unheaded-block-3",
+          "targetUnitDigest": "b0a0db080dad061ca93e63826e562c4710807db8e6f2c8ca50dc291fc0b69e09",
+          "sourceWitness": {
+            "startLine": 1215,
+            "endLine": 1215,
+            "text": "Not applicable — không có màn hình.",
+            "ancestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Visuals"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_2cfd89083b61b2c263e84f24624a6f3c",
+          "path": "docs/specs/work-state.md",
+          "anchor": "unheaded-block-110",
+          "unitDigest": "b0a0db080dad061ca93e63826e562c4710807db8e6f2c8ca50dc291fc0b69e09",
+          "targetOwner": "docs/platform/work-state/spec.md",
+          "targetAnchor": "unheaded-block-97",
+          "targetUnitDigest": "b0a0db080dad061ca93e63826e562c4710807db8e6f2c8ca50dc291fc0b69e09",
+          "sourceWitness": {
+            "startLine": 1334,
+            "endLine": 1334,
+            "text": "Not applicable — không có màn hình.",
+            "ancestry": [
+              "Spec: Work-State (tầng quản việc của forgent)",
+              "Visuals"
+            ]
+          }
+        }
+      ],
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "digest": "0e00c9cccba1af1ea5926f1106dd72d535b230294281707303ecd16fbc0a2bea",
+      "owners": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "docs/platform/system-overview/spec.md",
+        "docs/platform/work-state/decisions/retired-decision-history.md"
+      ],
+      "kind": "document-or-section-scoped-repetition",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "reason": "The identical unit is a heading label reused by separately mapped source sections; section subjects and payloads remain attached to their own source/owner pairs. Contexts: Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4); Spec: System Overview / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4); Spec: Work-State (tầng quản việc của forgent) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4). Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_4060effa4f71f4e9367b0fc41af34ef0",
+          "path": "docs/specs/runner.md",
+          "anchor": "lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4",
+          "unitDigest": "0e00c9cccba1af1ea5926f1106dd72d535b230294281707303ecd16fbc0a2bea",
+          "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "targetAnchor": "lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4",
+          "targetUnitDigest": "0e00c9cccba1af1ea5926f1106dd72d535b230294281707303ecd16fbc0a2bea",
+          "sourceWitness": {
+            "startLine": 1615,
+            "endLine": 1615,
+            "text": "## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "ancestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_42cce1eacf244132db046ecf3733c4fb",
+          "path": "docs/specs/system-overview.md",
+          "anchor": "lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4",
+          "unitDigest": "0e00c9cccba1af1ea5926f1106dd72d535b230294281707303ecd16fbc0a2bea",
+          "targetOwner": "docs/platform/system-overview/spec.md",
+          "targetAnchor": "lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4",
+          "targetUnitDigest": "0e00c9cccba1af1ea5926f1106dd72d535b230294281707303ecd16fbc0a2bea",
+          "sourceWitness": {
+            "startLine": 73,
+            "endLine": 73,
+            "text": "## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "ancestry": [
+              "Spec: System Overview",
+              "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_ae1f21106b52006a2ff377f9104a1fce",
+          "path": "docs/specs/work-state.md",
+          "anchor": "lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4",
+          "unitDigest": "0e00c9cccba1af1ea5926f1106dd72d535b230294281707303ecd16fbc0a2bea",
+          "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "targetAnchor": "1-provenance-of-retired-decisions",
+          "targetUnitDigest": "260da5fd6eab8c113ea7e756985b782b5e45721aae8f34aab1e50389af0dff24",
+          "sourceWitness": {
+            "startLine": 1363,
+            "endLine": 1363,
+            "text": "## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+            "ancestry": [
+              "Spec: Work-State (tầng quản việc của forgent)",
+              "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+            ]
+          }
+        }
+      ],
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
+    },
+    {
+      "digest": "ac2b043c0d4f9fde1e7ecee60609cbe700480b9dd33105f98d30f6c6057ffb5c",
+      "owners": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "docs/platform/system-overview/spec.md",
+        "docs/platform/work-state/decisions/retired-decision-history.md"
+      ],
+      "kind": "document-or-section-scoped-repetition",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+      "reason": "The repeated short text introduces or qualifies the surrounding local section; each source occurrence retains that local payload at its mapped owner. Contexts: Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4); Spec: System Overview / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4); Spec: Work-State (tầng quản việc của forgent) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4). Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+      "sourceUnits": [
+        {
+          "claimId": "claim_a9b1dd4a68565497b9bcb9120e7b9a76",
+          "path": "docs/specs/runner.md",
+          "anchor": "unheaded-block-144",
+          "unitDigest": "ac2b043c0d4f9fde1e7ecee60609cbe700480b9dd33105f98d30f6c6057ffb5c",
+          "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "targetAnchor": "unheaded-block-3",
+          "targetUnitDigest": "ac2b043c0d4f9fde1e7ecee60609cbe700480b9dd33105f98d30f6c6057ffb5c",
+          "sourceWitness": {
+            "startLine": 1617,
+            "endLine": 1617,
+            "text": "Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, phần narrative đầy đủ sống ở đây. Thứ tự theo số ADR gốc.",
+            "ancestry": [
+              "Spec: Runner (vòng tự hành)",
+              "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_1aa589b82c1b4ebf922a2ff495921ff9",
+          "path": "docs/specs/system-overview.md",
+          "anchor": "unheaded-block-16",
+          "unitDigest": "ac2b043c0d4f9fde1e7ecee60609cbe700480b9dd33105f98d30f6c6057ffb5c",
+          "targetOwner": "docs/platform/system-overview/spec.md",
+          "targetAnchor": "unheaded-block-19",
+          "targetUnitDigest": "ac2b043c0d4f9fde1e7ecee60609cbe700480b9dd33105f98d30f6c6057ffb5c",
+          "sourceWitness": {
+            "startLine": 75,
+            "endLine": 75,
+            "text": "Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, phần narrative đầy đủ sống ở đây. Thứ tự theo số ADR gốc.",
+            "ancestry": [
+              "Spec: System Overview",
+              "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+            ]
+          }
+        },
+        {
+          "claimId": "claim_192ebab9dbc6cec8b8957683e3ff8c82",
+          "path": "docs/specs/work-state.md",
+          "anchor": "unheaded-block-112",
+          "unitDigest": "ac2b043c0d4f9fde1e7ecee60609cbe700480b9dd33105f98d30f6c6057ffb5c",
+          "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "targetAnchor": "unheaded-block-2",
+          "targetUnitDigest": "ac2b043c0d4f9fde1e7ecee60609cbe700480b9dd33105f98d30f6c6057ffb5c",
+          "sourceWitness": {
+            "startLine": 1365,
+            "endLine": 1365,
+            "text": "Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, phần narrative đầy đủ sống ở đây. Thứ tự theo số ADR gốc.",
+            "ancestry": [
+              "Spec: Work-State (tầng quản việc của forgent)",
+              "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+            ]
+          }
+        }
+      ],
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     }
-  ]
+  ],
+  "currentStateReconciliation": {
+    "accounting": "step10-author-candidate-accounting.json",
+    "reviewStatus": "pending",
+    "meaning": "Changed groups pending; removed historical receipts preserved in accounting; unchanged per-group approvals retain their original scope."
+  }
 }

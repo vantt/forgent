@@ -1,0 +1,73 @@
+{
+  "requestCommit": "f70ecf4ec",
+  "requestRows": 113,
+  "changedRequestRows": [],
+  "files": [
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "sha256": "f8b37c676a6745b0a73ba15c24c410e705425450cb4fbbba6db1da6ec9c875bb",
+      "byteEqualToRequestCommit": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "sha256": "6312b4206bc28836953cfe10006f960d89e7435b168d22d36bed5c152e53bced",
+      "byteEqualToRequestCommit": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "sha256": "e303dbc86e6aaff61b3972da2ed1b30fdb4127f3b72a10b1057b76e90f9f53e6",
+      "byteEqualToRequestCommit": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
+      "sha256": "1d9ff777c6be027baf4fd3a6cc9118fa2f9c4ef908452ad0ccda2ced2d19b485",
+      "byteEqualToRequestCommit": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "sha256": "227b971accd2ecfbbd3a854cc84bab15d125272e5ccbcdaaac37117e26ca6e3e",
+      "byteEqualToRequestCommit": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "sha256": "7b490c2f430307245ab4ef4ad7a4116bb50c63aadd95211a4e70736a9a365efd",
+      "byteEqualToRequestCommit": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-generated-backlog.json",
+      "sha256": "46385a2366b34c77a1f5b51c47fa87d311ae5b5e2105e1e33644d4b2cd8bd662",
+      "byteEqualToRequestCommit": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+      "sha256": "cf1a9b5c133fbc8f2ad3007b96aae4cfb4a4a09028dadfce4b835a7ee8072eeb",
+      "byteEqualToRequestCommit": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-source-completion.json",
+      "sha256": "33b4714a6ff824b95cb48c0f91e915ac80db83e9ba219081b5cf9c21e0b6f711",
+      "byteEqualToRequestCommit": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-predecessor.json",
+      "sha256": "0bb781fdd1a47e0f1f01c94fb1785e84089ea785541f03827ec1cfec4a1c8251",
+      "byteEqualToRequestCommit": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "sha256": "e7b7bb923ef1c06213682a5d527e319ecdae8cc9ccd36ac99c9ab1647c70c94d",
+      "byteEqualToRequestCommit": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "sha256": "7177778b84673b93e141ffca9a1b00f629d105d80cc5282d18715208d4a7d9b3",
+      "byteEqualToRequestCommit": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "sha256": "2d2c9ace44a2d481031d1897115da0d484206a5fd145ebf80eb7a1dabbca2161",
+      "byteEqualToRequestCommit": true
+    }
+  ],
+  "registryUnchanged": true
+}

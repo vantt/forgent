@@ -1,0 +1,16 @@
+{
+  "ok": false,
+  "strictGreen": false,
+  "counts": {
+    "claims-unknown-blocking": 0,
+    "claims-not-reviewed": 24,
+    "identical-units-multiple-owners": 362,
+    "candidate-blocks-unreferenced": 2334,
+    "claims-partial-carry": 28
+  },
+  "errors": [
+    "unexpected open category: registry-gaps-without-disposition",
+    "native count mismatch: registry-gaps-without-disposition",
+    "unexpected fatal: registry-gaps-without-disposition"
+  ]
+}

@@ -1,3 +1,21 @@
+# Author reconciliation complete — package turn next
+
+Input/request `f70ecf4ec`; assignment `unit-run-1792168391979-ad740169/producer/1`. **71 list rebinds /95 adds /67 native-gap removals** (60/95/54 distinct tuples); all **138 historical occurrences resolved**, none open. Proofs: native carried id63, explicit authored successor7, unique same-path content1. Lead count113 same path/anchor and54 same claim verified; path/ordinal alone is never identity proof. **2,334 current reverse tuples exactly covered.** Owner groups **+25/−10 =362**, all additions pending. Two reading-map gaps reclassified outside platform scope in a new pending ordinary shard. Session Identity eight-field header complete; Implementation value retained, all body bytes identical; promoted/post-review logs written before edit.
+
+**Promotion160/160,0 incomplete;H0;tests507/507;independent audit12,903 rows/93 shards/0 findings**,69 historical witness limits unrelated to the resolved138. Ownership0 new active pairs/0 native duplicates/0 digest drift;replay366+98+4 clean;A/B/H/current routes clean. **All113 outstanding review rows unchanged**;native registry unchanged.
+
+Unchanged comparator from saved E/applied rows + recomputed explicit expected: **307→3**, solely old E's two undisposed reading-map gaps; candidate/group/pending/partial sets exact. **Predicted after genuine package global D/E:0 unexplained differences**, conditional on applying the new gap rows and authenticating header native effects; no strict-green/closure claim. [Report](step-10-report.md),[all entry accounting](step10-author-candidate-accounting.json),[gap/header proof](step10-author-gap-header-accounting.json),[checks](step10-author-checks.json),[actual comparator](step10-author-comparison-persisted.json),[reproduction](step10-author-reproduction.json).
+
+**NEXT=package after runner commit:** one native sync, global D/E, comparator zero unexplained, checkpoint refresh, small bounded independent request for EVERY changed list/group entry, both gap decisions and header, plus any rework from the113-row review. No new owner blocker;Phase6 remains open. No native sync/global D/E/checkpoint/rehearsal/review packaging/CLI/Git/protected-tool/vocabulary/extractor/baseline/.fgos writes this author turn. Scoped docs+plan files only,plus required outbox;runner commits. MDView not started outside write scope.
+
+---
+
+# Author reconciliation in progress — package turn next
+
+Assignment `unit-run-1792168391979-ad740169/producer/1`. Verifying persisted global differences and historical candidate bindings; current-state list/group repair, two reading-map gap dispositions and Session Identity header only. No native sync/global D/E/checkpoint/rehearsal/review request this turn. All changed entries will be pending independent review; runner commits.
+
+---
+
 # Global turn complete — independent review/checkpoint requested, closure blocked
 
 Assignment `unit-run-1792151464109-150279f8/producer/1`;content `c3f22d6a6`;SYNC `498048c1a`,docs delta0. **Holds0;A43 three Rings pending (one move,two supersede).** One native sync673.455s/one compact persistence,known99,567→99,581,zero loss;4,486 files/91,388 active tuples equal. Nine drafts resolved,6 real predecessor gaps;generated backlog heading/body pending;9,216 target bindings/zero drift.

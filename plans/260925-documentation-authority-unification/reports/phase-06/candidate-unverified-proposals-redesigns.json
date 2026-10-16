@@ -24,8 +24,8 @@
     "docs/architect/proposals/step-10-coding-domain-adoption.md",
     "docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md"
   ],
-  "count": 665,
-  "reviewStatus": "reviewed",
+  "count": 651,
+  "reviewStatus": "pending",
   "meaning": "Complete native reverse population for the Step 7 source scopes. Namespace expansion is native checker behavior and includes pre-existing candidate units in owning areas. Eligibility review is not truth approval or a classification receipt; no source approval is carried.",
   "rows": [
     {
@@ -663,27 +663,6 @@
       "path": "docs/platform/agent-coordination/architecture/evidence-and-results.md",
       "anchor": "unheaded-block-9",
       "unitDigest": "5e9b2ae62fe7b6f3018ff335c99a951584349e79eda9afcfbe82847b011001c2",
-      "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
-      "fileStatus": {
-        "kind": "architecture",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "authorityStatus": "candidate"
-      },
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewNote": "mechanical: digest recomputed from git blob at the pin (sha256 of raw block lines) equals shown digest; tuple byte-equal in the Agent list; file header Design status Candidate / kind architecture; not read in full",
-      "reviewedAt": "2026-10-15",
-      "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
-    },
-    {
-      "claimId": "claim_d2d0dd2bf84fc671f0214bd5590fddd8",
-      "path": "docs/platform/agent-coordination/architecture/evidence-and-results.md",
-      "anchor": "unheaded-block-12",
-      "unitDigest": "8eb9ffe50558f482ecfccd85d1367e6007368f21f77b8ffd18921182a047c6cb",
       "status": "candidate-unverified",
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
@@ -2363,22 +2342,18 @@
       "claimId": "claim_3e77ba7d49e3be7af271cdc24bdc5b0b",
       "path": "docs/platform/agent-coordination/architecture/work-integration.md",
       "anchor": "work-driver-handoff-to-dispatch",
-      "unitDigest": "f80fbd765eff3f472a6159d5574b7083988ec66c70e680dfcb51921873386fb0",
+      "unitDigest": "ef0e26efeb3a17d765d289a523eaf0d5cbb2ca31b5fb14ea3f55f5e067fe53dc",
       "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "fileStatus": {
         "kind": "architecture",
         "kindCanonical": true,
         "designStatus": "Candidate",
         "authorityStatus": "candidate"
       },
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewNote": "mechanical: digest recomputed from git blob at the pin (section formula) equals shown digest; tuple byte-equal in the Agent list; file header Design status Candidate / kind architecture; not read in full",
-      "reviewedAt": "2026-10-15",
-      "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      "reviewStatus": "pending",
+      "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     },
     {
       "claimId": "claim_d2fcca59c2c4c5feb63d4ca8a27b20eb",
@@ -2406,27 +2381,6 @@
       "path": "docs/platform/agent-coordination/architecture/work-integration.md",
       "anchor": "unheaded-block-11",
       "unitDigest": "a2ced60a011a5b42d1a5720f8ad4f82e83615cf1c76e92df1f06ef12ae3a81fe",
-      "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
-      "fileStatus": {
-        "kind": "architecture",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "authorityStatus": "candidate"
-      },
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewNote": "mechanical: digest recomputed from git blob at the pin (sha256 of raw block lines) equals shown digest; tuple byte-equal in the Agent list; file header Design status Candidate / kind architecture; not read in full",
-      "reviewedAt": "2026-10-15",
-      "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
-    },
-    {
-      "claimId": "claim_de83fb877d4286ef843b8f19172802c9",
-      "path": "docs/platform/agent-coordination/architecture/work-integration.md",
-      "anchor": "unheaded-block-12",
-      "unitDigest": "72aff64849bcc7a94572e626e21ab07d78adc3f6ca6b93b964fd2600db8a9d72",
       "status": "candidate-unverified",
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
@@ -3707,43 +3661,18 @@
       "claimId": "claim_06f1e2385c0487b7256aff419d115abf",
       "path": "docs/platform/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md",
       "anchor": "current-scope",
-      "unitDigest": "73162204a2fae8b62504d86213650461f4baecf2e37b27af9cd2b6c58a22e9ab",
+      "unitDigest": "1e6e6ec09e02bf511b2c53aa7dd36d2a73ebe057d3b2411c988b8cdf89024e89",
       "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "fileStatus": {
         "kind": "decision",
         "kindCanonical": true,
         "designStatus": "Candidate",
         "authorityStatus": "candidate"
       },
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewNote": "mechanical: digest recomputed from git blob at the pin (section formula) equals shown digest; tuple byte-equal in the Agent list; file header Design status Candidate / kind decision; not read in full",
-      "reviewedAt": "2026-10-15",
-      "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
-    },
-    {
-      "claimId": "claim_39dd4e7b16f018f0d5c07a2a02bc5682",
-      "path": "docs/platform/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md",
-      "anchor": "unheaded-block-2",
-      "unitDigest": "3da7b3785eae9a90a5eefd48a05bd6b258b394066383fa3691d5340147d78e39",
-      "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
-      "fileStatus": {
-        "kind": "decision",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "authorityStatus": "candidate"
-      },
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewNote": "mechanical: digest recomputed from git blob at the pin (sha256 of raw block lines) equals shown digest; tuple byte-equal in the Agent list; file header Design status Candidate / kind decision; not read in full",
-      "reviewedAt": "2026-10-15",
-      "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      "reviewStatus": "pending",
+      "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     },
     {
       "claimId": "claim_1555cd71461961cdde31a1244e2ede08",
@@ -3917,43 +3846,18 @@
       "claimId": "claim_eefd21e417ee3e32c356caf5759b8166",
       "path": "docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
       "anchor": "current-scope",
-      "unitDigest": "12ebb60222c1092105508d1ea2faea45c7530716f9176fdf308cb9ec79d46189",
+      "unitDigest": "83370882ceae06bff62a3f0b1debbf065c551c18181f316685b83db0455c54e7",
       "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "fileStatus": {
         "kind": "decision",
         "kindCanonical": true,
         "designStatus": "Candidate",
         "authorityStatus": "candidate"
       },
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewNote": "mechanical: digest recomputed from git blob at the pin (section formula) equals shown digest; tuple byte-equal in the Agent list; file header Design status Candidate / kind decision; not read in full",
-      "reviewedAt": "2026-10-15",
-      "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
-    },
-    {
-      "claimId": "claim_5392c523415c538db19b5aa600efd102",
-      "path": "docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
-      "anchor": "unheaded-block-2",
-      "unitDigest": "3da7b3785eae9a90a5eefd48a05bd6b258b394066383fa3691d5340147d78e39",
-      "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
-      "fileStatus": {
-        "kind": "decision",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "authorityStatus": "candidate"
-      },
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewNote": "mechanical: digest recomputed from git blob at the pin (sha256 of raw block lines) equals shown digest; tuple byte-equal in the Agent list; file header Design status Candidate / kind decision; not read in full",
-      "reviewedAt": "2026-10-15",
-      "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      "reviewStatus": "pending",
+      "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     },
     {
       "claimId": "claim_5c6bea803446b9defca10e203135e1d2",
@@ -6140,25 +6044,21 @@
       "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
     },
     {
-      "claimId": "claim_f15e4328e1e5df90c51f535e75da554b",
+      "claimId": "claim_4a2dfdbfa271d8f20b4e581757288988",
       "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md",
       "anchor": "unheaded-block-44",
-      "unitDigest": "9643a6fe01ce142637dcea09eb07b8690322ab13683212165934615d5aba3ae5",
+      "unitDigest": "f03302423020c8beeac177192fbe0952433473b78efd7c17f5eb96b39d67dbca",
       "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "fileStatus": {
         "kind": "guide-runbook",
         "kindCanonical": true,
         "designStatus": "Candidate",
         "authorityStatus": "candidate"
       },
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewNote": "mechanical: digest recomputed from git blob at the pin (sha256 of raw block lines) equals shown digest; tuple byte-equal in the Agent list; file header Design status Candidate / kind guide-runbook; not read in full",
-      "reviewedAt": "2026-10-15",
-      "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      "reviewStatus": "pending",
+      "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     },
     {
       "claimId": "claim_d1c017c28c6d3926fd84cc6e62bbac71",
@@ -8114,25 +8014,21 @@
       "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
     },
     {
-      "claimId": "claim_9e9d711e331efe5a12c8b8bf50371dc6",
+      "claimId": "claim_cfdd80946e57e4ea360ed04c1413f4dd",
       "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
       "anchor": "unheaded-block-117",
-      "unitDigest": "087d5cdd477bde5b2bf98882290f0d23d3e44a06f0c6f93b7f15e6bcfa391c63",
+      "unitDigest": "7486a9e911dc83dd8182817e3d51bccd7b2e95a87b245307e19b3dd1de9fbb34",
       "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "fileStatus": {
         "kind": "guide-runbook",
         "kindCanonical": true,
         "designStatus": "Candidate",
         "authorityStatus": "candidate"
       },
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewNote": "mechanical: digest recomputed from git blob at the pin (sha256 of raw block lines) equals shown digest; tuple byte-equal in the Agent list; file header Design status Candidate / kind guide-runbook; not read in full",
-      "reviewedAt": "2026-10-15",
-      "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      "reviewStatus": "pending",
+      "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     },
     {
       "claimId": "claim_0006e17834c14072fb303c783a283ff9",
@@ -9962,27 +9858,6 @@
       "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
     },
     {
-      "claimId": "claim_68b845cbd9551b6591900b3601e0477e",
-      "path": "docs/platform/agent-coordination/proposals/README.md",
-      "anchor": "unheaded-block-8",
-      "unitDigest": "61decfc7e60331377923681eda5e862852566fe991df6f99927b7b1705e3877e",
-      "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
-      "fileStatus": {
-        "kind": "collection-index",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "authorityStatus": "candidate"
-      },
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewNote": "mechanical: digest recomputed from git blob at the pin (sha256 of raw block lines) equals shown digest; tuple byte-equal in the Agent list; file header Design status Candidate / kind collection-index; not read in full",
-      "reviewedAt": "2026-10-15",
-      "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
-    },
-    {
       "claimId": "claim_c080b888b647a84ccf899f6d715b0832",
       "path": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",
       "anchor": "unheaded-block-24",
@@ -10112,64 +9987,35 @@
       "claimId": "claim_9786ce02129b75faa01d4b022dca1fe2",
       "path": "docs/platform/agent-coordination/spec.md",
       "anchor": "agent-coordination-spec",
-      "unitDigest": "212dcfd747c924d1e8ff5b65f47f0c146fec482bfe80818922875bea5c379e06",
+      "unitDigest": "294b2487cc407d098b8ef87abbfa9d257267db56afb2366c6db4deebc2e94c87",
       "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "fileStatus": {
         "kind": "spec",
         "kindCanonical": true,
         "designStatus": "Candidate",
         "authorityStatus": "candidate"
       },
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewNote": "mechanical: digest recomputed from git blob at the pin (section formula) equals shown digest; tuple byte-equal in the Agent list; file header Design status Candidate / kind spec; not read in full",
-      "reviewedAt": "2026-10-15",
-      "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
-    },
-    {
-      "claimId": "claim_090ebd9cc224963fdc64bd75b839cd2c",
-      "path": "docs/platform/agent-coordination/spec.md",
-      "anchor": "unheaded-block-2",
-      "unitDigest": "4188d500b0f10c0965e89f50fae62cc4e448656b454be41be646c2a2b715ac93",
-      "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
-      "fileStatus": {
-        "kind": "spec",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "authorityStatus": "candidate"
-      },
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewNote": "mechanical: digest recomputed from git blob at the pin (sha256 of raw block lines) equals shown digest; tuple byte-equal in the Agent list; file header Design status Candidate / kind spec; not read in full",
-      "reviewedAt": "2026-10-15",
-      "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      "reviewStatus": "pending",
+      "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     },
     {
       "claimId": "claim_1b9e2ea95285bcf3db525a371492b405",
       "path": "docs/platform/agent-coordination/spec.md",
       "anchor": "current-summary",
-      "unitDigest": "674ed15043cb82124d0e7350e71c4d554d34c9f298617c34ad31d6db06f1f909",
+      "unitDigest": "b54a970932f68ca248093ffc54b6adf753ac25391815499903f32239f351cbbf",
       "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "fileStatus": {
         "kind": "spec",
         "kindCanonical": true,
         "designStatus": "Candidate",
         "authorityStatus": "candidate"
       },
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewNote": "mechanical: digest recomputed from git blob at the pin (section formula) equals shown digest; tuple byte-equal in the Agent list; file header Design status Candidate / kind spec; not read in full",
-      "reviewedAt": "2026-10-15",
-      "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      "reviewStatus": "pending",
+      "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     },
     {
       "claimId": "claim_673ec2128d21493f7be2e5ef46db9c23",
@@ -10214,67 +10060,21 @@
       "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
     },
     {
-      "claimId": "claim_64e1ea23c81fc81bee349e087d0b5613",
-      "path": "docs/platform/agent-coordination/spec.md",
-      "anchor": "unheaded-block-5",
-      "unitDigest": "d9f730d360225c70b813f1c031ca013db80a4c96b0e187fafc9639b97dfc067b",
-      "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
-      "fileStatus": {
-        "kind": "spec",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "authorityStatus": "candidate"
-      },
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewNote": "mechanical: digest recomputed from git blob at the pin (sha256 of raw block lines) equals shown digest; tuple byte-equal in the Agent list; file header Design status Candidate / kind spec; not read in full",
-      "reviewedAt": "2026-10-15",
-      "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
-    },
-    {
       "claimId": "claim_6c4f618a99c27c8d995e5ae4ea838c31",
       "path": "docs/platform/agent-coordination/spec.md",
       "anchor": "scope",
-      "unitDigest": "da24681315c1fe3d0a5c0da30afb76e5fb1d585a86a618d43aaba649ff5adf07",
+      "unitDigest": "f4b260299aa4019eb6ca092c3ea02bc49ac316d8e0d6c551de22b7699d048a5a",
       "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "fileStatus": {
         "kind": "spec",
         "kindCanonical": true,
         "designStatus": "Candidate",
         "authorityStatus": "candidate"
       },
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewNote": "mechanical: digest recomputed from git blob at the pin (section formula) equals shown digest; tuple byte-equal in the Agent list; file header Design status Candidate / kind spec; not read in full",
-      "reviewedAt": "2026-10-15",
-      "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
-    },
-    {
-      "claimId": "claim_e94d7488815a8009c8283bc41fe3e131",
-      "path": "docs/platform/agent-coordination/spec.md",
-      "anchor": "unheaded-block-6",
-      "unitDigest": "c5157b420803be8eb8678c3e99bf82a14ac85950b7a1e4ea6ebaeec931a15cdf",
-      "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
-      "fileStatus": {
-        "kind": "spec",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "authorityStatus": "candidate"
-      },
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewNote": "mechanical: digest recomputed from git blob at the pin (sha256 of raw block lines) equals shown digest; tuple byte-equal in the Agent list; file header Design status Candidate / kind spec; not read in full",
-      "reviewedAt": "2026-10-15",
-      "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      "reviewStatus": "pending",
+      "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     },
     {
       "claimId": "claim_7c7e5b0cd65941649f09dccaccc3fcb8",
@@ -10448,22 +10248,18 @@
       "claimId": "claim_bdc686550bc36d7563154fd33098741d",
       "path": "docs/platform/agent-coordination/spec.md",
       "anchor": "contracts-owned",
-      "unitDigest": "8954a8e58c071d4fb3b88fbfcbdec5e16e70ab7fb53c5bda0172b9449441cd3a",
+      "unitDigest": "e7d024c8e95cf7d1b35c78a8540b8f6179ab3c40a672637ccdb6a28f1780b80d",
       "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "fileStatus": {
         "kind": "spec",
         "kindCanonical": true,
         "designStatus": "Candidate",
         "authorityStatus": "candidate"
       },
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewNote": "mechanical: digest recomputed from git blob at the pin (section formula) equals shown digest; tuple byte-equal in the Agent list; file header Design status Candidate / kind spec; not read in full",
-      "reviewedAt": "2026-10-15",
-      "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      "reviewStatus": "pending",
+      "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     },
     {
       "claimId": "claim_12c1a2e9e7024e1bfd575fbeda3a95a5",
@@ -10487,67 +10283,21 @@
       "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
     },
     {
-      "claimId": "claim_734d43b3f87b58f7ec0f0cd1073dc427",
-      "path": "docs/platform/agent-coordination/spec.md",
-      "anchor": "unheaded-block-12",
-      "unitDigest": "9dd2dfa0c08950203b2624139e0296f66212bb3f5f7718be9fff1c60df7a72ef",
-      "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
-      "fileStatus": {
-        "kind": "spec",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "authorityStatus": "candidate"
-      },
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewNote": "mechanical: digest recomputed from git blob at the pin (sha256 of raw block lines) equals shown digest; tuple byte-equal in the Agent list; file header Design status Candidate / kind spec; not read in full",
-      "reviewedAt": "2026-10-15",
-      "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
-    },
-    {
       "claimId": "claim_021a84c1334927bc8bba62ec12584496",
       "path": "docs/platform/agent-coordination/spec.md",
       "anchor": "contracts-consumed",
-      "unitDigest": "77a4cce54c6ebd9156e28f1d048925b0140f30f3e73682dc5a445d75143b611c",
+      "unitDigest": "6d46dde5699b5d3e43be6fdcc96e786f8e4f2ddedbc4300aa2481454976984a5",
       "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "fileStatus": {
         "kind": "spec",
         "kindCanonical": true,
         "designStatus": "Candidate",
         "authorityStatus": "candidate"
       },
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewNote": "mechanical: digest recomputed from git blob at the pin (section formula) equals shown digest; tuple byte-equal in the Agent list; file header Design status Candidate / kind spec; not read in full",
-      "reviewedAt": "2026-10-15",
-      "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
-    },
-    {
-      "claimId": "claim_dce19ec48d028c5f1657fd5df726b092",
-      "path": "docs/platform/agent-coordination/spec.md",
-      "anchor": "unheaded-block-13",
-      "unitDigest": "db902584bf169a7f175b8dc535d47e7374a407ee39bd59552e28e7d7ad73a462",
-      "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
-      "fileStatus": {
-        "kind": "spec",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "authorityStatus": "candidate"
-      },
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewNote": "mechanical: digest recomputed from git blob at the pin (sha256 of raw block lines) equals shown digest; tuple byte-equal in the Agent list; file header Design status Candidate / kind spec; not read in full",
-      "reviewedAt": "2026-10-15",
-      "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      "reviewStatus": "pending",
+      "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     },
     {
       "claimId": "claim_1289fd071fae40e82e7dba2d1b9bcbb2",
@@ -10658,43 +10408,18 @@
       "claimId": "claim_9a3c360e46f16369ea4820a1b8bfbcca",
       "path": "docs/platform/agent-coordination/spec.md",
       "anchor": "related-files",
-      "unitDigest": "cea23d290f75e2ac209e82cee5494f046e4a68e4d930c1c95099f8a5030e1bd2",
+      "unitDigest": "339867f1bc28f15750988a320498aea72f5d029aebf7555129edd289650ff303",
       "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
+      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
       "fileStatus": {
         "kind": "spec",
         "kindCanonical": true,
         "designStatus": "Candidate",
         "authorityStatus": "candidate"
       },
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewNote": "mechanical: digest recomputed from git blob at the pin (section formula) equals shown digest; tuple byte-equal in the Agent list; file header Design status Candidate / kind spec; not read in full",
-      "reviewedAt": "2026-10-15",
-      "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
-    },
-    {
-      "claimId": "claim_956983c278f6903d62b1b3dc303a46ef",
-      "path": "docs/platform/agent-coordination/spec.md",
-      "anchor": "unheaded-block-17",
-      "unitDigest": "c8e31fb9e478e637a8e6ea59121c143466ff0080d02ee9cc40f8f44d8d7be0d9",
-      "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
-      "fileStatus": {
-        "kind": "spec",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "authorityStatus": "candidate"
-      },
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewNote": "mechanical: digest recomputed from git blob at the pin (sha256 of raw block lines) equals shown digest; tuple byte-equal in the Agent list; file header Design status Candidate / kind spec; not read in full",
-      "reviewedAt": "2026-10-15",
-      "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      "reviewStatus": "pending",
+      "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+      "currentStateAccounting": "step10-author-candidate-accounting.json"
     },
     {
       "claimId": "claim_f981631cd89e4bb32875daad697892de",
@@ -11205,27 +10930,6 @@
       "path": "docs/platform/agent-coordination/vision.md",
       "anchor": "unheaded-block-55",
       "unitDigest": "193705ea44c0569bf34021d147e6a70a6181f5e64de865feac9b15dea288ef63",
-      "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
-      "fileStatus": {
-        "kind": "vision",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "authorityStatus": "candidate"
-      },
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewNote": "mechanical: digest recomputed from git blob at the pin (sha256 of raw block lines) equals shown digest; tuple byte-equal in the Agent list; file header Design status Candidate / kind vision; not read in full",
-      "reviewedAt": "2026-10-15",
-      "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
-    },
-    {
-      "claimId": "claim_5404663725f76c2fbb60196c497b8ab3",
-      "path": "docs/platform/agent-coordination/vision.md",
-      "anchor": "unheaded-block-57",
-      "unitDigest": "64317c7696804228ccf55baf1f9d497c932d6da2377b4e2fe6d7386376574fc4",
       "status": "candidate-unverified",
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
@@ -11898,27 +11602,6 @@
       "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
       "anchor": "unheaded-block-12",
       "unitDigest": "aa01943e9305701d35d00d1542f51a2fb0088686175c7f45957d54f0ceadb365",
-      "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
-      "fileStatus": {
-        "kind": "vocabulary",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "authorityStatus": "candidate"
-      },
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewNote": "mechanical: digest recomputed from git blob at the pin (sha256 of raw block lines) equals shown digest; tuple byte-equal in the Agent list; file header Design status Candidate / kind vocabulary; not read in full",
-      "reviewedAt": "2026-10-15",
-      "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
-    },
-    {
-      "claimId": "claim_0b9fcf0a1a07c29e6ae48f02d7f5dc59",
-      "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
-      "anchor": "unheaded-block-13",
-      "unitDigest": "a6662af528d7186106b7dc978680ed96bcc4b7500854e3f4bfb8ddd204e728eb",
       "status": "candidate-unverified",
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
@@ -13953,27 +13636,6 @@
       "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
     },
     {
-      "claimId": "claim_95ecfacefbe989a282e80086da78c813",
-      "path": "docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md",
-      "anchor": "unheaded-block-2",
-      "unitDigest": "846ef344dc875c30b8c5aaaf62ef71d2629011a265605d75cc3bb278066579eb",
-      "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
-      "fileStatus": {
-        "kind": "proposal",
-        "kindCanonical": false,
-        "designStatus": "Candidate",
-        "authorityStatus": "candidate"
-      },
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewNote": "deep: Added-in-candidate label L22 for visibility-and-interactive-contact-herdr-spawn.md; sentence \"Candidate design evidence cited by docs/specs/runner.md:999 RUL40, sections 3.3, 4 and 14 \" is the triage reason (place verbatim) plus the fixed carriage boilerplate; labelled addition, no source claim",
-      "reviewedAt": "2026-10-15",
-      "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
-    },
-    {
       "claimId": "claim_87f7b9422bc7d27afb46f3467c6b6a45",
       "path": "docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md",
       "anchor": "unheaded-block-3",
@@ -14130,5 +13792,16 @@
   "nativeRebindingGlobal": {
     "SYNC": "498048c1a6651556a0ae977a2871135b5ac7c945",
     "method": "Exact native tuple or authenticated retained ID; no expected-ID filtering or inferred approval."
+  },
+  "currentStateReconciliation": {
+    "authorSession": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+    "basisCommit": "498048c1a6651556a0ae977a2871135b5ac7c945",
+    "accounting": "step10-author-candidate-accounting.json",
+    "changes": {
+      "remove": 14,
+      "rebind": 11
+    },
+    "reviewStatus": "pending",
+    "meaning": "Prior list-level review/native-equality receipts describe their historical pins; changed entries require new independent review. Current tuple membership verified against persisted native registry and reverse set, not current implementation truth."
   }
 }

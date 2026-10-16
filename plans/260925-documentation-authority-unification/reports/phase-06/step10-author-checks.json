@@ -1,0 +1,214 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+  "runs": [
+    {
+      "label": "promotion",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "scripts/check-doc-constitution.mjs",
+        "--no-ledger",
+        "--promotion"
+      ],
+      "exitCode": 0,
+      "seconds": 0.129,
+      "log": "/tmp/fgos-work/author-reconcile/promotion.log",
+      "durableLog": "plans/260925-documentation-authority-unification/reports/phase-06/step10-author-promotion.log"
+    },
+    {
+      "label": "H",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "scripts/check-doc-candidate-status.mjs",
+        "--strict",
+        "--json"
+      ],
+      "exitCode": 0,
+      "seconds": 0.095,
+      "log": "/tmp/fgos-work/author-reconcile/H.log",
+      "durableLog": "plans/260925-documentation-authority-unification/reports/phase-06/step10-author-H.json"
+    },
+    {
+      "label": "tests",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "--test",
+        "--test-concurrency=1",
+        "test/scripts/check-doc-candidate-status.test.mjs",
+        "test/scripts/check-doc-conservation.test.mjs",
+        "test/scripts/check-doc-constitution.test.mjs",
+        "test/scripts/check-doc-retirement.test.mjs",
+        "test/scripts/doc-alias-resolver.test.mjs",
+        "test/scripts/doc-binding-repair.test.mjs",
+        "test/scripts/doc-candidate-conservation.test.mjs",
+        "test/scripts/doc-corpus-decisions.test.mjs",
+        "test/scripts/doc-decision-conservation.test.mjs",
+        "test/scripts/doc-decision-exact.test.mjs",
+        "test/scripts/doc-decision-mirrors.test.mjs",
+        "test/scripts/doc-decision-review.test.mjs",
+        "test/scripts/doc-global-closure.test.mjs",
+        "test/scripts/doc-link-pass.test.mjs",
+        "test/scripts/doc-rationale-author.test.mjs",
+        "test/scripts/doc-rationale-facts.test.mjs",
+        "test/scripts/doc-rationale-reproduction.test.mjs",
+        "test/scripts/doc-rationale.test.mjs",
+        "test/scripts/doc-restoration-proofs.test.mjs",
+        "test/scripts/doc-review-authorship.test.mjs",
+        "test/scripts/doc-review-format.test.mjs",
+        "test/scripts/doc-runner-liveness.test.mjs",
+        "test/scripts/generate-doc-inventory.test.mjs",
+        "test/scripts/list-doc-anchors.test.mjs",
+        "test/scripts/next-doc-id.test.mjs",
+        "test/scripts/verify-phase-02.test.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 43.7,
+      "log": "/tmp/fgos-work/author-reconcile/tests.log",
+      "durableLog": "plans/260925-documentation-authority-unification/reports/phase-06/step10-author-tests.log"
+    },
+    {
+      "label": "independent-audit",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "--max-old-space-size=3072",
+        "plans/260925-documentation-authority-unification/reports/phase-06/step10-independent-rationale-audit.mjs",
+        "--output",
+        "/tmp/fgos-work/author-reconcile/independent-audit.json"
+      ],
+      "exitCode": 0,
+      "seconds": 8.698,
+      "log": "/tmp/fgos-work/author-reconcile/independent-audit.log",
+      "durableLog": null
+    },
+    {
+      "label": "checks",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "/tmp/fgos-work/author-reconcile/checks.mjs",
+        "--output-dir",
+        "/tmp/fgos-work/author-reconcile"
+      ],
+      "exitCode": 0,
+      "seconds": 3.259,
+      "log": "/tmp/fgos-work/author-reconcile/checks.log",
+      "durableLog": null
+    },
+    {
+      "label": "ownership",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "/tmp/fgos-work/author-reconcile/ownership.mjs",
+        "--output-dir",
+        "/tmp/fgos-work/author-reconcile"
+      ],
+      "exitCode": 0,
+      "seconds": 10.45,
+      "log": "/tmp/fgos-work/author-reconcile/ownership.log",
+      "durableLog": null
+    },
+    {
+      "label": "ownership-audit",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "/tmp/fgos-work/author-reconcile/audit-ownership.mjs",
+        "--output-dir",
+        "/tmp/fgos-work/author-reconcile"
+      ],
+      "exitCode": 0,
+      "seconds": 0.751,
+      "log": "/tmp/fgos-work/author-reconcile/ownership-audit.log",
+      "durableLog": null
+    },
+    {
+      "label": "replay",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "python3",
+        "/tmp/fgos-work/author-reconcile/replay.py",
+        "--output-dir",
+        "/tmp/fgos-work/author-reconcile"
+      ],
+      "exitCode": 0,
+      "seconds": 2.459,
+      "log": "/tmp/fgos-work/author-reconcile/replay.log",
+      "durableLog": null
+    }
+  ],
+  "allRequiredChecksPassed": true,
+  "promotion": {
+    "canonicalDocuments": 160,
+    "complete": 160,
+    "headerless": 0,
+    "headeredIncomplete": 0
+  },
+  "HFindings": 0,
+  "tests": {
+    "pass": 507,
+    "fail": 0,
+    "skip": 0
+  },
+  "independentAudit": {
+    "rows": 12903,
+    "shards": 93,
+    "findings": 0,
+    "historicalWitnessLimits": 69
+  },
+  "ownership": {
+    "referenceGroups": 256,
+    "newActivePairCollisions": 0,
+    "nativeDuplicateIdentities": 0,
+    "targetDigestDrift": 0
+  },
+  "replay": {
+    "original": 366,
+    "later": 98,
+    "labelledCorrections": 4,
+    "findings": 0
+  },
+  "comparator": {
+    "actual": "step10-global-applied-rows.json",
+    "gate": "step10-global-E.json",
+    "expected": "step10-author-closure-expected.json",
+    "result": "step10-author-comparison-persisted.json",
+    "ok": false,
+    "strictGreen": false,
+    "diagnostics": 3,
+    "explainedBy": "Two historical reading-map native gaps still undisposed in the immutable old E artifact. Two ordinary pending decisions authored in ledger/decisions/s10-reading-map-global-gaps.json; no gate artifact edited.",
+    "predictedAfterPackage": {
+      "unexplainedDifferences": 0,
+      "strictGreen": false,
+      "conditions": "Native sync + global D/E must verify unchanged known membership apart from authenticated header consequences; apply both new gap decisions; comparator must reach zero unexplained differences. Pending/partial/candidate and owner-exception queues remain open."
+    }
+  },
+  "protectedReviewRowsChanged": [],
+  "registryUnchanged": true,
+  "limitations": [
+    "No native sync/global D/E/checkpoint refresh/rehearsal/review requests by author contract.",
+    "69 historical source-witness limits in existing all-ledger audit are unrelated to the 138 candidate-list occurrences; all 138 are resolved.",
+    "No blanket npm test or global strict-E-green claim.",
+    "MDView MCP unavailable; CLI preview may write a database outside this assignment write scope and was not started."
+  ]
+}
