@@ -1,0 +1,100 @@
+{
+  "generatedAt": "2026-10-15T18:47:46Z",
+  "targetRevision": "ee05a4795",
+  "targetDoc": "plans/reports/design-261016-0122-lock-and-run-supervisor-foundation-v3-r1.md",
+  "probes": {
+    "R4-1_pidns_vs_process_facts_and_hot_lock": {
+      "script": "import fs from 'node:fs';\nimport { spawnSync } from 'node:child_process';\n\nconst readBootId = () => fs.readFileSync('/proc/sys/kernel/random/boot_id', 'utf8').trim();\nconst readStartTime = (pid) => {\n  try {\n    const raw = fs.readFileSync(`/proc/${pid}/stat`, 'utf8');\n    return Number(raw.slice(raw.lastIndexOf(')') + 2).trim().split(/\\s+/)[19]);\n  } catch { return null; }\n};\nconst readPidNs = (pid) => {\n  try { return fs.readlinkSync(`/proc/${pid}/ns/pid`); } catch { return null; }\n};\n\n// Config A: Exact command in v3-r1 section 9.3 / probe_pidns_containment.py:\n// bwrap --dev-bind / / --unshare-pid --die-with-parent (WITHOUT --proc /proc)\nconst cfgA = spawnSync('bwrap', [\n  '--dev-bind', '/', '/', '--unshare-pid', '--die-with-parent',\n  'node', '-e',\n  `const fs = require('node:fs');\n   const pid = process.pid;\n   const stat = fs.readFileSync('/proc/' + pid + '/stat', 'utf8').slice(0, 40).trim();\n   let fdErr = null;\n   try { fs.readdirSync('/proc/' + pid + '/fd'); } catch (e) { fdErr = e.code; }\n   console.log(JSON.stringify({ innerPid: pid, procPidStatOnHostProc: stat, readProcFdCode: fdErr }));`\n], { encoding: 'utf8' });\nconst cfgAData = JSON.parse(cfgA.stdout.trim());\nconst hostSeesPid2Alive = readStartTime(cfgAData.innerPid) !== null;\n\n// Config B: With --proc /proc AND pidNs check per section 5.1 (\"pidNs khac -> unknown\") & section 6.6 (\"chi dead, khong bao gio unknown\")\nconst cfgB = spawnSync('bwrap', [\n  '--dev-bind', '/', '/', '--proc', '/proc', '--unshare-pid', '--die-with-parent',\n  'node', '-e',\n  `const fs = require('node:fs');\n   const raw = fs.readFileSync('/proc/' + process.pid + '/stat', 'utf8');\n   const st = Number(raw.slice(raw.lastIndexOf(')') + 2).trim().split(/\\\\s+/)[19]);\n   const pidNs = fs.readlinkSync('/proc/' + process.pid + '/ns/pid');\n   console.log(JSON.stringify({ pid: process.pid, startTime: st, pidNs }));`\n], { encoding: 'utf8' });\nconst deadAttemptHolder = JSON.parse(cfgB.stdout.trim());\nconst hostPidNs = readPidNs(process.pid);\nconst judgeFromHostWithPidNs = deadAttemptHolder.pidNs !== hostPidNs ? 'unknown' : 'dead';\nconst reclaimAllowedUnderSection6_6 = judgeFromHostWithPidNs === 'dead';\n\n// Config C: With --proc /proc WITHOUT pidNs check (as in probe-hot-reclaim.mjs)\nconst liveHostRecord = { pid: process.pid, startTime: readStartTime(process.pid), bootId: readBootId() };\nconst cfgC = spawnSync('bwrap', [\n  '--dev-bind', '/', '/', '--proc', '/proc', '--unshare-pid', '--die-with-parent',\n  'node', '-e',\n  `const holder = ${JSON.stringify(liveHostRecord)};\n   let alive = true;\n   try { process.kill(holder.pid, 0); } catch (e) { if (e.code === 'ESRCH') alive = false; }\n   console.log(JSON.stringify({ liveHostPid: holder.pid, innerKill0SeesAlive: alive, innerJudgesLiveHostHolder: alive ? 'alive' : 'dead' }));`\n], { encoding: 'utf8' });\nconst cfgCData = JSON.parse(cfgC.stdout.trim());\n\nconsole.log(JSON.stringify({\n  configA_withoutProcMount: { ...cfgAData, hostSeesPid2AsLiveKernelThread: hostSeesPid2Alive, permanentDeadlockOnCrash: hostSeesPid2Alive },\n  configB_withProcMountAndPidNsCheck: { deadAttemptHolder, hostPidNs, judgeFromHostWithPidNs, reclaimAllowedUnderSection6_6, permanentDeadlockOnCrash: !reclaimAllowedUnderSection6_6 },\n  configC_withProcMountWithoutPidNsCheck: { ...cfgCData, liveHostLockStolenByAttempt: cfgCData.innerJudgesLiveHostHolder === 'dead' }\n}));",
+      "output": {
+        "configA_withoutProcMount": {
+          "innerPid": 2,
+          "procPidStatOnHostProc": "2 (kthreadd) S 0 0 0 0 -1 2129984 0 0 0",
+          "readProcFdCode": "EACCES",
+          "hostSeesPid2AsLiveKernelThread": true,
+          "permanentDeadlockOnCrash": true
+        },
+        "configB_withProcMountAndPidNsCheck": {
+          "deadAttemptHolder": {
+            "pid": 2,
+            "startTime": 31706582,
+            "pidNs": "pid:[4026533071]"
+          },
+          "hostPidNs": "pid:[4026531836]",
+          "judgeFromHostWithPidNs": "unknown",
+          "reclaimAllowedUnderSection6_6": false,
+          "permanentDeadlockOnCrash": true
+        },
+        "configC_withProcMountWithoutPidNsCheck": {
+          "liveHostPid": 514399,
+          "innerKill0SeesAlive": false,
+          "innerJudgesLiveHostHolder": "dead",
+          "liveHostLockStolenByAttempt": true
+        }
+      }
+    },
+    "R4-2_bwrap_driver_and_namespace_escape": {
+      "script": "import fs from 'node:fs';\nimport net from 'node:net';\nimport path from 'node:path';\nimport { spawn, spawnSync } from 'node:child_process';\nimport { prepareBwrapSync } from '/home/vantt/projects/forgentX/src/runner/dispatch/confinement/drivers/bwrap.mjs';\n\nconst dir = process.argv[2];\n\nconst baseReq = {\n  dispatchId: 'd1',\n  context: { repoRoot: dir, stateRoot: path.join(dir, '.fgos'), timeoutMs: 5000 },\n  invocation: { command: 'true', args: [], cwd: dir, env: {}, resourceBindings: [] },\n  policy: { mode: 'required', controls: { hostWrite: 'deny', hostRead: 'allow', networkEgress: 'allow', process: 'host' } }\n};\nconst normalPrep = prepareBwrapSync({ resources: [] }, baseReq, {});\nconst blindPrep = prepareBwrapSync(\n  { resources: [{ resource: 'own-assignment', hostTarget: dir, executionTarget: { path: dir }, access: 'read-only' }] },\n  { ...baseReq, policy: { mode: 'required', controls: { hostWrite: 'deny', hostRead: 'blind', networkEgress: 'allow', process: 'host' } } },\n  {}\n);\n\nconst sockPath = path.join(dir, 'host-daemon.sock');\nlet daemonSpawnedPid = null;\nconst server = net.createServer((conn) => {\n  conn.on('data', () => {\n    const child = spawn('node', ['-e', 'setInterval(() => {}, 1000)'], { detached: true, stdio: 'ignore' });\n    child.unref();\n    daemonSpawnedPid = child.pid;\n    conn.end(String(child.pid));\n  });\n});\nawait new Promise((r) => server.listen(sockPath, r));\n\nconst gate = spawn('bwrap', [\n  '--dev-bind', '/', '/', '--proc', '/proc', '--unshare-pid', '--die-with-parent',\n  'node', '-e',\n  `const net = require('node:net');\n   const c = net.connect(${JSON.stringify(sockPath)}, () => c.write('spawn'));\n   c.on('data', () => { setInterval(() => {}, 1000); });`\n], { stdio: 'ignore' });\n\nawait new Promise((r) => setTimeout(r, 250));\nprocess.kill(gate.pid, 'SIGKILL');\nawait new Promise((r) => setTimeout(r, 150));\n\nlet escapedAliveAfterGateSigkill = false;\nif (daemonSpawnedPid) {\n  try { process.kill(daemonSpawnedPid, 0); escapedAliveAfterGateSigkill = true; } catch {}\n  try { process.kill(daemonSpawnedPid, 'SIGKILL'); } catch {}\n}\nserver.close();\n\nconst leakMarker = path.join(dir, 'blind-no-diewithparent.txt');\nconst gateNoDie = spawn('python3', ['-c', `\nimport ctypes, os, subprocess, time\nlibc = ctypes.CDLL(\"libc.so.6\")\ndef set_pdeath(): libc.prctl(1, 9)\np = subprocess.Popen(\n    [\"bwrap\", \"--dev-bind\", \"/\", \"/\", \"--proc\", \"/proc\", \"--unshare-pid\",\n     \"python3\", \"-c\",\n     \"import os, time\\\\nif os.fork() == 0:\\\\n os.setsid()\\\\n while True:\\\\n  open(\" + ${JSON.stringify(JSON.stringify(leakMarker))} + \", 'w').write(str(time.time()))\\\\n  time.sleep(0.03)\\\\ntime.sleep(30)\"],\n    preexec_fn=set_pdeath\n)\ntime.sleep(30)\n`]);\nawait new Promise((r) => setTimeout(r, 300));\nprocess.kill(gateNoDie.pid, 'SIGKILL');\nawait new Promise((r) => setTimeout(r, 150));\nconst t1 = Number(fs.readFileSync(leakMarker, 'utf8'));\nawait new Promise((r) => setTimeout(r, 120));\nconst t2 = Number(fs.readFileSync(leakMarker, 'utf8'));\nconst leakedWithoutDieWithParent = t2 > t1;\nspawnSync('pkill', ['-9', '-f', leakMarker]);\n\nconst ttyCheck = spawnSync('python3', ['-c', `\nimport os, pty, subprocess\nmaster, slave = pty.openpty()\ndef setup_ctty():\n    os.setsid()\n    import fcntl, termios\n    fcntl.ioctl(0, termios.TIOCSCTTY, 0)\np = subprocess.Popen(\n    [\"bwrap\", \"--dev-bind\", \"/\", \"/\", \"--proc\", \"/proc\", \"--unshare-pid\", \"--die-with-parent\",\n     \"python3\", \"-c\", \"import os; print(f'{os.getpgrp()}:{os.tcgetpgrp(0)}')\"],\n    stdin=slave, stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=setup_ctty\n)\nos.close(slave)\nout, _ = p.communicate(timeout=3)\nos.close(master)\nprint(out.decode().strip())\n`], { encoding: 'utf8' });\n\nconsole.log(JSON.stringify({\n  productionBwrapNormalHasUnsharePid: normalPrep.invocation.args.includes('--unshare-pid'),\n  productionBwrapNormalHasDieWithParent: normalPrep.invocation.args.includes('--unshare-pid') && normalPrep.invocation.args.includes('--die-with-parent'),\n  productionBwrapBlindHasUnsharePid: blindPrep.invocation.args.includes('--unshare-pid'),\n  productionBwrapBlindHasDieWithParent: blindPrep.invocation.args.includes('--die-with-parent'),\n  leakedGrandchildWhenDieWithParentOmitted: leakedWithoutDieWithParent,\n  hostSocketSpawnedPid: daemonSpawnedPid,\n  escapedProcessAliveAfterGateSigkillWithDieWithParent: escapedAliveAfterGateSigkill,\n  innerGetpgrpAndTcgetpgrpWhenHostSetsForeground: ttyCheck.stdout.trim()\n}));",
+      "output": {
+        "productionBwrapNormalHasUnsharePid": false,
+        "productionBwrapNormalHasDieWithParent": false,
+        "productionBwrapBlindHasUnsharePid": false,
+        "productionBwrapBlindHasDieWithParent": false,
+        "leakedGrandchildWhenDieWithParentOmitted": true,
+        "hostSocketSpawnedPid": 514458,
+        "escapedProcessAliveAfterGateSigkillWithDieWithParent": true,
+        "innerGetpgrpAndTcgetpgrpWhenHostSetsForeground": "0:0"
+      }
+    },
+    "R4-3_pid1_fence_bypassed_and_buried": {
+      "script": "import fs from 'node:fs';\nimport path from 'node:path';\nimport { spawnSync } from 'node:child_process';\nimport { tryAcquireAccountLock } from '/home/vantt/projects/forgentX/src/runner/dispatch/provider-capacity.mjs';\nimport { getProcessStartTime } from '/home/vantt/projects/forgentX/src/runner/dispatch/process-identity.mjs';\n\nconst runtimeDir = path.join(process.argv[2], 'fence-state');\nconst lockDir = path.join(runtimeDir, 'account-locks', 'claude', 'acc-1', 'lock');\nfs.mkdirSync(lockDir, { recursive: true });\n\n// Cutover Phase 1 writes exact fence from v3-r1 section 6.8 / probe-ledger-fence-generation.mjs\nconst fenceGen = path.join(lockDir, '0000000001.json');\nfs.writeFileSync(fenceGen, JSON.stringify({\n  version: 2, generation: 1,\n  holder: { pid: 1, processStartTime: getProcessStartTime(1), createdAtMs: Date.now() },\n  acquiredAt: new Date().toISOString(), ttlMs: null, releasedAt: null\n}));\n\nconst hostBefore = tryAcquireAccountLock({ runtimeDir, provider: 'claude', accountId: 'acc-1' });\n\nconst innerRun = spawnSync('bwrap', [\n  '--dev-bind', '/', '/', '--proc', '/proc', '--unshare-pid', '--die-with-parent',\n  'node', '--input-type=module', '-e',\n  `import { tryAcquireAccountLock } from '/home/vantt/projects/forgentX/src/runner/dispatch/provider-capacity.mjs';\n   import { getProcessStartTime } from '/home/vantt/projects/forgentX/src/runner/dispatch/process-identity.mjs';\n   const h = tryAcquireAccountLock({ runtimeDir: ${JSON.stringify(runtimeDir)}, provider: 'claude', accountId: 'acc-1' });\n   const ok = Boolean(h);\n   if (h) h.release();\n   console.log(JSON.stringify({ innerPid1StartTime: getProcessStartTime(1), acquiredInsidePidNs: ok }));`\n], { encoding: 'utf8' });\nconst innerData = JSON.parse(innerRun.stdout.trim());\n\nconst hostAfter = tryAcquireAccountLock({ runtimeDir, provider: 'claude', accountId: 'acc-1' });\nconst hostAcquiredAfterBypass = Boolean(hostAfter);\nif (hostAfter) hostAfter.release();\n\nconsole.log(JSON.stringify({\n  hostPid1StartTime: getProcessStartTime(1),\n  hostBlockedBeforeBypass: hostBefore === null,\n  innerPidNsResult: innerData,\n  hostAcquiredAfterSinglePidNsBypass: hostAcquiredAfterBypass,\n  generationsOnDisk: fs.readdirSync(lockDir).sort()\n}));",
+      "output": {
+        "hostPid1StartTime": "8",
+        "hostBlockedBeforeBypass": true,
+        "innerPidNsResult": {
+          "innerPid1StartTime": "31706696",
+          "acquiredInsidePidNs": true
+        },
+        "hostAcquiredAfterSinglePidNsBypass": true,
+        "generationsOnDisk": [
+          "0000000001.json",
+          "0000000002.json",
+          "0000000003.json"
+        ]
+      }
+    },
+    "R4-4_lazy_cwd_tombstone_and_symlink_dual_holder": {
+      "script": "import fs from 'node:fs';\nimport path from 'node:path';\nimport { acquireMainCheckoutLock, dispatchLockFile } from '/home/vantt/projects/forgentX/src/runner/main-checkout-lock.mjs';\n\nconst base = path.join(process.argv[2], 'cwd-cutover');\nconst fgosDir = path.join(base, '.fgos');\nconst realWt = path.join(base, 'real-wt');\nconst symWt = path.join(base, 'sym-wt');\nfs.mkdirSync(fgosDir, { recursive: true });\nfs.mkdirSync(realWt, { recursive: true });\nfs.symlinkSync(realWt, symWt);\n\nconst v1BeforeFirstV3 = acquireMainCheckoutLock(fgosDir, {\n  identity: process.pid, ttlMs: 60000, releaseOnExit: false, lockFile: dispatchLockFile(realWt)\n});\nv1BeforeFirstV3.release();\n\nconst tombstonePaths = new Set([path.resolve(realWt), fs.realpathSync(realWt)]);\nfor (const p of tombstonePaths) {\n  fs.writeFileSync(path.join(fgosDir, dispatchLockFile(p)), JSON.stringify({ v: 3, migrated: 'flock' }));\n}\nconst v1ViaReal = acquireMainCheckoutLock(fgosDir, {\n  identity: process.pid, ttlMs: 60000, releaseOnExit: false, lockFile: dispatchLockFile(realWt)\n});\nconst v1ViaSymlink = acquireMainCheckoutLock(fgosDir, {\n  identity: process.pid, ttlMs: 60000, releaseOnExit: false, lockFile: dispatchLockFile(symWt)\n});\n\nconsole.log(JSON.stringify({\n  v1AcquiredBeforeFirstV3TouchAfterCutover: v1BeforeFirstV3.status === 'acquired',\n  v3TombstoneCountForCanonicalInput: tombstonePaths.size,\n  v1BlockedOnCanonicalPath: v1ViaReal.status === 'held',\n  v1AcquiredViaSymlinkWhileV3HoldsFlock: v1ViaSymlink.status === 'acquired'\n}));",
+      "output": {
+        "v1AcquiredBeforeFirstV3TouchAfterCutover": true,
+        "v3TombstoneCountForCanonicalInput": 1,
+        "v1BlockedOnCanonicalPath": true,
+        "v1AcquiredViaSymlinkWhileV3HoldsFlock": true
+      }
+    },
+    "R4-5_cwd_lease_self_race_and_readonly_block": {
+      "script": "import fs from 'node:fs';\nimport path from 'node:path';\nimport { spawn } from 'node:child_process';\n\nconst dir = path.join(process.argv[2], 'cwd-race');\nfs.mkdirSync(dir, { recursive: true });\nconst cwdLock = path.join(dir, 'cwd.lock');\nconst resultFile = path.join(dir, 'result-1.json');\n\nconst sup1 = spawn('python3', ['-c', `\nimport fcntl, json, os, time\nfd = os.open(${JSON.stringify(cwdLock)}, os.O_CREAT | os.O_RDWR, 0o600)\nfcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)\nwith open(${JSON.stringify(resultFile)}, \"w\") as f:\n    json.dump({\"status\": \"done\"}, f)\ntime.sleep(0.25)\nos.close(fd)\n`]);\n\nwhile (!fs.existsSync(resultFile)) {\n  await new Promise((r) => setTimeout(r, 10));\n}\nconst round2 = spawn('python3', ['-c', `\nimport fcntl, os\nfd = os.open(${JSON.stringify(cwdLock)}, os.O_CREAT | os.O_RDWR, 0o600)\ntry:\n    fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)\n    print(\"acquired\")\nexcept BlockingIOError:\n    print(\"blocked-by-previous-round-supervisor\")\n`]);\nconst round2Out = await new Promise((resolve) => {\n  let d = '';\n  round2.stdout.on('data', (c) => d += c);\n  round2.on('close', () => resolve(d.trim()));\n});\nawait new Promise((r) => sup1.on('close', r));\n\nconsole.log(JSON.stringify({\n  round1ResultPresentWhenControllerProceeded: fs.existsSync(resultFile),\n  round2AcquireAttemptWhileRound1InFinalizeHome: round2Out\n}));",
+      "output": {
+        "round1ResultPresentWhenControllerProceeded": true,
+        "round2AcquireAttemptWhileRound1InFinalizeHome": "blocked-by-previous-round-supervisor"
+      }
+    },
+    "R4-6_R4-7_adopt_matrix_and_reaper_home_leak": {
+      "script": "import fs from 'node:fs';\nimport path from 'node:path';\nimport { acquireRunControl, buildRunControlHolder } from '/home/vantt/projects/forgentX/src/runner/dispatch/run-lock.mjs';\nimport { finalizeConfinementResources } from '/home/vantt/projects/forgentX/src/runner/dispatch/confinement/authority.mjs';\n\nconst base = path.join(process.argv[2], 'adopt-and-reaper');\nconst runDir = path.join(base, 'runs', '01');\nfs.mkdirSync(runDir, { recursive: true });\n\n// Controller acquires run-control in section 9.4 step 2 using buildRunControlHolder (as assignment-runner.mjs:2097 does)\nconst ctrl = acquireRunControl(runDir, {\n  holder: buildRunControlHolder('ctrl-1'),\n  purpose: 'execute'\n});\n// Supervisor dies after writing receipt.json while controller process is still alive;\n// adopt enters Row 4 (\"Receipt co, chua settle -> acquire run control, settle\")\nconst adoptAcquire = acquireRunControl(runDir, {\n  holder: buildRunControlHolder('adopt-1'),\n  purpose: 'reconcile'\n});\n\nconst stateOnSigkillOrReboot = { binding: true, gateExit: false, receipt: false, settled: false };\nconst matchesRow1 = !stateOnSigkillOrReboot.binding && !stateOnSigkillOrReboot.receipt;\nconst matchesRow2 = stateOnSigkillOrReboot.gateExit && !stateOnSigkillOrReboot.receipt;\nconst matchesRow3Or4 = stateOnSigkillOrReboot.receipt;\nconst matchedAnyRowInSection9_7 = matchesRow1 || matchesRow2 || matchesRow3Or4;\n\nconst homeDir = path.join(base, 'private-home-1');\nconst descDir = path.join(runDir, 'protected', 'confinement-finalization');\nfs.mkdirSync(homeDir, { recursive: true });\nfs.mkdirSync(descDir, { recursive: true });\nconst descriptor = {\n  launchCommandId: 'cmd-1',\n  cleanupState: 'pending',\n  resources: [{ resource: 'private-home', pathRef: homeDir }]\n};\nfs.writeFileSync(path.join(descDir, 'cmd-1.json'), JSON.stringify(descriptor));\n\nconst finTimeout = await finalizeConfinementResources({\n  runDir, launchCommandId: 'cmd-1',\n  receipt: { completion: { kind: 'timeout' }, processTree: { coverage: 'process-group' } }\n});\nconst finSecondCall = await finalizeConfinementResources({\n  runDir, launchCommandId: 'cmd-1',\n  receipt: { completion: { kind: 'exited' }, processTree: { coverage: 'process-group' } }\n});\nconst homeStillOnDiskAfterTimeoutFinalize = fs.existsSync(homeDir);\n\nconsole.log(JSON.stringify({\n  controllerAcquireStatus: ctrl.status,\n  row4AdoptAcquireWhenControllerAlive: adoptAcquire.status,\n  sigkillOrRebootStateMatchedAnyRowInSection9_7: matchedAnyRowInSection9_7,\n  finalizeOnTimeoutCleanupState: finTimeout.cleanupState,\n  secondFinalizeCallCleanupState: finSecondCall.cleanupState,\n  homeLeakedForeverWithoutReaper: homeStillOnDiskAfterTimeoutFinalize\n}));",
+      "output": {
+        "controllerAcquireStatus": "acquired",
+        "row4AdoptAcquireWhenControllerAlive": "held",
+        "sigkillOrRebootStateMatchedAnyRowInSection9_7": false,
+        "finalizeOnTimeoutCleanupState": "retained",
+        "secondFinalizeCallCleanupState": "retained",
+        "homeLeakedForeverWithoutReaper": true
+      }
+    },
+    "R4-8_esm_named_import_bypasses_child_process_patch": {
+      "script": "import childProcess, { execFileSync } from 'node:child_process';\n\nlet guardTriggered = false;\nconst orig = childProcess.execFileSync;\nchildProcess.execFileSync = function (...args) {\n  guardTriggered = true;\n  throw new Error('blocked-by-stateTx-guard');\n};\n\nlet bypassedError = null;\ntry {\n  execFileSync('true');\n} catch (e) {\n  bypassedError = e.message;\n}\nchildProcess.execFileSync = orig;\n\nconsole.log(JSON.stringify({\n  guardTriggeredOnNamedEsmImport: guardTriggered,\n  namedEsmImportBypassedWrapper: !guardTriggered && bypassedError === null\n}));",
+      "output": {
+        "guardTriggeredOnNamedEsmImport": false,
+        "namedEsmImportBypassedWrapper": true
+      }
+    }
+  }
+}
