@@ -23,9 +23,10 @@ test('every domain compiled.json matches its registry.yaml and workflows/*.yaml'
   }
 });
 
-test('the domain registry loads with no yaml package resolvable', () => {
-  // A child process whose module resolution cannot reach node_modules: copy only the sources the
-  // registry needs next to a compiled domain, in a directory with no node_modules above it.
+test('the domain registry loads from compiled.json using only its own few source files', () => {
+  // The registry reads a compiled domain at run time and parses no YAML: copy only the sources it
+  // imports next to a compiled domain, in a directory that holds nothing else (no YAML door, no
+  // vendored parser), and load it in a child process.
   const tmp = fs.mkdtempSync(path.join(root, '..', 'fgos-registry-nodeps-'));
   try {
     for (const rel of ['src/state/domain-registry.mjs', 'src/workflow/definition.mjs', 'src/runner/dispatch/write-scope.mjs', 'src/runner/dispatch/run-timeout.mjs', 'src/workflow/steps.mjs', 'domains/coding/compiled.json']) {

@@ -1193,6 +1193,12 @@ export function findYamlParserLoads(rawSource) {
     /\brequire\(\s*(['"`])([^'"`]+)\1\s*,?\s*\)/gms,
     /\bcreateRequire\s*\([^)]*\)\s*\(\s*(['"`])([^'"`]+)\1\s*,?\s*\)/gms,
   ];
+  // `const req = createRequire(import.meta.url); req('yaml')`: any identifier bound to a createRequire(...) call.
+  const requireNames = [...code.matchAll(/(?<![\w$.])(?:const|let|var)\s+([\w$]+)\s*=\s*(?:[\w$]+\.)?createRequire\s*\(/g)].map((m) => m[1]);
+  for (const name of new Set(requireNames)) {
+    const escaped = name.replace(/[$]/g, '\\$&');
+    patterns.push(new RegExp(`(?<![\\w$.])${escaped}\\(\\s*(['"\`])([^'"\`]+)\\1\\s*,?\\s*\\)`, 'gms'));
+  }
   const loads = [];
   for (const pattern of patterns) {
     for (const m of code.matchAll(pattern)) {
@@ -1202,6 +1208,12 @@ export function findYamlParserLoads(rawSource) {
     }
   }
   return loads;
+}
+
+// A copy of the parser pasted in under another name loads nothing by specifier, so it is found by what
+// the bundle itself says: its vendoring banner or its loadAll entry point.
+export function hasYamlBundleSignature(source) {
+  return /^\/\/ package:\s+js-yaml\s/m.test(source) || /\bfunction\s+loadAll\s*\(/.test(source);
 }
 
 function scriptFilesUnder(dir) {
@@ -1214,11 +1226,13 @@ function scriptFilesUnder(dir) {
 }
 
 test('YAML has one door: only src/util/yaml.mjs loads a YAML parser', () => {
-  const violations = ['src', 'bin', 'scripts', 'test']
-    .flatMap(scriptFilesUnder)
-    .filter((file) => file !== YAML_DOOR && file !== YAML_THIRD_PARTY)
-    .flatMap((file) => findYamlParserLoads(fs.readFileSync(path.join(root, file), 'utf8')).map((spec) => `${file}: ${spec}`));
+  // core/ is scanned too; .agents/skills is generated from it and plugins carry copies, so they are not.
+  const files = ['src', 'bin', 'scripts', 'test', 'core'].flatMap(scriptFilesUnder).filter((file) => file !== YAML_DOOR && file !== YAML_THIRD_PARTY);
+  const violations = files.flatMap((file) => findYamlParserLoads(fs.readFileSync(path.join(root, file), 'utf8')).map((spec) => `${file}: ${spec}`));
   assert.deepEqual(violations, [], `Expected every YAML parse to go through ${YAML_DOOR}, found:\n${violations.join('\n')}`);
+  const copies = files.filter((file) => hasYamlBundleSignature(fs.readFileSync(path.join(root, file), 'utf8')));
+  assert.deepEqual(copies, [], `Expected no copy of the YAML parser outside ${YAML_THIRD_PARTY}, found:\n${copies.join('\n')}`);
+  assert.ok(hasYamlBundleSignature(fs.readFileSync(path.join(root, YAML_THIRD_PARTY), 'utf8')), 'the signature check recognises the vendored bundle');
   assert.deepEqual(findYamlParserLoads(fs.readFileSync(path.join(root, YAML_DOOR), 'utf8')), ['./third-party/js-yaml.mjs']);
 });
 
@@ -1239,6 +1253,9 @@ test('YAML door guard catches each way to load a parser and ignores comments, st
     "import { loadAll } from '../util/third-party/js-yaml.mjs';",
     "import { loadAll } from './third-party/js-yaml.mjs';",
     "if (x) {}\n/'/.test(y); import('yaml'); //'",
+    "const req = createRequire(import.meta.url);\nconst YAML = req('yaml');",
+    "const load = module.createRequire(import.meta.url); load(\"js-yaml\");",
+    "let $r = createRequire(import.meta.url), x = $r('yaml');",
   ];
   for (const source of caught) assert.ok(findYamlParserLoads(source).length >= 1, source);
   const passed = [
@@ -1252,6 +1269,17 @@ test('YAML door guard catches each way to load a parser and ignores comments, st
     'const t = `import jsyaml from \'js-yaml\';`;',
     "const parse = (s) => s; parse('yaml');",
     "obj.import('yaml');",
+    "const req = createRequire(import.meta.url);\nconst sqlite = req('node:sqlite');",
+    "const req = (x) => x; req('yaml');",
   ];
   for (const source of passed) assert.deepEqual(findYamlParserLoads(source), [], source);
+});
+
+test('YAML bundle signature catches a pasted copy of the parser and ignores code that merely mentions it', () => {
+  const banner = ['// Third-party code, vendored unmodified.', '//', '// package:    js-yaml 5.4.3', 'export {};'].join('\n');
+  const entryPoint = ['function', ' loadAll(input, options) {', '  return [];', '}'].join('');
+  for (const source of [banner, entryPoint, `const a = 1;\n${entryPoint}`]) assert.ok(hasYamlBundleSignature(source), source);
+  for (const source of ["import { parseYaml } from '../util/yaml.mjs';", 'const loadAll = () => [];', '// the js-yaml package', 'loadAll(x);']) {
+    assert.equal(hasYamlBundleSignature(source), false, source);
+  }
 });
