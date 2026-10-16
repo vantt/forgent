@@ -224,3 +224,16 @@ fn an_unknown_record_is_never_ignored() {
     assert!(record_path(&res.path).exists());
     let _ = fs::remove_dir_all(&dir);
 }
+
+#[test]
+fn only_an_exclusive_holder_declares_a_domain() {
+    let _serial = serial();
+    let dir = temp_dir("declare-sh");
+    let res = resource(&dir, "sh");
+    let shared = acquired(acquire(&res, Mode::Sh, Wait::Try, 2000));
+    let me = identity_of(ProcId(std::process::id())).unwrap();
+    assert!(shared.declare_domain(&Domain::LinuxGate(me)).is_err());
+    assert!(!record_path(&res.path).exists());
+    release(shared);
+    let _ = fs::remove_dir_all(&dir);
+}

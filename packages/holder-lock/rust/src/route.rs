@@ -189,13 +189,13 @@ fn lock_fd(args: &[String]) -> i32 {
     let drv = driver::current();
     if mode == "--borrowed-check" {
         let lock_path = PathBuf::from(flags.values("--borrowed-check")[0]);
+        if !drv.supported() {
+            return emit(Some("unavailable"), json!({ "reason": "unsupported-platform", "detail": drv.unsupported_detail() }), EXIT_UNAVAILABLE);
+        }
         let file = match take_slot3() {
             Ok(file) => file,
             Err(_) => return emit(Some("not-borrower"), json!({ "reason": NotBorrowerReason::FdMissing.as_str() }), EXIT_NEGATIVE),
         };
-        if !drv.supported() {
-            return emit(Some("unavailable"), json!({ "reason": "unsupported-platform", "detail": drv.unsupported_detail() }), EXIT_UNAVAILABLE);
-        }
         let env = std::env::var(LOCK_FD_ENV).ok();
         return match port::borrowed_check(&file, &lock_path, env.as_deref(), BORROW_SLOT) {
             BorrowedCheck::Borrower => emit(Some("borrower"), json!({}), EXIT_OK),
@@ -339,14 +339,20 @@ mod quiesce {
         dirs
     }
 
+    /// The argv names a fgOS payload, or runs something inside the workspace
+    /// (any argument that is a path under the root or one of its worktrees,
+    /// including `--cwd <path>`).
     fn names_payload(argv: &[String], dirs: &[PathBuf], state_root: &Path) -> bool {
-        let under = |p: &Path| dirs.iter().any(|d| p.starts_with(d));
-        argv.iter().enumerate().any(|(i, arg)| {
+        let under = |arg: &str| {
+            let p = Path::new(arg.split_once('=').map_or(arg, |(_, v)| v));
+            p.is_absolute() && dirs.iter().any(|d| p.starts_with(d))
+        };
+        argv.iter().any(|arg| {
             let base = Path::new(arg).file_name().and_then(|n| n.to_str()).unwrap_or("");
             arg.ends_with("bin/fgos.mjs")
                 || matches!(base, "fgos" | "fgos-runner" | "fgos-gateway")
                 || Path::new(arg).starts_with(state_root.join("releases"))
-                || (arg == "--cwd" && argv.get(i + 1).is_some_and(|next| under(Path::new(next))))
+                || under(arg)
         })
     }
 
@@ -370,6 +376,11 @@ mod quiesce {
         if !cfg!(target_os = "linux") {
             return emit(Some("unavailable"), json!({ "processes": [], "unreadable": 0, "detail": "process scan is only implemented on Linux; a person confirms no fgOS process is left" }), EXIT_UNAVAILABLE);
         }
+        // Inside a PID namespace (a sandbox) every process outside it is
+        // invisible: a scan from there could only ever look clean.
+        if !fgos_process::facts::pid_ns().is_initial {
+            return emit(Some("unavailable"), json!({ "processes": [], "unreadable": 0, "detail": "the scan runs inside a PID namespace that hides the host's processes; run it from the host" }), EXIT_UNAVAILABLE);
+        }
         let state_root = state_root::state_root().0;
         let per_root: Vec<(PathBuf, Vec<PathBuf>)> = roots.iter().map(|r| (r.clone(), workspace_dirs(r))).collect();
         let filter = ScanFilter { env_keys: vec![state_root::PINNED_ROOT_ENV.to_string()], include_self: false };
@@ -386,21 +397,23 @@ mod quiesce {
                 continue;
             }
             let argv = view.cmdline.clone().unwrap_or_default();
-            let mut hit: Option<(&str, &Path)> = None;
+            // A process working in a given workspace is attributed to it; one
+            // that only carries the machine-wide pinned state root is a fgOS
+            // process of some workspace and blocks a stop-everything cutover
+            // all the same, without a root.
+            let mut hit: Option<(&str, Option<&Path>)> = None;
             for (root, dirs) in &per_root {
-                let matched = if view.env_subset.contains_key(state_root::PINNED_ROOT_ENV) {
-                    Some("environ")
-                } else if view.cwd.as_deref().is_some_and(|cwd| dirs.iter().any(|d| cwd.starts_with(d))) {
-                    Some("cwd")
+                if view.cwd.as_deref().is_some_and(|cwd| dirs.iter().any(|d| cwd.starts_with(d))) {
+                    hit = Some(("cwd", Some(root.as_path())));
                 } else if names_payload(&argv, dirs, &state_root) {
-                    Some("cmdline")
-                } else {
-                    None
-                };
-                if let Some(m) = matched {
-                    hit = Some((m, root.as_path()));
+                    hit = Some(("cmdline", Some(root.as_path())));
+                }
+                if hit.is_some() {
                     break;
                 }
+            }
+            if hit.is_none() && view.env_subset.contains_key(state_root::PINNED_ROOT_ENV) {
+                hit = Some(("environ", None));
             }
             match hit {
                 Some((matched, root)) => processes.push(json!({
@@ -409,7 +422,7 @@ mod quiesce {
                     "cwd": view.cwd.as_ref().map(|c| c.to_string_lossy().into_owned()),
                     "cmdline": argv.join(" "),
                     "matched": matched,
-                    "root": root.to_string_lossy(),
+                    "root": root.map(|r| r.to_string_lossy().into_owned()),
                 })),
                 None if !view.unreadable.is_empty() && same_user(view.pid.0) => unreadable += 1,
                 None => {}

@@ -239,7 +239,8 @@ fn end_listed_holders(file: &File, kill_wait: Duration) -> Result<u32, Leftovers
         // leftover may have forked before it died).
         let others: Vec<_> = match lock_holders(dev, ino) {
             Holders::List(list) => list.into_iter().filter(|t| t.pid.0 != me).collect(),
-            Holders::Unlistable => return Ok(killed),
+            // Linux always lists; an answer it cannot give is never "none left".
+            Holders::Unlistable => return Err(Leftovers { killed, pids: Vec::new() }),
         };
         if others.is_empty() {
             return Ok(killed);
@@ -270,27 +271,69 @@ fn end_listed_holders(file: &File, kill_wait: Duration) -> Result<u32, Leftovers
                         Err(Leftovers { killed, pids: left })
                     }
                 }
-                Holders::Unlistable => Ok(killed),
+                Holders::Unlistable => Err(Leftovers { killed, pids: Vec::new() }),
             };
         }
     }
 }
 
 /// macOS: the borrowing child ran in its own process group; kill the group
-/// and wait until no member is left.
+/// and wait until no member but the unreaped child itself is left (the
+/// caller reaps it afterwards, so the group id cannot be reused meanwhile).
 fn end_process_group(child_pid: u32, kill_wait: Duration) -> Result<u32, Leftovers> {
     let pgid = child_pid as libc::pid_t;
-    // SAFETY: killpg/kill with signal 0 only target the child's own group.
+    // SAFETY: killpg only targets the child's own group; the unreaped child
+    // keeps the group id from being reused.
     let killed = if unsafe { libc::killpg(pgid, libc::SIGKILL) } == 0 { 1 } else { 0 };
     let deadline = Instant::now() + kill_wait;
     loop {
-        // SAFETY: as above.
-        if unsafe { libc::kill(-pgid, 0) } != 0 && io::Error::last_os_error().raw_os_error() == Some(libc::ESRCH) {
+        let left: Vec<u32> = group_members(pgid).into_iter().filter(|pid| *pid != child_pid).collect();
+        if left.is_empty() {
             return Ok(killed);
         }
         if Instant::now() >= deadline {
-            return Err(Leftovers { killed, pids: vec![child_pid] });
+            return Err(Leftovers { killed, pids: left });
         }
         std::thread::sleep(Duration::from_millis(1));
     }
+}
+
+/// Pids in process group `pgid`.
+#[cfg(target_os = "macos")]
+fn group_members(pgid: libc::pid_t) -> Vec<u32> {
+    // `PROC_PGRP_ONLY` from <libproc.h>; the libc crate does not export it.
+    const PROC_PGRP_ONLY: u32 = 2;
+    let mut pids = vec![0 as libc::pid_t; 256];
+    loop {
+        let bytes = (pids.len() * std::mem::size_of::<libc::pid_t>()) as libc::c_int;
+        // SAFETY: proc_listpids writes at most `bytes` bytes into the buffer.
+        let n = unsafe { libc::proc_listpids(PROC_PGRP_ONLY, pgid as u32, pids.as_mut_ptr().cast(), bytes) };
+        if n <= 0 {
+            return Vec::new();
+        }
+        let count = n as usize / std::mem::size_of::<libc::pid_t>();
+        if count < pids.len() {
+            return pids[..count].iter().filter(|p| **p > 0).map(|p| *p as u32).collect();
+        }
+        pids.resize(pids.len() * 2, 0);
+    }
+}
+
+/// Pids in process group `pgid` (scanned from /proc where there is no
+/// group listing call).
+#[cfg(not(target_os = "macos"))]
+fn group_members(pgid: libc::pid_t) -> Vec<u32> {
+    let Ok(entries) = std::fs::read_dir("/proc") else {
+        return Vec::new();
+    };
+    entries
+        .flatten()
+        .filter_map(|e| e.file_name().to_str()?.parse::<u32>().ok())
+        .filter(|pid| {
+            std::fs::read_to_string(format!("/proc/{pid}/stat"))
+                .ok()
+                .and_then(|stat| stat[stat.rfind(')')? + 1..].split_whitespace().nth(2)?.parse::<libc::pid_t>().ok())
+                == Some(pgid)
+        })
+        .collect()
 }

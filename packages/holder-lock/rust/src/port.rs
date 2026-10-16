@@ -159,7 +159,12 @@ impl Handle {
     /// Record the process domain this holder is about to create, before it
     /// creates it (`<lockFile>.predecessor.json`, temp file then rename). A
     /// later holder that finds this domain not empty ends it first.
+    /// Only an exclusive holder may declare one: a second shared holder
+    /// would find it populated and kill it.
     pub fn declare_domain(&self, domain: &Domain) -> io::Result<()> {
+        if self.mode != Mode::Ex {
+            return Err(io::Error::new(io::ErrorKind::InvalidInput, "only an exclusive holder declares a domain"));
+        }
         predecessor::declare(&predecessor::record_path(&self.resource.path), domain)
     }
 }
@@ -506,10 +511,15 @@ pub fn run_borrowed(handle: &Handle, spec: &BorrowSpec) -> Result<BorrowOutcome,
     drv.prepare_borrow(&mut cmd);
     let mut child = fgos_process::control::spawn_with_fds(cmd, &[(FdSlot(BORROW_SLOT), &handle.file)]).map_err(BorrowError::Spawn)?;
     let child_pid = child.id();
+    // The child stays unreaped (a zombie) while its leftovers are ended, so
+    // its pid, and on macOS its process group id, cannot be reused by an
+    // unrelated process in the meantime.
+    wait_exited_unreaped(child_pid).map_err(BorrowError::Wait)?;
+    let leftovers = drv.end_leftovers(&handle.file, child_pid, Duration::from_millis(handle.kill_wait_ms));
     let status = child.wait().map_err(BorrowError::Wait)?;
     let (exit, signal) = exit_parts(&status);
     let mut outcome = BorrowOutcome { exit, signal, leftovers_killed: 0 };
-    match drv.end_leftovers(&handle.file, child_pid, Duration::from_millis(handle.kill_wait_ms)) {
+    match leftovers {
         Ok(killed) => {
             outcome.leftovers_killed = killed;
             Ok(outcome)
@@ -518,6 +528,28 @@ pub fn run_borrowed(handle: &Handle, spec: &BorrowSpec) -> Result<BorrowOutcome,
             outcome.leftovers_killed = left.killed;
             Err(BorrowError::LeftoverNotKilled { outcome, pids: left.pids })
         }
+    }
+}
+
+/// Block until `pid` (a child of this process) has exited, without reaping it.
+fn wait_exited_unreaped(pid: u32) -> io::Result<()> {
+    #[cfg(unix)]
+    loop {
+        // SAFETY: waitid fills a zeroed siginfo for our own child; WNOWAIT
+        // leaves it waitable for the reap that follows.
+        let mut info: libc::siginfo_t = unsafe { std::mem::zeroed() };
+        if unsafe { libc::waitid(libc::P_PID, pid as libc::id_t, &mut info, libc::WEXITED | libc::WNOWAIT) } == 0 {
+            return Ok(());
+        }
+        let err = io::Error::last_os_error();
+        if err.raw_os_error() != Some(libc::EINTR) {
+            return Err(err);
+        }
+    }
+    #[cfg(not(unix))]
+    {
+        let _ = pid;
+        Ok(())
     }
 }
 

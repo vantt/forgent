@@ -301,6 +301,25 @@ fn quiesce_scan_lists_a_process_working_in_the_workspace() {
     assert!(v["processes"].as_array().unwrap().iter().all(|p| p["pid"] != sleeper.id()), "{v}");
     let _ = sleeper.kill();
     let _ = sleeper.wait();
+    // A process elsewhere whose argv points into the workspace.
+    let file_in_root = dir.join("payload.mjs");
+    let mut runner = Command::new("sh")
+        .args(["-c", "sleep 30; :", "runner"])
+        .arg(&file_in_root)
+        .current_dir("/")
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()
+        .unwrap();
+    std::thread::sleep(Duration::from_millis(50));
+    let v = json_line(&route(&["quiesce-scan", "--protocol", "1", "--root", &root]));
+    let hit: Vec<&Value> = v["processes"].as_array().unwrap().iter().filter(|p| p["pid"] == runner.id()).collect();
+    assert_eq!(hit.len(), 1, "{v}");
+    assert_eq!(hit[0]["matched"], "cmdline");
+    assert_eq!(hit[0]["root"], root.as_str());
+    let _ = runner.kill();
+    let _ = runner.wait();
     let _ = fs::remove_dir_all(&dir);
 }
 
