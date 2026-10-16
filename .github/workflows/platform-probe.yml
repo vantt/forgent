@@ -1,0 +1,37 @@
+name: platform-probe
+
+# Manual only: measures the OS lock / process-containment mechanisms on real
+# macOS, Windows and Linux runners and uploads probe-report-<os>.json.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+        working-directory: tools/platform-probe
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build probe
+        run: cargo build --release
+      - name: Run probe
+        run: cargo run --release -- --out "$RUNNER_TEMP/probe-out"
+      - name: Show report
+        if: always()
+        run: cat "$RUNNER_TEMP"/probe-out/probe-report-*.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: probe-report-${{ matrix.os }}
+          path: ${{ runner.temp }}/probe-out/probe-report-*.json
+          if-no-files-found: warn
