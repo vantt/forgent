@@ -28,6 +28,7 @@ fn acquired(a: Acquire) -> fgos_holder_lock::Handle {
 
 #[test]
 fn two_descriptions_in_one_process_exclude_each_other() {
+    let _serial = serial();
     let dir = temp_dir("two-desc");
     let res = resource(&dir, "two");
     let first = acquired(acquire(&res, Mode::Ex, Wait::Try, 2000));
@@ -43,6 +44,7 @@ fn two_descriptions_in_one_process_exclude_each_other() {
 
 #[test]
 fn a_sigkilled_holder_frees_the_lock_at_once() {
+    let _serial = serial();
     let dir = temp_dir("sigkill");
     let res = resource(&dir, "k");
     let ready = dir.join("ready");
@@ -58,6 +60,7 @@ fn a_sigkilled_holder_frees_the_lock_at_once() {
 
 #[test]
 fn wait_ms_times_out_and_nothing_is_kept() {
+    let _serial = serial();
     let dir = temp_dir("timeout");
     let res = resource(&dir, "t");
     let ready = dir.join("ready");
@@ -77,6 +80,7 @@ fn wait_ms_times_out_and_nothing_is_kept() {
 
 #[test]
 fn probes_are_shared_and_never_obstruct_each_other() {
+    let _serial = serial();
     let dir = temp_dir("probe");
     let res = resource(&dir, "p");
     // A probe in progress is a shared lock on its own description; another
@@ -108,6 +112,7 @@ fn gone(pid: u32) -> bool {
 #[cfg(target_os = "linux")]
 #[test]
 fn predecessor_gate_is_killed_before_the_next_holder_proceeds() {
+    let _serial = serial();
     let dir = temp_dir("predecessor");
     let res = resource(&dir, "pred");
     let mut extra = Vec::new();
@@ -137,6 +142,7 @@ fn predecessor_gate_is_killed_before_the_next_holder_proceeds() {
 #[cfg(target_os = "linux")]
 #[test]
 fn a_stale_predecessor_record_lets_the_next_holder_through_at_once() {
+    let _serial = serial();
     let dir = temp_dir("stale");
     let res = resource(&dir, "stale");
     let mut sleeper = spawn_term_ignoring_sleep();
@@ -180,6 +186,7 @@ fn a_stale_predecessor_record_lets_the_next_holder_through_at_once() {
 #[cfg(target_os = "linux")]
 #[test]
 fn an_unkillable_predecessor_domain_is_held_within_the_kill_wait() {
+    let _serial = serial();
     if unsafe { libc::geteuid() } == 0 {
         eprintln!("skipped: running as root can signal pid 1");
         return;
@@ -206,6 +213,7 @@ fn an_unkillable_predecessor_domain_is_held_within_the_kill_wait() {
 
 #[test]
 fn an_unknown_record_is_never_ignored() {
+    let _serial = serial();
     let dir = temp_dir("unknown-record");
     let res = resource(&dir, "u");
     fs::write(record_path(&res.path), r#"{"v":2,"domainKind":"future","domainId":"x"}"#).unwrap();

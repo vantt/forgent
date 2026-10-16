@@ -29,6 +29,7 @@ fn git() -> &'static Path {
 
 #[test]
 fn borrowing_git_disables_automatic_gc_and_maintenance() {
+    let _serial = serial();
     let argv: Vec<String> = ["git", "commit", "-m", "x"].map(String::from).to_vec();
     assert_eq!(borrowed_argv(&argv), ["git", "-c", "gc.auto=0", "-c", "maintenance.auto=false", "commit", "-m", "x"]);
     let other: Vec<String> = ["sh", "-c", "true"].map(String::from).to_vec();
@@ -37,6 +38,7 @@ fn borrowing_git_disables_automatic_gc_and_maintenance() {
 
 #[test]
 fn the_four_borrow_vectors_and_the_sibling_check_are_green() {
+    let _serial = serial();
     let report = borrow_vectors::run(git(), &[], false).expect("vectors run");
     for v in &report.vectors {
         println!("vector {}: {} in {} ms ({})", v.name, if v.pass { "pass" } else { "FAIL" }, v.elapsed_ms, v.detail);
@@ -48,6 +50,7 @@ fn the_four_borrow_vectors_and_the_sibling_check_are_green() {
 
 #[test]
 fn an_unknown_vector_name_is_a_usage_error() {
+    let _serial = serial();
     assert!(matches!(borrow_vectors::run(git(), &["nope".to_string()], false), Err(borrow_vectors::RunError::Usage(_))));
 }
 
@@ -74,6 +77,7 @@ fn kill_pids(pids: &[u32]) {
 /// exists to catch.
 #[test]
 fn control_without_the_gc_switch_leaks_the_lock_to_background_gc() {
+    let _serial = serial();
     let dir = temp_dir("gc-control");
     let repo = dir.join("repo");
     init_repo(git(), &repo).unwrap();
@@ -126,6 +130,7 @@ fn fd_of_handle(path: &Path) -> i32 {
 /// as soon as the owner releases.
 #[test]
 fn run_borrowed_kills_a_setsid_escaper_before_returning() {
+    let _serial = serial();
     let dir = temp_dir("escaper");
     let repo = dir.join("repo");
     init_repo(git(), &repo).unwrap();

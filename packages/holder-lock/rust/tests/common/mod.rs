@@ -17,6 +17,15 @@ pub const LOCK: &str = "HL_TEST_LOCK";
 pub const READY: &str = "HL_TEST_READY";
 pub const ARG: &str = "HL_TEST_ARG";
 
+/// Tests of one binary run on parallel threads, and a fork on one thread
+/// copies every description open in the process until the child execs: a
+/// probe right after another test's release could see that copy. Each
+/// lock test holds this for its whole run.
+pub fn serial() -> std::sync::MutexGuard<'static, ()> {
+    static SERIAL: std::sync::Mutex<()> = std::sync::Mutex::new(());
+    SERIAL.lock().unwrap_or_else(|poisoned| poisoned.into_inner())
+}
+
 pub fn temp_dir(tag: &str) -> PathBuf {
     let nanos = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos();
     let dir = std::env::temp_dir().join(format!("fgos-holder-lock-{tag}-{}-{nanos}", std::process::id()));
