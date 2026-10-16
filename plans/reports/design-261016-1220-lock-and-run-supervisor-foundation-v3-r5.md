@@ -800,8 +800,8 @@ Công cụ `tools/platform-probe`; báo cáo [implementation-261016-1205-platfor
 
 | Nền | Kết quả | Điểm quyết định cho thiết kế |
 |---|---|---|
-| macOS 26.6 arm64 | 8/8 pass | `flock` nhả khi SIGKILL; fd kế thừa và fd qua `SCM_RIGHTS` giữ lock sau khi cha chết; `killpg` kết thúc group; kẻ thoát `setsid`+fork đôi **sống sót** (xác nhận best-effort); quét cây + `kill_all` kết thúc đủ cây; mượn git (hook chặn, `gc.auto=1`) không lúc nào thấy lock trống khi git/con còn sống |
-| Linux (đối chứng) | 8/8 pass | Như macOS |
+| macOS 26.6.2 arm64 | 8 pass, 1 skip (test chỉ dành cho Windows) | `flock` nhả khi SIGKILL; fd kế thừa và fd qua `SCM_RIGHTS` giữ lock sau khi cha chết; `killpg` kết thúc group; kẻ thoát `setsid`+fork đôi **sống sót** (xác nhận best-effort); quét cây + `kill_all` kết thúc đủ cây; mượn git (hook chặn, `gc.auto=1`) không lúc nào thấy lock trống khi git/con còn sống |
+| Linux 6.17 Azure (đối chứng) | 8 pass, 1 skip | Như macOS |
 | Windows Server 10.0.26100, NTFS, git 2.56 | 7 pass, 1 fail, 1 skip | `LockFileEx` nhả 0,1 ms sau `TerminateProcess`; helper thoát cùng cha (2,9 ms), lock trống 3,0 ms; con giữ handle kế thừa **không** giữ lock; job đóng giết con, cháu, con detached (4,0 ms), breakaway bị từ chối; `ActiveProcesses` 5 → 0 (2,0 ms); Toolhelp đủ chuỗi tổ tiên (2,6 ms). **Fail `git-borrow-blocking-hook`**: lock trống 0,2 ms, process cuối trong job chết 3,9 ms → 1 vi phạm → luật 6.0.1. Skip: herdr không có trên PATH |
 
 ## 13. Khác gì so với bản 2
