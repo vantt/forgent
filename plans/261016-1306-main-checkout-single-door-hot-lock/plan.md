@@ -20,6 +20,12 @@ created: 2026-10-16
 - Impact-analysis: GitNexus có mặt; `bin/fgos.mjs` không có symbol được index (tsk-38h), nên mọi trích dẫn trong phase là grep có số dòng; executor chạy `impact` trên symbol ngoài `bin/fgos.mjs` trước khi sửa và báo blast radius.
 - Component boundary: **có đổi** (main checkout thành một cửa của holder-lock; state hot-mutex thuộc state store). P09 cập nhật [`component-boundary.md`](../../docs/platform/component-boundary.md).
 
+> **TẠM GIỮ một phần plan, chờ hội đồng thiết kế component Git (quyết định của anh, 2026-10-16 22:50).**
+> Anh quyết tách một **component Git riêng** (crate Rust, ngang hàng Workflow và Execution Core, domain nào cũng dùng). Mọi thao tác ghi lên repo git sẽ gom về đó: worktree, sync, land có verify/abort, trusted commit, và **khoá repo của plan này**. Hình thái do một hội đồng kiến trúc thiết kế trước; sau đó mới cắt lại 4.3.
+> - **Chưa bắt đầu** P03 (main door, checkpoint, hook), P05 (land/promote/sync-root/approve dưới slot), P06 (`worktree-admin`), P08 (`fgctl` bỏ đọc v1 main), phần reset-trong-mutex của P07, và phần tương ứng của P00/P09/P10. Các phần này dự kiến chuyển sang component Git; hội đồng có thể đổi ranh giới.
+> - **Có thể tiến khi 4.2 đã land:** P01 (hot-lock core) và P02 (gộp claims vào `state`). P04 chờ main door của component Git.
+> - Bối cảnh: [roadmap-261016-2212-fgos-cook-and-git-component.md](../reports/roadmap-261016-2212-fgos-cook-and-git-component.md), [research-261016-2158-work-harness-reuse-and-ak-cook-worker.md](../reports/research-261016-2158-work-harness-reuse-and-ak-cook-worker.md). Kết luận hội đồng sẽ được ghi vào đây khi có.
+
 ## Phạm vi
 
 Trong 4.3: main mutex v3 + `withMainCheckout(scope, purpose, fn)` + `checkpointMainFgos(mainHandle)`; merge slot v3; land/promote/sync-root/approve dưới slot bên ngoài; mượn qua fd (`runBorrowed`) thay `FGOS_MAIN_LOCK_HOLDER_PID`; hook dùng `--borrowed-check` rồi `probe`; `worktree-admin` quanh `git worktree add`; gộp `events.lock` + `claims.lock` thành hot-mutex `state` với `stateTx` thu hồi được, record nóng tuple đầy đủ, dọn holder chết dưới kernel lock `state.reclaim`, cùng cơ chế cho `porting-events`; gác `child_process` + re-entry ném ngay; HEAD, gốc main checkout, snapshot bằng chứng plan lấy trước lock; kiểm trần worker trong `state` ngay trước claim + thu hẹp claim (main mutex chỉ quanh checkpoint) **trong một commit**; `fgos lock fence` thay `unlock`, `lock-status` đọc v3; `main-checkout-reset` trong mutex; xoá phần v1 còn lại của `lock.rs` (`fgctl`); doctor `lock-record-unreadable`; hàng rào; landing.
