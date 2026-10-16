@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { COMMAND_REGISTRY, HELP_SELECTORS } from '../src/cli/command-registry.mjs';
+import { acceptedFlags } from '../src/cli/flag-check.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -226,6 +227,16 @@ function helpRoute(selector) {
   };
 }
 
+function nativeFlagProjection(cmd) {
+  const sorted = (set) => [...set].sort();
+  if (cmd.subcommands) {
+    const subcommand_flags = {};
+    for (const sub of Object.keys(cmd.subcommands).sort()) subcommand_flags[sub] = sorted(acceptedFlags(cmd, [sub]));
+    return { subcommand_flags };
+  }
+  return { accepted_flags: sorted(acceptedFlags(cmd)) };
+}
+
 /**
  * Generate CommandRouteDescriptor map from registry and annotations.
  */
@@ -303,6 +314,10 @@ export function generateCommandRoutes({ registry = COMMAND_REGISTRY, annotations
       owner_path,
       compatibility_tests,
       ...(ann?.subcommands !== undefined ? { subcommands: Boolean(ann.subcommands) } : {}),
+      // The Rust host validates a native verb's flags itself (the legacy-node
+      // payload does it for every other verb), from this projection of the
+      // registry: one list of valid flags, two enforcement points.
+      ...(route_kind === 'native' ? nativeFlagProjection(cmd) : {}),
     };
     routes[selector] = descriptor;
   }
