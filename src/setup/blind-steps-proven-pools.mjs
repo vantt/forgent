@@ -14,7 +14,7 @@ import path from 'node:path';
 import { bind } from '../runner/execution/bind.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
 import { deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
-import { loadWorkflowDefinitions } from './workflow-pool-independence.mjs';
+import { loadWorkflowDefinitions, unparsableDefinitionsResult } from './workflow-pool-independence.mjs';
 
 /**
  * Pairs a live canary proved blind: a worker of that provider family, run through that transport
@@ -97,9 +97,7 @@ export async function checkBlindStepsUseProvenPools(cwd, { packageRoot, loadRunn
   }
   const roots = path.resolve(cwd) === path.resolve(packageRoot) ? [packageRoot] : [packageRoot, cwd];
   const loaded = loadWorkflowDefinitions(roots);
-  if (loaded.unavailable) {
-    return { passed: true, message: `blind pools not evaluated: ${loaded.unavailable}` };
-  }
+  if (loaded.unreadable.length > 0) return unparsableDefinitionsResult(loaded.unreadable);
 
   const problems = [];
   let evaluated = 0;

@@ -22,7 +22,7 @@ import path from 'node:path';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
 import { detectHerdrPresent } from '../runner/execution/run.mjs';
 import { resolvePattern } from '../runner/execution/patterns/presets.mjs';
-import { parseYaml } from '../util/yaml.mjs';
+import { describeYamlError, parseYaml } from '../util/yaml.mjs';
 
 // Patterns whose roles are bound against each other's provider family.
 const INDEPENDENCE_PATTERNS = new Set(['panel', 'reviewed']);
@@ -50,7 +50,11 @@ function workflowDefinitionFiles(root) {
   return files;
 }
 
-/** Workflow definitions under `roots` (package root, then the project), each as { id, steps }. */
+/**
+ * Workflow definitions under `roots` (package root, then the project), each as { id, steps }. A file
+ * that cannot be read or parsed is left out and named in `unreadable` as
+ * `<file>: cannot be parsed: <reason> (line L, column C)`.
+ */
 export function loadWorkflowDefinitions(roots) {
   const workflows = new Map();
   const unreadable = [];
@@ -58,15 +62,20 @@ export function loadWorkflowDefinitions(roots) {
     for (const { file, fallbackId } of workflowDefinitionFiles(root)) {
       try {
         const body = fs.readFileSync(file, 'utf8');
-        const raw = file.endsWith('.json') ? JSON.parse(body) : parseYaml(body, { filename: file });
+        const raw = file.endsWith('.json') ? JSON.parse(body) : parseYaml(body, { filename: path.relative(root, file) });
         const id = typeof raw?.id === 'string' && raw.id ? raw.id : fallbackId;
         if (!workflows.has(id)) workflows.set(id, { id, steps: Array.isArray(raw?.steps) ? raw.steps : [] });
       } catch (err) {
-        unreadable.push(`${path.basename(file)} (${err.message})`);
+        unreadable.push(`${path.relative(root, file)}: cannot be parsed: ${file.endsWith('.json') ? err.message : describeYamlError(err)}`);
       }
     }
   }
   return { workflows, unreadable };
+}
+
+/** The failing doctor result for Workflow definitions that could not be parsed, so no pool was evaluated. */
+export function unparsableDefinitionsResult(unreadable) {
+  return { passed: false, message: `Workflow definitions that cannot be parsed, so their pools are not evaluated: ${unreadable.join('; ')}` };
 }
 
 /**
@@ -85,9 +94,7 @@ export async function checkWorkflowPoolsSatisfyIndependence(cwd, { packageRoot, 
   }
   const roots = path.resolve(cwd) === path.resolve(packageRoot) ? [packageRoot] : [packageRoot, cwd];
   const loaded = loadWorkflowDefinitions(roots);
-  if (loaded.unavailable) {
-    return { passed: true, message: `Workflow definitions not evaluated: ${loaded.unavailable}` };
-  }
+  if (loaded.unreadable.length > 0) return unparsableDefinitionsResult(loaded.unreadable);
 
   const session = { headless: true, herdrPresent: detectHerdrPresent() };
   const problems = [];
@@ -139,11 +146,10 @@ export async function checkWorkflowPoolsSatisfyIndependence(cwd, { packageRoot, 
   const sharingNote = sharing.length > 0
     ? `; panel seats share a provider family because the pool has fewer families than seats (a preference, not a failure; add a prefer entry on another family to spread them): ${sharing.join(' | ')}`
     : '';
-  const unreadableNote = loaded.unreadable.length > 0 ? `; unreadable definitions skipped: ${loaded.unreadable.join(', ')}` : '';
   return {
     passed: true,
     message: evaluated === 0
-      ? `no panel or reviewed Workflow unit to evaluate${unreadableNote}`
-      : `every panel/reviewed Workflow unit (${evaluated}) binds all its roles${sharingNote || ' with independent provider families'}${unreadableNote}`,
+      ? 'no panel or reviewed Workflow unit to evaluate'
+      : `every panel/reviewed Workflow unit (${evaluated}) binds all its roles${sharingNote || ' with independent provider families'}`,
   };
 }
