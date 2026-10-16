@@ -12,6 +12,7 @@ import { checkStopped, placeFences, fenceStatus, fenceCutover, ownPidChain } fro
 
 const HOST_BIN = process.env.FGOS_HOST_BIN;
 const READY_WAIT_MS = 10_000;
+const SETTLE_ATTEMPTS = 20;
 const GIT_ENV = { ...process.env, GIT_AUTHOR_NAME: 'fences', GIT_AUTHOR_EMAIL: 'fences@test', GIT_COMMITTER_NAME: 'fences', GIT_COMMITTER_EMAIL: 'fences@test' };
 
 let scratch;
@@ -67,12 +68,43 @@ async function stopPayload(child) {
   }
 }
 
-function scan(ws) {
-  return checkStopped({ workspaces: [ws.root], hostBin: HOST_BIN });
-}
-
 function blockerPids(result) {
   return result.blockers.filter((blocker) => blocker.kind === 'process').map((blocker) => blocker.pid);
+}
+
+/**
+ * fgOS processes of other sessions on this machine (a test suite, a doctor
+ * run) match every workspace through their argv, and the scan is right to
+ * count them. The test names the ones running right now, read from a
+ * workspace it never starts anything in, and declares them next to its own
+ * pid chain, so only what the test itself starts can block.
+ */
+function foreignPids() {
+  const probe = path.join(scratch, 'foreign-probe');
+  fs.mkdirSync(probe, { recursive: true });
+  const mine = new Set([...children].map((child) => child.pid));
+  const result = checkStopped({ workspaces: [probe], hostBin: HOST_BIN });
+  return [...ownPidChain(), ...blockerPids(result).filter((pid) => !mine.has(pid))];
+}
+
+/** Whether every blocker is a process of another session that started after the probe, or a transient unreadable entry. */
+function onlyForeign(result) {
+  const mine = new Set([...children].map((child) => child.pid));
+  return result.blockers.length > 0 && result.blockers.every((blocker) => blocker.kind === 'unreadable' || !mine.has(blocker.pid));
+}
+
+function scan(ws) {
+  return checkStopped({ workspaces: [ws.root], hostBin: HOST_BIN, excludePids: foreignPids() });
+}
+
+/** A scan that is not blocked by other sessions' processes coming and going: retried while only those block it. */
+function settledScan(ws) {
+  let result;
+  for (let attempt = 0; attempt < SETTLE_ATTEMPTS; attempt += 1) {
+    result = scan(ws);
+    if (result.status !== 'blocked' || !onlyForeign(result)) return result;
+  }
+  return result;
 }
 
 test('ownPidChain starts with this process and climbs through its parents', () => {
@@ -85,7 +117,7 @@ test('ownPidChain starts with this process and climbs through its parents', () =
 
 test('a workspace with no fgOS process is clean', () => {
   const ws = makeWorkspace('clean');
-  const result = scan(ws);
+  const result = settledScan(ws);
   assert.equal(result.status, 'clean', JSON.stringify(result.blockers));
   assert.deepEqual(result.blockers, []);
   assert.equal(result.scans.length, 1);
@@ -105,7 +137,7 @@ test('a node process running the payload with its cwd in the workspace is a bloc
   } finally {
     await stopPayload(payload);
   }
-  const afterwards = scan(ws);
+  const afterwards = settledScan(ws);
   assert.equal(afterwards.status, 'clean', JSON.stringify(afterwards.blockers));
 });
 
@@ -128,7 +160,7 @@ test('a blocker found before placement means nothing is placed', async () => {
 
 test('a process that starts after the first scan is seen by the scan after placement', async () => {
   const ws = makeWorkspace('late-starter');
-  const first = scan(ws);
+  const first = settledScan(ws);
   assert.equal(first.status, 'clean', JSON.stringify(first.blockers));
   const payload = await startPayload(ws);
   try {
@@ -144,11 +176,23 @@ test('a process that starts after the first scan is seen by the scan after place
 
 test('a clean workspace is fenced and scanned clean again by the whole cutover step', () => {
   const ws = makeWorkspace('clean-cutover');
-  const result = fenceCutover({ workspaces: [ws.root], fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, hostBin: HOST_BIN });
+  const placedPaths = new Set();
+  let result;
+  for (let attempt = 0; attempt < SETTLE_ATTEMPTS; attempt += 1) {
+    result = fenceCutover({ workspaces: [ws.root], fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, hostBin: HOST_BIN, excludePids: foreignPids() });
+    for (const placed of result.fences?.placed ?? []) placedPaths.add(placed);
+    if (result.status === 'placed') break;
+    // Another session's process starting between the probe and a scan:
+    // a blocked first scan placed nothing; a blocked second scan left the
+    // fences in place, and the next attempt finds them and skips them.
+    const scanned = result.status === 'blocked' ? result.before : result.after;
+    assert.ok(['blocked', 'placed-then-blocked'].includes(result.status) && onlyForeign(scanned), JSON.stringify(result));
+    if (result.status === 'blocked') assert.equal(result.fences, null);
+  }
   assert.equal(result.status, 'placed', JSON.stringify(result));
   assert.equal(result.before.status, 'clean');
   assert.equal(result.fences.ok, true);
-  assert.ok(result.fences.placed.length > 0);
+  assert.ok(placedPaths.size > 0);
   assert.equal(result.after.status, 'clean');
   assert.equal(fenceStatus({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir }).complete, true);
 });
