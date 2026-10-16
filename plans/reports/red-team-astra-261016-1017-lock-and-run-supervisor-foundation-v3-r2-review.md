@@ -1,0 +1,32 @@
+<!-- Nguồn: .fgos/assignments/unit-run-1792118056236-d043ffd1/producer/1/runs/01/outbox/report-1.md — openai/tetcu72, gpt-6-astra (frontier), herdr pane, fgos run read-only, 2026-10-16, review vòng 2 hẹp (chỉ kiểm R3-1…R3-12 của Astra vòng 1) trên bản r2 (9622bb642). Bản sao nguyên văn. -->
+
+# Phản biện vòng 2 hẹp — Astra
+
+Đã đối chiếu đủ R3-1…R3-12 của [Astra vòng 1](/home/vantt/projects/forgentX/plans/reports/red-team-astra-261016-0122-lock-and-run-supervisor-foundation-v3-review.md) với bản r2 tại commit `9622bb64280b24b704e971da6af01fc117a3cfab`. File r2 trên đĩa không khác commit này. Đọc mục 14 rồi kiểm lại các mục được dẫn, không lấy chữ “Nhận” làm bằng chứng đóng.
+
+“Đóng” là đóng ở thiết kế. Không xác nhận đã triển khai hoặc test xanh. Chỉ đọc tài liệu, mã probe đã lưu và source được dẫn. Không chạy probe, test, lifecycle verb; không sửa workspace ngoài các tệp outbox được giao.
+
+| Mã | Trạng thái | Mục r2 | Lý do và sửa tối thiểu nếu còn thiếu |
+|---|---|---|---|
+| R3-1 | **Đóng một phần** | [§6.8, bảng hình dạng và bước 1–5](/home/vantt/projects/forgentX/plans/reports/design-261016-0933-lock-and-run-supervisor-foundation-v3-r2.md:275); §11/4.2 | Đã sửa ledger, drain và sàn, nhưng bước 1 vẫn chấp nhận release cũ chạy qua symlink chưa chặn được; sửa tối thiểu: không bật họ cwd khi admission còn hở, thay vì coi scan và sàn activation là đủ. |
+| R3-2 | **Đóng một phần** | [§9.3, điểm 3–7](/home/vantt/projects/forgentX/plans/reports/design-261016-0933-lock-and-run-supervisor-foundation-v3-r2.md:485); §10; §12.7 | Đã chọn PID namespace và SIGKILL, nhưng điểm 7 suy “agent thoát → miền rỗng” khi gate-init còn sống; sửa tối thiểu: ghi rõ kill/reap hậu duệ và giữ ownership tới khi xác nhận miền rỗng, cả ở nhánh gate bị SIGKILL. |
+| R3-3 | **Đóng** | [§9.4, bước 1–3](/home/vantt/projects/forgentX/plans/reports/design-261016-0933-lock-and-run-supervisor-foundation-v3-r2.md:505); §11/6.2 | Lock attempt và lease cwd khi cần được giữ trước prepare/allocate, rồi truyền liên tục cho supervisor. |
+| R3-4 | **Đóng** | [§9.6](/home/vantt/projects/forgentX/plans/reports/design-261016-0933-lock-and-run-supervisor-foundation-v3-r2.md:523); [§9.7, ma trận và điểm 6](/home/vantt/projects/forgentX/plans/reports/design-261016-0933-lock-and-run-supervisor-foundation-v3-r2.md:535) | Adopt giữ token cũ cho `alreadySettledByUs`, tiếp tục finalize dù đã có result, và hoàn tất từng bước bằng receipt cùng idempotency. |
+| R3-5 | **Đóng** | [§9.4, bước 4–5](/home/vantt/projects/forgentX/plans/reports/design-261016-0933-lock-and-run-supervisor-foundation-v3-r2.md:512) | Controller phải đóng fd cả trong `finally` của `launch-unknown`, và timeout binding không cho mở attempt mới. |
+| R3-6 | **Đóng** | [§7.2](/home/vantt/projects/forgentX/plans/reports/design-261016-0933-lock-and-run-supervisor-foundation-v3-r2.md:322); [§7.7](/home/vantt/projects/forgentX/plans/reports/design-261016-0933-lock-and-run-supervisor-foundation-v3-r2.md:387) | `launch-requested` có trước driver, GO sau `launched` bền, grace chỉ đối soát và close cần authority cùng kiểm incarnation/foreground. |
+| R3-7 | **Đóng** | [§6.6, bất biến 1](/home/vantt/projects/forgentX/plans/reports/design-261016-0933-lock-and-run-supervisor-foundation-v3-r2.md:254); §11/4.3 | Mọi ghi phải qua `stateTx` bị thu hồi khi release, kèm kiểm tĩnh và test continuation ghi sau release. |
+| R3-8 | **Đóng** | [§6.6, bất biến 2 và 5](/home/vantt/projects/forgentX/plans/reports/design-261016-0933-lock-and-run-supervisor-foundation-v3-r2.md:257); §11/4.3 | Snapshot plan/Git lấy ngoài lock, bên trong so revision/SHA, bỏ catch nuốt lỗi và truyền `stateTx` qua acquire/release/settle. |
+| R3-9 | **Đóng một phần** | [§6.1.1, điểm 8](/home/vantt/projects/forgentX/plans/reports/design-261016-0933-lock-and-run-supervisor-foundation-v3-r2.md:164); [§6.4](/home/vantt/projects/forgentX/plans/reports/design-261016-0933-lock-and-run-supervisor-foundation-v3-r2.md:210); §11/4.2–4.3 | Đã ghi close-only và tắt Git GC, nhưng chưa đưa leak qua shell/filter/background child và đổi Git/host/driver thành điều kiện kiểm rõ; sửa tối thiểu: thêm các vector này và gate kiểm lại khi đổi runtime. |
+| R3-10 | **Đóng** | [§9.8](/home/vantt/projects/forgentX/plans/reports/design-261016-0933-lock-and-run-supervisor-foundation-v3-r2.md:559); §11/6.2 | Writer và bốn cửa reader/destructor chuyển cùng wave, còn marker theo phiên bản tách home cũ/mới để mỗi home chỉ có một giao thức dọn. |
+| R3-11 | **Đóng** | [§7.2](/home/vantt/projects/forgentX/plans/reports/design-261016-0933-lock-and-run-supervisor-foundation-v3-r2.md:322); §7.7 | Incarnation đủ host/boot/namespace, close kiểm peer trên chính kết nối thao tác, unknown giữ pane và attach không bị core đóng. |
+| R3-12 | **Đóng một phần** | [§6.1.2](/home/vantt/projects/forgentX/plans/reports/design-261016-0933-lock-and-run-supervisor-foundation-v3-r2.md:166); §9.3; §11/4.2, 6.2, 6.5 | Ma trận, mount gate và socket/user-namespace đã rõ, nhưng `allocationGrace` cùng policy retain chưa có nguồn cấu hình/check cụ thể; sửa tối thiểu: chỉ rõ chúng là tham số caller hay config và đăng ký default/check tương ứng trước bật terminal. |
+
+Các căn cứ cần giữ khi đọc bảng:
+
+- R3-1: chính §6.8 bước 1 gọi symlink chưa biết là “rủi ro chấp nhận”; đây là phần chưa đóng của lời hứa chặn giao thức cũ, dù các họ file cố định và ledger đã có cách xử lý.
+- R3-2: §9.3 điểm 3 dựa vào **init chết** để kernel dọn namespace, còn điểm 7 dùng **agent thoát** trước khi gate publish rồi thoát; hai sự kiện khác nhau nếu agent để lại cháu. Mã `probe_pidns_containment.py` trong [bundle r1](/home/vantt/projects/forgentX/plans/reports/design-261016-0122-lock-and-run-supervisor-foundation-v3-r1-probes.json:4) đặt gate **ngoài** namespace và kiểm heartbeat sau một khoảng chờ; nó không giữ/thử attempt lock và không chứng minh ordering “lock nhả sau writer cuối”. Đây là thiếu sót contract/proof, không phải kết quả của probe mới.
+- R3-10: hiểu “marker có phiên bản” là đổi giá trị trường `contract`, không chỉ thêm `attemptId`; [reader cũ](/home/vantt/projects/forgentX/src/runner/dispatch/confinement/cleanup.mjs:198) chỉ nhận đúng `confinement-resource-ownership.v1`, nên marker contract mới bị bỏ qua. Đây là cách thực hiện yêu cầu đã có của r2, không cần sửa reader release cũ.
+
+Kết quả: **8 đóng; 4 đóng một phần; 0 chưa đóng hoàn toàn**. R3-9 và R3-12 còn phần medium; R3-1 và R3-2 còn phần must-fix.
+
+**Kết luận: các must-fix của Astra vòng 1 chưa đóng hết.** Không thêm phát hiện R5; các khoảng hở nêu trên thuộc chính phát hiện vòng 1.
