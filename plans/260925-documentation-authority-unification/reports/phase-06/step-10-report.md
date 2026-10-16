@@ -1,3 +1,25 @@
+# Backlog accounting closed; package ready for independent review
+
+Assignment `unit-run-1792176628519-ac852ba4/producer/1`; docs content/SYNC `38672e7f157788cbe1b2bf59511bd61046dce660`; package pin is the runner commit containing this report. Docs remain byte-identical to the content pin. Under A31/L10-14, the generated-backlog shard now has ordinary pending, content-bound rows for heading `claim_f0b2a407…`, active table `claim_127225b8…` and predecessor gap `claim_9b3b7fac…`; the deferred native placeholder is removed. No position-based identity, approval carry, renderer permission or truth approval.
+
+The package reused the preceding sole native sync: **802.964s**, one 62,195,972-byte persistence, known IDs 99,584→99,585, zero loss, 4,486 files/91,388 active tuples equal; registry SHA256 **`b20238af95f89cd3a83fbc20dd53ce8df1192153415cd85b9586d53884aa9c2b`**. No second carry-forward or persistence ran. Read-only inventory confirmed the persisted registry still binds to the unchanged docs pin.
+
+Global D is **0 fatal** for both priors together and each alone (94.040s/94.759s/94.018s). Strict E over all 1,045 sources has 22,759 active claims/2,235 gaps: 2 pending, 28 partial, 362 identical-owner groups, 2,336 reverse candidate units, 0 unknown and 0 undisposed reading-map gaps. The regenerated exact comparator is **exit 0 / `ok=true` / zero differences**. Its `strictGreen=false` field reflects the declared open categories, not unexplained drift or a waiver.
+
+Promotion is **160/160**; H is 609 files/217 checked/0 findings; T9 is **17/17**; mutation is **12/12**. Independent audit and rationale consistency each scan 12,905 rows/93 shards with 0 findings and retain 66 historical witness limits. Ownership has 0 new active pairs/0 native duplicates/0 target drift; replay 366+98+4 and A/B/H/current routes are clean. Alias validation covers 9,236 entries. Snapshot is 68,463 rows, verified/unsealed, SHA256 `96ab39486f6e67f96e93a5e6251828e9c5861595a2100a58fb15459b4c844820`. Relevant tests initially exposed one transient seeded fixture (506/507), passed 25/25 in isolation, then passed **507/507** in the full relevant rerun; no full npm-suite claim.
+
+The third checkpoint refresh contains **123 complete shards / 2,558,697,813 bytes / 19 fields**; every part hash, aggregate hash and all 91,388 native tuples verify. Aggregate SHA256 **`4d00146ebab1b783c01425088be06b8fa75d81d18a9c55178082983b49891775`**. Current unselected population SHA256 **`eba7f5fa4ff78dc9078d44642b874b7000171d7f8fe8f6361cb5eed937a4d71d`** covers 22,757 reviewed +2 pending active bindings and 2,235 gaps.
+
+Because the two new backlog decisions change strict-E pending coverage, the prior rehearsal did not suffice. A genuine whole-corpus + Step 2 rerun completed in **968.706s**; clone removed=true, docs diff empty, cutover exit1, counts 7 pass/12 blocked/1 review. No blocker was simulated away.
+
+ONE [small ordinary request](review-request-step10-close-index.md) contains **25 entries in one JSON file**: 3 pending decisions, 1 full re-carry accounting row, 6 list/receipt refreshes and all 15 native changes. Per-row helper validation passed 25/25; reviewers need no native/global D/E. The [checkpoint request](review-request-step10-checkpoint.md) binds the current strict comparator result and population hash. The producer authored no sensitivity pack, key or checkpoint verdict.
+
+[Scorecard](step10-global-scorecard-draft.md), [L10-1..40+A43 summary](step10-global-decisions-summary.json), [effort](step10-global-effort.md), [final audit](step10-package-final-audit.json). Owner token total remains unreported. A34/current-truth, 20 wording/citation/successor notes, 32 Phase 7/8 groups, 14 runner-cutover bindings and consumer/cutover queues remain explicit.
+
+**NEXT:** independent ordinary review of the 25-entry request and independent checkpoint; for the checkpoint commit sensitivity pack first, report second, seed key last. Then apply matching verdicts and refresh population, complete A28 truth sampling and final red-team, and only afterward use a separate close turn to set **awaiting owner review**. Phase 6 remains open now. No docs, protected tools, vocabulary, extractor, comparator, baseline, fgOS CLI or Git writes.
+
+---
+
 # Ordinary package verdicts applied; comparator inputs refreshed — package next
 
 Assignment `unit-run-1792173247556-515f6e95/producer/1`; ordinary request pin `ea5ec7406a816239617c55756fe08169ed828850`; five independent reports committed at `9aad548ebf87bf8d364e2f8055e2d9a252114041`; SYNC `bc7358789`. The only main docs delta from the package content pin is the two-row `docs/backlog.md` addition. Runner owns the commit. This was the bounded AUTHOR turn: no native sync, global D/E, comparator execution, checkpoint refresh, rehearsal or review-request construction.

@@ -1,7 +1,7 @@
 {
-  "pin": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
-  "clone": "/tmp/fgos-work/step10-rehearsal-9YQMNl",
-  "startedAt": "2026-10-16T17:24:19.409Z",
+  "pin": "38672e7f157788cbe1b2bf59511bd61046dce660",
+  "clone": "/tmp/fgos-work/step10-rehearsal-enYvrG",
+  "startedAt": "2026-10-16T19:16:49.548Z",
   "overlay": "Current plan-only authored decisions and exact native registry; docs bytes stay at committed SYNC.",
   "commands": [
     {
@@ -27,7 +27,7 @@
       "command": [
         "git",
         "archive",
-        "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+        "38672e7f157788cbe1b2bf59511bd61046dce660",
         "docs",
         "scripts",
         "plans/260925-documentation-authority-unification/ledger/decisions",
@@ -40,11 +40,11 @@
         "git",
         "diff",
         "--name-only",
-        "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+        "38672e7f157788cbe1b2bf59511bd61046dce660",
         "--",
         "docs"
       ],
-      "cwd": "/tmp/fgos-work/step10-rehearsal-9YQMNl"
+      "cwd": "/tmp/fgos-work/step10-rehearsal-enYvrG"
     }
   ],
   "cloneMethod": "Read-only git archive plus isolated metadata/index copy and object-store alternate; no git clone/checkout/init/add/commit or other Git mutation verb.",
@@ -59,7 +59,7 @@
   "regenerated": {
     "files": 4486,
     "units": 91388,
-    "commit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be"
+    "commit": "38672e7f157788cbe1b2bf59511bd61046dce660"
   },
   "globalStrict": {
     "clean": false,
@@ -67,6 +67,10 @@
       {
         "type": "claims-partial-carry",
         "message": "28 claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover) (e.g. docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes, docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms, docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol, docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker, docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts)"
+      },
+      {
+        "type": "claims-not-reviewed",
+        "message": "2 claim rows whose reviewStatus is not reviewed (e.g. docs/backlog.md#product-backlog, docs/backlog.md#unheaded-block-2)"
       },
       {
         "type": "identical-units-multiple-owners",
@@ -88,6 +92,15 @@
           "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
           "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
           "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+        ]
+      },
+      {
+        "type": "claims-not-reviewed",
+        "message": "claim rows whose reviewStatus is not reviewed",
+        "count": 2,
+        "examples": [
+          "docs/backlog.md#product-backlog",
+          "docs/backlog.md#unheaded-block-2"
         ]
       },
       {
@@ -12840,7 +12853,7 @@
         {
           "claimId": "claim_2bebe6c55e6d3140c1fa481d8a9dee77",
           "path": "docs/platform/runner/architecture/h-7af1f0242611.md",
-          "anchor": "added-in-candidate-runner-t\u1eeb-v\u1ef1ng-dispatch-hi\u1ec7n-h\u00e0nh",
+          "anchor": "added-in-candidate-runner-từ-vựng-dispatch-hiện-hành",
           "unitDigest": "ccc8696ed438ee4a84d995cf26b810c12311b606f9fdaf4928b18ac5efe48247"
         },
         {
@@ -12900,7 +12913,7 @@
         {
           "claimId": "claim_c868bc8d5e9e5a6f4859364834528dd6",
           "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
-          "anchor": "added-in-candidate-runner-l\u1ecbch-s\u1eed-quy\u1ebft-\u0111\u1ecbnh-retired-t\u1eeb-docsdecisions-tsk-1lv-4",
+          "anchor": "added-in-candidate-runner-lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4",
           "unitDigest": "fcb4bf6684cf1413e7033d94ba44c4d65cdc51b712bd9346a80505d7688d2812"
         },
         {
@@ -12924,7 +12937,7 @@
         {
           "claimId": "claim_8cd28ca6800c45c489bed67870072181",
           "path": "docs/platform/runner/decisions/h-aabefc85f0c9.md",
-          "anchor": "added-in-candidate-runner-coordinationsession-l\u1ecbch-s\u1eed-\u0111\u00e3-thu-h\u1ed3i-per-p4-thay-b\u1eb1ng-collaborationpattern-workflow-runner",
+          "anchor": "added-in-candidate-runner-coordinationsession-lịch-sử-đã-thu-hồi-per-p4-thay-bằng-collaborationpattern-workflow-runner",
           "unitDigest": "f74b367ba72da0fae4ac7a34c339c75b4607fab83af330e735270c0963684444"
         },
         {
@@ -22221,7 +22234,7 @@
         "docs/platform/work-state/README.md",
         "docs/platform/work-state/spec.md"
       ],
-      "registryIdentityGapCount": 5912,
+      "registryIdentityGapCount": 5913,
       "retiredWithoutDispositionCount": 0,
       "retiredWithoutDispositionRows": [],
       "duplicateContentGroupCount": 822,
@@ -30054,7 +30067,7 @@
           "rationale": "Same normalized area/title; requires semantic duplicate/conflict review before promotion."
         },
         {
-          "key": "runner-dispatch-merge-lifecycle:spec-runner-v\u00f2ng-t\u1ef1-h\u00e0nh",
+          "key": "runner-dispatch-merge-lifecycle:spec-runner-vòng-tự-hành",
           "paths": [
             "docs/platform/runner/spec.md",
             "docs/specs/runner.md"
@@ -41984,7 +41997,7 @@
         "docs/platform/work-state/README.md",
         "docs/platform/work-state/spec.md"
       ],
-      "registryIdentityGapCount": 5912,
+      "registryIdentityGapCount": 5913,
       "retiredWithoutDispositionCount": 0,
       "retiredWithoutDispositionRows": [],
       "duplicateContentGroupCount": 822,
@@ -49817,7 +49830,7 @@
           "rationale": "Same normalized area/title; requires semantic duplicate/conflict review before promotion."
         },
         {
-          "key": "runner-dispatch-merge-lifecycle:spec-runner-v\u00f2ng-t\u1ef1-h\u00e0nh",
+          "key": "runner-dispatch-merge-lifecycle:spec-runner-vòng-tự-hành",
           "paths": [
             "docs/platform/runner/spec.md",
             "docs/specs/runner.md"
@@ -49974,8 +49987,8 @@
   "retirement": {
     "method": "Unchanged evaluateRetirement/summarizeResults/exitCodeFor exports underlying check-doc-retirement.mjs --cutover; native in-memory applied inventory avoids JSON transport limit. No review waived or promotion simulated.",
     "counts": {
-      "pass": 8,
-      "blocked": 11,
+      "pass": 7,
+      "blocked": 12,
       "review": 1
     },
     "results": [
@@ -50016,8 +50029,8 @@
         "id": "claims-reviewed",
         "rule": "Every claim row of the document has reviewStatus reviewed.",
         "enforcedBy": "script",
-        "status": "pass",
-        "measure": "none: claim rows whose reviewStatus is not reviewed"
+        "status": "blocked",
+        "measure": "2 claim rows whose reviewStatus is not reviewed"
       },
       {
         "gate": "promotionGate",
@@ -50025,7 +50038,7 @@
         "rule": "The intent ledger is updated when the document narrows a vision, and the component-boundary check is recorded.",
         "enforcedBy": "review",
         "status": "review",
-        "measure": "human review owed (docs/doc-governance.md \u00a78, \u00a711); record it with --review-record"
+        "measure": "human review owed (docs/doc-governance.md §8, §11); record it with --review-record"
       },
       {
         "gate": "retirementGate",
@@ -50041,7 +50054,7 @@
         "rule": "No claim row of the file is unknown-blocking or unreviewed.",
         "enforcedBy": "script",
         "status": "blocked",
-        "measure": "28 claim rows that are unknown-blocking, partial-carry or unreviewed (overlapping counts)"
+        "measure": "30 claim rows that are unknown-blocking, partial-carry or unreviewed (overlapping counts)"
       },
       {
         "gate": "retirementGate",
@@ -50113,7 +50126,7 @@
         "rule": "The ledger validator runs in a cutover mode: every retained claim has an owner, an anchor, a classified kind and review status reviewed, and vocabulary usage drift is fatal.",
         "enforcedBy": "script",
         "status": "blocked",
-        "measure": "68089 ledger cutover violations ({\"partial-carry\":13,\"unknown-blocking\":22616,\"not-reviewed\":22840,\"without-own-rationale\":22616}) plus 4 vocabulary usage drift(s)"
+        "measure": "68091 ledger cutover violations ({\"partial-carry\":13,\"not-reviewed\":22842,\"unknown-blocking\":22616,\"without-own-rationale\":22616}) plus 4 vocabulary usage drift(s)"
       },
       {
         "gate": "retirementGate",
@@ -50143,8 +50156,6 @@
     "cutoverExitCode": 1
   },
   "docsDiff": "",
-  "finishedAt": "2026-10-16T17:41:24.498Z",
-  "cloneRemoved": true,
-  "globalOpenPopulationMatchesPackageE": true,
-  "firstAttemptReceipt": "step10-package-rehearsal-attempt1.json"
+  "finishedAt": "2026-10-16T19:32:58.254Z",
+  "cloneRemoved": true
 }

@@ -1,5 +1,6 @@
 {
   "holds": [
+    "claim_127225b8542c701295574b1b00749594",
     "claim_f0b2a4079764d68b1102ddddb08776ce"
   ],
   "identicalUnits": [
@@ -62025,6 +62026,15 @@
       },
       {
         "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-generated-backlog.json",
+        "collection": "claims",
+        "claimId": "claim_127225b8542c701295574b1b00749594",
+        "sourcePath": "docs/backlog.md",
+        "sourceAnchor": "unheaded-block-2",
+        "sourceUnitDigest": "7d5317616b4b105936b065a213de9cce47e44c3e623d6dd293ffd0d5dc4c84ec",
+        "disposition": "regenerate-from-source"
+      },
+      {
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-generated-backlog.json",
         "collection": "registryGaps",
         "claimId": "claim_9b3b7fac64df06547dd06e05f4f026c5",
         "sourcePath": "docs/backlog.md",
@@ -62033,7 +62043,7 @@
         "disposition": "regenerate-from-source"
       }
     ],
-    "meaning": "The frozen comparator field holds is the union of real holds (0) and explicit current active rows awaiting independent review. Gap decisions awaiting review are listed separately; native claims-not-reviewed does not count gaps. This compatibility input changes no checker or review status.",
+    "meaning": "The frozen comparator field holds is the union of real holds (0) and explicit current active rows awaiting independent review. Gap decisions awaiting review are listed separately; native claims-not-reviewed does not count gaps. This compatibility input changes no checker or review status. A43 Rings are pending ordinary review, never holds.",
     "candidateSources": [
       {
         "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-agent-coordination.json",

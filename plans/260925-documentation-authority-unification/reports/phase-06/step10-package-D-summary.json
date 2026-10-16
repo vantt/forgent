@@ -4,7 +4,7 @@
   "runs": [
     {
       "label": "both",
-      "seconds": 233.493,
+      "seconds": 94.04,
       "fatalFindings": [],
       "conservationOpen": [
         {
@@ -56,7 +56,7 @@
     },
     {
       "label": "identity",
-      "seconds": 348.062,
+      "seconds": 94.759,
       "fatalFindings": [],
       "conservationOpen": [
         {
@@ -108,7 +108,7 @@
     },
     {
       "label": "phase02",
-      "seconds": 289.8,
+      "seconds": 94.018,
       "fatalFindings": [],
       "conservationOpen": [
         {

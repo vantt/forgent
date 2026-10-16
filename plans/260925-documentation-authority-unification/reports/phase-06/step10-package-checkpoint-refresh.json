@@ -1,643 +1,213 @@
 {
-  "commit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
-  "checkpoint": 3,
-  "inventoryFiles": 4486,
-  "inventoryUnits": 91388,
-  "manifest": {
-    "$schema": "https://forgent.dev/schemas/sharded-json-artifact.v1.json",
-    "schemaVersion": 1,
-    "artifactKind": "phase-02-doc-inventory",
-    "encoding": "utf8",
-    "reassembly": "ordered-concat-then-json-parse",
-    "canonicalJson": "pretty-2-space-with-final-newline",
-    "totalBytes": 2537573604,
-    "sha256": "2d58e5c6686119715e03c8504520fd34d92f9965145f5c42098051054f912193",
-    "partCount": 122,
-    "maxPartBytes": 20971520,
-    "parts": [
-      {
-        "path": "doc-inventory.parts/part-0001.jsonl",
-        "bytes": 20971488,
-        "sha256": "57e7f924dd350113f4ddbcbad2e4b6b0de18e447331dd463ade863f23a54a793"
-      },
-      {
-        "path": "doc-inventory.parts/part-0002.jsonl",
-        "bytes": 20971458,
-        "sha256": "13e27257b575e972b738698a9f9a24072dda19dea43e56f2b0e86ef4b5f8b389"
-      },
-      {
-        "path": "doc-inventory.parts/part-0003.jsonl",
-        "bytes": 20971469,
-        "sha256": "e0d279b971a25d02942d4d9d5046e40bd88ff548127f12fa4d5d802226f80220"
-      },
-      {
-        "path": "doc-inventory.parts/part-0004.jsonl",
-        "bytes": 20971459,
-        "sha256": "6eb68df2895df4235813ceea743a36b80dd0de07fd7cff26d80674cbdaf5524e"
-      },
-      {
-        "path": "doc-inventory.parts/part-0005.jsonl",
-        "bytes": 20971466,
-        "sha256": "a54d89180f86bef750139dc19f6ac92f88b02f15da08aba53a0d600eecdba41f"
-      },
-      {
-        "path": "doc-inventory.parts/part-0006.jsonl",
-        "bytes": 20971489,
-        "sha256": "51de92d39b4a29d9456aba67d1a49fd90ed9a63ebc6b0ce23373876a75dbbb77"
-      },
-      {
-        "path": "doc-inventory.parts/part-0007.jsonl",
-        "bytes": 20971501,
-        "sha256": "2567c67937e5a63d6f0bbc922e0177301c7d2750fb827df45156700a518efc93"
-      },
-      {
-        "path": "doc-inventory.parts/part-0008.jsonl",
-        "bytes": 20971508,
-        "sha256": "06d7eeba1d20d146cb23e2f035c52fdbac7438ab1c9d5d91e4737735ce5dc3fc"
-      },
-      {
-        "path": "doc-inventory.parts/part-0009.jsonl",
-        "bytes": 20971431,
-        "sha256": "5f61639b31068099c2201ce1be1a0ea0ecf5b0900aa0ce6cad7f4217b516bbee"
-      },
-      {
-        "path": "doc-inventory.parts/part-0010.jsonl",
-        "bytes": 20971516,
-        "sha256": "9d20442bd07978ac3b00b0336ee85ba1031854caf00d92374fa52dcd7eeb5dba"
-      },
-      {
-        "path": "doc-inventory.parts/part-0011.jsonl",
-        "bytes": 20971441,
-        "sha256": "9ab8d7a1205461ed9763b55427c157a4df96739fa063304e8e405d1aa1634f3b"
-      },
-      {
-        "path": "doc-inventory.parts/part-0012.jsonl",
-        "bytes": 20971383,
-        "sha256": "48e2ddc7afb0aeb94d9ec36f93f59ddb55e9efb012e96ffb5fd10f5dc3b91741"
-      },
-      {
-        "path": "doc-inventory.parts/part-0013.jsonl",
-        "bytes": 20971503,
-        "sha256": "c5371fa0ed501244145c900c45446e5bca21bf991eda115a612427e8019934bd"
-      },
-      {
-        "path": "doc-inventory.parts/part-0014.jsonl",
-        "bytes": 20971469,
-        "sha256": "748cad8ff16eac466476e2ebbe6916016bb95f4db39865f3b26c58a89a05d6c8"
-      },
-      {
-        "path": "doc-inventory.parts/part-0015.jsonl",
-        "bytes": 20971416,
-        "sha256": "297b1fff407f29d03b6de7bb531ec695edb5a3a1232ae4622ef7b1ec10f8872e"
-      },
-      {
-        "path": "doc-inventory.parts/part-0016.jsonl",
-        "bytes": 20971456,
-        "sha256": "4eea2a04efe12ac64a60b7a7c9dbff30938fc35f24a03a92c24c641d5284b25f"
-      },
-      {
-        "path": "doc-inventory.parts/part-0017.jsonl",
-        "bytes": 20971487,
-        "sha256": "76d4aebaab66db034f80cb61c74cebe53bb8af6935d4b0f238e9aa22434f5f53"
-      },
-      {
-        "path": "doc-inventory.parts/part-0018.jsonl",
-        "bytes": 20971496,
-        "sha256": "49116859c962b307923443f4ba76b9bce5e3828be0845b190d811b6bfd293a42"
-      },
-      {
-        "path": "doc-inventory.parts/part-0019.jsonl",
-        "bytes": 20971462,
-        "sha256": "8d9e992ee906b7b81e2d0e449c6b8dde1fec5763d4c65e173b734a740827ee38"
-      },
-      {
-        "path": "doc-inventory.parts/part-0020.jsonl",
-        "bytes": 20971505,
-        "sha256": "3f31fe2c8bac6ec3fba98139239c179236b5d011e6f8268720b72476e24a33df"
-      },
-      {
-        "path": "doc-inventory.parts/part-0021.jsonl",
-        "bytes": 20971478,
-        "sha256": "6f16b73a3ee06da77139865e184fac98505fca2af93090652274a19a65685be9"
-      },
-      {
-        "path": "doc-inventory.parts/part-0022.jsonl",
-        "bytes": 20971430,
-        "sha256": "77deaa85f440080bd3320572febea8712530eeae306f1d76b2034a86d5d3b4ad"
-      },
-      {
-        "path": "doc-inventory.parts/part-0023.jsonl",
-        "bytes": 20971470,
-        "sha256": "9c51afa5c318bb258bff286177a42b7b7d359cec05459df7f7fae23a72f69aa4"
-      },
-      {
-        "path": "doc-inventory.parts/part-0024.jsonl",
-        "bytes": 20971516,
-        "sha256": "a06071b80f71c479a1490598d4efec65c700b948c5bc379be68b7615f59fb899"
-      },
-      {
-        "path": "doc-inventory.parts/part-0025.jsonl",
-        "bytes": 20971502,
-        "sha256": "ece04826bc9b3a14050a345dbde82d2d5482a3db54f65e915841a58fe2adb46f"
-      },
-      {
-        "path": "doc-inventory.parts/part-0026.jsonl",
-        "bytes": 20971496,
-        "sha256": "71acaa537a84aa8510b87f41ac8589f3f0d3f4e667d121face47fef023cfbdd4"
-      },
-      {
-        "path": "doc-inventory.parts/part-0027.jsonl",
-        "bytes": 20971377,
-        "sha256": "7787e4e0481c780215dea7933a90762fec23cba80ec4456f14732dabf2342a73"
-      },
-      {
-        "path": "doc-inventory.parts/part-0028.jsonl",
-        "bytes": 20971434,
-        "sha256": "4979b2e4ab3a9d26b42c9c644a9b8bfca6869a22bffc887227e6fc2f9304ff89"
-      },
-      {
-        "path": "doc-inventory.parts/part-0029.jsonl",
-        "bytes": 20971518,
-        "sha256": "618a07cc66321ad4248a22c979dea5aa4ec7934c9bdf4e27e0a2b81a8ba58ee4"
-      },
-      {
-        "path": "doc-inventory.parts/part-0030.jsonl",
-        "bytes": 20971502,
-        "sha256": "a2aef5f205146f8966eb32af4a03cf2b3d3a3e2312d34f210bd98c62a448d259"
-      },
-      {
-        "path": "doc-inventory.parts/part-0031.jsonl",
-        "bytes": 20971410,
-        "sha256": "7012a90db758198bf17614cc4bea7dc564b82b0b1f5bf274b5b8b8cb43f47e81"
-      },
-      {
-        "path": "doc-inventory.parts/part-0032.jsonl",
-        "bytes": 20971483,
-        "sha256": "24385e65bd66bb0ef20542257105ef1a8b949be458d9f2e8ba5bcbdb8b56ee8e"
-      },
-      {
-        "path": "doc-inventory.parts/part-0033.jsonl",
-        "bytes": 20971381,
-        "sha256": "747dca1fc78b09fa54945761cf4789ae2fbc22d347e198d7e836d4a3c7c84439"
-      },
-      {
-        "path": "doc-inventory.parts/part-0034.jsonl",
-        "bytes": 20971516,
-        "sha256": "93454668598bef21011ab2e1380cb45794cbf2b22d69add4856e8b87d6d2b3b7"
-      },
-      {
-        "path": "doc-inventory.parts/part-0035.jsonl",
-        "bytes": 20971492,
-        "sha256": "90a86080b775c93b4f76173126b6dab589d5e2fa69818567e6541765cb864e6f"
-      },
-      {
-        "path": "doc-inventory.parts/part-0036.jsonl",
-        "bytes": 20971367,
-        "sha256": "9295bdc46dc1ea8915678c70d7b3759953d3a4a0306de3cd8d6bbd514b3ac4ac"
-      },
-      {
-        "path": "doc-inventory.parts/part-0037.jsonl",
-        "bytes": 20971513,
-        "sha256": "598b9efbe0d5bc58d9ffdb8096516c42a6dfac3f106a61e4560c64d491bba1d9"
-      },
-      {
-        "path": "doc-inventory.parts/part-0038.jsonl",
-        "bytes": 20971494,
-        "sha256": "370dc29603383656ddae0dc5b03b7a0949ed088d5806d62882c2940230996e76"
-      },
-      {
-        "path": "doc-inventory.parts/part-0039.jsonl",
-        "bytes": 20971384,
-        "sha256": "ff3f4431d8dd0ae70540f1f15728eea7cd0e6221a04a9f32cba53fc5df910e5c"
-      },
-      {
-        "path": "doc-inventory.parts/part-0040.jsonl",
-        "bytes": 20971493,
-        "sha256": "a94cccf61a1298d90c4491d24ffb85e5545eaaa87639fe5250a71bf12d256759"
-      },
-      {
-        "path": "doc-inventory.parts/part-0041.jsonl",
-        "bytes": 20971485,
-        "sha256": "4da7b3dbcddfb4dc5f64f4e165c72a765d5be6a3e02d16c6617695bda6db058c"
-      },
-      {
-        "path": "doc-inventory.parts/part-0042.jsonl",
-        "bytes": 20971497,
-        "sha256": "deabfd0e9a1f97be532f3139e72aa0dd784719f12340514b9a13a9271395c92e"
-      },
-      {
-        "path": "doc-inventory.parts/part-0043.jsonl",
-        "bytes": 20971368,
-        "sha256": "09f4c15685b34bebdaf73c846688cbd7b457e579fee4f4374508beba581669ce"
-      },
-      {
-        "path": "doc-inventory.parts/part-0044.jsonl",
-        "bytes": 20971491,
-        "sha256": "cfa87db20208f1dcb7962294693e2a509a46fd578367c6cbc0b898a1aec63f05"
-      },
-      {
-        "path": "doc-inventory.parts/part-0045.jsonl",
-        "bytes": 20971427,
-        "sha256": "f470d894dd4fd91afb2ee9359cc04219e017e0c243fc8f3f16dc1c6e769ac0ad"
-      },
-      {
-        "path": "doc-inventory.parts/part-0046.jsonl",
-        "bytes": 20971481,
-        "sha256": "c5e630c12e84ac4403b03687c6caa8e1aa7d3ba6d3bcd8f1faf4d8ac9b24e7a1"
-      },
-      {
-        "path": "doc-inventory.parts/part-0047.jsonl",
-        "bytes": 20971433,
-        "sha256": "2c1b1b5bcaf7d99632651bc6c8330e90717258805a3446f92b662599bc968d69"
-      },
-      {
-        "path": "doc-inventory.parts/part-0048.jsonl",
-        "bytes": 20971518,
-        "sha256": "32cce2db9e15a27b67c06fc08bb0577eb4ac124a104676239f62529413905249"
-      },
-      {
-        "path": "doc-inventory.parts/part-0049.jsonl",
-        "bytes": 20971489,
-        "sha256": "6bfee33761a8c59070974b08c84a4e2373bbf856950cdad4e2544139e9507fa7"
-      },
-      {
-        "path": "doc-inventory.parts/part-0050.jsonl",
-        "bytes": 20971416,
-        "sha256": "a6b809c91bf1d0625126df08965f0ac6e21a51fed89ec4f5d47dd6e93cd9d94d"
-      },
-      {
-        "path": "doc-inventory.parts/part-0051.jsonl",
-        "bytes": 20971442,
-        "sha256": "a765bf81aa54e3a52bc8a2678f4b0596a6f9190644aff88fdc59c4d747069d1d"
-      },
-      {
-        "path": "doc-inventory.parts/part-0052.jsonl",
-        "bytes": 20971509,
-        "sha256": "38249b6246f56b39636eee8995d491d421772082182ea6a69093fa56a9f5ddfe"
-      },
-      {
-        "path": "doc-inventory.parts/part-0053.jsonl",
-        "bytes": 20971408,
-        "sha256": "41513542be6b7fff3f14aa0751fc0086c251a2a01640c650fc251716759bec66"
-      },
-      {
-        "path": "doc-inventory.parts/part-0054.jsonl",
-        "bytes": 20971514,
-        "sha256": "a42e0b450c626c034e76a26691a0f50c657bcee03f6727b3e19be219054d3cc2"
-      },
-      {
-        "path": "doc-inventory.parts/part-0055.jsonl",
-        "bytes": 20971409,
-        "sha256": "ca110f16ed2c065e72b6c0e032d381622190a8edd9d9a1ce943c2132d89cbfcb"
-      },
-      {
-        "path": "doc-inventory.parts/part-0056.jsonl",
-        "bytes": 20971484,
-        "sha256": "292f2e24838757b83e7d453838e4c75241bbfd74dc47cce5a3a568ac998f0a87"
-      },
-      {
-        "path": "doc-inventory.parts/part-0057.jsonl",
-        "bytes": 20971441,
-        "sha256": "77e7a00c4875e5447bae458fb7707f21d464535156ed96f76652c4eacb2d056c"
-      },
-      {
-        "path": "doc-inventory.parts/part-0058.jsonl",
-        "bytes": 20971506,
-        "sha256": "d2161ba85cf84f9b203b66a7d4d00bed35515e4aaf4da838610c367cd35d6d6e"
-      },
-      {
-        "path": "doc-inventory.parts/part-0059.jsonl",
-        "bytes": 20971466,
-        "sha256": "0e988bcf6ed7906fcb9870ec76f1d1a8de09c95dc7afacfb7d5a3accfca45d44"
-      },
-      {
-        "path": "doc-inventory.parts/part-0060.jsonl",
-        "bytes": 20971378,
-        "sha256": "2d48926b8250d1506ddcc8a003f15e00e88f9d66c3629b7166a76c2c201ebbcf"
-      },
-      {
-        "path": "doc-inventory.parts/part-0061.jsonl",
-        "bytes": 20971432,
-        "sha256": "7e201da5abe8b4f395653274cc04073abab16ad410d4beec1167e8e3691b9f92"
-      },
-      {
-        "path": "doc-inventory.parts/part-0062.jsonl",
-        "bytes": 20971407,
-        "sha256": "4eca49a063c59988ca6bd42ecb4b3d1b46e39b81d539ea09f4ce2ee1c84c5190"
-      },
-      {
-        "path": "doc-inventory.parts/part-0063.jsonl",
-        "bytes": 20971427,
-        "sha256": "4103e172ac900b033d94a2b9f28f25340042ce1cfb7b069bd5ab010467e43b8e"
-      },
-      {
-        "path": "doc-inventory.parts/part-0064.jsonl",
-        "bytes": 20971430,
-        "sha256": "ee461e0c6f6dd63058f82f886b9ed1a79c4e87fc0c68eb91b0b45e7be174683b"
-      },
-      {
-        "path": "doc-inventory.parts/part-0065.jsonl",
-        "bytes": 20971482,
-        "sha256": "d0fec739d3857ed11c55b74a43b0a551fe770876a6e0a7f0a9b18138ea19f7bb"
-      },
-      {
-        "path": "doc-inventory.parts/part-0066.jsonl",
-        "bytes": 20971373,
-        "sha256": "a1596705135b30e929f463b79f665161f0d7238bdac242f4220105395fe397df"
-      },
-      {
-        "path": "doc-inventory.parts/part-0067.jsonl",
-        "bytes": 20971469,
-        "sha256": "c79a2d33fdbafbb29ced5c66865f273d5e9efae08e5844e94da4101a93612c71"
-      },
-      {
-        "path": "doc-inventory.parts/part-0068.jsonl",
-        "bytes": 20971442,
-        "sha256": "afa72e24d76966f1bd1ddfeb9d36069cc72e4aa45a8e486426146877070e5969"
-      },
-      {
-        "path": "doc-inventory.parts/part-0069.jsonl",
-        "bytes": 20971412,
-        "sha256": "17f8ce8e20fdd591005df014d5628a834cb171dee0afd382cb399dc33ab3ea83"
-      },
-      {
-        "path": "doc-inventory.parts/part-0070.jsonl",
-        "bytes": 20971516,
-        "sha256": "b1dda97eabf19eaa4fe5096ee57501b5f07fa2bfa7c547701e4fe2ec1d4a38b7"
-      },
-      {
-        "path": "doc-inventory.parts/part-0071.jsonl",
-        "bytes": 20971517,
-        "sha256": "b8feb911c0d0e2001189d5ac34710e6eb7cf8c805fea4394379df49263b204ae"
-      },
-      {
-        "path": "doc-inventory.parts/part-0072.jsonl",
-        "bytes": 20971497,
-        "sha256": "a47a0a9304f204b330298c22670cb7dab364e9cfcb5572a2e4514ffaa2233328"
-      },
-      {
-        "path": "doc-inventory.parts/part-0073.jsonl",
-        "bytes": 20971490,
-        "sha256": "7c3d2113e2e4eb3cc55cfad0476e5958d2a7cdde91752b44393312ed63e27142"
-      },
-      {
-        "path": "doc-inventory.parts/part-0074.jsonl",
-        "bytes": 20971451,
-        "sha256": "8c4c87299e82e7761faa977bd8ce0d4dd5d3daf741a73cdafcd78bc88d4e0432"
-      },
-      {
-        "path": "doc-inventory.parts/part-0075.jsonl",
-        "bytes": 20971457,
-        "sha256": "084636db7a050ab9a4fcbe511b3956bf03810d3311429e7dcc431f0c8caa4ec8"
-      },
-      {
-        "path": "doc-inventory.parts/part-0076.jsonl",
-        "bytes": 20971412,
-        "sha256": "fba128aabb59df1b17abc535ac02fb53845afc3f2ef2c169d0b68b796cb30bfc"
-      },
-      {
-        "path": "doc-inventory.parts/part-0077.jsonl",
-        "bytes": 20971490,
-        "sha256": "3a00635cbde157f7c938ab6357f6675ede9c37323d1e7f2ce115571543d047a8"
-      },
-      {
-        "path": "doc-inventory.parts/part-0078.jsonl",
-        "bytes": 20971489,
-        "sha256": "41785bd2399627e3356523c687ef69bca5b65cd67fe9b7b8c8885d37bc5f172f"
-      },
-      {
-        "path": "doc-inventory.parts/part-0079.jsonl",
-        "bytes": 20971507,
-        "sha256": "0d8cd741b77c4f03d2f36e491cacbff9f92bc9c5d1af28a251945e9407565010"
-      },
-      {
-        "path": "doc-inventory.parts/part-0080.jsonl",
-        "bytes": 20971494,
-        "sha256": "10c030e9f479dcc79ea3da363cc6707804fdf7786258a333421cef75d1ffaa34"
-      },
-      {
-        "path": "doc-inventory.parts/part-0081.jsonl",
-        "bytes": 20971441,
-        "sha256": "b8e7d2ce492fbbd3eaf5c5480445ed70c1b662e18de4e5984b0eba639ae1ce73"
-      },
-      {
-        "path": "doc-inventory.parts/part-0082.jsonl",
-        "bytes": 20971478,
-        "sha256": "94493e58b0719928b0a8e4cb74f945298d2441a4dc44bb1c5a7d91a9a4fe4e26"
-      },
-      {
-        "path": "doc-inventory.parts/part-0083.jsonl",
-        "bytes": 20971504,
-        "sha256": "9b54d09cf7060512ed04d9d1b289aebe4cf79d7e008460dd4cef388d73a990f9"
-      },
-      {
-        "path": "doc-inventory.parts/part-0084.jsonl",
-        "bytes": 20971450,
-        "sha256": "6fae6bdb265d30f661dce293f13069c2b7b757341e31bac9760ea93e4a50237b"
-      },
-      {
-        "path": "doc-inventory.parts/part-0085.jsonl",
-        "bytes": 20971511,
-        "sha256": "ff8584d160b52a149b2255d45aedd88d36e21151008bf1202457fec7c1c4c00c"
-      },
-      {
-        "path": "doc-inventory.parts/part-0086.jsonl",
-        "bytes": 20971501,
-        "sha256": "c13c39160bb4872b37681ccaa90364d4cbc26ccb06f5ec5abe4971fb2c3ddeee"
-      },
-      {
-        "path": "doc-inventory.parts/part-0087.jsonl",
-        "bytes": 20971427,
-        "sha256": "8f8758bc92ab7e30cb43064dc250c05fcadaeb6e860895974f62a6bc877b5c76"
-      },
-      {
-        "path": "doc-inventory.parts/part-0088.jsonl",
-        "bytes": 20971481,
-        "sha256": "e92a803424448cb7d700ea23a2d10b6dd1952dc0afbd50135aaaab9f83aa9f41"
-      },
-      {
-        "path": "doc-inventory.parts/part-0089.jsonl",
-        "bytes": 20971454,
-        "sha256": "ed909d1d8bb2187bafa12e80d538740570e03757aac72c2ab3c50dfee13df697"
-      },
-      {
-        "path": "doc-inventory.parts/part-0090.jsonl",
-        "bytes": 20971513,
-        "sha256": "f9d4ab8c8a62322e1be2b9d1370b0213a604ca4d447dbb5b7c24a5dd303df893"
-      },
-      {
-        "path": "doc-inventory.parts/part-0091.jsonl",
-        "bytes": 20971501,
-        "sha256": "4c84b7b3e9af8866f953cd2cd6a1929a0b5cc0a53b021028cdc3bb0a5c159546"
-      },
-      {
-        "path": "doc-inventory.parts/part-0092.jsonl",
-        "bytes": 20971510,
-        "sha256": "0408c9d247ad04f1b1973cab20157ad3fed79e23d4b34ac25f6034c1647a4abc"
-      },
-      {
-        "path": "doc-inventory.parts/part-0093.jsonl",
-        "bytes": 20971509,
-        "sha256": "a13b5cb8782fdc719b6913ce672c9a1c21698f36c19cfa630f25896cadac6b81"
-      },
-      {
-        "path": "doc-inventory.parts/part-0094.jsonl",
-        "bytes": 20971519,
-        "sha256": "e8d3c622df93bbfd18dd3cbbbb3ef97ce6c0fb4b00b42eee989883aec1a0bb4b"
-      },
-      {
-        "path": "doc-inventory.parts/part-0095.jsonl",
-        "bytes": 20971468,
-        "sha256": "b0fc694f6d91bcfe6e4c87d5a1467c27eceb4b50ff369af599ef6c544556221e"
-      },
-      {
-        "path": "doc-inventory.parts/part-0096.jsonl",
-        "bytes": 20971484,
-        "sha256": "f3406bc2a013057bf3fc2bdeed43a3eab8adeaa1543ed711e650282ca056c745"
-      },
-      {
-        "path": "doc-inventory.parts/part-0097.jsonl",
-        "bytes": 20971516,
-        "sha256": "6ac54144daabd7b35a8c507f2abe256137e8476e94c29b883bdfa154d9dcd74a"
-      },
-      {
-        "path": "doc-inventory.parts/part-0098.jsonl",
-        "bytes": 20971442,
-        "sha256": "8b3ac1c03316a6b911de32bcb9fe451df2c572d14e9ad42edf2e1e5874316950"
-      },
-      {
-        "path": "doc-inventory.parts/part-0099.jsonl",
-        "bytes": 20971409,
-        "sha256": "8d9f473e16c88997a1b6c22e35c323da2fb3ceff09a806e5bad7b259c6d42970"
-      },
-      {
-        "path": "doc-inventory.parts/part-0100.jsonl",
-        "bytes": 20971518,
-        "sha256": "883799e8ee012f5bf35fc391a4b86e0a58c0d0460384113a86df18a4a4f62602"
-      },
-      {
-        "path": "doc-inventory.parts/part-0101.jsonl",
-        "bytes": 20971516,
-        "sha256": "59d0875ca052c1b66c026ffa5fb42ea96794c645e161cbc4d32a2927f6c3f309"
-      },
-      {
-        "path": "doc-inventory.parts/part-0102.jsonl",
-        "bytes": 20971504,
-        "sha256": "62b23205830e72ca290bb8ad941b9bef8e7aa4b62fb92942ad2cddbb27a57621"
-      },
-      {
-        "path": "doc-inventory.parts/part-0103.jsonl",
-        "bytes": 20971503,
-        "sha256": "bcd0cdc3d292c80b9637d6df50c60bd284fe620ff99de98c9030da67bac10bb8"
-      },
-      {
-        "path": "doc-inventory.parts/part-0104.jsonl",
-        "bytes": 20971492,
-        "sha256": "f156002752ef37d8bf6bbe4b00ad6058f147e48cb4e3fa7c62cff7590cf9c225"
-      },
-      {
-        "path": "doc-inventory.parts/part-0105.jsonl",
-        "bytes": 20971498,
-        "sha256": "f086d3ae96be84085ab3fb9fbd9678e3b28de8dff554bb686468581e1b6629fb"
-      },
-      {
-        "path": "doc-inventory.parts/part-0106.jsonl",
-        "bytes": 20971513,
-        "sha256": "77562beaef3a92f4ca2d073a02710a81a9a2c750db03d0ed9b4e58503915bcde"
-      },
-      {
-        "path": "doc-inventory.parts/part-0107.jsonl",
-        "bytes": 20971509,
-        "sha256": "ab552f175ff5d82f9787586dfc8667ecada618800591dbf62d5ea6be9a425d83"
-      },
-      {
-        "path": "doc-inventory.parts/part-0108.jsonl",
-        "bytes": 20971486,
-        "sha256": "07beda9b124fb3374ac855b04ab9de62ea1bc7b7d70c68715f0e38fb048857ac"
-      },
-      {
-        "path": "doc-inventory.parts/part-0109.jsonl",
-        "bytes": 20971476,
-        "sha256": "8493557cba867e715a0a28b815f7e83c84a1b9b17ceedc15b5bfb5117c8ff189"
-      },
-      {
-        "path": "doc-inventory.parts/part-0110.jsonl",
-        "bytes": 20971507,
-        "sha256": "d76e9a5390e45591f05f21f16a0bced259ad3404b564e6ec297338b9f5cb0e62"
-      },
-      {
-        "path": "doc-inventory.parts/part-0111.jsonl",
-        "bytes": 20971515,
-        "sha256": "c9e7f9f738347ce8f487635be7dde935cb3674f549b468e18ce39b46e9f7f295"
-      },
-      {
-        "path": "doc-inventory.parts/part-0112.jsonl",
-        "bytes": 20971486,
-        "sha256": "3cd3def5c1b341d4c84091a050fd281e26dd1177431baffb64da20f059e9ab1f"
-      },
-      {
-        "path": "doc-inventory.parts/part-0113.jsonl",
-        "bytes": 20971482,
-        "sha256": "284628aae6360dcb40efcb1f8b30d7fa32b333aeaac811d52fd42c870cf13eaa"
-      },
-      {
-        "path": "doc-inventory.parts/part-0114.jsonl",
-        "bytes": 20971492,
-        "sha256": "400b7de00e837ec126b822b89c1a500da6d517f4de60fe20186c88547abd951f"
-      },
-      {
-        "path": "doc-inventory.parts/part-0115.jsonl",
-        "bytes": 20971481,
-        "sha256": "032ee5b25b617c8924baf93786eee5a42848a2a1f9959ee9f000ab0fc3582aac"
-      },
-      {
-        "path": "doc-inventory.parts/part-0116.jsonl",
-        "bytes": 20971515,
-        "sha256": "0dfddfe9e150db7e610035a6d756beb05f5467e5d2749223dddd1f6c95e5b48f"
-      },
-      {
-        "path": "doc-inventory.parts/part-0117.jsonl",
-        "bytes": 20971520,
-        "sha256": "511c54af06a36d517cc75291a3a5148cc31f0b894da896feef25b0ee4b2a915f"
-      },
-      {
-        "path": "doc-inventory.parts/part-0118.jsonl",
-        "bytes": 20971511,
-        "sha256": "8f47a159d4d91a1991479e284edebf6e4d4d68c4a846d2241fb9f0e54bc27cf4"
-      },
-      {
-        "path": "doc-inventory.parts/part-0119.jsonl",
-        "bytes": 20971511,
-        "sha256": "9aad29ade44bcb82656f220a62bf11b61eecc7dd6cc4433a32e76cb9e49a3f0e"
-      },
-      {
-        "path": "doc-inventory.parts/part-0120.jsonl",
-        "bytes": 20971485,
-        "sha256": "9cd9ff19173689ee69a80a243745c687682314e7a98639da9b6e7748e6b3e48d"
-      },
-      {
-        "path": "doc-inventory.parts/part-0121.jsonl",
-        "bytes": 20971480,
-        "sha256": "30e35a4f88701f67227a4faa1e16afaddd794832f04443c406ebad5520564ad5"
-      },
-      {
-        "path": "doc-inventory.parts/part-0122.jsonl",
-        "bytes": 25471,
-        "sha256": "d90100954e675c2c8c69f4b40857e4ed2136c123a4f443e346c98f703390be21"
-      }
-    ]
+  "version": 1,
+  "contentCommit": "38672e7f157788cbe1b2bf59511bd61046dce660",
+  "producer": "codex-session:unit-run-1792176628519-ac852ba4@2026-10-17",
+  "refreshedAt": "2026-10-17T02:16:00+07:00",
+  "sourcePopulation": {
+    "path": "plans/260925-documentation-authority-unification/reports/phase-06/checkpoint-10-source-population.json",
+    "sha256": "eba7f5fa4ff78dc9078d44642b874b7000171d7f8fe8f6361cb5eed937a4d71d",
+    "claims": 22759,
+    "gaps": 2235,
+    "pendingActive": 2
   },
-  "registrySHA256": "6fcd58e6f7a2ea0f17df2b1c4024b2728dfa2d73dfc365278df3c3a1c964018c",
-  "registryIsExactCopyOfSolePersistence": true,
-  "priorCheckpointRegistry": "plans/260925-documentation-authority-unification/reports/phase-06/step10-global-prior-checkpoint-registry.json",
-  "zeroKnownIDLoss": true,
-  "method": "Lossless streaming canonical JSON transport of complete native inventory; every enumerable field, no filter. Native Markdown renderer. No second sync or regeneration.",
-  "initialReceiptRegistrySHA256": "b7b7c94cca23f863ab3d5bb052d9ef0f66fd754bed9cd09de95b757b3b5116ac",
-  "checkpointCopyCorrection": {
-    "reason": "Final independent hash check detected that an inline comment in the author refresh wrapper suppressed the checkpoint-copy statement. No native persistence or inventory field was changed.",
-    "previousCheckpointRegistrySHA256": "b7b7c94cca23f863ab3d5bb052d9ef0f66fd754bed9cd09de95b757b3b5116ac",
-    "action": "First actual checkpoint copy this turn: byte-exact copy of the existing sole compact native persistence. No native carry, second persistence or inventory regeneration.",
-    "correctedSHA256": "6fcd58e6f7a2ea0f17df2b1c4024b2728dfa2d73dfc365278df3c3a1c964018c",
-    "byteEqualityVerified": true
+  "fullInventory": {
+    "parts": 123,
+    "bytes": 2558697813,
+    "sha256": "4d00146ebab1b783c01425088be06b8fa75d81d18a9c55178082983b49891775",
+    "topLevelFields": 19,
+    "sourceFiles": 4486,
+    "claims": 91388,
+    "activeTupleEquality": true,
+    "allPartHashesVerified": true,
+    "validationOK": true
+  },
+  "registry": {
+    "sha256": "b20238af95f89cd3a83fbc20dd53ce8df1192153415cd85b9586d53884aa9c2b",
+    "bytes": 62195972,
+    "copyReusedFromSolePersistence": true
+  },
+  "rehearsal": {
+    "rerunRequired": true,
+    "reason": "The active backlog decision and predecessor-gap accounting change strict-E pending coverage exercised by the rehearsal.",
+    "startedAt": "2026-10-16T19:16:49.548Z",
+    "finishedAt": "2026-10-16T19:32:58.254Z",
+    "regenerated": {
+      "files": 4486,
+      "units": 91388,
+      "commit": "38672e7f157788cbe1b2bf59511bd61046dce660"
+    },
+    "retirement": {
+      "method": "Unchanged evaluateRetirement/summarizeResults/exitCodeFor exports underlying check-doc-retirement.mjs --cutover; native in-memory applied inventory avoids JSON transport limit. No review waived or promotion simulated.",
+      "counts": {
+        "pass": 7,
+        "blocked": 12,
+        "review": 1
+      },
+      "results": [
+        {
+          "gate": "promotionGate",
+          "id": "owner-per-claim",
+          "rule": "Every retained claim row has exactly one targetOwner and no unknown-blocking row remains for the promoted sources.",
+          "enforcedBy": "script",
+          "status": "blocked",
+          "measure": "22629 owner violations of retained rows, retained rows without an owner and unknown-blocking rows"
+        },
+        {
+          "gate": "promotionGate",
+          "id": "no-new-legacy-growth",
+          "rule": "No unreviewed edit or new maintained file under the legacy roots.",
+          "enforcedBy": "script",
+          "status": "pass",
+          "measure": "none: legacy-docs ratchet violations"
+        },
+        {
+          "gate": "promotionGate",
+          "id": "metadata-and-structure",
+          "rule": "Candidate material carries candidateCore; a document becoming canonical carries the full promotionFields list and meets its placement pattern.",
+          "enforcedBy": "script",
+          "status": "blocked",
+          "measure": "89 platform documents with no switchboard status (89, evidence payloads excluded), missing metadata fields (0), no placement (0) or an ambiguous route (0)"
+        },
+        {
+          "gate": "promotionGate",
+          "id": "links-resolve",
+          "rule": "Every relative link and Related path resolves.",
+          "enforcedBy": "script",
+          "status": "blocked",
+          "measure": "158 unresolved relative links or Related paths in candidate and promoted documents"
+        },
+        {
+          "gate": "promotionGate",
+          "id": "claims-reviewed",
+          "rule": "Every claim row of the document has reviewStatus reviewed.",
+          "enforcedBy": "script",
+          "status": "blocked",
+          "measure": "2 claim rows whose reviewStatus is not reviewed"
+        },
+        {
+          "gate": "promotionGate",
+          "id": "intent-and-boundary",
+          "rule": "The intent ledger is updated when the document narrows a vision, and the component-boundary check is recorded.",
+          "enforcedBy": "review",
+          "status": "review",
+          "measure": "human review owed (docs/doc-governance.md §8, §11); record it with --review-record"
+        },
+        {
+          "gate": "retirementGate",
+          "id": "file-disposition",
+          "rule": "The file has one non-blocking file-level disposition.",
+          "enforcedBy": "script",
+          "status": "pass",
+          "measure": "none: inventory files whose file-level disposition is unknown-blocking"
+        },
+        {
+          "gate": "retirementGate",
+          "id": "claims-closed",
+          "rule": "No claim row of the file is unknown-blocking or unreviewed.",
+          "enforcedBy": "script",
+          "status": "blocked",
+          "measure": "30 claim rows that are unknown-blocking, partial-carry or unreviewed (overlapping counts)"
+        },
+        {
+          "gate": "retirementGate",
+          "id": "dropped-claims-resolved",
+          "rule": "Every entry of the dropped-claims register has a reviewed disposition.",
+          "enforcedBy": "script",
+          "status": "pass",
+          "measure": "none: dropped-claims register entries without a reviewed disposition"
+        },
+        {
+          "gate": "retirementGate",
+          "id": "aliases-cover-immutable-refs",
+          "rule": "Immutable historical references to the file resolve through the alias table.",
+          "enforcedBy": "script",
+          "status": "blocked",
+          "measure": "994 of 994 legacy paths that history reads by path have no bare-path alias (alias table holds 0 entries)"
+        },
+        {
+          "gate": "retirementGate",
+          "id": "consumers-rewritten",
+          "rule": "Every consumer edge is rewritten or proven non-authority.",
+          "enforcedBy": "script",
+          "status": "blocked",
+          "measure": "5213 consumer edges read a legacy path from outside the legacy roots and history (upper bound, not yet proven non-authority; by kind {\"literal\":2954,\"executable-proof\":651,\"dynamic\":60,\"glob\":1455,\"shipped-contract\":35,\"fixture\":58}; 7467 unresolved dynamic patterns from authority consumers are not counted)"
+        },
+        {
+          "gate": "retirementGate",
+          "id": "evidence-digests",
+          "rule": "Relocated evidence payloads match their recorded digests.",
+          "enforcedBy": "planned",
+          "status": "blocked",
+          "measure": "no evidence relocation manifest and no verifier exist; this dry run does not execute one"
+        },
+        {
+          "gate": "retirementGate",
+          "id": "no-new-legacy-growth",
+          "rule": "The legacy-docs ratchet is clean.",
+          "enforcedBy": "script",
+          "status": "pass",
+          "measure": "none: legacy-docs ratchet violations"
+        },
+        {
+          "gate": "retirementGate",
+          "id": "write-lease",
+          "rule": "The cutover runs under the migration documentation-cutover lease.",
+          "enforcedBy": "planned",
+          "status": "blocked",
+          "measure": "the lease is a design only (cutover-write-lease-design.md); no door, hook guard or doctor check exists"
+        },
+        {
+          "gate": "retirementGate",
+          "id": "row-set-conserved",
+          "rule": "Every claim identity of the previous ledger and identity registry is present in the current row set, or has a recorded removal with rationale and disposition.",
+          "enforcedBy": "script",
+          "status": "pass",
+          "measure": "none: previous claim ids missing from the current registry, or retired rows without a disposition (against 2 registries)"
+        },
+        {
+          "gate": "retirementGate",
+          "id": "one-owner-per-semantic-claim",
+          "rule": "Rows that share a semanticClaimId name one distinct targetOwner.",
+          "enforcedBy": "script",
+          "status": "pass",
+          "measure": "none: semantic claims with more than one owner"
+        },
+        {
+          "gate": "retirementGate",
+          "id": "cutover-mode",
+          "rule": "The ledger validator runs in a cutover mode: every retained claim has an owner, an anchor, a classified kind and review status reviewed, and vocabulary usage drift is fatal.",
+          "enforcedBy": "script",
+          "status": "blocked",
+          "measure": "68091 ledger cutover violations ({\"partial-carry\":13,\"not-reviewed\":22842,\"unknown-blocking\":22616,\"without-own-rationale\":22616}) plus 4 vocabulary usage drift(s)"
+        },
+        {
+          "gate": "retirementGate",
+          "id": "reviewed-rationale",
+          "rule": "A row reviewed at cutover carries its own reviewed rationale on the row; the inventory item's proposedRationale fallback is not enough.",
+          "enforcedBy": "script",
+          "status": "blocked",
+          "measure": "22616 rows whose disposition requires a rationale and that carry none of their own"
+        },
+        {
+          "gate": "retirementGate",
+          "id": "canonical-metadata-complete",
+          "rule": "Every maintained canonical document under docs/platform/** carries all promotionFields (the validator --promotion report lists the gaps).",
+          "enforcedBy": "script",
+          "status": "pass",
+          "measure": "none: of 160 canonical platform documents lack promotion fields (0 headerless, 0 incomplete)"
+        },
+        {
+          "gate": "migration-acceptance",
+          "id": "no-unresolved-conflicts",
+          "rule": "No unresolved claim conflict remains.",
+          "enforcedBy": "script",
+          "status": "blocked",
+          "measure": "32 duplicate-content groups (4, excluding 814 evidence mirrors that resolve by deduplication) and semantic-conflict groups (28) still open"
+        }
+      ],
+      "cutoverExitCode": 1
+    },
+    "cloneRemoved": true,
+    "docsDiff": ""
   }
 }

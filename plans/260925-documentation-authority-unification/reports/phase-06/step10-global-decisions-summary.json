@@ -163,6 +163,6 @@
       "summary": "Keep the two A31 main-diff successors as supersede; apply matching committed ok verdicts normally."
     }
   ],
-  "A43": "Responsibility groups only; no required/planned Orchestrator/Launcher/Router/Driver/Dispatcher entity. Three rows pending ordinary independent review (one move, two supersede); holds=0. Phase 6 stops awaiting owner review after checkpoint.",
-  "packageContentCommit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be"
+  "A43": "Responsibility groups only; no required/planned Orchestrator/Launcher/Router/Driver/Dispatcher entity. Three matching ordinary approvals were applied; current-truth, runtime and cutover obligations remain. Holds=0. Phase 6 reaches awaiting owner review only after checkpoint, A28 truth sampling and final red-team.",
+  "packageContentCommit": "38672e7f157788cbe1b2bf59511bd61046dce660"
 }

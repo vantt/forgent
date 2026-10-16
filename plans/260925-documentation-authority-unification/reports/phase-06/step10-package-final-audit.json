@@ -1,122 +1,162 @@
 {
-  "contentCommit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
-  "checks": {
-    "HEADisContent": true,
-    "docsUnchanged": true,
-    "allWritesInPlan": true,
-    "soleRegistrySHA": true,
-    "checkpointRegistryExact": true,
-    "nativeIDLossZero": true,
-    "priorBytePreserved": true,
-    "DallThreeClean": true,
-    "comparisonExactlyExplained": true,
-    "requestCounts": true,
-    "allPartHashes": true,
-    "partUnique:review-request-step10-package-decisions.json": true,
-    "partUnique:review-request-step10-package-documents.json": true,
-    "partUnique:review-request-step10-package-candidate-sample.json": true,
-    "partUnique:review-request-step10-package-accounting.json": true,
-    "partUnique:review-request-step10-package-native.json": true,
-    "all13DecisionRowsExact": true,
-    "candidateSeedReproduced": true,
-    "groupSeedReproduced": true,
-    "helpers91": true,
-    "freshPortable6": true,
-    "postchecksAllPass": true,
-    "tests507": true,
-    "auditClean": true,
-    "all122HashesVerified": true,
-    "full19Fields": true,
-    "rehearsalNoError": true,
-    "rehearsalFullDenominator": true,
-    "bothRehearsalScopes": true,
-    "clonesRemoved": true,
-    "rehearsalDocsUnchanged": true,
-    "protectedUnchanged": true,
-    "T9all17AndStub": true,
-    "H0": true,
-    "promotion160": true,
-    "snapshotVerify": true,
-    "aliasCoverage": true,
-    "diffCheck": true
+  "version": 1,
+  "contentCommit": "38672e7f157788cbe1b2bf59511bd61046dce660",
+  "producer": "codex-session:unit-run-1792176628519-ac852ba4@2026-10-17",
+  "comparison": {
+    "ok": true,
+    "strictGreen": false,
+    "counts": {
+      "claims-unknown-blocking": 0,
+      "claims-not-reviewed": 2,
+      "identical-units-multiple-owners": 362,
+      "candidate-blocks-unreferenced": 2336,
+      "claims-partial-carry": 28
+    },
+    "errors": []
   },
-  "ok": true,
-  "diffCheckOutput": "",
-  "writePaths": [
-    "plans/260925-documentation-authority-unification/reports/doc-inventory.json",
-    "plans/260925-documentation-authority-unification/reports/doc-inventory.md",
-    "plans/260925-documentation-authority-unification/reports/identity-registry.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/checkpoint-10-source-population.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/progress.md",
-    "plans/260925-documentation-authority-unification/reports/phase-06/rehearsal-step-02.md",
-    "plans/260925-documentation-authority-unification/reports/phase-06/rehearsal-step-10.md",
-    "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-checkpoint.md",
-    "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-accounting.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-candidate-sample.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-decisions.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-documents.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-index.md",
-    "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step-10-report.md",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-global-decisions-summary.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-global-effort.md",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-global-scorecard-draft.md",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-D-both.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-D-identity.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-D-phase02.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-D-summary.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-E-summary.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-E.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-H.log",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-T9.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-alias-coverage.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-alias.log",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-applied-rows.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-audit-ownership.log",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-checkpoint-input-changes.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-checkpoint-refresh.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-checkpoint-transport-validation.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-checks.log",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-closure-expected.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-comparison-explanations.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-comparison-original.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-comparison.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-consistency.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-consistency.log",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-final-audit.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-independent-audit.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-independent-audit.log",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-mutation.log",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-native-content-accounting.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-native-proof.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-native.log",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-ownership.log",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-portable-validation.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-postchecks.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-promotion.log",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-protected-hashes.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-refresh.log",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-final-hashes.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-rehearsal-attempt1.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-rehearsal-attempt1.log",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-rehearsal.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-rehearsal.log",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-replay.log",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-reproduction.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-request-coverage.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-row-auth-validation.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-snapshot.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-source-scope.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-step10-round5-checks.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-step10-round5-link-replay.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-step10-round5-target-ownership.json",
-    "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-tests.log",
-    "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json"
-  ],
-  "comparisonPass": false,
-  "comparisonDifferences": 6,
-  "unexplainedDifferences": 0,
-  "phaseClosed": false,
-  "next": "Independent ordinary review plus checkpoint pack commit, report commit, seed key commit; then separate close awaiting owner review."
+  "D": {
+    "scopeFiles": 1045,
+    "runs": [
+      {
+        "label": "both",
+        "seconds": 94.04,
+        "fatalFindings": 0
+      },
+      {
+        "label": "identity",
+        "seconds": 94.759,
+        "fatalFindings": 0
+      },
+      {
+        "label": "phase02",
+        "seconds": 94.018,
+        "fatalFindings": 0
+      }
+    ]
+  },
+  "E": {
+    "seconds": 159.422,
+    "claims": 22759,
+    "gaps": 2235,
+    "counts": {
+      "claims-partial-carry": 28,
+      "claims-not-reviewed": 2,
+      "identical-units-multiple-owners": 362,
+      "candidate-blocks-unreferenced": 2336
+    },
+    "applyFindings": []
+  },
+  "promotion": {
+    "canonical": 160,
+    "complete": 160,
+    "headerless": 0,
+    "incomplete": 0
+  },
+  "H": {
+    "counts": {
+      "findings": [],
+      "counts": {
+        "files": 609,
+        "byStatus": {
+          "promoted": 3,
+          "candidate": 214,
+          "legacy-current": 0,
+          "non-authority": 1,
+          "unrouted": 391
+        },
+        "exemptUnrouted": 302,
+        "checked": 217,
+        "findings": 0,
+        "byType": {}
+      }
+    }
+  },
+  "T9": {
+    "entries": 17,
+    "reviewed": 17,
+    "findings": 0
+  },
+  "mutation": {
+    "passed": 12,
+    "total": 12
+  },
+  "audit": {
+    "rows": 12905,
+    "shards": 93,
+    "findings": 0,
+    "sourceWitnessLimits": 66
+  },
+  "consistency": {
+    "rows": 12905,
+    "shards": 93,
+    "findings": 0,
+    "sourceWitnessLimits": 66
+  },
+  "ownership": {
+    "newActivePairs": 0,
+    "nativeDuplicates": 0,
+    "targetDigestDrift": 0
+  },
+  "replay": {
+    "original": 366,
+    "later": 98,
+    "round3": 4,
+    "findings": 0
+  },
+  "ABHI": {
+    "ok": true,
+    "A": true,
+    "B": true,
+    "H": 0,
+    "IEqualToHEAD": true,
+    "IUnchanged": true
+  },
+  "tests": {
+    "firstRun": {
+      "pass": 506,
+      "fail": 1,
+      "isolatedRerun": {
+        "pass": 25,
+        "fail": 0
+      }
+    },
+    "finalRun": {
+      "pass": 507,
+      "fail": 0,
+      "skip": 0
+    }
+  },
+  "alias": {
+    "entries": 9236,
+    "valid": true
+  },
+  "snapshot": {
+    "pin": "38672e7f157788cbe1b2bf59511bd61046dce660",
+    "dryRun": true,
+    "sealed": false,
+    "rows": 68463,
+    "sha256": "96ab39486f6e67f96e93a5e6251828e9c5861595a2100a58fb15459b4c844820",
+    "verify": {
+      "ok": true,
+      "rows": 68463,
+      "sha256": "96ab39486f6e67f96e93a5e6251828e9c5861595a2100a58fb15459b4c844820"
+    },
+    "snapshotBytes": 116940860
+  },
+  "checkpoint": {
+    "parts": 123,
+    "bytes": 2558697813,
+    "sha256": "4d00146ebab1b783c01425088be06b8fa75d81d18a9c55178082983b49891775",
+    "ok": true
+  },
+  "rehearsal": {
+    "counts": {
+      "pass": 7,
+      "blocked": 12,
+      "review": 1
+    },
+    "cutoverExitCode": 1,
+    "cloneRemoved": true
+  },
+  "blockers": []
 }

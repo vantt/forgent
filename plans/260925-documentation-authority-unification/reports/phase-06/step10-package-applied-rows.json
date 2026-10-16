@@ -1012375,14 +1012375,17 @@
       },
       "targetOwner": null,
       "targetAnchor": null,
-      "claimKind": "unclassified",
+      "claimKind": "historical-context",
       "authorityKind": "non-authority",
       "status": "future",
       "relations": [],
       "decisionRefs": [],
       "evidenceLinks": [],
       "disposition": "regenerate-from-source",
-      "reviewStatus": "pending"
+      "reviewStatus": "pending",
+      "rationale": "The persisted native registry binds claim_127225b8542c701295574b1b00749594 by content to the complete current generated backlog table at docs/backlog.md#unheaded-block-2, source SHA256 7d5317616b4b105936b065a213de9cce47e44c3e623d6dd293ffd0d5dc4c84ec, lines 11-54 at content commit 38672e7f1. The c3614f4d2 predecessor remains separately conserved as registry gap claim_9b3b7fac64df06547dd06e05f4f026c5; the successor was not inferred from ordinal or position. Keep regenerate-from-source with no platform target under the A31/L10-14 generated-backlog route. This does not authorize a renderer run, discard hand-added rows, certify backlog truth, promote, retire or cut over. Independent ordinary review is pending; no predecessor or heading approval carries.",
+      "authoredBy": "codex-session:unit-run-1792176628519-ac852ba4@2026-10-17",
+      "reviewNote": "A31/L10-14 native successor accounting: content-bound to digest 7d531761 at the persisted registry, never position-bound. Independent ordinary review pending; no approval carried."
     },
     {
       "claimId": "claim_743cde02b9562c5f8e4724512ee6fc8f",
@@ -1145938,7 +1145941,7 @@
       "disposition": "regenerate-from-source",
       "targetOwner": null,
       "targetAnchor": null,
-      "dispositionRationale": "The complete c3614f4d2 generated backlog table (SHA256 3430068fb5b1687e480e143bc34727fa7d6ada9f1342932c9fdd2f8b23c17da2) is preserved as the exact predecessor of the bc7358789 table. Main adds only p-68be2ae3 and p-7eb9e65b; all predecessor lines remain verbatim. Keep regenerate-from-source outside platform authority and preserve the predecessor until the next single native sync records the current 7d5317616b4b105936b065a213de9cce47e44c3e623d6dd293ffd0d5dc4c84ec unit under its real native identity. No guessed successor ID, renderer permission, truth approval, promotion, retirement or cutover."
+      "dispositionRationale": "The complete c3614f4d2 generated backlog table, source SHA256 3430068fb5b1687e480e143bc34727fa7d6ada9f1342932c9fdd2f8b23c17da2, is preserved by the persisted native registry as identity gap claim_9b3b7fac64df06547dd06e05f4f026c5. The current table is separately bound by content as claim_127225b8542c701295574b1b00749594 with source SHA256 7d5317616b4b105936b065a213de9cce47e44c3e623d6dd293ffd0d5dc4c84ec; the two added PBI rows are the exact committed difference and all predecessor lines remain verbatim. Keep regenerate-from-source outside platform authority under A31/L10-14. This predecessor accounting is not an ordinal identity graft and grants no renderer permission, truth approval, promotion, retirement or cutover. Independent ordinary review is pending; no prior approval carries."
     },
     {
       "sourcePath": "docs/backlog.md",

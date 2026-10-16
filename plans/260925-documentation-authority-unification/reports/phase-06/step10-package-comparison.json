@@ -1,5 +1,5 @@
 {
-  "ok": false,
+  "ok": true,
   "strictGreen": false,
   "counts": {
     "claims-unknown-blocking": 0,
@@ -8,7 +8,5 @@
     "candidate-blocks-unreferenced": 2336,
     "claims-partial-carry": 28
   },
-  "errors": [
-    "pending holds unexpected: claim_127225b8542c701295574b1b00749594"
-  ]
+  "errors": []
 }

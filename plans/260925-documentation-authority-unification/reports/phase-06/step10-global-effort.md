@@ -1,27 +1,23 @@
-# Step 10 effort record — package refresh
+# Step 10 effort record — backlog close package
 
-Content/SYNC `c3614f4d2`; producer `codex-session:unit-run-1792169760182-e3acba42@2026-10-16`. No owner token total was supplied; no inferred token number or calendar estimate is reported as measured fact.
+Docs content/SYNC `38672e7f1`; producer `codex-session:unit-run-1792176628519-ac852ba4@2026-10-17`. No owner token total was supplied, so none is inferred.
 
 | Measured stage | Seconds | Evidence |
 |---|---:|---|
-|One native carry/generation/compact persistence|665.599|step10-package-native-proof.json |
-|D both priors together|96.195|step10-package-D-summary.json |
-|D identity prior|99.059|step10-package-D-summary.json |
-|D Phase02 prior|96.552|step10-package-D-summary.json |
-|Strict E plus applied-overlay conservation equality|161.179|step10-package-E-summary.json |
-|mutation|1.483|step10-package-mutation.log |
-|independent-audit|8.820|step10-package-independent-audit.log |
-|consistency|8.764|step10-package-consistency.log |
-|checks|3.631|step10-package-checks.log |
-|ownership|9.117|step10-package-ownership.log |
-|audit-ownership|0.654|step10-package-audit-ownership.log |
-|replay|2.324|step10-package-replay.log |
-|tests|42.407|step10-package-tests.log |
+| Sole native sync/generation/persistence (preceding package) | 802.964 | `step10-package-native-proof.json` |
+| D both priors | 94.040 | `step10-package-D-summary.json` |
+| D identity prior | 94.759 | `step10-package-D-summary.json` |
+| D Phase 02 prior | 94.018 | `step10-package-D-summary.json` |
+| Strict E plus applied-overlay equality | 159.422 | `step10-package-E-summary.json` |
+| Full checkpoint export | 52.597 | package execution log / refresh receipt |
+| Independent bounded checkpoint validation | 18.900 | `step10-package-checkpoint-transport-validation.json` |
+| Full + Step 2 genuine rehearsal | 968.706 | `step10-package-rehearsal.json` |
+| Final relevant test rerun | 42.509 | `step10-package-tests.log` |
 
-Refreshed full+Step2 rehearsal elapsed1025.089s;clone removed=True. Native generation,global D/E,checkpoint refresh/validation and rehearsal run ONE AT A TIME. Read-only native regeneration inside rehearsal is not a second identity carry or registry persistence. Checkpoint export/validation and helper-authoring wall time were not separately metered, so no invented total is supplied. Stage times above are distinct; they are not added to an overlapping overall wrapper duration.
+Native inventory, D/E, checkpoint refresh/validation and rehearsal ran one at a time. The package reused the persisted registry; read-only inventory generation and rehearsal regeneration are not a second identity carry or persistence. Mutation, audit, consistency, A/B/H, ownership, replay and helper validation were run but not all separately metered, so no invented aggregate is reported.
 
-Ordinary request91 entries/five small parts (13/3/15/17/43),max43 entries/81,717 bytes;per-row authentication91/91,10 group source/target checks,fresh portable checks6/6. It samples15/233 candidate edits and10/35 group edits with an explicit reproducible accounting seed;this is not the independent checkpoint seed. Every43 raw native change and all13 pending decisions are enumerated. Producer authors no sensitivity pack/key/checkpoint verdict.
+The ordinary request has 25 entries in one file (3 decisions, 1 re-carry accounting, 6 list/receipt refreshes, 15 native changes); per-row helper validation passed 25/25. The producer authored no checkpoint sensitivity pack, seed, key or verdict.
 
-Earlier effort/UNPROVEN throughput figures remain in committed historical reports;they are not silently converted into measured cost for this package. Owner token total remains unreported. Independent ordinary review,checkpoint(current-truth/red-team and seed discipline included),and the separate owner-review close remain outstanding.
+The first 507-test run had one transient seeded review-format fixture failure (506/507). The same test passed 25/25 in isolation, and the complete relevant suite then passed 507/507. Both facts are retained; no flaky result is erased and no full npm-suite claim is made.
 
-The first rehearsal attempt was SIGKILLed before gate results;its elapsed time was not separately metered. Owned-clone cleanup and transport release are recorded in `step10-package-rehearsal-attempt1.json`;the completed retry above preserves the full source corpus and real evaluator. Final registry hash checking also caught the suppressed author-wrapper copy statement;the first actual checkpoint copy corrected it without second native persistence or shard regeneration.
+Earlier UNPROVEN throughput estimates remain historical. Independent ordinary review, checkpoint, A28 truth sample, final red-team and the separate `awaiting owner review` close remain outstanding.

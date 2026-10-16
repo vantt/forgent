@@ -1,0 +1,931 @@
+{
+  "version": 1,
+  "contentCommit": "38672e7f157788cbe1b2bf59511bd61046dce660",
+  "packagePin": "runner commit containing this request",
+  "producer": "codex-session:unit-run-1792176628519-ac852ba4@2026-10-17",
+  "mode": "ordinary",
+  "entries": [
+    {
+      "entry": "d01",
+      "kind": "decision",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-generated-backlog.json",
+      "collection": "claims",
+      "claimId": "claim_f0b2a4079764d68b1102ddddb08776ce",
+      "row": {
+        "claimId": "claim_f0b2a4079764d68b1102ddddb08776ce",
+        "sourceUnitDigest": "5f190b849165ce8115369ebb112a31b286e85237f5c3dd32f8493cc3cfd93d17",
+        "claimKind": "navigation",
+        "disposition": "regenerate-from-source",
+        "targetOwner": null,
+        "targetAnchor": null,
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792173247556-515f6e95@2026-10-17",
+        "rationale": "At SYNC bc7358789, the retained Product Backlog heading resolves locally to source SHA256 5f190b849165ce8115369ebb112a31b286e85237f5c3dd32f8493cc3cfd93d17 after exactly two upstream PBI rows were added. The file remains the generated, non-authority backlog projection at its frozen root path. Keep regenerate-from-source with no platform target; this does not authorize a renderer run, discard hand-added rows, certify status truth, promote, retire or cut over. Exact c3614f4d2..bc7358789 hunk and old/new units are in step10-ordinary-application-and-refresh.json. Native retained-ID confirmation and independent review are pending; no prior approval carries.",
+        "reviewNote": "A31/L10-14 main re-carry: heading section payload changed only because two PBI rows were added. Native retained-ID confirmation and independent ordinary review remain next; no approval carried.",
+        "sourcePath": "docs/backlog.md",
+        "sourceAnchor": "product-backlog"
+      },
+      "before": {
+        "claimId": "claim_f0b2a4079764d68b1102ddddb08776ce",
+        "sourceUnitDigest": "5f190b849165ce8115369ebb112a31b286e85237f5c3dd32f8493cc3cfd93d17",
+        "claimKind": "navigation",
+        "disposition": "regenerate-from-source",
+        "targetOwner": null,
+        "targetAnchor": null,
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792173247556-515f6e95@2026-10-17",
+        "rationale": "At SYNC bc7358789, the retained Product Backlog heading resolves locally to source SHA256 5f190b849165ce8115369ebb112a31b286e85237f5c3dd32f8493cc3cfd93d17 after exactly two upstream PBI rows were added. The file remains the generated, non-authority backlog projection at its frozen root path. Keep regenerate-from-source with no platform target; this does not authorize a renderer run, discard hand-added rows, certify status truth, promote, retire or cut over. Exact c3614f4d2..bc7358789 hunk and old/new units are in step10-ordinary-application-and-refresh.json. Native retained-ID confirmation and independent review are pending; no prior approval carries.",
+        "reviewNote": "A31/L10-14 main re-carry: heading section payload changed only because two PBI rows were added. Native retained-ID confirmation and independent ordinary review remain next; no approval carried.",
+        "sourcePath": "docs/backlog.md",
+        "sourceAnchor": "product-backlog"
+      },
+      "reason": "A31/L10-14 generated-backlog content-bound re-carry; ordinary pending, no approval carry.",
+      "reviewStatus": "pending"
+    },
+    {
+      "entry": "d02",
+      "kind": "decision",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-generated-backlog.json",
+      "collection": "claims",
+      "claimId": "claim_127225b8542c701295574b1b00749594",
+      "row": {
+        "claimId": "claim_127225b8542c701295574b1b00749594",
+        "sourceUnitDigest": "7d5317616b4b105936b065a213de9cce47e44c3e623d6dd293ffd0d5dc4c84ec",
+        "claimKind": "historical-context",
+        "disposition": "regenerate-from-source",
+        "targetOwner": null,
+        "targetAnchor": null,
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792176628519-ac852ba4@2026-10-17",
+        "rationale": "The persisted native registry binds claim_127225b8542c701295574b1b00749594 by content to the complete current generated backlog table at docs/backlog.md#unheaded-block-2, source SHA256 7d5317616b4b105936b065a213de9cce47e44c3e623d6dd293ffd0d5dc4c84ec, lines 11-54 at content commit 38672e7f1. The c3614f4d2 predecessor remains separately conserved as registry gap claim_9b3b7fac64df06547dd06e05f4f026c5; the successor was not inferred from ordinal or position. Keep regenerate-from-source with no platform target under the A31/L10-14 generated-backlog route. This does not authorize a renderer run, discard hand-added rows, certify backlog truth, promote, retire or cut over. Independent ordinary review is pending; no predecessor or heading approval carries.",
+        "reviewNote": "A31/L10-14 native successor accounting: content-bound to digest 7d531761 at the persisted registry, never position-bound. Independent ordinary review pending; no approval carried.",
+        "sourcePath": "docs/backlog.md",
+        "sourceAnchor": "unheaded-block-2"
+      },
+      "before": null,
+      "reason": "A31/L10-14 generated-backlog content-bound re-carry; ordinary pending, no approval carry.",
+      "reviewStatus": "pending"
+    },
+    {
+      "entry": "d03",
+      "kind": "decision",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-generated-backlog.json",
+      "collection": "registryGaps",
+      "claimId": "claim_9b3b7fac64df06547dd06e05f4f026c5",
+      "row": {
+        "claimId": "claim_9b3b7fac64df06547dd06e05f4f026c5",
+        "sourcePath": "docs/backlog.md",
+        "sourceAnchor": "unheaded-block-2",
+        "sourceUnitDigest": "3430068fb5b1687e480e143bc34727fa7d6ada9f1342932c9fdd2f8b23c17da2",
+        "claimKind": "historical-context",
+        "disposition": "regenerate-from-source",
+        "targetOwner": null,
+        "targetAnchor": null,
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792176628519-ac852ba4@2026-10-17",
+        "rationale": "The complete c3614f4d2 generated backlog table, source SHA256 3430068fb5b1687e480e143bc34727fa7d6ada9f1342932c9fdd2f8b23c17da2, is preserved by the persisted native registry as identity gap claim_9b3b7fac64df06547dd06e05f4f026c5. The current table is separately bound by content as claim_127225b8542c701295574b1b00749594 with source SHA256 7d5317616b4b105936b065a213de9cce47e44c3e623d6dd293ffd0d5dc4c84ec; the two added PBI rows are the exact committed difference and all predecessor lines remain verbatim. Keep regenerate-from-source outside platform authority under A31/L10-14. This predecessor accounting is not an ordinal identity graft and grants no renderer permission, truth approval, promotion, retirement or cutover. Independent ordinary review is pending; no prior approval carries.",
+        "reviewNote": "A31/L10-14 predecessor-gap accounting refreshed after native confirmation of the separate current identity. Content binding only; independent ordinary review pending; no approval carried.",
+        "sourceCommit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be"
+      },
+      "before": {
+        "claimId": "claim_9b3b7fac64df06547dd06e05f4f026c5",
+        "sourcePath": "docs/backlog.md",
+        "sourceAnchor": "unheaded-block-2",
+        "sourceUnitDigest": "3430068fb5b1687e480e143bc34727fa7d6ada9f1342932c9fdd2f8b23c17da2",
+        "claimKind": "historical-context",
+        "disposition": "regenerate-from-source",
+        "targetOwner": null,
+        "targetAnchor": null,
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792173247556-515f6e95@2026-10-17",
+        "rationale": "The complete c3614f4d2 generated backlog table (SHA256 3430068fb5b1687e480e143bc34727fa7d6ada9f1342932c9fdd2f8b23c17da2) is preserved as the exact predecessor of the bc7358789 table. Main adds only p-68be2ae3 and p-7eb9e65b; all predecessor lines remain verbatim. Keep regenerate-from-source outside platform authority and preserve the predecessor until the next single native sync records the current 7d5317616b4b105936b065a213de9cce47e44c3e623d6dd293ffd0d5dc4c84ec unit under its real native identity. No guessed successor ID, renderer permission, truth approval, promotion, retirement or cutover.",
+        "reviewNote": "A31/L10-14 main re-carry: this c3614f4d2 table identity is now a historical predecessor of the two-row-expanded table. Native sync must allocate/confirm the successor; no ordinal graft or approval carry.",
+        "sourceCommit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be"
+      },
+      "reason": "A31/L10-14 generated-backlog content-bound re-carry; ordinary pending, no approval carry.",
+      "reviewStatus": "pending"
+    },
+    {
+      "entry": "a01",
+      "kind": "backlog-accounting",
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-ordinary-application-and-refresh.json",
+      "proof": {
+        "fromCommit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+        "toCommit": "bc7358789",
+        "newRows": [
+          "| p-68be2ae3 | **`fgos doctor --fix` is all-or-nothing and can disturb working configs.** Owner report (2026-10-16): `--fix` hangs, and has damaged configs that were working. Code facts: `--fix` runs every registered fix (22 today, `src/setup/registrations.mjs` `registerFix`), including writes into other tools' configs (`codex-hook-wired`, `agy-hook-wired`, `omp-hook-wired`, `pi-hook-wired`, `agy-permissions-configured`, `claude-plugin-marketplace`) and cleanup (`confinement-orphaned-resources-reaped`, `credential-copies-retained`); there is no way to run one fix, no dry run, no backup. The JSON writers skip a malformed file (`src/setup/agent-hooks.mjs:107-108`) but otherwise rewrite the whole file with `JSON.stringify` (`agent-hooks.mjs:35-37`), so formatting and anything outside the touched key are re-serialized. Owner expectation: a fix only repairs what is wrong, keeps every existing setting, and when a file is syntactically broken it reports the syntax error (file, line, column) instead of guessing. | `fgos doctor --fix <check-id>` runs one fix; `--fix --dry-run` prints the exact change per file; every fix that edits a file makes a minimal key-level edit, keeps a timestamped backup, and leaves unrelated keys, ordering and formatting intact (golden tests on real-world config samples); a file that does not parse is reported with file, line and column and left untouched; each fix has a time limit and reports which fix is still running instead of hanging | proposed | — |",
+          "| p-7eb9e65b | **fgOS and AgentKit (`ak`) overwrite each other's registrations.** Observed 2026-10-16 in this repo: installing the `ak` engineer kit for both `claude-code` and `omp` targets wrote the same rule set into `.claude/rules/*.md` and into an `AGENTKIT-OMP` block in `AGENTS.md` (read twice by Claude through `@AGENTS.md`, about 17 KB), and re-appended about 19 hooks into `.claude/settings.json` in its raw form next to the guarded form fgOS had rewritten them to (commit `036884908`), so each hook fires twice; `statusLine` points at paths that do not exist. Cause: two installers each assume they own `settings.json` and the instruction files, and each compares hook commands by exact string. Related doctrine: `docs/coexistence.md` (territory, one conductor per session, Known Gaps). | A written ownership contract between fgOS and other kit installers: each tool owns named files or marked blocks (e.g. fgOS hooks in `.claude/settings.json`, kit hooks in `.claude/settings.local.json` or a kit-owned block), neither rewrites the other's entries, and hook identity is the script path, not the command string; `fgos doctor` reports duplicate hook registrations and instruction blocks loaded twice (reuse `core/skills/instruction-audit/scripts/instruction-audit.mjs` logic) and `--fix` removes only fgOS's own duplicates; `docs/coexistence.md` Known Gaps updated; re-running `ak kit install` and `fgos setup` in either order leaves no duplicates (test) | proposed | — |"
+        ],
+        "oldUnits": {
+          "heading": [
+            "claim_f0b2a4079764d68b1102ddddb08776ce",
+            "92be08bb7b0a9af07f2d36307db6a7891545c2ab4590dcbb77074d46c2c8dfbe"
+          ],
+          "table": [
+            "claim_9b3b7fac64df06547dd06e05f4f026c5",
+            "3430068fb5b1687e480e143bc34727fa7d6ada9f1342932c9fdd2f8b23c17da2"
+          ]
+        },
+        "currentLocalUnits": {
+          "headingDigest": "5f190b849165ce8115369ebb112a31b286e85237f5c3dd32f8493cc3cfd93d17",
+          "tableDigest": "7d5317616b4b105936b065a213de9cce47e44c3e623d6dd293ffd0d5dc4c84ec"
+        },
+        "decisionShard": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-generated-backlog.json",
+        "route": "regenerate-from-source",
+        "nativeSuccessorId": "pending next single native sync; never guessed",
+        "noIdentityGraft": true,
+        "noApprovalCarry": true,
+        "exactDiff": "diff --git a/docs/backlog.md b/docs/backlog.md\nindex 7393034cc..5063fd3e2 100644\n--- a/docs/backlog.md\n+++ b/docs/backlog.md\n@@ -17,6 +17,8 @@ never a generation timestamp or any other wall-clock value.\n | p-2a39f940 | Neither fgOS trigger path (interactive pick, headless runner) reaches an MVP2-equivalent outcome on its own terms — different failure shapes, not equivalent | Case 1 (interactive /fgOS:pick, tsk-57u, docs/history/mvp2-scope-test-infra/reports/case-1-interactive.md) reaches all three literal artifacts -- green verify (23 pass/0 fail), a real commit (4f501f1) on the item's own fgw/tsk-57u branch, and a clean worktree teardown -- but fgos return's fresh-claim path measures only the ORIGINAL checkout's HEAD, never the fgw/<id> branch pick itself created, so return structurally refuses to register the completed work and the item is stuck at awaiting-human instead of proposed/done. Case 2 (headless fgos-runner --once, docs/history/mvp2-scope-test-infra/reports/case-2-headless.md) never reaches ANY of the three artifacts: fgos-runner.mjs resolves repoRoot via git rev-parse --show-toplevel with no override flag/env, dogfood-fixture is not its own git repo, so a real --once invocation would claim and dispatch real forgent work off the live repo/.fgos/state.json (8 real items) -- confirmed unsafe twice, never invoked for real. Fix scope: (a) fgos return's branch-aware path (bin/fgos.mjs:1306) must also accept a first, ordinary interactive pick's fgw/<id> branch, not only a re-claimed already-blocked item's branchHeadAtTake; (b) fgos-runner needs a cwd-rooted root override (e.g. --root/FGOS_ROOT) parallel to the fgos.mjs verbs' existing process.cwd()-derived isolation, so the headless trigger can be pointed at a testbed instead of always resolving through git toplevel. Done when both cases can independently reach green verify + commit on own branch + clean teardown AND the engine registers completion (proposed/done), proven by re-running this feature's two live cases. | proposed | mvp2-scope-test-infra |\n | p-3e6b1a52 | Remove `legacyPersonaProjection` from `src/runner/dispatch/assignment.mjs`. It is the old line-based persona reader kept only so persona text pinned into a run before the YAML parser change still resumes with the same text when the strict parser rejects it. Open it when no run pinned by a release older than the vendored-parser change can still be resumed (check the oldest resumable pinned run, or retire pre-change releases explicitly). | `legacyPersonaProjection` and its pinned-text fallback are gone, the persona tests that pin the fallback are removed with them, and a pinned persona now takes the same parser path as a fresh one | proposed | vendor-js-yaml-single-yaml-door |\n | p-51f4eb7e | **Bù version token cho CTR006 (routing-handoff)** — decision 0011 bắt mọi contract mang `<name>/v<N>`; CTR006 khai \"designed — spec đầy đủ, chưa có code implement\" (architecture-map.md:350) và `routing-handoff-contract.md` không mang field version nào. Để NGOÀI biên STR46 khi chốt exploring 2026-07-27: dán version lên thứ chưa chạy là đóng dấu cho giả định, không phải cho hành vi. Làm khi CTR006 có code thật, cùng lượt với lần implement đầu tiên. | CTR006 mang version token đúng khuôn 0011, và token đó đối chiếu được với code đang chạy chứ không chỉ với spec | proposed | — |\n+| p-68be2ae3 | **`fgos doctor --fix` is all-or-nothing and can disturb working configs.** Owner report (2026-10-16): `--fix` hangs, and has damaged configs that were working. Code facts: `--fix` runs every registered fix (22 today, `src/setup/registrations.mjs` `registerFix`), including writes into other tools' configs (`codex-hook-wired`, `agy-hook-wired`, `omp-hook-wired`, `pi-hook-wired`, `agy-permissions-configured`, `claude-plugin-marketplace`) and cleanup (`confinement-orphaned-resources-reaped`, `credential-copies-retained`); there is no way to run one fix, no dry run, no backup. The JSON writers skip a malformed file (`src/setup/agent-hooks.mjs:107-108`) but otherwise rewrite the whole file with `JSON.stringify` (`agent-hooks.mjs:35-37`), so formatting and anything outside the touched key are re-serialized. Owner expectation: a fix only repairs what is wrong, keeps every existing setting, and when a file is syntactically broken it reports the syntax error (file, line, column) instead of guessing. | `fgos doctor --fix <check-id>` runs one fix; `--fix --dry-run` prints the exact change per file; every fix that edits a file makes a minimal key-level edit, keeps a timestamped backup, and leaves unrelated keys, ordering and formatting intact (golden tests on real-world config samples); a file that does not parse is reported with file, line and column and left untouched; each fix has a time limit and reports which fix is still running instead of hanging | proposed | — |\n+| p-7eb9e65b | **fgOS and AgentKit (`ak`) overwrite each other's registrations.** Observed 2026-10-16 in this repo: installing the `ak` engineer kit for both `claude-code` and `omp` targets wrote the same rule set into `.claude/rules/*.md` and into an `AGENTKIT-OMP` block in `AGENTS.md` (read twice by Claude through `@AGENTS.md`, about 17 KB), and re-appended about 19 hooks into `.claude/settings.json` in its raw form next to the guarded form fgOS had rewritten them to (commit `036884908`), so each hook fires twice; `statusLine` points at paths that do not exist. Cause: two installers each assume they own `settings.json` and the instruction files, and each compares hook commands by exact string. Related doctrine: `docs/coexistence.md` (territory, one conductor per session, Known Gaps). | A written ownership contract between fgOS and other kit installers: each tool owns named files or marked blocks (e.g. fgOS hooks in `.claude/settings.json`, kit hooks in `.claude/settings.local.json` or a kit-owned block), neither rewrites the other's entries, and hook identity is the script path, not the command string; `fgos doctor` reports duplicate hook registrations and instruction blocks loaded twice (reuse `core/skills/instruction-audit/scripts/instruction-audit.mjs` logic) and `--fix` removes only fgOS's own duplicates; `docs/coexistence.md` Known Gaps updated; re-running `ak kit install` and `fgos setup` in either order leaves no duplicates (test) | proposed | — |\n | p-782e25aa | STR46 buoc merge: viet lai kho fgos-test-drive tu ngoai worktree str46 | Kho /home/vantt/projects/fgos-test-drive/.fgos KHONG viet duoc tu worktree str46: write guard tu choi moi duong dan khong nam gon trong worktree vat ly (da do bang probe that, khong phai suy doan). Vi vay no roi khoi lat 1 cung ly do da doi kho song ra. Pham vi: events.jsonl 26 dong, 12 dong mang ten cu, 0 dang predicted long, tat ca deu mang truong version. Kho la mot repo git nhung .fgos KHONG duoc theo doi nen khong co nghia vu commit. Dung script scripts/migrate-actor-to-role.mjs (cell str46-io-contract-r3-6), chay --dry-run truoc, backup ra ngoai thu muc kho. Sau do chay lai ban chieu bang cach dat thu muc lam viec VAO chinh kho do roi goi bin/fgos.mjs rebuild - fgos lay kho tu process.cwd() va KHONG co co --dir nao, nen goi tu cho khac se nham vao kho sai. Xong: log khong con ten cu, khong con dong khai version 2, moi dong parse duoc, 26 dong, seq lien tuc. Chay cung dip voi PBI p-b822cf9f (kho song), tu mot noi co quyen ghi ca hai. | proposed | str46-io-contract |\n | p-88b4ae1e | Audit every reservations release / releaseHolds call site for the same missing-session-filter gap xwh-3 fixed at one call site | Every call site that scopes a cross-worktree hold release derives and passes session (or documents why it legitimately cannot), not just cell -- confirmed via code read across the whole .bee/bin tree, not just handleReservationsRelease | proposed | — |\n | p-8d04c7f1 | Watch js-yaml security advisories. js-yaml is vendored as one file (`src/util/third-party/js-yaml.mjs`, upgrade procedure in `docs/specs/distribution.md` decision history), so `npm audit` and Dependabot no longer see it. Open it on every advisory for js-yaml, and review at least when a release is staged. | A named owner checks the js-yaml advisory feed on a stated cadence or hooks it into release staging, and an advisory leads to the documented upgrade procedure | proposed | vendor-js-yaml-single-yaml-door |\n"
+      },
+      "decisionFile": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-generated-backlog.json",
+      "claimIds": [
+        "claim_f0b2a4079764d68b1102ddddb08776ce",
+        "claim_127225b8542c701295574b1b00749594",
+        "claim_9b3b7fac64df06547dd06e05f4f026c5"
+      ],
+      "reviewStatus": "pending",
+      "check": "Authenticate the exact committed backlog diff, current native content identities and the three pending rows. Position alone is never identity proof."
+    },
+    {
+      "entry": "r01",
+      "kind": "refresh-accounting",
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-ordinary-application-and-refresh.json",
+      "index": 0,
+      "proof": {
+        "entry": "x01",
+        "direction": "unexpected",
+        "oldTuple": [
+          "claim_35b6d8008541bef15edc061dade28c06",
+          "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+          "unheaded-block-3",
+          "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b"
+        ],
+        "newTuple": [
+          "claim_87f236ae2e3356f5e23e70a7f7224242",
+          "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+          "unheaded-block-3",
+          "59d70c7fd04f6212e5c8909a4bf8bca340c7aeb0f372547419ca80fbc74dd78a"
+        ],
+        "reviewVerdict": "ok",
+        "reviewNote": "deep: comparator unexpected tuple claim_87f236ae... block-3 of executor-health-and-fallback; registry holds the old claim_35b6d8... as an identity gap and the new ID as a unit, the committed recovery receipt (digest d4d6dd64...) with its reviewed projection report exists and is stale by digest because the paragraph now carries the two restored recovery-planner sentences (diff touches exactly line 27), the old unit is in no candidate-unverified list so the new one is correctly unexpected; the difference stays open and is not a waiver; wording: the gate cite is lines 1056-1063 (digest comparison at 1062-1063), not 1056-1061",
+        "proof": {
+          "nativeAccountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-native-content-accounting.json",
+          "nativeAccountingIndex": 1,
+          "candidateLists": [
+            "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-agent-coordination.json",
+            "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-proposals-redesigns.json"
+          ],
+          "currentReceipt": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step10-refresh.json"
+        },
+        "noRelabelling": true,
+        "noWaiver": true
+      },
+      "reviewStatus": "pending",
+      "check": "Authenticate old/new tuple membership and the current refreshed list/receipt. This approves accounting only; no relabelling or waiver."
+    },
+    {
+      "entry": "r02",
+      "kind": "refresh-accounting",
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-ordinary-application-and-refresh.json",
+      "index": 1,
+      "proof": {
+        "entry": "x02",
+        "direction": "unexpected",
+        "oldTuple": [
+          "claim_2e2938c719ad58a967857c76c72850f1",
+          "docs/platform/agent-coordination/architecture/run-handle.md",
+          "unheaded-block-3",
+          "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b"
+        ],
+        "newTuple": [
+          "claim_9d5d0b39286fb978c6de4bbc09e75adb",
+          "docs/platform/agent-coordination/architecture/run-handle.md",
+          "unheaded-block-3",
+          "1f25a51f75e78cb32b002b7ccb303a916191d96c495a81235ebf1b7a8608f694"
+        ],
+        "reviewVerdict": "ok",
+        "reviewNote": "deep: unexpected tuple claim_9d5d0b39... block-3 of run-handle.md; native accounting shows old claim_2e2938c7... preserved as an identity gap and a distinct new unit ID for the three-sentence paragraph (diff touches only line 27 and its three evidence ranges in run-lock.mjs are in the text); no receipt exists for this unit, as stated; the new tuple replaces the old committed list tuple x05",
+        "proof": {
+          "nativeAccountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-native-content-accounting.json",
+          "nativeAccountingIndex": 3,
+          "candidateLists": [
+            "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-agent-coordination.json",
+            "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-proposals-redesigns.json"
+          ],
+          "currentReceipt": null
+        },
+        "noRelabelling": true,
+        "noWaiver": true
+      },
+      "reviewStatus": "pending",
+      "check": "Authenticate old/new tuple membership and the current refreshed list/receipt. This approves accounting only; no relabelling or waiver."
+    },
+    {
+      "entry": "r03",
+      "kind": "refresh-accounting",
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-ordinary-application-and-refresh.json",
+      "index": 2,
+      "proof": {
+        "entry": "x03",
+        "direction": "unexpected",
+        "oldTuple": [
+          "claim_b6963c89796864ca59f82467d506f348",
+          "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+          "implementation-and-design-status",
+          "4fc22267739453739992bd7673b29eaa711de810b721bd915c28f58ec555cc0c"
+        ],
+        "newTuple": [
+          "claim_b6963c89796864ca59f82467d506f348",
+          "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+          "implementation-and-design-status",
+          "e9987e41f961ef6c8dc9e9e2b204eafc3ee98883460e98c0c18606ac0cc3a046"
+        ],
+        "reviewVerdict": "ok",
+        "reviewNote": "deep: unexpected tuple claim_b6963c89... heading implementation-and-design-status of executor-health-and-fallback; the ID is retained with a new section digest (4fc22267... to e9987e41...) because the section payload changed, and the old receipt for the 4fc22267 digest is in the committed classification file and is rejected by the unit-digest equality in the gate; wording: the explanation text is copied from x01 and speaks of a paragraph unit though this tuple is the heading",
+        "proof": {
+          "nativeAccountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-native-content-accounting.json",
+          "nativeAccountingIndex": 0,
+          "candidateLists": [
+            "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-agent-coordination.json",
+            "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-proposals-redesigns.json"
+          ],
+          "currentReceipt": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step10-refresh.json"
+        },
+        "noRelabelling": true,
+        "noWaiver": true
+      },
+      "reviewStatus": "pending",
+      "check": "Authenticate old/new tuple membership and the current refreshed list/receipt. This approves accounting only; no relabelling or waiver."
+    },
+    {
+      "entry": "r04",
+      "kind": "refresh-accounting",
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-ordinary-application-and-refresh.json",
+      "index": 3,
+      "proof": {
+        "entry": "x04",
+        "direction": "unexpected",
+        "oldTuple": [
+          "claim_f1c6ef52a41ee978ba72a88733520c60",
+          "docs/platform/agent-coordination/architecture/run-handle.md",
+          "implementation-and-design-status",
+          "bef0ccaa8745300be2bf165c8d136047af133c064637af821eed0a95b23d04fe"
+        ],
+        "newTuple": [
+          "claim_f1c6ef52a41ee978ba72a88733520c60",
+          "docs/platform/agent-coordination/architecture/run-handle.md",
+          "implementation-and-design-status",
+          "565cf67de33a96a867f31b05e3ef2330415d5c6385df5a355e92b6d4d5a38421"
+        ],
+        "reviewVerdict": "ok",
+        "reviewNote": "deep: unexpected tuple claim_f1c6ef52... heading of run-handle.md with a new digest 565cf67d... (old bef0ccaa...) under the retained native ID; native accounting, before and after units recomputed and the registry unit carries the new sourceUnitDigest; the pair x04 and x06 is one heading replacement",
+        "proof": {
+          "nativeAccountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-native-content-accounting.json",
+          "nativeAccountingIndex": 2,
+          "candidateLists": [
+            "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-agent-coordination.json",
+            "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-proposals-redesigns.json"
+          ],
+          "currentReceipt": null
+        },
+        "noRelabelling": true,
+        "noWaiver": true
+      },
+      "reviewStatus": "pending",
+      "check": "Authenticate old/new tuple membership and the current refreshed list/receipt. This approves accounting only; no relabelling or waiver."
+    },
+    {
+      "entry": "r05",
+      "kind": "refresh-accounting",
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-ordinary-application-and-refresh.json",
+      "index": 4,
+      "proof": {
+        "entry": "x05",
+        "direction": "missing",
+        "oldTuple": [
+          "claim_2e2938c719ad58a967857c76c72850f1",
+          "docs/platform/agent-coordination/architecture/run-handle.md",
+          "unheaded-block-3",
+          "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b"
+        ],
+        "newTuple": [
+          "claim_9d5d0b39286fb978c6de4bbc09e75adb",
+          "docs/platform/agent-coordination/architecture/run-handle.md",
+          "unheaded-block-3",
+          "1f25a51f75e78cb32b002b7ccb303a916191d96c495a81235ebf1b7a8608f694"
+        ],
+        "reviewVerdict": "ok",
+        "reviewNote": "deep: expected-only tuple claim_2e2938c7... block-3 of run-handle.md with digest d4d6dd64...; the committed candidate-unverified-agent-coordination.json at HEAD still lists it (the same digest also appears for eight other files, correctly), the old ID is now an identity gap and the current occupant is the x02 tuple; historical list membership retained and not waived; wording: the sentence about the heading-or-paragraph alternative is generic and applies to x06 only",
+        "proof": {
+          "nativeAccountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-native-content-accounting.json",
+          "nativeAccountingIndex": 3,
+          "candidateLists": [
+            "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-agent-coordination.json",
+            "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-proposals-redesigns.json"
+          ],
+          "currentReceipt": null
+        },
+        "noRelabelling": true,
+        "noWaiver": true
+      },
+      "reviewStatus": "pending",
+      "check": "Authenticate old/new tuple membership and the current refreshed list/receipt. This approves accounting only; no relabelling or waiver."
+    },
+    {
+      "entry": "r06",
+      "kind": "refresh-accounting",
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-ordinary-application-and-refresh.json",
+      "index": 5,
+      "proof": {
+        "entry": "x06",
+        "direction": "missing",
+        "oldTuple": [
+          "claim_f1c6ef52a41ee978ba72a88733520c60",
+          "docs/platform/agent-coordination/architecture/run-handle.md",
+          "implementation-and-design-status",
+          "bef0ccaa8745300be2bf165c8d136047af133c064637af821eed0a95b23d04fe"
+        ],
+        "newTuple": [
+          "claim_f1c6ef52a41ee978ba72a88733520c60",
+          "docs/platform/agent-coordination/architecture/run-handle.md",
+          "implementation-and-design-status",
+          "565cf67de33a96a867f31b05e3ef2330415d5c6385df5a355e92b6d4d5a38421"
+        ],
+        "reviewVerdict": "ok",
+        "reviewNote": "deep: seed pick; expected-only tuple claim_f1c6ef52... heading with the old digest bef0ccaa... still present in the committed candidate list and absent from active reverse E, because the section digest changed with the restored paragraph; replaced by x04, no ordinal identity graft; the six differences (four actual-only, two expected-only) are exactly the six comparator errors and the explanations file counts unexplained as empty",
+        "proof": {
+          "nativeAccountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-native-content-accounting.json",
+          "nativeAccountingIndex": 2,
+          "candidateLists": [
+            "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-agent-coordination.json",
+            "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-proposals-redesigns.json"
+          ],
+          "currentReceipt": null
+        },
+        "noRelabelling": true,
+        "noWaiver": true
+      },
+      "reviewStatus": "pending",
+      "check": "Authenticate old/new tuple membership and the current refreshed list/receipt. This approves accounting only; no relabelling or waiver."
+    },
+    {
+      "entry": "n01",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 1,
+      "proof": {
+        "collection": "metadata",
+        "key": "_binding",
+        "kind": "changed",
+        "before": {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+          "bytes": 62198395,
+          "sha256": "b7b7c94cca23f863ab3d5bb052d9ef0f66fd754bed9cd09de95b757b3b5116ac"
+        },
+        "after": {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+          "bytes": 62196419,
+          "sha256": "6fcd58e6f7a2ea0f17df2b1c4024b2728dfa2d73dfc365278df3c3a1c964018c"
+        },
+        "changedFields": [
+          "bytes",
+          "sha256"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after registry collections from 38672e7f1 to the sole persisted sync. Metadata/marker accounting is not truth approval."
+    },
+    {
+      "entry": "n02",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 2,
+      "proof": {
+        "collection": "metadata",
+        "key": "carriedFromCommit",
+        "kind": "changed",
+        "before": "498048c1a6651556a0ae977a2871135b5ac7c945",
+        "after": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+        "changedFields": []
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after registry collections from 38672e7f1 to the sole persisted sync. Metadata/marker accounting is not truth approval."
+    },
+    {
+      "entry": "n03",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 3,
+      "proof": {
+        "collection": "metadata",
+        "key": "carryForward",
+        "kind": "changed",
+        "before": {
+          "fromCommit": "498048c1a6651556a0ae977a2871135b5ac7c945",
+          "toCommit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+          "oldUnits": 91388,
+          "newUnits": 91388,
+          "kept": 91008,
+          "paired": 374,
+          "moved": 0,
+          "editedKept": 3,
+          "added": 3,
+          "gaps": 3,
+          "retired": 0,
+          "retiredDocuments": 0
+        },
+        "after": {
+          "fromCommit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+          "toCommit": "38672e7f157788cbe1b2bf59511bd61046dce660",
+          "oldUnits": 91388,
+          "newUnits": 91388,
+          "kept": 91012,
+          "paired": 374,
+          "moved": 0,
+          "editedKept": 1,
+          "added": 1,
+          "gaps": 1,
+          "retired": 0,
+          "retiredDocuments": 0
+        },
+        "changedFields": [
+          "added",
+          "editedKept",
+          "fromCommit",
+          "gaps",
+          "kept",
+          "toCommit"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after registry collections from 38672e7f1 to the sole persisted sync. Metadata/marker accounting is not truth approval."
+    },
+    {
+      "entry": "n04",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 4,
+      "proof": {
+        "collection": "metadata",
+        "key": "commit",
+        "kind": "changed",
+        "before": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+        "after": "38672e7f157788cbe1b2bf59511bd61046dce660",
+        "changedFields": []
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after registry collections from 38672e7f1 to the sole persisted sync. Metadata/marker accounting is not truth approval."
+    },
+    {
+      "entry": "n05",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 5,
+      "proof": {
+        "collection": "units",
+        "key": "claim_127225b8542c701295574b1b00749594",
+        "kind": "added",
+        "before": null,
+        "after": {
+          "sourcePath": "docs/backlog.md",
+          "unitDigest": "d65ab03874823983b79507d826dbe801c620f933080b56e6b64483b082e52e6e",
+          "identityFingerprint": "d65ab03874823983b79507d826dbe801c620f933080b56e6b64483b082e52e6e",
+          "claimId": "claim_127225b8542c701295574b1b00749594",
+          "sourceAnchor": "unheaded-block-2",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "7d5317616b4b105936b065a213de9cce47e44c3e623d6dd293ffd0d5dc4c84ec",
+          "claimKind": "unclassified",
+          "status": "future",
+          "origin": "added-since-c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be"
+        },
+        "changedFields": [
+          "claimId",
+          "claimKind",
+          "identityFingerprint",
+          "origin",
+          "sourceAnchor",
+          "sourcePath",
+          "sourceUnitDigest",
+          "status",
+          "unitDigest",
+          "unitKind"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after registry collections from 38672e7f1 to the sole persisted sync. Metadata/marker accounting is not truth approval."
+    },
+    {
+      "entry": "n06",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 6,
+      "proof": {
+        "collection": "units",
+        "key": "claim_3b20c21f7dd91fecef6382c16397c623",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/platform/session-identity/spec.md",
+          "unitDigest": "25baa5728093912506c0f8ea341b390b05b78bce671e213500c4fb899177ec0d",
+          "identityFingerprint": "25baa5728093912506c0f8ea341b390b05b78bce671e213500c4fb899177ec0d",
+          "claimId": "claim_3b20c21f7dd91fecef6382c16397c623",
+          "sourceAnchor": "unheaded-block-1",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "0ec0241bb11b9491bf96749ef3f292f590f7c2e9bc51913dc5b45f972e3cd716",
+          "claimKind": "specification",
+          "status": "future",
+          "origin": "added-since-498048c1a6651556a0ae977a2871135b5ac7c945"
+        },
+        "after": {
+          "sourcePath": "docs/platform/session-identity/spec.md",
+          "unitDigest": "25baa5728093912506c0f8ea341b390b05b78bce671e213500c4fb899177ec0d",
+          "identityFingerprint": "25baa5728093912506c0f8ea341b390b05b78bce671e213500c4fb899177ec0d",
+          "claimId": "claim_3b20c21f7dd91fecef6382c16397c623",
+          "sourceAnchor": "unheaded-block-1",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "0ec0241bb11b9491bf96749ef3f292f590f7c2e9bc51913dc5b45f972e3cd716",
+          "claimKind": "specification",
+          "status": "future"
+        },
+        "changedFields": [
+          "origin"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after registry collections from 38672e7f1 to the sole persisted sync. Metadata/marker accounting is not truth approval."
+    },
+    {
+      "entry": "n07",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 7,
+      "proof": {
+        "collection": "units",
+        "key": "claim_47720e8dc7d54d433aeba2418c93098b",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/platform/session-identity/spec.md",
+          "unitDigest": "e33e44e581a9f4afe71330474cd4301751afa7fba17a75f8da172e55e51bef20",
+          "identityFingerprint": "0269907614ae65aa698d168a28464caee52b578165dcdc9953daec455614b6c4",
+          "claimId": "claim_47720e8dc7d54d433aeba2418c93098b",
+          "sourceAnchor": "session-identity-component-specification",
+          "unitKind": "heading",
+          "sourceUnitDigest": "94917454a42ee413d6555c49f5c86c513d9165ec0ff6ed0924e29634d72a8582",
+          "claimKind": "architecture",
+          "status": "future",
+          "reviewStatus": "needs-review",
+          "lineage": {
+            "fromCommit": "498048c1a6651556a0ae977a2871135b5ac7c945",
+            "fromUnitDigest": "184ecd5327340d2f2bc4166b12cee436632d384caee990164f916c958d36e9d0",
+            "toUnitDigest": "e33e44e581a9f4afe71330474cd4301751afa7fba17a75f8da172e55e51bef20",
+            "fromSourceUnitDigest": "edb2b14e9b84180246823708126e1dbc05f8f2ca57c9a8cce045685960224ce1",
+            "toSourceUnitDigest": "94917454a42ee413d6555c49f5c86c513d9165ec0ff6ed0924e29634d72a8582"
+          }
+        },
+        "after": {
+          "sourcePath": "docs/platform/session-identity/spec.md",
+          "unitDigest": "e33e44e581a9f4afe71330474cd4301751afa7fba17a75f8da172e55e51bef20",
+          "identityFingerprint": "0269907614ae65aa698d168a28464caee52b578165dcdc9953daec455614b6c4",
+          "claimId": "claim_47720e8dc7d54d433aeba2418c93098b",
+          "sourceAnchor": "session-identity-component-specification",
+          "unitKind": "heading",
+          "sourceUnitDigest": "94917454a42ee413d6555c49f5c86c513d9165ec0ff6ed0924e29634d72a8582",
+          "claimKind": "architecture",
+          "status": "future"
+        },
+        "changedFields": [
+          "lineage",
+          "reviewStatus"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after registry collections from 38672e7f1 to the sole persisted sync. Metadata/marker accounting is not truth approval."
+    },
+    {
+      "entry": "n08",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 8,
+      "proof": {
+        "collection": "units",
+        "key": "claim_87f236ae2e3356f5e23e70a7f7224242",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+          "unitDigest": "30148b4c0e53a517416cfc5fb1b22bc8dd7b6301c5f7f69ba51cb1a5cd4025ca",
+          "identityFingerprint": "30148b4c0e53a517416cfc5fb1b22bc8dd7b6301c5f7f69ba51cb1a5cd4025ca",
+          "claimId": "claim_87f236ae2e3356f5e23e70a7f7224242",
+          "sourceAnchor": "unheaded-block-3",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "59d70c7fd04f6212e5c8909a4bf8bca340c7aeb0f372547419ca80fbc74dd78a",
+          "claimKind": "architecture",
+          "status": "future",
+          "origin": "added-since-498048c1a6651556a0ae977a2871135b5ac7c945"
+        },
+        "after": {
+          "sourcePath": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+          "unitDigest": "30148b4c0e53a517416cfc5fb1b22bc8dd7b6301c5f7f69ba51cb1a5cd4025ca",
+          "identityFingerprint": "30148b4c0e53a517416cfc5fb1b22bc8dd7b6301c5f7f69ba51cb1a5cd4025ca",
+          "claimId": "claim_87f236ae2e3356f5e23e70a7f7224242",
+          "sourceAnchor": "unheaded-block-3",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "59d70c7fd04f6212e5c8909a4bf8bca340c7aeb0f372547419ca80fbc74dd78a",
+          "claimKind": "architecture",
+          "status": "future"
+        },
+        "changedFields": [
+          "origin"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after registry collections from 38672e7f1 to the sole persisted sync. Metadata/marker accounting is not truth approval."
+    },
+    {
+      "entry": "n09",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 9,
+      "proof": {
+        "collection": "units",
+        "key": "claim_9b3b7fac64df06547dd06e05f4f026c5",
+        "kind": "removed",
+        "before": {
+          "sourcePath": "docs/backlog.md",
+          "unitDigest": "84458bb943e32f1355bac07b21217404e8d472ff91c1ec1dc486a7743dd8c9d6",
+          "identityFingerprint": "84458bb943e32f1355bac07b21217404e8d472ff91c1ec1dc486a7743dd8c9d6",
+          "claimId": "claim_9b3b7fac64df06547dd06e05f4f026c5",
+          "sourceAnchor": "unheaded-block-2",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "3430068fb5b1687e480e143bc34727fa7d6ada9f1342932c9fdd2f8b23c17da2",
+          "claimKind": "unclassified",
+          "status": "future"
+        },
+        "after": null,
+        "changedFields": [
+          "claimId",
+          "claimKind",
+          "identityFingerprint",
+          "sourceAnchor",
+          "sourcePath",
+          "sourceUnitDigest",
+          "status",
+          "unitDigest",
+          "unitKind"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after registry collections from 38672e7f1 to the sole persisted sync. Metadata/marker accounting is not truth approval."
+    },
+    {
+      "entry": "n10",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 10,
+      "proof": {
+        "collection": "units",
+        "key": "claim_9d5d0b39286fb978c6de4bbc09e75adb",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/platform/agent-coordination/architecture/run-handle.md",
+          "unitDigest": "fc59912d35eb78157c56d47b46235aa9955bf2e27ba7016f353a3a28de61ee1b",
+          "identityFingerprint": "fc59912d35eb78157c56d47b46235aa9955bf2e27ba7016f353a3a28de61ee1b",
+          "claimId": "claim_9d5d0b39286fb978c6de4bbc09e75adb",
+          "sourceAnchor": "unheaded-block-3",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "1f25a51f75e78cb32b002b7ccb303a916191d96c495a81235ebf1b7a8608f694",
+          "claimKind": "architecture",
+          "status": "future",
+          "origin": "added-since-498048c1a6651556a0ae977a2871135b5ac7c945"
+        },
+        "after": {
+          "sourcePath": "docs/platform/agent-coordination/architecture/run-handle.md",
+          "unitDigest": "fc59912d35eb78157c56d47b46235aa9955bf2e27ba7016f353a3a28de61ee1b",
+          "identityFingerprint": "fc59912d35eb78157c56d47b46235aa9955bf2e27ba7016f353a3a28de61ee1b",
+          "claimId": "claim_9d5d0b39286fb978c6de4bbc09e75adb",
+          "sourceAnchor": "unheaded-block-3",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "1f25a51f75e78cb32b002b7ccb303a916191d96c495a81235ebf1b7a8608f694",
+          "claimKind": "architecture",
+          "status": "future"
+        },
+        "changedFields": [
+          "origin"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after registry collections from 38672e7f1 to the sole persisted sync. Metadata/marker accounting is not truth approval."
+    },
+    {
+      "entry": "n11",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 11,
+      "proof": {
+        "collection": "units",
+        "key": "claim_b6963c89796864ca59f82467d506f348",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+          "unitDigest": "64ad2fe38659742d6debea41fbdb62236e592ac2fd442f8c1737e423c1ef1d1a",
+          "identityFingerprint": "275e80f633d4ea169fb1ab51a863af7332b8244e2ec85f9a4d7fd7d8b596bd0a",
+          "claimId": "claim_b6963c89796864ca59f82467d506f348",
+          "sourceAnchor": "implementation-and-design-status",
+          "unitKind": "heading",
+          "sourceUnitDigest": "e9987e41f961ef6c8dc9e9e2b204eafc3ee98883460e98c0c18606ac0cc3a046",
+          "claimKind": "architecture",
+          "status": "future",
+          "reviewStatus": "needs-review",
+          "lineage": {
+            "fromCommit": "498048c1a6651556a0ae977a2871135b5ac7c945",
+            "fromUnitDigest": "2ef32787bed31abb089e8a71ad65e598717f83aef5f59c0f9f47736c5bc752df",
+            "toUnitDigest": "64ad2fe38659742d6debea41fbdb62236e592ac2fd442f8c1737e423c1ef1d1a",
+            "fromSourceUnitDigest": "4fc22267739453739992bd7673b29eaa711de810b721bd915c28f58ec555cc0c",
+            "toSourceUnitDigest": "e9987e41f961ef6c8dc9e9e2b204eafc3ee98883460e98c0c18606ac0cc3a046"
+          }
+        },
+        "after": {
+          "sourcePath": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+          "unitDigest": "64ad2fe38659742d6debea41fbdb62236e592ac2fd442f8c1737e423c1ef1d1a",
+          "identityFingerprint": "275e80f633d4ea169fb1ab51a863af7332b8244e2ec85f9a4d7fd7d8b596bd0a",
+          "claimId": "claim_b6963c89796864ca59f82467d506f348",
+          "sourceAnchor": "implementation-and-design-status",
+          "unitKind": "heading",
+          "sourceUnitDigest": "e9987e41f961ef6c8dc9e9e2b204eafc3ee98883460e98c0c18606ac0cc3a046",
+          "claimKind": "architecture",
+          "status": "future"
+        },
+        "changedFields": [
+          "lineage",
+          "reviewStatus"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after registry collections from 38672e7f1 to the sole persisted sync. Metadata/marker accounting is not truth approval."
+    },
+    {
+      "entry": "n12",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 12,
+      "proof": {
+        "collection": "units",
+        "key": "claim_f0b2a4079764d68b1102ddddb08776ce",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/backlog.md",
+          "unitDigest": "eb37a0f7bbe5c0d4c4ab5d4b3e9fd1259fc8152c286d9e05041ec7599fbcd69c",
+          "identityFingerprint": "cc648a60c0ee1838306fe1fc26a84e7ea554283def177d79a7632b5ed0dbee8e",
+          "claimId": "claim_f0b2a4079764d68b1102ddddb08776ce",
+          "sourceAnchor": "product-backlog",
+          "unitKind": "heading",
+          "sourceUnitDigest": "92be08bb7b0a9af07f2d36307db6a7891545c2ab4590dcbb77074d46c2c8dfbe",
+          "claimKind": "unclassified",
+          "status": "future"
+        },
+        "after": {
+          "sourcePath": "docs/backlog.md",
+          "unitDigest": "2e296ac6311f73f661e5228093762d06399ffd6dfa3d2614d6962a13d1bd6d58",
+          "identityFingerprint": "328d730967bfa5ae2d8a7aa98f1eeaa043832830bfc30545833d93f8dfb0adbe",
+          "claimId": "claim_f0b2a4079764d68b1102ddddb08776ce",
+          "sourceAnchor": "product-backlog",
+          "unitKind": "heading",
+          "sourceUnitDigest": "5f190b849165ce8115369ebb112a31b286e85237f5c3dd32f8493cc3cfd93d17",
+          "claimKind": "unclassified",
+          "status": "future",
+          "reviewStatus": "needs-review",
+          "lineage": {
+            "fromCommit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+            "fromUnitDigest": "eb37a0f7bbe5c0d4c4ab5d4b3e9fd1259fc8152c286d9e05041ec7599fbcd69c",
+            "toUnitDigest": "2e296ac6311f73f661e5228093762d06399ffd6dfa3d2614d6962a13d1bd6d58",
+            "fromSourceUnitDigest": "92be08bb7b0a9af07f2d36307db6a7891545c2ab4590dcbb77074d46c2c8dfbe",
+            "toSourceUnitDigest": "5f190b849165ce8115369ebb112a31b286e85237f5c3dd32f8493cc3cfd93d17"
+          }
+        },
+        "changedFields": [
+          "identityFingerprint",
+          "lineage",
+          "reviewStatus",
+          "sourceUnitDigest",
+          "unitDigest"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after registry collections from 38672e7f1 to the sole persisted sync. Metadata/marker accounting is not truth approval."
+    },
+    {
+      "entry": "n13",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 13,
+      "proof": {
+        "collection": "units",
+        "key": "claim_f1c6ef52a41ee978ba72a88733520c60",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/platform/agent-coordination/architecture/run-handle.md",
+          "unitDigest": "e106f9b9cbcb845af99af61b913c9f36ef35269fc079700d6ae59bab75afe92d",
+          "identityFingerprint": "fe1cafe68efb9af38993d05e2171d902f7d9d7e0be304a2c7fdd20f862207645",
+          "claimId": "claim_f1c6ef52a41ee978ba72a88733520c60",
+          "sourceAnchor": "implementation-and-design-status",
+          "unitKind": "heading",
+          "sourceUnitDigest": "565cf67de33a96a867f31b05e3ef2330415d5c6385df5a355e92b6d4d5a38421",
+          "claimKind": "architecture",
+          "status": "future",
+          "reviewStatus": "needs-review",
+          "lineage": {
+            "fromCommit": "498048c1a6651556a0ae977a2871135b5ac7c945",
+            "fromUnitDigest": "660240a3617d2444b6ad07151342f136439005270deae66460949db1bec8e81c",
+            "toUnitDigest": "e106f9b9cbcb845af99af61b913c9f36ef35269fc079700d6ae59bab75afe92d",
+            "fromSourceUnitDigest": "bef0ccaa8745300be2bf165c8d136047af133c064637af821eed0a95b23d04fe",
+            "toSourceUnitDigest": "565cf67de33a96a867f31b05e3ef2330415d5c6385df5a355e92b6d4d5a38421"
+          }
+        },
+        "after": {
+          "sourcePath": "docs/platform/agent-coordination/architecture/run-handle.md",
+          "unitDigest": "e106f9b9cbcb845af99af61b913c9f36ef35269fc079700d6ae59bab75afe92d",
+          "identityFingerprint": "fe1cafe68efb9af38993d05e2171d902f7d9d7e0be304a2c7fdd20f862207645",
+          "claimId": "claim_f1c6ef52a41ee978ba72a88733520c60",
+          "sourceAnchor": "implementation-and-design-status",
+          "unitKind": "heading",
+          "sourceUnitDigest": "565cf67de33a96a867f31b05e3ef2330415d5c6385df5a355e92b6d4d5a38421",
+          "claimKind": "architecture",
+          "status": "future"
+        },
+        "changedFields": [
+          "lineage",
+          "reviewStatus"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after registry collections from 38672e7f1 to the sole persisted sync. Metadata/marker accounting is not truth approval."
+    },
+    {
+      "entry": "n14",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 14,
+      "proof": {
+        "collection": "identityGaps",
+        "key": "claim_9b3b7fac64df06547dd06e05f4f026c5",
+        "kind": "added",
+        "before": null,
+        "after": {
+          "sourcePath": "docs/backlog.md",
+          "unitDigest": "84458bb943e32f1355bac07b21217404e8d472ff91c1ec1dc486a7743dd8c9d6",
+          "identityFingerprint": "84458bb943e32f1355bac07b21217404e8d472ff91c1ec1dc486a7743dd8c9d6",
+          "claimId": "claim_9b3b7fac64df06547dd06e05f4f026c5",
+          "sourceAnchor": "unheaded-block-2",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "3430068fb5b1687e480e143bc34727fa7d6ada9f1342932c9fdd2f8b23c17da2",
+          "claimKind": "unclassified",
+          "status": "future",
+          "identityStatus": "identity-gap",
+          "gapReason": "edited unit whose anchor unheaded-block-2 is not a stable heading anchor"
+        },
+        "changedFields": [
+          "claimId",
+          "claimKind",
+          "gapReason",
+          "identityFingerprint",
+          "identityStatus",
+          "sourceAnchor",
+          "sourcePath",
+          "sourceUnitDigest",
+          "status",
+          "unitDigest",
+          "unitKind"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after registry collections from 38672e7f1 to the sole persisted sync. Metadata/marker accounting is not truth approval."
+    },
+    {
+      "entry": "n15",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 15,
+      "proof": {
+        "collection": "documents",
+        "key": "docs/backlog.md",
+        "kind": "changed",
+        "before": {
+          "path": "docs/backlog.md",
+          "sourceId": "src_1f1f4fa4ef6f30f09be2164da951294d",
+          "sourceDigest": "4d2d62ea2daf95a874c86396104f345263d5241e3ca96edddf8020690bda8826",
+          "blobSha": "7393034ccba32324522de0e8b2cee077b2b3298d"
+        },
+        "after": {
+          "path": "docs/backlog.md",
+          "sourceId": "src_1f1f4fa4ef6f30f09be2164da951294d",
+          "sourceDigest": "b9f6678387c5f2a15766739e0e14919c1dc8cb7087e5c3784c985f26a1a2dc6d",
+          "blobSha": "5063fd3e2481e1a39bbf33c07a7c9e92deb19043"
+        },
+        "changedFields": [
+          "blobSha",
+          "sourceDigest"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after registry collections from 38672e7f1 to the sole persisted sync. Metadata/marker accounting is not truth approval."
+    }
+  ]
+}

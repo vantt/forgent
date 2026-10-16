@@ -1,6 +1,6 @@
 {
   "method": "Independent file-derived audit; frozen extractor only. No renderer, classifier, saved generated facts or regeneration equality used. Label accounts resolved by claim id at their immutable git commit.",
-  "rowsScanned": 12904,
+  "rowsScanned": 12905,
   "shardsScanned": 93,
   "structuredRows": 733,
   "sectionClaims": 263,

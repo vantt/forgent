@@ -1,3 +1,13 @@
+# Backlog accounting and package complete — independent reviews next
+
+Assignment `unit-run-1792176628519-ac852ba4/producer/1`; docs content/SYNC `38672e7f1`, unchanged. A31/L10-14 now binds the heading, active `claim_127225b8542c701295574b1b00749594` and predecessor gap `claim_9b3b7fac64df06547dd06e05f4f026c5` as ordinary pending by content, never position; no approval carry. The preceding sole native sync remains one 802.964s/62,195,972-byte persistence; registry SHA256 `b20238af95f89cd3a83fbc20dd53ce8df1192153415cd85b9586d53884aa9c2b`. No second carry/persistence.
+
+Global D is 0 fatal against both priors together and each separately. Strict E has 2 pending/28 partial/362 groups/2,336 reverse across 1,045 sources/22,759 claims/2,235 gaps; exact comparator exit0, `ok=true`, **zero differences**. Promotion160/160,H0,T9 17/17,mutation12/12,audit+consistency12,905 rows/93 shards/0 findings,ownership/replay/A/B/H clean. Final relevant tests507/507. Third checkpoint123 shards/2,558,697,813 bytes/all hashes/19 fields/91,388 tuples verified;aggregate SHA256 `4d00146ebab1b783c01425088be06b8fa75d81d18a9c55178082983b49891775`. Genuine full+Step2 rehearsal reran968.706s;clone removed=true;cutover exit1,7 pass/12 blocked/1 review.
+
+**NEXT:** independent ordinary review of [25 entries/one file](review-request-step10-close-index.md) plus the [checkpoint](review-request-step10-checkpoint.md): sensitivity pack first, checkpoint report second, seed key last. Apply matching verdicts and refresh population; then A28 truth sample + final red-team; then a separate close to **awaiting owner review**. Phase6 remains open. No blocker. No docs/protected-tool/vocabulary/extractor/comparator/baseline/fgOS CLI/Git write; runner commits.
+
+---
+
 # Package blocked by one unaccounted native backlog unit
 
 Assignment `unit-run-1792174045086-f2aacd25/producer/1`; content `38672e7f157788cbe1b2bf59511bd61046dce660`; initial docs diff0. One native sync **802.964s**, one compact persistence **62,195,972 bytes**, known **99,584→99,585**, zero loss, **4,486 files/91,388 active tuples equal**. Registry SHA256 **`b20238af95f89cd3a83fbc20dd53ce8df1192153415cd85b9586d53884aa9c2b`**. The generator and 2,301,055,281-byte lossless serialization completed once; a post-serialization one-shot hash hit Node's >2 GiB limit, then chunked hashing/tuple verification reused the completed transport with no second generation or persistence.

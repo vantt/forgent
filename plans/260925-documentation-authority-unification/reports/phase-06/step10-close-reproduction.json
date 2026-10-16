@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "contentCommit": "38672e7f157788cbe1b2bf59511bd61046dce660",
+  "producer": "codex-session:unit-run-1792176628519-ac852ba4@2026-10-17",
+  "readOnlyScripts": {
+    "row-auth.mjs": "import fs from 'node:fs';import assert from 'node:assert/strict';import crypto from 'node:crypto';import {execFileSync} from 'node:child_process';\nconst [part,id]=process.argv.slice(2),read=p=>JSON.parse(fs.readFileSync(p)),sha=b=>crypto.createHash('sha256').update(b).digest('hex'),e=read(part).entries.find(x=>x.entry===id);assert(e,'entry absent');const root=process.cwd(),pin='38672e7f157788cbe1b2bf59511bd61046dce660',{buildConservationUnitLookup}=await import(root+'/scripts/check-doc-inventory-gates.mjs'),at=buildConservationUnitLookup(root,pin),reg=read('plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json'),known=new Map(['units','identityGaps','retiredUnits'].flatMap(k=>(reg[k]||[]).map(r=>[r.claimId,{collection:k,...r}])));\nif(e.kind==='decision'){const row=read(e.file)[e.collection].find(r=>r.claimId===e.claimId);assert.deepEqual(row,e.row);assert.equal(row.reviewStatus,'pending');assert.equal(row.targetOwner,null);assert.equal(row.disposition,'regenerate-from-source');const native=known.get(row.claimId);assert(native);assert.equal(native.sourcePath,'docs/backlog.md');assert.equal(native.sourceAnchor,row.sourceAnchor);assert.equal(native.sourceUnitDigest,row.sourceUnitDigest);console.log(JSON.stringify({entry:e.entry,row,native,unit:native.collection==='units'?(at(native.sourcePath)||[]).find(u=>u.anchor===native.sourceAnchor):null,before:e.before},null,2));}\nelse if(e.kind==='backlog-accounting'){const p=read(e.file).backlogRecarry;assert.deepEqual(p,e.proof);for(const id of e.claimIds)assert(known.has(id));console.log(JSON.stringify({entry:e.entry,proof:p,native:e.claimIds.map(id=>known.get(id)),rows:e.claimIds.map(id=>['claims','registryGaps'].flatMap(k=>read(e.decisionFile)[k]||[]).find(r=>r.claimId===id))},null,2));}\nelse if(e.kind==='refresh-accounting'){const p=read(e.file).comparatorRefreshes[e.index];assert.deepEqual(p,e.proof);const tuples=[p.oldTuple,p.newTuple].filter(Boolean),native=tuples.map(t=>known.get(t[0])).filter(Boolean),units=tuples.map(t=>({tuple:t,current:(at(t[1])||[]).find(u=>u.anchor===t[2]),listedIn:(p.proof.candidateLists||[]).filter(f=>(read(f).rows||[]).some(r=>r.claimId===t[0]))}));console.log(JSON.stringify({entry:e.entry,proof:p,native,units},null,2));}\nelse if(e.kind==='native-accounting'){const p=read(e.accountingFile).changes[e.index-1];assert.deepEqual(p,e.proof);if(p.after?.sourcePath&&p.collection!=='documents'){const n=known.get(p.after.claimId);assert(n);assert.deepEqual(Object.fromEntries(Object.entries(n).filter(([k])=>k!=='collection')),p.after);}console.log(JSON.stringify({entry:e.entry,proof:p,current:p.after?.claimId?known.get(p.after.claimId):null},null,2));}\nelse throw Error('unsupported '+e.kind);\n"
+  },
+  "materialize": "node --input-type=module - <OUT> <<'NODE'\nimport fs from 'node:fs';const o=process.argv[2],j=JSON.parse(fs.readFileSync('plans/260925-documentation-authority-unification/reports/phase-06/step10-close-reproduction.json'));fs.mkdirSync(o,{recursive:true});for(const [n,s] of Object.entries(j.readOnlyScripts))fs.writeFileSync(o+'/'+n,s);\nNODE",
+  "ordinaryCommand": "env -u CLAUDE_CODE_SESSION_ID node --max-old-space-size=512 <OUT>/row-auth.mjs plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-close.json <entry>",
+  "entryIds": [
+    "d01",
+    "d02",
+    "d03",
+    "a01",
+    "r01",
+    "r02",
+    "r03",
+    "r04",
+    "r05",
+    "r06",
+    "n01",
+    "n02",
+    "n03",
+    "n04",
+    "n05",
+    "n06",
+    "n07",
+    "n08",
+    "n09",
+    "n10",
+    "n11",
+    "n12",
+    "n13",
+    "n14",
+    "n15"
+  ],
+  "globalResult": {
+    "D": "step10-package-D-summary.json",
+    "E": "step10-package-E-summary.json",
+    "comparison": "step10-package-comparison.json"
+  },
+  "notes": [
+    "Ordinary reviewers need no native generation or global D/E.",
+    "Review every entry; no producer verdict or sensitivity pack."
+  ]
+}
