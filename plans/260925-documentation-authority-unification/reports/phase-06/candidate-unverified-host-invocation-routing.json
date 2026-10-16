@@ -112,7 +112,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_329b4bcfce8e95e248aeeccbcbeef952",
+      "claimId": "claim_88754cf656cf1454c5ee34d5cb1d0ff3",
       "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
       "anchor": "unheaded-block-4",
       "unitDigest": "ceb33bb84b1999bac2d5070546554ce9498ada3bc463f846eff2c0d2e8129473",
@@ -142,7 +142,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_be2cfd31df91349fad58c345974220a8",
+      "claimId": "claim_9ace0378af33ef44f306352ce284b05c",
       "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
       "anchor": "unheaded-block-5",
       "unitDigest": "9b760da62f6e56cbda32d5425b967cae2156d66465ee367020fa77e919fd9578",
@@ -397,7 +397,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_c5554a28cdc61b5ef89cfd0cbbfda3d9",
+      "claimId": "claim_8bfbb4262b7fd8f909a0ba87fd0e6206",
       "path": "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
       "anchor": "unheaded-block-4",
       "unitDigest": "0030a8ecadd3da43d02992eaa5351328b9e479dbf5632372af05a0f27f2a343b",
@@ -427,7 +427,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_b8ee028b729e7858bb60489a8073c5ee",
+      "claimId": "claim_ac60cea128a499fd60540ff035634387",
       "path": "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
       "anchor": "unheaded-block-5",
       "unitDigest": "1445ff220a93b5864634f29de1750eea50899fc7d34f79a0418597eeb56af7a4",
@@ -592,7 +592,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_3b38101a70e08a774b241f094a18fd7c",
+      "claimId": "claim_b054d5e762a2825bd5b0afbd135fd82f",
       "path": "docs/platform/host-invocation-routing/architecture/invocation-kernel.md",
       "anchor": "unheaded-block-6",
       "unitDigest": "afc0d447b8058af6a9b71b07e93ed38cad616f6ee388b436644c2e206f992e40",
@@ -712,7 +712,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_38ec1158b2d6b794d94d4c0833ba086b",
+      "claimId": "claim_2e93cf87f45ee956f2ed56e46cbf798c",
       "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
       "anchor": "unheaded-block-4",
       "unitDigest": "e7d3883a4de19bd1da5ec89a99879548c428062782c6fe7c80293aea9d90a411",
@@ -742,7 +742,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_8c84eb4c9c8c795f961a25bcc4fc2a41",
+      "claimId": "claim_a1fcc13fa1d8fb64ec7611d55eb19488",
       "path": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
       "anchor": "unheaded-block-5",
       "unitDigest": "d065fc4e83a195caf9a5a2033ffca4acd7c3ef1716b2551929efd2d14217ce88",
@@ -1027,7 +1027,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_3524a9f7bdf4f94a8f02b980d2562ac3",
+      "claimId": "claim_2256e4c675692c7d27a4f2a2d626191d",
       "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
       "anchor": "unheaded-block-6",
       "unitDigest": "2ec5e40e146a13aec30a832e64d0ed69cf42b5c076ad65d8a8aad742dc30da70",
@@ -1387,7 +1387,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_4f9220927515a14b76e4e440ae71e39b",
+      "claimId": "claim_ca6f3ce32704ae2d80dbc0d812e33ff5",
       "path": "docs/platform/host-invocation-routing/architecture/provider-routing.md",
       "anchor": "unheaded-block-8",
       "unitDigest": "2aea4bb7a7b57db96479acebd86bbab8882653a5530274ab63fd5fcf42a01fc3",
@@ -1642,7 +1642,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_bd0481d4bdb68395abf927c719ad6dd7",
+      "claimId": "claim_7b452f8c62d3b53fda9b81e5084f2982",
       "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
       "anchor": "unheaded-block-5",
       "unitDigest": "3e859a799ab1b85e7bf241f8aad775044756a7b9937b5a1475d49642af7af976",
@@ -1672,7 +1672,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_e4c0a544b5c290030181212cb26c06b5",
+      "claimId": "claim_077e9436261842c720dbe6246da4bc3a",
       "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
       "anchor": "unheaded-block-6",
       "unitDigest": "dd2365f988e5303e317e680a0dba513ec33c351e74c3335b04075f4aecf0d678",
@@ -1942,7 +1942,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_a8f170e39133b7c1583883423b246a5a",
+      "claimId": "claim_f2f88b5943acaa73e7f5467b2c89ff1b",
       "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
       "anchor": "unheaded-block-31",
       "unitDigest": "281da983307b9f20bc6b1fa693bed8dfaaadcd8e5418e135b8f90e11cefb0a75",
@@ -2257,7 +2257,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_2b19e028376c0a48fe162a3fcc756da0",
+      "claimId": "claim_1a642f36b5f64d739966b1222cf2d1c1",
       "path": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
       "anchor": "unheaded-block-5",
       "unitDigest": "defc387a05360ad1015640eb0a7c080871ffe33b7d7b7e1f11ac7cac8b70edb3",
@@ -2917,7 +2917,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_8462db41b5a752d5ad672d513eef63c8",
+      "claimId": "claim_12c883b52f2d9112413875c80d0f3b7b",
       "path": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
       "anchor": "unheaded-block-68",
       "unitDigest": "5d49788c33a3a8421bd11af9024b62ac8d98e61bcf37c0da20826a037618b31b",
@@ -3052,7 +3052,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_5b4cde30fa8f5db22b0bb9019163e172",
+      "claimId": "claim_e1cf4c6dd617a3e93884cc21041449f9",
       "path": "docs/platform/host-invocation-routing/contracts/external-provider-manifest.md",
       "anchor": "unheaded-block-5",
       "unitDigest": "e0f4c04562b0127bf2980e5425b66a1120a4967a2854e796abe0b86d4fb01c11",
@@ -3307,7 +3307,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_5f4f3fa2eeaa77eea5f0225b13e75a6a",
+      "claimId": "claim_2f303a0b0819ff9e6ce8f300d784b242",
       "path": "docs/platform/host-invocation-routing/contracts/legacy-payload.md",
       "anchor": "unheaded-block-9",
       "unitDigest": "14c1c0ac5e7be57002c04a3c0beed23bc3afcb963eb9f6ece2afe2dbcb29e015",
@@ -3457,7 +3457,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_2a4a81080a0e94256e1df729edbd97fa",
+      "claimId": "claim_7378b17617d90876833e9fd675112825",
       "path": "docs/platform/host-invocation-routing/contracts/operation-catalog.md",
       "anchor": "unheaded-block-6",
       "unitDigest": "7bb1d6f8897ba4be06cae145af83f0637f0cc803358a4581084ec38a8de12040",
@@ -3862,7 +3862,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_f59a3833efd7c3cf23e00e86cdcc6267",
+      "claimId": "claim_48f38761566de627fa498f5c584bb377",
       "path": "docs/platform/host-invocation-routing/contracts/operation-request-outcome.md",
       "anchor": "unheaded-block-9",
       "unitDigest": "49936b3eb6ca6771135725cc6cd33345764e2bb88097928bf5d925c4401b2939",
@@ -4687,7 +4687,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_7fd674401820141ebb74925792cd516e",
+      "claimId": "claim_263e154d5f0bf9a843cbb17b3ba55b2e",
       "path": "docs/platform/host-invocation-routing/intent-preservation-ledger.md",
       "anchor": "unheaded-block-6",
       "unitDigest": "45d7db6a7075e118c4290ed08d5f2df32c46140aa42cfaee1d4403f87fb84d22",
@@ -6847,7 +6847,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_81abf5d91858b52546282d3e06006c27",
+      "claimId": "claim_ad229a78169cb3f98b0a842fdd895d46",
       "path": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
       "anchor": "unheaded-block-6",
       "unitDigest": "1c48ed72e5ca0c7ba3980eb03fbf61e149bb85f1f5177479511ad50ac369f467",
@@ -7372,7 +7372,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_9a0ac13a48f8031024d3c8bab6086043",
+      "claimId": "claim_03a937f10136bd45f58c69c64092e7a3",
       "path": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
       "anchor": "unheaded-block-12",
       "unitDigest": "cf38877250cde6ac00999479ee793fd3c5fad700a23cd4b37fb51601fcea26de",
@@ -7732,7 +7732,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_20de0f36f45551f5566ca02e6ebe575e",
+      "claimId": "claim_4e9e85cc6d705115bed1886937d0f84e",
       "path": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
       "anchor": "unheaded-block-15",
       "unitDigest": "1ebc5ca17a42cc28d47ba1ca9bebe4c027487a21c4e054e72b537d7c4a33f9db",
@@ -8092,7 +8092,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_d1138b10e140b451ab9fe1c4d99a39a3",
+      "claimId": "claim_bdb98431338d0a6233240f433e6cbe70",
       "path": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
       "anchor": "unheaded-block-16",
       "unitDigest": "318d52d941f1c5655b46f5389a17d612f8de7ea6c356e38fd309aaeadbadf91d",
@@ -8347,7 +8347,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_7e290b307af2de8f90843c4954d62398",
+      "claimId": "claim_989a974d1fa3f43ba46ce69bf5708d5d",
       "path": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
       "anchor": "unheaded-block-6",
       "unitDigest": "bde5207b515b4be800ca245741a3c524e97067e3c96e39853879a1995d7c2ed0",
@@ -8782,7 +8782,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_ae763b0fd649a678fb3c7a8522aaa3f6",
+      "claimId": "claim_dba2f79b14e40be4baf226be555c8a5f",
       "path": "docs/platform/host-invocation-routing/vision.md",
       "anchor": "unheaded-block-11",
       "unitDigest": "ae9e5973a1589865f79a8daee8e14aa245ce6a8b7a0f7af3978006e63771ebb2",
@@ -8812,7 +8812,7 @@
       "status": "candidate-unverified"
     },
     {
-      "claimId": "claim_6bffa0280cda097aa04d4190b40d999d",
+      "claimId": "claim_56b291a46fe7b4cc683ba6dc3a28fe06",
       "path": "docs/platform/host-invocation-routing/vision.md",
       "anchor": "unheaded-block-12",
       "unitDigest": "4c23bb00adc45ab23cb9400ff10fdb8e86c70f7a06af7312c3f47b95beb34790",
@@ -8841,5 +8841,9 @@
     "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-closure-resolution.md",
     "reviewReportCommit": "ff3ec502574afd0e703076c0ea5702d4069d04e0",
     "reviewMode": "ordinary"
+  },
+  "nativeRebindingGlobal": {
+    "SYNC": "498048c1a6651556a0ae977a2871135b5ac7c945",
+    "method": "Exact native tuple or authenticated retained ID; no expected-ID filtering or inferred approval."
   }
 }

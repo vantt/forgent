@@ -1,0 +1,195 @@
+{
+  "ok": true,
+  "HEAD": "498048c1a6651556a0ae977a2871135b5ac7c945",
+  "contentCommit": "c3f22d6a6",
+  "docsSourceDelta": [],
+  "outsideWriteScope": [],
+  "trackedChangedFiles": 17,
+  "newFiles": 79,
+  "registrySHA256": "b7b7c94cca23f863ab3d5bb052d9ef0f66fd754bed9cd09de95b757b3b5116ac",
+  "protectedBytesUnchanged": true,
+  "cloneRemoved": true,
+  "initialCloneRemoved": true,
+  "independentRehearsalStrictEqualsProducerE": true,
+  "DZeroFatalBothTogetherAndEach": true,
+  "strictEAndComparisonRemainOpen": true,
+  "all113PendingRowsSubmitted": true,
+  "Rings": 3,
+  "holds": 0,
+  "newMarkdownLinksChecked": 43,
+  "links": [
+    {
+      "from": "review-request-step10-global-index.md",
+      "target": "review-request-step10-global-pending-01.json"
+    },
+    {
+      "from": "review-request-step10-global-index.md",
+      "target": "review-request-step10-global-pending-02.json"
+    },
+    {
+      "from": "review-request-step10-global-index.md",
+      "target": "review-request-step10-global-pending-03.json"
+    },
+    {
+      "from": "review-request-step10-global-index.md",
+      "target": "review-request-step10-global-pending-04.json"
+    },
+    {
+      "from": "review-request-step10-global-index.md",
+      "target": "review-request-step10-global-pending-05.json"
+    },
+    {
+      "from": "review-request-step10-global-index.md",
+      "target": "review-request-step10-global-pending-06.json"
+    },
+    {
+      "from": "review-request-step10-global-index.md",
+      "target": "review-request-step10-global-pending-07.json"
+    },
+    {
+      "from": "review-request-step10-global-index.md",
+      "target": "review-request-step10-global-pending-08.json"
+    },
+    {
+      "from": "review-request-step10-global-index.md",
+      "target": "review-request-step10-global-pending-09.json"
+    },
+    {
+      "from": "review-request-step10-global-index.md",
+      "target": "review-request-step10-global-pending-10.json"
+    },
+    {
+      "from": "review-request-step10-global-index.md",
+      "target": "step10-global-reproduction.json"
+    },
+    {
+      "from": "review-request-step10-global-index.md",
+      "target": "step10-global-native-reconciliation.json"
+    },
+    {
+      "from": "review-request-step10-global-index.md",
+      "target": "step10-global-backlog-redecision.json"
+    },
+    {
+      "from": "review-request-step10-global-index.md",
+      "target": "step10-global-registry-accounting.json"
+    },
+    {
+      "from": "review-request-step10-global-index.md",
+      "target": "step10-global-candidate-reconciliation.json"
+    },
+    {
+      "from": "review-request-step10-global-index.md",
+      "target": "step10-global-native-proof.json"
+    },
+    {
+      "from": "review-request-step10-global-index.md",
+      "target": "step10-global-rebindings.json"
+    },
+    {
+      "from": "review-request-step10-global-index.md",
+      "target": "step10-global-D-summary.json"
+    },
+    {
+      "from": "review-request-step10-global-index.md",
+      "target": "step10-global-E-summary.json"
+    },
+    {
+      "from": "review-request-step10-global-index.md",
+      "target": "step10-global-comparison-current.json"
+    },
+    {
+      "from": "review-request-step10-global-index.md",
+      "target": "step10-global-promotion-H.json"
+    },
+    {
+      "from": "review-request-step10-global-index.md",
+      "target": "step10-global-alias-coverage.json"
+    },
+    {
+      "from": "review-request-step10-global-index.md",
+      "target": "rehearsal-step-10.md"
+    },
+    {
+      "from": "review-request-step10-global-index.md",
+      "target": "review-request-step10-checkpoint.md"
+    },
+    {
+      "from": "review-request-step10-checkpoint.md",
+      "target": "review-request-step10-global-index.md"
+    },
+    {
+      "from": "review-request-step10-checkpoint.md",
+      "target": "checkpoint-10-source-population.json"
+    },
+    {
+      "from": "review-request-step10-checkpoint.md",
+      "target": "step10-global-reproduction.json"
+    },
+    {
+      "from": "review-request-step10-checkpoint.md",
+      "target": "step10-global-checkpoint-transport-validation.json"
+    },
+    {
+      "from": "review-request-step10-checkpoint.md",
+      "target": "step10-global-prior-witness.json"
+    },
+    {
+      "from": "review-request-step10-checkpoint.md",
+      "target": "step10-global-closure-differences.json"
+    },
+    {
+      "from": "review-request-step10-checkpoint.md",
+      "target": "rehearsal-step-10.md"
+    },
+    {
+      "from": "review-request-step10-checkpoint.md",
+      "target": "rehearsal-step-02.md"
+    },
+    {
+      "from": "rehearsal-step-10.md",
+      "target": "step10-global-rehearsal.json"
+    },
+    {
+      "from": "rehearsal-step-10.md",
+      "target": "rehearsal-step-02.md"
+    },
+    {
+      "from": "rehearsal-step-02.md",
+      "target": "step10-global-rehearsal.json"
+    },
+    {
+      "from": "rehearsal-step-02.md",
+      "target": "rehearsal-step-10.md"
+    },
+    {
+      "from": "step10-global-scorecard-draft.md",
+      "target": "review-request-step10-checkpoint.md"
+    },
+    {
+      "from": "step10-global-scorecard-draft.md",
+      "target": "step10-global-decisions-summary.json"
+    },
+    {
+      "from": "step10-global-scorecard-draft.md",
+      "target": "step10-global-effort.md"
+    },
+    {
+      "from": "step10-global-effort.md",
+      "target": "step10-global-final.log"
+    },
+    {
+      "from": "step10-global-effort.md",
+      "target": "step10-global-postchecks.json"
+    },
+    {
+      "from": "step10-global-effort.md",
+      "target": "step10-global-rehearsal-initial.json"
+    },
+    {
+      "from": "step10-global-effort.md",
+      "target": "step10-global-rehearsal-initial.log"
+    }
+  ],
+  "producerPackOrSeedCreated": false
+}

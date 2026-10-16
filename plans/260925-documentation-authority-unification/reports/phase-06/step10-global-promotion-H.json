@@ -1,0 +1,59 @@
+{
+  "promotion": {
+    "canonicalDocuments": 160,
+    "complete": 159,
+    "headerless": 0,
+    "headeredIncomplete": 1,
+    "headeredDocuments": 160,
+    "evidencePayloads": 302,
+    "headerlessPaths": [],
+    "missingByField": {
+      "Document type": 0,
+      "Audience": 0,
+      "Purpose": 0,
+      "Design status": 0,
+      "Implementation": 1,
+      "Provenance": 1,
+      "Writer type": 1,
+      "Canonical for": 1,
+      "Use this when": 1,
+      "Do not use this for": 1,
+      "Last reviewed": 0,
+      "Related": 0,
+      "Supersedes": 1,
+      "Superseded by": 1
+    },
+    "incomplete": [
+      {
+        "path": "docs/platform/session-identity/spec.md",
+        "missing": [
+          "Implementation",
+          "Provenance",
+          "Writer type",
+          "Canonical for",
+          "Use this when",
+          "Do not use this for",
+          "Supersedes",
+          "Superseded by"
+        ]
+      }
+    ]
+  },
+  "H": {
+    "findings": [],
+    "counts": {
+      "files": 609,
+      "byStatus": {
+        "promoted": 3,
+        "candidate": 214,
+        "legacy-current": 0,
+        "non-authority": 1,
+        "unrouted": 391
+      },
+      "exemptUnrouted": 302,
+      "checked": 217,
+      "findings": 0,
+      "byType": {}
+    }
+  }
+}

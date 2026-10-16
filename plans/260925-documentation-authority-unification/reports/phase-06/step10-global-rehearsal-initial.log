@@ -1,0 +1,10 @@
+Clone genuine native regeneration start 2026-10-16T12:30:17.786Z
+Clone regenerated 2026-10-16T12:40:37.221Z
+Clone global strict done 2026-10-16T12:42:58.061Z
+Clone Step 2 reduced strict done 2026-10-16T12:45:14.457Z
+Error: ENOENT: no such file or directory, open 'plans/260925-documentation-authority-unification/ledger/retiring-roots.json'
+    at Object.openSync (node:fs:561:18)
+    at Object.readFileSync (node:fs:445:35)
+    at read (file:///tmp/fgos-work/global498/rehearsal.mjs:2:207)
+    at file:///tmp/fgos-work/global498/rehearsal.mjs:16:622
+Clone removed true

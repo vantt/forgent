@@ -8163,7 +8163,7 @@
       }
     },
     {
-      "claimId": "claim_4bd5d26ffa7210f7eeb2fd4923263297",
+      "claimId": "claim_12c1a2e9e7024e1bfd575fbeda3a95a5",
       "path": "docs/platform/agent-coordination/spec.md",
       "anchor": "unheaded-block-11",
       "unitDigest": "ea74865624780601cd67f4c2c5138432dfb6a150c7fb8cdb465299fab313b4e0",
@@ -8322,7 +8322,7 @@
       }
     },
     {
-      "claimId": "claim_461c8d744899c9dcceedcfe31024c6ec",
+      "claimId": "claim_105f15e6b189309da77518915b5406e1",
       "path": "docs/platform/agent-coordination/spec.md",
       "anchor": "unheaded-block-16",
       "unitDigest": "897dce4f1eedf73927e88e7bd18e4151bf7daac694151605695d83e6eb387994",
@@ -9621,5 +9621,9 @@
     "candidateUnverifiedCount": 570,
     "nativeSync": false,
     "meaning": "Fresh comparison from persisted registry; metadata application only."
+  },
+  "nativeRebindingGlobal": {
+    "SYNC": "498048c1a6651556a0ae977a2871135b5ac7c945",
+    "method": "Exact native tuple or authenticated retained ID; no expected-ID filtering or inferred approval."
   }
 }

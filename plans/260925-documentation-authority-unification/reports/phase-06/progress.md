@@ -1,3 +1,45 @@
+# Global turn complete — independent review/checkpoint requested, closure blocked
+
+Assignment `unit-run-1792151464109-150279f8/producer/1`;content `c3f22d6a6`;SYNC `498048c1a`,docs delta0. **Holds0;A43 three Rings pending (one move,two supersede).** One native sync673.455s/one compact persistence,known99,567→99,581,zero loss;4,486 files/91,388 active tuples equal. Nine drafts resolved,6 real predecessor gaps;generated backlog heading/body pending;9,216 target bindings/zero drift.
+
+**Final global D0 fatal both priors together/each. E all1,045 sources/22,759 claims:**28 partial,24 pending,362 identical-owner groups,2 undisposed reading-map gaps,2,334 reverse units. Exact comparator **fails307 diagnostics**:155 actual-only/114 expected-only candidate tuples,25 actual-only/10 expected-only groups,+2 unsupported gaps. Pending/partial sets equal;58 candidate tuple updates/138 unresolved preserved. [Every difference](step10-global-closure-differences.json).
+
+**T9 17/17,confirmation pending;promotion0 headerless/1 incomplete Session Identity spec(8 fields);H0;mutation12/12;tests507/507.** Independent audit12,901 rows/92 shards,zero findings,69 historical limits;ownership/replay/A/B/H/current routes clean. Third checkpoint119 full shards/2,475,544,461 bytes,all hashes/complete JSON/native tuples verified;use lossless in-memory replay. Shards remain local/excluded by existing policy; fresh scratch export+validation is supplied (6GiB scratch for v8+JSON). Full+Step2 reduced rehearsal executed,clone removed=True,cutover still blocked. Alias1,028+11=1,039/valid0;snapshot68,463/verifytrue/unsealed.
+
+**NEXT=[ordinary request113 rows/10 small files](review-request-step10-global-index.md) + [independent checkpoint](review-request-step10-checkpoint.md)**. Reviewer builds/commits sensitivity pack first,checkpoint report second,seed key last;Doer created none. Checkpoint acceptance requires explicit resolution/accounting of global comparison and promotion blockers;then separate close to **awaiting owner review**. Phase6 remains open. [Report](step-10-report.md),[draft scorecard](step10-global-scorecard-draft.md),[effort](step10-global-effort.md),[portable commands](step10-global-reproduction.json). Owner token total unreported;A34/truth/32 groups/14 runner-cutover/consumer queues retained. No docs/protected-tool/vocabulary/extractor/baseline-policy/workspace.fgos/fgOS CLI/source-Git writes;runner commits. Scratch clone/fixture Git only;clone removed. MDView unavailable within grant.
+
+---
+
+# Final rehearsal retry — all other global proof complete
+
+Initial genuine clone completed native regeneration and both full/reduced strict scopes, then author wrapper failed on absent OPTIONAL retiring-roots.json; initial receipt/log preserved, clone removed. Wrapper now mirrors unchanged production default null. Final genuine-clone replay is running sequentially; no second native registry carry/persistence.
+
+Independent bounded stdlib JSON parsing now verifies ALL19 top-level fields,91,388 claim tuples,4,596,665 consumer edges,4,486 files and full2,475,544,461-byte aggregate SHA256 across119 shards. All other proof remains: D0 both priors together/each;E comparison307 differences;T9 17/17;H0/promotion1 incomplete;mutation12/12;tests507/507;audit12,901 rows/92 shards/0 findings/69 limits;alias1,028+11;verified snapshot68,463. Holds0,3 Rings pending;ordinary request113 rows/10 parts.
+
+Next: finish corrected rehearsal/cleanup;final checkpoint request+scorecard/report/progress;independent ordinary review + checkpoint (reviewer pack commit first,report second,key last),then separate close to awaiting owner review once blockers resolved/accepted. Phase6 stays open;no docs/protected code/CLI/source-Git writes.
+
+---
+
+# Global proof and third refresh complete — rehearsal running
+
+Final D0 fatal with both priors together/each;E all1,045 sources/22,759 claims:28 partial,24 pending,362 owner groups,2 gaps,2,334 reverse units. Exact comparison fails307 diagnostics:155 actual-only/114 expected-only candidate tuples;25 actual-only/10 expected-only groups;2 undisposed reading-map gaps. Pending/partial sets match. Holds0,three A43 Rings pending. T9 17/17,confirmation pending;promotion1 incomplete Session Identity spec(8 fields),H0;mutation12/12;tests507/507;independent audit12,901 rows/92 shards,zero findings,69 historical witness limits. Full registry accounting61 changes.
+
+Third checkpoint119 complete lossless shards/2,475,544,461 bytes;all hashes/aggregate pass,exact sole-persistence registry copy,original prior preserved at its committed Git blob. Independent bounded JSON parsing/tuple verification queued after rehearsal. Snapshot68,463 verified/unsealed. Alias1,028 covered+11 no-alias=1,039/valid0. Genuine disposable-clone native regeneration now running;will record full+missing Step2 rehearsal and remove clone. No parallel heavy jobs. Ordinary request113 rows/10 small files prepared;checkpoint request/scorecard finalization after rehearsal. Phase6 stays open;independent reviews then separate close to awaiting owner review.
+
+---
+
+# Global native sync complete — full D/E running
+
+SYNC `498048c1a`; no docs delta from content `c3f22d6a6`. Native sync **673.455s**, compact persistence once, **99,567→99,581 known IDs /zero loss**, **4,486 files /91,388 active units /exact tuple equality**. Native registry SHA256 `b7b7c94cca23f863ab3d5bb052d9ef0f66fd754bed9cd09de95b757b3b5116ac`. All nine drafts resolved; six old decisions moved to real native gaps; four retained identities re-decided and five new current decisions pending. All9,216 bindings checked, zero drift. Candidate lists:58 authenticated tuple updates,138 unresolved historical tuples retained explicitly. Global D/E runs sequentially on complete inventory; no closure claim. Promotion:0 headerless/1 incomplete (`session-identity/spec.md`,8 fields); H zero. Alias:1,028 covered+11 reasoned no-alias=1,039, validation exit0. Holds0,three Rings pending. Next: measured global comparison, remaining checks/rehearsal and independent requests.
+
+---
+
+# Global turn in progress at 498048c1a
+
+Assignment `unit-run-1792151464109-150279f8/producer/1`. Content `c3f22d6a6`; SYNC `498048c1a6651556a0ae977a2871135b5ac7c945`; `git diff c3f22d6a6 HEAD -- docs` empty. Holds=0; three A43 Rings rows pending. One native sync and compact persistence, then sequential global D/E, exact comparison, T9/promotion/H/mutation/checkpoint refresh/rehearsal/alias/snapshot checks and independent review requests. No docs edits, protected-tool edits, fgOS CLI, workspace .fgos or Git writes; runner commits. No sensitivity pack authored here.
+
+---
+
 # Round-7 author complete — package + global turn next
 
 Assignment `unit-run-1792150605063-4191f728/producer/1`; SYNC `a9a2b079f6a12d5992461312cd03b5d24c6495a2`. All40 request entries/25 table ok verdicts accounted with verbatim notes; five matching decision approvals applied, native/tool verdicts retained as accounting receipts. Exact entry-023 package registry SHA256 `1f5325ff1b1c2012c06aaf17b805c3f4fc2527923742271dff3d77e10707989e` /62,185,030 bytes bound to `b53dd05df`; registry unchanged.

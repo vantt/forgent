@@ -1,0 +1,262 @@
+{
+  "SYNC": "498048c1a",
+  "authorSession": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+  "meaning": "Every still-pending row, including A43 Rings and all main re-carried/dependent rows. Ordinary independent review; no producer verdict or sample. Immutable current records below.",
+  "entries": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-generated-backlog.json",
+      "shard": "s5-root-generated-backlog.json",
+      "authorSession": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "collection": "registryGaps",
+      "row": {
+        "claimId": "claim_d7660c15ae6c2d2e7d610c1aa571101c",
+        "sourceUnitDigest": "57afbc488deb465cf96541393acb2cef97bed4c9acdea33bec65ef009c0c9a86",
+        "claimKind": "historical-context",
+        "disposition": "regenerate-from-source",
+        "targetOwner": null,
+        "targetAnchor": null,
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+        "rationale": "The complete unheaded-block-2 unit is part of the non-authority generated product-backlog projection. Its header names bee backlog render and the event-sourced PBI input; the frozen root map retains the backlog outside platform authority. Keep the projection at its existing path and regenerate through its owning source workflow when that workflow changes, rather than hand-copying PBI statuses into a candidate spec or treating an exact source-to-itself match as carriage. Full current text and native digest are supplied for independent disposition review. This approves no renderer run, underlying store freshness, historical status truth, retirement, reader cutover or platform promotion. The renderer input .bee/backlog.jsonl is not in the repository and the bee tool is not installed. Commit b6763388b added PBI rows p-c3a41d07, p-c7e90b52 and p-cf1280a6 by hand to docs/backlog.md. docs/backlog.md stays at its existing path and must not be deleted or regenerated at cutover until a real source exists; regenerate-from-source is a future workflow disposition, not permission to discard these bytes.",
+        "reviewNote": "Native predecessor gap; independent review pending; no approval carried.",
+        "sourcePath": "docs/backlog.md",
+        "sourceAnchor": "unheaded-block-2"
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+      "shard": "s5-root-main-recarry.json",
+      "authorSession": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "collection": "registryGaps",
+      "row": {
+        "claimId": "claim_f9c135d80cce2e8cf98c8b3b5b0db4ad",
+        "sourcePath": "docs/architecture-manifest.json",
+        "sourceUnitDigest": "70c00c205578fc34084e5bf8701a6bde0999cb6f05a1b58f8424ad95ed4c28d4",
+        "disposition": "supersede",
+        "targetOwner": "docs/architecture-manifest.json",
+        "targetAnchor": "file-block",
+        "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
+        "reviewStatus": "pending",
+        "rationale": "Source: docs/architecture-manifest.json:1-267#file-block (historical witness at d924f22ca44307ece579169fa2a2d459d5c0197e); unit SHA256 70c00c205578fc34084e5bf8701a6bde0999cb6f05a1b58f8424ad95ed4c28d4.\nTarget: docs/architecture-manifest.json:1-272#file-block (current lines); unit SHA256 74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: this historical predecessor remains conserved at the exact cited git witness. Its current mapped candidate incorporates the upstream doctor-check/YAML decision or manifest additions. Unique complete-file identity, exact retained decision-list prefix, or the unique Doctor-check table establishes the successor by content. Current text is pending independent review; no prior approval or identity is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "targetUnitDigest": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
+        "targetAncestry": []
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+      "shard": "s5-root-main-recarry.json",
+      "authorSession": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "collection": "registryGaps",
+      "row": {
+        "claimId": "claim_b19630ef4dcf1330c9807fc226a90e7b",
+        "sourcePath": "docs/architecture-manifest.json",
+        "sourceUnitDigest": "92391ce631b0c3602a5e22947a73182a6fd37f148e4b052cb4749a55b7657a6d",
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "targetOwner": "docs/architecture-manifest.json",
+        "targetAnchor": "file-block",
+        "rationale": "Source: docs/architecture-manifest.json:1-268#file-block (historical witness at e27182da4cf6c6e496d9d931e82eee7759db4ed2); unit SHA256 92391ce631b0c3602a5e22947a73182a6fd37f148e4b052cb4749a55b7657a6d.\nTarget: docs/architecture-manifest.json:1-272#file-block (current lines); unit SHA256 74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: this historical predecessor remains conserved at the exact cited git witness. Its current mapped candidate incorporates the upstream doctor-check/YAML decision or manifest additions. Unique complete-file identity, exact retained decision-list prefix, or the unique Doctor-check table establishes the successor by content. Current text is pending independent review; no prior approval or identity is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
+        "targetUnitDigest": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
+        "targetAncestry": []
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+      "shard": "s5-root-main-recarry.json",
+      "authorSession": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "collection": "registryGaps",
+      "row": {
+        "claimId": "claim_03ef50e87178220032a3eebe5c5d89d9",
+        "sourcePath": "docs/architecture-manifest.json",
+        "sourceAnchor": "file-block",
+        "sourceUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+        "rationale": "Source: docs/architecture-manifest.json:1-269#file-block (historical witness at 0f60e2f1db7af15581a152e307d0835fc6e510e5); unit SHA256 2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a.\nTarget: docs/platform/contracts/architecture-manifest.json:1-272#file-block (current lines); unit SHA256 74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f supersedes this retained predecessor with the changed current source carried in the mapped candidate. The predecessor source digest and history stay intact; the current-source draft is separately enumerated in step10-round7-new-unit-drafts.json. No identity graft or review carry; native transition owed next package.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "targetOwner": "docs/platform/contracts/architecture-manifest.json",
+        "targetAnchor": "file-block",
+        "targetUnitDigest": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
+        "targetAncestry": [],
+        "reviewNote": "Native predecessor gap; independent review pending; no approval carried."
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-source-completion.json",
+      "shard": "s5-root-source-completion.json",
+      "authorSession": "codex-session:22@2026-10-14",
+      "collection": "registryGaps",
+      "row": {
+        "claimId": "claim_4b96f4f42ea417623dcc794155fa17ce",
+        "sourceUnitDigest": "c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85",
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
+        "targetOwner": "docs/platform/contracts/architecture-manifest.json",
+        "targetAnchor": "file-block",
+        "rationale": "Source: docs/architecture-manifest.json:1-260#file-block (historical witness at 1b818c5862ad1dd31f7d0961c25b5052419450bd); unit SHA256 c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85.\nTarget: docs/platform/contracts/architecture-manifest.json:1-272#file-block (current lines); unit SHA256 74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: this historical predecessor remains conserved at the exact cited git witness. Its current mapped candidate incorporates the upstream doctor-check/YAML decision or manifest additions. Unique complete-file identity, exact retained decision-list prefix, or the unique Doctor-check table establishes the successor by content. Current text is pending independent review; no prior approval or identity is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "sourcePath": "docs/architecture-manifest.json",
+        "sourceAnchor": "file-block",
+        "targetUnitDigest": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
+        "targetAncestry": []
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-predecessor.json",
+      "shard": "s8-herdr-web-dashboard-predecessor.json",
+      "authorSession": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+      "collection": "registryGaps",
+      "row": {
+        "claimId": "claim_7d5937c751aa5fa0db3a489560c25b6b",
+        "sourcePath": "docs/specs/herdr-web-dashboard.md",
+        "sourceUnitDigest": "dfb39feda064d64c81b97e75de9dc9de5f2f795a6828e777f50fad3014f56e97",
+        "disposition": "supersede",
+        "targetOwner": "docs/specs/herdr-web-dashboard.md",
+        "targetAnchor": "unheaded-block-21",
+        "authoredBy": "codex-session:unit-run-1792049113860-a8237dd4@2026-10-15",
+        "reviewStatus": "pending",
+        "rationale": "A40 explicit authorization of A22/A34 dashboard predecessor accounting. The complete same-file current successor adds answer/move --approve forwarding; full old/current text and native successor are in step8-predecessor-reconciliation.json. Accounting only, no identity graft, no approval carry, no source edit. Include in the next bounded truth re-review.",
+        "targetUnitDigest": "7d9e2d425937e495926bbff08bacc8e77e9781253b5c83692215e62cf6da2913",
+        "targetAncestry": [
+          "Spec: herdr Web Dashboard (browser surface for fgOS work)",
+          "Business Rules"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "shard": "s9-runner-01.json",
+      "authorSession": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "collection": "claims",
+      "row": {
+        "claimId": "claim_552ef3d6e22bac10c24cc31e48463d50",
+        "sourceUnitDigest": "b91663aeb373f3e9759bda7e8edf97edc512497d6d3adbf55ebdb6b8c7af5187",
+        "targetOwner": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+        "targetAnchor": "data-dictionary",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
+        "rationale": "Source: docs/specs/runner.md:68-68#data-dictionary (current lines); unit SHA256 b91663aeb373f3e9759bda7e8edf97edc512497d6d3adbf55ebdb6b8c7af5187.\nTarget: docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md:25-25#data-dictionary (current lines); unit SHA256 3ffc347bf68707fd1a1b4d6d8673db7d38467fae324107ddf64e6151d03a3c41.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 3ffc347bf68707fd1a1b4d6d8673db7d38467fae324107ddf64e6151d03a3c41 at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 2; title \"Data Dictionary\" → \"Data Dictionary\".\nWhole direct section differs; depth 2 → 2; 0 distinct link changes; normalized line order differs; 2 removed and 2 added nonblank lines after heading/link/correction normalization.\nSection accounting (existing-labelled-successor-correction): Existing correction labels A41 at immutable account 9b0526380:plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json; Removed direct-section lines have distinct live carrier witnesses docs/platform/runner/spec.md#historical-source-section-552ef3d6, docs/platform/runner/spec.md#unheaded-block-7. Added lines are explicit candidate declarations or labelled corrections in the bound target; these are additions, not source-carriage evidence.  Exact normalized nonblank line delta: removed [\"| 9 | Candidate (Gate A, self-improve loop STR13 Slice 1) | Một việc mang ít nhất một bản ghi friction chưa ngã-ngũ, xếp hạng làm ứng viên tự cải thiện — dẫn xuất TỪ friction đã ghi, không phải một bản ghi độc lập, không bền qua lần `evolve` khác | id, disposition, errorClass, layer, detail, attempts (tất cả lấy từ bản ghi friction MỚI NHẤT theo dấu thời gian của id đó khi id có nhiều bản ghi chưa ngã-ngũ), score (cộng dồn TOÀN BỘ bản ghi chưa ngã-ngũ của id đó, không chỉ bản mới nhất) | — | dẫn xuất mỗi lần gọi `evolve` |\",\"| 10 | Phán quyết Iron Law (self-improve loop STR13 Slice 2/3) | Kết quả của phép tính hai-cửa (module + từ khóa) trên MỘT candidate fix — dẫn xuất thuần từ đầu vào truyền vào, không bền. Gọi từ bên trong `approve` nguồn `runner` (Cổng duyệt PR nội bộ), ngay trước bước kiểm cây sạch, cho MỌI đề xuất nguồn runner đang land LÊN TRUNK (thu hẹp về ranh giới trunk per `0032`) — xem \\\"Cổng duyệt PR nội bộ\\\" và \\\"Iron Law\\\" dưới, Business Rules RUL36 (`evolve --submit` là hành động ghi duy nhất trên bề mặt evolve, tái dùng chính cửa `submit`)/RUL37 (Iron Law hỏi ở đúng một ranh giới — trunk — cho mọi đề xuất nguồn runner tới đó)/RUL64 (`ironLaw.level` — key config riêng của cổng Iron Law, fail-closed về `ask`) | required (có/không cần chứng minh test-đỏ-trước), matchedFlags (danh sách từ khóa rủi ro nặng khớp trong mô tả fix), matchedModules (danh sách file khớp danh sách module minh họa) | — | required mặc định `false` khi cả hai phép thử đều không khớp |\"]; added [\"| 9 | Candidate (former Gate A; Added in candidate: `evolve` removed in `120af6b3d`, `bin/fgos.mjs:4415`) | Một việc mang ít nhất một bản ghi friction chưa ngã-ngũ, xếp hạng làm ứng viên tự cải thiện — dẫn xuất TỪ friction đã ghi, không phải một bản ghi độc lập, không bền qua lần `evolve` khác | id, disposition, errorClass, layer, detail, attempts (tất cả lấy từ bản ghi friction MỚI NHẤT theo dấu thời gian của id đó khi id có nhiều bản ghi chưa ngã-ngũ), score (cộng dồn TOÀN BỘ bản ghi chưa ngã-ngũ của id đó, không chỉ bản mới nhất) | — | former derivation on `evolve`; no current CLI entry |\",\"| 10 | Phán quyết Iron Law (self-improve loop STR13 Slice 2/3) | Kết quả của phép tính hai-cửa (module + từ khóa) trên MỘT candidate fix — dẫn xuất thuần từ đầu vào truyền vào, không bền. Gọi từ bên trong `approve` nguồn `runner` (Cổng duyệt PR nội bộ), ngay trước bước kiểm cây sạch, cho MỌI đề xuất nguồn runner đang land LÊN TRUNK (thu hẹp về ranh giới trunk per `0032`) — xem \\\"Cổng duyệt PR nội bộ\\\" và \\\"Iron Law\\\" dưới, Business Rules RUL36 (former `evolve --submit` contract; Added in candidate: door removed in `120af6b3d`, `bin/fgos.mjs:4415`)/RUL37 (Iron Law hỏi ở đúng một ranh giới — trunk — cho mọi đề xuất nguồn runner tới đó)/RUL64 (`ironLaw.level` — key config riêng của cổng Iron Law, fail-closed về `ask`) | required (có/không cần chứng minh test-đỏ-trước), matchedFlags (danh sách từ khóa rủi ro nặng khớp trong mô tả fix), matchedModules (danh sách file khớp danh sách module minh họa) | — | required mặc định `false` khi cả hai phép thử đều không khớp |\"].\nApplicable labelled corrections:\nA41 F-D: capacity lock is a directory: \"lock ở `~/.fgos/runtime/provider-capacity/state.lock`\" → \"lock là thư mục `~/.fgos/runtime/provider-capacity/state-lock`\"; evidence step9-truth-corrections.json; src/runner/dispatch/provider-capacity.mjs:44-49 (evidence commit 24be6cb1d).\nA41 F-D: recovery has 14 classes: \"8 lớp: hỏng-spawn, quá-giờ, chấm-trượt, hỏng-worktree, nhật-ký-hỏng, đề-xuất-bị-trả, việc-kẹt-do-crash, tranh-chấp-ghi\" → \"14 lớp: `worker-spawn-fail`, `worker-timeout`, `verify-miss`, `verify-timeout`, `worktree-fail`, `corrupt-log`, `reject-returned`, `stale-doing`, `state-conflict`, `dispatch-in-flight`, `dispatch-depth-exceeded`, `provider-limit`, `worker-failed`, `no-executor`\"; evidence step9-truth-corrections.json; src/runner/recovery.mjs:126-141 (evidence commit 24be6cb1d).\nA41 F-E: item log receives pointer and settled output: \"Cùng file còn nhận chunk stdout/stderr LIVE khi worker đang chạy (STR39, xem \\\"Xem live output worker khi đang chạy\\\") — `tail -f` thấy được ngay, không đợi khối kết-cục cuối\" → \"Trong lúc worker chạy, file nhận con trỏ tới capture của Unit run; khối output được nối sau khi run kết thúc\"; evidence step9-truth-corrections.json; src/runner/loop.mjs:349-351 (evidence commit 24be6cb1d); src/runner/loop.mjs:1110-1112 (evidence commit 24be6cb1d); src/runner/loop.mjs:1150-1163 (evidence commit 24be6cb1d).\nA41 F-E: remove raw live-chunk claim: \"xen giữa các khối kết-cục là chunk thô không bọc, ghi ngay khi đến\" → \"con trỏ Unit run được ghi khi run được tạo\"; evidence step9-truth-corrections.json; src/runner/loop.mjs:1110-1112 (evidence commit 24be6cb1d).\nDisposition supersede: Account for docs/specs/runner.md#data-dictionary under docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md#data-dictionary; source context \"Spec: Runner (vòng tự hành)\", target context \"Added in candidate: Runner Data Dictionary\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "targetUnitDigest": "3ffc347bf68707fd1a1b4d6d8673db7d38467fae324107ddf64e6151d03a3c41",
+        "targetAncestry": [
+          "Added in candidate: Runner Data Dictionary"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "shard": "s9-runner-01.json",
+      "authorSession": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "collection": "claims",
+      "row": {
+        "claimId": "claim_5a944093894be93c5792a1c5e14990c6",
+        "sourceUnitDigest": "43f03eb4dffdeff420f464531d60be7e37e13192429963b10ba302be1e9b777e",
+        "targetOwner": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+        "targetAnchor": "unheaded-block-3",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
+        "rationale": "Source: docs/specs/runner.md:70-84#unheaded-block-9 (current lines); unit SHA256 43f03eb4dffdeff420f464531d60be7e37e13192429963b10ba302be1e9b777e.\nTarget: docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md:27-41#unheaded-block-3 (current lines); unit SHA256 417a56fd2a82950722e3a35187fe79050d444a85b8b55a4106d3e45059fa1b39.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 417a56fd2a82950722e3a35187fe79050d444a85b8b55a4106d3e45059fa1b39 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nA41 F-D: capacity lock is a directory: \"lock ở `~/.fgos/runtime/provider-capacity/state.lock`\" → \"lock là thư mục `~/.fgos/runtime/provider-capacity/state-lock`\"; evidence step9-truth-corrections.json; src/runner/dispatch/provider-capacity.mjs:44-49 (evidence commit 24be6cb1d).\nA41 F-D: recovery has 14 classes: \"8 lớp: hỏng-spawn, quá-giờ, chấm-trượt, hỏng-worktree, nhật-ký-hỏng, đề-xuất-bị-trả, việc-kẹt-do-crash, tranh-chấp-ghi\" → \"14 lớp: `worker-spawn-fail`, `worker-timeout`, `verify-miss`, `verify-timeout`, `worktree-fail`, `corrupt-log`, `reject-returned`, `stale-doing`, `state-conflict`, `dispatch-in-flight`, `dispatch-depth-exceeded`, `provider-limit`, `worker-failed`, `no-executor`\"; evidence step9-truth-corrections.json; src/runner/recovery.mjs:126-141 (evidence commit 24be6cb1d).\nA41 F-E: item log receives pointer and settled output: \"Cùng file còn nhận chunk stdout/stderr LIVE khi worker đang chạy (STR39, xem \\\"Xem live output worker khi đang chạy\\\") — `tail -f` thấy được ngay, không đợi khối kết-cục cuối\" → \"Trong lúc worker chạy, file nhận con trỏ tới capture của Unit run; khối output được nối sau khi run kết thúc\"; evidence step9-truth-corrections.json; src/runner/loop.mjs:349-351 (evidence commit 24be6cb1d); src/runner/loop.mjs:1110-1112 (evidence commit 24be6cb1d); src/runner/loop.mjs:1150-1163 (evidence commit 24be6cb1d).\nA41 F-E: remove raw live-chunk claim: \"xen giữa các khối kết-cục là chunk thô không bọc, ghi ngay khi đến\" → \"con trỏ Unit run được ghi khi run được tạo\"; evidence step9-truth-corrections.json; src/runner/loop.mjs:1110-1112 (evidence commit 24be6cb1d).\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-9 under docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md#unheaded-block-3; source context \"Spec: Runner (vòng tự hành) / Data Dictionary\", target context \"Added in candidate: Runner Data Dictionary / Data Dictionary\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "targetUnitDigest": "417a56fd2a82950722e3a35187fe79050d444a85b8b55a4106d3e45059fa1b39",
+        "targetAncestry": [
+          "Added in candidate: Runner Data Dictionary",
+          "Data Dictionary"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "shard": "s9-runner-01.json",
+      "authorSession": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "collection": "claims",
+      "row": {
+        "claimId": "claim_224b5f54d28b453f1e3feaced0468399",
+        "sourceUnitDigest": "52a283ef3e1356d53fc5ae6efb44c1c8c687858b70009ef970c11e151b896b6d",
+        "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+        "targetAnchor": "gate-a-xếp-hạng-candidate-bắc-cầu-sang-việc-thật-evolve",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
+        "rationale": "Source: docs/specs/runner.md:545-545#gate-a-xếp-hạng-candidate-bắc-cầu-sang-việc-thật-evolve (current lines); unit SHA256 52a283ef3e1356d53fc5ae6efb44c1c8c687858b70009ef970c11e151b896b6d.\nTarget: docs/platform/runner/operations/h-51f5cd7279fd.md:454-454#gate-a-xếp-hạng-candidate-bắc-cầu-sang-việc-thật-evolve (current lines); unit SHA256 445c152056e209d17110ce712ff081e8adc824b2abba8197069b59ad8fcc37ab.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 445c152056e209d17110ce712ff081e8adc824b2abba8197069b59ad8fcc37ab at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 3 → 3; title \"Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\" → \"Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\".\nWhole direct section differs; depth 3 → 3; 0 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (heading-and-links): Complete direct sections differ only in heading, link spellings/labels or authenticated exact corrections. Exact normalized nonblank line delta: removed []; added [].\nApplicable labelled corrections:\nA41 F-C: evolve/ranking is absent: \"    - `fgos evolve` — xếp hạng MỖI id còn friction chưa ngã-ngũ\\n (`src/evolve/candidates.mjs`'s `rankCandidates`, tái dùng cơ học\\n      `listUnsettledFrictionsByWork`/`WEIGHTS.frictionUnsettled` của\\n      `entropy.mjs`, không tự định nghĩa lại \\\"chưa ngã-ngũ\\\" hay trọng số\\n      riêng) rồi in TOÀN BỘ danh sách — mỗi dòng mang đủ id/score/\\n      disposition/errorClass/layer/attempts/detail, không cắt bớt (cùng kỷ\\n      luật \\\"mọi trường người cần để phán\\\" như phần friction của `check`).\\n      Không friction chưa ngã-ngũ nào → một thông điệp trạng-thái-rỗng rõ\\n      ràng, exit 0 — chưa khởi tạo `.fgos/` nếu nó chưa tồn tại, giữ đúng hợp\\n      đồng đọc-thuần của `ready`/`list`.\" → \"    - CLI hiện hành không có verb `fgos evolve`; module `src/evolve/candidates.mjs` đã bị xoá và không có hàm `rankCandidates` đang chạy.\"; evidence step9-truth-corrections.json; bin/fgos.mjs:4373-4380 (evidence commit 24be6cb1d); bin/fgos.mjs:4640-4643 (evidence commit 24be6cb1d).\nA41 F-C: scope the old Gate A contract explicitly; unavailable verb is not described as current: \"- **Runs when:** người vận hành gọi `fgos evolve`\" → \"- **Runs when:** CLI hiện hành không có `fgos evolve`; phần còn lại của mục này lưu hợp đồng Gate A trước khi module ranking bị xoá, không mô tả hành vi hiện hành. Theo hợp đồng cũ, người vận hành gọi `fgos evolve`\"; evidence step9-truth-corrections.json; bin/fgos.mjs:4373-4380 (evidence commit 24be6cb1d); git show 120af6b3d -- src/evolve/candidates.mjs.\nA41 addition under Lead A42: scope remaining present-tense Gate A introduction to removed legacy evolve surface (composed with L10-24/citation-refuseHelp): \"Bước vào của vòng tự cải thiện (self-improve loop, STR13 — CONTEXT.md):\\nfgOS xếp hạng chính friction chưa ngã-ngũ của nó thành\\nmột danh sách candidate, người chọn đúng một hoặc dừng (Slice 1), rồi có thể\\nbắc cầu candidate đã chọn sang một việc thật để runner thi công (Slice 3,\\n`--submit`). Loop này chỉ nhắm vào chính `repo/src` của fgOS — không\\nphải một tính năng mở cho host project ngoài — và chạy khi người gọi tay,\\nkhông bao giờ là một nhánh tự động của vòng dispatch thường. Vòng khép\\nkín đầy đủ: `evolve` (liệt kê) → `evolve --pick` (xem một candidate, đọc-thuần)\\n→ `evolve --submit` (bắc cầu, HÀNH ĐỘNG GHI duy nhất của cả bề mặt evolve) →\\nrunner dispatch việc mới như mọi việc khác → `review`/`approve` qua cổng duyệt\\nPR nội bộ, với `approve` chạy thêm phán Iron Law (xem dưới) trước khi merge.\" → \"Added in candidate — A41/A42 correction: CLI hiện hành không có verb `evolve` (`bin/fgos.mjs:4415,4503`; `evolve --help` trả \\\"unknown verb\\\"). Module ranking đã bị xoá ở commit `120af6b3d`. Đoạn dưới ghi lại hợp đồng Gate A trước khi bị gỡ, không xác nhận triển khai hiện hành; full truth check owed at promotion.\\nBước vào trước đây của vòng tự cải thiện (self-improve loop, STR13 — CONTEXT.md):\\nTheo hợp đồng cũ, fgOS xếp hạng chính friction chưa ngã-ngũ của nó thành\\nmột danh sách candidate, người chọn đúng một hoặc dừng (Slice 1), rồi có thể\\nbắc cầu candidate đã chọn sang một việc thật để runner thi công (Slice 3,\\n`--submit`). Loop này chỉ nhắm vào chính `repo/src` của fgOS — không\\nphải một tính năng mở cho host project ngoài — và chạy khi người gọi tay,\\nkhông bao giờ là một nhánh tự động của vòng dispatch thường. Vòng khép\\nkín đầy đủ: `evolve` (liệt kê) → `evolve --pick` (xem một candidate, đọc-thuần)\\n→ `evolve --submit` (bắc cầu, HÀNH ĐỘNG GHI duy nhất của cả bề mặt evolve) →\\nrunner dispatch việc mới như mọi việc khác → `review`/`approve` qua cổng duyệt\\nPR nội bộ, với `approve` chạy thêm phán Iron Law (xem dưới) trước khi merge.\"; evidence step9-truth-corrections.json; bin/fgos.mjs:4373 (evidence commit 24be6cb1d); bin/fgos.mjs:4461 (evidence commit 24be6cb1d); 120af6b3d; single CLI evidence probe, env -u CLAUDE_CODE_SESSION_ID node bin/fgos.mjs evolve --help.\nL10-24/citation-refuseHelp [intermediate state; witness 19ca8de23]: \"bin/fgos.mjs:4373,4461\" → \"bin/fgos.mjs:4415,4503\"; evidence step10-round3-doc-edits.json; bin/fgos.mjs:4414-4417,4503 (evidence commit 5035fed52e60254ecbe034cc987553feb24616f4).\nDisposition supersede: Account for docs/specs/runner.md#gate-a-xếp-hạng-candidate-bắc-cầu-sang-việc-thật-evolve under docs/platform/runner/operations/h-51f5cd7279fd.md#gate-a-xếp-hạng-candidate-bắc-cầu-sang-việc-thật-evolve; source context \"Spec: Runner (vòng tự hành) / Behaviors & Operations\", target context \"Added in candidate: Runner Behaviors & Operations / Behaviors & Operations\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "targetUnitDigest": "445c152056e209d17110ce712ff081e8adc824b2abba8197069b59ad8fcc37ab",
+        "targetAncestry": [
+          "Added in candidate: Runner Behaviors & Operations",
+          "Behaviors & Operations"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "shard": "s9-runner-01.json",
+      "authorSession": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "collection": "claims",
+      "row": {
+        "claimId": "claim_979ec4a61acca9e1b6a0a3967b1d0c88",
+        "sourceUnitDigest": "c7182f609c029616bc8c23ef95b7fb69ade8fc943ebf7aba8f339003c4437459",
+        "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+        "targetAnchor": "unheaded-block-26",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
+        "rationale": "Source: docs/specs/runner.md:547-557#unheaded-block-38 (current lines); unit SHA256 c7182f609c029616bc8c23ef95b7fb69ade8fc943ebf7aba8f339003c4437459.\nTarget: docs/platform/runner/operations/h-51f5cd7279fd.md:456-467#unheaded-block-26 (current lines); unit SHA256 0f61fde6bc880cb19623ecde63a6a137571884e4b6ae2f8b24b8a585b25d600a.\nSource and target unit digests differ.\nTarget changed since last reviewed digest 0dce2b78b5d497ab9dbe1b9cc6d0d8a00ad2ff468b97fe5964c8e86464b0a3b2 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nA41 addition under Lead A42: scope remaining present-tense Gate A introduction to removed legacy evolve surface (composed with L10-24/citation-refuseHelp): \"Bước vào của vòng tự cải thiện (self-improve loop, STR13 — CONTEXT.md):\\nfgOS xếp hạng chính friction chưa ngã-ngũ của nó thành\\nmột danh sách candidate, người chọn đúng một hoặc dừng (Slice 1), rồi có thể\\nbắc cầu candidate đã chọn sang một việc thật để runner thi công (Slice 3,\\n`--submit`). Loop này chỉ nhắm vào chính `repo/src` của fgOS — không\\nphải một tính năng mở cho host project ngoài — và chạy khi người gọi tay,\\nkhông bao giờ là một nhánh tự động của vòng dispatch thường. Vòng khép\\nkín đầy đủ: `evolve` (liệt kê) → `evolve --pick` (xem một candidate, đọc-thuần)\\n→ `evolve --submit` (bắc cầu, HÀNH ĐỘNG GHI duy nhất của cả bề mặt evolve) →\\nrunner dispatch việc mới như mọi việc khác → `review`/`approve` qua cổng duyệt\\nPR nội bộ, với `approve` chạy thêm phán Iron Law (xem dưới) trước khi merge.\" → \"Added in candidate — A41/A42 correction: CLI hiện hành không có verb `evolve` (`bin/fgos.mjs:4415,4503`; `evolve --help` trả \\\"unknown verb\\\"). Module ranking đã bị xoá ở commit `120af6b3d`. Đoạn dưới ghi lại hợp đồng Gate A trước khi bị gỡ, không xác nhận triển khai hiện hành; full truth check owed at promotion.\\nBước vào trước đây của vòng tự cải thiện (self-improve loop, STR13 — CONTEXT.md):\\nTheo hợp đồng cũ, fgOS xếp hạng chính friction chưa ngã-ngũ của nó thành\\nmột danh sách candidate, người chọn đúng một hoặc dừng (Slice 1), rồi có thể\\nbắc cầu candidate đã chọn sang một việc thật để runner thi công (Slice 3,\\n`--submit`). Loop này chỉ nhắm vào chính `repo/src` của fgOS — không\\nphải một tính năng mở cho host project ngoài — và chạy khi người gọi tay,\\nkhông bao giờ là một nhánh tự động của vòng dispatch thường. Vòng khép\\nkín đầy đủ: `evolve` (liệt kê) → `evolve --pick` (xem một candidate, đọc-thuần)\\n→ `evolve --submit` (bắc cầu, HÀNH ĐỘNG GHI duy nhất của cả bề mặt evolve) →\\nrunner dispatch việc mới như mọi việc khác → `review`/`approve` qua cổng duyệt\\nPR nội bộ, với `approve` chạy thêm phán Iron Law (xem dưới) trước khi merge.\"; evidence step9-truth-corrections.json; bin/fgos.mjs:4373 (evidence commit 24be6cb1d); bin/fgos.mjs:4461 (evidence commit 24be6cb1d); 120af6b3d; single CLI evidence probe, env -u CLAUDE_CODE_SESSION_ID node bin/fgos.mjs evolve --help.\nL10-24/citation-refuseHelp [intermediate state; witness 19ca8de23]: \"bin/fgos.mjs:4373,4461\" → \"bin/fgos.mjs:4415,4503\"; evidence step10-round3-doc-edits.json; bin/fgos.mjs:4414-4417,4503 (evidence commit 5035fed52e60254ecbe034cc987553feb24616f4).\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-38 under docs/platform/runner/operations/h-51f5cd7279fd.md#unheaded-block-26; source context \"Spec: Runner (vòng tự hành) / Behaviors & Operations / Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\", target context \"Added in candidate: Runner Behaviors & Operations / Behaviors & Operations / Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "targetUnitDigest": "0f61fde6bc880cb19623ecde63a6a137571884e4b6ae2f8b24b8a585b25d600a",
+        "targetAncestry": [
+          "Added in candidate: Runner Behaviors & Operations",
+          "Behaviors & Operations",
+          "Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "shard": "s9-runner-01.json",
+      "authorSession": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "collection": "claims",
+      "row": {
+        "claimId": "claim_0686418ae7571d82eade8059c698709d",
+        "sourceUnitDigest": "3f682e32dc04d19e654abc927f8a3570f8ed866f17711e4ff18302e2840461e7",
+        "targetOwner": "docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
+        "targetAnchor": "actors-access",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
+        "rationale": "Source: docs/specs/runner.md:947-947#actors-access (current lines); unit SHA256 3f682e32dc04d19e654abc927f8a3570f8ed866f17711e4ff18302e2840461e7.\nTarget: docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md:25-25#actors-access (current lines); unit SHA256 704500af02588d8c934f08e738fc13445896cc4feba37d83c162b866d7d59e42.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 704500af02588d8c934f08e738fc13445896cc4feba37d83c162b866d7d59e42 at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 2; title \"Actors & Access\" → \"Actors & Access\".\nWhole direct section differs; depth 2 → 2; 0 distinct link changes; normalized line order differs; 1 removed and 1 added nonblank lines after heading/link/correction normalization.\nSection accounting (split-or-corrected-section): Removed direct-section lines have distinct live carrier witnesses docs/platform/runner/spec.md#historical-source-section-0686418a, docs/platform/runner/spec.md#unheaded-block-9. Added lines are explicit candidate declarations or labelled corrections in the bound target; these are additions, not source-carriage evidence.  Exact normalized nonblank line delta: removed [\"| Xếp hạng/xem candidate tự cải thiện (Gate A, `evolve`) | ✓ | — | — |\"]; added [\"| Xếp hạng/xem candidate tự cải thiện (Gate A, former `evolve`; Added in candidate: door removed in `120af6b3d`, `bin/fgos.mjs:4415`) | Historical operator role | — | — |\"].\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#actors-access under docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md#actors-access; source context \"Spec: Runner (vòng tự hành)\", target context \"Added in candidate: Runner Actors & Access\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "targetUnitDigest": "704500af02588d8c934f08e738fc13445896cc4feba37d83c162b866d7d59e42",
+        "targetAncestry": [
+          "Added in candidate: Runner Actors & Access"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "shard": "s9-runner-01.json",
+      "authorSession": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "collection": "claims",
+      "row": {
+        "claimId": "claim_add6d13e14df87ad5d5bd46cc5bb98d4",
+        "sourceUnitDigest": "81c2724820c499b40d0e4d2964c798263c2ad99a479582176a95ee13b7f4d24e",
+        "targetOwner": "docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
+        "targetAnchor": "unheaded-block-3",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
+        "rationale": "Source: docs/specs/runner.md:949-956#unheaded-block-60 (current lines); unit SHA256 81c2724820c499b40d0e4d2964c798263c2ad99a479582176a95ee13b7f4d24e.\nTarget: docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md:27-34#unheaded-block-3 (current lines); unit SHA256 6ee82017c754d1ebcfed7fcd146851cdd954235737f350c0dbd70a9629516110.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 6ee82017c754d1ebcfed7fcd146851cdd954235737f350c0dbd70a9629516110 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-60 under docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md#unheaded-block-3; source context \"Spec: Runner (vòng tự hành) / Actors & Access\", target context \"Added in candidate: Runner Actors & Access / Actors & Access\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "targetUnitDigest": "6ee82017c754d1ebcfed7fcd146851cdd954235737f350c0dbd70a9629516110",
+        "targetAncestry": [
+          "Added in candidate: Runner Actors & Access",
+          "Actors & Access"
+        ]
+      }
+    }
+  ]
+}

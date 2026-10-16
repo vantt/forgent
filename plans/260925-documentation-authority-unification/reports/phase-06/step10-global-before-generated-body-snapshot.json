@@ -1,0 +1,13 @@
+{
+  "pin": "498048c1a6651556a0ae977a2871135b5ac7c945",
+  "dryRun": true,
+  "sealed": false,
+  "rows": 68463,
+  "sha256": "f4534c09f4a85c30e50dcfd7f8386a1a4eee2d43a3738fad9466fe6721e25873",
+  "verify": {
+    "ok": true,
+    "rows": 68463,
+    "sha256": "f4534c09f4a85c30e50dcfd7f8386a1a4eee2d43a3738fad9466fe6721e25873"
+  },
+  "snapshotBytes": 116940129
+}

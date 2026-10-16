@@ -1,7 +1,7 @@
 {
   "version": 1,
   "shard": "s5-root-boundary-sync.json",
-  "authorSession": "codex-session:27@2026-10-14",
+  "authorSession": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
   "authorshipRequired": true,
   "sources": [
     "docs/architect/agent-coordination/README.md",
@@ -213,24 +213,6 @@
       "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
     },
     {
-      "claimId": "claim_f703aeda7755ab376e6e3eee88eb82c2",
-      "sourceUnitDigest": "4f47df08a667f8edb2b8e4418246ac6ca36b09f02f255f3d344b268393034399",
-      "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "unheaded-block-92",
-      "claimKind": "specification",
-      "disposition": "supersede",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
-      "rationale": "Source: docs/specs/distribution.md:324-325#unheaded-block-15 (historical witness at 0f60e2f1db7af15581a152e307d0835fc6e510e5); unit SHA256 4f47df08a667f8edb2b8e4418246ac6ca36b09f02f255f3d344b268393034399.\nTarget: docs/platform/packaging-distribution/spec.md:708-710#unheaded-block-92 (current lines); unit SHA256 87f98a72908fb6991a3cd9bdf8c1407373d72b039ad1b3e83a35a89a2a87d299.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: this historical predecessor remains conserved at the exact cited git witness. Its current mapped candidate incorporates the upstream doctor-check/YAML decision or manifest additions. Unique complete-file identity, exact retained decision-list prefix, or the unique Doctor-check table establishes the successor by content. Current text is pending independent review; no prior approval or identity is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "targetUnitDigest": "87f98a72908fb6991a3cd9bdf8c1407373d72b039ad1b3e83a35a89a2a87d299",
-      "targetAncestry": [
-        "Spec: Packaging-Distribution",
-        "Retained Distribution Source Detail",
-        "Spec: Distribution",
-        "Lịch sử quyết định"
-      ]
-    },
-    {
       "claimId": "claim_53838c4268148341ce0069394572d0eb",
       "sourceUnitDigest": "b712c1644b8475d3e1625be217fc446174718933cddf4092f1da35b3125f59e7",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
@@ -401,6 +383,22 @@
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0236-bounded-corrections.md",
       "reviewMode": "ordinary",
       "reviewReportCommit": "6fbb5aed0493b2afb99552ef5bd5cefac897e551"
+    },
+    {
+      "claimId": "claim_35a5dbff0280f3ec835d94703f9f8151",
+      "sourcePath": "docs/architecture-manifest.json",
+      "sourceAnchor": "file-block",
+      "sourceUnitDigest": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
+      "claimKind": "contract",
+      "targetOwner": "docs/platform/contracts/architecture-manifest.json",
+      "targetAnchor": "file-block",
+      "targetUnitDigest": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
+      "targetAncestry": [],
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "rationale": "Source: docs/architecture-manifest.json:1-272#file-block (current lines); unit SHA256 74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507.\nTarget: docs/platform/contracts/architecture-manifest.json:1-272#file-block (current lines); unit SHA256 74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: A31 SYNC a9a2b079f: upstream changed content is carried verbatim in its mapped candidate; surrounding candidate corrections and placement remain. Native identity resolved at SYNC 498048c1a by exact path/anchor/full source digest. No approval inherited.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "Current native source binding; independent ordinary review pending."
     }
   ],
   "registryGaps": [
@@ -1316,6 +1314,27 @@
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-accounting-01-62751458b.md",
       "reviewMode": "ordinary",
       "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
+    },
+    {
+      "claimId": "claim_f703aeda7755ab376e6e3eee88eb82c2",
+      "sourceUnitDigest": "4f47df08a667f8edb2b8e4418246ac6ca36b09f02f255f3d344b268393034399",
+      "targetOwner": "docs/platform/packaging-distribution/spec.md",
+      "targetAnchor": "unheaded-block-92",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "rationale": "Source: docs/specs/distribution.md:324-325#unheaded-block-15 (historical witness at 0f60e2f1db7af15581a152e307d0835fc6e510e5); unit SHA256 4f47df08a667f8edb2b8e4418246ac6ca36b09f02f255f3d344b268393034399.\nTarget: docs/platform/packaging-distribution/spec.md:708-710#unheaded-block-92 (current lines); unit SHA256 87f98a72908fb6991a3cd9bdf8c1407373d72b039ad1b3e83a35a89a2a87d299.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: this historical predecessor remains conserved at the exact cited git witness. Its current mapped candidate incorporates the upstream doctor-check/YAML decision or manifest additions. Unique complete-file identity, exact retained decision-list prefix, or the unique Doctor-check table establishes the successor by content. Current text is pending independent review; no prior approval or identity is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "targetUnitDigest": "87f98a72908fb6991a3cd9bdf8c1407373d72b039ad1b3e83a35a89a2a87d299",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution",
+        "Lịch sử quyết định"
+      ],
+      "sourcePath": "docs/specs/distribution.md",
+      "sourceAnchor": "unheaded-block-15",
+      "reviewNote": "Native predecessor gap; independent review pending; no approval carried."
     }
   ]
 }

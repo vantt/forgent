@@ -1,0 +1,43 @@
+{
+  "ok": true,
+  "method": "Independent bounded stdlib JSONDecoder parsing of every complete top-level field and array element from all119 shards, plus full native active tuple equality and aggregate SHA256; no projection or omitted inventory field.",
+  "topLevelKeys": [
+    "$schema",
+    "version",
+    "generatedAt",
+    "phase",
+    "description",
+    "commit",
+    "identityRegistry",
+    "scanRoots",
+    "additionalRootFiles",
+    "summary",
+    "duplicateContentGroups",
+    "semanticConflictGroups",
+    "claimIdentityGapRows",
+    "scanGaps",
+    "immutableRefEdges",
+    "claimLedger",
+    "consumerEdges",
+    "inboundLinkEdges",
+    "items"
+  ],
+  "arrayCounts": {
+    "scanRoots": 1,
+    "additionalRootFiles": 2,
+    "duplicateContentGroups": 822,
+    "semanticConflictGroups": 219,
+    "claimIdentityGapRows": 0,
+    "scanGaps": 13,
+    "immutableRefEdges": 4085,
+    "claimLedger": 91388,
+    "consumerEdges": 4596665,
+    "inboundLinkEdges": 4484,
+    "items": 4486
+  },
+  "sourceFiles": 4486,
+  "claims": 91388,
+  "activeTupleEquality": true,
+  "bytes": 2475544461,
+  "sha256": "7926809ecf436df6105d0beeffde0c775859953236b3f7886a18cf0dc661f797"
+}

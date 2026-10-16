@@ -1,0 +1,1840 @@
+{
+  "previousRequestCommit": "b53dd05dff3b7608ad9000eea82b4d6fc12c84f7",
+  "currentCommit": "498048c1a6651556a0ae977a2871135b5ac7c945",
+  "registry": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+  "method": "All top-level keys and all identity/document collections, including removals and marker-only changes. No selected-ID filter.",
+  "changes": [
+    {
+      "collection": "metadata",
+      "key": "_binding",
+      "kind": "changed",
+      "before": {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+        "bytes": 62185799,
+        "sha256": "3ead3b5244f88f956f2e9a535d3f93f9c4f352ecea6c1bf219690a2cb4c25abc"
+      },
+      "after": {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+        "bytes": 62185030,
+        "sha256": "1f5325ff1b1c2012c06aaf17b805c3f4fc2527923742271dff3d77e10707989e"
+      },
+      "changedFields": [
+        "bytes",
+        "sha256"
+      ]
+    },
+    {
+      "collection": "metadata",
+      "key": "carriedFromCommit",
+      "kind": "changed",
+      "before": "4d363436049120ffc9b94dd5269f06a026a827fd",
+      "after": "ade5812a9f444f895185594aedc1f73cf8b2288a",
+      "changedFields": []
+    },
+    {
+      "collection": "metadata",
+      "key": "carryForward",
+      "kind": "changed",
+      "before": {
+        "fromCommit": "4d363436049120ffc9b94dd5269f06a026a827fd",
+        "toCommit": "ade5812a9f444f895185594aedc1f73cf8b2288a",
+        "oldUnits": 91386,
+        "newUnits": 91386,
+        "kept": 91012,
+        "paired": 374,
+        "moved": 0,
+        "editedKept": 0,
+        "added": 0,
+        "gaps": 0,
+        "retired": 0,
+        "retiredDocuments": 0
+      },
+      "after": {
+        "fromCommit": "ade5812a9f444f895185594aedc1f73cf8b2288a",
+        "toCommit": "498048c1a6651556a0ae977a2871135b5ac7c945",
+        "oldUnits": 91386,
+        "newUnits": 91388,
+        "kept": 90990,
+        "paired": 374,
+        "moved": 0,
+        "editedKept": 10,
+        "added": 14,
+        "gaps": 12,
+        "retired": 0,
+        "retiredDocuments": 0
+      },
+      "changedFields": [
+        "added",
+        "editedKept",
+        "fromCommit",
+        "gaps",
+        "kept",
+        "newUnits",
+        "toCommit"
+      ]
+    },
+    {
+      "collection": "metadata",
+      "key": "commit",
+      "kind": "changed",
+      "before": "ade5812a9f444f895185594aedc1f73cf8b2288a",
+      "after": "498048c1a6651556a0ae977a2871135b5ac7c945",
+      "changedFields": []
+    },
+    {
+      "collection": "units",
+      "key": "claim_03ef50e87178220032a3eebe5c5d89d9",
+      "kind": "removed",
+      "before": {
+        "sourcePath": "docs/architecture-manifest.json",
+        "unitDigest": "bee0f585dc079a9cf24fe84a2cfacaa3aa99e6818f4fbf4e69dbf76dd601e99c",
+        "identityFingerprint": "bee0f585dc079a9cf24fe84a2cfacaa3aa99e6818f4fbf4e69dbf76dd601e99c",
+        "claimId": "claim_03ef50e87178220032a3eebe5c5d89d9",
+        "sourceAnchor": "file-block",
+        "unitKind": "file-block",
+        "sourceUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
+        "claimKind": "contract",
+        "status": "future"
+      },
+      "after": null,
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "identityFingerprint",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_0b9fcf0a1a07c29e6ae48f02d7f5dc59",
+      "kind": "removed",
+      "before": {
+        "sourcePath": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+        "unitDigest": "dfaa1d1ff9e96e3acd207cd169acef9f1fa12da6a91d8c349c4eb540d297a9a4",
+        "identityFingerprint": "dfaa1d1ff9e96e3acd207cd169acef9f1fa12da6a91d8c349c4eb540d297a9a4",
+        "claimId": "claim_0b9fcf0a1a07c29e6ae48f02d7f5dc59",
+        "sourceAnchor": "unheaded-block-13",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "a6662af528d7186106b7dc978680ed96bcc4b7500854e3f4bfb8ddd204e728eb",
+        "claimKind": "architecture",
+        "status": "future"
+      },
+      "after": null,
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "identityFingerprint",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_0fa55480c276f05a190ac7c866632f9e",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "sourcePath": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+        "unitDigest": "ab506b8d2df15cb275914e2f7c92d098a7043c781e5c1203bef95cda6de4d4d8",
+        "identityFingerprint": "ab506b8d2df15cb275914e2f7c92d098a7043c781e5c1203bef95cda6de4d4d8",
+        "claimId": "claim_0fa55480c276f05a190ac7c866632f9e",
+        "sourceAnchor": "unheaded-block-14",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "67f9f91fe484e41c014e151aaee4856f8aba43c473e42ffa3428d00e693db22c",
+        "claimKind": "unclassified",
+        "status": "future",
+        "origin": "added-since-ade5812a9f444f895185594aedc1f73cf8b2288a"
+      },
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "identityFingerprint",
+        "origin",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_18e6220e1e54f07c5754d1f5cc61187f",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "sourcePath": "docs/platform/runner/architecture/h-69197b459754.md",
+        "unitDigest": "07e8b7a8f8522eb37c2a8aea63ff636e995355fc9cfd93e500c9a17760998c00",
+        "identityFingerprint": "07e8b7a8f8522eb37c2a8aea63ff636e995355fc9cfd93e500c9a17760998c00",
+        "claimId": "claim_18e6220e1e54f07c5754d1f5cc61187f",
+        "sourceAnchor": "unheaded-block-5",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "75a73f547e8e94133e10c4e8a503a4be54ab173417f1b7fe4b8bf54555507a53",
+        "claimKind": "architecture",
+        "status": "future",
+        "origin": "added-since-ade5812a9f444f895185594aedc1f73cf8b2288a"
+      },
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "identityFingerprint",
+        "origin",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_2c510f453909b3c7e8a107811003b21e",
+      "kind": "removed",
+      "before": {
+        "sourcePath": "docs/platform/packaging-distribution/spec.md",
+        "unitDigest": "efdbc472e987bef628352ebcce1a16bf80b33d017c6b99af37f0f9d20d2dd69f",
+        "identityFingerprint": "efdbc472e987bef628352ebcce1a16bf80b33d017c6b99af37f0f9d20d2dd69f",
+        "claimId": "claim_2c510f453909b3c7e8a107811003b21e",
+        "sourceAnchor": "unheaded-block-85",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
+        "claimKind": "specification",
+        "status": "future"
+      },
+      "after": null,
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "identityFingerprint",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_35a5dbff0280f3ec835d94703f9f8151",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "sourcePath": "docs/architecture-manifest.json",
+        "unitDigest": "67c1b8cb95183cf31ddc23488a21df07dd360a01d5ccf95cd9c0d520e0e6e862",
+        "identityFingerprint": "67c1b8cb95183cf31ddc23488a21df07dd360a01d5ccf95cd9c0d520e0e6e862",
+        "claimId": "claim_35a5dbff0280f3ec835d94703f9f8151",
+        "sourceAnchor": "file-block",
+        "unitKind": "file-block",
+        "sourceUnitDigest": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
+        "claimKind": "contract",
+        "status": "future",
+        "origin": "added-since-ade5812a9f444f895185594aedc1f73cf8b2288a"
+      },
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "identityFingerprint",
+        "origin",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_383a6485c1aaed79a640a59463183fe8",
+      "kind": "changed",
+      "before": {
+        "sourcePath": "docs/specs/runner.md",
+        "unitDigest": "31b0465179a24758c4df8881812c1cb7aa10d3cb4d16c37bd6abb5065c458b2a",
+        "identityFingerprint": "14be3d5558678d5393fd902d9dfff1e943d20edb8b2b4b8b265d2f5c391a6910",
+        "claimId": "claim_383a6485c1aaed79a640a59463183fe8",
+        "sourceAnchor": "guard-reconciliation",
+        "unitKind": "heading",
+        "sourceUnitDigest": "16c2b3dace9daab9a6d90e29bd7f00fbad2c313cbedb0e28ed031664fa81b255",
+        "claimKind": "specification",
+        "status": "current"
+      },
+      "after": {
+        "sourcePath": "docs/specs/runner.md",
+        "unitDigest": "fcbec7af428f6773bab696a96bb017921473a6480fe262f0372464e590122fe6",
+        "identityFingerprint": "9994203f0129df5d90efa8caf5eb4382998caf92cb553ccb73a2b49824319bc8",
+        "claimId": "claim_383a6485c1aaed79a640a59463183fe8",
+        "sourceAnchor": "guard-reconciliation",
+        "unitKind": "heading",
+        "sourceUnitDigest": "42ab966efc78e26589453160b8a631996c393b84c94d6acd46e78e19029b63d6",
+        "claimKind": "specification",
+        "status": "current",
+        "reviewStatus": "needs-review",
+        "lineage": {
+          "fromCommit": "ade5812a9f444f895185594aedc1f73cf8b2288a",
+          "fromUnitDigest": "31b0465179a24758c4df8881812c1cb7aa10d3cb4d16c37bd6abb5065c458b2a",
+          "toUnitDigest": "fcbec7af428f6773bab696a96bb017921473a6480fe262f0372464e590122fe6",
+          "fromSourceUnitDigest": "16c2b3dace9daab9a6d90e29bd7f00fbad2c313cbedb0e28ed031664fa81b255",
+          "toSourceUnitDigest": "42ab966efc78e26589453160b8a631996c393b84c94d6acd46e78e19029b63d6"
+        }
+      },
+      "changedFields": [
+        "identityFingerprint",
+        "lineage",
+        "reviewStatus",
+        "sourceUnitDigest",
+        "unitDigest"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_3883003faea82c5a23d576a5fd4d627c",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "sourcePath": "docs/specs/runner.md",
+        "unitDigest": "07e8b7a8f8522eb37c2a8aea63ff636e995355fc9cfd93e500c9a17760998c00",
+        "identityFingerprint": "07e8b7a8f8522eb37c2a8aea63ff636e995355fc9cfd93e500c9a17760998c00",
+        "claimId": "claim_3883003faea82c5a23d576a5fd4d627c",
+        "sourceAnchor": "unheaded-block-119",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "75a73f547e8e94133e10c4e8a503a4be54ab173417f1b7fe4b8bf54555507a53",
+        "claimKind": "specification",
+        "status": "current",
+        "origin": "added-since-ade5812a9f444f895185594aedc1f73cf8b2288a"
+      },
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "identityFingerprint",
+        "origin",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_39c66e391d621f2df14c19a014dfdbd6",
+      "kind": "changed",
+      "before": {
+        "sourcePath": "docs/platform/packaging-distribution/spec.md",
+        "unitDigest": "e1a7ad73753ef71389387b0843a965d0ed6b33ac4fa56fbe98f6f3a4f4ee2678",
+        "identityFingerprint": "04efbb9007333486f8b90faa4b6224d76930050bf6126cb0612a7d0bffa8642d",
+        "claimId": "claim_39c66e391d621f2df14c19a014dfdbd6",
+        "sourceAnchor": "lịch-sử-quyết-định",
+        "unitKind": "heading",
+        "sourceUnitDigest": "75835bc044b19fbcddfbe17788fe06579ba39bf2c99d1b381aa810e6390a9726",
+        "claimKind": "specification",
+        "status": "future"
+      },
+      "after": {
+        "sourcePath": "docs/platform/packaging-distribution/spec.md",
+        "unitDigest": "54303a6e71149df37bc1312e873a6afddc67fb267ff8697ed64d4e82bc5c909d",
+        "identityFingerprint": "24e17c40142c4e027dfb0e219cc540fd90c22d3a47fa07b3d13da486140dcba2",
+        "claimId": "claim_39c66e391d621f2df14c19a014dfdbd6",
+        "sourceAnchor": "lịch-sử-quyết-định",
+        "unitKind": "heading",
+        "sourceUnitDigest": "aa23ac1936263d65e45dba048c4949930715c52c31a30290b3eff845d39200fa",
+        "claimKind": "specification",
+        "status": "future",
+        "reviewStatus": "needs-review",
+        "lineage": {
+          "fromCommit": "ade5812a9f444f895185594aedc1f73cf8b2288a",
+          "fromUnitDigest": "e1a7ad73753ef71389387b0843a965d0ed6b33ac4fa56fbe98f6f3a4f4ee2678",
+          "toUnitDigest": "54303a6e71149df37bc1312e873a6afddc67fb267ff8697ed64d4e82bc5c909d",
+          "fromSourceUnitDigest": "75835bc044b19fbcddfbe17788fe06579ba39bf2c99d1b381aa810e6390a9726",
+          "toSourceUnitDigest": "aa23ac1936263d65e45dba048c4949930715c52c31a30290b3eff845d39200fa"
+        }
+      },
+      "changedFields": [
+        "identityFingerprint",
+        "lineage",
+        "reviewStatus",
+        "sourceUnitDigest",
+        "unitDigest"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_39e8bffc8c5b0e8befcf80a389804953",
+      "kind": "changed",
+      "before": {
+        "sourcePath": "docs/how-to/operate-dispatch-runtime-inspection-and-reconciliation.md",
+        "unitDigest": "23d4a2fd85251c1dea84d37bd6767919e9c1e3e916438ebb77af77f8a9dcf629",
+        "identityFingerprint": "b98bb95ffabdf5dfd5bf0d8169f6a8f2ead993705df0ec14f280a4e2015160c7",
+        "claimId": "claim_39e8bffc8c5b0e8befcf80a389804953",
+        "sourceAnchor": "plan-reconciliation",
+        "unitKind": "heading",
+        "sourceUnitDigest": "d6f1f0dd3a8e56efd74a07eb446bd856fc83b0e5ee83e010c6c7898e8244e9b5",
+        "claimKind": "unclassified",
+        "status": "future"
+      },
+      "after": {
+        "sourcePath": "docs/how-to/operate-dispatch-runtime-inspection-and-reconciliation.md",
+        "unitDigest": "a9a6ae8afaa6b069cbcf33cc8ac031dd168fc198758b0bcd4c41369faadc7b28",
+        "identityFingerprint": "32ab6e6060a8057d1776a321ab634f4600752e56214d69a0a991e2ef7c3a442f",
+        "claimId": "claim_39e8bffc8c5b0e8befcf80a389804953",
+        "sourceAnchor": "plan-reconciliation",
+        "unitKind": "heading",
+        "sourceUnitDigest": "8b2da672cd9f9955e40fe2663cba7f8b51c23ad981c3fea10af5d96dbf8d21b5",
+        "claimKind": "unclassified",
+        "status": "future",
+        "reviewStatus": "needs-review",
+        "lineage": {
+          "fromCommit": "ade5812a9f444f895185594aedc1f73cf8b2288a",
+          "fromUnitDigest": "23d4a2fd85251c1dea84d37bd6767919e9c1e3e916438ebb77af77f8a9dcf629",
+          "toUnitDigest": "a9a6ae8afaa6b069cbcf33cc8ac031dd168fc198758b0bcd4c41369faadc7b28",
+          "fromSourceUnitDigest": "d6f1f0dd3a8e56efd74a07eb446bd856fc83b0e5ee83e010c6c7898e8244e9b5",
+          "toSourceUnitDigest": "8b2da672cd9f9955e40fe2663cba7f8b51c23ad981c3fea10af5d96dbf8d21b5"
+        }
+      },
+      "changedFields": [
+        "identityFingerprint",
+        "lineage",
+        "reviewStatus",
+        "sourceUnitDigest",
+        "unitDigest"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_4eeb2f406288458e61bad21531966ab1",
+      "kind": "changed",
+      "before": {
+        "sourcePath": "docs/specs/distribution.md",
+        "unitDigest": "6f5ebbe0d4bf45bbe61a46b082fc8d84f95e120f7e62f8c01c8af86ff1d7e3fb",
+        "identityFingerprint": "a12ee238bf46dbb593445e87f009ff49eabf8909da233a79cb77963dfab64331",
+        "claimId": "claim_4eeb2f406288458e61bad21531966ab1",
+        "sourceAnchor": "data-dictionary",
+        "unitKind": "heading",
+        "sourceUnitDigest": "04f89e98512b5fd7af474ab2abbf362b9a0d30a25b5a911d011037539b3a9d3f",
+        "claimKind": "specification",
+        "status": "current"
+      },
+      "after": {
+        "sourcePath": "docs/specs/distribution.md",
+        "unitDigest": "3e5702120075fce2d14df8f06b46c6222d413a6571daca63be4b825e13ccdddf",
+        "identityFingerprint": "7ef557db4234046af14a1b492392cb69ace9f7ba74e0ecba0164438c21dabb10",
+        "claimId": "claim_4eeb2f406288458e61bad21531966ab1",
+        "sourceAnchor": "data-dictionary",
+        "unitKind": "heading",
+        "sourceUnitDigest": "fcbd92b190383feb2779a6eec9d86e6f67e881b30840fa490b7230c69c09e09d",
+        "claimKind": "specification",
+        "status": "current",
+        "reviewStatus": "needs-review",
+        "lineage": {
+          "fromCommit": "ade5812a9f444f895185594aedc1f73cf8b2288a",
+          "fromUnitDigest": "6f5ebbe0d4bf45bbe61a46b082fc8d84f95e120f7e62f8c01c8af86ff1d7e3fb",
+          "toUnitDigest": "3e5702120075fce2d14df8f06b46c6222d413a6571daca63be4b825e13ccdddf",
+          "fromSourceUnitDigest": "04f89e98512b5fd7af474ab2abbf362b9a0d30a25b5a911d011037539b3a9d3f",
+          "toSourceUnitDigest": "fcbd92b190383feb2779a6eec9d86e6f67e881b30840fa490b7230c69c09e09d"
+        }
+      },
+      "changedFields": [
+        "identityFingerprint",
+        "lineage",
+        "reviewStatus",
+        "sourceUnitDigest",
+        "unitDigest"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_53e415a9b7534fe99249c5d0e0b6539c",
+      "kind": "changed",
+      "before": {
+        "sourcePath": "docs/platform/runner/architecture/h-69197b459754.md",
+        "unitDigest": "11bb9ba599ba3e301c87b27ec1aa7712ee470a3df5c0cf86de3da492743eee07",
+        "identityFingerprint": "c13bfa3d5cd47ed92e9566fa138d948a7661b1c8a6c47de2f75c203c46c2cb63",
+        "claimId": "claim_53e415a9b7534fe99249c5d0e0b6539c",
+        "sourceAnchor": "dispatch-operability-implementation-slice-2026-09-16",
+        "unitKind": "heading",
+        "sourceUnitDigest": "4200a6cf61ccb7c1ffb502add937aa1762d55724f4d32f243a41c6bb9fefa871",
+        "claimKind": "architecture",
+        "status": "future"
+      },
+      "after": {
+        "sourcePath": "docs/platform/runner/architecture/h-69197b459754.md",
+        "unitDigest": "208ef82f369a7c09db460111fa79b9172be887f5bc515c61d407a25a39ffc910",
+        "identityFingerprint": "976c5fdbad0710eee6454392c4445f470b1f648a1f9dfa67b90fc15d6db276a6",
+        "claimId": "claim_53e415a9b7534fe99249c5d0e0b6539c",
+        "sourceAnchor": "dispatch-operability-implementation-slice-2026-09-16",
+        "unitKind": "heading",
+        "sourceUnitDigest": "c7040697a3027c20e21f5ded2fc574689980ee6b1f5016fdbfc7bbef87ea7db5",
+        "claimKind": "architecture",
+        "status": "future",
+        "reviewStatus": "needs-review",
+        "lineage": {
+          "fromCommit": "ade5812a9f444f895185594aedc1f73cf8b2288a",
+          "fromUnitDigest": "11bb9ba599ba3e301c87b27ec1aa7712ee470a3df5c0cf86de3da492743eee07",
+          "toUnitDigest": "208ef82f369a7c09db460111fa79b9172be887f5bc515c61d407a25a39ffc910",
+          "fromSourceUnitDigest": "4200a6cf61ccb7c1ffb502add937aa1762d55724f4d32f243a41c6bb9fefa871",
+          "toSourceUnitDigest": "c7040697a3027c20e21f5ded2fc574689980ee6b1f5016fdbfc7bbef87ea7db5"
+        }
+      },
+      "changedFields": [
+        "identityFingerprint",
+        "lineage",
+        "reviewStatus",
+        "sourceUnitDigest",
+        "unitDigest"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_54d2ff6d9214b5612db7b830aa249b2e",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "sourcePath": "docs/platform/packaging-distribution/spec.md",
+        "unitDigest": "5fe6ec8118995d5bae6c9cf9d97c07c3f116a21d8520816aacf1828b68c6608e",
+        "identityFingerprint": "5fe6ec8118995d5bae6c9cf9d97c07c3f116a21d8520816aacf1828b68c6608e",
+        "claimId": "claim_54d2ff6d9214b5612db7b830aa249b2e",
+        "sourceAnchor": "unheaded-block-85",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "00a3412a5974cb6c7e2d4f51aadd36437162cdc3bf4a92e4dc781ec0f334ed1d",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-ade5812a9f444f895185594aedc1f73cf8b2288a"
+      },
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "identityFingerprint",
+        "origin",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_55b85c1d204ea6a7b336fd6b066fc4f1",
+      "kind": "changed",
+      "before": {
+        "sourcePath": "docs/specs/runner.md",
+        "unitDigest": "0d0147733a63186a0883228eff2c5a5cd46e848958813fe1390c484607acc071",
+        "identityFingerprint": "a93a848401334a58fad6a5c8bab66dc0dca1c922170e941f32972ad336b87008",
+        "claimId": "claim_55b85c1d204ea6a7b336fd6b066fc4f1",
+        "sourceAnchor": "dispatch-operability-implementation-slice-2026-09-16",
+        "unitKind": "heading",
+        "sourceUnitDigest": "aaec88b66425149e842fe7c507cd3dd0beaee9d3e0ecde88fa805637967d2f10",
+        "claimKind": "specification",
+        "status": "current"
+      },
+      "after": {
+        "sourcePath": "docs/specs/runner.md",
+        "unitDigest": "3a0cc4520dfc05108e10b2f44afdefbe41af848d0bb0ff22d729db6767bdfcd4",
+        "identityFingerprint": "157436a8e4ad9ccc9f1ce147a74fd35b0651244abd6857a8ee12b47317f82414",
+        "claimId": "claim_55b85c1d204ea6a7b336fd6b066fc4f1",
+        "sourceAnchor": "dispatch-operability-implementation-slice-2026-09-16",
+        "unitKind": "heading",
+        "sourceUnitDigest": "020a15e1469e9d8f87b2295cc7ea3ca73da8fdda1dd62ff82b49a403fdb086f5",
+        "claimKind": "specification",
+        "status": "current",
+        "reviewStatus": "needs-review",
+        "lineage": {
+          "fromCommit": "ade5812a9f444f895185594aedc1f73cf8b2288a",
+          "fromUnitDigest": "0d0147733a63186a0883228eff2c5a5cd46e848958813fe1390c484607acc071",
+          "toUnitDigest": "3a0cc4520dfc05108e10b2f44afdefbe41af848d0bb0ff22d729db6767bdfcd4",
+          "fromSourceUnitDigest": "aaec88b66425149e842fe7c507cd3dd0beaee9d3e0ecde88fa805637967d2f10",
+          "toSourceUnitDigest": "020a15e1469e9d8f87b2295cc7ea3ca73da8fdda1dd62ff82b49a403fdb086f5"
+        }
+      },
+      "changedFields": [
+        "identityFingerprint",
+        "lineage",
+        "reviewStatus",
+        "sourceUnitDigest",
+        "unitDigest"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_580793ae55c06a4891f1f902939145c4",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "sourcePath": "docs/specs/distribution.md",
+        "unitDigest": "83d0e6ae090d097618304293a869f795b5d52d3ea260ec6bc5426783f4b13381",
+        "identityFingerprint": "83d0e6ae090d097618304293a869f795b5d52d3ea260ec6bc5426783f4b13381",
+        "claimId": "claim_580793ae55c06a4891f1f902939145c4",
+        "sourceAnchor": "unheaded-block-15",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "87f98a72908fb6991a3cd9bdf8c1407373d72b039ad1b3e83a35a89a2a87d299",
+        "claimKind": "specification",
+        "status": "current",
+        "origin": "added-since-ade5812a9f444f895185594aedc1f73cf8b2288a"
+      },
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "identityFingerprint",
+        "origin",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_5b4314fb79de70a2d846f9baca39c1c5",
+      "kind": "removed",
+      "before": {
+        "sourcePath": "docs/platform/packaging-distribution/spec.md",
+        "unitDigest": "7ae41ccdcd2ca6fa76fdf8c0f823b111fcb100c03c9fef3421cb3684a15493c3",
+        "identityFingerprint": "7ae41ccdcd2ca6fa76fdf8c0f823b111fcb100c03c9fef3421cb3684a15493c3",
+        "claimId": "claim_5b4314fb79de70a2d846f9baca39c1c5",
+        "sourceAnchor": "unheaded-block-92",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "4f47df08a667f8edb2b8e4418246ac6ca36b09f02f255f3d344b268393034399",
+        "claimKind": "specification",
+        "status": "future"
+      },
+      "after": null,
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "identityFingerprint",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_5c7a41cb0091d5fa398c963b4f28b50d",
+      "kind": "changed",
+      "before": {
+        "sourcePath": "docs/platform/packaging-distribution/spec.md",
+        "unitDigest": "76072d6308310a074a737f2b974014d8113b212829301afaa19088a2dd935001",
+        "identityFingerprint": "b21182e7c3aa0a098607ad3c94a20aada6a3ef44224b6bfacd30188c36967466",
+        "claimId": "claim_5c7a41cb0091d5fa398c963b4f28b50d",
+        "sourceAnchor": "data-dictionary",
+        "unitKind": "heading",
+        "sourceUnitDigest": "3dd2d51fac193d78f712a83b2f0918c9f5f48a0e8eb65572afda4bb678b1de95",
+        "claimKind": "specification",
+        "status": "future"
+      },
+      "after": {
+        "sourcePath": "docs/platform/packaging-distribution/spec.md",
+        "unitDigest": "9ad0e34b7bf4554eab8c8bdd02fed7a689946c34cce67a2ca9839a5cd4256395",
+        "identityFingerprint": "ab460471d33c6c9d1250e39a1ad934276e8edcc20ad955cba582284bea178cf5",
+        "claimId": "claim_5c7a41cb0091d5fa398c963b4f28b50d",
+        "sourceAnchor": "data-dictionary",
+        "unitKind": "heading",
+        "sourceUnitDigest": "aa3ecf1c73f2625a3f371a732ad4a4468c9c5e5a3e74ac693e9af0d507454720",
+        "claimKind": "specification",
+        "status": "future",
+        "reviewStatus": "needs-review",
+        "lineage": {
+          "fromCommit": "ade5812a9f444f895185594aedc1f73cf8b2288a",
+          "fromUnitDigest": "76072d6308310a074a737f2b974014d8113b212829301afaa19088a2dd935001",
+          "toUnitDigest": "9ad0e34b7bf4554eab8c8bdd02fed7a689946c34cce67a2ca9839a5cd4256395",
+          "fromSourceUnitDigest": "3dd2d51fac193d78f712a83b2f0918c9f5f48a0e8eb65572afda4bb678b1de95",
+          "toSourceUnitDigest": "aa3ecf1c73f2625a3f371a732ad4a4468c9c5e5a3e74ac693e9af0d507454720"
+        }
+      },
+      "changedFields": [
+        "identityFingerprint",
+        "lineage",
+        "reviewStatus",
+        "sourceUnitDigest",
+        "unitDigest"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_7128e9202e4487a49758e98140b8c19a",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "sourcePath": "docs/how-to/operate-dispatch-runtime-inspection-and-reconciliation.md",
+        "unitDigest": "315dd41fb941e00fcbfe3d64e119541c365fdc553cab7e330d60e6e892936ff8",
+        "identityFingerprint": "315dd41fb941e00fcbfe3d64e119541c365fdc553cab7e330d60e6e892936ff8",
+        "claimId": "claim_7128e9202e4487a49758e98140b8c19a",
+        "sourceAnchor": "unheaded-block-9",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "18c3b2ef3b753051196c1aa174af453fb4c2cb14bbb6e71ad1659694f813e950",
+        "claimKind": "unclassified",
+        "status": "future",
+        "origin": "added-since-ade5812a9f444f895185594aedc1f73cf8b2288a"
+      },
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "identityFingerprint",
+        "origin",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_7b8ebb8144ab632113046a7a6dbba680",
+      "kind": "changed",
+      "before": {
+        "sourcePath": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+        "unitDigest": "093a41489968546b5cae4e588c2bbd318f2e69584e2c7c005c8549dc42669b66",
+        "identityFingerprint": "b5ccafe8ce8629d269c28335083ec4e5234edbb917bbd46a057b61f94a62d28d",
+        "claimId": "claim_7b8ebb8144ab632113046a7a6dbba680",
+        "sourceAnchor": "coordination-rings",
+        "unitKind": "heading",
+        "sourceUnitDigest": "845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823",
+        "claimKind": "unclassified",
+        "status": "future"
+      },
+      "after": {
+        "sourcePath": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+        "unitDigest": "cd3da0a21cfd255db98547e16c87e33e2682f365d1c0d66e9dd9cc2eb7d0d8cf",
+        "identityFingerprint": "b67759f600fb731add46583ff0955d3d9e623fa8e140a67217f9a6fda2326b56",
+        "claimId": "claim_7b8ebb8144ab632113046a7a6dbba680",
+        "sourceAnchor": "coordination-rings",
+        "unitKind": "heading",
+        "sourceUnitDigest": "c1a3107f359fb34010a0f09ad1156aaa2be077954106517f738f6cbc073ad579",
+        "claimKind": "unclassified",
+        "status": "future",
+        "reviewStatus": "needs-review",
+        "lineage": {
+          "fromCommit": "ade5812a9f444f895185594aedc1f73cf8b2288a",
+          "fromUnitDigest": "093a41489968546b5cae4e588c2bbd318f2e69584e2c7c005c8549dc42669b66",
+          "toUnitDigest": "cd3da0a21cfd255db98547e16c87e33e2682f365d1c0d66e9dd9cc2eb7d0d8cf",
+          "fromSourceUnitDigest": "845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823",
+          "toSourceUnitDigest": "c1a3107f359fb34010a0f09ad1156aaa2be077954106517f738f6cbc073ad579"
+        }
+      },
+      "changedFields": [
+        "identityFingerprint",
+        "lineage",
+        "reviewStatus",
+        "sourceUnitDigest",
+        "unitDigest"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_8af62b949d9d3e77433b7fc8f72917cc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "sourcePath": "docs/specs/runner.md",
+        "unitDigest": "fca642b22bfc06c8629351c01cb04c76ba850ece54d87ba0161b68869ea77b04",
+        "identityFingerprint": "fca642b22bfc06c8629351c01cb04c76ba850ece54d87ba0161b68869ea77b04",
+        "claimId": "claim_8af62b949d9d3e77433b7fc8f72917cc",
+        "sourceAnchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "bed7c5ea3ed1a7241f9271b44d6a8253d4ea89c082745eed076d3c5ab703d789",
+        "claimKind": "specification",
+        "status": "current",
+        "origin": "added-since-ade5812a9f444f895185594aedc1f73cf8b2288a"
+      },
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "identityFingerprint",
+        "origin",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_95bccfdc53e0c3efcfa29e694d26d5a3",
+      "kind": "removed",
+      "before": {
+        "sourcePath": "docs/platform/contracts/architecture-manifest.json",
+        "unitDigest": "bee0f585dc079a9cf24fe84a2cfacaa3aa99e6818f4fbf4e69dbf76dd601e99c",
+        "identityFingerprint": "bee0f585dc079a9cf24fe84a2cfacaa3aa99e6818f4fbf4e69dbf76dd601e99c",
+        "claimId": "claim_95bccfdc53e0c3efcfa29e694d26d5a3",
+        "sourceAnchor": "file-block",
+        "unitKind": "file-block",
+        "sourceUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
+        "claimKind": "contract",
+        "status": "future"
+      },
+      "after": null,
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "identityFingerprint",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_9b3b7fac64df06547dd06e05f4f026c5",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "sourcePath": "docs/backlog.md",
+        "unitDigest": "84458bb943e32f1355bac07b21217404e8d472ff91c1ec1dc486a7743dd8c9d6",
+        "identityFingerprint": "84458bb943e32f1355bac07b21217404e8d472ff91c1ec1dc486a7743dd8c9d6",
+        "claimId": "claim_9b3b7fac64df06547dd06e05f4f026c5",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "3430068fb5b1687e480e143bc34727fa7d6ada9f1342932c9fdd2f8b23c17da2",
+        "claimKind": "unclassified",
+        "status": "future",
+        "origin": "added-since-ade5812a9f444f895185594aedc1f73cf8b2288a"
+      },
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "identityFingerprint",
+        "origin",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_9d97a24e7d17ac4be484f2c75a5e116a",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "sourcePath": "docs/specs/distribution.md",
+        "unitDigest": "5fe6ec8118995d5bae6c9cf9d97c07c3f116a21d8520816aacf1828b68c6608e",
+        "identityFingerprint": "5fe6ec8118995d5bae6c9cf9d97c07c3f116a21d8520816aacf1828b68c6608e",
+        "claimId": "claim_9d97a24e7d17ac4be484f2c75a5e116a",
+        "sourceAnchor": "unheaded-block-5",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "00a3412a5974cb6c7e2d4f51aadd36437162cdc3bf4a92e4dc781ec0f334ed1d",
+        "claimKind": "specification",
+        "status": "current",
+        "origin": "added-since-ade5812a9f444f895185594aedc1f73cf8b2288a"
+      },
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "identityFingerprint",
+        "origin",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_a1a323052194c5140b628b5f3861fa05",
+      "kind": "changed",
+      "before": {
+        "sourcePath": "docs/specs/distribution.md",
+        "unitDigest": "68f42c7210f344bf686830af3362e44156667aaa23248d34d789d095f0106e7b",
+        "identityFingerprint": "dbb40f272115b7243238f67e220b7185cf660d3ffe45f04bf59431345ab22e6a",
+        "claimId": "claim_a1a323052194c5140b628b5f3861fa05",
+        "sourceAnchor": "lịch-sử-quyết-định",
+        "unitKind": "heading",
+        "sourceUnitDigest": "7d3b22dcbeba036ee788b91dd1409d06f722321a5b10851c97cd677654203743",
+        "claimKind": "specification",
+        "status": "current"
+      },
+      "after": {
+        "sourcePath": "docs/specs/distribution.md",
+        "unitDigest": "973bcba559e20f6846f6e1da5fb3c73b6a5e06cd813fbe4b63d37cb7b5b2b025",
+        "identityFingerprint": "61b8e5f02ab9df6eeaec7bf9eed5d26114af3cae683904d9a728903f7fce2702",
+        "claimId": "claim_a1a323052194c5140b628b5f3861fa05",
+        "sourceAnchor": "lịch-sử-quyết-định",
+        "unitKind": "heading",
+        "sourceUnitDigest": "bf462051b1d0486a12178695e54518b61a46423454a45f2d7a9ecd4e1e90d5bf",
+        "claimKind": "specification",
+        "status": "current",
+        "reviewStatus": "needs-review",
+        "lineage": {
+          "fromCommit": "ade5812a9f444f895185594aedc1f73cf8b2288a",
+          "fromUnitDigest": "68f42c7210f344bf686830af3362e44156667aaa23248d34d789d095f0106e7b",
+          "toUnitDigest": "973bcba559e20f6846f6e1da5fb3c73b6a5e06cd813fbe4b63d37cb7b5b2b025",
+          "fromSourceUnitDigest": "7d3b22dcbeba036ee788b91dd1409d06f722321a5b10851c97cd677654203743",
+          "toSourceUnitDigest": "bf462051b1d0486a12178695e54518b61a46423454a45f2d7a9ecd4e1e90d5bf"
+        }
+      },
+      "changedFields": [
+        "identityFingerprint",
+        "lineage",
+        "reviewStatus",
+        "sourceUnitDigest",
+        "unitDigest"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_aceb6cd32c0737fd188a72b7582f4b04",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "sourcePath": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+        "unitDigest": "fbb81e86ae3da3650cd5af9c6a0312a831eca141f53fbe0be22f9dfad63be472",
+        "identityFingerprint": "fbb81e86ae3da3650cd5af9c6a0312a831eca141f53fbe0be22f9dfad63be472",
+        "claimId": "claim_aceb6cd32c0737fd188a72b7582f4b04",
+        "sourceAnchor": "unheaded-block-13",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "c83ac63a4a4e83300982f785d18cf976798bc12a439df80e994dc1e823790251",
+        "claimKind": "unclassified",
+        "status": "future",
+        "origin": "added-since-ade5812a9f444f895185594aedc1f73cf8b2288a"
+      },
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "identityFingerprint",
+        "origin",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_b3ba9f5c826b387dd038f6e0efdae210",
+      "kind": "removed",
+      "before": {
+        "sourcePath": "docs/platform/runner/architecture/h-69197b459754.md",
+        "unitDigest": "2d064dba3155bc553d3475e16a6df117ca22b5ed64aa65dc31a019cb794a767e",
+        "identityFingerprint": "2d064dba3155bc553d3475e16a6df117ca22b5ed64aa65dc31a019cb794a767e",
+        "claimId": "claim_b3ba9f5c826b387dd038f6e0efdae210",
+        "sourceAnchor": "unheaded-block-5",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "971748e22304ae0951d3624549cac6d54bdbf1ceb400152c456e74a8b36ac57a",
+        "claimKind": "architecture",
+        "status": "future"
+      },
+      "after": null,
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "identityFingerprint",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_b68d3dcef75b726c52655458154f4283",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "sourcePath": "docs/platform/contracts/architecture-manifest.json",
+        "unitDigest": "67c1b8cb95183cf31ddc23488a21df07dd360a01d5ccf95cd9c0d520e0e6e862",
+        "identityFingerprint": "67c1b8cb95183cf31ddc23488a21df07dd360a01d5ccf95cd9c0d520e0e6e862",
+        "claimId": "claim_b68d3dcef75b726c52655458154f4283",
+        "sourceAnchor": "file-block",
+        "unitKind": "file-block",
+        "sourceUnitDigest": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
+        "claimKind": "contract",
+        "status": "future",
+        "origin": "added-since-ade5812a9f444f895185594aedc1f73cf8b2288a"
+      },
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "identityFingerprint",
+        "origin",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_cbc24e79ea908b0660e3e47e9d4edc0e",
+      "kind": "removed",
+      "before": {
+        "sourcePath": "docs/how-to/operate-dispatch-runtime-inspection-and-reconciliation.md",
+        "unitDigest": "feefb89ff2393b7069758220790a3091f159e9ebadd561249d24a00336d6d124",
+        "identityFingerprint": "feefb89ff2393b7069758220790a3091f159e9ebadd561249d24a00336d6d124",
+        "claimId": "claim_cbc24e79ea908b0660e3e47e9d4edc0e",
+        "sourceAnchor": "unheaded-block-9",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "489a0c4547b989f9f3e660f640f32c63896801e115c8fe77fb2ad0fa9a6fa858",
+        "claimKind": "unclassified",
+        "status": "future"
+      },
+      "after": null,
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "identityFingerprint",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_cdf8c5562fb083bbdccf7d8c03decb7a",
+      "kind": "removed",
+      "before": {
+        "sourcePath": "docs/specs/runner.md",
+        "unitDigest": "f910f6f75425fbbf4aecc27f405fe0cdaa51e0abdd7fa033a81dee99cdd5e11a",
+        "identityFingerprint": "f910f6f75425fbbf4aecc27f405fe0cdaa51e0abdd7fa033a81dee99cdd5e11a",
+        "claimId": "claim_cdf8c5562fb083bbdccf7d8c03decb7a",
+        "sourceAnchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "026046f0b0c9dff4fa16ad675837105849db185678d8263e091270e599c0ba72",
+        "claimKind": "specification",
+        "status": "current"
+      },
+      "after": null,
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "identityFingerprint",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_d7660c15ae6c2d2e7d610c1aa571101c",
+      "kind": "removed",
+      "before": {
+        "sourcePath": "docs/backlog.md",
+        "unitDigest": "913ebd2df2fa44e8ac92b79c01455a4f2d6872792590a755ef8edc9964c58bcc",
+        "identityFingerprint": "913ebd2df2fa44e8ac92b79c01455a4f2d6872792590a755ef8edc9964c58bcc",
+        "claimId": "claim_d7660c15ae6c2d2e7d610c1aa571101c",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "57afbc488deb465cf96541393acb2cef97bed4c9acdea33bec65ef009c0c9a86",
+        "claimKind": "unclassified",
+        "status": "future"
+      },
+      "after": null,
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "identityFingerprint",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_d7fd3778a5cbb74cad9fb5e476708647",
+      "kind": "removed",
+      "before": {
+        "sourcePath": "docs/specs/runner.md",
+        "unitDigest": "f3971edb53166f0c76b7dffa57a32847b8a5abd532b150261b9a346693a5f8ea",
+        "identityFingerprint": "f3971edb53166f0c76b7dffa57a32847b8a5abd532b150261b9a346693a5f8ea",
+        "claimId": "claim_d7fd3778a5cbb74cad9fb5e476708647",
+        "sourceAnchor": "unheaded-block-119",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "1c77f2b68620610ff91f742d28ff88584c190c8af2ade3ac6818b67a6f054288",
+        "claimKind": "specification",
+        "status": "current"
+      },
+      "after": null,
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "identityFingerprint",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_d9185072d68925b4c020b13ba6c4d74f",
+      "kind": "removed",
+      "before": {
+        "sourcePath": "docs/specs/distribution.md",
+        "unitDigest": "efdbc472e987bef628352ebcce1a16bf80b33d017c6b99af37f0f9d20d2dd69f",
+        "identityFingerprint": "efdbc472e987bef628352ebcce1a16bf80b33d017c6b99af37f0f9d20d2dd69f",
+        "claimId": "claim_d9185072d68925b4c020b13ba6c4d74f",
+        "sourceAnchor": "unheaded-block-5",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
+        "claimKind": "specification",
+        "status": "current"
+      },
+      "after": null,
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "identityFingerprint",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_e3b2beba04aeae4e77dafa055f10741e",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "sourcePath": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+        "unitDigest": "cc95d39564ac7e782e418995a6a62443b3264be45c1700f1ddce15e754fcaf7d",
+        "identityFingerprint": "cc95d39564ac7e782e418995a6a62443b3264be45c1700f1ddce15e754fcaf7d",
+        "claimId": "claim_e3b2beba04aeae4e77dafa055f10741e",
+        "sourceAnchor": "unheaded-block-15",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "98cfa680f2dcc1b0e3893292faa24314b142123fc9b30d00895f90aaac26662c",
+        "claimKind": "unclassified",
+        "status": "future",
+        "origin": "added-since-ade5812a9f444f895185594aedc1f73cf8b2288a"
+      },
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "identityFingerprint",
+        "origin",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_e7dcb5fda0b4d46ecb9f4c10a3ef7f7e",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "sourcePath": "docs/platform/packaging-distribution/spec.md",
+        "unitDigest": "83d0e6ae090d097618304293a869f795b5d52d3ea260ec6bc5426783f4b13381",
+        "identityFingerprint": "83d0e6ae090d097618304293a869f795b5d52d3ea260ec6bc5426783f4b13381",
+        "claimId": "claim_e7dcb5fda0b4d46ecb9f4c10a3ef7f7e",
+        "sourceAnchor": "unheaded-block-92",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "87f98a72908fb6991a3cd9bdf8c1407373d72b039ad1b3e83a35a89a2a87d299",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-ade5812a9f444f895185594aedc1f73cf8b2288a"
+      },
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "identityFingerprint",
+        "origin",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_f0b2a4079764d68b1102ddddb08776ce",
+      "kind": "changed",
+      "before": {
+        "sourcePath": "docs/backlog.md",
+        "unitDigest": "efa09820ba5a42be5a4a06e55dae4be7e0507bd72effc9f8257dc849082654a4",
+        "identityFingerprint": "2a4f94c9f62e2fb4d5c7332fa8ef27512d29e3e97434caad54f777fa68804fc0",
+        "claimId": "claim_f0b2a4079764d68b1102ddddb08776ce",
+        "sourceAnchor": "product-backlog",
+        "unitKind": "heading",
+        "sourceUnitDigest": "800732106a25d1de145c1e71fdda4347cf26f60d8625771d1f42c540228cfc0a",
+        "claimKind": "unclassified",
+        "status": "future"
+      },
+      "after": {
+        "sourcePath": "docs/backlog.md",
+        "unitDigest": "eb37a0f7bbe5c0d4c4ab5d4b3e9fd1259fc8152c286d9e05041ec7599fbcd69c",
+        "identityFingerprint": "cc648a60c0ee1838306fe1fc26a84e7ea554283def177d79a7632b5ed0dbee8e",
+        "claimId": "claim_f0b2a4079764d68b1102ddddb08776ce",
+        "sourceAnchor": "product-backlog",
+        "unitKind": "heading",
+        "sourceUnitDigest": "92be08bb7b0a9af07f2d36307db6a7891545c2ab4590dcbb77074d46c2c8dfbe",
+        "claimKind": "unclassified",
+        "status": "future",
+        "reviewStatus": "needs-review",
+        "lineage": {
+          "fromCommit": "ade5812a9f444f895185594aedc1f73cf8b2288a",
+          "fromUnitDigest": "efa09820ba5a42be5a4a06e55dae4be7e0507bd72effc9f8257dc849082654a4",
+          "toUnitDigest": "eb37a0f7bbe5c0d4c4ab5d4b3e9fd1259fc8152c286d9e05041ec7599fbcd69c",
+          "fromSourceUnitDigest": "800732106a25d1de145c1e71fdda4347cf26f60d8625771d1f42c540228cfc0a",
+          "toSourceUnitDigest": "92be08bb7b0a9af07f2d36307db6a7891545c2ab4590dcbb77074d46c2c8dfbe"
+        }
+      },
+      "changedFields": [
+        "identityFingerprint",
+        "lineage",
+        "reviewStatus",
+        "sourceUnitDigest",
+        "unitDigest"
+      ]
+    },
+    {
+      "collection": "units",
+      "key": "claim_f703aeda7755ab376e6e3eee88eb82c2",
+      "kind": "removed",
+      "before": {
+        "sourcePath": "docs/specs/distribution.md",
+        "unitDigest": "7ae41ccdcd2ca6fa76fdf8c0f823b111fcb100c03c9fef3421cb3684a15493c3",
+        "identityFingerprint": "7ae41ccdcd2ca6fa76fdf8c0f823b111fcb100c03c9fef3421cb3684a15493c3",
+        "claimId": "claim_f703aeda7755ab376e6e3eee88eb82c2",
+        "sourceAnchor": "unheaded-block-15",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "4f47df08a667f8edb2b8e4418246ac6ca36b09f02f255f3d344b268393034399",
+        "claimKind": "specification",
+        "status": "current"
+      },
+      "after": null,
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "identityFingerprint",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "identityGaps",
+      "key": "claim_03ef50e87178220032a3eebe5c5d89d9",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "sourcePath": "docs/architecture-manifest.json",
+        "unitDigest": "bee0f585dc079a9cf24fe84a2cfacaa3aa99e6818f4fbf4e69dbf76dd601e99c",
+        "identityFingerprint": "bee0f585dc079a9cf24fe84a2cfacaa3aa99e6818f4fbf4e69dbf76dd601e99c",
+        "claimId": "claim_03ef50e87178220032a3eebe5c5d89d9",
+        "sourceAnchor": "file-block",
+        "unitKind": "file-block",
+        "sourceUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
+        "claimKind": "contract",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor file-block is not a stable heading anchor"
+      },
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "gapReason",
+        "identityFingerprint",
+        "identityStatus",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "identityGaps",
+      "key": "claim_0b9fcf0a1a07c29e6ae48f02d7f5dc59",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "sourcePath": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+        "unitDigest": "dfaa1d1ff9e96e3acd207cd169acef9f1fa12da6a91d8c349c4eb540d297a9a4",
+        "identityFingerprint": "dfaa1d1ff9e96e3acd207cd169acef9f1fa12da6a91d8c349c4eb540d297a9a4",
+        "claimId": "claim_0b9fcf0a1a07c29e6ae48f02d7f5dc59",
+        "sourceAnchor": "unheaded-block-13",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "a6662af528d7186106b7dc978680ed96bcc4b7500854e3f4bfb8ddd204e728eb",
+        "claimKind": "architecture",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-13 is not a stable heading anchor"
+      },
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "gapReason",
+        "identityFingerprint",
+        "identityStatus",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "identityGaps",
+      "key": "claim_2c510f453909b3c7e8a107811003b21e",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "sourcePath": "docs/platform/packaging-distribution/spec.md",
+        "unitDigest": "efdbc472e987bef628352ebcce1a16bf80b33d017c6b99af37f0f9d20d2dd69f",
+        "identityFingerprint": "efdbc472e987bef628352ebcce1a16bf80b33d017c6b99af37f0f9d20d2dd69f",
+        "claimId": "claim_2c510f453909b3c7e8a107811003b21e",
+        "sourceAnchor": "unheaded-block-85",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
+        "claimKind": "specification",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-85 is not a stable heading anchor"
+      },
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "gapReason",
+        "identityFingerprint",
+        "identityStatus",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "identityGaps",
+      "key": "claim_5b4314fb79de70a2d846f9baca39c1c5",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "sourcePath": "docs/platform/packaging-distribution/spec.md",
+        "unitDigest": "7ae41ccdcd2ca6fa76fdf8c0f823b111fcb100c03c9fef3421cb3684a15493c3",
+        "identityFingerprint": "7ae41ccdcd2ca6fa76fdf8c0f823b111fcb100c03c9fef3421cb3684a15493c3",
+        "claimId": "claim_5b4314fb79de70a2d846f9baca39c1c5",
+        "sourceAnchor": "unheaded-block-92",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "4f47df08a667f8edb2b8e4418246ac6ca36b09f02f255f3d344b268393034399",
+        "claimKind": "specification",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-92 is not a stable heading anchor"
+      },
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "gapReason",
+        "identityFingerprint",
+        "identityStatus",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "identityGaps",
+      "key": "claim_95bccfdc53e0c3efcfa29e694d26d5a3",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "sourcePath": "docs/platform/contracts/architecture-manifest.json",
+        "unitDigest": "bee0f585dc079a9cf24fe84a2cfacaa3aa99e6818f4fbf4e69dbf76dd601e99c",
+        "identityFingerprint": "bee0f585dc079a9cf24fe84a2cfacaa3aa99e6818f4fbf4e69dbf76dd601e99c",
+        "claimId": "claim_95bccfdc53e0c3efcfa29e694d26d5a3",
+        "sourceAnchor": "file-block",
+        "unitKind": "file-block",
+        "sourceUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
+        "claimKind": "contract",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor file-block is not a stable heading anchor"
+      },
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "gapReason",
+        "identityFingerprint",
+        "identityStatus",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "identityGaps",
+      "key": "claim_b3ba9f5c826b387dd038f6e0efdae210",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "sourcePath": "docs/platform/runner/architecture/h-69197b459754.md",
+        "unitDigest": "2d064dba3155bc553d3475e16a6df117ca22b5ed64aa65dc31a019cb794a767e",
+        "identityFingerprint": "2d064dba3155bc553d3475e16a6df117ca22b5ed64aa65dc31a019cb794a767e",
+        "claimId": "claim_b3ba9f5c826b387dd038f6e0efdae210",
+        "sourceAnchor": "unheaded-block-5",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "971748e22304ae0951d3624549cac6d54bdbf1ceb400152c456e74a8b36ac57a",
+        "claimKind": "architecture",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-5 is not a stable heading anchor"
+      },
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "gapReason",
+        "identityFingerprint",
+        "identityStatus",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "identityGaps",
+      "key": "claim_cbc24e79ea908b0660e3e47e9d4edc0e",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "sourcePath": "docs/how-to/operate-dispatch-runtime-inspection-and-reconciliation.md",
+        "unitDigest": "feefb89ff2393b7069758220790a3091f159e9ebadd561249d24a00336d6d124",
+        "identityFingerprint": "feefb89ff2393b7069758220790a3091f159e9ebadd561249d24a00336d6d124",
+        "claimId": "claim_cbc24e79ea908b0660e3e47e9d4edc0e",
+        "sourceAnchor": "unheaded-block-9",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "489a0c4547b989f9f3e660f640f32c63896801e115c8fe77fb2ad0fa9a6fa858",
+        "claimKind": "unclassified",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-9 is not a stable heading anchor"
+      },
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "gapReason",
+        "identityFingerprint",
+        "identityStatus",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "identityGaps",
+      "key": "claim_cdf8c5562fb083bbdccf7d8c03decb7a",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "sourcePath": "docs/specs/runner.md",
+        "unitDigest": "f910f6f75425fbbf4aecc27f405fe0cdaa51e0abdd7fa033a81dee99cdd5e11a",
+        "identityFingerprint": "f910f6f75425fbbf4aecc27f405fe0cdaa51e0abdd7fa033a81dee99cdd5e11a",
+        "claimId": "claim_cdf8c5562fb083bbdccf7d8c03decb7a",
+        "sourceAnchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "026046f0b0c9dff4fa16ad675837105849db185678d8263e091270e599c0ba72",
+        "claimKind": "specification",
+        "status": "current",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-3 is not a stable heading anchor"
+      },
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "gapReason",
+        "identityFingerprint",
+        "identityStatus",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "identityGaps",
+      "key": "claim_d7660c15ae6c2d2e7d610c1aa571101c",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "sourcePath": "docs/backlog.md",
+        "unitDigest": "913ebd2df2fa44e8ac92b79c01455a4f2d6872792590a755ef8edc9964c58bcc",
+        "identityFingerprint": "913ebd2df2fa44e8ac92b79c01455a4f2d6872792590a755ef8edc9964c58bcc",
+        "claimId": "claim_d7660c15ae6c2d2e7d610c1aa571101c",
+        "sourceAnchor": "unheaded-block-2",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "57afbc488deb465cf96541393acb2cef97bed4c9acdea33bec65ef009c0c9a86",
+        "claimKind": "unclassified",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-2 is not a stable heading anchor"
+      },
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "gapReason",
+        "identityFingerprint",
+        "identityStatus",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "identityGaps",
+      "key": "claim_d7fd3778a5cbb74cad9fb5e476708647",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "sourcePath": "docs/specs/runner.md",
+        "unitDigest": "f3971edb53166f0c76b7dffa57a32847b8a5abd532b150261b9a346693a5f8ea",
+        "identityFingerprint": "f3971edb53166f0c76b7dffa57a32847b8a5abd532b150261b9a346693a5f8ea",
+        "claimId": "claim_d7fd3778a5cbb74cad9fb5e476708647",
+        "sourceAnchor": "unheaded-block-119",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "1c77f2b68620610ff91f742d28ff88584c190c8af2ade3ac6818b67a6f054288",
+        "claimKind": "specification",
+        "status": "current",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-119 is not a stable heading anchor"
+      },
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "gapReason",
+        "identityFingerprint",
+        "identityStatus",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "identityGaps",
+      "key": "claim_d9185072d68925b4c020b13ba6c4d74f",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "sourcePath": "docs/specs/distribution.md",
+        "unitDigest": "efdbc472e987bef628352ebcce1a16bf80b33d017c6b99af37f0f9d20d2dd69f",
+        "identityFingerprint": "efdbc472e987bef628352ebcce1a16bf80b33d017c6b99af37f0f9d20d2dd69f",
+        "claimId": "claim_d9185072d68925b4c020b13ba6c4d74f",
+        "sourceAnchor": "unheaded-block-5",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
+        "claimKind": "specification",
+        "status": "current",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-5 is not a stable heading anchor"
+      },
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "gapReason",
+        "identityFingerprint",
+        "identityStatus",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "identityGaps",
+      "key": "claim_f703aeda7755ab376e6e3eee88eb82c2",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "sourcePath": "docs/specs/distribution.md",
+        "unitDigest": "7ae41ccdcd2ca6fa76fdf8c0f823b111fcb100c03c9fef3421cb3684a15493c3",
+        "identityFingerprint": "7ae41ccdcd2ca6fa76fdf8c0f823b111fcb100c03c9fef3421cb3684a15493c3",
+        "claimId": "claim_f703aeda7755ab376e6e3eee88eb82c2",
+        "sourceAnchor": "unheaded-block-15",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "4f47df08a667f8edb2b8e4418246ac6ca36b09f02f255f3d344b268393034399",
+        "claimKind": "specification",
+        "status": "current",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-15 is not a stable heading anchor"
+      },
+      "changedFields": [
+        "claimId",
+        "claimKind",
+        "gapReason",
+        "identityFingerprint",
+        "identityStatus",
+        "sourceAnchor",
+        "sourcePath",
+        "sourceUnitDigest",
+        "status",
+        "unitDigest",
+        "unitKind"
+      ]
+    },
+    {
+      "collection": "documents",
+      "key": "docs/architecture-manifest.json",
+      "kind": "changed",
+      "before": {
+        "path": "docs/architecture-manifest.json",
+        "sourceId": "src_d103858983b2e62ade276d1a9b958984",
+        "sourceDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
+        "blobSha": "e6d9582ddf4cbb72acaaebf8940dc4018e19ed67"
+      },
+      "after": {
+        "path": "docs/architecture-manifest.json",
+        "sourceId": "src_d103858983b2e62ade276d1a9b958984",
+        "sourceDigest": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
+        "blobSha": "2ff043edb33c5b65a861aa89804c948148ccd58c"
+      },
+      "changedFields": [
+        "blobSha",
+        "sourceDigest"
+      ]
+    },
+    {
+      "collection": "documents",
+      "key": "docs/backlog.md",
+      "kind": "changed",
+      "before": {
+        "path": "docs/backlog.md",
+        "sourceId": "src_1f1f4fa4ef6f30f09be2164da951294d",
+        "sourceDigest": "b714ae95d0d7b2f263b9f64c3291a7c2e1ede5b95d8cee1836e99c380c9d193d",
+        "blobSha": "62aaf1a547aca2e9819e0165098edbf51eaf3d5e"
+      },
+      "after": {
+        "path": "docs/backlog.md",
+        "sourceId": "src_1f1f4fa4ef6f30f09be2164da951294d",
+        "sourceDigest": "4d2d62ea2daf95a874c86396104f345263d5241e3ca96edddf8020690bda8826",
+        "blobSha": "7393034ccba32324522de0e8b2cee077b2b3298d"
+      },
+      "changedFields": [
+        "blobSha",
+        "sourceDigest"
+      ]
+    },
+    {
+      "collection": "documents",
+      "key": "docs/how-to/operate-dispatch-runtime-inspection-and-reconciliation.md",
+      "kind": "changed",
+      "before": {
+        "path": "docs/how-to/operate-dispatch-runtime-inspection-and-reconciliation.md",
+        "sourceId": "src_a38ff82f7c173461d54a611bb79e39ca",
+        "sourceDigest": "9bd485c6fcf35cb2d72e56baa17228048cae85b7be6569b8a6fda6853932e12b",
+        "blobSha": "8fdff5a4e8387c16749741f2eddac3efe1ed5ef0"
+      },
+      "after": {
+        "path": "docs/how-to/operate-dispatch-runtime-inspection-and-reconciliation.md",
+        "sourceId": "src_a38ff82f7c173461d54a611bb79e39ca",
+        "sourceDigest": "3f102116a22128a9edbc3ae4d64140a56637e8b666ab82ffd75694a5085e3135",
+        "blobSha": "a57df36a4a8c6d0ba2a6a5d5f9b3eabb80e85135"
+      },
+      "changedFields": [
+        "blobSha",
+        "sourceDigest"
+      ]
+    },
+    {
+      "collection": "documents",
+      "key": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+      "kind": "changed",
+      "before": {
+        "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+        "sourceId": "src_0f42a36cdd18cea757c726465a155f9b",
+        "sourceDigest": "5a9156c115ce392be1bed0cb8288b7c38625c437b0e9a21de171037e85de4e11",
+        "blobSha": "1cd1f6af796edc5d22ad21a53267c799272696d5"
+      },
+      "after": {
+        "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+        "sourceId": "src_0f42a36cdd18cea757c726465a155f9b",
+        "sourceDigest": "6ae9d176df352daeec9b335040b7672706cf6f6719ae79fb5c2c9b85111faafb",
+        "blobSha": "c35483e0fb6aebdf536abb8cb3587f7994a0e608"
+      },
+      "changedFields": [
+        "blobSha",
+        "sourceDigest"
+      ]
+    },
+    {
+      "collection": "documents",
+      "key": "docs/platform/contracts/architecture-manifest.json",
+      "kind": "changed",
+      "before": {
+        "path": "docs/platform/contracts/architecture-manifest.json",
+        "sourceDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
+        "blobSha": "e6d9582ddf4cbb72acaaebf8940dc4018e19ed67",
+        "sourceId": "src_694573f60aefd8b32f528bb6ece84c6e"
+      },
+      "after": {
+        "path": "docs/platform/contracts/architecture-manifest.json",
+        "sourceDigest": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
+        "blobSha": "2ff043edb33c5b65a861aa89804c948148ccd58c",
+        "sourceId": "src_694573f60aefd8b32f528bb6ece84c6e"
+      },
+      "changedFields": [
+        "blobSha",
+        "sourceDigest"
+      ]
+    },
+    {
+      "collection": "documents",
+      "key": "docs/platform/packaging-distribution/spec.md",
+      "kind": "changed",
+      "before": {
+        "path": "docs/platform/packaging-distribution/spec.md",
+        "sourceId": "src_2f1c581d397152f2085313fb792e279a",
+        "sourceDigest": "c80717db81d1489aaa371982cc3d0ba016a6e70dc03f548627035b67aa53d59a",
+        "blobSha": "accbded3aac58290bb60b2d72cf97ff6362bc037"
+      },
+      "after": {
+        "path": "docs/platform/packaging-distribution/spec.md",
+        "sourceId": "src_2f1c581d397152f2085313fb792e279a",
+        "sourceDigest": "653c795b29672a784d3c6b8e173796249a39c3486fadfe6f6c689cb95bd7be27",
+        "blobSha": "30a361b1a445c2b2308efdd0cf783f19da6e53fa"
+      },
+      "changedFields": [
+        "blobSha",
+        "sourceDigest"
+      ]
+    },
+    {
+      "collection": "documents",
+      "key": "docs/platform/runner/architecture/h-69197b459754.md",
+      "kind": "changed",
+      "before": {
+        "path": "docs/platform/runner/architecture/h-69197b459754.md",
+        "sourceDigest": "3aee6efaa9dae5c439bd493758da1610fb641005022b2eac26eb2c12aa330adb",
+        "blobSha": "a7c556641eb1043987aab192c3c0342aaab7e71e",
+        "sourceId": "src_f6d36fe4ac49d79dd0e7235b80d42a02"
+      },
+      "after": {
+        "path": "docs/platform/runner/architecture/h-69197b459754.md",
+        "sourceDigest": "c1b3d03c43d7d6021fc54c59a8eb97cfb202a70a049819067fb59d86b016a554",
+        "blobSha": "d97d42e37a6b0e73c785340cffeebd390a4921ce",
+        "sourceId": "src_f6d36fe4ac49d79dd0e7235b80d42a02"
+      },
+      "changedFields": [
+        "blobSha",
+        "sourceDigest"
+      ]
+    },
+    {
+      "collection": "documents",
+      "key": "docs/specs/distribution.md",
+      "kind": "changed",
+      "before": {
+        "path": "docs/specs/distribution.md",
+        "sourceId": "src_a0f7c4e71962f48f785ddae8f1176b49",
+        "sourceDigest": "167d99052f7fd8bda07e136d1b39ba33bb04ecd59d2eadf1df0a0808a45c77da",
+        "blobSha": "94e2a7b2c95267eb61d424683a5754f2657f5fc6"
+      },
+      "after": {
+        "path": "docs/specs/distribution.md",
+        "sourceId": "src_a0f7c4e71962f48f785ddae8f1176b49",
+        "sourceDigest": "2edf4befb296c5ca466f7905bc18da5bbc7ed047f86b25b0682cc6fa833e617a",
+        "blobSha": "f8b24c64b1a5899b2e62c0a81d0db23de09ab469"
+      },
+      "changedFields": [
+        "blobSha",
+        "sourceDigest"
+      ]
+    },
+    {
+      "collection": "documents",
+      "key": "docs/specs/runner.md",
+      "kind": "changed",
+      "before": {
+        "path": "docs/specs/runner.md",
+        "sourceId": "src_8e2eda7d746c62f2277991404e429d23",
+        "sourceDigest": "aaa47cf8f918131a1da8970de3a957ac7761cd560a3f6bf6a22531163561694d",
+        "blobSha": "122d1a51a5c1c0a81b881758ae4076a37aa9dd1f"
+      },
+      "after": {
+        "path": "docs/specs/runner.md",
+        "sourceId": "src_8e2eda7d746c62f2277991404e429d23",
+        "sourceDigest": "1c6c01ad2197db7ef884314de4ca40fa58fd3f9e0bfcd2953de42e100d7ea8a8",
+        "blobSha": "8c661ab0d92650ebdfcbc1cf87c6eeaf0772b835"
+      },
+      "changedFields": [
+        "blobSha",
+        "sourceDigest"
+      ]
+    }
+  ],
+  "counts": {
+    "metadata": 4,
+    "units": 36,
+    "identityGaps": 12,
+    "documents": 9
+  }
+}

@@ -1,0 +1,3 @@
+check-doc-constitution: vocabulary and constitution are consistent (17 dispositions, 12 claim kinds, 27 document kinds, 16 deferred items).
+check-doc-constitution: promotion: 160 canonical documents, 159 complete, 0 headerless, 1 headered with missing fields (report only; 160 headered, 302 evidence payloads exempt)
+    missing by field: {"Document type":0,"Audience":0,"Purpose":0,"Design status":0,"Implementation":1,"Provenance":1,"Writer type":1,"Canonical for":1,"Use this when":1,"Do not use this for":1,"Last reviewed":0,"Related":0,"Supersedes":1,"Superseded by":1}

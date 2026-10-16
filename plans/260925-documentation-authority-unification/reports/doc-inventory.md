@@ -11,13 +11,13 @@ Related:
 - `plans/260925-documentation-authority-unification/plan.md` §7 Phase 02
 ```
 
-- **Commit:** `76353c58eb885becc550d734fde5d7c2709cce33`
-- **Files scanned:** 4379
-- **Claim rows:** 86312
-- **Headings / unheaded blocks / mixed-file blocks:** 26226 / 58908 / 1178
-- **Gaps:** 1011 (1011 file/routing gap(s), 0 claim identity-gap blocker(s))
-- **Exact duplicate-content groups:** 818
-- **Semantic conflict groups:** 193
+- **Commit:** `498048c1a6651556a0ae977a2871135b5ac7c945`
+- **Files scanned:** 4486
+- **Claim rows:** 91388
+- **Headings / unheaded blocks / mixed-file blocks:** 27651 / 62555 / 1182
+- **Gaps:** 1012 (1012 file/routing gap(s), 0 claim identity-gap blocker(s))
+- **Exact duplicate-content groups:** 822
+- **Semantic conflict groups:** 219
 
 ## Summary By Dimension
 
@@ -25,7 +25,7 @@ Related:
 
 | Value | Count |
 |---|---:|
-| `platform-authority` | 2119 |
+| `platform-authority` | 2226 |
 | `history-evidence` | 1705 |
 | `user-knowledge` | 515 |
 | `consumer-project` | 40 |
@@ -34,9 +34,9 @@ Related:
 
 | Value | Count |
 |---|---:|
-| `non-authority` | 2267 |
-| `candidate` | 1069 |
-| `legacy-current` | 1026 |
+| `non-authority` | 2272 |
+| `candidate` | 1176 |
+| `legacy-current` | 1021 |
 | `unclassified` | 14 |
 | `promoted` | 3 |
 
@@ -44,32 +44,32 @@ Related:
 
 | Value | Count |
 |---|---:|
-| `maintained-authority` | 2597 |
+| `maintained-authority` | 2699 |
 | `history-evidence` | 1705 |
 | `retained-source` | 57 |
 | `unclassified` | 14 |
-| `generated` | 6 |
+| `generated` | 11 |
 
 ### Proposed Disposition
 
 | Value | Count |
 |---|---:|
 | `retain-as-evidence` | 1704 |
-| `unknown-blocking` | 1450 |
+| `unknown-blocking` | 1552 |
 | `merge` | 665 |
 | `reclassify-out-of-platform-scope` | 553 |
-| `regenerate-from-source` | 4 |
+| `regenerate-from-source` | 9 |
 | `promote` | 3 |
 
 ### Consumer Kind
 
 | Value | Count |
 |---|---:|
-| `literal` | 4142 |
-| `glob` | 2456 |
-| `fixture` | 2374 |
-| `executable-proof` | 1430 |
-| `dynamic` | 188 |
+| `literal` | 4249 |
+| `glob` | 2515 |
+| `executable-proof` | 2089 |
+| `fixture` | 1269 |
+| `dynamic` | 262 |
 | `shipped-contract` | 43 |
 
 ## Duplicate And Conflict Findings
@@ -131,6 +131,7 @@ Related:
 - Exact `0eebf17aad60625cc65b724baeb974626affe2a0`: `docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/impact-replaySession.log`, `docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.1/impact-replaySession.log`
 - Exact `1037d113ae00ab096fa65e784fad82e8343aafbe`: `docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/run-results/asgn_aap_driver_op_005-alternative-shaper-exec-family-b-run01-result.json`, `docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/run-results/asgn_aap_driver_op_005-alternative-shaper-exec-family-b-run01-result.json`
 - Exact `106fe7bd291208b4aefc080dd0f69984228036a9`: `docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/configured-executors-probe.mjs`, `docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/configured-executors-probe.mjs`
+- Exact `11684583c2ac84357168e237f3ac045201377712`: `docs/contracts/fgos-gateway-api-v1.yaml`, `docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml`
 - Exact `11d724c3afcb3b0e37fe82f64d662acbc6d4ed13`: `docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/proposals/system-shaper.md`, `docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/proposals/system-shaper.md`
 - Exact `12270fa0d0fadcf2e8637565d5f74bd64688e319`: `docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/session-events/aap_p051_main-events.jsonl`, `docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/session-events/aap_p051_main-events.jsonl`
 - Exact `125be87961979dd7fe083c49c180ca295b385377`: `docs/architect/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-boundary/environment.mjs`, `docs/platform/agent-coordination/verification/coordination-envelope/proofs/2026-09-06-boundary/environment.mjs`
@@ -213,11 +214,13 @@ Related:
 - Exact `2de173c6e45ba0e1059fc6ffd5409bfac47c90a6`: `docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/reviewer-findings.json`, `docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/reviewer-findings.json`
 - Exact `2e83c3c71c45d6ceea6e56ecc525730dc3f100cb`: `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-reviewer-recheck-report.md`, `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX-reviewer-recheck-report.md`
 - Exact `2edc470a8d5c0276453009863fb49b82c34c6b54`: `docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-07-redteam.stderr.log`, `docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-visibility-03.stderr.log`, `docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-07-redteam.stderr.log`, `docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/responses/out-attack-visibility-03.stderr.log`
+- Exact `2f163ff6092e16b1cb619c7dcc0765f316af1753`: `docs/platform/ui-spec/history/schema/surface-contract.schema.json`, `docs/ui-spec/schema/surface-contract.schema.json`
 - Exact `2f28783a285696250fe555a616f311b0818c2888`: `docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/requests/req-smoke.json`, `docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/requests/req-smoke.json`
 - Exact `2f300828dff76d8e04b8c66a2a5d64dfa62a4708`: `docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/glm-cli-attempt2-timeout.stderr.log`, `docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/glm-cli-attempt2-timeout.stderr.log`
 - Exact `2f4ce1c1a3606790e4ee839c051de6068d526ffa`: `docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/result.json`, `docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/result.json`
 - Exact `2f69efaa873410e55e92a8c10ed47c7466388395`: `docs/architect/agent-coordination/verification/code-implementation-track-policy/p01.md`, `docs/platform/agent-coordination/verification/code-implementation-track-policy/p01.md`
 - Exact `2fc9544da08c939acd81d75edbe7a23d0f492b02`: `docs/architect/agent-coordination/verification/runtime-recovery/p02h.md`, `docs/platform/agent-coordination/verification/runtime-recovery/p02h.md`
+- Exact `2ff043edb33c5b65a861aa89804c948148ccd58c`: `docs/architecture-manifest.json`, `docs/platform/contracts/architecture-manifest.json`
 - Exact `301b20c00f5a6d64de446d0d914ee1c4545b3ff4`: `docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/cli-output/declared-consult-envelope.json`, `docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/cli-output/declared-consult-envelope.json`
 - Exact `3053f6e5d8b7d1c134a3cd09a9cd291a29382358`: `docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P03.2/reviewer-recheck.md`, `docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P03.2/reviewer-recheck.md`
 - Exact `310b7bb58d8b75a542a960c11a43d4123997598e`: `docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/assignment.json`, `docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_001/assignment.json`
@@ -700,6 +703,7 @@ Related:
 - Exact `c4aefd933cad984209af8927ab9d0ba75603ca00`: `docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/runs/01/dispatch-plan.json`, `docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/artifacts/run1-fanout/fgos-snapshot/assignments/asgn_r8b_proof_driver_op_004/runs/01/dispatch-plan.json`
 - Exact `c4c4c8a5e12be258b6e8a84741411b0013cb3434`: `docs/architect/agent-coordination/verification/runtime-recovery/p05.md`, `docs/platform/agent-coordination/verification/runtime-recovery/p05.md`
 - Exact `c4d74986a875315507afd3eec10da95a6e2a98e3`: `docs/architect/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/non-driving-check.txt`, `docs/platform/agent-coordination/verification/step-07-mvp/proofs/P03.3/proof-2/non-driving-check.txt`
+- Exact `c51d822673e66f5012eab484c0974f57dd21a2ae`: `docs/platform/ui-spec/architecture/spec.config.yaml`, `docs/ui-spec/spec.config.yaml`
 - Exact `c561f088f4c05a6ec8ab0eb6adbe6b6e7b73735f`: `docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/requests/v3-01-open.json`, `docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/requests/v3-01-open.json`
 - Exact `c60f86350ec7d19a6050639983a634ad340e2f59`: `docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/doer-fix-round-2-report.md`, `docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P04.1/doer-fix-round-2-report.md`
 - Exact `c63db533bea90b59b1ddd900b182d4b116583044`: `docs/architect/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md`, `docs/platform/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md`
@@ -892,6 +896,7 @@ Related:
 - Exact `ffbcee87b05a21516c8a9db19c58088332204472`: `docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/codex-cli-live-proof.log`, `docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/codex-cli-live-proof.log`
 - Exact `ffbe3208a3b0fc0924b8c86ef2e7e5cd098fca0c`: `docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-01.log`, `docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-01.log`
 - Exact `ffc349db605984361c1713d808630e574fe3336b`: `docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/reviewer-report.md`, `docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/reviewer-report.md`
+- Semantic `agent-confinement:spec-agent-confinement-authority`: `docs/platform/agent-confinement/spec.md`, `docs/specs/confinement-authority.md`
 - Semantic `agent-coordination:1-context-investigator`: `docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/runs/1-context-investigator.json`, `docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/1-context-investigator.json`
 - Semantic `agent-coordination:1-context-investigator-raw`: `docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/runs/1-context-investigator-raw.log`, `docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/1-context-investigator-raw.log`
 - Semantic `agent-coordination:1-person`: `docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/human/1-person.md`, `docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/human/1-person.md`
@@ -1002,6 +1007,11 @@ Related:
 - Semantic `agent-coordination:visibility-and-herdr`: `docs/architect/agent-coordination/architecture/visibility-and-herdr.md`, `docs/platform/agent-coordination/architecture/visibility-and-herdr.md`
 - Semantic `agent-coordination:what-we-think-you-should-do`: `docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/explanation.md`, `docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/explanation.md`
 - Semantic `agent-coordination:work-integration-boundaries`: `docs/architect/agent-coordination/architecture/work-integration.md`, `docs/platform/agent-coordination/architecture/work-integration.md`
+- Semantic `claude-plugin-surface:spec-fgos-plugin-claude-code-slash-command-surface`: `docs/platform/claude-plugin/spec.md`, `docs/specs/fgos-plugin.md`
+- Semantic `decision-citation-drift:spec-decision-citation-drift-check`: `docs/platform/decision-citation-drift/spec.md`, `docs/specs/decision-citation-drift.md`
+- Semantic `distillery-reference-learning:distillery-porting-lifecycle`: `docs/platform/distillery/spec.md`, `docs/specs/distillery.md`
+- Semantic `documentation-system:transitional-documentation-authority-switchboard`: `docs/platform/documentation/switchboard.md`, `docs/transitional-switchboard.md`
+- Semantic `herdr-gateway-and-web-dashboard:spec-herdr-web-dashboard-browser-surface-for-fgos-work`: `docs/platform/herdr-web-dashboard/spec.md`, `docs/specs/herdr-web-dashboard.md`
 - Semantic `historyevidence:approach`: `docs/history/cell-6-3-validate-plan-live-smoke/plan.md`, `docs/history/dispatch-concept-boundary/plan.md`, `docs/history/restore-verifiedsha-docs-on-main/plan.md`, `docs/history/smoke-tsk-56w-4/plan.md`, `docs/history/smoke-tsk-56w-5/plan.md`, `docs/history/smoke-tsk-56w-6/plan.md`, `docs/history/smoke-tsk-56w-9/plan.md`, `docs/history/tsk-1ne-editwork-scoped-validation/plan.md`, `docs/history/tsk-2l0-iron-law-check-commit-ordering/plan.md`, `docs/history/tsk-4lh-stale-claim-release-docs/plan.md`
 - Semantic `historyevidence:capability-aware-dispatch-activation`: `docs/history/capability-aware-dispatch-activation/CONTEXT.md`, `docs/history/capability-aware-dispatch-activation/DISCUSSION.md`
 - Semantic `historyevidence:context`: `docs/history/current-dispatch-vocabulary-overlay/plan.md`, `docs/history/iron-law-classification-recipe-path/plan.md`
@@ -1014,6 +1024,7 @@ Related:
 - Semantic `historyevidence:round3-dispatch-prompt`: `docs/history/claude-named-executor/evidence/round3-dispatch-prompt.txt`, `docs/history/pi-executor-runtime-capacity/evidence/round3-dispatch-prompt.txt`
 - Semantic `historyevidence:scout-1`: `docs/history/discover-loop/scout-notes.md`, `docs/history/tsk-18a-merge-conflict-misclassification/scout-notes.md`, `docs/history/tsk-396-merge-gate-ordering/scout-notes.md`, `docs/history/tsk-3bn-merge-conductor-harness-v2/scout-notes.md`, `docs/history/tsk-3yh-take-deps-resolved-status/scout-notes.md`, `docs/history/tsk-480-approve-movework-friction-guard/scout-notes.md`, `docs/history/tsk-4voj-iron-law-leaf-scope/scout-notes.md`, `docs/history/tsk-5e97-decompose-footprint-overlap-gate/scout-notes.md`
 - Semantic `historyevidence:tsk-1pg-herdr-plugin-need-answer-after-deliver-boxes-render-empty`: `docs/history/herdr-need-answer-after-deliver-stage-crash/CONTEXT.md`, `docs/history/herdr-need-answer-after-deliver-stage-crash/plan.md`
+- Semantic `observe-metrics-and-friction:observe-component-specification`: `docs/platform/observe/spec.md`, `docs/specs/observe.md`
 - Semantic `packaging-distribution:runtime-identity-and-activation`: `docs/architect/packaging-distribution/runtime-identity-and-activation.md`, `docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md`
 - Semantic `platform-documentation-unmapped-candidate:1-context-investigator`: `docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/runs/1-context-investigator.json`, `docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/1-context-investigator.json`
 - Semantic `platform-documentation-unmapped-candidate:1-context-investigator-raw`: `docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/runs/1-context-investigator-raw.log`, `docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/1-context-investigator-raw.log`
@@ -2082,6 +2093,7 @@ Related:
 | `docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/unshare-shell.sh` | Platform documentation (unmapped candidate) | `candidate` | `maintained-authority` |  |
 | `docs/platform/agent-coordination/verification/visibility-herdr/v0-live-proof-2026-09-07.md` | Platform documentation (unmapped candidate) | `candidate` | `maintained-authority` |  |
 | `docs/platform/convention/spec.md` | Platform documentation (unmapped candidate) | `candidate` | `maintained-authority` |  |
+| `docs/platform/history/documentation-authority-unification/README.md` | Platform documentation (unmapped candidate) | `candidate` | `maintained-authority` |  |
 | `docs/platform/intent-preservation-ledger.md` | Platform documentation (unmapped candidate) | `candidate` | `maintained-authority` |  |
 | `docs/platform/migration-authoring-rules.md` | Platform documentation (unmapped candidate) | `candidate` | `maintained-authority` |  |
 | `docs/reading-map.md` | root:docs/reading-map.md | `legacy-current` | `maintained-authority` |  |
@@ -2131,7 +2143,7 @@ Related:
 | `claim_12e5db9cba7b51a5d83d737740f873f3` | `AGENTS.md` | `scratch-artifacts` | `unclassified` | `unknown-blocking` |  |
 | `claim_ad994bc3d2c97fb0d69e749535454434` | `AGENTS.md` | `unheaded-block-13` | `unclassified` | `unknown-blocking` |  |
 | `claim_ccf1acf857fc4e9757a933ca22ed34f1` | `AGENTS.md` | `legacy-node-cli-ownership-boundary` | `contract` | `unknown-blocking` |  |
-| `claim_251b389b227a62ef26b0fd3e1f0bebd9` | `AGENTS.md` | `unheaded-block-14` | `unclassified` | `unknown-blocking` |  |
+| `claim_c328f1aab4c53a87e5564dab101facf2` | `AGENTS.md` | `unheaded-block-14` | `unclassified` | `unknown-blocking` |  |
 | `claim_bb94912817abe39b4f476ea70b22d3ae` | `AGENTS.md` | `unheaded-block-15` | `unclassified` | `unknown-blocking` |  |
 | `claim_01354c596b32d883dcceda730047e156` | `AGENTS.md` | `unheaded-block-16` | `unclassified` | `unknown-blocking` |  |
 | `claim_ac6849769045271a57023dd684980fe6` | `AGENTS.md` | `installsetupdoctor-gate` | `unclassified` | `unknown-blocking` |  |
@@ -2143,52 +2155,54 @@ Related:
 | `claim_bb0f60933b1e135c60b80e82db86625d` | `AGENTS.md` | `unheaded-block-20` | `unclassified` | `unknown-blocking` |  |
 | `claim_442a4d4d948d6535b15da70f73519395` | `AGENTS.md` | `unheaded-block-21` | `unclassified` | `unknown-blocking` |  |
 | `claim_67eb8d55ba3230adf56b929b3b549cdc` | `AGENTS.md` | `dispatch-routing-work-to-an-executor` | `unclassified` | `unknown-blocking` |  |
-| `claim_5c520fcb1a68ba27e2093341834258c7` | `AGENTS.md` | `unheaded-block-22` | `unclassified` | `unknown-blocking` |  |
-| `claim_0bf7d168f64e5d7bf9add3470f4b6ec4` | `AGENTS.md` | `unheaded-block-23` | `unclassified` | `unknown-blocking` |  |
-| `claim_2e415bdb6f89215b30a9306f2b525bf7` | `AGENTS.md` | `unheaded-block-24` | `unclassified` | `unknown-blocking` |  |
-| `claim_47e8159f8179edd8e17fd67c744d1e89` | `AGENTS.md` | `unheaded-block-25` | `unclassified` | `unknown-blocking` |  |
-| `claim_c43cebec858362eb7b73975080dba714` | `AGENTS.md` | `unheaded-block-26` | `unclassified` | `unknown-blocking` |  |
-| `claim_664343a3da26204b9baf654b1ca4cb58` | `AGENTS.md` | `unheaded-block-27` | `unclassified` | `unknown-blocking` |  |
-| `claim_500d588a939fd6109cf102b8343484bb` | `AGENTS.md` | `unheaded-block-28` | `unclassified` | `unknown-blocking` |  |
-| `claim_1c85e6258b0455d9b44d738f833e1bb9` | `AGENTS.md` | `unheaded-block-29` | `unclassified` | `unknown-blocking` |  |
+| `claim_bfd24ffa5a43c26830bb9771c04de7f1` | `AGENTS.md` | `unheaded-block-22` | `unclassified` | `unknown-blocking` |  |
+| `claim_33713bd504d89af5cfb1eb5d6fa16d01` | `AGENTS.md` | `unheaded-block-23` | `unclassified` | `unknown-blocking` |  |
+| `claim_2ae81c7bed935553943d6777b81e2114` | `AGENTS.md` | `unheaded-block-24` | `unclassified` | `unknown-blocking` |  |
+| `claim_7d42588d114718c42e806e4070f1a22c` | `AGENTS.md` | `unheaded-block-25` | `unclassified` | `unknown-blocking` |  |
+| `claim_2e415bdb6f89215b30a9306f2b525bf7` | `AGENTS.md` | `unheaded-block-26` | `unclassified` | `unknown-blocking` |  |
+| `claim_351e6c4a4690c52f77aee859728d1140` | `AGENTS.md` | `unheaded-block-27` | `unclassified` | `unknown-blocking` |  |
+| `claim_c43cebec858362eb7b73975080dba714` | `AGENTS.md` | `unheaded-block-28` | `unclassified` | `unknown-blocking` |  |
+| `claim_664343a3da26204b9baf654b1ca4cb58` | `AGENTS.md` | `unheaded-block-29` | `unclassified` | `unknown-blocking` |  |
+| `claim_25243986083e5e07c7bfd524504fb054` | `AGENTS.md` | `unheaded-block-30` | `unclassified` | `unknown-blocking` |  |
+| `claim_1c85e6258b0455d9b44d738f833e1bb9` | `AGENTS.md` | `unheaded-block-31` | `unclassified` | `unknown-blocking` |  |
 | `claim_9dd28187a839e2ce10f2e9dd3f020cdf` | `AGENTS.md` | `starting-the-fgos-gateway-one-door-never-a-raw-process` | `unclassified` | `unknown-blocking` |  |
-| `claim_1e668e7697680b80953d4a1bc8bd65e4` | `AGENTS.md` | `unheaded-block-30` | `unclassified` | `unknown-blocking` |  |
+| `claim_1e668e7697680b80953d4a1bc8bd65e4` | `AGENTS.md` | `unheaded-block-32` | `unclassified` | `unknown-blocking` |  |
 | `claim_2e45cfdcd3f2bf602787b37feac667f3` | `AGENTS.md` | `documentation-viewing-mdview` | `unclassified` | `unknown-blocking` |  |
-| `claim_ae5e7954251083afc5130d73333ef771` | `AGENTS.md` | `unheaded-block-31` | `unclassified` | `unknown-blocking` |  |
+| `claim_ae5e7954251083afc5130d73333ef771` | `AGENTS.md` | `unheaded-block-33` | `unclassified` | `unknown-blocking` |  |
 | `claim_9f129b46b75d0c4d4e7119da265c74b0` | `AGENTS.md` | `using-mcp-preferred` | `unclassified` | `unknown-blocking` |  |
-| `claim_6a2cb3a88c1fb4c7faf143fa5ec076f3` | `AGENTS.md` | `unheaded-block-32` | `unclassified` | `unknown-blocking` |  |
-| `claim_d18c939cc9436e830dae9214808c21ae` | `AGENTS.md` | `unheaded-block-33` | `unclassified` | `unknown-blocking` |  |
-| `claim_74542e8562e9dd16128fadd8a2dbfaca` | `AGENTS.md` | `unheaded-block-34` | `unclassified` | `unknown-blocking` |  |
+| `claim_6a2cb3a88c1fb4c7faf143fa5ec076f3` | `AGENTS.md` | `unheaded-block-34` | `unclassified` | `unknown-blocking` |  |
+| `claim_d18c939cc9436e830dae9214808c21ae` | `AGENTS.md` | `unheaded-block-35` | `unclassified` | `unknown-blocking` |  |
+| `claim_74542e8562e9dd16128fadd8a2dbfaca` | `AGENTS.md` | `unheaded-block-36` | `unclassified` | `unknown-blocking` |  |
 | `claim_33fda3508cbed38745f7b6796ea65709` | `AGENTS.md` | `using-cli-fallback` | `unclassified` | `unknown-blocking` |  |
-| `claim_351eb1f4f67c8aaee59631dad24f99d8` | `AGENTS.md` | `unheaded-block-35` | `unclassified` | `unknown-blocking` |  |
+| `claim_351eb1f4f67c8aaee59631dad24f99d8` | `AGENTS.md` | `unheaded-block-37` | `unclassified` | `unknown-blocking` |  |
 | `claim_73ca3e1b87514a160d7114e22318f1e9` | `AGENTS.md` | `when-to-render` | `unclassified` | `unknown-blocking` |  |
-| `claim_95164f1150b3c485deff5673f7b4ef15` | `AGENTS.md` | `unheaded-block-36` | `unclassified` | `unknown-blocking` |  |
-| `claim_7e77c676144c5ca6cdc3351f5a5ef632` | `AGENTS.md` | `unheaded-block-37` | `unclassified` | `unknown-blocking` |  |
+| `claim_95164f1150b3c485deff5673f7b4ef15` | `AGENTS.md` | `unheaded-block-38` | `unclassified` | `unknown-blocking` |  |
+| `claim_7e77c676144c5ca6cdc3351f5a5ef632` | `AGENTS.md` | `unheaded-block-39` | `unclassified` | `unknown-blocking` |  |
 | `claim_fd05edc9de6352f95be164482329687d` | `AGENTS.md` | `gitnexus-code-intelligence` | `unclassified` | `unknown-blocking` |  |
-| `claim_08f8581721e89c08f589e3bb8002b6ce` | `AGENTS.md` | `unheaded-block-38` | `unclassified` | `unknown-blocking` |  |
-| `claim_d6a9e43c0997b6993a5d9670af469258` | `AGENTS.md` | `unheaded-block-39` | `unclassified` | `unknown-blocking` |  |
+| `claim_08f8581721e89c08f589e3bb8002b6ce` | `AGENTS.md` | `unheaded-block-40` | `unclassified` | `unknown-blocking` |  |
+| `claim_d6a9e43c0997b6993a5d9670af469258` | `AGENTS.md` | `unheaded-block-41` | `unclassified` | `unknown-blocking` |  |
 | `claim_0a800ae3d8a50ecdf22bf6c4604167d5` | `AGENTS.md` | `always-do` | `unclassified` | `unknown-blocking` |  |
-| `claim_f2afc3a44e09eb918aa8c59d42ffe195` | `AGENTS.md` | `unheaded-block-40` | `unclassified` | `unknown-blocking` |  |
+| `claim_f2afc3a44e09eb918aa8c59d42ffe195` | `AGENTS.md` | `unheaded-block-42` | `unclassified` | `unknown-blocking` |  |
 | `claim_133b6f931d35a06604813e97ac11bd8f` | `AGENTS.md` | `never-do` | `unclassified` | `unknown-blocking` |  |
-| `claim_3ca28ff7ed502c1bfd8e695a7387f753` | `AGENTS.md` | `unheaded-block-41` | `unclassified` | `unknown-blocking` |  |
+| `claim_3ca28ff7ed502c1bfd8e695a7387f753` | `AGENTS.md` | `unheaded-block-43` | `unclassified` | `unknown-blocking` |  |
 | `claim_42108ffe5c72a9f3ca2c7ef904fd14ec` | `AGENTS.md` | `resources` | `unclassified` | `unknown-blocking` |  |
-| `claim_11685a19f556cf213ef62e11a1d2d5c6` | `AGENTS.md` | `unheaded-block-42` | `unclassified` | `unknown-blocking` |  |
+| `claim_11685a19f556cf213ef62e11a1d2d5c6` | `AGENTS.md` | `unheaded-block-44` | `unclassified` | `unknown-blocking` |  |
 | `claim_7b36640f7d6ced0d3f089a419f5d26ff` | `AGENTS.md` | `cli` | `unclassified` | `unknown-blocking` |  |
-| `claim_1661543368ff1c7e6f57d20e2345cf4d` | `AGENTS.md` | `unheaded-block-43` | `architecture` | `unknown-blocking` |  |
-| `claim_2165e8fcd1ec571e64eae458439bb309` | `AGENTS.md` | `unheaded-block-44` | `unclassified` | `unknown-blocking` |  |
+| `claim_1661543368ff1c7e6f57d20e2345cf4d` | `AGENTS.md` | `unheaded-block-45` | `architecture` | `unknown-blocking` |  |
+| `claim_2165e8fcd1ec571e64eae458439bb309` | `AGENTS.md` | `unheaded-block-46` | `unclassified` | `unknown-blocking` |  |
 | `claim_6acc93d03a89146ebf7f4903938fabd9` | `AGENTS.md` | `fgos-effective-instructions` | `unclassified` | `unknown-blocking` |  |
 | `claim_9474ae42b4d6e079fcf33fec49e746fa` | `AGENTS.md` | `law` | `unclassified` | `unknown-blocking` |  |
 | `claim_a700bf68bba6456dc5d22693e0a42ff4` | `AGENTS.md` | `decision-question-template` | `decision` | `unknown-blocking` |  |
-| `claim_1ac1158b31cf27d233825c9e70232fdb` | `AGENTS.md` | `unheaded-block-45` | `decision` | `unknown-blocking` |  |
+| `claim_1ac1158b31cf27d233825c9e70232fdb` | `AGENTS.md` | `unheaded-block-47` | `decision` | `unknown-blocking` |  |
 | `claim_e922726b8953ed0cc00db6c4cdad3b48` | `AGENTS.md` | `decision-question-template-1` | `decision` | `unknown-blocking` |  |
-| `claim_1c0fa8ed450e9b4d240269ee06fbb6d2` | `AGENTS.md` | `unheaded-block-46` | `unclassified` | `unknown-blocking` |  |
+| `claim_1c0fa8ed450e9b4d240269ee06fbb6d2` | `AGENTS.md` | `unheaded-block-48` | `unclassified` | `unknown-blocking` |  |
 | `claim_fde89656fbadabacb69e8f793b223377` | `AGENTS.md` | `platform-operating-laws` | `unclassified` | `unknown-blocking` |  |
-| `claim_b70e7c39975314f130e9a2501156721d` | `AGENTS.md` | `unheaded-block-47` | `unclassified` | `unknown-blocking` |  |
+| `claim_b70e7c39975314f130e9a2501156721d` | `AGENTS.md` | `unheaded-block-49` | `unclassified` | `unknown-blocking` |  |
 | `claim_8231e682b35899eed43b85ce92dbc6ba` | `AGENTS.md` | `platform-operating-laws-1` | `unclassified` | `unknown-blocking` |  |
-| `claim_cace4724d966bb5a40bc0b17768520c1` | `AGENTS.md` | `unheaded-block-48` | `unclassified` | `unknown-blocking` |  |
-| `claim_07e83f30731906c4f25c96625cd95e26` | `AGENTS.md` | `unheaded-block-49` | `specification` | `unknown-blocking` |  |
-| `claim_4c8b5dcba297831ece58a92091e942d6` | `AGENTS.md` | `unheaded-block-50` | `verification` | `unknown-blocking` |  |
-| `claim_e59f80485141f1b75d155dca7272c34e` | `AGENTS.md` | `unheaded-block-51` | `unclassified` | `unknown-blocking` |  |
+| `claim_cace4724d966bb5a40bc0b17768520c1` | `AGENTS.md` | `unheaded-block-50` | `unclassified` | `unknown-blocking` |  |
+| `claim_07e83f30731906c4f25c96625cd95e26` | `AGENTS.md` | `unheaded-block-51` | `specification` | `unknown-blocking` |  |
+| `claim_4c8b5dcba297831ece58a92091e942d6` | `AGENTS.md` | `unheaded-block-52` | `verification` | `unknown-blocking` |  |
+| `claim_e59f80485141f1b75d155dca7272c34e` | `AGENTS.md` | `unheaded-block-53` | `unclassified` | `unknown-blocking` |  |
 | `claim_0d2c13615099d78c5e38533379ecf7cc` | `CLAUDE.md` | `project-rules` | `unclassified` | `unknown-blocking` |  |
 | `claim_db83a4c14e03868fccf833f00f51f296` | `CLAUDE.md` | `unheaded-block-1` | `unclassified` | `unknown-blocking` |  |
 | `claim_a18fb2712669f362c16aa39841718116` | `CLAUDE.md` | `impact-analysis-capability-gate` | `unclassified` | `unknown-blocking` |  |
@@ -2305,8 +2319,8 @@ Related:
 | `claim_682c6fe1822ee94db41d02a613e3d451` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-6` | `architecture` | `unknown-blocking` |  |
 | `claim_ebe7d2366429303cb74938b60f5cf2fb` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `routing-identities` | `architecture` | `unknown-blocking` |  |
 | `claim_0e4a5a251bfd44ef24cba6498ba146da` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-7` | `architecture` | `unknown-blocking` |  |
-| `claim_f5567f4d0486c29fd719218e8a37d4ad` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-8` | `architecture` | `unknown-blocking` |  |
-| `claim_ab182560a5142f22e010e35a97b115dc` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-9` | `architecture` | `unknown-blocking` |  |
+| `claim_a5297db7dd5392e3acf511564f7cb642` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-8` | `architecture` | `unknown-blocking` |  |
+| `claim_e0e3f54e0ac694fa7a5542eac3f7a721` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-9` | `architecture` | `unknown-blocking` |  |
 | `claim_b97839944d944e5f0f938409b67eb303` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-10` | `decision` | `unknown-blocking` |  |
 | `claim_ad2493c325d75127139698ed4a34592b` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-11` | `contract` | `unknown-blocking` |  |
 | `claim_0fc7c6e612423aa78420e2b5ad63f1bf` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `contracts` | `architecture` | `unknown-blocking` |  |
@@ -2334,7 +2348,7 @@ Related:
 | `claim_458c17a0810adaa7bfa194847aeba34c` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-28` | `contract` | `unknown-blocking` |  |
 | `claim_d277029b4e3a80bc6eb3c33a7990b182` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-29` | `architecture` | `unknown-blocking` |  |
 | `claim_e100affaa4ecb2bef4f4a21bb5cb2d5f` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-30` | `architecture` | `unknown-blocking` |  |
-| `claim_194da7d0a9b40e6ba93d40df2b58eaec` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-31` | `contract` | `unknown-blocking` |  |
+| `claim_142558254b0fa5e0b0fe78096f4caa9c` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-31` | `contract` | `unknown-blocking` |  |
 | `claim_4db6549f98828d78392e55a2acf3dbea` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `component-outer-boundary-note` | `contract` | `unknown-blocking` |  |
 | `claim_c80e24787a57aedd0631d6a970f15f51` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-32` | `architecture` | `unknown-blocking` |  |
 | `claim_453b627ec6b0763fa920582fc2922f6b` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `governance` | `architecture` | `unknown-blocking` |  |
@@ -2344,7 +2358,7 @@ Related:
 | `claim_0048419ea3512ca74c2fd495ac685c56` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-35` | `architecture` | `unknown-blocking` |  |
 | `claim_eb513de9dd1f55fd74ba8a7e2edede13` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-36` | `architecture` | `unknown-blocking` |  |
 | `claim_f42fcb530d066e79cb2632b13a7faa0e` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `source-inventory` | `architecture` | `unknown-blocking` |  |
-| `claim_bbeafe6e3e5396a33b48f77c3dec9756` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-37` | `architecture` | `unknown-blocking` |  |
+| `claim_d11900e7305d31956a2f066f6e29db57` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-37` | `architecture` | `unknown-blocking` |  |
 | `claim_35964c798e2d6ae0072c66bff3143ec7` | `docs/architect/agent-coordination/architecture/evidence-and-results.md` | `evidence-and-result-architecture` | `architecture` | `unknown-blocking` |  |
 | `claim_093d27f04745f067a7169e8aedb78a12` | `docs/architect/agent-coordination/architecture/evidence-and-results.md` | `unheaded-block-1` | `architecture` | `unknown-blocking` |  |
 | `claim_cc2f34c61fa29b444b5a422d38900d30` | `docs/architect/agent-coordination/architecture/evidence-and-results.md` | `unheaded-block-2` | `architecture` | `unknown-blocking` |  |
@@ -2609,5 +2623,3 @@ Related:
 | `claim_fe9a145fca29a661f8e7fed513d5cccc` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `allowed-uses` | `architecture` | `unknown-blocking` |  |
 | `claim_6a88397b647451041fa2c3a33597038b` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `unheaded-block-11` | `architecture` | `unknown-blocking` |  |
 | `claim_c0db062aa922f74c1b85aee8479a608d` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `forbidden-inferences` | `architecture` | `unknown-blocking` |  |
-| `claim_8e5f6cce78f0590a9ee66586d2de208e` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `unheaded-block-12` | `architecture` | `unknown-blocking` |  |
-| `claim_19d239a2b1605ac96d2ee658bdc5fdc0` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `stability-direction` | `architecture` | `unknown-blocking` |  |

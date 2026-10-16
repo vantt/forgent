@@ -1,0 +1,90 @@
+{
+  "pin": "498048c1a6651556a0ae977a2871135b5ac7c945",
+  "seconds": 156.546,
+  "scopeFiles": 1045,
+  "claims": 22759,
+  "gaps": 2234,
+  "applyFindings": [],
+  "exactOverlayConservationEquality": true,
+  "conservationOpen": [
+    {
+      "type": "claims-partial-carry",
+      "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+      "count": 28,
+      "examples": [
+        "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
+        "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
+        "docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol",
+        "docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker",
+        "docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts"
+      ]
+    },
+    {
+      "type": "claims-not-reviewed",
+      "message": "claim rows whose reviewStatus is not reviewed",
+      "count": 24,
+      "examples": [
+        "docs/architect/agent-coordination/vocabulary/concept-relationships.md#coordination-rings",
+        "docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-13",
+        "docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-14",
+        "docs/architecture-manifest.json#file-block",
+        "docs/backlog.md#product-backlog"
+      ]
+    },
+    {
+      "type": "identical-units-multiple-owners",
+      "message": "identical source units whose rows name different target owners",
+      "count": 362,
+      "examples": [
+        "03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
+        "5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
+        "a2d5fbe6e6e8: docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md, docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md",
+        "9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+        "930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md"
+      ]
+    },
+    {
+      "type": "registry-gaps-without-disposition",
+      "message": "registry identity-gap rows with no vocabulary disposition",
+      "count": 2,
+      "examples": [
+        "docs/reading-map.md#unheaded-block-15",
+        "docs/reading-map.md#unheaded-block-16"
+      ]
+    },
+    {
+      "type": "candidate-blocks-unreferenced",
+      "message": "candidate conservation units not named by a source decision",
+      "count": 2334,
+      "examples": [
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md#added-in-candidate-confinement-authority-v1",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md#unheaded-block-1",
+        "docs/platform/agent-confinement/contracts/confinement-authority-v1.md#unheaded-block-2",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md#added-in-candidate-confinement-authority-decisions",
+        "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md#unheaded-block-1"
+      ]
+    }
+  ],
+  "fatalFindings": [
+    {
+      "type": "claims-partial-carry",
+      "message": "28 claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover) (e.g. docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes, docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms, docs/architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol, docs/architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker, docs/architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts)"
+    },
+    {
+      "type": "claims-not-reviewed",
+      "message": "24 claim rows whose reviewStatus is not reviewed (e.g. docs/architect/agent-coordination/vocabulary/concept-relationships.md#coordination-rings, docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-13, docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-14, docs/architecture-manifest.json#file-block, docs/backlog.md#product-backlog)"
+    },
+    {
+      "type": "identical-units-multiple-owners",
+      "message": "362 identical source units whose rows name different target owners (e.g. 03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md, 5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md, a2d5fbe6e6e8: docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md, docs/platform/host-invocation-routing/history/documentation-migration/documentation-standardization-plan.md, 9d4815b7eabf: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md, 930de1671a17: docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md, docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md)"
+    },
+    {
+      "type": "registry-gaps-without-disposition",
+      "message": "2 registry identity-gap rows with no vocabulary disposition (e.g. docs/reading-map.md#unheaded-block-15, docs/reading-map.md#unheaded-block-16)"
+    },
+    {
+      "type": "candidate-blocks-unreferenced",
+      "message": "2334 candidate conservation units not named by a source decision (e.g. docs/platform/agent-confinement/contracts/confinement-authority-v1.md#added-in-candidate-confinement-authority-v1, docs/platform/agent-confinement/contracts/confinement-authority-v1.md#unheaded-block-1, docs/platform/agent-confinement/contracts/confinement-authority-v1.md#unheaded-block-2, docs/platform/agent-confinement/decisions/confinement-authority-decisions.md#added-in-candidate-confinement-authority-decisions, docs/platform/agent-confinement/decisions/confinement-authority-decisions.md#unheaded-block-1)"
+    }
+  ]
+}

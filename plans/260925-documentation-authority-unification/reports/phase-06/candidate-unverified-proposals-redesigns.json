@@ -10466,7 +10466,7 @@
       "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
     },
     {
-      "claimId": "claim_4bd5d26ffa7210f7eeb2fd4923263297",
+      "claimId": "claim_12c1a2e9e7024e1bfd575fbeda3a95a5",
       "path": "docs/platform/agent-coordination/spec.md",
       "anchor": "unheaded-block-11",
       "unitDigest": "ea74865624780601cd67f4c2c5138432dfb6a150c7fb8cdb465299fab313b4e0",
@@ -10634,7 +10634,7 @@
       "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
     },
     {
-      "claimId": "claim_461c8d744899c9dcceedcfe31024c6ec",
+      "claimId": "claim_105f15e6b189309da77518915b5406e1",
       "path": "docs/platform/agent-coordination/spec.md",
       "anchor": "unheaded-block-16",
       "unitDigest": "897dce4f1eedf73927e88e7bd18e4151bf7daac694151605695d83e6eb387994",
@@ -12230,7 +12230,7 @@
       "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
     },
     {
-      "claimId": "claim_98d6c194ff79ac24db79cab501f69e06",
+      "claimId": "claim_074ebac66fec4b7c1415a4b4e3e7dda2",
       "path": "docs/platform/documentation/architecture/documentation-system-design.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "17eb7516e2dfefa437f112df67c20294b3eb9f847b9e79e632e8d82df62ad5f9",
@@ -13091,7 +13091,7 @@
       "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
     },
     {
-      "claimId": "claim_0132a53476d61e713c9e018f07bb0163",
+      "claimId": "claim_9fcbbf13385477554e3c3b7d23b528f6",
       "path": "docs/platform/domainization/architecture/domainization.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "0b999d0ccb448e6f457297aea601d89ce5ac72f124a5b330e55cac5425b376ba",
@@ -13154,7 +13154,7 @@
       "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
     },
     {
-      "claimId": "claim_ff0085afd933b5b5710424400cbc83ae",
+      "claimId": "claim_40d76644257903a0c8514258cf31381b",
       "path": "docs/platform/proposals/architecture-advisory-panel.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "3189d3ec7f308ea4e1d589b31cdd440e519cb234ca7121905ded8670c641564a",
@@ -13217,7 +13217,7 @@
       "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
     },
     {
-      "claimId": "claim_3746a1b0492e2aa445e2a3ee499222b1",
+      "claimId": "claim_a10bd10a0b257a0b7cdd5994f0e8d53b",
       "path": "docs/platform/proposals/component-authority-boundary-map.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "83f553613af7f4fb9fc5bc11a4152202d60e4dfdf7f929966f307be4c951f516",
@@ -13280,7 +13280,7 @@
       "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
     },
     {
-      "claimId": "claim_752b12fcb98ca3bca59a6c89b1ae7657",
+      "claimId": "claim_bb5f6a1e98a54378c1625431a465ee34",
       "path": "docs/platform/proposals/coordination-capability-envelope.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "8dc3608dc1d50b9557a72afeb7bae84b6c34a414b40adb284ea0cc19f75b4b6c",
@@ -13343,7 +13343,7 @@
       "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
     },
     {
-      "claimId": "claim_0784acf824924e14852b2dee7a0611c7",
+      "claimId": "claim_f1b3f14ff757704d1cfa68d6cf6b56ef",
       "path": "docs/platform/proposals/coordination-dispatch-contract.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "d5320f601561a440112484fac1a581826e271e8a1fd1054e871e4c6ebc90f68a",
@@ -13406,7 +13406,7 @@
       "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
     },
     {
-      "claimId": "claim_2f285ad8662d57b1973368503e7f32aa",
+      "claimId": "claim_5bd5000888c9c3af38008570ad9647db",
       "path": "docs/platform/proposals/coordination-envelope-probe-contract.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "de3076f90bfc4e1fb3944bf78e7451f1891e56e129f2cb0afb19422101d5685c",
@@ -13469,7 +13469,7 @@
       "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
     },
     {
-      "claimId": "claim_aae6a95a9f091025a8fbe0a303ae8487",
+      "claimId": "claim_8604c1539af7fcbdd36463ee9fb44e29",
       "path": "docs/platform/proposals/coordination-worker-provider-boundary.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "a1429dd64f027baca628c4d58f931e9c1ed9ee8fa032f6e3899ca019526428d5",
@@ -13532,7 +13532,7 @@
       "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
     },
     {
-      "claimId": "claim_b765fd433d4750233a296c5797fb475e",
+      "claimId": "claim_ba982eb88874a08ec7877b69a6c06fec",
       "path": "docs/platform/proposals/dispatch-control-plane-redesign.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "bd6d7b3d4309e72838afebdfe2d75e90fea4bdf210067e340f8556c8382b8b3a",
@@ -13595,7 +13595,7 @@
       "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
     },
     {
-      "claimId": "claim_987627bf92b7a9982f9ee0c6789851d8",
+      "claimId": "claim_4ca8f5bec26fc2225ec46fb49ee2b78a",
       "path": "docs/platform/proposals/doing-coordination-redesign.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "15fe24ffb98982eef912d8657c1e7273ec7da048f443cab4ed6cff7d09b0db3b",
@@ -13659,7 +13659,7 @@
       "reviewNote": "channel candidate-eligibility: native successor for the file 6 Added paragraph (unheaded-block-2, line 22 at both pins); predecessor claim_40f7fa9b4ed19... digest 9c2d0ce7 equals the base text and successor de3e1dcc equals the HEAD text, both recomputed; it replaces the predecessor in the list as a pending unverified row, the predecessor stays an explicit native gap, no approval carried; file is Design status Candidate so it is eligible under A28."
     },
     {
-      "claimId": "claim_39828e8cbb222195b82d37264fc5d908",
+      "claimId": "claim_3479b9073e808e7cdfd3a9c1d3c3cbfd",
       "path": "docs/platform/proposals/knowledge-registry-redesign.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "6415fc5a5a6344155353d01383570615f5732c658e3f4b450b703b66c670c4b0",
@@ -13722,7 +13722,7 @@
       "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
     },
     {
-      "claimId": "claim_a13642cac16f75f2da5cc3b3c45a2ade",
+      "claimId": "claim_4b532639e19ca484a98dfa1f0b6148ed",
       "path": "docs/platform/proposals/README.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "a0c059976de2d8a9741c796715d8497309b9c9deb2166d3b04f9b6451b755951",
@@ -13785,7 +13785,7 @@
       "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
     },
     {
-      "claimId": "claim_8eb6e1cfcb299e072fa3bb682cff269e",
+      "claimId": "claim_40e143d1d41fa2924bdb0553d47d12fb",
       "path": "docs/platform/proposals/step-09-group-thinking-substrate.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "c1048238b02da249809075ef2443aa0c9f100f4a568a7234462ebc103516d43a",
@@ -13848,7 +13848,7 @@
       "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
     },
     {
-      "claimId": "claim_159952b96877b8d199d18978a6fddec5",
+      "claimId": "claim_9bf738f4e4b1f0747aa9c65a99f5d089",
       "path": "docs/platform/proposals/step-10-a0-coding-domain-boundary-facade-plan.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "d73cec67699136ad6d65ecd02545fe80643ecc11cbe1be7670ee4ddb712b321f",
@@ -13911,7 +13911,7 @@
       "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
     },
     {
-      "claimId": "claim_e7eb15c94bce0b438a98179cd2930098",
+      "claimId": "claim_8fa0a99a9a5f3a9cc5030b90be23099c",
       "path": "docs/platform/proposals/step-10-coding-domain-adoption.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "4e44dd0cedb1f19789d41034100af7d3bcb210b43d807a18d0120cce32b0a926",
@@ -13974,7 +13974,7 @@
       "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
     },
     {
-      "claimId": "claim_0493708f4c5e0c8557158b146fe64664",
+      "claimId": "claim_87f7b9422bc7d27afb46f3467c6b6a45",
       "path": "docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md",
       "anchor": "unheaded-block-3",
       "unitDigest": "188b0e4b3ec098bcb8133c352fdc17a48db75af40f9d66d5b5b842da5f29152b",
@@ -14126,5 +14126,9 @@
   "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1205-proposals-redesigns-bounded-rereview-d39fe9033.md",
   "reviewReportCommit": "953b7d38bc52a5cf42b0289c90b34aafb1a30640",
   "reviewContentCommit": "d39fe9033928edc45d03a56e66a2d9949cfc4bdb",
-  "reviewNote": "channel list: 665 rows at HEAD, compact sorted five-field serialization hashes to e6424a2d (before 115cdfcf equals the base list); the only tuple change is the file 6 predecessor replaced by its successor, all rows candidate-unverified, 664 retained approvals; the list file at d39fe9033 still held the predecessor and the HEAD sync commit carries the successor, so the pin is the HEAD list."
+  "reviewNote": "channel list: 665 rows at HEAD, compact sorted five-field serialization hashes to e6424a2d (before 115cdfcf equals the base list); the only tuple change is the file 6 predecessor replaced by its successor, all rows candidate-unverified, 664 retained approvals; the list file at d39fe9033 still held the predecessor and the HEAD sync commit carries the successor, so the pin is the HEAD list.",
+  "nativeRebindingGlobal": {
+    "SYNC": "498048c1a6651556a0ae977a2871135b5ac7c945",
+    "method": "Exact native tuple or authenticated retained ID; no expected-ID filtering or inferred approval."
+  }
 }

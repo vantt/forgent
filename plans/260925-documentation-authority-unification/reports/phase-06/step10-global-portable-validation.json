@@ -1,0 +1,38 @@
+{
+  "syntaxChecked": [
+    "inventory-readonly.mjs",
+    "verify-global.mjs",
+    "checks.mjs",
+    "ownership.mjs",
+    "audit-ownership.mjs",
+    "step10-sync287-lib.mjs",
+    "replay.py",
+    "rehearsal.mjs",
+    "validate-artifact.py"
+  ],
+  "freshDirectory": "/tmp/fgos-work/global-portable-final-po786w3j",
+  "runs": [
+    {
+      "script": "checks.mjs",
+      "exitCode": 0
+    },
+    {
+      "script": "ownership.mjs",
+      "exitCode": 0
+    },
+    {
+      "script": "audit-ownership.mjs",
+      "exitCode": 0
+    },
+    {
+      "script": "replay.py",
+      "exitCode": 0
+    }
+  ],
+  "noAuthorScratchImports": true,
+  "note": "Fresh supplied directory; embedded helper code only. Expensive native-generation/D/E/retirement wrappers ran as the author proof, not repeated here merely for syntax/output redirection.",
+  "extraSyntaxChecked": [
+    "checkpoint-export.mjs"
+  ],
+  "transportExportUsesSameVerifiedWriter": true
+}

@@ -1,0 +1,991 @@
+{
+  "pin": "498048c1a6651556a0ae977a2871135b5ac7c945",
+  "entries": 17,
+  "reviewed": 17,
+  "findings": [],
+  "register": {
+    "$schema": "https://forgent.dev/schemas/documentation-authority.dropped-claims-register.v1.json",
+    "version": 1,
+    "description": "Claims known to be missing from their promoted docs/platform/** target although the source still holds them. Each entry must have an explicit reviewed disposition before the atomic platform-authority cutover (restored at a target anchor, or a restoration owner named). Entries are added by hand with evidence; the generated inventory does not write this file. Entries dropped-002 to dropped-017 (2026-10-07) hold only the groups that a blind audit found and the lead reproduced by hand; they are a floor, not the full list: other rows of that audit stay unknown-blocking in the pilot decision shards without an entry here and need an owner path before the cutover.",
+    "entries": [
+      {
+        "id": "dropped-001",
+        "title": "Dev / Source Activation",
+        "recordedAt": "2026-10-06",
+        "status": "dropped-needs-restoration",
+        "intentional": false,
+        "intentionalEvidence": "Owner confirmed on 2026-10-06 that the drop was not intended (plans/261006-1445-fgctl-dev-activation/plan.md, Questions section, main checkout).",
+        "source": {
+          "path": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+          "anchors": [
+            "dev-source-activation"
+          ],
+          "lines": "73 (settled-facts table row) and 895-920 (section body)",
+          "introducedBy": "6733de7cf (2026-09-06, docs: reconcile packaging and workspace architecture)",
+          "authority": "Settled for V1"
+        },
+        "phase3Ledger": {
+          "claimId": "claim_efd5afeb35b4352c0229ea2f7be2356b",
+          "artifact": "reports/phase-02-doc-inventory.parts/part-0002.jsonl (claim row) and part-0008.jsonl (file row claimIds)",
+          "disposition": "unknown-blocking",
+          "targetOwner": null
+        },
+        "expectedTarget": "docs/platform/packaging-distribution/ (runtime identity and activation; no row or section names dev-source activation today)",
+        "absenceCheck": "rtk proxy grep -rn -i 'activationKind\\|dev-source\\|source activation' docs/platform/packaging-distribution returns nothing at branch head after the 2026-10-06 sync",
+        "relatedOverclaim": "docs/platform/host-invocation-routing/intent-preservation-ledger.md:81 (HI-I027) states '`dev:<rev>` and staged release use same mechanism' with status 'implemented preview'; Plan C reports the dev path is not implemented in code. Not verified in this record.",
+        "dropCause": "UNPROVEN: not investigated; do not infer.",
+        "restorationOwner": "Plan C (plans/261006-1445-fgctl-dev-activation/, draft, unscheduled) re-implements the mechanism and its docs after the cutover. The cutover does not wait for it. If Plan C lands first, the claim row points at the restored target anchor.",
+        "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition: before cutover, 'restore after cutover via Plan C (draft, unscheduled)'; if Plan C lands first, a pointer at the restored anchor.",
+        "reviewedDisposition": {
+          "decision": "defer-with-owner",
+          "owner": "Plan C (plans/261006-1445-fgctl-dev-activation/, draft, unscheduled) re-implements the mechanism and its docs after the cutover. The cutover does not wait for it. If Plan C lands first, the claim row points at the restored target anchor.",
+          "stubOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+          "stubAnchor": "dev-source-activation-restoration-stub",
+          "authoredBy": "codex-session:8@2026-10-13",
+          "reviewStatus": "reviewed",
+          "sourceCommit": "77830ba77eb05991d95b005919776ee6254e833b",
+          "reviewNote": "Register entry is unchanged from its prior form (only dropped-010 changed); reviewedDisposition defer-with-owner names Plan C and stub anchor dev-source-activation-restoration-stub which passes the anchor check; seven source rows defer to that stub as reviewed; stays pending, which is why E still shows dropped-claims-unreviewed 1",
+          "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+          "reviewedAt": "2026-10-14",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-closure-resolution.md",
+          "reviewReportCommit": "ff3ec502574afd0e703076c0ea5702d4069d04e0",
+          "reviewMode": "ordinary",
+          "reviewer": "reviewer:claude-session:a4954387@2026-10-14"
+        }
+      },
+      {
+        "id": "dropped-002",
+        "title": "Contract versioning (independent versions, exact version pair from range intersection, no best-effort coercio…",
+        "recordedAt": "2026-10-07",
+        "status": "dropped-needs-review",
+        "intentional": null,
+        "intentionalEvidence": "None found. The text was never present under docs/platform/host-invocation-routing (git log -S on distinctive terms lists only commits to docs/architect/host-invocation-routing), so it was not carried when the area was promoted and no later removal records a reason. A blind source-to-target audit (pilot, 2026-10-07) and a hand re-check by the lead found no promoted document, including the intent ledger and source inventory, that states it.",
+        "source": {
+          "path": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+          "anchors": [
+            "unheaded-block-24",
+            "unheaded-block-43"
+          ],
+          "lines": "115-186",
+          "introducedBy": "UNPROVEN: not investigated",
+          "authority": "Settled design text in the legacy source; the promoted area is silent"
+        },
+        "phase3Ledger": {
+          "claimId": "claim_bbaec409dcbaee8f33968727aa0abed5",
+          "claimIds": [
+            "claim_bbaec409dcbaee8f33968727aa0abed5",
+            "claim_e365a92a236aa909b9148185aa8f0801"
+          ],
+          "artifact": "pilot/first-round/a-host-invocation-provider-routing.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G23",
+          "disposition": "unknown-blocking",
+          "targetOwner": null
+        },
+        "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
+        "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"version pair|best-effort\",\"range intersection\",\"never invents\",\"retry-safe\"] returns no hit that states the claim",
+        "relatedOverclaim": "matrix: 'Architecture name, problem statement, canonical names, peer host use cases, core contracts, pure Router, InvocationService, two-stage authority, failure families, lifecycle record, human-input parking, physical placement, release boundaries, open ques",
+        "dropCause": "UNPROVEN: not investigated; do not infer.",
+        "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
+        "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
+        "reviewedDisposition": {
+          "decision": "restored",
+          "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+          "anchor": "restored-contract-versioning",
+          "unitDigest": "8ffc35b01b812e60431405f8d140ef900e24c4d87f05606dafec0dcb6e5f7dec",
+          "reviewStatus": "reviewed",
+          "authoredBy": "codex-session:1@2026-10-11",
+          "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+          "codeEvidence": [
+            "packages/host-runtime/rust/src/operation_provider_router.rs:108-119",
+            "packages/host-runtime/rust/src/contracts.rs:174-203"
+          ],
+          "statusNote": "Exact request/outcome version-pair matching is implemented; host/provider range intersection and registered transforms remain selected design, not an implemented promise here.",
+          "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+          "reviewedAt": "2026-10-13",
+          "reviewNote": "Literal in component-protocol.md. Status says exact version-pair matching only; range intersection and transforms are selected design. operation_provider_router.rs:108-119 does exact request/outcome version compare; contracts.rs:174-203 is ContractRef with id and version.",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+          "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
+        }
+      },
+      {
+        "id": "dropped-003",
+        "title": "Lifecycle state chain received -> admitted/refused -> selected/refused -> granted/refused -> dispatched -> te…",
+        "recordedAt": "2026-10-07",
+        "status": "dropped-needs-review",
+        "intentional": null,
+        "intentionalEvidence": "None found. The text was never present under docs/platform/host-invocation-routing (git log -S on distinctive terms lists only commits to docs/architect/host-invocation-routing), so it was not carried when the area was promoted and no later removal records a reason. A blind source-to-target audit (pilot, 2026-10-07) and a hand re-check by the lead found no promoted document, including the intent ledger and source inventory, that states it.",
+        "source": {
+          "path": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+          "anchors": [
+            "unheaded-block-41"
+          ],
+          "lines": "175-182",
+          "introducedBy": "UNPROVEN: not investigated",
+          "authority": "Settled design text in the legacy source; the promoted area is silent"
+        },
+        "phase3Ledger": {
+          "claimId": "claim_75c780a31188a0fa1e19d03ccbd3b6b1",
+          "claimIds": [
+            "claim_75c780a31188a0fa1e19d03ccbd3b6b1"
+          ],
+          "artifact": "pilot/first-round/a-host-invocation-provider-routing.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G24",
+          "disposition": "unknown-blocking",
+          "targetOwner": null
+        },
+        "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
+        "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"admission-refused\",\"selection-refused\",\"grant-refused\",\"semantic-failed\"] returns no hit that states the claim",
+        "relatedOverclaim": "matrix: 'Architecture name, problem statement, canonical names, peer host use cases, core contracts, pure Router, InvocationService, two-stage authority, failure families, lifecycle record, human-input parking, physical placement, release boundaries, open ques",
+        "dropCause": "UNPROVEN: not investigated; do not infer.",
+        "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
+        "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
+        "reviewedDisposition": {
+          "decision": "restored",
+          "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+          "anchor": "restored-lifecycle-state-chain-received-admitted-refused-selected-refused-granted-refused-dispatched-te",
+          "unitDigest": "f44c32e72b77048a0e5f38a820961ab9d3e631ce73110f8f46edd7d50806c941",
+          "reviewStatus": "reviewed",
+          "authoredBy": "codex-session:1@2026-10-11",
+          "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+          "codeEvidence": [
+            "packages/host-runtime/rust/src/invocation_service.rs:161-234",
+            "packages/host-runtime/rust/src/invocation_service.rs:494-570"
+          ],
+          "statusNote": "The runtime admits before selection, grants before dispatch and writes a terminal lifecycle record. The retained arrow chain is the design vocabulary, not an assertion that every arrow is a separately persisted state.",
+          "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+          "reviewedAt": "2026-10-13",
+          "reviewNote": "Literal arrow chain. Status says the chain is vocabulary, not separately persisted states. invocation_service.rs:161-234 has the terminal enum incl. Parked and the lifecycle record; 494-570 shows received and admit. Nit: the select stage (line 586) and grant stage (line 642) that back the admits-before-selection and grants-before-dispatch sentence sit just past the cited range; consider extending to 494-660.",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+          "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
+        }
+      },
+      {
+        "id": "dropped-004",
+        "title": "Physical placement layout tree (workspace root, apps/, packages/host-runtime/rust modules, distribution, comp…",
+        "recordedAt": "2026-10-07",
+        "status": "dropped-needs-review",
+        "intentional": null,
+        "intentionalEvidence": "None found. The text was never present under docs/platform/host-invocation-routing (git log -S on distinctive terms lists only commits to docs/architect/host-invocation-routing), so it was not carried when the area was promoted and no later removal records a reason. A blind source-to-target audit (pilot, 2026-10-07) and a hand re-check by the lead found no promoted document, including the intent ledger and source inventory, that states it.",
+        "source": {
+          "path": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+          "anchors": [
+            "unheaded-block-46"
+          ],
+          "lines": "194-218",
+          "introducedBy": "UNPROVEN: not investigated",
+          "authority": "Settled design text in the legacy source; the promoted area is silent"
+        },
+        "phase3Ledger": {
+          "claimId": "claim_54536d1078dc6a2b6eacd17105389f2b",
+          "claimIds": [
+            "claim_54536d1078dc6a2b6eacd17105389f2b"
+          ],
+          "artifact": "pilot/first-round/a-host-invocation-provider-routing.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G29",
+          "disposition": "unknown-blocking",
+          "targetOwner": null
+        },
+        "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
+        "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"workspace root\",\"herdr-plugin\",\"excluded in R1\"] returns no hit that states the claim",
+        "relatedOverclaim": "matrix: 'Architecture name, problem statement, canonical names, peer host use cases, core contracts, pure Router, InvocationService, two-stage authority, failure families, lifecycle record, human-input parking, physical placement, release boundaries, open ques",
+        "dropCause": "UNPROVEN: not investigated; do not infer.",
+        "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
+        "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
+        "reviewedDisposition": {
+          "decision": "restored",
+          "owner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+          "anchor": "restored-physical-placement-layout-tree",
+          "unitDigest": "b7c268c102bebb54ddfa5eb5e0a30776638dc450e855f71eb63088a47586c1fb",
+          "reviewStatus": "reviewed",
+          "authoredBy": "codex-session:1@2026-10-11",
+          "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+          "codeEvidence": [
+            "Cargo.toml:1-17",
+            "packages/host-runtime/rust/src/registry.rs:19-69"
+          ],
+          "statusNote": "This is the selected illustrative layout, not a current directory listing: the workspace uses apps/fgos and packages/host-runtime/rust and excludes apps/fgos-gateway; the actual snapshot constructor is registry.rs, not the proposed registry_linker.rs filename.",
+          "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+          "reviewedAt": "2026-10-13",
+          "reviewNote": "Marked illustrative, not a directory listing. Cargo.toml:1-17 shows members apps/fgos, packages/host-runtime/rust and the apps/fgos-gateway exclude; registry.rs:19-69 is build_snapshot (not registry_linker.rs). Claims match.",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+          "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
+        }
+      },
+      {
+        "id": "dropped-005",
+        "title": "Class definitions (core: required, fgOS-owned, atomically released, static-linked; packaged extension: option…",
+        "recordedAt": "2026-10-07",
+        "status": "dropped-needs-review",
+        "intentional": null,
+        "intentionalEvidence": "None found. The text was never present under docs/platform/host-invocation-routing (git log -S on distinctive terms lists only commits to docs/architect/host-invocation-routing), so it was not carried when the area was promoted and no later removal records a reason. A blind source-to-target audit (pilot, 2026-10-07) and a hand re-check by the lead found no promoted document, including the intent ledger and source inventory, that states it.",
+        "source": {
+          "path": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+          "anchors": [
+            "unheaded-block-7",
+            "unheaded-block-8",
+            "unheaded-block-10",
+            "unheaded-block-11",
+            "unheaded-block-12",
+            "unheaded-block-14",
+            "unheaded-block-15",
+            "unheaded-block-16",
+            "unheaded-block-17"
+          ],
+          "lines": "30-62",
+          "introducedBy": "UNPROVEN: not investigated",
+          "authority": "Settled design text in the legacy source; the promoted area is silent"
+        },
+        "phase3Ledger": {
+          "claimId": "claim_d90840823918415e74ddd353dae32ea3",
+          "claimIds": [
+            "claim_d90840823918415e74ddd353dae32ea3",
+            "claim_2ce14ab31e5b889ce37c4e99735c69e5",
+            "claim_95063c4b27e671f29631d4fd68427008",
+            "claim_bb84143c32c84b94257bfeb7ca6dacd2",
+            "claim_3f7b5a5b5b1c39251e56f0d232e11ec3",
+            "claim_962d99a375bab41c2063612523bdf348",
+            "claim_f2755ef85799b9a6ec4fd4f5d03e9106",
+            "claim_66ce4edf221963b22ad02dbdf872da1c",
+            "claim_8948a9c62d80ce2692687f3fcfbaf8ff"
+          ],
+          "artifact": "pilot/first-round/a-external-provider-protocol.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G36",
+          "disposition": "unknown-blocking",
+          "targetOwner": null
+        },
+        "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
+        "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"atomically\",\"statically linked\",\"corrupt core\",\"two mistakes\"] returns no hit that states the claim",
+        "relatedOverclaim": "matrix: 'Component class versus invocation mechanism, built-in/process/WASM protocol placement, JSON-RPC 2.0 semantics over length-prefixed stdio frames, static manifest discovery, registry/linker meaning, namespace and replacement rules' (class vs mechanism, ",
+        "dropCause": "UNPROVEN: not investigated; do not infer.",
+        "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
+        "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
+        "reviewedDisposition": {
+          "decision": "restored",
+          "owner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+          "anchor": "restored-class-definitions",
+          "unitDigest": "6f87a7eebf9ea1c9168ec539fbde7f1e86802905808f17cdf411b0e95de75e52",
+          "reviewStatus": "reviewed",
+          "authoredBy": "codex-session:1@2026-10-11",
+          "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+          "codeEvidence": [
+            "packages/host-runtime/rust/src/contracts.rs:377-393"
+          ],
+          "statusNote": "The class/mechanism axes are preserved as design policy. ProviderDescriptor stores open string metadata; this citation does not prove every release/authority policy or example pack is enforced or shipped.",
+          "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+          "reviewedAt": "2026-10-13",
+          "reviewNote": "All 9 literal. Qualified as design policy; contracts.rs:377-393 ProviderDescriptor has open Cow string component_class and mechanism, which is exactly what the note says.",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+          "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
+        }
+      },
+      {
+        "id": "dropped-006",
+        "title": "Same-process built-ins vs runtime extensions and cross-process cost (cold start, batch hot loops, one-shot CL…",
+        "recordedAt": "2026-10-07",
+        "status": "dropped-needs-review",
+        "intentional": null,
+        "intentionalEvidence": "None found. The text was never present under docs/platform/host-invocation-routing (git log -S on distinctive terms lists only commits to docs/architect/host-invocation-routing), so it was not carried when the area was promoted and no later removal records a reason. A blind source-to-target audit (pilot, 2026-10-07) and a hand re-check by the lead found no promoted document, including the intent ledger and source inventory, that states it.",
+        "source": {
+          "path": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+          "anchors": [
+            "same-process-built-ins-versus-runtime-extensions",
+            "unheaded-block-18",
+            "cross-process-cost",
+            "unheaded-block-19"
+          ],
+          "lines": "64-70",
+          "introducedBy": "UNPROVEN: not investigated",
+          "authority": "Settled design text in the legacy source; the promoted area is silent"
+        },
+        "phase3Ledger": {
+          "claimId": "claim_6ac894a939b9efb6725758fd6c4eb039",
+          "claimIds": [
+            "claim_6ac894a939b9efb6725758fd6c4eb039",
+            "claim_f8dc56c8e292eacb0d186f5dd16b7e52",
+            "claim_d03d06ad4a63b00a87a934ab594587c9",
+            "claim_db4217b66dba7e00b2af5d10624b795d"
+          ],
+          "artifact": "pilot/first-round/a-external-provider-protocol.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G37",
+          "disposition": "unknown-blocking",
+          "targetOwner": null
+        },
+        "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
+        "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"Cold process startup\",\"batch\",\"one-shot\",\"hot\"] returns no hit that states the claim",
+        "relatedOverclaim": "matrix: 'Component class versus invocation mechanism, built-in/process/WASM protocol placement, JSON-RPC 2.0 semantics over length-prefixed stdio frames, static manifest discovery, registry/linker meaning, namespace and replacement rules' (protocol placement; ",
+        "dropCause": "UNPROVEN: not investigated; do not infer.",
+        "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
+        "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
+        "reviewedDisposition": {
+          "decision": "restored",
+          "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+          "anchor": "restored-same-process-built-ins-vs-runtime-extensions-and-cross-process-cost",
+          "unitDigest": "09bad73031f65818132934438abaa9deb202c4d506ea8a0f1d2794b1e87c9a1e",
+          "reviewStatus": "reviewed",
+          "authoredBy": "codex-session:1@2026-10-11",
+          "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+          "codeEvidence": [
+            "packages/host-runtime/rust/src/contracts.rs:205-220",
+            "packages/host-runtime/rust/src/providers/external_process/frame_codec.rs:1-16"
+          ],
+          "statusNote": "OperationRequest uses typed input; the process codec is framed JSON-RPC. Cold-start and hot-loop discussion is qualitative design reasoning; no performance measurement is claimed.",
+          "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+          "reviewedAt": "2026-10-13",
+          "reviewNote": "Literal. Note says typed input plus framed JSON-RPC and no performance measurement. contracts.rs:205-220 OperationRequest has Box dyn Any input; frame_codec.rs:1-16 is the 4-byte length-prefixed JSON-RPC codec.",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+          "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
+        }
+      },
+      {
+        "id": "dropped-007",
+        "title": "Semantic contract stays transport-neutral (a future binary codec or local socket may replace framing)",
+        "recordedAt": "2026-10-07",
+        "status": "dropped-needs-review",
+        "intentional": null,
+        "intentionalEvidence": "None found. The text was never present under docs/platform/host-invocation-routing (git log -S on distinctive terms lists only commits to docs/architect/host-invocation-routing), so it was not carried when the area was promoted and no later removal records a reason. A blind source-to-target audit (pilot, 2026-10-07) and a hand re-check by the lead found no promoted document, including the intent ledger and source inventory, that states it.",
+        "source": {
+          "path": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+          "anchors": [
+            "unheaded-block-25"
+          ],
+          "lines": "90-90",
+          "introducedBy": "UNPROVEN: not investigated",
+          "authority": "Settled design text in the legacy source; the promoted area is silent"
+        },
+        "phase3Ledger": {
+          "claimId": "claim_d1c4102dc6dea3ae86434fb12c0abf71",
+          "claimIds": [
+            "claim_d1c4102dc6dea3ae86434fb12c0abf71"
+          ],
+          "artifact": "pilot/first-round/a-external-provider-protocol.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G38",
+          "disposition": "unknown-blocking",
+          "targetOwner": null
+        },
+        "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
+        "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"transport-neutral\",\"binary codec\",\"local socket\"] returns no hit that states the claim",
+        "relatedOverclaim": "matrix: 'Component class versus invocation mechanism, built-in/process/WASM protocol placement, JSON-RPC 2.0 semantics over length-prefixed stdio frames, static manifest discovery, registry/linker meaning, namespace and replacement rules'; HI-I021",
+        "dropCause": "UNPROVEN: not investigated; do not infer.",
+        "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
+        "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
+        "reviewedDisposition": {
+          "decision": "restored",
+          "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+          "anchor": "restored-semantic-contract-stays-transport-neutral",
+          "unitDigest": "ae783d1874e8f08378f9ba6fb523ab87b46e20cabc1de311ff702db6d2ca2f6b",
+          "reviewStatus": "reviewed",
+          "authoredBy": "codex-session:1@2026-10-11",
+          "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+          "codeEvidence": [
+            "packages/host-runtime/rust/src/providers/external_process/frame_codec.rs:1-16"
+          ],
+          "statusNote": "The implemented process codec is length-prefixed JSON-RPC. A binary codec or local socket is retained future transport-neutral design, not implemented functionality.",
+          "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+          "reviewedAt": "2026-10-13",
+          "reviewNote": "Literal. Binary codec or socket labelled future design; frame_codec.rs:1-16 confirms only the length-prefixed JSON-RPC codec exists.",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+          "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
+        }
+      },
+      {
+        "id": "dropped-008",
+        "title": "Registry linker procedure and its input/output formula (partly carried: the linker exists in code and proofs; the formula and the procedure steps are missing)",
+        "recordedAt": "2026-10-07",
+        "status": "dropped-needs-review",
+        "intentional": null,
+        "intentionalEvidence": "None found for the missing part. A linker is described in docs/platform/host-invocation-routing/spec.md and roadmap.md, in the R2 proof (refusal cases) and RegistrySnapshot in architecture/provider-routing.md, so the carried part is not missing; the missing part is the authored input list, the input/output formula and the scan/validate/verify procedure of the legacy source (never present under the promoted area according to git log -S on those phrases).",
+        "source": {
+          "path": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+          "anchors": [
+            "unheaded-block-32",
+            "unheaded-block-33",
+            "unheaded-block-34"
+          ],
+          "lines": "113-124",
+          "introducedBy": "UNPROVEN: not investigated",
+          "authority": "Settled design text in the legacy source; the promoted area is silent"
+        },
+        "phase3Ledger": {
+          "claimId": "claim_08172f75766eb1d002d4cba2669f9bbd",
+          "claimIds": [
+            "claim_08172f75766eb1d002d4cba2669f9bbd",
+            "claim_7e15be77fb7c4bff223728491df3e212",
+            "claim_0f401249972ad0ce465e24e0932a2834"
+          ],
+          "artifact": "pilot/first-round/a-external-provider-protocol.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G40",
+          "disposition": "unknown-blocking",
+          "targetOwner": null
+        },
+        "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
+        "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"linker\",\"RegistrySnapshot\",\"immutable\",\"source fingerprint\"] returns no hit that states the claim",
+        "relatedOverclaim": "matrix: 'Component class versus invocation mechanism, built-in/process/WASM protocol placement, JSON-RPC 2.0 semantics over length-prefixed stdio frames, static manifest discovery, registry/linker meaning, namespace and replacement rules' (registry/linker mean Existing carriers of the partly carried topic: spec.md, roadmap.md, architecture/provider-routing.md, verification/r2-external-process-proof.md.",
+        "dropCause": "UNPROVEN: not investigated; do not infer.",
+        "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
+        "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
+        "reviewedDisposition": {
+          "decision": "restored",
+          "owner": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+          "anchor": "restored-registry-linker-procedure-and-its-input-output-formula",
+          "unitDigest": "4d243a014e521ec3d00b1941aff46f7aaff78e04a4fa6d756840d1c6ef7d7d17",
+          "reviewStatus": "reviewed",
+          "authoredBy": "codex-session:1@2026-10-11",
+          "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+          "codeEvidence": [
+            "packages/host-runtime/rust/src/registry.rs:19-69",
+            "packages/host-runtime/rust/src/operation_provider_router.rs:24-40"
+          ],
+          "statusNote": "The input/output formula and full validation procedure are retained selected design. The cited immutable snapshot constructor validates duplicate bindings; it does not prove every proposed namespace/capability/replacement step is implemented.",
+          "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+          "reviewedAt": "2026-10-13",
+          "reviewNote": "Literal. Note says only duplicate-binding validation is implemented; registry.rs:19-69 does exactly that (panic on duplicate bindings, replacement pair exempt) and operation_provider_router.rs:24-40 shows RouterPolicy as an unused placeholder and SelectionInput.",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+          "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
+        }
+      },
+      {
+        "id": "dropped-009",
+        "title": "Both adapters delegate a complete use case (never split a state transaction between native and legacy); comma…",
+        "recordedAt": "2026-10-07",
+        "status": "dropped-needs-review",
+        "intentional": null,
+        "intentionalEvidence": "None found. The text was never present under docs/platform/host-invocation-routing (git log -S on distinctive terms lists only commits to docs/architect/host-invocation-routing), so it was not carried when the area was promoted and no later removal records a reason. A blind source-to-target audit (pilot, 2026-10-07) and a hand re-check by the lead found no promoted document, including the intent ledger and source inventory, that states it.",
+        "source": {
+          "path": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+          "anchors": [
+            "unheaded-block-8",
+            "unheaded-block-21"
+          ],
+          "lines": "30-71",
+          "introducedBy": "UNPROVEN: not investigated",
+          "authority": "Settled design text in the legacy source; the promoted area is silent"
+        },
+        "phase3Ledger": {
+          "claimId": "claim_7046eb56f67c02ef82f621a3fa30286c",
+          "claimIds": [
+            "claim_7046eb56f67c02ef82f621a3fa30286c",
+            "claim_7f7b3ba83bbde945cdd80d479b9d0b19"
+          ],
+          "artifact": "pilot/first-round/a-legacy-cli-transition.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G46",
+          "disposition": "unknown-blocking",
+          "targetOwner": null
+        },
+        "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
+        "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"complete use case\",\"state transaction\",\"host-owned projection\",\"semantic validation\"] returns no hit that states the claim",
+        "relatedOverclaim": "matrix: 'Separate LegacyCliPassthroughProvider and LegacySemanticProvider, legacy-node identity, bin/fgos.mjs immovability, activation-manifest resolution, caller inventory, CommandRouteDescriptor, Rust parser ownership, fgos.v1 presentation boundary, Rust hos",
+        "dropCause": "UNPROVEN: not investigated; do not infer.",
+        "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
+        "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
+        "reviewedDisposition": {
+          "decision": "restored",
+          "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+          "anchor": "restored-both-adapters-delegate-a-complete-use-case",
+          "unitDigest": "bee8f7b4f179667157c60c45770840b9db691e7c03ce3914556e097538b46c35",
+          "reviewStatus": "reviewed",
+          "authoredBy": "codex-session:1@2026-10-11",
+          "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+          "codeEvidence": [
+            "apps/fgos/src/legacy_exec.rs:69-154",
+            "apps/fgos/src/legacy_exec.rs:242-253"
+          ],
+          "statusNote": "The CLI lane forwards the complete argument vector to the manifest-owned Node entry and inherits stdio. The semantic Node bridge is retained per-operation migration design; no existing whole state transaction is split by this documentation.",
+          "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+          "reviewedAt": "2026-10-13",
+          "reviewNote": "Literal. legacy_exec.rs:69-154 resolves the payload through the manifest and verify_legacy_node; 242-253 spawns node with the forwarded args and inherited stdio. Note claims no more than that.",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+          "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
+        }
+      },
+      {
+        "id": "dropped-010",
+        "title": "package.json bin.fgos removed/pointed at workspace shim at default flip, bin.fgos-runner stays, ownership hea…",
+        "recordedAt": "2026-10-07",
+        "status": "dropped-needs-review",
+        "intentional": null,
+        "intentionalEvidence": "None found. The text was never present under docs/platform/host-invocation-routing (git log -S on distinctive terms lists only commits to docs/architect/host-invocation-routing), so it was not carried when the area was promoted and no later removal records a reason. A blind source-to-target audit (pilot, 2026-10-07) and a hand re-check by the lead found no promoted document, including the intent ledger and source inventory, that states it.",
+        "source": {
+          "path": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+          "anchors": [
+            "unheaded-block-14"
+          ],
+          "lines": "48-48",
+          "introducedBy": "UNPROVEN: not investigated",
+          "authority": "Settled design text in the legacy source; the promoted area is silent"
+        },
+        "phase3Ledger": {
+          "claimId": "claim_6a37273a0a45d24c53e344928c3edf22",
+          "claimIds": [
+            "claim_6a37273a0a45d24c53e344928c3edf22"
+          ],
+          "artifact": "pilot/first-round/a-legacy-cli-transition.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G47",
+          "disposition": "unknown-blocking",
+          "targetOwner": null
+        },
+        "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
+        "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"bin\\\\.fgos\",\"fgos-runner\",\"AGENTS\\\\.md\"] returns no hit that states the claim",
+        "relatedOverclaim": "matrix: 'Separate LegacyCliPassthroughProvider and LegacySemanticProvider, legacy-node identity, bin/fgos.mjs immovability, activation-manifest resolution, caller inventory, CommandRouteDescriptor, Rust parser ownership, fgos.v1 presentation boundary, Rust hos",
+        "dropCause": "UNPROVEN: not investigated; do not infer.",
+        "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
+        "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
+        "reviewedDisposition": {
+          "anchor": "restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
+          "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+          "codeEvidence": [
+            "package.json:9-12",
+            "bin/fgos.mjs:1-10"
+          ],
+          "stubOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+          "stubAnchor": "restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
+          "retainedVerbatim": {
+            "owner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+            "anchor": "restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
+            "unitDigest": "81114f62b8c05c85e164c4d4e4af580c889a4e33031282ca65c5a3da84763e07"
+          },
+          "decision": "superseded by decision",
+          "owner": "Packaging-distribution (release-owner decision)",
+          "authoredBy": "codex-session:12@2026-10-14",
+          "reviewStatus": "reviewed",
+          "successor": {
+            "decision": "2026-09-15 coordinator 30-day window",
+            "owner": "docs/platform/packaging-distribution/code-panel-rollout-plan.md",
+            "anchor": "2-coordinator-setup",
+            "line": 72,
+            "companionOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+            "companionAnchor": "2-open-release-decisions",
+            "companionLine": 35,
+            "earliestRemoval": "2026-10-18"
+          },
+          "owedObligation": "Removing or redirecting bin.fgos after the window remains owed to Packaging-distribution (release-owner decision). Nothing is removed now.",
+          "rationale": "Superseded by decision: the same-day ownership header and the dated coordinator window show intentional coexistence; the coordinator 30-day window is the successor to the automatic installed-default trigger.",
+          "statusNote": "Superseded by decision (owner F6 resolution, 2026-10-14): the installed-default npm `bin.fgos` removal trigger has the 2026-09-15 coordinator 30-day window as successor (`docs/platform/packaging-distribution/code-panel-rollout-plan.md:72`; compatibility-window row above, originally line 35). The Rust host is the installed default from preview; the deprecated Node fallback is supported for 30 calendar days after preview publication, earliest removal 2026-10-18. Removing or redirecting `bin.fgos` after the window remains owed to Packaging-distribution (release-owner decision). The original clause below is retained verbatim as dated design. The runner mapping and source-entry ownership header stay; nothing is removed now.",
+          "flaggedObsolete": false,
+          "retentionStatus": "superseded-by-decision; original clause retained verbatim as dated design",
+          "ownerResolution": {
+            "report": "plans/260925-documentation-authority-unification/reports/phase-06/owner-answers.md",
+            "commit": "5563bcb70d1c9f0706925271e8209e7eb49fd28b",
+            "text": "F6 resolution (owner-decided 2026-10-14, option A of the Step 4 decision, following `review-4-packaging-truth-f6.md` part 2): dropped-010 is superseded by decision, not retired by absence.\n1. The installed-default removal trigger for npm `bin.fgos` is superseded by the 2026-09-15 coordinator decision (`docs/platform/packaging-distribution/code-panel-rollout-plan.md:72`, with the `architecture/release-boundaries.md:35` row): the Rust host is the installed default from the preview, and the Node fallback is deprecated and supported for 30 calendar days, earliest removal 2026-10-18. The disposition cites that decision as its successor.\n2. Removing or redirecting `bin.fgos` after the window stays an owed obligation, owned by Packaging-distribution (release-owner decision). The disposition text says so; nothing is removed now.\n3. The rationale says \"superseded by decision\" and drops the \"no intentional retirement is inferred from absence\" wording. The FLAGGED-obsolete verbatim retention may now be resolved consistently with this verdict. The runner mapping and source-entry ownership header stay.",
+            "shownTextDigest": "f2a190c215efd2f962ba97b71118536ba72fdf316fc27cea30584299c7ab7487"
+          },
+          "reviewNote": "Decision doc, register and proposal row say superseded by decision, name the 2026-09-15 window (line 72 header, line 35 row, both verified) with earliest removal 2026-10-18, record end-of-window removal as owed to Packaging-distribution, drop the no-retirement-from-absence wording (only the owner own phrase not retired by absence remains), keep runner mapping and header, set flaggedObsolete false and keep the clause verbatim; minor: line 72 is the note header with the substance on line 73, and the status text phrase originally line 35 is odd since the row is still at line 35; stale top-level restorationOwner Unassigned and intentional null are historical record fields, left unchanged",
+          "unitDigest": "81114f62b8c05c85e164c4d4e4af580c889a4e33031282ca65c5a3da84763e07",
+          "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+          "reviewedAt": "2026-10-14",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-closure-resolution.md",
+          "reviewReportCommit": "ff3ec502574afd0e703076c0ea5702d4069d04e0",
+          "reviewMode": "ordinary",
+          "reviewer": "reviewer:claude-session:a4954387@2026-10-14"
+        }
+      },
+      {
+        "id": "dropped-011",
+        "title": "Rust-host-first cost: legacy call pays Rust launcher + Node startup, both runtimes shipped, compatibility fai…",
+        "recordedAt": "2026-10-07",
+        "status": "dropped-needs-review",
+        "intentional": null,
+        "intentionalEvidence": "None found. The text was never present under docs/platform/host-invocation-routing (git log -S on distinctive terms lists only commits to docs/architect/host-invocation-routing), so it was not carried when the area was promoted and no later removal records a reason. A blind source-to-target audit (pilot, 2026-10-07) and a hand re-check by the lead found no promoted document, including the intent ledger and source inventory, that states it.",
+        "source": {
+          "path": "docs/architect/host-invocation-routing/legacy-cli-transition.md",
+          "anchors": [
+            "unheaded-block-29"
+          ],
+          "lines": "91-91",
+          "introducedBy": "UNPROVEN: not investigated",
+          "authority": "Settled design text in the legacy source; the promoted area is silent"
+        },
+        "phase3Ledger": {
+          "claimId": "claim_8c44796ac827f6b1287421778b56511c",
+          "claimIds": [
+            "claim_8c44796ac827f6b1287421778b56511c"
+          ],
+          "artifact": "pilot/first-round/a-legacy-cli-transition.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G48",
+          "disposition": "unknown-blocking",
+          "targetOwner": null
+        },
+        "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
+        "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"launcher\",\"Node startup\",\"both runtimes\",\"compatibility failures\"] returns no hit that states the claim",
+        "relatedOverclaim": "matrix: 'Separate LegacyCliPassthroughProvider and LegacySemanticProvider, legacy-node identity, bin/fgos.mjs immovability, activation-manifest resolution, caller inventory, CommandRouteDescriptor, Rust parser ownership, fgos.v1 presentation boundary, Rust hos",
+        "dropCause": "UNPROVEN: not investigated; do not infer.",
+        "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
+        "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
+        "reviewedDisposition": {
+          "decision": "restored",
+          "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+          "anchor": "restored-rust-host-first-cost",
+          "unitDigest": "ce635b98194d303774b10085ed0267c25296c7bda6a154d34d0cdf3180f182e9",
+          "reviewStatus": "reviewed",
+          "authoredBy": "codex-session:1@2026-10-11",
+          "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+          "codeEvidence": [
+            "apps/fgos/src/legacy_exec.rs:242-253"
+          ],
+          "statusNote": "The legacy path launches Node from the Rust adapter, so the two-runtime cost is structural. No startup-latency benchmark or current distribution-size measurement is claimed.",
+          "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+          "reviewedAt": "2026-10-13",
+          "reviewNote": "Literal. legacy_exec.rs:242-253 Command::new node from the Rust adapter supports the structural two-runtime cost; no latency claim made.",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+          "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
+        }
+      },
+      {
+        "id": "dropped-012",
+        "title": "Scope (options, ordering, transition, cutover, rollback only) and obligation that every native migration slic…",
+        "recordedAt": "2026-10-07",
+        "status": "dropped-needs-review",
+        "intentional": null,
+        "intentionalEvidence": "None found. The text was never present under docs/platform/host-invocation-routing (git log -S on distinctive terms lists only commits to docs/architect/host-invocation-routing), so it was not carried when the area was promoted and no later removal records a reason. A blind source-to-target audit (pilot, 2026-10-07) and a hand re-check by the lead found no promoted document, including the intent ledger and source inventory, that states it.",
+        "source": {
+          "path": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+          "anchors": [
+            "unheaded-block-2"
+          ],
+          "lines": "15-26",
+          "introducedBy": "UNPROVEN: not investigated",
+          "authority": "Settled design text in the legacy source; the promoted area is silent"
+        },
+        "phase3Ledger": {
+          "claimId": "claim_2519e82bb2a6054b1b822fc266471424",
+          "claimIds": [
+            "claim_2519e82bb2a6054b1b822fc266471424"
+          ],
+          "artifact": "pilot/first-round/a-node-to-rust-component-migration.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G57",
+          "disposition": "unknown-blocking",
+          "targetOwner": null
+        },
+        "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
+        "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"Component Boundary Advisory\",\"Component Boundary\"] returns no hit that states the claim",
+        "relatedOverclaim": "matrix: 'Chosen migration strategy, rejected migration options, R1/R2/R3 sequence, release readiness categories, component-boundary repetition rule, read-model-before-writer rule, writer migration constraints, Node removal gate, rollback rules, verification ga",
+        "dropCause": "UNPROVEN: not investigated; do not infer.",
+        "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
+        "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
+        "reviewedDisposition": {
+          "decision": "restored",
+          "owner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+          "anchor": "restored-scope",
+          "unitDigest": "8f560ba167735c6e534d25346df656a0c215ecc909f7f29e5068c768e6842626",
+          "reviewStatus": "reviewed",
+          "authoredBy": "codex-session:1@2026-10-11",
+          "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+          "codeEvidence": [
+            "Cargo.toml:1-17"
+          ],
+          "statusNote": "The scope and advisory-reading obligation are selected engineering guidance, not an automated runtime gate. The cited workspace records the actual current component placement.",
+          "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+          "reviewedAt": "2026-10-13",
+          "reviewNote": "Literal. Marked engineering guidance not a gate; Cargo.toml:1-17 is the real current placement.",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+          "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
+        }
+      },
+      {
+        "id": "dropped-013",
+        "title": "Rejected options rationale (Option A: heavy investment in a composition root scheduled for removal; Option C:…",
+        "recordedAt": "2026-10-07",
+        "status": "dropped-needs-review",
+        "intentional": null,
+        "intentionalEvidence": "None found for the missing part. The rejected migration choices themselves are carried (the old audit lists Node-thinning-first and the big-bang rewrite as preserved rejected choices); the rationale of the rejected options (the Option A and Option C reasoning and the cost argument) was never present under the promoted area according to git log -S on those phrases.",
+        "source": {
+          "path": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+          "anchors": [
+            "unheaded-block-9",
+            "unheaded-block-10",
+            "unheaded-block-13",
+            "unheaded-block-14",
+            "3-why-the-sequence-is-selected",
+            "unheaded-block-16",
+            "unheaded-block-17",
+            "unheaded-block-18"
+          ],
+          "lines": "69-129",
+          "introducedBy": "UNPROVEN: not investigated",
+          "authority": "Settled design text in the legacy source; the promoted area is silent"
+        },
+        "phase3Ledger": {
+          "claimId": "claim_38ab2fca27e14c583debbe4bd42386c9",
+          "claimIds": [
+            "claim_38ab2fca27e14c583debbe4bd42386c9",
+            "claim_bb413cec669065c6ea224f0a326fcad1",
+            "claim_2f8cc2098b8aab83a7d7442cc88028a8",
+            "claim_9c041351e42cf17447a86425475d1d50",
+            "claim_5b0f65a4cc7366113339fc3a47d9eded",
+            "claim_666cd097b96236ab3c885054b2240ead",
+            "claim_50f628b5dcaf8dbdffee5607d27480f1",
+            "claim_f2eb44e222e17f54c6ccc94e0af4fa3e"
+          ],
+          "artifact": "pilot/first-round/a-node-to-rust-component-migration.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G58",
+          "disposition": "unknown-blocking",
+          "targetOwner": null
+        },
+        "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
+        "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"Node-thinning\",\"monotonic\",\"gradient\",\"temporary cost\"] returns no hit that states the claim",
+        "relatedOverclaim": "matrix: 'Chosen migration strategy, rejected migration options, R1/R2/R3 sequence, release readiness categories, component-boundary repetition rule, read-model-before-writer rule, writer migration constraints, Node removal gate, rollback rules, verification ga",
+        "dropCause": "UNPROVEN: not investigated; do not infer.",
+        "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
+        "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
+        "reviewedDisposition": {
+          "decision": "restored",
+          "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+          "anchor": "restored-rejected-options-rationale",
+          "unitDigest": "0dcb452da8abf3d78a91a1c882f6086bd7388c8117f462a695ee211ba8a42637",
+          "reviewStatus": "reviewed",
+          "authoredBy": "codex-session:1@2026-10-11",
+          "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+          "codeEvidence": [
+            "apps/fgos/src/legacy_exec.rs:69-154",
+            "apps/fgos/src/legacy_exec.rs:242-253"
+          ],
+          "statusNote": "These are dated selection/rejection reasons, not measured current-code performance. The present manifest-owned CLI delegation is consistent with host-first migration; no big-bang rewrite or repository-wide thinning is asserted.",
+          "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+          "reviewedAt": "2026-10-13",
+          "reviewNote": "All 8 literal. Marked dated reasoning, not measurement; cites are consistent with manifest-owned CLI delegation and make no big-bang claim.",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+          "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
+        }
+      },
+      {
+        "id": "dropped-014",
+        "title": "Per-component repeat procedure (10 steps: read the boundary advisory, pick a complete boundary, shared fixtur…",
+        "recordedAt": "2026-10-07",
+        "status": "dropped-needs-review",
+        "intentional": null,
+        "intentionalEvidence": "None found. The text was never present under docs/platform/host-invocation-routing (git log -S on distinctive terms lists only commits to docs/architect/host-invocation-routing), so it was not carried when the area was promoted and no later removal records a reason. A blind source-to-target audit (pilot, 2026-10-07) and a hand re-check by the lead found no promoted document, including the intent ledger and source inventory, that states it.",
+        "source": {
+          "path": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+          "anchors": [
+            "unheaded-block-44",
+            "unheaded-block-45",
+            "unheaded-block-49",
+            "unheaded-block-50"
+          ],
+          "lines": "305-342",
+          "introducedBy": "UNPROVEN: not investigated",
+          "authority": "Settled design text in the legacy source; the promoted area is silent"
+        },
+        "phase3Ledger": {
+          "claimId": "claim_9f2283b25ef4be9f0e68b4381f1ce08e",
+          "claimIds": [
+            "claim_9f2283b25ef4be9f0e68b4381f1ce08e",
+            "claim_abc80009ab1bf59c40a645089fbc82fd",
+            "claim_99bf6932b3f44681c138edf8384d652b",
+            "claim_056d11e86ef88989c436bc14a24997a1"
+          ],
+          "artifact": "pilot/first-round/a-node-to-rust-component-migration.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G60",
+          "disposition": "unknown-blocking",
+          "targetOwner": null
+        },
+        "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
+        "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"shared fixtures\",\"Component Boundary Advisory\",\"decode\",\"frontier\"] returns no hit that states the claim",
+        "relatedOverclaim": "matrix: 'Chosen migration strategy, rejected migration options, R1/R2/R3 sequence, release readiness categories, component-boundary repetition rule, read-model-before-writer rule, writer migration constraints, Node removal gate, rollback rules, verification ga",
+        "dropCause": "UNPROVEN: not investigated; do not infer.",
+        "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
+        "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
+        "reviewedDisposition": {
+          "decision": "restored",
+          "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+          "anchor": "restored-per-component-repeat-procedure",
+          "unitDigest": "c73fb84bd5ff7d0269e399109f5067e14c6cfce10f6bc48094f2c20ecc7e90b8",
+          "reviewStatus": "reviewed",
+          "authoredBy": "codex-session:1@2026-10-11",
+          "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+          "codeEvidence": [
+            "packages/host-runtime/rust/src/invocation_service.rs:161-209",
+            "package.json:27-35"
+          ],
+          "statusNote": "The ten-step sequence is manual migration guidance, not a newly registered automation. Parked is represented distinctly from success in the runtime terminal enum; no provider-side human wait or reinvocation smoke is claimed.",
+          "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+          "reviewedAt": "2026-10-13",
+          "reviewNote": "Literal. Ten-step list called manual guidance, not registered automation. invocation_service.rs:161-209 shows Parked distinct from Succeeded; package.json:27-35 is the real scripts block.",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+          "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
+        }
+      },
+      {
+        "id": "dropped-015",
+        "title": "Rollback bullets: legacy and native only side by side during the operation observation window; never delete a…",
+        "recordedAt": "2026-10-07",
+        "status": "dropped-needs-review",
+        "intentional": null,
+        "intentionalEvidence": "None found. The text was never present under docs/platform/host-invocation-routing (git log -S on distinctive terms lists only commits to docs/architect/host-invocation-routing), so it was not carried when the area was promoted and no later removal records a reason. A blind source-to-target audit (pilot, 2026-10-07) and a hand re-check by the lead found no promoted document, including the intent ledger and source inventory, that states it.",
+        "source": {
+          "path": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+          "anchors": [
+            "unheaded-block-59"
+          ],
+          "lines": "389-395",
+          "introducedBy": "UNPROVEN: not investigated",
+          "authority": "Settled design text in the legacy source; the promoted area is silent"
+        },
+        "phase3Ledger": {
+          "claimId": "claim_a1c1085c9d77a84ca5e5aefe1de6d059",
+          "claimIds": [
+            "claim_a1c1085c9d77a84ca5e5aefe1de6d059"
+          ],
+          "artifact": "pilot/first-round/a-node-to-rust-component-migration.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G61",
+          "disposition": "unknown-blocking",
+          "targetOwner": null
+        },
+        "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
+        "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"observation window\",\"last written\"] returns no hit that states the claim",
+        "relatedOverclaim": "matrix: 'Chosen migration strategy, rejected migration options, R1/R2/R3 sequence, release readiness categories, component-boundary repetition rule, read-model-before-writer rule, writer migration constraints, Node removal gate, rollback rules, verification ga",
+        "dropCause": "UNPROVEN: not investigated; do not infer.",
+        "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
+        "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
+        "reviewedDisposition": {
+          "decision": "restored",
+          "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+          "anchor": "restored-rollback-bullets",
+          "unitDigest": "69dc68b645856ef1e861ecd4262595c7562de726b88e352deec9aea187b88fc0",
+          "reviewStatus": "reviewed",
+          "authoredBy": "codex-session:1@2026-10-11",
+          "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+          "codeEvidence": [
+            "packages/host-runtime/rust/src/operation_provider_router.rs:74-119",
+            "packages/host-runtime/rust/src/registry.rs:41-69"
+          ],
+          "statusNote": "The observation-window and writer-recovery obligations remain manual selected policy. Selection reads immutable bindings, not a runtime provider-selection override; this pass does not execute or certify release rollback.",
+          "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+          "reviewedAt": "2026-10-13",
+          "reviewNote": "Literal. Called manual selected policy, not executed rollback; operation_provider_router.rs:74-119 select reads snapshot bindings with no override and registry.rs:41-69 builds the snapshot.",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+          "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
+        }
+      },
+      {
+        "id": "dropped-016",
+        "title": "P1 compatibility harness: changed areas, performance gates (legacy exec overhead <= 25 ms p50, native version…",
+        "recordedAt": "2026-10-07",
+        "status": "dropped-needs-review",
+        "intentional": null,
+        "intentionalEvidence": "None found. The text was never present under docs/platform/host-invocation-routing (git log -S on distinctive terms lists only commits to docs/architect/host-invocation-routing), so it was not carried when the area was promoted and no later removal records a reason. A blind source-to-target audit (pilot, 2026-10-07) and a hand re-check by the lead found no promoted document, including the intent ledger and source inventory, that states it.",
+        "source": {
+          "path": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+          "anchors": [
+            "changed-areas",
+            "unheaded-block-19",
+            "performance-gates",
+            "unheaded-block-22",
+            "exit-gate-and-verify",
+            "unheaded-block-23",
+            "unheaded-block-24"
+          ],
+          "lines": "189-246",
+          "introducedBy": "UNPROVEN: not investigated",
+          "authority": "Settled design text in the legacy source; the promoted area is silent"
+        },
+        "phase3Ledger": {
+          "claimId": "claim_89e8b193eb339f06478bf6998576080c",
+          "claimIds": [
+            "claim_89e8b193eb339f06478bf6998576080c",
+            "claim_49ffb5866f0a65b3a12eef5f66b6d667",
+            "claim_5c200f279a9c0fcf20b7df169781b026",
+            "claim_82a6b9c5ebba8c1384c0bfaca9be39b8",
+            "claim_dce9740dd9f04988dc3d1ffc4c1069d5",
+            "claim_cea27866daa3823bc706fe737e7155d9",
+            "claim_096b8a1eacd02f9b9f34e80d62ec57e3"
+          ],
+          "artifact": "pilot/first-round/a-rust-cli-and-proof-components-plan.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G73",
+          "disposition": "unknown-blocking",
+          "targetOwner": null
+        },
+        "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
+        "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"p50\",\"25 ms\",\"injected difference\",\"envelope-contract\"] returns no hit that states the claim",
+        "relatedOverclaim": "matrix: 'Outcome, non-goals, settled choices, P0-P9 proof graph, test gates, rollback gates, risk controls, done criteria, remaining choices for target matrix, compatibility window, and preview versus stable' (P0-P9 proof graph, test gates); HI-I029 names veri",
+        "dropCause": "UNPROVEN: not investigated; do not infer.",
+        "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
+        "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
+        "reviewedDisposition": {
+          "decision": "restored",
+          "owner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+          "anchor": "restored-p1-compatibility-harness",
+          "unitDigest": "02610d5ee4372f569658cebaca082fca27d29f30918a4328ed6cbe0a8aa80101",
+          "reviewStatus": "reviewed",
+          "authoredBy": "codex-session:1@2026-10-11",
+          "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+          "codeEvidence": [
+            "package.json:27-35",
+            "apps/fgos/src/legacy_exec.rs:242-253"
+          ],
+          "statusNote": "The source itself labels 25 ms and 10 ms budgets as placeholders to confirm. They are retained unexecuted performance acceptance requirements, UNPROVEN as measurements. package.json names the current test entry; no all-suite pass or injected-difference run is inferred.",
+          "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+          "reviewedAt": "2026-10-13",
+          "reviewNote": "All 7 literal. 25 ms and 10 ms budgets stated as source placeholders, UNPROVEN as measurements, not inferred from any run. package.json test script and legacy_exec.rs:242-253 exist as cited.",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+          "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
+        }
+      },
+      {
+        "id": "dropped-017",
+        "title": "Test and review gates table (per commit, R1 integration/release, R2, R3, future writer proof), evidence rules…",
+        "recordedAt": "2026-10-07",
+        "status": "dropped-needs-review",
+        "intentional": null,
+        "intentionalEvidence": "None found. The text was never present under docs/platform/host-invocation-routing (git log -S on distinctive terms lists only commits to docs/architect/host-invocation-routing), so it was not carried when the area was promoted and no later removal records a reason. A blind source-to-target audit (pilot, 2026-10-07) and a hand re-check by the lead found no promoted document, including the intent ledger and source inventory, that states it.",
+        "source": {
+          "path": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+          "anchors": [
+            "15-test-and-review-gates",
+            "unheaded-block-60",
+            "unheaded-block-61",
+            "17-risks-and-controls",
+            "unheaded-block-65"
+          ],
+          "lines": "582-644",
+          "introducedBy": "UNPROVEN: not investigated",
+          "authority": "Settled design text in the legacy source; the promoted area is silent"
+        },
+        "phase3Ledger": {
+          "claimId": "claim_ca69fde84ef390b737cc841f2e0722f8",
+          "claimIds": [
+            "claim_ca69fde84ef390b737cc841f2e0722f8",
+            "claim_ed367a232471867cbc3fb24c44d1baf6",
+            "claim_de0f6932bac03ad628e2470515e7fb5f",
+            "claim_245edf82638eebaa26df985249540c8c",
+            "claim_ce5758286602f8062fe2c8ac0d709f22"
+          ],
+          "artifact": "pilot/first-round/a-rust-cli-and-proof-components-plan.json (decision rows, disposition unknown-blocking) and reports/phase-05/pilot-a-discrepancy.md group G75",
+          "disposition": "unknown-blocking",
+          "targetOwner": null
+        },
+        "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
+        "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"process-spy\",\"Per commit\",\"timestamp\",\"Rust re-parses legacy flags\"] returns no hit that states the claim",
+        "relatedOverclaim": "matrix: 'Outcome, non-goals, settled choices, P0-P9 proof graph, test gates, rollback gates, risk controls, done criteria, remaining choices for target matrix, compatibility window, and preview versus stable' (test gates, risk controls)",
+        "dropCause": "UNPROVEN: not investigated; do not infer.",
+        "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
+        "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition.",
+        "reviewedDisposition": {
+          "decision": "restored",
+          "owner": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+          "anchor": "restored-test-and-review-gates-table",
+          "unitDigest": "56d15064f93ccee95d727bc4f4508544ff979ef20ec5b4d7a61b0cf1b601177d",
+          "reviewStatus": "reviewed",
+          "authoredBy": "codex-session:1@2026-10-11",
+          "sourceCommit": "83d757f4d693ae13d3fd50e0a454fb95c78f1ff4",
+          "codeEvidence": [
+            "package.json:27-35"
+          ],
+          "statusNote": "This table is a dated proof/acceptance policy, not a claim that the current full Node/Rust/gateway suites or performance gates ran. The real Node suite entry is preserved; checkpoint evidence reports only commands actually exercised.",
+          "reviewer": "reviewer:claude-session:4df9e88c@2026-10-13",
+          "reviewedAt": "2026-10-13",
+          "reviewNote": "All 5 literal. Stated as dated acceptance policy, no suite claimed run. package.json:27-35 contains the real test entry.",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-3-checkpoint-host-invocation.md",
+          "reviewReportCommit": "aaa3ab9629eebdd0af50b044b24fbea813f540c4"
+        }
+      }
+    ]
+  },
+  "stub": [
+    {
+      "unitKind": "heading",
+      "level": 2,
+      "title": "Dev Source Activation Restoration Stub",
+      "anchor": "dev-source-activation-restoration-stub",
+      "githubAnchor": "dev-source-activation-restoration-stub",
+      "stableAnchor": "h-0ab19164a3b7",
+      "startLine": 370,
+      "endLine": 370,
+      "textDigest": "2cda289ff834706e95ac82903eb9518fc523d85011a80349900cb627158ddde1",
+      "sample": "Dev Source Activation Restoration Stub",
+      "sectionPayloadDigest": "4855d45ad7dd811f44991d8686c2dd2e4752b74fd38fe7205c2761f5d4da60ef",
+      "followingBlockDigest": "0a68b45b9aad074b7be63e3f7d810b871adee57edd805f6ea71849d1534f09f4",
+      "identityFingerprint": "27daa5cfaf4b9ca605e650588f9430db02320a5f9941275679c0e024f6775c6a",
+      "ancestry": [
+        "Runtime Identity And Activation"
+      ],
+      "text": "## Dev Source Activation Restoration Stub",
+      "sectionText": "## Dev Source Activation Restoration Stub\n\nAdded in candidate — not carried; restoration tracked by dropped-001 and Plan C.\n\nRestoration owner: Plan C (`plans/261006-1445-fgctl-dev-activation/`, draft, unscheduled). This is an explicit deferral of the seven source units, not an implementation or retirement verdict. The six units under Dev / Source Activation and the dev-source clause in the compound settled-facts table remain tracked in the source register. All other clauses of that table are retained below without promoting dev activation.\n\n| Decision | Status |\n|---|---|\n| Runtime identity is digest-based, not PATH-based. | Settled for V1. |\n| `artifactDigest` is the digest of the canonical release tree manifest, not an archive digest. | Settled for V1. |\n| Release tree manifest uses normalized logical paths and refuses symlinks/case collisions in V1. | Settled for V1. |\n| Project commands enter through stable local shims under workspace `.fgos/installation/bin/`. | Settled for V1. |\n| Immutable release payloads live under a shared content-addressed machine/trust-domain release store, not under each worktree. | Settled for V1. |\n| Activation is per workspace via `.fgos/installation/activation.json`; there is no single repository-wide active runtime pointer in V1. | Settled for V1. |\n| Packaging release/activation state uses workspace installation roots and must not share a namespace with work coordination state. | Settled for V1. |\n| The project/team pin is tracked as `.fgos/distribution.json`; machine-local activation state remains ignored. | Settled for V1. |\n| `activation.json` is a durably published workspace binding, not a symlink, in V1. | Settled for V1. |\n| Install transaction state lives under the release store root's `installs/<activationId>.json`, not inside `activation.json`. | Settled for V1. |\n| Mutating invocations create lease files; `fgctl` may stage/verify during leases but refuses activation while a non-stale mutating lease exists. | Settled for V1. |\n| V1 does not do automatic state migration during upgrade/rollback. | Settled for V1. |\n| `fgctl` never writes host-visible projection files directly; local `fgos init` / `doctor --fix` owns projection materialization under active identity. | Settled for V1. |\n| Existing projects are adoptable: a missing state schema record is treated as schema `1` and written during local `fgos init`. | Settled for V1. |\n| Dev / source activation restoration is tracked by dropped-001 and Plan C. | Deferred; not carried in this candidate. |\n| `fgctl` V1 is a Rust bootstrap binary with local path/tarball and GitHub release asset as acquisition sources. | Settled for V1. |\n| Candidate preflight is static: `fgctl` never executes candidate release code before the ready binding is published. | Settled for V1 (P7 red-team fix, 2026-09-14). |\n| Shared gateway/web are architecture constraints only, not active delivery scope. | Promoted for active delivery. |"
+    }
+  ],
+  "reviewerConfirmation": "pending independent checkpoint"
+}

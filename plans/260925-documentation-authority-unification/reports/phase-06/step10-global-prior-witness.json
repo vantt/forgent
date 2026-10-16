@@ -1,0 +1,9 @@
+{
+  "pin": "498048c1a",
+  "originalPriorPath": "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+  "preservedPriorPath": "plans/260925-documentation-authority-unification/reports/phase-06/step10-global-prior-checkpoint-registry.json",
+  "gitBlob": "80a67c59356dd61f05d03e4fa7726ecc450cfe24",
+  "equalsOriginalCommittedPrior": true,
+  "sha256": "aa13f3cb4df8e1fedd8a546ddb8b8101951a45a1ac671c2c70a68d1aba9ed138",
+  "reproduction": "Use preservedPriorPath after the third checkpoint exact-copy refresh; phase-02 prior remains unchanged."
+}

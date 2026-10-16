@@ -1,22 +1,18 @@
 {
   "version": 1,
   "shard": "s4-packaging-main-recarry.json",
-  "authorSession": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+  "authorSession": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
   "authorshipRequired": true,
   "sources": [
     "docs/specs/distribution.md"
   ],
   "claims": [
     {
-      "claimId": "claim_d9185072d68925b4c020b13ba6c4d74f",
+      "claimId": "claim_9d97a24e7d17ac4be484f2c75a5e116a",
       "sourcePath": "docs/specs/distribution.md",
       "sourceAnchor": "unheaded-block-5",
-      "sourceUnitDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
+      "sourceUnitDigest": "00a3412a5974cb6c7e2d4f51aadd36437162cdc3bf4a92e4dc781ec0f334ed1d",
       "claimKind": "specification",
-      "disposition": "supersede",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
-      "rationale": "Source: docs/specs/distribution.md:57-73#unheaded-block-5 (historical witness at 0f60e2f1db7af15581a152e307d0835fc6e510e5); unit SHA256 59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e.\nTarget: docs/platform/packaging-distribution/spec.md:517-533#unheaded-block-85 (current lines); unit SHA256 00a3412a5974cb6c7e2d4f51aadd36437162cdc3bf4a92e4dc781ec0f334ed1d.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f supersedes this retained predecessor with the changed current source carried in the mapped candidate. The predecessor source digest and history stay intact; the current-source draft is separately enumerated in step10-round7-new-unit-drafts.json. No identity graft or review carry; native transition owed next package.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
       "targetAnchor": "unheaded-block-85",
       "targetUnitDigest": "00a3412a5974cb6c7e2d4f51aadd36437162cdc3bf4a92e4dc781ec0f334ed1d",
@@ -25,7 +21,33 @@
         "Retained Distribution Source Detail",
         "Spec: Distribution",
         "Data Dictionary"
-      ]
+      ],
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "rationale": "Source: docs/specs/distribution.md:57-73#unheaded-block-5 (current lines); unit SHA256 00a3412a5974cb6c7e2d4f51aadd36437162cdc3bf4a92e4dc781ec0f334ed1d.\nTarget: docs/platform/packaging-distribution/spec.md:517-533#unheaded-block-85 (current lines); unit SHA256 00a3412a5974cb6c7e2d4f51aadd36437162cdc3bf4a92e4dc781ec0f334ed1d.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: A31 SYNC a9a2b079f: upstream changed content is carried verbatim in its mapped candidate; surrounding candidate corrections and placement remain. Native identity resolved at SYNC 498048c1a by exact path/anchor/full source digest. No approval inherited.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "Current native source binding; independent ordinary review pending."
+    },
+    {
+      "claimId": "claim_580793ae55c06a4891f1f902939145c4",
+      "sourcePath": "docs/specs/distribution.md",
+      "sourceAnchor": "unheaded-block-15",
+      "sourceUnitDigest": "87f98a72908fb6991a3cd9bdf8c1407373d72b039ad1b3e83a35a89a2a87d299",
+      "claimKind": "specification",
+      "targetOwner": "docs/platform/packaging-distribution/spec.md",
+      "targetAnchor": "unheaded-block-92",
+      "targetUnitDigest": "87f98a72908fb6991a3cd9bdf8c1407373d72b039ad1b3e83a35a89a2a87d299",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution",
+        "Lịch sử quyết định"
+      ],
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "rationale": "Source: docs/specs/distribution.md:324-326#unheaded-block-15 (current lines); unit SHA256 87f98a72908fb6991a3cd9bdf8c1407373d72b039ad1b3e83a35a89a2a87d299.\nTarget: docs/platform/packaging-distribution/spec.md:708-710#unheaded-block-92 (current lines); unit SHA256 87f98a72908fb6991a3cd9bdf8c1407373d72b039ad1b3e83a35a89a2a87d299.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: A31 SYNC a9a2b079f: upstream changed content is carried verbatim in its mapped candidate; surrounding candidate corrections and placement remain. Native identity resolved at SYNC 498048c1a by exact path/anchor/full source digest. No approval inherited.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "Current native source binding; independent ordinary review pending."
     }
   ],
   "registryGaps": [
@@ -46,6 +68,27 @@
         "Spec: Distribution",
         "Data Dictionary"
       ]
+    },
+    {
+      "claimId": "claim_d9185072d68925b4c020b13ba6c4d74f",
+      "sourcePath": "docs/specs/distribution.md",
+      "sourceAnchor": "unheaded-block-5",
+      "sourceUnitDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "rationale": "Source: docs/specs/distribution.md:57-73#unheaded-block-5 (historical witness at 0f60e2f1db7af15581a152e307d0835fc6e510e5); unit SHA256 59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e.\nTarget: docs/platform/packaging-distribution/spec.md:517-533#unheaded-block-85 (current lines); unit SHA256 00a3412a5974cb6c7e2d4f51aadd36437162cdc3bf4a92e4dc781ec0f334ed1d.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f supersedes this retained predecessor with the changed current source carried in the mapped candidate. The predecessor source digest and history stay intact; the current-source draft is separately enumerated in step10-round7-new-unit-drafts.json. No identity graft or review carry; native transition owed next package.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "targetOwner": "docs/platform/packaging-distribution/spec.md",
+      "targetAnchor": "unheaded-block-85",
+      "targetUnitDigest": "00a3412a5974cb6c7e2d4f51aadd36437162cdc3bf4a92e4dc781ec0f334ed1d",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution",
+        "Data Dictionary"
+      ],
+      "reviewNote": "Native predecessor gap; independent review pending; no approval carried."
     }
   ]
 }

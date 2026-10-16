@@ -1,7 +1,7 @@
 {
   "version": 1,
   "shard": "s9-runner-01.json",
-  "authorSession": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+  "authorSession": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
   "authorshipRequired": true,
   "sources": [
     "docs/specs/runner.md"
@@ -92,22 +92,6 @@
       "reviewReportCommit": "edffd7c6b9cfb0461eec9e0fef65c9b4a2487acc"
     },
     {
-      "claimId": "claim_383a6485c1aaed79a640a59463183fe8",
-      "sourceUnitDigest": "16c2b3dace9daab9a6d90e29bd7f00fbad2c313cbedb0e28ed031664fa81b255",
-      "targetOwner": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
-      "targetAnchor": "guard-reconciliation",
-      "claimKind": "specification",
-      "disposition": "supersede",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
-      "rationale": "Source: docs/specs/runner.md:13-13#guard-reconciliation (historical witness at 0f60e2f1db7af15581a152e307d0835fc6e510e5); unit SHA256 16c2b3dace9daab9a6d90e29bd7f00fbad2c313cbedb0e28ed031664fa81b255.\nTarget: docs/platform/runner/architecture/h-e53a3a9829a8.md:27-27#guard-reconciliation (current lines); unit SHA256 42ab966efc78e26589453160b8a631996c393b84c94d6acd46e78e19029b63d6.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 3 → 3; title \"Guard reconciliation\" → \"Guard reconciliation\".\nWhole direct section differs; depth 3 → 3; 0 distinct link changes; normalized line order differs; 5 removed and 2 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f supersedes this retained predecessor with the changed current source carried in the mapped candidate. The predecessor source digest and history stay intact; the current-source draft is separately enumerated in step10-round7-new-unit-drafts.json. No identity graft or review carry; native transition owed next package.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "targetUnitDigest": "42ab966efc78e26589453160b8a631996c393b84c94d6acd46e78e19029b63d6",
-      "targetAncestry": [
-        "Added in candidate: Runner Dispatch runtime inspection",
-        "Dispatch runtime inspection"
-      ]
-    },
-    {
       "claimId": "claim_9a0635bb67690683a0a7465eadae82af",
       "sourceUnitDigest": "52b140cfe4f41a03526182348d228ca206a88dade16f7969fe3852284677c39a",
       "targetOwner": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
@@ -129,23 +113,6 @@
         "Guard reconciliation"
       ],
       "reviewReportCommit": "edffd7c6b9cfb0461eec9e0fef65c9b4a2487acc"
-    },
-    {
-      "claimId": "claim_cdf8c5562fb083bbdccf7d8c03decb7a",
-      "sourceUnitDigest": "026046f0b0c9dff4fa16ad675837105849db185678d8263e091270e599c0ba72",
-      "targetOwner": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
-      "targetAnchor": "unheaded-block-4",
-      "claimKind": "specification",
-      "disposition": "supersede",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
-      "rationale": "Source: docs/specs/runner.md:21-36#unheaded-block-3 (historical witness at 0f60e2f1db7af15581a152e307d0835fc6e510e5); unit SHA256 026046f0b0c9dff4fa16ad675837105849db185678d8263e091270e599c0ba72.\nTarget: docs/platform/runner/architecture/h-e53a3a9829a8.md:35-47#unheaded-block-4 (current lines); unit SHA256 bed7c5ea3ed1a7241f9271b44d6a8253d4ea89c082745eed076d3c5ab703d789.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f supersedes this retained predecessor with the changed current source carried in the mapped candidate. The predecessor source digest and history stay intact; the current-source draft is separately enumerated in step10-round7-new-unit-drafts.json. No identity graft or review carry; native transition owed next package.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "targetUnitDigest": "bed7c5ea3ed1a7241f9271b44d6a8253d4ea89c082745eed076d3c5ab703d789",
-      "targetAncestry": [
-        "Added in candidate: Runner Dispatch runtime inspection",
-        "Dispatch runtime inspection",
-        "Guard reconciliation"
-      ]
     },
     {
       "claimId": "claim_5d9ba2698cc42766513d2f6892f4456c",
@@ -3441,21 +3408,6 @@
       "reviewReportCommit": "edffd7c6b9cfb0461eec9e0fef65c9b4a2487acc"
     },
     {
-      "claimId": "claim_55b85c1d204ea6a7b336fd6b066fc4f1",
-      "sourceUnitDigest": "aaec88b66425149e842fe7c507cd3dd0beaee9d3e0ecde88fa805637967d2f10",
-      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
-      "targetAnchor": "dispatch-operability-implementation-slice-2026-09-16",
-      "claimKind": "specification",
-      "disposition": "supersede",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
-      "rationale": "Source: docs/specs/runner.md:1425-1425#dispatch-operability-implementation-slice-2026-09-16 (historical witness at 0f60e2f1db7af15581a152e307d0835fc6e510e5); unit SHA256 aaec88b66425149e842fe7c507cd3dd0beaee9d3e0ecde88fa805637967d2f10.\nTarget: docs/platform/runner/architecture/h-69197b459754.md:25-25#dispatch-operability-implementation-slice-2026-09-16 (current lines); unit SHA256 c7040697a3027c20e21f5ded2fc574689980ee6b1f5016fdbfc7bbef87ea7db5.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 3, target 3; 3 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nLink 1: \"`assignment-layout.mjs`\" (../../src/runner/dispatch/assignment-layout.mjs) → \"`assignment-layout.mjs`\" (../../../../src/runner/dispatch/assignment-layout.mjs); resolved src/runner/dispatch/assignment-layout.mjs → src/runner/dispatch/assignment-layout.mjs.\nLink 2: \"`test/fixtures/run-layout/expected.json`\" (../../test/fixtures/run-layout/expected.json) → \"`test/fixtures/run-layout/expected.json`\" (../../../../test/fixtures/run-layout/expected.json); resolved test/fixtures/run-layout/expected.json → test/fixtures/run-layout/expected.json.\nLink 3: \"Prior-art report\" (../../plans/reports/observe-unit-summary-stance-prior-art-261005.md) → \"Prior-art report\" (../../../../plans/reports/observe-unit-summary-stance-prior-art-261005.md); resolved plans/reports/observe-unit-summary-stance-prior-art-261005.md → plans/reports/observe-unit-summary-stance-prior-art-261005.md.\nHeading depth: 2 → 2; title \"Dispatch operability implementation slice (2026-09-16)\" → \"Dispatch operability implementation slice (2026-09-16)\".\nWhole direct section differs; depth 2 → 2; 3 distinct link changes; normalized line order differs; 3 removed and 5 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f supersedes this retained predecessor with the changed current source carried in the mapped candidate. The predecessor source digest and history stay intact; the current-source draft is separately enumerated in step10-round7-new-unit-drafts.json. No identity graft or review carry; native transition owed next package.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "targetUnitDigest": "c7040697a3027c20e21f5ded2fc574689980ee6b1f5016fdbfc7bbef87ea7db5",
-      "targetAncestry": [
-        "Added in candidate: Runner Dispatch operability implementation slice (2026-09-16)"
-      ]
-    },
-    {
       "claimId": "claim_fca50adfa6081d799d49e2aba84a9d80",
       "sourceUnitDigest": "225b05f175562f82288e354367b96d258adb631d94f9bc20a2db83d44cb1b00b",
       "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
@@ -3498,22 +3450,6 @@
         "Dispatch operability implementation slice (2026-09-16)"
       ],
       "reviewReportCommit": "edffd7c6b9cfb0461eec9e0fef65c9b4a2487acc"
-    },
-    {
-      "claimId": "claim_d7fd3778a5cbb74cad9fb5e476708647",
-      "sourceUnitDigest": "1c77f2b68620610ff91f742d28ff88584c190c8af2ade3ac6818b67a6f054288",
-      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
-      "targetAnchor": "unheaded-block-5",
-      "claimKind": "specification",
-      "disposition": "supersede",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
-      "rationale": "Source: docs/specs/runner.md:1445-1451#unheaded-block-119 (historical witness at 0f60e2f1db7af15581a152e307d0835fc6e510e5); unit SHA256 1c77f2b68620610ff91f742d28ff88584c190c8af2ade3ac6818b67a6f054288.\nTarget: docs/platform/runner/architecture/h-69197b459754.md:45-51#unheaded-block-5 (current lines); unit SHA256 75a73f547e8e94133e10c4e8a503a4be54ab173417f1b7fe4b8bf54555507a53.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f supersedes this retained predecessor with the changed current source carried in the mapped candidate. The predecessor source digest and history stay intact; the current-source draft is separately enumerated in step10-round7-new-unit-drafts.json. No identity graft or review carry; native transition owed next package.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "targetUnitDigest": "75a73f547e8e94133e10c4e8a503a4be54ab173417f1b7fe4b8bf54555507a53",
-      "targetAncestry": [
-        "Added in candidate: Runner Dispatch operability implementation slice (2026-09-16)",
-        "Dispatch operability implementation slice (2026-09-16)"
-      ]
     },
     {
       "claimId": "claim_58aec75ea3f912db7cd71475af20983a",
@@ -11421,6 +11357,82 @@
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-i01-2300d6557.md",
       "reviewMode": "ordinary",
       "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
+    },
+    {
+      "claimId": "claim_383a6485c1aaed79a640a59463183fe8",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "guard-reconciliation",
+      "sourceUnitDigest": "42ab966efc78e26589453160b8a631996c393b84c94d6acd46e78e19029b63d6",
+      "claimKind": "specification",
+      "targetOwner": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+      "targetAnchor": "guard-reconciliation",
+      "targetUnitDigest": "42ab966efc78e26589453160b8a631996c393b84c94d6acd46e78e19029b63d6",
+      "targetAncestry": [
+        "Added in candidate: Runner Dispatch runtime inspection",
+        "Dispatch runtime inspection"
+      ],
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "rationale": "Source: docs/specs/runner.md:13-13#guard-reconciliation (current lines); unit SHA256 42ab966efc78e26589453160b8a631996c393b84c94d6acd46e78e19029b63d6.\nTarget: docs/platform/runner/architecture/h-e53a3a9829a8.md:27-27#guard-reconciliation (current lines); unit SHA256 42ab966efc78e26589453160b8a631996c393b84c94d6acd46e78e19029b63d6.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 3 → 3; title \"Guard reconciliation\" → \"Guard reconciliation\".\nWhole direct section equal; depth 3 → 3; 0 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: A31 SYNC a9a2b079f: upstream changed content is carried verbatim in its mapped candidate; surrounding candidate corrections and placement remain. Native identity resolved at SYNC 498048c1a by exact path/anchor/full source digest. No approval inherited.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "Current native source binding; independent ordinary review pending."
+    },
+    {
+      "claimId": "claim_8af62b949d9d3e77433b7fc8f72917cc",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-3",
+      "sourceUnitDigest": "bed7c5ea3ed1a7241f9271b44d6a8253d4ea89c082745eed076d3c5ab703d789",
+      "claimKind": "specification",
+      "targetOwner": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+      "targetAnchor": "unheaded-block-4",
+      "targetUnitDigest": "bed7c5ea3ed1a7241f9271b44d6a8253d4ea89c082745eed076d3c5ab703d789",
+      "targetAncestry": [
+        "Added in candidate: Runner Dispatch runtime inspection",
+        "Dispatch runtime inspection",
+        "Guard reconciliation"
+      ],
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "rationale": "Source: docs/specs/runner.md:21-33#unheaded-block-3 (current lines); unit SHA256 bed7c5ea3ed1a7241f9271b44d6a8253d4ea89c082745eed076d3c5ab703d789.\nTarget: docs/platform/runner/architecture/h-e53a3a9829a8.md:35-47#unheaded-block-4 (current lines); unit SHA256 bed7c5ea3ed1a7241f9271b44d6a8253d4ea89c082745eed076d3c5ab703d789.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: A31 SYNC a9a2b079f: upstream changed content is carried verbatim in its mapped candidate; surrounding candidate corrections and placement remain. Native identity resolved at SYNC 498048c1a by exact path/anchor/full source digest. No approval inherited.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "Current native source binding; independent ordinary review pending."
+    },
+    {
+      "claimId": "claim_55b85c1d204ea6a7b336fd6b066fc4f1",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "dispatch-operability-implementation-slice-2026-09-16",
+      "sourceUnitDigest": "020a15e1469e9d8f87b2295cc7ea3ca73da8fdda1dd62ff82b49a403fdb086f5",
+      "claimKind": "specification",
+      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+      "targetAnchor": "dispatch-operability-implementation-slice-2026-09-16",
+      "targetUnitDigest": "c7040697a3027c20e21f5ded2fc574689980ee6b1f5016fdbfc7bbef87ea7db5",
+      "targetAncestry": [
+        "Added in candidate: Runner Dispatch operability implementation slice (2026-09-16)"
+      ],
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "rationale": "Source: docs/specs/runner.md:1422-1422#dispatch-operability-implementation-slice-2026-09-16 (current lines); unit SHA256 020a15e1469e9d8f87b2295cc7ea3ca73da8fdda1dd62ff82b49a403fdb086f5.\nTarget: docs/platform/runner/architecture/h-69197b459754.md:25-25#dispatch-operability-implementation-slice-2026-09-16 (current lines); unit SHA256 c7040697a3027c20e21f5ded2fc574689980ee6b1f5016fdbfc7bbef87ea7db5.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 3, target 3; 3 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nLink 1: \"`assignment-layout.mjs`\" (../../src/runner/dispatch/assignment-layout.mjs) → \"`assignment-layout.mjs`\" (../../../../src/runner/dispatch/assignment-layout.mjs); resolved src/runner/dispatch/assignment-layout.mjs → src/runner/dispatch/assignment-layout.mjs.\nLink 2: \"`test/fixtures/run-layout/expected.json`\" (../../test/fixtures/run-layout/expected.json) → \"`test/fixtures/run-layout/expected.json`\" (../../../../test/fixtures/run-layout/expected.json); resolved test/fixtures/run-layout/expected.json → test/fixtures/run-layout/expected.json.\nLink 3: \"Prior-art report\" (../../plans/reports/observe-unit-summary-stance-prior-art-261005.md) → \"Prior-art report\" (../../../../plans/reports/observe-unit-summary-stance-prior-art-261005.md); resolved plans/reports/observe-unit-summary-stance-prior-art-261005.md → plans/reports/observe-unit-summary-stance-prior-art-261005.md.\nHeading depth: 2 → 2; title \"Dispatch operability implementation slice (2026-09-16)\" → \"Dispatch operability implementation slice (2026-09-16)\".\nWhole direct section differs; depth 2 → 2; 3 distinct link changes; normalized line order differs; 2 removed and 4 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: upstream changed content is carried verbatim in its mapped candidate; surrounding candidate corrections and placement remain. Native identity resolved at SYNC 498048c1a by exact path/anchor/full source digest. No approval inherited.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "Current native source binding; independent ordinary review pending."
+    },
+    {
+      "claimId": "claim_3883003faea82c5a23d576a5fd4d627c",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-119",
+      "sourceUnitDigest": "75a73f547e8e94133e10c4e8a503a4be54ab173417f1b7fe4b8bf54555507a53",
+      "claimKind": "specification",
+      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+      "targetAnchor": "unheaded-block-5",
+      "targetUnitDigest": "75a73f547e8e94133e10c4e8a503a4be54ab173417f1b7fe4b8bf54555507a53",
+      "targetAncestry": [
+        "Added in candidate: Runner Dispatch operability implementation slice (2026-09-16)",
+        "Dispatch operability implementation slice (2026-09-16)"
+      ],
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "rationale": "Source: docs/specs/runner.md:1442-1448#unheaded-block-119 (current lines); unit SHA256 75a73f547e8e94133e10c4e8a503a4be54ab173417f1b7fe4b8bf54555507a53.\nTarget: docs/platform/runner/architecture/h-69197b459754.md:45-51#unheaded-block-5 (current lines); unit SHA256 75a73f547e8e94133e10c4e8a503a4be54ab173417f1b7fe4b8bf54555507a53.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: A31 SYNC a9a2b079f: upstream changed content is carried verbatim in its mapped candidate; surrounding candidate corrections and placement remain. Native identity resolved at SYNC 498048c1a by exact path/anchor/full source digest. No approval inherited.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "Current native source binding; independent ordinary review pending."
     }
   ],
   "registryGaps": [
@@ -15280,6 +15292,45 @@
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-i01-2300d6557.md",
       "reviewMode": "ordinary",
       "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
+    },
+    {
+      "claimId": "claim_cdf8c5562fb083bbdccf7d8c03decb7a",
+      "sourceUnitDigest": "026046f0b0c9dff4fa16ad675837105849db185678d8263e091270e599c0ba72",
+      "targetOwner": "docs/platform/runner/architecture/h-e53a3a9829a8.md",
+      "targetAnchor": "unheaded-block-4",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "rationale": "Source: docs/specs/runner.md:21-36#unheaded-block-3 (historical witness at 0f60e2f1db7af15581a152e307d0835fc6e510e5); unit SHA256 026046f0b0c9dff4fa16ad675837105849db185678d8263e091270e599c0ba72.\nTarget: docs/platform/runner/architecture/h-e53a3a9829a8.md:35-47#unheaded-block-4 (current lines); unit SHA256 bed7c5ea3ed1a7241f9271b44d6a8253d4ea89c082745eed076d3c5ab703d789.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f supersedes this retained predecessor with the changed current source carried in the mapped candidate. The predecessor source digest and history stay intact; the current-source draft is separately enumerated in step10-round7-new-unit-drafts.json. No identity graft or review carry; native transition owed next package.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "targetUnitDigest": "bed7c5ea3ed1a7241f9271b44d6a8253d4ea89c082745eed076d3c5ab703d789",
+      "targetAncestry": [
+        "Added in candidate: Runner Dispatch runtime inspection",
+        "Dispatch runtime inspection",
+        "Guard reconciliation"
+      ],
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-3",
+      "reviewNote": "Native predecessor gap; independent review pending; no approval carried."
+    },
+    {
+      "claimId": "claim_d7fd3778a5cbb74cad9fb5e476708647",
+      "sourceUnitDigest": "1c77f2b68620610ff91f742d28ff88584c190c8af2ade3ac6818b67a6f054288",
+      "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+      "targetAnchor": "unheaded-block-5",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "rationale": "Source: docs/specs/runner.md:1445-1451#unheaded-block-119 (historical witness at 0f60e2f1db7af15581a152e307d0835fc6e510e5); unit SHA256 1c77f2b68620610ff91f742d28ff88584c190c8af2ade3ac6818b67a6f054288.\nTarget: docs/platform/runner/architecture/h-69197b459754.md:45-51#unheaded-block-5 (current lines); unit SHA256 75a73f547e8e94133e10c4e8a503a4be54ab173417f1b7fe4b8bf54555507a53.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f supersedes this retained predecessor with the changed current source carried in the mapped candidate. The predecessor source digest and history stay intact; the current-source draft is separately enumerated in step10-round7-new-unit-drafts.json. No identity graft or review carry; native transition owed next package.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "targetUnitDigest": "75a73f547e8e94133e10c4e8a503a4be54ab173417f1b7fe4b8bf54555507a53",
+      "targetAncestry": [
+        "Added in candidate: Runner Dispatch operability implementation slice (2026-09-16)",
+        "Dispatch operability implementation slice (2026-09-16)"
+      ],
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-119",
+      "reviewNote": "Native predecessor gap; independent review pending; no approval carried."
     }
   ],
   "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-rationale-rereview-b80e8c16c.md"

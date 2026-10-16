@@ -1,7 +1,7 @@
 {
   "version": 1,
   "shard": "s4-packaging-distribution-distribution.json",
-  "authorSession": "codex-session:8@2026-10-13",
+  "authorSession": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
   "authorshipRequired": true,
   "sources": [
     "docs/specs/distribution.md"
@@ -142,25 +142,6 @@
         "Entry Points & Triggers"
       ],
       "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
-    },
-    {
-      "claimId": "claim_4eeb2f406288458e61bad21531966ab1",
-      "sourcePath": "docs/specs/distribution.md",
-      "sourceAnchor": "data-dictionary",
-      "sourceUnitDigest": "04f89e98512b5fd7af474ab2abbf362b9a0d30a25b5a911d011037539b3a9d3f",
-      "claimKind": "specification",
-      "disposition": "supersede",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
-      "rationale": "Source: docs/specs/distribution.md:55-55#data-dictionary (historical witness at 0f60e2f1db7af15581a152e307d0835fc6e510e5); unit SHA256 04f89e98512b5fd7af474ab2abbf362b9a0d30a25b5a911d011037539b3a9d3f.\nTarget: docs/platform/packaging-distribution/spec.md:515-515#data-dictionary (current lines); unit SHA256 aa3ecf1c73f2625a3f371a732ad4a4468c9c5e5a3e74ac693e9af0d507454720.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 4; title \"Data Dictionary\" → \"Data Dictionary\".\nWhole direct section differs; depth 2 → 4; 0 distinct link changes; normalized line order differs; 1 removed and 1 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f supersedes this retained predecessor with the changed current source carried in the mapped candidate. The predecessor source digest and history stay intact; the current-source draft is separately enumerated in step10-round7-new-unit-drafts.json. No identity graft or review carry; native transition owed next package.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "data-dictionary",
-      "targetUnitDigest": "aa3ecf1c73f2625a3f371a732ad4a4468c9c5e5a3e74ac693e9af0d507454720",
-      "targetAncestry": [
-        "Spec: Packaging-Distribution",
-        "Retained Distribution Source Detail",
-        "Spec: Distribution"
-      ]
     },
     {
       "claimId": "claim_35e55882f79d7ab6b9435f03982beba3",
@@ -537,23 +518,6 @@
       "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
     },
     {
-      "claimId": "claim_a1a323052194c5140b628b5f3861fa05",
-      "sourceUnitDigest": "7d3b22dcbeba036ee788b91dd1409d06f722321a5b10851c97cd677654203743",
-      "targetOwner": "docs/platform/packaging-distribution/spec.md",
-      "targetAnchor": "lịch-sử-quyết-định",
-      "claimKind": "specification",
-      "disposition": "supersede",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
-      "rationale": "Source: docs/specs/distribution.md:322-322#lịch-sử-quyết-định (historical witness at 0f60e2f1db7af15581a152e307d0835fc6e510e5); unit SHA256 7d3b22dcbeba036ee788b91dd1409d06f722321a5b10851c97cd677654203743.\nTarget: docs/platform/packaging-distribution/spec.md:706-706#lịch-sử-quyết-định (current lines); unit SHA256 aa23ac1936263d65e45dba048c4949930715c52c31a30290b3eff845d39200fa.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 4; title \"Lịch sử quyết định\" → \"Lịch sử quyết định\".\nWhole direct section differs; depth 2 → 4; 0 distinct link changes; normalized line order differs; 0 removed and 1 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f supersedes this retained predecessor with the changed current source carried in the mapped candidate. The predecessor source digest and history stay intact; the current-source draft is separately enumerated in step10-round7-new-unit-drafts.json. No identity graft or review carry; native transition owed next package.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "targetUnitDigest": "aa23ac1936263d65e45dba048c4949930715c52c31a30290b3eff845d39200fa",
-      "targetAncestry": [
-        "Spec: Packaging-Distribution",
-        "Retained Distribution Source Detail",
-        "Spec: Distribution"
-      ]
-    },
-    {
       "claimId": "claim_797fb0be5db3c260c97745cd0894bec8",
       "sourceUnitDigest": "1222a356730459a58d03ca68ada07f9dbd0d21cc6d6dcfba18067b6fddf7902d",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
@@ -740,6 +704,46 @@
         "Pointers (implementation)"
       ],
       "reviewReportCommit": "5b1387c7a6874f260f57369cc0c0f3fda9fd4940"
+    },
+    {
+      "claimId": "claim_4eeb2f406288458e61bad21531966ab1",
+      "sourcePath": "docs/specs/distribution.md",
+      "sourceAnchor": "data-dictionary",
+      "sourceUnitDigest": "fcbd92b190383feb2779a6eec9d86e6f67e881b30840fa490b7230c69c09e09d",
+      "claimKind": "specification",
+      "targetOwner": "docs/platform/packaging-distribution/spec.md",
+      "targetAnchor": "data-dictionary",
+      "targetUnitDigest": "aa3ecf1c73f2625a3f371a732ad4a4468c9c5e5a3e74ac693e9af0d507454720",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution"
+      ],
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "rationale": "Source: docs/specs/distribution.md:55-55#data-dictionary (current lines); unit SHA256 fcbd92b190383feb2779a6eec9d86e6f67e881b30840fa490b7230c69c09e09d.\nTarget: docs/platform/packaging-distribution/spec.md:515-515#data-dictionary (current lines); unit SHA256 aa3ecf1c73f2625a3f371a732ad4a4468c9c5e5a3e74ac693e9af0d507454720.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 4; title \"Data Dictionary\" → \"Data Dictionary\".\nWhole direct section differs; depth 2 → 4; 0 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: upstream changed content is carried verbatim in its mapped candidate; surrounding candidate corrections and placement remain. Native identity resolved at SYNC 498048c1a by exact path/anchor/full source digest. No approval inherited.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "Current native source binding; independent ordinary review pending."
+    },
+    {
+      "claimId": "claim_a1a323052194c5140b628b5f3861fa05",
+      "sourcePath": "docs/specs/distribution.md",
+      "sourceAnchor": "lịch-sử-quyết-định",
+      "sourceUnitDigest": "bf462051b1d0486a12178695e54518b61a46423454a45f2d7a9ecd4e1e90d5bf",
+      "claimKind": "specification",
+      "targetOwner": "docs/platform/packaging-distribution/spec.md",
+      "targetAnchor": "lịch-sử-quyết-định",
+      "targetUnitDigest": "aa23ac1936263d65e45dba048c4949930715c52c31a30290b3eff845d39200fa",
+      "targetAncestry": [
+        "Spec: Packaging-Distribution",
+        "Retained Distribution Source Detail",
+        "Spec: Distribution"
+      ],
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "rationale": "Source: docs/specs/distribution.md:322-322#lịch-sử-quyết-định (current lines); unit SHA256 bf462051b1d0486a12178695e54518b61a46423454a45f2d7a9ecd4e1e90d5bf.\nTarget: docs/platform/packaging-distribution/spec.md:706-706#lịch-sử-quyết-định (current lines); unit SHA256 aa23ac1936263d65e45dba048c4949930715c52c31a30290b3eff845d39200fa.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 4; title \"Lịch sử quyết định\" → \"Lịch sử quyết định\".\nWhole direct section differs; depth 2 → 4; 0 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: upstream changed content is carried verbatim in its mapped candidate; surrounding candidate corrections and placement remain. Native identity resolved at SYNC 498048c1a by exact path/anchor/full source digest. No approval inherited.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "Current native source binding; independent ordinary review pending."
     }
   ],
   "files": [

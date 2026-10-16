@@ -1,0 +1,198 @@
+{
+  "runs": [
+    {
+      "label": "comparison-current",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "scripts/compare-doc-global-closure.mjs",
+        "--gate",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-06/step10-global-E.json",
+        "--actual",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-06/step10-global-applied-rows.json",
+        "--expected",
+        "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-06/step10-global-closure-current-expected.json"
+      ],
+      "exitCode": 1,
+      "seconds": 0.324307,
+      "log": "step10-global-comparison-current.log"
+    },
+    {
+      "label": "mutation",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "plans/260925-documentation-authority-unification/reports/phase-06/structural-mutation-probe.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 1.553852,
+      "log": "step10-global-mutation.log"
+    },
+    {
+      "label": "tests",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "--test",
+        "--test-concurrency=1",
+        "test/scripts/check-doc-candidate-status.test.mjs",
+        "test/scripts/check-doc-conservation.test.mjs",
+        "test/scripts/check-doc-constitution.test.mjs",
+        "test/scripts/check-doc-retirement.test.mjs",
+        "test/scripts/doc-alias-resolver.test.mjs",
+        "test/scripts/doc-binding-repair.test.mjs",
+        "test/scripts/doc-candidate-conservation.test.mjs",
+        "test/scripts/doc-corpus-decisions.test.mjs",
+        "test/scripts/doc-decision-conservation.test.mjs",
+        "test/scripts/doc-decision-exact.test.mjs",
+        "test/scripts/doc-decision-mirrors.test.mjs",
+        "test/scripts/doc-decision-review.test.mjs",
+        "test/scripts/doc-global-closure.test.mjs",
+        "test/scripts/doc-link-pass.test.mjs",
+        "test/scripts/doc-rationale-author.test.mjs",
+        "test/scripts/doc-rationale-facts.test.mjs",
+        "test/scripts/doc-rationale-reproduction.test.mjs",
+        "test/scripts/doc-rationale.test.mjs",
+        "test/scripts/doc-restoration-proofs.test.mjs",
+        "test/scripts/doc-review-authorship.test.mjs",
+        "test/scripts/doc-review-format.test.mjs",
+        "test/scripts/doc-runner-liveness.test.mjs",
+        "test/scripts/generate-doc-inventory.test.mjs",
+        "test/scripts/list-doc-anchors.test.mjs",
+        "test/scripts/next-doc-id.test.mjs",
+        "test/scripts/verify-phase-02.test.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 44.008855,
+      "log": "step10-global-tests.log"
+    },
+    {
+      "label": "registry-accounting",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "plans/260925-documentation-authority-unification/reports/phase-06/step10-registry-accounting.mjs",
+        "--previous-request",
+        "b53dd05df",
+        "--output",
+        "/tmp/fgos-work/global498/registry-accounting.json"
+      ],
+      "exitCode": 0,
+      "seconds": 1.114739,
+      "log": "step10-global-registry-accounting.log"
+    },
+    {
+      "label": "independent-audit",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "plans/260925-documentation-authority-unification/reports/phase-06/step10-independent-rationale-audit.mjs",
+        "--output",
+        "/tmp/fgos-work/global498/independent-audit.json"
+      ],
+      "exitCode": 0,
+      "seconds": 8.980237,
+      "log": "step10-global-independent-audit.log"
+    },
+    {
+      "label": "checks",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "/tmp/fgos-work/global498/checks.mjs",
+        "--output-dir",
+        "/tmp/fgos-work/global498"
+      ],
+      "exitCode": 0,
+      "seconds": 3.440548,
+      "log": "step10-global-checks.log"
+    },
+    {
+      "label": "ownership",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "/tmp/fgos-work/global498/ownership.mjs",
+        "--output-dir",
+        "/tmp/fgos-work/global498"
+      ],
+      "exitCode": 0,
+      "seconds": 9.094019,
+      "log": "step10-global-ownership.log"
+    },
+    {
+      "label": "ownership-audit",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "/tmp/fgos-work/global498/audit-ownership.mjs",
+        "--output-dir",
+        "/tmp/fgos-work/global498"
+      ],
+      "exitCode": 0,
+      "seconds": 0.66114,
+      "log": "step10-global-ownership-audit.log"
+    },
+    {
+      "label": "replay",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "python3",
+        "/tmp/fgos-work/global498/replay.py",
+        "--output-dir",
+        "/tmp/fgos-work/global498"
+      ],
+      "exitCode": 0,
+      "seconds": 2.383437,
+      "log": "step10-global-replay.log"
+    },
+    {
+      "label": "refresh",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "--max-old-space-size=4096",
+        "--max-semi-space-size=16",
+        "/tmp/fgos-work/global498/refresh.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 57.797873,
+      "log": "step10-global-refresh.log"
+    },
+    {
+      "label": "checks-final",
+      "command": [
+        "env",
+        "-u",
+        "CLAUDE_CODE_SESSION_ID",
+        "node",
+        "/tmp/fgos-work/global498/checks.mjs",
+        "--output-dir",
+        "/tmp/fgos-work/global498"
+      ],
+      "exitCode": 0,
+      "seconds": 3.400458,
+      "log": "step10-global-checks-final.log"
+    }
+  ]
+}

@@ -1,0 +1,272 @@
+{
+  "SYNC": "498048c1a",
+  "authorSession": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+  "meaning": "Every still-pending row, including A43 Rings and all main re-carried/dependent rows. Ordinary independent review; no producer verdict or sample. Immutable current records below.",
+  "entries": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "shard": "s5-root-authorities-boundary-gaps.json",
+      "authorSession": "codex-session:15@2026-10-14",
+      "collection": "registryGaps",
+      "row": {
+        "claimId": "claim_f2f1dadddff0c5440195d8c00b74d56e",
+        "sourcePath": "docs/specs/distribution.md",
+        "sourceUnitDigest": "0ce5ce17cd290a31a55e9a63872f96732a0cd0d096c4aa29693105768629ba90",
+        "disposition": "supersede",
+        "targetOwner": "docs/specs/distribution.md",
+        "targetAnchor": "unheaded-block-5",
+        "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
+        "reviewStatus": "pending",
+        "rationale": "Source: docs/specs/distribution.md:57-73#unheaded-block-5 (historical witness at 806d8946b75eca7a862b3207b50081e2c2f44414); unit SHA256 0ce5ce17cd290a31a55e9a63872f96732a0cd0d096c4aa29693105768629ba90.\nTarget: docs/specs/distribution.md:57-73#unheaded-block-5 (current lines); unit SHA256 00a3412a5974cb6c7e2d4f51aadd36437162cdc3bf4a92e4dc781ec0f334ed1d.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: this historical predecessor remains conserved at the exact cited git witness. Its current mapped candidate incorporates the upstream doctor-check/YAML decision or manifest additions. Unique complete-file identity, exact retained decision-list prefix, or the unique Doctor-check table establishes the successor by content. Current text is pending independent review; no prior approval or identity is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "targetUnitDigest": "00a3412a5974cb6c7e2d4f51aadd36437162cdc3bf4a92e4dc781ec0f334ed1d",
+        "targetAncestry": [
+          "Spec: Distribution",
+          "Data Dictionary"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "shard": "s5-root-boundary-sync.json",
+      "authorSession": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "collection": "claims",
+      "row": {
+        "claimId": "claim_35a5dbff0280f3ec835d94703f9f8151",
+        "sourcePath": "docs/architecture-manifest.json",
+        "sourceAnchor": "file-block",
+        "sourceUnitDigest": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
+        "claimKind": "contract",
+        "targetOwner": "docs/platform/contracts/architecture-manifest.json",
+        "targetAnchor": "file-block",
+        "targetUnitDigest": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
+        "targetAncestry": [],
+        "disposition": "move",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+        "rationale": "Source: docs/architecture-manifest.json:1-272#file-block (current lines); unit SHA256 74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507.\nTarget: docs/platform/contracts/architecture-manifest.json:1-272#file-block (current lines); unit SHA256 74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: A31 SYNC a9a2b079f: upstream changed content is carried verbatim in its mapped candidate; surrounding candidate corrections and placement remain. Native identity resolved at SYNC 498048c1a by exact path/anchor/full source digest. No approval inherited.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "reviewNote": "Current native source binding; independent ordinary review pending."
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "shard": "s5-root-boundary-sync.json",
+      "authorSession": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "collection": "registryGaps",
+      "row": {
+        "claimId": "claim_2f7cbb5fabfc5e77f7014c54f020c524",
+        "sourcePath": "docs/platform/contracts/architecture-manifest.json",
+        "sourceAnchor": "file-block",
+        "sourceUnitDigest": "c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/contracts/architecture-manifest.json",
+        "targetAnchor": "file-block",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
+        "rationale": "Source: docs/platform/contracts/architecture-manifest.json:1-260#file-block (historical witness at 86ce0d284e72543899750674fac47db1dadc11aa); unit SHA256 c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85.\nTarget: docs/platform/contracts/architecture-manifest.json:1-272#file-block (current lines); unit SHA256 74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: this historical predecessor remains conserved at the exact cited git witness. Its current mapped candidate incorporates the upstream doctor-check/YAML decision or manifest additions. Unique complete-file identity, exact retained decision-list prefix, or the unique Doctor-check table establishes the successor by content. Current text is pending independent review; no prior approval or identity is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "targetUnitDigest": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
+        "targetAncestry": []
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "shard": "s5-root-boundary-sync.json",
+      "authorSession": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "collection": "registryGaps",
+      "row": {
+        "claimId": "claim_b7876fcb567891ddc8431cdab2f2dab0",
+        "sourcePath": "docs/specs/runner.md",
+        "sourceAnchor": "unheaded-block-100",
+        "sourceUnitDigest": "a9da2cf6e58fce799612fa0621321bd73b52671c571c30d19146f0e982f19d72",
+        "disposition": "supersede",
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": "unheaded-block-102",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
+        "rationale": "Source: docs/specs/runner.md:1196-1238#unheaded-block-102 (historical witness at a8457b07f65f1b3e9ccc19de83546b5fb1bc69ee); unit SHA256 a9da2cf6e58fce799612fa0621321bd73b52671c571c30d19146f0e982f19d72.\nTarget: docs/specs/runner.md:1219-1269#unheaded-block-102 (current lines); unit SHA256 29fd80cd85f3529f3dcc99950563df4461655efc9d0550abe9dc52b199d07854.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 29fd80cd85f3529f3dcc99950563df4461655efc9d0550abe9dc52b199d07854 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-102 under docs/specs/runner.md#unheaded-block-102; source context \"Spec: Runner (vòng tự hành) / Pointers (implementation)\", target context \"Spec: Runner (vòng tự hành) / Pointers (implementation)\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "targetUnitDigest": "29fd80cd85f3529f3dcc99950563df4461655efc9d0550abe9dc52b199d07854",
+        "targetAncestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Pointers (implementation)"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "shard": "s5-root-boundary-sync.json",
+      "authorSession": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "collection": "registryGaps",
+      "row": {
+        "claimId": "claim_c2cb6de3e8b1288ed15fcd60f3154bbb",
+        "sourcePath": "docs/specs/runner.md",
+        "sourceAnchor": "unheaded-block-9",
+        "sourceUnitDigest": "daf2341d585c13bd3e7f44184eb0b61402e41abf7ac9ae8a987b200a83f51c9e",
+        "disposition": "supersede",
+        "targetOwner": "docs/specs/runner.md",
+        "targetAnchor": "unheaded-block-9",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
+        "rationale": "Source: docs/specs/runner.md:73-87#unheaded-block-9 (historical witness at c67e9a6b24ab326edd3190051178663f42e3a665); unit SHA256 daf2341d585c13bd3e7f44184eb0b61402e41abf7ac9ae8a987b200a83f51c9e.\nTarget: docs/specs/runner.md:70-84#unheaded-block-9 (current lines); unit SHA256 43f03eb4dffdeff420f464531d60be7e37e13192429963b10ba302be1e9b777e.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 43f03eb4dffdeff420f464531d60be7e37e13192429963b10ba302be1e9b777e at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-9 under docs/specs/runner.md#unheaded-block-9; source context \"Spec: Runner (vòng tự hành) / Data Dictionary\", target context \"Spec: Runner (vòng tự hành) / Data Dictionary\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "targetUnitDigest": "43f03eb4dffdeff420f464531d60be7e37e13192429963b10ba302be1e9b777e",
+        "targetAncestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Data Dictionary"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "shard": "s5-root-boundary-sync.json",
+      "authorSession": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "collection": "registryGaps",
+      "row": {
+        "claimId": "claim_6f9769825ad867b974bc2f69118c2261",
+        "sourcePath": "docs/platform/contracts/architecture-manifest.json",
+        "sourceAnchor": "file-block",
+        "sourceUnitDigest": "0eab58e60acc4e19019d05f6317967bbfe06fc70a222b7f6297b107a3071559f",
+        "claimKind": "contract",
+        "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "targetOwner": "docs/platform/contracts/architecture-manifest.json",
+        "targetAnchor": "file-block",
+        "rationale": "Source: docs/platform/contracts/architecture-manifest.json:1-264#file-block (historical witness at 6c6a65e8543fa72012bd55f8999f13f9ed6193c4); unit SHA256 0eab58e60acc4e19019d05f6317967bbfe06fc70a222b7f6297b107a3071559f.\nTarget: docs/platform/contracts/architecture-manifest.json:1-272#file-block (current lines); unit SHA256 74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: this historical predecessor remains conserved at the exact cited git witness. Its current mapped candidate incorporates the upstream doctor-check/YAML decision or manifest additions. Unique complete-file identity, exact retained decision-list prefix, or the unique Doctor-check table establishes the successor by content. Current text is pending independent review; no prior approval or identity is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "targetUnitDigest": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
+        "targetAncestry": []
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "shard": "s5-root-boundary-sync.json",
+      "authorSession": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "collection": "registryGaps",
+      "row": {
+        "claimId": "claim_0416642260519cf992931a4968e80c03",
+        "sourceUnitDigest": "0eab58e60acc4e19019d05f6317967bbfe06fc70a222b7f6297b107a3071559f",
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
+        "targetOwner": "docs/platform/contracts/architecture-manifest.json",
+        "targetAnchor": "file-block",
+        "rationale": "Source: docs/architecture-manifest.json:1-264#file-block (historical witness at 84fe38b2f517613b753d85c21aeac0e80abe03e7); unit SHA256 0eab58e60acc4e19019d05f6317967bbfe06fc70a222b7f6297b107a3071559f.\nTarget: docs/platform/contracts/architecture-manifest.json:1-272#file-block (current lines); unit SHA256 74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: this historical predecessor remains conserved at the exact cited git witness. Its current mapped candidate incorporates the upstream doctor-check/YAML decision or manifest additions. Unique complete-file identity, exact retained decision-list prefix, or the unique Doctor-check table establishes the successor by content. Current text is pending independent review; no prior approval or identity is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "sourcePath": "docs/architecture-manifest.json",
+        "sourceAnchor": "file-block",
+        "targetUnitDigest": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
+        "targetAncestry": []
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "shard": "s5-root-boundary-sync.json",
+      "authorSession": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "collection": "registryGaps",
+      "row": {
+        "claimId": "claim_daaf3726036adad15b2529ad43f71d44",
+        "sourceUnitDigest": "b2602ce11716f89d5f4d3371f398fee7eba9a6db5481383e8b8a52b81b829b9f",
+        "targetOwner": "docs/platform/packaging-distribution/spec.md",
+        "targetAnchor": "unheaded-block-85",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
+        "rationale": "Source: docs/specs/distribution.md:57-73#unheaded-block-5 (historical witness at 554401219ddbc4676c3b57381a468904442855e9); unit SHA256 b2602ce11716f89d5f4d3371f398fee7eba9a6db5481383e8b8a52b81b829b9f.\nTarget: docs/platform/packaging-distribution/spec.md:517-533#unheaded-block-85 (current lines); unit SHA256 00a3412a5974cb6c7e2d4f51aadd36437162cdc3bf4a92e4dc781ec0f334ed1d.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: this historical predecessor remains conserved at the exact cited git witness. Its current mapped candidate incorporates the upstream doctor-check/YAML decision or manifest additions. Unique complete-file identity, exact retained decision-list prefix, or the unique Doctor-check table establishes the successor by content. Current text is pending independent review; no prior approval or identity is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "sourcePath": "docs/specs/distribution.md",
+        "targetUnitDigest": "00a3412a5974cb6c7e2d4f51aadd36437162cdc3bf4a92e4dc781ec0f334ed1d",
+        "targetAncestry": [
+          "Spec: Packaging-Distribution",
+          "Retained Distribution Source Detail",
+          "Spec: Distribution",
+          "Data Dictionary"
+        ]
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "shard": "s5-root-boundary-sync.json",
+      "authorSession": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "collection": "registryGaps",
+      "row": {
+        "sourcePath": "docs/architecture-manifest.json",
+        "sourceAnchor": "file-block",
+        "sourceUnitDigest": "5a7e59abe736f2b6d3af229d70366d3b7c83484c682540ec4bcf79c3ec0a1657",
+        "targetOwner": "docs/platform/contracts/architecture-manifest.json",
+        "targetAnchor": "file-block",
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
+        "rationale": "Source: docs/architecture-manifest.json:1-266#file-block (historical witness at 9a051dfd5af2cfe6a19ead00c54986c70470e67f); unit SHA256 5a7e59abe736f2b6d3af229d70366d3b7c83484c682540ec4bcf79c3ec0a1657.\nTarget: docs/platform/contracts/architecture-manifest.json:1-272#file-block (current lines); unit SHA256 74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: this historical predecessor remains conserved at the exact cited git witness. Its current mapped candidate incorporates the upstream doctor-check/YAML decision or manifest additions. Unique complete-file identity, exact retained decision-list prefix, or the unique Doctor-check table establishes the successor by content. Current text is pending independent review; no prior approval or identity is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "claimId": "claim_cdb2776a59ac6a8bbc129754ffc7380f",
+        "targetUnitDigest": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
+        "targetAncestry": []
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "shard": "s5-root-boundary-sync.json",
+      "authorSession": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "collection": "registryGaps",
+      "row": {
+        "claimId": "claim_f703aeda7755ab376e6e3eee88eb82c2",
+        "sourceUnitDigest": "4f47df08a667f8edb2b8e4418246ac6ca36b09f02f255f3d344b268393034399",
+        "targetOwner": "docs/platform/packaging-distribution/spec.md",
+        "targetAnchor": "unheaded-block-92",
+        "claimKind": "specification",
+        "disposition": "supersede",
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+        "rationale": "Source: docs/specs/distribution.md:324-325#unheaded-block-15 (historical witness at 0f60e2f1db7af15581a152e307d0835fc6e510e5); unit SHA256 4f47df08a667f8edb2b8e4418246ac6ca36b09f02f255f3d344b268393034399.\nTarget: docs/platform/packaging-distribution/spec.md:708-710#unheaded-block-92 (current lines); unit SHA256 87f98a72908fb6991a3cd9bdf8c1407373d72b039ad1b3e83a35a89a2a87d299.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: this historical predecessor remains conserved at the exact cited git witness. Its current mapped candidate incorporates the upstream doctor-check/YAML decision or manifest additions. Unique complete-file identity, exact retained decision-list prefix, or the unique Doctor-check table establishes the successor by content. Current text is pending independent review; no prior approval or identity is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "targetUnitDigest": "87f98a72908fb6991a3cd9bdf8c1407373d72b039ad1b3e83a35a89a2a87d299",
+        "targetAncestry": [
+          "Spec: Packaging-Distribution",
+          "Retained Distribution Source Detail",
+          "Spec: Distribution",
+          "Lịch sử quyết định"
+        ],
+        "sourcePath": "docs/specs/distribution.md",
+        "sourceAnchor": "unheaded-block-15",
+        "reviewNote": "Native predecessor gap; independent review pending; no approval carried."
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-generated-backlog.json",
+      "shard": "s5-root-generated-backlog.json",
+      "authorSession": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "collection": "claims",
+      "row": {
+        "claimId": "claim_f0b2a4079764d68b1102ddddb08776ce",
+        "sourceUnitDigest": "92be08bb7b0a9af07f2d36307db6a7891545c2ab4590dcbb77074d46c2c8dfbe",
+        "claimKind": "navigation",
+        "disposition": "regenerate-from-source",
+        "targetOwner": null,
+        "targetAnchor": null,
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+        "rationale": "At SYNC 498048c1a, the retained native product-backlog heading has source SHA256 92be08bb7b0a9af07f2d36307db6a7891545c2ab4590dcbb77074d46c2c8dfbe. The file is a generated, non-authority backlog projection and remains at its existing path under the frozen root authority map. The complete current heading is re-decided regenerate-from-source, with no platform target and no approval inherited from its previous wording. This is a disposition of the projection, not evidence that its store, renderer or status values are current, and does not authorize regeneration, deletion, retirement, promotion or cutover. See step10-round7-main-carry.json for the independently reviewable generated-file/source mapping; this turn edits no docs bytes.",
+        "reviewNote": "Native source digest changed at SYNC 498048c1a; current complete heading requires independent ordinary review. No approval carried.",
+        "sourcePath": "docs/backlog.md",
+        "sourceAnchor": "product-backlog"
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-generated-backlog.json",
+      "shard": "s5-root-generated-backlog.json",
+      "authorSession": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "collection": "claims",
+      "row": {
+        "claimId": "claim_9b3b7fac64df06547dd06e05f4f026c5",
+        "sourcePath": "docs/backlog.md",
+        "sourceAnchor": "unheaded-block-2",
+        "sourceUnitDigest": "3430068fb5b1687e480e143bc34727fa7d6ada9f1342932c9fdd2f8b23c17da2",
+        "claimKind": "historical-context",
+        "disposition": "regenerate-from-source",
+        "targetOwner": null,
+        "targetAnchor": null,
+        "reviewStatus": "pending",
+        "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+        "rationale": "The complete current generated product-backlog table is retained at docs/backlog.md#unheaded-block-2, native source SHA256 3430068fb5b1687e480e143bc34727fa7d6ada9f1342932c9fdd2f8b23c17da2. The upstream main table update is an event-sourced product-backlog projection, outside platform authority under the frozen root map. Its predecessor native identity remains as a separate pending registryGap decision; this new identity is not grafted onto that predecessor. Keep the current bytes at their existing path. Regenerate-from-source describes its owning future workflow, not permission to run a renderer, discard manually introduced rows, certify status truth, copy product backlog into a candidate spec, retire a source or cut over readers. Header/source mapping and the exact main hunk are in step10-round7-main-carry.json. Independent ordinary disposition review is pending; no approval inherited.",
+        "reviewNote": "New native generated table unit at final SYNC, authored pending for the same bounded ordinary request. No renderer run or truth approval."
+      }
+    }
+  ]
+}

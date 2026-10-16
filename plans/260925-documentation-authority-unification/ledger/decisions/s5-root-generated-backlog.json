@@ -1,7 +1,7 @@
 {
   "version": 1,
   "shard": "s5-root-generated-backlog.json",
-  "authorSession": "codex-session:23@2026-10-14",
+  "authorSession": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
   "authorshipRequired": true,
   "sources": [
     "docs/backlog.md"
@@ -9,20 +9,17 @@
   "claims": [
     {
       "claimId": "claim_f0b2a4079764d68b1102ddddb08776ce",
-      "sourceUnitDigest": "800732106a25d1de145c1e71fdda4347cf26f60d8625771d1f42c540228cfc0a",
+      "sourceUnitDigest": "92be08bb7b0a9af07f2d36307db6a7891545c2ab4590dcbb77074d46c2c8dfbe",
       "claimKind": "navigation",
       "disposition": "regenerate-from-source",
       "targetOwner": null,
       "targetAnchor": null,
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:25@2026-10-14",
-      "rationale": "The complete product-backlog unit is part of the non-authority generated product-backlog projection. Its header names bee backlog render and the event-sourced PBI input; the frozen root map retains the backlog outside platform authority. Keep the projection at its existing path and regenerate through its owning source workflow when that workflow changes, rather than hand-copying PBI statuses into a candidate spec or treating an exact source-to-itself match as carriage. Full current text and native digest are supplied for independent disposition review. This approves no renderer run, underlying store freshness, historical status truth, retirement, reader cutover or platform promotion. The renderer input .bee/backlog.jsonl is not in the repository and the bee tool is not installed. Commit b6763388b added PBI rows p-c3a41d07, p-c7e90b52 and p-cf1280a6 by hand to docs/backlog.md. docs/backlog.md stays at its existing path and must not be deleted or regenerated at cutover until a real source exists; regenerate-from-source is a future workflow disposition, not permission to discard these bytes.",
-      "reviewNote": "deep: heading Product Backlog line 1, native digest 80073210 recomputed at HEAD; only rationale and authoredBy changed vs the reviewed version. The added wording (.bee/backlog.jsonl absent from the repo and git index, bee not on PATH, rows p-c3a41d07/p-c7e90b52/p-cf1280a6 added by hand in b6763388b, file stays and is neither deleted nor regenerated at cutover until a real source exists) is true.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0027-root-pending-resume.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "rationale": "At SYNC 498048c1a, the retained native product-backlog heading has source SHA256 92be08bb7b0a9af07f2d36307db6a7891545c2ab4590dcbb77074d46c2c8dfbe. The file is a generated, non-authority backlog projection and remains at its existing path under the frozen root authority map. The complete current heading is re-decided regenerate-from-source, with no platform target and no approval inherited from its previous wording. This is a disposition of the projection, not evidence that its store, renderer or status values are current, and does not authorize regeneration, deletion, retirement, promotion or cutover. See step10-round7-main-carry.json for the independently reviewable generated-file/source mapping; this turn edits no docs bytes.",
+      "reviewNote": "Native source digest changed at SYNC 498048c1a; current complete heading requires independent ordinary review. No approval carried.",
+      "sourcePath": "docs/backlog.md",
+      "sourceAnchor": "product-backlog"
     },
     {
       "claimId": "claim_c295c4c899afa37544bda841421c92e4",
@@ -35,23 +32,6 @@
       "authoredBy": "codex-session:25@2026-10-14",
       "rationale": "The complete unheaded-block-1 unit is part of the non-authority generated product-backlog projection. Its header names bee backlog render and the event-sourced PBI input; the frozen root map retains the backlog outside platform authority. Keep the projection at its existing path and regenerate through its owning source workflow when that workflow changes, rather than hand-copying PBI statuses into a candidate spec or treating an exact source-to-itself match as carriage. Full current text and native digest are supplied for independent disposition review. This approves no renderer run, underlying store freshness, historical status truth, retirement, reader cutover or platform promotion. The renderer input .bee/backlog.jsonl is not in the repository and the bee tool is not installed. Commit b6763388b added PBI rows p-c3a41d07, p-c7e90b52 and p-cf1280a6 by hand to docs/backlog.md. docs/backlog.md stays at its existing path and must not be deleted or regenerated at cutover until a real source exists; regenerate-from-source is a future workflow disposition, not permission to discard these bytes.",
       "reviewNote": "deep: lines 3-9 GENERATED FILE header comment, digest 8311fcb7 recomputed at HEAD and at e63a17b8e (unchanged); only the backlog rationale sentences were appended. The added wording (.bee/backlog.jsonl absent from the repo and git index, bee not on PATH, rows p-c3a41d07/p-c7e90b52/p-cf1280a6 added by hand in b6763388b, file stays and is neither deleted nor regenerated at cutover until a real source exists) is true.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0027-root-pending-resume.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
-    },
-    {
-      "claimId": "claim_d7660c15ae6c2d2e7d610c1aa571101c",
-      "sourceUnitDigest": "57afbc488deb465cf96541393acb2cef97bed4c9acdea33bec65ef009c0c9a86",
-      "claimKind": "historical-context",
-      "disposition": "regenerate-from-source",
-      "targetOwner": null,
-      "targetAnchor": null,
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:25@2026-10-14",
-      "rationale": "The complete unheaded-block-2 unit is part of the non-authority generated product-backlog projection. Its header names bee backlog render and the event-sourced PBI input; the frozen root map retains the backlog outside platform authority. Keep the projection at its existing path and regenerate through its owning source workflow when that workflow changes, rather than hand-copying PBI statuses into a candidate spec or treating an exact source-to-itself match as carriage. Full current text and native digest are supplied for independent disposition review. This approves no renderer run, underlying store freshness, historical status truth, retirement, reader cutover or platform promotion. The renderer input .bee/backlog.jsonl is not in the repository and the bee tool is not installed. Commit b6763388b added PBI rows p-c3a41d07, p-c7e90b52 and p-cf1280a6 by hand to docs/backlog.md. docs/backlog.md stays at its existing path and must not be deleted or regenerated at cutover until a real source exists; regenerate-from-source is a future workflow disposition, not permission to discard these bytes.",
-      "reviewNote": "deep: active PBI table lines 11-50, digest 57afbc48 recomputed; rows 24-26 are the three b6763388b rows (git log -S confirms) so the hand-added statement is accurate. The added wording (.bee/backlog.jsonl absent from the repo and git index, bee not on PATH, rows p-c3a41d07/p-c7e90b52/p-cf1280a6 added by hand in b6763388b, file stays and is neither deleted nor regenerated at cutover until a real source exists) is true.",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-15",
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0027-root-pending-resume.md",
@@ -91,6 +71,36 @@
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0027-root-pending-resume.md",
       "reviewMode": "ordinary",
       "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+    },
+    {
+      "claimId": "claim_9b3b7fac64df06547dd06e05f4f026c5",
+      "sourcePath": "docs/backlog.md",
+      "sourceAnchor": "unheaded-block-2",
+      "sourceUnitDigest": "3430068fb5b1687e480e143bc34727fa7d6ada9f1342932c9fdd2f8b23c17da2",
+      "claimKind": "historical-context",
+      "disposition": "regenerate-from-source",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "rationale": "The complete current generated product-backlog table is retained at docs/backlog.md#unheaded-block-2, native source SHA256 3430068fb5b1687e480e143bc34727fa7d6ada9f1342932c9fdd2f8b23c17da2. The upstream main table update is an event-sourced product-backlog projection, outside platform authority under the frozen root map. Its predecessor native identity remains as a separate pending registryGap decision; this new identity is not grafted onto that predecessor. Keep the current bytes at their existing path. Regenerate-from-source describes its owning future workflow, not permission to run a renderer, discard manually introduced rows, certify status truth, copy product backlog into a candidate spec, retire a source or cut over readers. Header/source mapping and the exact main hunk are in step10-round7-main-carry.json. Independent ordinary disposition review is pending; no approval inherited.",
+      "reviewNote": "New native generated table unit at final SYNC, authored pending for the same bounded ordinary request. No renderer run or truth approval."
+    }
+  ],
+  "registryGaps": [
+    {
+      "claimId": "claim_d7660c15ae6c2d2e7d610c1aa571101c",
+      "sourceUnitDigest": "57afbc488deb465cf96541393acb2cef97bed4c9acdea33bec65ef009c0c9a86",
+      "claimKind": "historical-context",
+      "disposition": "regenerate-from-source",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "rationale": "The complete unheaded-block-2 unit is part of the non-authority generated product-backlog projection. Its header names bee backlog render and the event-sourced PBI input; the frozen root map retains the backlog outside platform authority. Keep the projection at its existing path and regenerate through its owning source workflow when that workflow changes, rather than hand-copying PBI statuses into a candidate spec or treating an exact source-to-itself match as carriage. Full current text and native digest are supplied for independent disposition review. This approves no renderer run, underlying store freshness, historical status truth, retirement, reader cutover or platform promotion. The renderer input .bee/backlog.jsonl is not in the repository and the bee tool is not installed. Commit b6763388b added PBI rows p-c3a41d07, p-c7e90b52 and p-cf1280a6 by hand to docs/backlog.md. docs/backlog.md stays at its existing path and must not be deleted or regenerated at cutover until a real source exists; regenerate-from-source is a future workflow disposition, not permission to discard these bytes.",
+      "reviewNote": "Native predecessor gap; independent review pending; no approval carried.",
+      "sourcePath": "docs/backlog.md",
+      "sourceAnchor": "unheaded-block-2"
     }
   ]
 }

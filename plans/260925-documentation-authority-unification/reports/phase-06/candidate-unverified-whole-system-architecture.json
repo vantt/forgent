@@ -409,7 +409,7 @@
       "reviewNote": "mechanical: text block unheaded-block-4 of component-boundary.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest 5a4f9608c6c88b21 equal the request, sidecar and committed bytes; component-boundary.md declares Design status Draft (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
     },
     {
-      "claimId": "claim_aacc38bae14d6ddc021cc4278795f5af",
+      "claimId": "claim_c11ed79c0397df3ecb557a64094e0d62",
       "path": "docs/platform/component-boundary.md",
       "anchor": "unheaded-block-5",
       "unitDigest": "ef970220b2a0deaa9fe9d0aabe96a61d29451f0955f547b511aaa46b7f5df403",
@@ -1333,5 +1333,9 @@
     "knownIDsPreserved": true,
     "noApprovalCarry": true,
     "meaning": "R6-8: two wrapper tuples locally rebound; native identity/gap reconciliation owed. Earlier complete verification retained in previousNativeVerificationMetadata.beforeClosureCorrection."
+  },
+  "nativeRebindingGlobal": {
+    "SYNC": "498048c1a6651556a0ae977a2871135b5ac7c945",
+    "method": "Exact native tuple or authenticated retained ID; no expected-ID filtering or inferred approval."
   }
 }

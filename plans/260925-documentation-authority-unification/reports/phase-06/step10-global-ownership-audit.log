@@ -1,0 +1,8 @@
+{
+  collisions: 256,
+  newGapGroups: 6,
+  newActivePairs: 0,
+  nativeDuplicates: 0,
+  drift: 0,
+  ok: true
+}

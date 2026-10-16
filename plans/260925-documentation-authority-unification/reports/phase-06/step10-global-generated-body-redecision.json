@@ -1,0 +1,55 @@
+{
+  "native": {
+    "sourcePath": "docs/backlog.md",
+    "unitDigest": "84458bb943e32f1355bac07b21217404e8d472ff91c1ec1dc486a7743dd8c9d6",
+    "identityFingerprint": "84458bb943e32f1355bac07b21217404e8d472ff91c1ec1dc486a7743dd8c9d6",
+    "claimId": "claim_9b3b7fac64df06547dd06e05f4f026c5",
+    "sourceAnchor": "unheaded-block-2",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "3430068fb5b1687e480e143bc34727fa7d6ada9f1342932c9fdd2f8b23c17da2",
+    "claimKind": "unclassified",
+    "status": "future",
+    "origin": "added-since-ade5812a9f444f895185594aedc1f73cf8b2288a"
+  },
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-generated-backlog.json",
+  "row": {
+    "claimId": "claim_9b3b7fac64df06547dd06e05f4f026c5",
+    "sourcePath": "docs/backlog.md",
+    "sourceAnchor": "unheaded-block-2",
+    "sourceUnitDigest": "3430068fb5b1687e480e143bc34727fa7d6ada9f1342932c9fdd2f8b23c17da2",
+    "claimKind": "historical-context",
+    "disposition": "regenerate-from-source",
+    "targetOwner": null,
+    "targetAnchor": null,
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+    "rationale": "The complete current generated product-backlog table is retained at docs/backlog.md#unheaded-block-2, native source SHA256 3430068fb5b1687e480e143bc34727fa7d6ada9f1342932c9fdd2f8b23c17da2. The upstream main table update is an event-sourced product-backlog projection, outside platform authority under the frozen root map. Its predecessor native identity remains as a separate pending registryGap decision; this new identity is not grafted onto that predecessor. Keep the current bytes at their existing path. Regenerate-from-source describes its owning future workflow, not permission to run a renderer, discard manually introduced rows, certify status truth, copy product backlog into a candidate spec, retire a source or cut over readers. Header/source mapping and the exact main hunk are in step10-round7-main-carry.json. Independent ordinary disposition review is pending; no approval inherited.",
+    "reviewNote": "New native generated table unit at final SYNC, authored pending for the same bounded ordinary request. No renderer run or truth approval."
+  },
+  "previousNativeProposal": {
+    "claimId": "claim_9b3b7fac64df06547dd06e05f4f026c5",
+    "sourceId": "src_1f1f4fa4ef6f30f09be2164da951294d",
+    "sourcePath": "docs/backlog.md",
+    "sourceAnchor": "unheaded-block-2",
+    "sourceDigest": "4d2d62ea2daf95a874c86396104f345263d5241e3ca96edddf8020690bda8826",
+    "sourceUnitDigest": "3430068fb5b1687e480e143bc34727fa7d6ada9f1342932c9fdd2f8b23c17da2",
+    "identityUnitDigest": "84458bb943e32f1355bac07b21217404e8d472ff91c1ec1dc486a7743dd8c9d6",
+    "identityFingerprint": "84458bb943e32f1355bac07b21217404e8d472ff91c1ec1dc486a7743dd8c9d6",
+    "identityStatus": "carried-forward",
+    "sourceLocation": {
+      "start": 11,
+      "end": 52
+    },
+    "targetOwner": null,
+    "targetAnchor": null,
+    "claimKind": "unclassified",
+    "authorityKind": "non-authority",
+    "status": "future",
+    "relations": [],
+    "decisionRefs": [],
+    "evidenceLinks": [],
+    "disposition": "regenerate-from-source",
+    "reviewStatus": "pending"
+  },
+  "approvalCarried": false
+}

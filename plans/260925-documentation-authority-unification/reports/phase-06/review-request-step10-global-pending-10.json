@@ -1,0 +1,125 @@
+{
+  "SYNC": "498048c1a",
+  "authorSession": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+  "meaning": "Every still-pending row, including A43 Rings and all main re-carried/dependent rows. Ordinary independent review; no producer verdict or sample. Immutable current records below.",
+  "entries": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "collection": "rows",
+      "row": {
+        "claimId": "claim_f3f5921d113281737e0074b0a61ec008",
+        "sourcePath": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
+        "sourceAnchor": "unheaded-block-2",
+        "sourceUnitDigest": "3b995f5d64b6f1ba59b04dfdfa123ea6514c276cbb45e084d9d88ed3fdab1d12",
+        "claimKind": "contract",
+        "disposition": "move",
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/deprecated-and-reserved.md",
+        "targetAnchor": "literal-snapshot",
+        "targetUnitDigest": "90907f43df391bea9bff202edea68dc02d837641fdb9cc3e1852b4bebf295db1",
+        "shownTargetDigest": "0e2747678934e46adb323dbea4c940bd9ec971562b09089336a3664036d5ff3f",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "pending",
+        "rationale": "The dated former unit is retained verbatim in this file's complete historical carrier, not because the whole surviving subject is retired. The restored current file separately carries live/design obligations and corrects old metadata, session-only interfaces, obsolete operational recipes or dated claims. Retirement 2180b4e72 is limited to engine-only text. Review the original shown source and current full file; no previous blanket engine classification is carried.",
+        "shownSourceText": "Reserved for the existing fgOS platform-level concept: any process that\nspeaks the fgOS event-log contract is a full \"participant\"\n(`docs/specs/platform-foundations.md` D0014,\n`docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md`).\nThat definition lives outside this documentation tree and is not restated\nhere. Do not reuse `Participant` for the agent-coordination actor-instance\nconcept — the addressable instance that fills a Role inside a definition or\nsession is [SessionActor](canonical-concepts.md#sessionactor)\n(per [ADR-008](../decisions/ADR-008-coordination-session-and-mission-deferral.md)).",
+        "shownSourceDigest": "3b995f5d64b6f1ba59b04dfdfa123ea6514c276cbb45e084d9d88ed3fdab1d12",
+        "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "reviewNote": "vocabulary/deprecated-and-reserved.md#unheaded-block-2 (rebound) -> history/retired-engine/files/vocabulary/deprecated-and-reserved.md#literal-snapshot: Participant and Job reservations and the forbidden-equivalence list are engine-independent and live; their current headings are empty."
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "collection": "rows",
+      "row": {
+        "claimId": "claim_6bafadeba84b06dec3d6ee864f2fc868",
+        "sourcePath": "docs/platform/agent-coordination/vocabulary/deprecated-and-reserved.md",
+        "sourceAnchor": "unheaded-block-3",
+        "sourceUnitDigest": "c7e8d4779fd2e82706ec2d88c562587445832e06aa148eb5d56ee1888086b575",
+        "claimKind": "historical-context",
+        "disposition": "move",
+        "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/vocabulary/deprecated-and-reserved.md",
+        "targetAnchor": "literal-snapshot",
+        "targetUnitDigest": "90907f43df391bea9bff202edea68dc02d837641fdb9cc3e1852b4bebf295db1",
+        "shownTargetDigest": "0e2747678934e46adb323dbea4c940bd9ec971562b09089336a3664036d5ff3f",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "pending",
+        "rationale": "The dated former unit is retained verbatim in this file's complete historical carrier, not because the whole surviving subject is retired. The restored current file separately carries live/design obligations and corrects old metadata, session-only interfaces, obsolete operational recipes or dated claims. Retirement 2180b4e72 is limited to engine-only text. Review the original shown source and current full file; no previous blanket engine classification is carried.",
+        "shownSourceText": "Reserved for a future durable queue/scheduler unit. Team Dispatch V1 does not\ncreate Job records. Do not use Job as a generic synonym for Work, AdhocTask,\nAssignment, or Run.",
+        "shownSourceDigest": "c7e8d4779fd2e82706ec2d88c562587445832e06aa148eb5d56ee1888086b575",
+        "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+        "reviewNote": "vocabulary/deprecated-and-reserved.md#unheaded-block-3 (rebound) -> history/retired-engine/files/vocabulary/deprecated-and-reserved.md#literal-snapshot: Participant and Job reservations and the forbidden-equivalence list are engine-independent and live; their current headings are empty."
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "collection": "rows",
+      "row": {
+        "claimId": "claim_2d9ccc774d84c91978163a37739aaa26",
+        "sourcePath": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+        "sourceAnchor": "current-scope",
+        "sourceUnitDigest": "bb132a423a617e5eda9382504b9ebc87f186077bb3a3cd589d7eb0e7a28d5f07",
+        "claimKind": "historical-context",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+        "targetAnchor": "implementation-and-design-status",
+        "targetUnitDigest": "4fc22267739453739992bd7673b29eaa711de810b721bd915c28f58ec555cc0c",
+        "shownTargetDigest": "4fc22267739453739992bd7673b29eaa711de810b721bd915c28f58ec555cc0c",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "pending",
+        "rationale": "The old candidate scope/operating fragment is superseded by this restored, explicitly scoped current/design statement. The rejected blanket whole-file retirement or unqualified operational recipe is corrected, not inherited as current truth. Full prior shown text and source pin are retained in liveness-retired-unit-text.json; the independent reviewer must compare the restored full file and the pinned current code, not approve from this rationale alone. No prior approval carries.",
+        "reviewNote": "architecture/executor-health-and-fallback.md#current-scope (new) -> architecture/executor-health-and-fallback.md#implementation-and-design-status: Planner recommendation/apply-check facts are live, true and verified (recovery-planner.mjs:243-266,281-316) and no restored current text carries them."
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "collection": "rows",
+      "row": {
+        "claimId": "claim_8be1f5a856f48c009b2a47816d982eb1",
+        "sourcePath": "docs/platform/agent-coordination/architecture/run-handle.md",
+        "sourceAnchor": "current-scope",
+        "sourceUnitDigest": "1326efcc3958a7e8952f474b38053519b7591970a705c9933c3073a9512fe2ff",
+        "claimKind": "historical-context",
+        "disposition": "supersede",
+        "targetOwner": "docs/platform/agent-coordination/architecture/run-handle.md",
+        "targetAnchor": "implementation-and-design-status",
+        "targetUnitDigest": "bef0ccaa8745300be2bf165c8d136047af133c064637af821eed0a95b23d04fe",
+        "shownTargetDigest": "bef0ccaa8745300be2bf165c8d136047af133c064637af821eed0a95b23d04fe",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "pending",
+        "rationale": "The old candidate scope/operating fragment is superseded by this restored, explicitly scoped current/design statement. The rejected blanket whole-file retirement or unqualified operational recipe is corrected, not inherited as current truth. Full prior shown text and source pin are retained in liveness-retired-unit-text.json; the independent reviewer must compare the restored full file and the pinned current code, not approve from this rationale alone. No prior approval carries.",
+        "reviewNote": "architecture/run-handle.md#current-scope (new) -> architecture/run-handle.md#implementation-and-design-status: Low: the three run-lock facts were live and true (run-lock.mjs:306-334,390-412); the acquire/settle-fencing and settled-generation sentences are no longer stated in current prose (only terse table evidence), so one sentence should be restored (e.g. in section 3 or 4)."
+      }
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "collection": "rows",
+      "row": {
+        "sourcePath": "docs/specs/confinement-authority.md",
+        "unitDigest": "6c423bb840992daf8f370543fa7a56c7b16c932385268752cc4b81acf0a46fed",
+        "identityFingerprint": "6c423bb840992daf8f370543fa7a56c7b16c932385268752cc4b81acf0a46fed",
+        "claimId": "claim_ac8c8092219e244b8a9001337c1d8310",
+        "sourceAnchor": "unheaded-block-139",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "45c002409eb1ea7d8170b033d5a590edc01ab8284b9cf787474a310e05c24823",
+        "claimKind": "specification",
+        "status": "removed-pending-disposition",
+        "priorStatus": "current",
+        "retiredAtCommit": "a4e132ccd01e2b20a0e6c874ec5b4d6fbb5781e2",
+        "retiredReason": "no counterpart in current source",
+        "disposition": "supersede",
+        "targetOwner": "docs/specs/confinement-authority.md",
+        "targetAnchor": "unheaded-block-140",
+        "targetUnitDigest": "a58b4be15c55c3d02464399b2586a140a5570426f09c064077121b88783931f6",
+        "shownTargetDigest": "a58b4be15c55c3d02464399b2586a140a5570426f09c064077121b88783931f6",
+        "sourceCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+        "shownSourceText": "1. `resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: <CODEX_HOME | HOME | PI_CODING_AGENT_DIR> } }]` trên invocation (cùng dạng `codex-cli-bwrap`).\n2. Login của account đến từ inventory toàn máy `runner.providers.<provider>.accounts.<id>.credentialSource` trong `~/.fgos/config.json` (RUL65b của `docs/specs/runner.md`): kind `codex-home` (`auth.json`) hoặc `home-files` (danh sách file tường minh, copy owner-only, fail closed) — driver `drivers/bwrap.mjs` copy vào private home trước khi spawn. Không mount thư mục account thật, không bypass flag thay sandbox.\n3. Trust của workspace ghi vào store trong private home (`herdr-round.mjs` `trustStorePaths`), dẫn xuất từ store account thật; `fgos doctor` check `confined-pane-accounts` báo pane nào sẽ khởi động chưa đăng nhập.",
+        "shownSourceDigest": "45c002409eb1ea7d8170b033d5a590edc01ab8284b9cf787474a310e05c24823",
+        "authoredBy": "codex-session:1@2026-10-10",
+        "reviewStatus": "pending",
+        "mainCommit": "a8b3ab38083904ba5249246a8191befbf1f0e4be",
+        "rationale": "Standing A13 main-side source-identity accounting: main a8b3ab38083904ba5249246a8191befbf1f0e4be and a48548ca26839eff0c0f0087297c204f5ec46bd1 revise the private-home trust and process-local approval explanation. The former three-item recipe at unheaded-block-139 is superseded by the current three-item recipe at unheaded-block-140, retaining resourceBindings and credential inventory/provisioning while correcting the trust detail. This is a pending identity successor for the owning confinement-spec batch, not another Agent Coordination truth fix or approval; no legacy text is edited.",
+        "owningBatch": "specs-confinement-authority",
+        "nextIndependentReview": "the next review of the owning specs batch (not closed); excluded from the 21-section/49-row Agent Coordination targeted check"
+      }
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "version": 1,
   "shard": "s5-root-main-recarry.json",
-  "authorSession": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+  "authorSession": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
   "authorshipRequired": true,
   "sources": [
     "docs/architecture-manifest.json",
@@ -51,21 +51,6 @@
         "4. Exit Codes"
       ],
       "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
-    },
-    {
-      "claimId": "claim_03ef50e87178220032a3eebe5c5d89d9",
-      "sourcePath": "docs/architecture-manifest.json",
-      "sourceAnchor": "file-block",
-      "sourceUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
-      "claimKind": "specification",
-      "disposition": "supersede",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
-      "rationale": "Source: docs/architecture-manifest.json:1-269#file-block (historical witness at 0f60e2f1db7af15581a152e307d0835fc6e510e5); unit SHA256 2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a.\nTarget: docs/platform/contracts/architecture-manifest.json:1-272#file-block (current lines); unit SHA256 74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f supersedes this retained predecessor with the changed current source carried in the mapped candidate. The predecessor source digest and history stay intact; the current-source draft is separately enumerated in step10-round7-new-unit-drafts.json. No identity graft or review carry; native transition owed next package.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "targetOwner": "docs/platform/contracts/architecture-manifest.json",
-      "targetAnchor": "file-block",
-      "targetUnitDigest": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
-      "targetAncestry": []
     }
   ],
   "registryGaps": [
@@ -95,6 +80,22 @@
       "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
       "targetUnitDigest": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
       "targetAncestry": []
+    },
+    {
+      "claimId": "claim_03ef50e87178220032a3eebe5c5d89d9",
+      "sourcePath": "docs/architecture-manifest.json",
+      "sourceAnchor": "file-block",
+      "sourceUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
+      "rationale": "Source: docs/architecture-manifest.json:1-269#file-block (historical witness at 0f60e2f1db7af15581a152e307d0835fc6e510e5); unit SHA256 2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a.\nTarget: docs/platform/contracts/architecture-manifest.json:1-272#file-block (current lines); unit SHA256 74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f supersedes this retained predecessor with the changed current source carried in the mapped candidate. The predecessor source digest and history stay intact; the current-source draft is separately enumerated in step10-round7-new-unit-drafts.json. No identity graft or review carry; native transition owed next package.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "targetOwner": "docs/platform/contracts/architecture-manifest.json",
+      "targetAnchor": "file-block",
+      "targetUnitDigest": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
+      "targetAncestry": [],
+      "reviewNote": "Native predecessor gap; independent review pending; no approval carried."
     }
   ]
 }
