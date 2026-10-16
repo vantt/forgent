@@ -1,31 +1,30 @@
-# Phase 12: tích hợp, full test, quiesce, merge, activate 3 workspace, cutover
+# Phase 12: tích hợp, full test, dừng-toàn-bộ, activate 3 workspace, đặt hàng rào
 
-Lead chính làm. Executor phase khác không chạy runbook này.
+Lead chính làm.
 
 ## A. Tích hợp
 
-1. Worktree `.claude/worktrees/hl-integration`, nhánh `holder-lock/integration` tạo từ main lúc bắt đầu P00. Trước mỗi wave: `git merge --ff-only main` nếu được, không thì `git rebase main` và báo các phase đang chạy rebase.
-2. Merge từng nhánh phase vào `holder-lock/integration` theo thứ tự: P00 → P01 → P02 → P03 → P05 → P04 → P11 (docs) → P06 → P07 → P08 → P09 → P10 → P11 (check). Sau **mỗi** merge chạy test hẹp của phase đó (lệnh trong phase file) trên nhánh tích hợp. Xung đột chỉ được phép ở `Cargo.lock` (sinh lại bằng `cargo build`); xung đột khác = vi phạm sở hữu file → trả phase về executor.
-3. Build: `cargo build -p fgos -p fgctl` trong worktree tích hợp (`CARGO_TARGET_DIR` riêng của worktree nếu dùng chung target với worktree khác thì tuần tự hoá).
-4. **Full suite trên đúng binary:** `env -u CLAUDE_CODE_SESSION_ID -u CODEX_THREAD_ID -u FGOS_SESSION_ID FGOS_HOST_BIN="$PWD/<target-dir>/debug/fgos" npm test` (biến đường dẫn target qua biến shell, không gõ literal). Thêm `cargo test --workspace` và `cargo check -p fgos-process -p fgos-holder-lock --target x86_64-pc-windows-msvc --target aarch64-apple-darwin`. Ghi commit + đường binary + kết quả vào `plans/261016-1104-holder-lock-kernel-lock-foundation/reports/` (tên lấy bằng `fgos convention path`).
-5. Review độc lập một vòng (Opus reviewer, tối đa 2 vòng) trên diff `main...holder-lock/integration`, tập trung: luật description, phân loại payload cũ/mới của quiescence, đường v1 giữ nguyên văn.
+1. Worktree `.claude/worktrees/hl-integration`, nhánh `holder-lock/integration` từ main lúc bắt đầu P00. Đầu mỗi wave: `git merge --ff-only main`, không được thì rebase và báo các phase đang chạy.
+2. Merge theo thứ tự P00 → P01 → P02 → P03 → P04 → P05 → P11 (docs) → P06 → P07 → P08 → P09 → P10 → P11 (check). Sau mỗi merge chạy test hẹp của phase đó trên nhánh tích hợp. Chỉ `Cargo.lock` được phép xung đột (sinh lại bằng `cargo build`); xung đột khác là vi phạm sở hữu file → trả về executor.
+3. `cargo build -p fgos -p fgctl` trong worktree tích hợp (tuần tự hoá nếu dùng chung `CARGO_TARGET_DIR`).
+4. **Full suite trên đúng binary:** `env -u CLAUDE_CODE_SESSION_ID -u CODEX_THREAD_ID -u FGOS_SESSION_ID FGOS_HOST_BIN="$TARGET_DIR/debug/fgos" npm test` (đường target qua biến shell); `cargo test --workspace`; `cargo check -p fgos-process -p fgos-holder-lock --target x86_64-pc-windows-msvc --target aarch64-apple-darwin`; `rg` xác nhận không còn đường v1 của 10 lock (tiêu chí 5 của plan.md). Ghi commit, binary, kết quả vào `reports/` của plan (tên lấy bằng `fgos convention path`).
+5. Một vòng review độc lập (Opus, tối đa 2 vòng) trên `main...holder-lock/integration`: luật description, kiểm dừng-toàn-bộ, không còn đường v1.
 
-## B. Landing (máy anh, một người dùng)
+## B. Landing dừng-toàn-bộ (quyết định A1)
 
-1. **Quiesce** mọi writer của fgOS trên máy: phiên Claude/Codex trên forgentX, mdview, mcp-skill-hub; `fgos run`/workflow runner; `fgos gateway stop` ở mỗi workspace; runner nền; pane agy/pi/omp. Đóng pane herdr rảnh.
-2. **Catch-up worktree đang mở** (`git worktree list`) để `npm test` của chúng không treo ở hàng đợi full-suite cũ (P08 rủi ro): rebase lên main mới sau bước 3, hoặc ghi chú dùng `FGOS_FULL_SUITE_QUEUE=off`.
-3. Merge `holder-lock/integration` vào main bằng ff trong main checkout (không `update-ref` từ worktree khác; không checkout nhánh trong main checkout).
-4. Cài `fgctl` mới trước (để sàn và vector có hiệu lực), rồi build/stage/activate forgentX; `fgos doctor` qua shim: `active-release-matches-checkout`, `state-root`, `lock-kernel-semantics`, `lock-borrow-vectors` pass.
-5. Activate cùng release ở **mdview** và **mcp-skill-hub** (họ máy dùng chung `lockRoot`), doctor ở cả hai.
-6. **Cutover**, từng họ, ở từng workspace (họ máy chỉ một lần cho máy): `fgos lock cutover repo-files`, `dispatch-cwd`, rồi `machine-files`, `machine-ledgers`. Mỗi lần: pha 1 → pha 2 (đợi process cũ thoát; restart process sống lâu: gateway, runner nền, phiên agent đang mở) → bật. Họ `dispatch-cwd` chỉ bật khi đủ điều kiện D9.
-7. `fgos doctor` ở cả ba: `lock-cutover` = `active` cho mọi họ, `lock-holders` không có holder lạ. Commit đầu tiên ở main sau đó chạy hook bình thường.
-8. Ghi kết quả (họ, thời điểm, process cũ đã chờ) vào báo cáo landing.
+1. **Dừng mọi writer:** phiên Claude/Codex trên forgentX, mdview, mcp-skill-hub; `fgos run`/workflow runner; `fgos gateway stop` ở mỗi workspace; runner nền; pane agy/pi/omp; đóng pane herdr rảnh.
+2. Merge `holder-lock/integration` vào main bằng ff trong main checkout.
+3. Cài `fgctl` mới, rồi build/stage/activate forgentX, mdview, mcp-skill-hub (cổng vector + probe ngữ nghĩa chạy ở mỗi lần activate).
+4. Ở mỗi workspace: `fgos doctor --fix` cho `lock-fences` (kiểm dừng → đặt hàng rào → kiểm lại). Có blocker → dừng process đó rồi chạy lại.
+5. `fgos doctor` qua shim ở cả ba: `active-release-matches-checkout`, `state-root`, `lock-kernel-semantics`, `lock-borrow-vectors`, `lock-fences` pass; `lock-holders` không có holder lạ.
+6. Rebase các worktree đang mở lên main mới (nhánh cũ gặp hàng rào ở gateway/sessions/runner/dispatch sẽ báo lỗi to tiếng).
+7. Mở lại việc. Ghi báo cáo landing.
 
 ## Rollback
 
-- **Trước bước 6:** họ chưa bật; revert merge trên main + activate release trước (`previousArtifactDigest`, sàn chưa ghi nên `fgctl` cho phép).
-- **Sau khi một họ bật:** quiesce → `fgos lock cutover <family> --revert` ở mọi workspace đã bật → chờ engine báo xong (không còn process v3 giữ) → chỉ được về release ≥ R-dual (chính release này): sàn đã ghi, `fgctl` từ chối thấp hơn (r4 §6.8 bước 6). Muốn về hẳn trước 4.2: gỡ file sàn bằng tay sau khi mọi họ đã revert và đã quét sạch process v3 — bước tay, ghi vào báo cáo.
+- Trước bước B4: revert merge trên main, activate release trước ở ba workspace.
+- Sau B4: dừng mọi writer; revert merge; activate release trước; gỡ hàng rào: `rm -r` các thư mục `TOMBSTONE` theo danh sách `fenceStatus` in ra, và ở mỗi thư mục ledger publish thêm một thế hệ copy thế hệ chặn kèm `releasedAt` (hoặc xoá thư mục ledger: anh đã chấp nhận xoá state làm lại). Ghi lại lệnh đã chạy.
 
 ## Tiêu chí nghiệm thu
 
-Tiêu chí 8–9 của [plan.md](plan.md#tiêu-chí-xong-đo-được); báo cáo có commit, binary, kết quả suite, trạng thái họ ở ba workspace.
+Tiêu chí 9 của [plan.md](plan.md#tiêu-chí-xong); báo cáo có commit, binary, kết quả suite, doctor ba workspace.

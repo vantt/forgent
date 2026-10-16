@@ -15,7 +15,7 @@ Wave 1. Nhánh `holder-lock/p02-crate-routes`, worktree `.claude/worktrees/hl-p0
 | `holders(resource)` | `fgos_process::facts::lock_holders(dev, ino)`; macOS `Unlistable` |
 | `guarantee(resource_dir)` | `{driver:"flock", exclusion:"kernel"\|"kernel-unmeasured"(macOS), borrow:"kernel-fd", holders:"listable"\|"unlistable"}`; fs mạng (`statfs` magic NFS/SMB/CIFS) → `none` |
 
-Handle là kiểu mờ; caller không thấy fd. Driver Windows: `cfg(windows)` trả `Unavailable` + `guarantee = {driver:"none", note:"chờ spike X1 (4.4)"}` (Lead D6). Không có kiểu chỉ-POSIX trong API công khai.
+Handle là kiểu mờ; caller không thấy fd. Driver Windows: `cfg(windows)` trả `Unavailable` + `guarantee = {driver:"unsupported", exclusion:"unsupported", note:"driver Windows ở 4.4 sau spike X1"}` (quyết định A2: không lùi về v1). Không có kiểu chỉ-POSIX trong API công khai.
 
 **State root (r4 §6.9):** `state_root() -> (PathBuf, Source)` đúng công thức [`store.rs:59-75`](../../packages/distribution/rust/src/store.rs) (`FGOS_STATE_ROOT` đã ghim thắng trước, rồi `FGOS_STATE_HOME` nguyên giá trị, `XDG_STATE_HOME/fgos`, `HOME`/`USERPROFILE` `/.local/state/fgos`). `resolve_machine_release_store_root` trong `store.rs` gọi hàm này (một nguồn). `lock_root() = state_root/locks`.
 
@@ -25,7 +25,7 @@ Handle là kiểu mờ; caller không thấy fd. Driver Windows: `cfg(windows)` 
 
 - `internal lock-fd --protocol 1 (--try|--wait-ms N|--shared-try|--borrowed-check <path>|--guarantee <dir>)`: đặt `CLOEXEC` lên fd 3 ngay lệnh đầu (luật 6.1.1 điểm 2), `flock` description kế thừa, in một dòng JSON, thoát. `--borrowed-check`: đúng ba điều r4 §6.4 điểm 2 (env chỉ đúng slot; `fstat(3)` cùng `dev:ino` với path; `LOCK_EX\|LOCK_NB` thành công).
 - `internal state-root --protocol 1`: in `{stateRoot, lockRoot, source}`.
-- `internal quiesce-scan --protocol 1 --workspace <root> [--state-root <p>]`: gọi `fgos_process::facts::scan`, in danh sách process fgOS liên quan (cmdline có entry fgOS, cwd trong một worktree của workspace, env `FGOS_STATE_ROOT`) kèm payload root; không phán cũ/mới (việc đó của P04).
+- `internal quiesce-scan --protocol 1 --workspace <root> [--state-root <p>]`: gọi `fgos_process::facts::scan`, in danh sách process fgOS liên quan (cmdline có entry fgOS, cwd trong một worktree của workspace, env `FGOS_STATE_ROOT`) kèm payload root; không phán gì (P04 dùng danh sách này để kiểm dừng-toàn-bộ).
 - `internal lock-borrow-vectors --protocol 1`: chạy `borrow_vectors::run`.
 - `--protocol` khác 1 → exit 4, stderr `host-version-mismatch`.
 
