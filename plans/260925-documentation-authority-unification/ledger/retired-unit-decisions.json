@@ -6051,15 +6051,21 @@
       "targetAnchor": "surface-taxonomy",
       "shownTargetDigest": "6783eba05403033970ee5832ace843ceccf7b816a0b115fa601d31c4921a311a",
       "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:106-114#unheaded-block-10 (historical witness at d23045c2de83e3508fda8fd2580b43ece2e1e046); unit SHA256 1162040b79db2beccc2fe163e3f008e931b8f6ce13d15113a3f2838abb9df2a5.\nTarget: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:70-70#surface-taxonomy (current lines); unit SHA256 acfa27bd06c8c37b033b7a44209aa880627f7de384684846e6f8bed12129c4f6.\nSource and target unit digests differ.\nTarget changed since last reviewed digest 0c50fe16d128e763572d7c17246d17511168a21279be7960e8975ff40f91f2be at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 2; 2 changed spellings/labels, 0 destination changes; 2 added, 0 removed.\nLink 1: \"none\" (none) → \"`request-kinds-and-routes.md`\" (../../../../core/skills/fgos-advise/references/request-kinds-and-routes.md); resolved none → core/skills/fgos-advise/references/request-kinds-and-routes.md.\nLink 2: \"none\" (none) → \"`fgos-advise`\" (../../../../core/skills/fgos-advise/SKILL.md); resolved none → core/skills/fgos-advise/SKILL.md.\nHeading depth: not a heading → 2; title \"Unheaded block 10\" → \"Surface Taxonomy\".\nWhole direct section differs; depth block → 2; 2 distinct link changes; normalized line order differs; 9 removed and 9 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-10 under docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#surface-taxonomy; source context \"Group Thinking Trigger Surface / Happy Path Routing\", target context \"Group Thinking Trigger Surface\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy. L10-32/A34: current renamed section supersedes the prior target at historical witness ce575996f; upstream 09fe3ab32 and f4ed59997 replaced that section. No unchanged-current-target assertion or historical approval is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "shownSourceText": "| User phrase | Expected route |\n|---|---|\n| \"run a panel on whether we should split this service\" | `architecture-panel` -> `fgos-architecture-panel` -> architecture advisory protocol -> `advise` |\n| \"compare these 3 implementation options\" | `option-comparison` when the options are concrete; upgrade to `architecture-panel` if repository investigation and a full architecture recommendation are requested |\n| \"red-team this architecture decision\" | `architecture-panel`; red-team remains a declared phase inside that protocol |\n| \"get independent opinions before I commit\" | `independent-feedback`; ask only for the subject if it is absent |\n| \"review this proposal with group thinking\" | `proposal-review`; use the proposal text or artifact already in scope |\n| \"business panel: should we change pricing?\" | `strategy-options` if alternatives must be generated/compared; `business-review` if a concrete pricing proposal exists |\n| \"coding panel: should this be a plugin or core feature?\" | `coding-design-panel` -> `architecture-panel` -> `advise`; never `fgos-code-panel` because no implementation was requested |",
       "shownSourceDigest": "1162040b79db2beccc2fe163e3f008e931b8f6ce13d15113a3f2838abb9df2a5",
       "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "reviewNote": "deep: historical witness d23045c2d unheaded-block-10 (106-114, user-phrase to route table, digest and ancestry Happy Path Routing recomputed) superseded by current Surface Taxonomy section 70, which says the route map moved to core/skills/fgos-advise/references/request-kinds-and-routes.md; Happy Path Routing no longer exists in the target, the two added links resolve, and the rationale names 09fe3ab32 and f4ed59997 which are ancestors of HEAD; prior target digest 0c50fe16 verified at 947f6169e and ce575996f; the dropped table lives in the named successor, accepted as a supersede.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-12-62751458b.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "acfa27bd06c8c37b033b7a44209aa880627f7de384684846e6f8bed12129c4f6",
       "targetAncestry": [
         "Group Thinking Trigger Surface"
-      ]
+      ],
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_3b6d77f7a7e766cc7d9dea1216cb699a",
@@ -6340,16 +6346,22 @@
       "targetAnchor": "b-add-fgos-advise",
       "shownTargetDigest": "245116acac90f31a527eca59811652803d0415b74a13e78f1585303b061f086e",
       "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:193-195#unheaded-block-20 (historical witness at d23045c2de83e3508fda8fd2580b43ece2e1e046); unit SHA256 6bea20cb9a1aa9d19c5c6e9ef6e1ccf1f7ec636b964c2aaa50521ba3c14d73d5.\nTarget: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:132-132#b-add-fgos-advise (current lines); unit SHA256 bb1ae7699ab58ef15b7ea30bf4d78b57cdd8eb69b9a4ef6a7713e83e50f9eb3c.\nSource and target unit digests differ.\nTarget changed since last reviewed digest 255adc34ce54db5747cd3c1a8d950b6d92f47a1ee0360648afd326076ae6281c at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 20\" → \"B. Add `fgos-advise`\".\nWhole direct section differs; depth block → 3; 0 distinct link changes; normalized line order differs; 3 removed and 4 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-20 under docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#b-add-fgos-advise; source context \"Group Thinking Trigger Surface / Alternatives Considered / B. Add `fgos-panel`\", target context \"Group Thinking Trigger Surface / Alternatives Considered\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy. L10-32/A34: current renamed section supersedes the prior target at historical witness ce575996f; upstream 09fe3ab32 and f4ed59997 replaced that section. No unchanged-current-target assertion or historical approval is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "shownSourceText": "Selected. It gives natural requests one memorable entrypoint, keeps all mapping\nin this canonical table, and delegates unchanged execution to the pack gate and\nregistered protocol. Existing specialist skills remain available.",
       "shownSourceDigest": "6bea20cb9a1aa9d19c5c6e9ef6e1ccf1f7ec636b964c2aaa50521ba3c14d73d5",
       "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
+      "reviewNote": "deep: historical block d23045c2d unheaded-block-20 (193-195, B. Add fgos-panel Selected paragraph) superseded by the current B. Add fgos-advise heading (132); the rewrite drops the pack-gate sentences and the specialist-skills sentence, which is the stated upstream rename; counts 3 removed and 4 added match; prior digest 255adc34 verified at 947f6169e.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-12-62751458b.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "bb1ae7699ab58ef15b7ea30bf4d78b57cdd8eb69b9a4ef6a7713e83e50f9eb3c",
       "targetAncestry": [
         "Group Thinking Trigger Surface",
         "Alternatives Considered"
-      ]
+      ],
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_d59cde69213f0af09c4d84d78e51aa68",

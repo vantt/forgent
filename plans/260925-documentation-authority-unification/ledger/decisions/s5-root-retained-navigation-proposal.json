@@ -3289,12 +3289,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
       "rationale": "Retain in place outside platform documentation authority: docs/specs/reading-map.md#reading-map-sản-phẩm, source unit SHA256 19c2ff247fb664d39a56d6194b1d47b6dce16ea18c8ee19369bd2884efbf918a, source file SHA256 22606348608523b94c6a25f1540007aec5512d340278efea1f835713a7e67250 at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. docs/reading-map.md section 5 contains seven labelled truth corrections plus the Session Identity entry; retained legacy docs/specs/reading-map.md is untouched. Pending independent review; no authority flip or truth certificate.",
-      "reviewNote": "mechanical: retain-in-place H1 of docs/specs/reading-map.md; file sha256 22606348 equals the pin and the rationale, unit digest 19c2ff24 recomputes equal; the rationale claim of seven labelled truth corrections plus the Session Identity entry in docs/reading-map.md was counted true (see 306); no target. Digests also hand-recomputed with an independent script: equal.",
+      "reviewNote": "deep: docs/specs/reading-map.md#reading-map-sản-phẩm unit digest 19c2ff24 reproduces; source file sha256 22606348 equals the rationale pin and is unchanged since 19ca8de23; no target or copy claimed and none exists; the seven-label sentence concerns docs/reading-map.md section 5 not this legacy file, which is true but carried over from the sibling row; legacy docs/specs/reading-map.md is byte-identical to its pin; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-09-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-03-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_587566a4401b92c909e862d72aad4af0",
@@ -3321,12 +3321,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
       "rationale": "Retain in place outside platform documentation authority: docs/reading-map.md#5-detailed-product-and-source-map, source unit SHA256 01204e281f177e257efc7b015d93651c874a149f0e4bb3a68054b943a66d2e91, source file SHA256 f4fce87549f728da23d13a9ff8c8c85efc397956bfacf5c5cf83badf13dc5abb at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. docs/reading-map.md section 5 contains seven labelled truth corrections plus the Session Identity entry; retained legacy docs/specs/reading-map.md is untouched. Pending independent review; no authority flip or truth certificate.",
-      "reviewNote": "deep: retain-in-place heading of docs/reading-map.md section 5; file sha256 f4fce875 equals the pin, unit digest 01204e28 equal; counted seven Truth correction labels plus the Session Identity entry in section 5 as the rationale says; no target, no carry.",
+      "reviewNote": "deep: docs/reading-map.md#5-detailed-product-and-source-map unit digest 01204e28 reproduces; source file sha256 f4fce875 equals the rationale pin and is unchanged since 19ca8de23; no target or copy claimed and none exists; section 5 of docs/reading-map.md holds seven Truth correction labels (lines 154 155 172 174 178 181 182) as stated; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-09-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-03-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_a4f7ef8823510c108225f922da1261ba",
@@ -3398,12 +3398,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
       "rationale": "Retain in place outside platform documentation authority: docs/specs/reading-map.md#unheaded-block-2, source unit SHA256 1c7bbf9e95dcf48b5e1f6de612a5baf82e268ea009eda1ff201ffa5dacdd1fbd, source file SHA256 22606348608523b94c6a25f1540007aec5512d340278efea1f835713a7e67250 at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. docs/reading-map.md section 5 contains seven labelled truth corrections plus the Session Identity entry; retained legacy docs/specs/reading-map.md is untouched. Pending independent review; no authority flip or truth certificate.",
-      "reviewNote": "deep: retain-in-place block of docs/specs/reading-map.md (lines 11-64, the 53-entry list); file sha256 22606348 equals pin, unit digest 1c7bbf9e equal; no target claimed; the phrase \"root instruction/navigation file\" is loose for a docs/specs file but not false.",
+      "reviewNote": "deep: retain-in-place docs/specs/reading-map.md unheaded-block-2 L11-64, unit digest 1c7bbf9e and file sha256 22606348 recomputed and equal at HEAD and the pin; the section 5 seven corrections statement verified as for its siblings; anchor ok",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-09-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-accounting-02-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_42444c5f44c4076300c2b9c56516c429",
@@ -3415,12 +3415,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
       "rationale": "Retain in place outside platform documentation authority: docs/reading-map.md#unheaded-block-16, source unit SHA256 607cd88b7a9323d610811e9bee61bbcb328ad12ba92f9f1b62defc5ab6c6db24, source file SHA256 f4fce87549f728da23d13a9ff8c8c85efc397956bfacf5c5cf83badf13dc5abb at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. docs/reading-map.md section 5 contains seven labelled truth corrections plus the Session Identity entry; retained legacy docs/specs/reading-map.md is untouched. Pending independent review; no authority flip or truth certificate.",
-      "reviewNote": "deep: retain-in-place block of docs/reading-map.md (lines 131-184); file sha256 f4fce875 equals pin, unit digest 607cd88b equal; the list is the 53 retained entries plus the labelled corrections, rationale count of seven corrections is true; no target.",
+      "reviewNote": "deep: retain-in-place docs/reading-map.md unheaded-block-16 L131-184, unit digest 607cd88b recomputed by extractor and by hand (seed 20261016) and file sha256 f4fce875 equal to the pin; anchor ok; rationale claims match the file",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-09-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-accounting-02-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     }
   ],
   "files": [
@@ -3517,13 +3517,13 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
       "rationale": "L10-3 / A31: historical native instruction/navigation identity claim_2bdbea8cb68325ec8b5b8d1a62447f4d records docs/reading-map.md#unheaded-block-16 at digest 9a08a47745ab1aaa1c00c35a181813b16ff2e9f12eb14332d3993c9009d36219. The numbered anchor identifies historical text, not a claim of current byte equality. Retain root instructions and repository navigation outside platform authority. Current changed unit is separately drafted at SYNC 59b9b7087; native sync must determine retained identity or predecessor gap, preserving all history. No platform copy, source-to-self carry proof, truth approval or retirement. Native sync at 19ca8de23908e161c34c91626e41041b7813167c confirms a predecessor gap; retain historical root/navigation identity outside platform scope. Current successor is separately native-resolved. No live old-anchor claim.",
-      "reviewNote": "deep: no-target retained row; historical docs/reading-map.md#unheaded-block-16 at witness 2300d6557 (L131-183) digest 9a08a477 recomputed by extractor and by hand and equal to the full digest quoted in the rationale; docs/reading-map.md is byte-identical to 19ca8de23, current successor claim_42444c5f is a separate current unit, so the gap and 'no live old-anchor claim' statements hold; the rationale mixes the earlier 'native sync must determine' wording with the later gap confirmation but nothing in it is false",
+      "reviewNote": "deep: retain-in-place gap for docs/reading-map.md unheaded-block-16 historical L131-183 digest 9a08a477 recomputed at 2300d6557 and by hand (seed 20261016); current unit is L131-184 so the one extra bullet is the Session Identity entry; no target, no platform copy, rationale history is truthful",
       "sourcePath": "docs/reading-map.md",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-accounting-01-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     }
   ]
 }

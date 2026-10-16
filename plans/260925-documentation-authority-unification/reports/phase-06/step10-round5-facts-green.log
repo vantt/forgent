@@ -1,0 +1,13 @@
+✔ independent facts reject a generator-consistent invented label and equal section claim (1.507296ms)
+✔ independent facts reject wrong removed and added line arrays (0.282515ms)
+✔ independent facts recompute link counts from the actual bound sections (0.15429ms)
+✔ independent facts accept actual delta and a real account label (0.665393ms)
+✔ independent equal-section facts reject replacement wording (0.221034ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 45.141176

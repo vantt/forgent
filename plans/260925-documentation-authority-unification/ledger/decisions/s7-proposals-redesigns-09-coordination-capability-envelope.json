@@ -1864,16 +1864,16 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "Weak-exact: current source and target unit digests are equal; placement ancestry is disclosed.; mandatory A36 deep read. place verbatim: Reject inference that engine retirement retires this alternative recommendation. Preserve the complete map proposal, with stale code citations literal; no assumption the proposed envelope shipped. Evidence: Source section 2 cites surviving src/runner/dispatch/assignment-runner.mjs and assignment.mjs, while the session-engine/store/coordination verbs it criticizes were removed in 2180b4e72. Source lines 34–43 recommends an alternative to graph-owned deliberation, not merely use of the old graph. Complete source heading docs/architect/proposals/coordination-capability-envelope.md#10-smallest-experiments-before-implementation-planning (lines 386–386) is carried at docs/platform/proposals/coordination-capability-envelope.md#10-smallest-experiments-before-implementation-planning (lines 413–413); Frozen map target and kind retained. Difference is limited to inserted candidate metadata, literal-source fencing, original pre-H1 YAML relocation or physical Markdown link rebasing; the committed accounting records exact line mapping and reversible transformations. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source and target digests recomputed by the extractor and equal to the shard; target ancestry equal; anchor 10-smallest-experiments-before-implementation-planning ok; rationale source and target path#anchor and line ranges equal the live units; text not read beyond what is stated",
+      "reviewNote": "deep: read source and target sections (2860 chars): identical, so the Weak-exact digest-equality claim is true; cited evidence checked where it is a file or line fact; anchors exist; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-01-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "c35e33bb5e4d4fc730ef52f6b5823601188c474715bde9adaf98fbfd83276415",
       "targetAncestry": [
         "Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_63e205836d7968a5141e0350e70ad8a8",

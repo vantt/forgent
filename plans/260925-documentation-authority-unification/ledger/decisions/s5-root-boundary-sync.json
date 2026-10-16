@@ -1357,13 +1357,13 @@
       "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
       "rationale": "L10-3 / A31: historical native instruction/navigation identity claim_d956ba3fb9a8cce9589194e5f59d021f records docs/specs/reading-map.md#unheaded-block-2 at digest 3cb37dbc28864019579211dcadd7e189fb667783946e770ad45a9a81c2ca5b30. The numbered anchor identifies historical text, not a claim of current byte equality. Retain root instructions and repository navigation outside platform authority. Current changed unit is separately drafted at SYNC 59b9b7087; native sync must determine retained identity or predecessor gap, preserving all history. No platform copy, source-to-self carry proof, truth approval or retirement. Final b01 clarification: the current merged section 5 carries 53 original entries, with seven entries explicitly labelled truth corrections and evidence, plus one verbatim Session Identity entry from main. It does not assert that all 53 are still verbatim or defer those seven known truth fixes to promotion; wrapper count is 36 in 55 directories (_shared has no SKILL.md). Historical source binding and current navigation are separately pending independent review. Native sync at 19ca8de23908e161c34c91626e41041b7813167c confirms a predecessor gap; retain historical root/navigation identity outside platform scope. Current successor is separately native-resolved. No live old-anchor claim.",
       "reviewStatus": "reviewed",
-      "reviewNote": "deep: no-target retained row; historical docs/specs/reading-map.md#unheaded-block-2 at witness 2300d6557 (L11-63) digest 3cb37dbc recomputed by extractor and by hand and equal to the full digest quoted in the rationale; docs/specs/reading-map.md is byte-identical to 19ca8de23, successor units exist as current claims, and the rationale facts at HEAD hold: seven 'Truth correction' labels in docs/reading-map.md, 36 wrappers (37 non-fgos directories minus _shared) in 55 directories and 54 SKILL.md; the rationale mixes the earlier 'native sync must determine' wording with the later gap confirmation but nothing in it is false",
+      "reviewNote": "deep: retain-in-place gap for docs/specs/reading-map.md unheaded-block-2 historical L11-63 digest 3cb37dbc recomputed at 2300d6557; the final b01 clarification is true at HEAD: section 5 of docs/reading-map.md has 54 bullets (53 original plus 1 Session Identity), 7 Truth correction labels, and the wrapper statement 36 in 55 directories with _shared lacking SKILL.md; the retained legacy map is byte-identical to its pin",
       "sourcePath": "docs/specs/reading-map.md",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-accounting-01-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     }
   ]
 }

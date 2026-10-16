@@ -1,0 +1,23 @@
+✔ frozen reviewed rationale survives regeneration until a binding changes (1.29847ms)
+✔ identical source occurrences require their own anchor or authenticated historical ordinal (0.420505ms)
+✔ heading comparison uses complete direct section and detects unlabelled payload loss (0.987781ms)
+✔ heading body equality and link rebases are explained independently of depth (0.44801ms)
+✔ correction before must occur in its own bound source or identify an intermediate witness (0.27704ms)
+✔ removed and added unrelated links are two changes and repeated changes are distinct pairs (0.218506ms)
+✔ whole-section audit cannot clear an unexplained delta with a generic reason (0.250976ms)
+✔ whole-section comparison reports reordered lines even with identical line multisets (0.152418ms)
+✔ whole-section normalization applies complete corrections before overlapping fragments (0.146127ms)
+✔ a repository directory trailing slash is a spelling change with the same destination (0.188152ms)
+✔ secondary section-accounting carriers do not masquerade as the primary source anchor (0.893025ms)
+✔ section witnesses reject same-side source loss and target additions (0.170381ms)
+✔ section witnesses require whole lines, never substring matches (0.115121ms)
+✔ label classifier matches only registered case-sensitive bounded ids (0.176355ms)
+✔ equal section movement never claims replacement even with an account label (0.175005ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 48.996191

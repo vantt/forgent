@@ -326,3 +326,13 @@ Relayed in assignment `unit-run-1792118148618-e4fd15ef/producer/1`; reports comm
 - **L10-32:** re-decide `claim_0145c13614b75e7da1321473afa8a0f1` and `claim_deb1e4063a1eabf13dd8ed523748039f` as pending supersede to current renamed sections, historical witness under A34 (upstream `09fe3ab32`, `f4ed59997`).
 
 Apply every still-matching ok verdict with verbatim notes; reopen changed rows. Author/docs turn: no native sync or review packs. Next = package, one native sync and one bounded independent re-review of every changed row, parts ≤60 entries. Existing global/cutover/consumer/checkpoint obligations remain.
+
+
+## L10-33–L10-34 — Lead A42 round-5 author instruction
+
+Relayed in assignment `unit-run-1792126341980-e0c35701/producer/1`, after committed round-5 reports at `4901bf25c` over content `62751458b` / request `f1f414b02`. Every Notes/Concerns read. Apply every binding-matching ok verdict with verbatim notes; metadata alone is not binding drift. These are Lead directions, not producer review judgments.
+
+- **L10-33:** remove the unanchored case-insensitive label classifier and its fabricated fallback. Select case-sensitive whole-token ids from this owner-answer registry and require each in its own immutable claim account. Equal sections get no replacement wording; actual removed/added lines are printed. Unexplained differences are conservation findings; repair the actual carrier. Regenerate all affected Section accounting rationales, including the reported rationale rows and claim_4eeb2f406288458e61bad21531966ab1. Correct claim_08f9b4c1 / claim_61244b0a last-reviewed wording. The prior schema's digest text is never a correction label.
+- **L10-34:** tests first for same-side self-witness rejection (path, anchor and commit) and whole-line witnesses. Independent author diagnostics recompute label-account membership, section equality/order, removed/added lines and links from authenticated source/target files; generator equality is not truth evidence. A9 protects native gates/checkers, vocabulary, extractor and baselines.
+
+Reviewer commands state `NODE_OPTIONS=--max-old-space-size=3072` (roughly 3 GiB heap) and accept explicit external output paths/directories. Author turn performs no native sync or review packs; next = package with one native sync and one bounded re-review of changed rows/tools in small files. Merge `1d92a7229` adds plan files only: no docs source delta to re-carry under A31. Existing truth/global/consumer/cutover obligations remain open.

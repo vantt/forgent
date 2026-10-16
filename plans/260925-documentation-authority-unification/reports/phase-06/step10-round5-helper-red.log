@@ -1,0 +1,89 @@
+✔ frozen reviewed rationale survives regeneration until a binding changes (1.194853ms)
+✔ identical source occurrences require their own anchor or authenticated historical ordinal (0.407675ms)
+✔ heading comparison uses complete direct section and detects unlabelled payload loss (0.912728ms)
+✔ heading body equality and link rebases are explained independently of depth (0.418174ms)
+✔ correction before must occur in its own bound source or identify an intermediate witness (0.282015ms)
+✔ removed and added unrelated links are two changes and repeated changes are distinct pairs (0.214896ms)
+✔ whole-section audit cannot clear an unexplained delta with a generic reason (0.214745ms)
+✔ whole-section comparison reports reordered lines even with identical line multisets (0.149186ms)
+✔ whole-section normalization applies complete corrections before overlapping fragments (0.150737ms)
+✔ a repository directory trailing slash is a spelling change with the same destination (0.202205ms)
+✔ secondary section-accounting carriers do not masquerade as the primary source anchor (0.833441ms)
+✖ section witnesses reject same-side source loss and target additions (0.632174ms)
+✖ section witnesses require whole lines, never substring matches (0.176082ms)
+✖ label classifier matches only registered case-sensitive bounded ids (0.075219ms)
+✖ equal section movement never claims replacement even with an account label (0.092322ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 11
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 48.026592
+
+✖ failing tests:
+
+test at test/scripts/doc-rationale-author.test.mjs:73:1
+✖ section witnesses reject same-side source loss and target additions (0.632174ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 2
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale-author.test.mjs:77:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 2,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/scripts/doc-rationale-author.test.mjs:80:1
+✖ section witnesses require whole lines, never substring matches (0.176082ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 2
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale-author.test.mjs:82:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 2,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/scripts/doc-rationale-author.test.mjs:84:1
+✖ label classifier matches only registered case-sensitive bounded ids (0.075219ms)
+  TypeError: h.sectionAccountLabels is not a function
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale-author.test.mjs:85:21)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7)
+
+test at test/scripts/doc-rationale-author.test.mjs:89:1
+✖ equal section movement never claims replacement even with an account label (0.092322ms)
+  TypeError: h.classifySectionAccounting is not a function
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale-author.test.mjs:91:17)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7)

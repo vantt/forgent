@@ -11,6 +11,6 @@ if not output.is_absolute() or output.resolve().is_relative_to(root) or not outp
 if output.is_symlink() or output.exists() and output.stat().st_nlink != 1:
  parser.error('unsafe output: external scratch file must not be a symlink or hardlink')
 output.parent.mkdir(parents=True, exist_ok=True)
-env=os.environ.copy(); env.pop('CLAUDE_CODE_SESSION_ID',None);env['TMPDIR']='/tmp/fgos-work'
-script=root/'plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-rebuild.mjs'
-subprocess.run(['node',str(script),'--check','--output',str(output)],cwd=root,env=env,check=True)
+env=os.environ.copy(); env.pop('CLAUDE_CODE_SESSION_ID',None);env['TMPDIR']='/tmp/fgos-work';env.setdefault('NODE_OPTIONS','--max-old-space-size=3072')
+script=root/'plans/260925-documentation-authority-unification/reports/phase-06/step10-independent-rationale-audit.mjs'
+subprocess.run(['node',str(script),'--output',str(output)],cwd=root,env=env,check=True)

@@ -1,0 +1,17 @@
+{
+  "counts": {
+    "files": 609,
+    "byStatus": {
+      "promoted": 3,
+      "candidate": 214,
+      "legacy-current": 0,
+      "non-authority": 1,
+      "unrouted": 391
+    },
+    "exemptUnrouted": 302,
+    "checked": 217,
+    "findings": 0,
+    "byType": {}
+  },
+  "findings": []
+}

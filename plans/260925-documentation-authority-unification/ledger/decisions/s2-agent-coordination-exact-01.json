@@ -2078,11 +2078,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: move into the literal history snapshot; source block occurs byte-for-byte exactly once in the target section so the verbatim sentence is true; the 3 listed links are the snapshot section's own links and each source and resolved destination recomputes; 0 removed and 164 added lines recomputed",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-62751458b.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "db94cf7b2b9b21d5eb2371632789a49359037830e65e86442fb922d756d859f4",
       "targetAncestry": [
         "Historical File: Group Thinking Trigger Surface"
-      ]
+      ],
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_12746c423e60cdb38d2b80fad595e4cd",
@@ -2093,11 +2099,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: move into the literal history snapshot; source block occurs byte-for-byte exactly once in the target section so the verbatim sentence is true; link lines identical to the sibling rows because the whole snapshot section is the target, 0 removed and 164 added recomputed",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-62751458b.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "db94cf7b2b9b21d5eb2371632789a49359037830e65e86442fb922d756d859f4",
       "targetAncestry": [
         "Historical File: Group Thinking Trigger Surface"
-      ]
+      ],
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_898ee653f5ee715980c7d4d6f6225c93",
@@ -2108,11 +2120,17 @@
       "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/architecture/group-thinking-trigger-surface.md",
       "targetAnchor": "literal-snapshot",
       "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: move into the literal history snapshot; 13-line source block occurs byte-for-byte exactly once in the target section, verbatim sentence true; 0 removed and 164 added recomputed, link lines match the target section",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-62751458b.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "db94cf7b2b9b21d5eb2371632789a49359037830e65e86442fb922d756d859f4",
       "targetAncestry": [
         "Historical File: Group Thinking Trigger Surface"
-      ]
+      ],
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_c7cca1cdeb6ef62b78ffb0c78cae1c2e",

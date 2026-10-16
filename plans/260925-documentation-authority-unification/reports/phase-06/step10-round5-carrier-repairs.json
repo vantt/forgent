@@ -1,0 +1,37 @@
+{
+  "reason": "Same-side source witnesses cannot prove carriage; complete former runner sections are now retained in distinct live historical carrier sections. Existing current correction labels unchanged.",
+  "carriers": [
+    {
+      "claimId": "claim_552ef3d6e22bac10c24cc31e48463d50",
+      "path": "docs/platform/runner/spec.md",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "data-dictionary",
+      "sourceSectionSHA256": "66b8d6214e0ee226ba4e2281b69b31149136d529985f4ad47947d9b812a9c6ff",
+      "heading": "Historical source section 552ef3d6"
+    },
+    {
+      "claimId": "claim_0686418ae7571d82eade8059c698709d",
+      "path": "docs/platform/runner/spec.md",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "actors-access",
+      "sourceSectionSHA256": "dc4aa74f90f5d31ad01b168b95def5e58294caf629f7e3547e79a6f6e7c283d8",
+      "heading": "Historical source section 0686418a"
+    },
+    {
+      "claimId": "claim_099eb566c825967cf35f9397f2d7b947",
+      "path": "docs/platform/runner/spec.md",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "edge-cases-settled",
+      "sourceSectionSHA256": "d79fe195afbe5a4dc3a512da0701f3755e8b75033f4c0b7cbc3b2f19c036a6ac",
+      "heading": "Historical source section 099eb566"
+    },
+    {
+      "claimId": "claim_4efee765e5a47fc42f4d9cccc7a53191",
+      "path": "docs/platform/runner/spec.md",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "pointers-implementation",
+      "sourceSectionSHA256": "72979b2afcaaf5abc5490bc6e660241e85b7ca77c871f83633f5107c814c33a0",
+      "heading": "Historical source section 4efee765"
+    }
+  ]
+}

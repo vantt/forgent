@@ -21,17 +21,17 @@
       "rationale": "A22/A31/L10-23–L10-27: native predecessor from 345f15d95 is superseded by the current same-section unit after authorized legacy destination restoration or scaffold/refuseHelp code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync287-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval.",
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792116045118-73cfbb42@2026-10-16",
-      "reviewNote": "deep: vision.md unheaded-block-11 L61-67 (Design Direction table): word diff of the 345f15d95 unit against the current unit is exactly the three Preserved from destinations (spec.md, architecture/external-provider-protocol.md, architecture/node-to-rust-migration.md to the three ../../architect/host-invocation-routing/ files), i.e. the legacy destination restoration of L10-23; the unit digest recorded as source reproduces at 345f15d95 and the target digest equals the current unit at the same anchor, so the claim that the Complete immutable before and after text is recorded in step10-sync287-predecessor-reconciliation.json is true (texts equal my recomputation); the registry record moved from units to identityGaps with identityStatus identity-gap and the new successor unit exists, row equals the committed shard row, pending, no approval; rationale is generic but not false: one sentence shared by all four rows names every possible cause (legacy destination restoration or scaffold or refuseHelp citation correction) instead of the one that applies; claimKind specification is a vocabulary difference from the registry kind, as accepted before.",
+      "reviewNote": "deep: native predecessor vision.md read as word diff of the 345f15d95 unit against the current unit at unheaded-block-11: only the three Preserved from link destinations change (legacy destination restoration); source digest d02d7891 reproduces at 345f15d95 under the predecessor anchor and target digest ae9e5973 equals the current unit; the rationale names the delta only generically (destination restoration or citation correction) but the difference is one of the two and fully recorded in the reconciliation file; shard row did not exist at 287a22d33 so frozen text equals the 9b0526380 row",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-accounting-06-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-04-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "ae9e5973a1589865f79a8daee8e14aa245ce6a8b7a0f7af3978006e63771ebb2",
       "targetAncestry": [
         "Host Invocation Vision",
         "5. Design Direction"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_a4ed6ca5cfd26790037b35d1c99373b2",
@@ -44,10 +44,10 @@
       "rationale": "A22/A31/L10-23–L10-27: native predecessor from 345f15d95 is superseded by the current same-section unit after authorized legacy destination restoration or scaffold/refuseHelp code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync287-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval.",
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792116045118-73cfbb42@2026-10-16",
-      "reviewNote": "deep: packaging-distribution spec.md unheaded-block-75 L438-442: the only delta is the destination ../system-architecture/architecture/workspace-topology.md to ../../architect/workspace-topology.md under the unchanged label (L10-26); the unit digest recorded as source reproduces at 345f15d95 and the target digest equals the current unit at the same anchor, so the claim that the Complete immutable before and after text is recorded in step10-sync287-predecessor-reconciliation.json is true (texts equal my recomputation); the registry record moved from units to identityGaps with identityStatus identity-gap and the new successor unit exists, row equals the committed shard row, pending, no approval; rationale is generic but not false: one sentence shared by all four rows names every possible cause (legacy destination restoration or scaffold or refuseHelp citation correction) instead of the one that applies; claimKind specification is a vocabulary difference from the registry kind, as accepted before.",
+      "reviewNote": "deep: native predecessor spec.md read as word diff of the 345f15d95 unit against the current unit at unheaded-block-75: only the workspace-topology link destination changes under the same label; source digest 9aefc76d reproduces at 345f15d95 under the predecessor anchor and target digest 19851b06 equals the current unit; the rationale names the delta only generically (destination restoration or citation correction) but the difference is one of the two and fully recorded in the reconciliation file; shard row did not exist at 287a22d33 so frozen text equals the 9b0526380 row",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-accounting-06-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-04-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "19851b062b9026d35b203683af36c1a27d3cf542f557549831e1e860138dee6a",
       "targetAncestry": [
@@ -55,7 +55,7 @@
         "Retained Workspace Runtime Model Source Detail",
         "Workspace Runtime Model"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_c0f157804addf46fdb20b9c61882794b",
@@ -68,10 +68,10 @@
       "rationale": "A22/A31/L10-23–L10-27: native predecessor from 345f15d95 is superseded by the current same-section unit after authorized legacy destination restoration or scaffold/refuseHelp code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync287-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval.",
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792116045118-73cfbb42@2026-10-16",
-      "reviewNote": "deep: h-51f5cd7279fd.md unheaded-block-26 L456-467: the only delta is bin/fgos.mjs:4415,4461 to 4415,4503 (L10-24 refuseHelp); the unit digest recorded as source reproduces at 345f15d95 and the target digest equals the current unit at the same anchor, so the claim that the Complete immutable before and after text is recorded in step10-sync287-predecessor-reconciliation.json is true (texts equal my recomputation); the registry record moved from units to identityGaps with identityStatus identity-gap and the new successor unit exists, row equals the committed shard row, pending, no approval; rationale is generic but not false: one sentence shared by all four rows names every possible cause (legacy destination restoration or scaffold or refuseHelp citation correction) instead of the one that applies; claimKind specification is a vocabulary difference from the registry kind, as accepted before.",
+      "reviewNote": "deep: native predecessor h-51f5cd7279fd.md read as word diff of the 345f15d95 unit against the current unit at unheaded-block-26: only bin/fgos.mjs:4415,4461 becomes 4415,4503; source digest 0dce2b78 reproduces at 345f15d95 under the predecessor anchor and target digest 0f61fde6 equals the current unit; the rationale names the delta only generically (destination restoration or citation correction) but the difference is one of the two and fully recorded in the reconciliation file; shard row did not exist at 287a22d33 so frozen text equals the 9b0526380 row",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-accounting-06-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-04-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "0f61fde6bc880cb19623ecde63a6a137571884e4b6ae2f8b24b8a585b25d600a",
       "targetAncestry": [
@@ -79,7 +79,7 @@
         "Behaviors & Operations",
         "Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_647a9d5f06216a5e9d6fa267e77cbf03",
@@ -92,16 +92,16 @@
       "rationale": "A22/A31/L10-23–L10-27: native predecessor from 345f15d95 is superseded by the current same-section unit after authorized legacy destination restoration or scaffold/refuseHelp code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync287-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval.",
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792116045118-73cfbb42@2026-10-16",
-      "reviewNote": "deep: h-f34e0d170d89/spec.md unheaded-block-2 L23: the only delta is the inverted pointer pair 4640-4643; 4415-4380 to 4414-4417 (L10-24 scaffold); the unit digest recorded as source reproduces at 345f15d95 and the target digest equals the current unit at the same anchor, so the claim that the Complete immutable before and after text is recorded in step10-sync287-predecessor-reconciliation.json is true (texts equal my recomputation); the registry record moved from units to identityGaps with identityStatus identity-gap and the new successor unit exists, row equals the committed shard row, pending, no approval; rationale is generic but not false: one sentence shared by all four rows names every possible cause (legacy destination restoration or scaffold or refuseHelp citation correction) instead of the one that applies; claimKind specification is a vocabulary difference from the registry kind, as accepted before.",
+      "reviewNote": "deep: native predecessor spec.md read as word diff of the 345f15d95 unit against the current unit at unheaded-block-2: only the pointer pair 4640-4643; 4415-4380 becomes 4414-4417; source digest 35107e63 reproduces at 345f15d95 under the predecessor anchor and target digest c354e335 equals the current unit; the rationale names the delta only generically (destination restoration or citation correction) but the difference is one of the two and fully recorded in the reconciliation file; shard row did not exist at 287a22d33 so frozen text equals the 9b0526380 row",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-accounting-06-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-04-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "c354e3357585a5cc6bce8dd57d833b0e85d3f19e58ba6e81e9d6f562aca53edc",
       "targetAncestry": [
         "Added in candidate: Runner Pointers (implementation)"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     }
   ]
 }

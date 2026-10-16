@@ -212,16 +212,16 @@
         ],
         "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
       },
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source and target digests recomputed by the extractor and equal to the shard; target ancestry equal; anchor active-proposals ok; rationale source and target path#anchor and line ranges equal the live units; text not read beyond what is stated",
+      "reviewNote": "deep: read source and target sections (824 chars): identical, so the Weak-exact digest-equality claim is true; cited evidence checked where it is a file or line fact; anchors exist; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-01-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "35d38e36aa9ae5117a3aba40a90d734ccb07badb2f8c4c7e19984e6f6c0b1b93",
       "targetAncestry": [
         "Architect-Level Proposals"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_76cd5a79f79a23ddf7bf30b53312aadf",

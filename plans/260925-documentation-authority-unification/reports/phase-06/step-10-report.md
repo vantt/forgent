@@ -1,3 +1,21 @@
+# Step 10 round-5 author corrections complete — package next
+
+Assignment `unit-run-1792126341980-e0c35701/producer/1`; input `1d92a7229`; reviewed content `62751458b`, request `f1f414b02`, reports `4901bf25c`. Every29 Notes/Concerns read. Lead L10-33/L10-34 recorded under A42. Merge adds plans only: no docs-source delta requiring A31 re-carry.
+
+**54 rationales regenerated:52 Section accounting rows +2 last-reviewed nits;36 reviewed rows reopened pending;zero binding-field changes.** All432 binding-matching claim-row ok instances applied/preserved with verbatim notes, including repeated-report instances; the audit retains every table note (511 ok /21 rework across532 table verdicts; non-decision evidence is not stamped as a claim approval). Changed prose inherits no approval. The fabricated45-label fallback is gone;20 equal-section moves no longer claim replacement. Case-sensitive whole-token registry labels and exact real deltas replace the old SHA256 classifier.
+
+**Four self-witnessed source sections repaired with distinct complete live historical carriers in `docs/platform/runner/spec.md`:12 new native units /zero old-unit loss; native sync owed.** Existing explicit candidate additions/corrections are counted as additions. Same-side witnesses and substring matches are rejected. No native sync or review pack this turn.
+
+**Independent checker:12,895 rows /92 shards /zero findings;70 historical source-witness limits explicit.** It reads actual files/git witnesses and computes label-account membership, sections, removed/added lines, links, citations and named carrier lines independently of the generator. Coverage includes718 structured source citations,261 section assertions and719 link assertions; older hand prose retains its prior review, with binding checks rather than an inferred natural-language truth proof. Separate author regeneration check54/54 is stable. Frozen117 rationale text is untouched.
+
+**500/500 document-tool tests pass.** Broader scripts suite1,037/1,039: undefined fixture env-root path and confinement-denied worktree creation remain separately recorded; no bypass. Candidate-status zero findings/unresolved links; A/B/H pass; I frozen bytes unchanged/current reader links equal HEAD, with its existing historical baseline delta retained. Ownership zero target drift/new active collision/native duplicate; link replay366+98+4 zero findings. Scoped FAST D zero fatal both priors together/each. E remains open16 partial /25 not-reviewed /one identical-owner group /two gaps /313 reverse units; not closure.
+
+Evidence: [audit](step10-round5-final-audit.json), [independent checker](step10-round5-independent-consistency.json), [54 edits](step10-round5-rationale-edits.json), [applications](step10-round5-review-application.json), [checks](step10-round5-checks.json), [fast D/E](step10-round5-fast-check.json), [reproduction](step10-round5-reproduction.json), [tooling](tooling.md#l10-33l10-34--tests-first-author-diagnostics-and-classifier-repair). No native gate/checker/vocabulary/extractor/baseline/legacy/runtime authority edit; protected bytes and registry unchanged. GitNexus index misses author helpers; static callsites and its limited low-risk detect result are disclosed.
+
+**NEXT = PACKAGE:** one native sync; refresh all actual drift/dependent evidence; one bounded independent re-review of only this turn's54 changed rows, carrier changes, tools/tests/reproduction and resulting native transitions. Use small parts (target≤20 entries and≤400KB), committed after snapshots, no producer-selected seeds/verdicts. Existing global E/A34/truth/consumer/cutover/checkpoint/scorecard obligations remain. No new owner-direction blocker; broader-suite limits above remain. Phase6 stays open. Runner commits; no fgOS CLI or author Git write, no workspace `.fgos` writes. MDView callable tool is unavailable; CLI preview would write an external registration database beyond the grant, so no preview URL.
+
+---
+
 # Step 10 package at 62751458b complete — independent review next
 
 Assignment `unit-run-1792122626822-ceb0cdd9/producer/1`; Author session `codex-session:unit-run-1792122626822-ceb0cdd9@2026-10-16`. Content/SYNC **`62751458b22b47e930dc33b8501d07798b91ace3`**, author `eb793bc63`, comparison `9b0526380`. Main merge changes no docs; no re-carry blocker. Runner owns commits. Phase 6 remains open.

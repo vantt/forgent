@@ -32,12 +32,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "L10-3: retain AGENTS.md#always-do as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source digest recomputed by the extractor and equal to the shard; rationale names AGENTS.md#always-do equal to the registry; AGENTS.md sha256 47f3a4e5 equals the rationale pin at 59b9b7087 and the file at the content commit; target none by design; text not read beyond what is stated",
+      "reviewNote": "mechanical: AGENTS.md#always-do recomputes to e51ed959 from the HEAD file and equals the shard; rationale names the same anchor; file sha256 47f3a4e5 equals the rationale pin at 59b9b7087; target none by design; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-01-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-01-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_fa3bda92497320da1952eb67f4d954ef",
@@ -49,12 +49,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "L10-3: retain AGENTS.md#before-touching-code as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source digest recomputed by the extractor and equal to the shard; rationale names AGENTS.md#before-touching-code equal to the registry; AGENTS.md sha256 47f3a4e5 equals the rationale pin at 59b9b7087 and the file at the content commit; target none by design; text not read beyond what is stated",
+      "reviewNote": "mechanical: AGENTS.md#before-touching-code recomputes to 8e8826de from the HEAD file and equals the shard; rationale names the same anchor; file sha256 47f3a4e5 equals the rationale pin at 59b9b7087; target none by design; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-01-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-01-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_00ee16658d1baf1ac05b8e371408fd01",
@@ -66,12 +66,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "L10-3: retain AGENTS.md#changing-a-locked-law as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source digest recomputed by the extractor and equal to the shard; rationale names AGENTS.md#changing-a-locked-law equal to the registry; AGENTS.md sha256 47f3a4e5 equals the rationale pin at 59b9b7087 and the file at the content commit; target none by design; text not read beyond what is stated",
+      "reviewNote": "mechanical: AGENTS.md#changing-a-locked-law recomputes to 52fb0a5c from the HEAD file and equals the shard; rationale names the same anchor; file sha256 47f3a4e5 equals the rationale pin at 59b9b7087; target none by design; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-01-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-01-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_7b36640f7d6ced0d3f089a419f5d26ff",
@@ -83,12 +83,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "L10-3: retain AGENTS.md#cli as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source digest recomputed by the extractor and equal to the shard; rationale names AGENTS.md#cli equal to the registry; AGENTS.md sha256 47f3a4e5 equals the rationale pin at 59b9b7087 and the file at the content commit; target none by design; text not read beyond what is stated",
+      "reviewNote": "mechanical: AGENTS.md#cli recomputes to ed59f3cf from the HEAD file and equals the shard; rationale names the same anchor; file sha256 47f3a4e5 equals the rationale pin at 59b9b7087; target none by design; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-01-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-01-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_a700bf68bba6456dc5d22693e0a42ff4",
@@ -100,12 +100,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "L10-3: retain AGENTS.md#decision-question-template as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source digest recomputed by the extractor and equal to the shard; rationale names AGENTS.md#decision-question-template equal to the registry; AGENTS.md sha256 47f3a4e5 equals the rationale pin at 59b9b7087 and the file at the content commit; target none by design; text not read beyond what is stated",
+      "reviewNote": "mechanical: AGENTS.md#decision-question-template recomputes to e1f3e3fd from the HEAD file and equals the shard; rationale names the same anchor; file sha256 47f3a4e5 equals the rationale pin at 59b9b7087; target none by design; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-01-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-01-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_e922726b8953ed0cc00db6c4cdad3b48",
@@ -117,12 +117,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "L10-3: retain AGENTS.md#decision-question-template-1 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source digest recomputed by the extractor and equal to the shard; rationale names AGENTS.md#decision-question-template-1 equal to the registry; AGENTS.md sha256 47f3a4e5 equals the rationale pin at 59b9b7087 and the file at the content commit; target none by design; text not read beyond what is stated",
+      "reviewNote": "mechanical: AGENTS.md#decision-question-template-1 recomputes to 0083e749 from the HEAD file and equals the shard; rationale names the same anchor; file sha256 47f3a4e5 equals the rationale pin at 59b9b7087; target none by design; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-01-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-01-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_22c44c85aa5a35949e59c1fa1a36bd1a",
@@ -134,12 +134,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "L10-3: retain AGENTS.md#definition-of-done-platform-foundations-l5 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source digest recomputed by the extractor and equal to the shard; rationale names AGENTS.md#definition-of-done-platform-foundations-l5 equal to the registry; AGENTS.md sha256 47f3a4e5 equals the rationale pin at 59b9b7087 and the file at the content commit; target none by design; text not read beyond what is stated; source digest re-hashed independently in Python (seed 20261017)",
+      "reviewNote": "deep: read the retained unit (heading:2, 1162 chars) at AGENTS.md#definition-of-done-platform-foundations-l5; it is plain always-loaded instruction text with no platform carrier claimed, so retain-in-place is truthful; AGENTS.md#definition-of-done-platform-foundations-l5 recomputes to 660e4921 from the HEAD file and equals the shard; rationale names the same anchor; file sha256 47f3a4e5 equals the rationale pin at 59b9b7087; target none by design; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-01-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-01-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_67eb8d55ba3230adf56b929b3b549cdc",
@@ -151,12 +151,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "L10-3: retain AGENTS.md#dispatch-routing-work-to-an-executor as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source digest recomputed by the extractor and equal to the shard; rationale names AGENTS.md#dispatch-routing-work-to-an-executor equal to the registry; AGENTS.md sha256 47f3a4e5 equals the rationale pin at 59b9b7087 and the file at the content commit; target none by design; text not read beyond what is stated",
+      "reviewNote": "mechanical: AGENTS.md#dispatch-routing-work-to-an-executor recomputes to 3bbd7ce4 from the HEAD file and equals the shard; rationale names the same anchor; file sha256 47f3a4e5 equals the rationale pin at 59b9b7087; target none by design; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-01-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-01-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_2e45cfdcd3f2bf602787b37feac667f3",
@@ -168,12 +168,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "L10-3: retain AGENTS.md#documentation-viewing-mdview as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source digest recomputed by the extractor and equal to the shard; rationale names AGENTS.md#documentation-viewing-mdview equal to the registry; AGENTS.md sha256 47f3a4e5 equals the rationale pin at 59b9b7087 and the file at the content commit; target none by design; text not read beyond what is stated",
+      "reviewNote": "mechanical: AGENTS.md#documentation-viewing-mdview recomputes to 7d84eb3c from the HEAD file and equals the shard; rationale names the same anchor; file sha256 47f3a4e5 equals the rationale pin at 59b9b7087; target none by design; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-01-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-01-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_6acc93d03a89146ebf7f4903938fabd9",
@@ -185,12 +185,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "L10-3: retain AGENTS.md#fgos-effective-instructions as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source digest recomputed by the extractor and equal to the shard; rationale names AGENTS.md#fgos-effective-instructions equal to the registry; AGENTS.md sha256 47f3a4e5 equals the rationale pin at 59b9b7087 and the file at the content commit; target none by design; text not read beyond what is stated",
+      "reviewNote": "mechanical: AGENTS.md#fgos-effective-instructions recomputes to 10e4f148 from the HEAD file and equals the shard; rationale names the same anchor; file sha256 47f3a4e5 equals the rationale pin at 59b9b7087; target none by design; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-01-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-01-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_9039ff2ea2cb745f4758ba64efaf4d1b",
@@ -202,12 +202,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "L10-3: retain AGENTS.md#forgent as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source digest recomputed by the extractor and equal to the shard; rationale names AGENTS.md#forgent equal to the registry; AGENTS.md sha256 47f3a4e5 equals the rationale pin at 59b9b7087 and the file at the content commit; target none by design; text not read beyond what is stated",
+      "reviewNote": "mechanical: AGENTS.md#forgent recomputes to 0c141b80 from the HEAD file and equals the shard; rationale names the same anchor; file sha256 47f3a4e5 equals the rationale pin at 59b9b7087; target none by design; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-01-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-01-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_fd05edc9de6352f95be164482329687d",
@@ -219,12 +219,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "L10-3: retain AGENTS.md#gitnexus-code-intelligence as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source digest recomputed by the extractor and equal to the shard; rationale names AGENTS.md#gitnexus-code-intelligence equal to the registry; AGENTS.md sha256 47f3a4e5 equals the rationale pin at 59b9b7087 and the file at the content commit; target none by design; text not read beyond what is stated",
+      "reviewNote": "mechanical: AGENTS.md#gitnexus-code-intelligence recomputes to 150e95a6 from the HEAD file and equals the shard; rationale names the same anchor; file sha256 47f3a4e5 equals the rationale pin at 59b9b7087; target none by design; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-01-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-01-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_ac6849769045271a57023dd684980fe6",
@@ -236,12 +236,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "L10-3: retain AGENTS.md#installsetupdoctor-gate as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source digest recomputed by the extractor and equal to the shard; rationale names AGENTS.md#installsetupdoctor-gate equal to the registry; AGENTS.md sha256 47f3a4e5 equals the rationale pin at 59b9b7087 and the file at the content commit; target none by design; text not read beyond what is stated",
+      "reviewNote": "deep: read the retained unit (heading:2, 1088 chars) at AGENTS.md#installsetupdoctor-gate; it is plain always-loaded instruction text with no platform carrier claimed, so retain-in-place is truthful; AGENTS.md#installsetupdoctor-gate recomputes to 47395663 from the HEAD file and equals the shard; rationale names the same anchor; file sha256 47f3a4e5 equals the rationale pin at 59b9b7087; target none by design; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-01-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-01-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_9474ae42b4d6e079fcf33fec49e746fa",
@@ -253,12 +253,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "L10-3: retain AGENTS.md#law as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source digest recomputed by the extractor and equal to the shard; rationale names AGENTS.md#law equal to the registry; AGENTS.md sha256 47f3a4e5 equals the rationale pin at 59b9b7087 and the file at the content commit; target none by design; text not read beyond what is stated",
+      "reviewNote": "mechanical: AGENTS.md#law recomputes to 28440004 from the HEAD file and equals the shard; rationale names the same anchor; file sha256 47f3a4e5 equals the rationale pin at 59b9b7087; target none by design; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-01-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-01-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_ccf1acf857fc4e9757a933ca22ed34f1",
@@ -270,12 +270,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
       "rationale": "Retain in place outside platform documentation authority: AGENTS.md#legacy-node-cli-ownership-boundary, source unit SHA256 fed79e2e75d57ab326d97e74e6b2cd4b8fd1474aa6df3abb284ae2bb6d46f817, source file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. Pending independent review; no authority flip or truth certificate.",
-      "reviewNote": "deep: retain-in-place heading row with no target; AGENTS.md sha256 47f3a4e5 equals the file hash quoted in the rationale, the quoted unit digest fed79e2e recomputes equal, the section \"Legacy-Node CLI Ownership Boundary\" is at line 83; nothing carried, nothing added; the rationale sentence \"Pending independent review\" is stale on a reviewed row but is the repo-wide convention (452 rows). Digests also hand-recomputed with an independent script: equal.",
+      "reviewNote": "deep: AGENTS.md#legacy-node-cli-ownership-boundary unit digest fed79e2e reproduces; source file sha256 47f3a4e5 equals the rationale pin and is unchanged since 19ca8de23; no target or copy claimed and none exists; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-09-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-03-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_133b6f931d35a06604813e97ac11bd8f",
@@ -287,12 +287,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "L10-3: retain AGENTS.md#never-do as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source digest recomputed by the extractor and equal to the shard; rationale names AGENTS.md#never-do equal to the registry; AGENTS.md sha256 47f3a4e5 equals the rationale pin at 59b9b7087 and the file at the content commit; target none by design; text not read beyond what is stated",
+      "reviewNote": "mechanical: AGENTS.md#never-do recomputes to f081560d from the HEAD file and equals the shard; rationale names the same anchor; file sha256 47f3a4e5 equals the rationale pin at 59b9b7087; target none by design; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-01-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-01-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_fde89656fbadabacb69e8f793b223377",
@@ -304,12 +304,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "L10-3: retain AGENTS.md#platform-operating-laws as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source digest recomputed by the extractor and equal to the shard; rationale names AGENTS.md#platform-operating-laws equal to the registry; AGENTS.md sha256 47f3a4e5 equals the rationale pin at 59b9b7087 and the file at the content commit; target none by design; text not read beyond what is stated",
+      "reviewNote": "mechanical: AGENTS.md#platform-operating-laws recomputes to dc48182c from the HEAD file and equals the shard; rationale names the same anchor; file sha256 47f3a4e5 equals the rationale pin at 59b9b7087; target none by design; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-01-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-01-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_8231e682b35899eed43b85ce92dbc6ba",
@@ -321,12 +321,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "L10-3: retain AGENTS.md#platform-operating-laws-1 as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source digest recomputed by the extractor and equal to the shard; rationale names AGENTS.md#platform-operating-laws-1 equal to the registry; AGENTS.md sha256 47f3a4e5 equals the rationale pin at 59b9b7087 and the file at the content commit; target none by design; text not read beyond what is stated",
+      "reviewNote": "mechanical: AGENTS.md#platform-operating-laws-1 recomputes to 192d7bf6 from the HEAD file and equals the shard; rationale names the same anchor; file sha256 47f3a4e5 equals the rationale pin at 59b9b7087; target none by design; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-01-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-01-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_dadecacb903167be7252b40d75033a56",
@@ -338,12 +338,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "L10-3: retain AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source digest recomputed by the extractor and equal to the shard; rationale names AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd equal to the registry; AGENTS.md sha256 47f3a4e5 equals the rationale pin at 59b9b7087 and the file at the content commit; target none by design; text not read beyond what is stated",
+      "reviewNote": "deep: read the retained unit (heading:2, 1534 chars) at AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd; it is plain always-loaded instruction text with no platform carrier claimed, so retain-in-place is truthful; AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd recomputes to 7a863d1c from the HEAD file and equals the shard; rationale names the same anchor; file sha256 47f3a4e5 equals the rationale pin at 59b9b7087; target none by design; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-01-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-01-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_2c843f49586c14b6d70149ae591d47f9",
@@ -355,12 +355,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "L10-3: retain AGENTS.md#ranh-giới-sứ-mệnh-d-adr0035-docsspecsplatform-foundationsmd as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source digest recomputed by the extractor and equal to the shard; rationale names AGENTS.md#ranh-giới-sứ-mệnh-d-adr0035-docsspecsplatform-foundationsmd equal to the registry; AGENTS.md sha256 47f3a4e5 equals the rationale pin at 59b9b7087 and the file at the content commit; target none by design; text not read beyond what is stated",
+      "reviewNote": "mechanical: AGENTS.md#ranh-giới-sứ-mệnh-d-adr0035-docsspecsplatform-foundationsmd recomputes to b0c5afec from the HEAD file and equals the shard; rationale names the same anchor; file sha256 47f3a4e5 equals the rationale pin at 59b9b7087; target none by design; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-01-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-01-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_42108ffe5c72a9f3ca2c7ef904fd14ec",
@@ -372,12 +372,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "L10-3: retain AGENTS.md#resources as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source digest recomputed by the extractor and equal to the shard; rationale names AGENTS.md#resources equal to the registry; AGENTS.md sha256 47f3a4e5 equals the rationale pin at 59b9b7087 and the file at the content commit; target none by design; text not read beyond what is stated",
+      "reviewNote": "mechanical: AGENTS.md#resources recomputes to 14d6f595 from the HEAD file and equals the shard; rationale names the same anchor; file sha256 47f3a4e5 equals the rationale pin at 59b9b7087; target none by design; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-01-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-01-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_5f15ada3e8a013ad4b1c962bd082ea68",
@@ -389,12 +389,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "L10-3: retain AGENTS.md#rul11-tùm-lum-không-phải-nặng-d-adr0054-supersedes-d-adr0036-docsspecsplatform-foundationsmd as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source digest recomputed by the extractor and equal to the shard; rationale names AGENTS.md#rul11-tùm-lum-không-phải-nặng-d-adr0054-supersedes-d-adr0036-docsspecsplatform-foundationsmd equal to the registry; AGENTS.md sha256 47f3a4e5 equals the rationale pin at 59b9b7087 and the file at the content commit; target none by design; text not read beyond what is stated",
+      "reviewNote": "mechanical: AGENTS.md#rul11-tùm-lum-không-phải-nặng-d-adr0054-supersedes-d-adr0036-docsspecsplatform-foundationsmd recomputes to 52ff86d6 from the HEAD file and equals the shard; rationale names the same anchor; file sha256 47f3a4e5 equals the rationale pin at 59b9b7087; target none by design; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-01-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-01-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_12e5db9cba7b51a5d83d737740f873f3",
@@ -406,12 +406,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "L10-3: retain AGENTS.md#scratch-artifacts as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source digest recomputed by the extractor and equal to the shard; rationale names AGENTS.md#scratch-artifacts equal to the registry; AGENTS.md sha256 47f3a4e5 equals the rationale pin at 59b9b7087 and the file at the content commit; target none by design; text not read beyond what is stated",
+      "reviewNote": "deep: read the retained unit (heading:2, 599 chars) at AGENTS.md#scratch-artifacts; it is plain always-loaded instruction text with no platform carrier claimed, so retain-in-place is truthful; AGENTS.md#scratch-artifacts recomputes to 960948ac from the HEAD file and equals the shard; rationale names the same anchor; file sha256 47f3a4e5 equals the rationale pin at 59b9b7087; target none by design; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-01-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-01-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_9dd28187a839e2ce10f2e9dd3f020cdf",
@@ -423,12 +423,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "L10-3: retain AGENTS.md#starting-the-fgos-gateway-one-door-never-a-raw-process as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source digest recomputed by the extractor and equal to the shard; rationale names AGENTS.md#starting-the-fgos-gateway-one-door-never-a-raw-process equal to the registry; AGENTS.md sha256 47f3a4e5 equals the rationale pin at 59b9b7087 and the file at the content commit; target none by design; text not read beyond what is stated",
+      "reviewNote": "deep: read the retained unit (heading:2, 805 chars) at AGENTS.md#starting-the-fgos-gateway-one-door-never-a-raw-process; it is plain always-loaded instruction text with no platform carrier claimed, so retain-in-place is truthful; AGENTS.md#starting-the-fgos-gateway-one-door-never-a-raw-process recomputes to ea437289 from the HEAD file and equals the shard; rationale names the same anchor; file sha256 47f3a4e5 equals the rationale pin at 59b9b7087; target none by design; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-01-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-01-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_89185e56cc8ad38646b1045d993b3eb3",
@@ -1307,12 +1307,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "L10-3: retain AGENTS.md#using-cli-fallback as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source digest recomputed by the extractor and equal to the shard; rationale names AGENTS.md#using-cli-fallback equal to the registry; AGENTS.md sha256 47f3a4e5 equals the rationale pin at 59b9b7087 and the file at the content commit; target none by design; text not read beyond what is stated",
+      "reviewNote": "mechanical: AGENTS.md#using-cli-fallback recomputes to 64aa23eb from the HEAD file and equals the shard; rationale names the same anchor; file sha256 47f3a4e5 equals the rationale pin at 59b9b7087; target none by design; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-01-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_9f129b46b75d0c4d4e7119da265c74b0",
@@ -1324,12 +1324,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "L10-3: retain AGENTS.md#using-mcp-preferred as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source digest recomputed by the extractor and equal to the shard; rationale names AGENTS.md#using-mcp-preferred equal to the registry; AGENTS.md sha256 47f3a4e5 equals the rationale pin at 59b9b7087 and the file at the content commit; target none by design; text not read beyond what is stated",
+      "reviewNote": "mechanical: AGENTS.md#using-mcp-preferred recomputes to c1a9ae0d from the HEAD file and equals the shard; rationale names the same anchor; file sha256 47f3a4e5 equals the rationale pin at 59b9b7087; target none by design; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-01-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_73ca3e1b87514a160d7114e22318f1e9",
@@ -1341,12 +1341,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
       "rationale": "L10-3: retain AGENTS.md#when-to-render as always-loaded instruction source outside platform doc authority; native identity retained; no truth certification. Current source-file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f, pinned at 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
-      "reviewNote": "mechanical: shard row at the content commit equals the request after row with 0 field differences; note equals the committed ok note; source digest recomputed by the extractor and equal to the shard; rationale names AGENTS.md#when-to-render equal to the registry; AGENTS.md sha256 47f3a4e5 equals the rationale pin at 59b9b7087 and the file at the content commit; target none by design; text not read beyond what is stated",
+      "reviewNote": "mechanical: AGENTS.md#when-to-render recomputes to b8596a31 from the HEAD file and equals the shard; rationale names the same anchor; file sha256 47f3a4e5 equals the rationale pin at 59b9b7087; target none by design; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-01-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_79dd88f1fb058d9385445406fbd9296d",
@@ -1868,12 +1868,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
       "rationale": "Retain in place outside platform documentation authority: AGENTS.md#unheaded-block-14, source unit SHA256 e3c0146e4d7a42d364c551fcb327b9ab9faef893cfe3b6075a4e658836d69972, source file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. Pending independent review; no authority flip or truth certificate.",
-      "reviewNote": "mechanical: retain-in-place block (lines 85-94 of AGENTS.md), no target; file sha256 47f3a4e5 and unit digest e3c0146e both equal the values quoted in the rationale; source file unchanged since the pin; shard equals pack; cited report row ok; I did not re-read the paragraph.",
+      "reviewNote": "deep: retain-in-place AGENTS.md unheaded-block-14 L85-94, unit digest e3c0146e and file sha256 47f3a4e5 recomputed and equal at HEAD and 19ca8de23; anchor ok; sibling of the historical predecessor claim_251b389b which keeps the old L85-91 text",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-09-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-accounting-02-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     }
   ],
   "registryGaps": [
@@ -1974,10 +1974,16 @@
       "sourceUnitDigest": "938342cd7dfcb965b91bb4ab13461c296dbda391d975bca9d1f5e296e9b75895",
       "disposition": "reclassify-out-of-platform-scope",
       "rationale": "L10-2 supersedes the earlier A34 source-to-self partial-carry acceptance with reclassify-out-of-platform-scope, pending independent review. The historical two-line unit claim_5c520fcb1a68ba27e2093341834258c7 has old digest 938342cd7dfcb965b91bb4ab13461c296dbda391d975bca9d1f5e296e9b75895. Both complete original lines are retained in the always-loaded AGENTS.md, outside platform documentation authority: (1) `fgos run` is the primary door for executing new work in the execution core. (2) For routing checks, `fgos dispatch decide` computes the execution mechanism and executor via `bind()` (`src/runner/execution/bind.mjs`). herdr is the default transport when present in the session/environment. The first retained native identity is claim_bfd24ffa5a43c26830bb9771c04de7f1 at AGENTS.md#unheaded-block-22 with digest b093c6fb2a5d0ad347222f5cd68b1b44614799ac24ed54b60a29134c5f7ddfb8; the second is claim_2ae81c7bed935553943d6777b81e2114 at AGENTS.md#unheaded-block-24 with digest e4e33c148710cfb9775867b0160ed6e82d2e469d0f118ad9ba5ae33ce79c2484. Residual evidence plans/260925-documentation-authority-unification/reports/phase-06/root-instructions-partial-carry-residual.json has SHA256 d4bd139d397c007d0f633998319284bfc37073b27ed39f377cd677946fe00a0d. Both native identities are preserved; the claim_2ae81c7bed935553943d6777b81e2114 decision remains byte-for-byte unchanged in its existing shard. No platform instruction copy is created. Q5a and L10-3 retain all root doctrine outside platform authority. This reclassification is not source-to-self carry proof, truth certification or approval carry. Source file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f at HEAD 59b9b70876324e07135db53d2351f7db6a7e1746. L10-3 current-file repin at SYNC 59b9b7087: AGENTS.md SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f; unchanged unit text but file binding re-decided pending.",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "targetOwner": null,
       "targetAnchor": null,
-      "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16"
+      "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+      "reviewNote": "deep: reclassify-out-of-platform-scope, no target by design; recomputed sha256 of the two quoted lines equals old digest 938342cd, AGENTS.md at HEAD and at 59b9b7087 both hash 47f3a4e5, residual file hashes d4bd1399, native units block-22 and block-24 (lines 152 and 156) recompute to b093c6fb and e4e33c14 and map to claim_bfd24ffa and claim_2ae81c7b in the registry; the claim_2ae81c7b row in s5-root-boundary-sync.json is byte-equal between 9b0526380 and 62751458b; every L10-2 element and L10-29 restoration is present; Q5a resolves to the Q5 owner answer",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-62751458b.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_0bf7d168f64e5d7bf9add3470f4b6ec4",
@@ -2205,13 +2211,13 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
       "rationale": "L10-3 / A31: historical native instruction/navigation identity claim_251b389b227a62ef26b0fd3e1f0bebd9 records AGENTS.md#unheaded-block-14 at digest 9babb9141d90b2e3a99f353c735db9e64679ea4be0bc12cf27432d1cd728df8f. The numbered anchor identifies historical text, not a claim of current byte equality. Retain root instructions and repository navigation outside platform authority. Current changed unit is separately drafted at SYNC 59b9b7087; native sync must determine retained identity or predecessor gap, preserving all history. No platform copy, source-to-self carry proof, truth approval or retirement. Native sync at 19ca8de23908e161c34c91626e41041b7813167c confirms a predecessor gap; retain historical root/navigation identity outside platform scope. Current successor is separately native-resolved. No live old-anchor claim.",
-      "reviewNote": "deep: no-target retained row; historical AGENTS.md#unheaded-block-14 at witness 2300d6557 (L85-91) digest 9babb914 recomputed by extractor and by hand and equal to the full digest quoted in the rationale; AGENTS.md is byte-identical to 19ca8de23 at HEAD, the current successor claim_c328f1aa is a separate current unit, so 'no live old-anchor claim' holds; the rationale mixes the earlier 'native sync must determine' wording with the later gap confirmation but nothing in it is false",
+      "reviewNote": "deep: retain-in-place gap for AGENTS.md unheaded-block-14 historical L85-91 at 2300d6557, digest 9babb914 recomputed and equal to the full digest quoted in the rationale; AGENTS.md is byte-identical to its pin so nothing is claimed about current bytes; the rationale sentence that native sync must still decide is followed by the resolved gap statement, so it is stale wording but not false; no target and no platform copy",
       "sourcePath": "AGENTS.md",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-accounting-01-62751458b.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     }
   ]
 }

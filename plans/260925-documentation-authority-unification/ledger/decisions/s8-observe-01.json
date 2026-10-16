@@ -109,8 +109,8 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
-      "rationale": "Source: docs/specs/observe.md:12-12#owns (current lines); unit SHA256 ca2fd76b4ca2fe575e858e1f9ae76cf0ddf0f7300593c6a58b11ac2249b4d1b2.\nTarget: docs/platform/observe/spec.md:34-34#owns (current lines); unit SHA256 a03c9cf9107371c2ec305cd2efea93cc9ca0f549ec485158bdb5e9ecc05c63aa.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest a03c9cf9107371c2ec305cd2efea93cc9ca0f549ec485158bdb5e9ecc05c63aa at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 1, target 1; 1 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nLink 1: \"spec\" (../platform/session-identity/spec.md) → \"spec\" (../session-identity/spec.md); resolved docs/platform/session-identity/spec.md → docs/platform/session-identity/spec.md.\nHeading depth: 3 → 3; title \"Owns\" → \"Owns\".\nWhole direct section differs; depth 3 → 3; 1 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (existing-labelled-successor-correction): Complete direct section compared to the next native heading. Depth 3 → 3, title \"Owns\" → \"Owns\"; 1 distinct link spelling/label changes; 1 applicable exact labelled corrections. Normalized nonblank line order differs; exact raw-section removed/added line witnesses are accounted below; correction-normalized counts are reported separately. Existing correction labels A40 at immutable account 9b0526380:plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json; exact section delta: removed [\"- Quản lý kho lưu trữ friction độc lập, phi tập trung (`fgos friction record`, `fgos friction resolve`, `fgos friction list`, `fgos friction show`, `fgos friction rank`).\"]; added [\"- Quản lý kho lưu trữ friction độc lập, phi tập trung (`fgos friction record`, `fgos friction resolve`, `fgos friction list`, `fgos friction show`, `fgos friction rank`, `fgos friction ping`, `fgos friction migrate`).\"]. This records replacement, not byte carriage or current-truth certification.\nApplicable labelled corrections:\nA40/step8-truth-corrections-1: \"`fgos friction rank`).\" → \"`fgos friction rank`, `fgos friction ping`, `fgos friction migrate`).\"; evidence step8-truth-corrections.json; packages/observe/rust/src/friction_cli.rs:7-9 (evidence commit 2107c4761cdde5f4302502ad564258220ba6a09d).\nDisposition supersede: Account for docs/specs/observe.md#owns under docs/platform/observe/spec.md#owns; source context \"Observe Component Specification / 1. Overview & Boundaries\", target context \"Observe Component Specification / 1. Overview & Boundaries\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "authoredBy": "codex-session:unit-run-1792126341980-e0c35701@2026-10-16",
+      "rationale": "Source: docs/specs/observe.md:12-12#owns (current lines); unit SHA256 ca2fd76b4ca2fe575e858e1f9ae76cf0ddf0f7300593c6a58b11ac2249b4d1b2.\nTarget: docs/platform/observe/spec.md:34-34#owns (current lines); unit SHA256 a03c9cf9107371c2ec305cd2efea93cc9ca0f549ec485158bdb5e9ecc05c63aa.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest a03c9cf9107371c2ec305cd2efea93cc9ca0f549ec485158bdb5e9ecc05c63aa at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 1, target 1; 1 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nLink 1: \"spec\" (../platform/session-identity/spec.md) → \"spec\" (../session-identity/spec.md); resolved docs/platform/session-identity/spec.md → docs/platform/session-identity/spec.md.\nHeading depth: 3 → 3; title \"Owns\" → \"Owns\".\nWhole direct section differs; depth 3 → 3; 1 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (heading-and-links): Complete direct sections differ only in heading, link spellings/labels or authenticated exact corrections. Exact normalized nonblank line delta: removed []; added [].\nApplicable labelled corrections:\nA40/step8-truth-corrections-1: \"`fgos friction rank`).\" → \"`fgos friction rank`, `fgos friction ping`, `fgos friction migrate`).\"; evidence step8-truth-corrections.json; packages/observe/rust/src/friction_cli.rs:7-9 (evidence commit 2107c4761cdde5f4302502ad564258220ba6a09d).\nDisposition supersede: Account for docs/specs/observe.md#owns under docs/platform/observe/spec.md#owns; source context \"Observe Component Specification / 1. Overview & Boundaries\", target context \"Observe Component Specification / 1. Overview & Boundaries\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetOwner": "docs/platform/observe/spec.md",
       "targetAnchor": "owns",
       "targetUnitDigest": "a03c9cf9107371c2ec305cd2efea93cc9ca0f549ec485158bdb5e9ecc05c63aa",
@@ -544,17 +544,23 @@
       "sourceUnitDigest": "36f5428de433214eb4a9a17e3a2366471095b9bb658faa4f11d4bb108beea137",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
       "rationale": "Source: docs/specs/observe.md:13-17#unheaded-block-3 (current lines); unit SHA256 36f5428de433214eb4a9a17e3a2366471095b9bb658faa4f11d4bb108beea137.\nTarget: docs/platform/observe/spec.md:35-39#unheaded-block-5 (current lines); unit SHA256 11717c094b7543079c51f31172bdc5cc8e3d66f9da00bdb02056323819401b2c.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 11717c094b7543079c51f31172bdc5cc8e3d66f9da00bdb02056323819401b2c at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 1, target 1; 1 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nLink 1: \"spec\" (../platform/session-identity/spec.md) → \"spec\" (../session-identity/spec.md); resolved docs/platform/session-identity/spec.md → docs/platform/session-identity/spec.md.\nApplicable labelled corrections:\nA40/step8-truth-corrections-1: \"`fgos friction rank`).\" → \"`fgos friction rank`, `fgos friction ping`, `fgos friction migrate`).\"; evidence step8-truth-corrections.json; packages/observe/rust/src/friction_cli.rs:7-9 (evidence commit 2107c4761cdde5f4302502ad564258220ba6a09d).\nDisposition supersede: Account for docs/specs/observe.md#unheaded-block-3 under docs/platform/observe/spec.md#unheaded-block-5; source context \"Observe Component Specification / 1. Overview & Boundaries / Owns\", target context \"Observe Component Specification / 1. Overview & Boundaries / Owns\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetOwner": "docs/platform/observe/spec.md",
       "targetAnchor": "unheaded-block-5",
+      "reviewNote": "deep: the same friction bullet as the Owns row but as unheaded block 5; identical A40 correction verified before-in-source and after-in-target, same link rebase with equal resolved file, no other difference.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-11-62751458b.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "11717c094b7543079c51f31172bdc5cc8e3d66f9da00bdb02056323819401b2c",
       "targetAncestry": [
         "Observe Component Specification",
         "1. Overview & Boundaries",
         "Owns"
-      ]
+      ],
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     }
   ],
   "registryGaps": [
@@ -569,11 +575,11 @@
       "rationale": "A22/A31/A34: one native sync at 19ca8de23908e161c34c91626e41041b7813167c preserves this historical predecessor as a gap; current upstream source successor is separately native-accounted and carried to the candidate. Historical lines changed; exact untransferred residual is retained verbatim with SHA256, independent representation review required; cutover remains blocked. Full source/current witnesses and residual: step10-sync19-predecessor-residuals.json. No identity graft or approval carry.",
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
-      "reviewNote": "deep: historical docs/specs/observe.md#unheaded-block-3 at witness 2300d6557 (L13-17, digest 1840cc4b recomputed by extractor and by hand) against successor 36f5428d (current L13-17, recomputed): my own subsequence comparison leaves exactly 1 residual line(s) equal to step10-sync19-predecessor-residuals.json, whose SHA256 recomputes by hand; successor claim_bf1888a0 carries the current text (pending row in another shard), so partial-carry with a named verbatim remainder is accurate; the rationale is shared template wording but each statement in it holds for this row",
+      "reviewNote": "deep: partial-carry gap, observe.md unheaded-block-3 L13-17 at 2300d6557 against successor L13-17; subsequence comparison leaves 1 residual line (the store lock and writer shard bullet) with sha256 ca9a59c1 equal to the remainder; digests 1840cc4b and 36f5428d recompute and the successor is the source of claim_bf1888a0",
       "remainder": "Verbatim historical residual in plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json, claim claim_a7278e1567e5432cfb079506cf2f5050, residual SHA256 ca9a59c18839e81d0f58c6602e5c373a161cbeb6a20721e23fbff39be36107af. Source 1840cc4b1da22587ed69755276cad9a882139c62a36179d8fba2269905414623; primary target 36f5428de433214eb4a9a17e3a2366471095b9bb658faa4f11d4bb108beea137. Residual file SHA256 recorded in step10-sync19-predecessor-reconciliation.json. A34 independent acceptance pending; cutover blocked.",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-accounting-01-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "36f5428de433214eb4a9a17e3a2366471095b9bb658faa4f11d4bb108beea137",
       "targetAncestry": [
@@ -581,7 +587,7 @@
         "1. Overview & Boundaries",
         "Owns"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     }
   ]
 }

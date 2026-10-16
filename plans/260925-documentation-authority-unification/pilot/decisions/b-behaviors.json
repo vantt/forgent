@@ -100,15 +100,21 @@
       "targetAnchor": "unheaded-block-65",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source: docs/specs/work-state.md:866-871#unheaded-block-78 (current lines); unit SHA256 96b669468dbe4f3a8fd6eaa112986cead07ae88fa9de2b233f8fbf27314f9d16.\nTarget: docs/platform/work-state/spec.md:715-720#unheaded-block-65 (current lines); unit SHA256 91c2e63acc8563a92edc6d06d6634a299a3120b6682db0bf3e3fd289b6987445.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 91c2e63acc8563a92edc6d06d6634a299a3120b6682db0bf3e3fd289b6987445 at cd82746a8.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nU8 add id (composed with U8 add required flags): \"đòi người\\ngọi tự điền mọi trường (kể cả tự đặt id kebab-case), khác hẳn UX \\\"nộp rồi đi\\\"\\ncủa `submit`.\" → \"đòi người\\ngọi điền đủ các cờ bắt buộc `--title`, `--description`, `--kind`, `--risk` và `--verify`; `--id` tùy chọn, khi vắng thì `generateId`\\nsinh id `tsk-<hash>` chống trùng từ title, khác UX \\\"nộp rồi đi\\\" của `submit`.\"; evidence root-authorities-truth-corrections-turn21.json; bin/fgos.mjs:933-959 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 99d801a92839b2a7b7202bb9c07bb8fd2277f705).\nU8 test count: \"trực tiếp (9 file) tiếp tục dùng nguyên trạng;\" → \"trực tiếp trong nhiều file tiếp tục dùng nguyên trạng (ví dụ `test/cli/fgos-intake-7.test.mjs` và `test/e2e/pr-gate.test.mjs`);\"; evidence root-authorities-truth-corrections-turn21.json; test/cli/fgos-intake-7.test.mjs:128-148 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 52d47cb364bfec23ebc829f8a28c9233b70cda5e); test/e2e/pr-gate.test.mjs:68-80 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 69959ce8f0de476d42ee219e8846b51ea35a5544).\nDisposition supersede: Account for docs/specs/work-state.md#unheaded-block-78 under docs/platform/work-state/spec.md#unheaded-block-65; source context \"Spec: Work-State (tầng quản việc của forgent) / Behaviors & Operations / Khai việc (add) — bề mặt nội bộ\", target context \"Work State Specification / 9. Behaviors And Operations / Add Verb\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+      "reviewNote": "deep: supersede work-state.md:866-871#unheaded-block-78 -> work-state/spec.md:715-720#unheaded-block-65; both unit digests hand-recomputed from raw lines, anchors ok, context and heading depth and title recomputed equal, links 0/0 with 0 changed recomputed equal, source equals target after the listed corrections (0 removed, 0 added), before-text in source, after-text in target, evidence blob pins and line ranges verified; last-reviewed digest backed by a committed ok verdict at the named content commit",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-62751458b.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "91c2e63acc8563a92edc6d06d6634a299a3120b6682db0bf3e3fd289b6987445",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Add Verb"
-      ]
+      ],
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_22efb604ffdcadbc5fd3d9a3df00d539",
@@ -500,15 +506,21 @@
       "targetAnchor": "unheaded-block-75",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source: docs/specs/work-state.md:1073-1077#unheaded-block-88 (current lines); unit SHA256 504b6a5b42d39ff1886b7e1865b5cd54713406e8caff7f6c22e0b3085efb755d.\nTarget: docs/platform/work-state/spec.md:923-927#unheaded-block-75 (current lines); unit SHA256 31381297e4545267ec79a77e7535df60d454ddacffe884ced82a687bfcce2d2c.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 31381297e4545267ec79a77e7535df60d454ddacffe884ced82a687bfcce2d2c at 55ec1e0c4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nU3 resume: \"item về status trước lúc `ask` đậu nó (`statusAtAsk`, ghi lúc `ask`, mặc định `todo` khi vắng — log cũ/gate không mang field này) — **`todo`** nếu item chưa bị cầm claim lúc hỏi, hoặc **`doing`** nếu một claim `pick`/`take` đang sống lúc hỏi (claim-lock §5.1: trước đây LUÔN về `todo` trần, làm rớt claim đang giữ nếu `ask` xảy ra giữa lúc item `doing` — đã sửa).\" → \"item về durable status trước lúc `ask` đậu nó (`durableStatusAtAsk`, do cửa ghi tính từ status bền); log cũ thiếu trường này dùng `statusAtAsk`, thiếu cả hai mặc định `todo`, và mọi giá trị `doing` đều được clamp về `todo`. `putInAwaiting` đã settle và nhả claim lúc đậu, nên trả lời không phục hồi claim cũ.\"; evidence root-authorities-truth-corrections-turn21.json; src/state/store.mjs:1388-1420 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 418f3d688929b78bae26607a8eb624737e0ead25); src/state/store.mjs:745-777 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 418f3d688929b78bae26607a8eb624737e0ead25); src/state/status-fsm.mjs:175-190 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 6eede4ce0c28fe8bc5488ffa209a35e94180c26c).\nU3 ready consequence: \"item lại actionable — về `todo` thì xuất hiện trong `ready` khi deps đủ điều kiện; về `doing` thì KHÔNG xuất hiện trong `ready` (claim vẫn đang giữ, chờ `fgos return` như bình thường).\" → \"item không resume về `doing`; trường hợp resume về `todo` xuất hiện trong `ready` khi deps, workflow step và lineage đủ điều kiện; một lần `take` sau đó lấy claim mới.\"; evidence root-authorities-truth-corrections-turn21.json; src/state/store.mjs:1388-1420 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 418f3d688929b78bae26607a8eb624737e0ead25); src/state/frontier.mjs:40-105 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 07bb8d9e5ec8439cc0af6541c878f9f0ae3fa764).\nDisposition supersede: Account for docs/specs/work-state.md#unheaded-block-88 under docs/platform/work-state/spec.md#unheaded-block-75; source context \"Spec: Work-State (tầng quản việc của forgent) / Behaviors & Operations / Trả lời (answer)\", target context \"Work State Specification / 9. Behaviors And Operations / Answer Verb\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+      "reviewNote": "deep: supersede work-state.md:1073-1077#unheaded-block-88 -> work-state/spec.md:923-927#unheaded-block-75; both unit digests hand-recomputed from raw lines, anchors ok, context and heading depth and title recomputed equal, links 0/0 with 0 changed recomputed equal, source equals target after the listed corrections (0 removed, 0 added), before-text in source, after-text in target, evidence blob pins and line ranges verified; last-reviewed digest backed by a committed ok verdict at the named content commit",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-62751458b.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "31381297e4545267ec79a77e7535df60d454ddacffe884ced82a687bfcce2d2c",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Answer Verb"
-      ]
+      ],
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_0f34f596e1d30c6195234ae86ff49537",
@@ -1148,15 +1160,21 @@
       "targetAnchor": "unheaded-block-91",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source: docs/specs/work-state.md:1177-1178#unheaded-block-104 (current lines); unit SHA256 27a3ba1515c8ffa4c6db8e9123168b72f583293dd0d4904824848c7187fe2bf1.\nTarget: docs/platform/work-state/spec.md:1027-1028#unheaded-block-91 (current lines); unit SHA256 c6a18ec4c4d25ad879f1d641ceca294e769d4e0da33767626d17a8403c449400.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest c6a18ec4c4d25ad879f1d641ceca294e769d4e0da33767626d17a8403c449400 at 55ec1e0c4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nU20 footprint: \"PHI-CHẶN: chỉ nuôi cố-vấn này, không vào cycle-check/frontier.\" → \"Không vào cycle-check/frontier; footprint còn chặn đề xuất chia có overlap bằng cổng `awaiting-human`, xếp các item xung đột vào wave khác nhau trong `computeSchedule`, và cung cấp tín hiệu cho `mergeReadiness`.\"; evidence root-authorities-truth-corrections-turn21.json; src/intake/plan.mjs:884-898 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob ea2bad13189ba75f59b9d4c45a3ba0a6f28013ad); src/state/graph-metrics.mjs:737-775 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 3f7832198a1b09e0b0e1a6121f80ca14ff498bfc); src/state/graph-harness.mjs:100-210 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 5e1fe753e747c2ce99fa7a804482c1425b04f653).\nDisposition supersede: Account for docs/specs/work-state.md#unheaded-block-104 under docs/platform/work-state/spec.md#unheaded-block-91; source context \"Spec: Work-State (tầng quản việc của forgent) / Behaviors & Operations / Cố vấn xung đột dấu chân file (conflicts) — chống đụng độ fan-out song song (S9)\", target context \"Work State Specification / 9. Behaviors And Operations / Conflicts Verb\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
+      "reviewNote": "deep: supersede work-state.md:1177-1178#unheaded-block-104 -> work-state/spec.md:1027-1028#unheaded-block-91; both unit digests hand-recomputed from raw lines, anchors ok, context and heading depth and title recomputed equal, links 0/0 with 0 changed recomputed equal, source equals target after the listed corrections (0 removed, 0 added), before-text in source, after-text in target, evidence blob pins and line ranges verified; last-reviewed digest backed by a committed ok verdict at the named content commit",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-62751458b.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "c6a18ec4c4d25ad879f1d641ceca294e769d4e0da33767626d17a8403c449400",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Conflicts Verb"
-      ]
+      ],
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     }
   ],
   "authorSession": "codex-session:21@2026-10-14"

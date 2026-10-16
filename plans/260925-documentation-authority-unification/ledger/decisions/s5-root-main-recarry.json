@@ -64,14 +64,14 @@
       "rationale": "Source: docs/architecture-manifest.json:1-269#file-block (current lines); unit SHA256 2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a.\nTarget: docs/platform/contracts/architecture-manifest.json:1-269#file-block (current lines); unit SHA256 2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architecture-manifest.json#file-block under docs/platform/contracts/architecture-manifest.json#file-block; source context \"file-block\", target context \"file-block\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetOwner": "docs/platform/contracts/architecture-manifest.json",
       "targetAnchor": "file-block",
-      "reviewNote": "mechanical: move architecture-manifest.json:1-269#file-block -> architecture-manifest.json:1-269#file-block; both digests recomputed by script and equal; lines equal real spans; anchor ok; ancestry equals real chain; links 0/0/0/0/0/0; row equals shard at the pin; last-reviewed digest backed by a committed ok verdict; class Unit-exact.",
+      "reviewNote": "deep: docs/architecture-manifest.json file-block L1-269 moved to docs/platform/contracts/architecture-manifest.json, digest 2d55be82 equal on both sides; file-block anchors cannot be listed by list-doc-anchors for JSON so I confirmed the unit with the extractor; unchanged since 345f15d95 per the shard row",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-11-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-accounting-04-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
       "targetAncestry": [],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     }
   ],
   "registryGaps": [
@@ -105,14 +105,14 @@
       "rationale": "A22/A31/A34: one native sync at 19ca8de23908e161c34c91626e41041b7813167c preserves this historical predecessor as a gap; current upstream source successor is separately native-accounted and carried to the candidate. All historical source lines occur verbatim in order in current successor; insertion-only containment. Full source/current witnesses and residual: step10-sync19-predecessor-residuals.json. No identity graft or approval carry.",
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
-      "reviewNote": "deep: historical docs/architecture-manifest.json at witness 2300d6557 (whole file, 268 lines, sha256 recomputed by hand) against current successor 2d55be82 (269 lines): difflib subsequence leaves 0 residual lines, matching the residual file empty text and its e3b0c442 empty-string SHA256, so insertion-only containment and supersede are accurate; successor claim_03ef50e8 exists with its own pending move row; anchor 'file-block' cannot be checked by list-doc-anchors (JSON file, tool lists markdown anchors only), digest matches the file-block unit",
+      "reviewNote": "deep: supersede gap of docs/architecture-manifest.json file-block; historical file at 2300d6557 has 268 lines and the successor 269; every historical line occurs in order in the successor (0 residual lines), so the rationale insertion-only containment is true; digests 92391ce6 and 2d55be82 recompute (file-block anchor is not listable by list-doc-anchors for JSON, checked with the extractor); target is the same file the move row claim_03ef50e8 accounts",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-accounting-01-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
       "targetAncestry": [],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     }
   ]
 }

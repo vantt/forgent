@@ -1,0 +1,114 @@
+{
+  "HEAD": "1d92a7229af9050b3ce57729c8652b8a836e93b6",
+  "scopeViolations": [],
+  "protectedDrift": [],
+  "rowsRegenerated": 54,
+  "reopenedReviewed": 36,
+  "independent": {
+    "ok": true,
+    "rowsScanned": 12895,
+    "shardsScanned": 92,
+    "structuredRows": 718,
+    "sectionClaims": 261,
+    "linkClaims": 719
+  },
+  "sourceWitnessLimits": 70,
+  "regenerationStable": true,
+  "nativeSyncCount": 0,
+  "reviewPackCount": 0,
+  "newCarrierUnits": 12,
+  "oldCarrierUnitsRemoved": 0,
+  "docTests": {
+    "tests": 500,
+    "pass": 500,
+    "fail": 0
+  },
+  "broadScriptsSuite": {
+    "tests": 1039,
+    "pass": 1037,
+    "fail": 2,
+    "limits": [
+      "Unchanged run-tests fixture expects a missing child environment root (ERR_INVALID_ARG_TYPE).",
+      "Unchanged mutant integration needs git worktree add in the read-only shared git directory; denied before a worktree was created. No bypass or checkout write attempted by author commands."
+    ]
+  },
+  "D": [
+    {
+      "label": "both",
+      "fatalCount": 0
+    },
+    {
+      "label": "identity",
+      "fatalCount": 0
+    },
+    {
+      "label": "phase02",
+      "fatalCount": 0
+    }
+  ],
+  "E": [
+    {
+      "type": "claims-partial-carry",
+      "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+      "count": 16,
+      "examples": [
+        "docs/io-contract.md#unheaded-block-5",
+        "docs/specs/distribution.md#unheaded-block-5",
+        "docs/specs/observe.md#unheaded-block-3",
+        "docs/specs/runner.md#unheaded-block-102",
+        "docs/specs/runner.md#unheaded-block-118"
+      ]
+    },
+    {
+      "type": "claims-not-reviewed",
+      "message": "claim rows whose reviewStatus is not reviewed",
+      "count": 25,
+      "examples": [
+        "docs/specs/runner.md#data-dictionary",
+        "docs/specs/runner.md#gate-a-xếp-hạng-candidate-bắc-cầu-sang-việc-thật-evolve",
+        "docs/specs/runner.md#actors-access",
+        "docs/specs/runner.md#edge-cases-settled",
+        "docs/specs/runner.md#pointers-implementation"
+      ]
+    },
+    {
+      "type": "identical-units-multiple-owners",
+      "message": "identical source units whose rows name different target owners",
+      "count": 1,
+      "examples": [
+        "39a803b85af8: docs/platform/packaging-distribution/spec.md, docs/platform/runner/operations/h-51f5cd7279fd.md"
+      ]
+    },
+    {
+      "type": "registry-gaps-without-disposition",
+      "message": "registry identity-gap rows with no vocabulary disposition",
+      "count": 2,
+      "examples": [
+        "docs/reading-map.md#unheaded-block-15",
+        "docs/reading-map.md#unheaded-block-16"
+      ]
+    },
+    {
+      "type": "candidate-blocks-unreferenced",
+      "message": "candidate conservation units not named by a source decision",
+      "count": 313,
+      "examples": [
+        "docs/platform/work-state/contracts/cli-io-contract.md#cli-io-contract",
+        "docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-1",
+        "docs/platform/work-state/contracts/cli-io-contract.md#single-write-door",
+        "docs/platform/work-state/contracts/cli-io-contract.md#writer-identity",
+        "docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-5"
+      ]
+    }
+  ],
+  "I": "Frozen baseline bytes unchanged; current reader links equal HEAD. The pre-existing historical baseline delta remains.",
+  "nativeRegistryUnchanged": true,
+  "mergeDocsDelta": [],
+  "next": "PACKAGE: one native sync; refresh all actual drift/dependencies; one bounded independent re-review of only this turn changed rows/tools and resulting native transitions, in small files. Existing global E/truth/A34/consumer/cutover/checkpoint obligations stay open.",
+  "okScoped": true,
+  "finalScopeChecked": true,
+  "changedPaths": 77,
+  "changedRowsPendingWithoutApproval": 54,
+  "fallbackRowsRemaining": 0,
+  "docsFinalized": true
+}

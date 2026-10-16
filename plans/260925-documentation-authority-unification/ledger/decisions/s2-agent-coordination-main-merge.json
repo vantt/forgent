@@ -15,12 +15,18 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "targetAnchor": "b-add-fgos-advise",
       "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: supersede group-thinking-trigger-surface.md:151-153#unheaded-block-18 -> group-thinking-trigger-surface.md:132-132#b-add-fgos-advise; both unit digests hand-recomputed from raw lines, anchors ok, context and heading depth and title recomputed equal, links 0/0 with 0 changed recomputed equal, section delta 3 removed and 4 added recomputed equal, 22% of source words survive in place and the rest is a truth rewrite the supersede label covers (first changed hunk: [It gives natural] -> [Natural])",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-62751458b.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "bb1ae7699ab58ef15b7ea30bf4d78b57cdd8eb69b9a4ef6a7713e83e50f9eb3c",
       "targetAncestry": [
         "Group Thinking Trigger Surface",
         "Alternatives Considered"
-      ]
+      ],
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_014f0a1be5c823ca15a3e1d3a097c3c4",

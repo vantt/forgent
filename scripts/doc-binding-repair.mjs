@@ -227,7 +227,7 @@ export function describeSectionChange(source,target,corrections=[]) {
   // Multisets preserve duplicate lines. Removed/added line witnesses are printed
   // in full for independent review; a missing line is never called conserved.
   const subtract=(x,y)=>{const rest=[...y];return x.filter(l=>{const i=rest.indexOf(l);if(i<0)return true;rest.splice(i,1);return false;});};
-  return {equal:a===b,normalizedOrderEqual:aa.join('\n')===bb.join('\n'),depthChanged:source.level!==target.level,titleChanged:source.title!==target.title,
+  return {source,target,equal:a===b,normalizedOrderEqual:aa.join('\n')===bb.join('\n'),depthChanged:source.level!==target.level,titleChanged:source.title!==target.title,
     linkChanges:links.changes.length,unexplainedRemoved:subtract(aa,bb),unexplainedAdded:subtract(bb,aa)};
 }
 
@@ -237,8 +237,25 @@ export function checkSectionExplanation(delta, explanation={}) {
   for(const [side,lines] of [['removed',delta.unexplainedRemoved],['added',delta.unexplainedAdded]]){
     for(const line of lines){
       const witnesses=explanation[side+'Witnesses']||[];
-      if(!witnesses.some(w=>w.path&&w.anchor&&normalize(w.text).includes(normalize(line))))findings.push({type:'unexplained-section-'+side,line});
+      if(!witnesses.some(w=>{
+        const bound=side==='removed'?delta.source:delta.target;
+        const self=bound&&w.path===bound.path&&w.anchor===bound.anchor&&(w.commit||null)===(bound.commit||null);
+        return w.path&&w.anchor&&!self&&normalize(w.text).split('\n').includes(normalize(line));
+      }))findings.push({type:'unexplained-section-'+side,line});
     }
   }
   return findings;
+}
+
+// Label ids come from the plan's real owner-answer registry, never digest text.
+export function sectionAccountLabels(account, registeredIds) {
+  return [...new Set(registeredIds)].filter(id=>new RegExp('(?<![A-Za-z0-9_])'+id.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?![A-Za-z0-9_])').test(account));
+}
+export function classifySectionAccounting(delta, {labels=[],account='',kind='heading-and-links',description=''}={}) {
+  if(delta.equal)return {kind:'equal-section',description:'Complete direct source and target sections are byte-equal; no removed or added lines.'};
+  const removed=delta.unexplainedRemoved,added=delta.unexplainedAdded;
+  const exact=' Exact normalized nonblank line delta: removed '+JSON.stringify(removed)+'; added '+JSON.stringify(added)+'.';
+  if(!removed.length&&!added.length)return {kind:'heading-and-links',description:'Complete direct sections differ only in heading, link spellings/labels or authenticated exact corrections.'+exact};
+  if(labels.length)return {kind:'existing-labelled-successor-correction',description:'Existing correction labels '+labels.join(', ')+' at immutable account '+account+'; '+description+exact};
+  return {kind,description:description+exact};
 }

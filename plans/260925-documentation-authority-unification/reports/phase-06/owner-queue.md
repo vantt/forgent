@@ -555,3 +555,10 @@ Lead decision supplied under A42; no new question. Keep these 4007 reviewed rows
 Round-4 decisions-08/09 cutover observations: heading-only seq/date qualifiers remain in retained legacy sources; dates 2026-08-15 and 2026-08-15/16 and seq 18030 must be checked before source retirement. No retirement or heading-qualifier policy change is made here.
 
 Historical target witnesses are separately enumerated by the all-shard consistency report. They authenticate historical bindings, not fresh current ownership; reconcile them at promotion/cutover.
+
+
+## Round-5 author follow-up — unrelated broader scripts-suite failures
+
+`step10-round5-broad-tests.log`: 1,037/1,039 pass. Separate follow-up: `test/scripts/run-tests.test.mjs:372` calls its spawn fixture with an undefined environment-root path (`ERR_INVALID_ARG_TYPE`, `path.join` at line380). Separate confinement limitation: `test/scripts/test-select-mutate.test.mjs:274` needs a real `git worktree add` into the read-only shared Git directory; the write was denied. Both test/implementation files are unchanged; no bypass or unrelated repair is made in this author turn. The requested document-tool suite passes500/500. These are broader-suite limitations, not owner-direction questions and not conservation waivers.
+
+Next execution remains package: one native sync for12 new historical-carrier units (zero old unit loss), refresh actual dependencies, and one bounded independent re-review of only54 changed rationales, changed tools/tests/reproduction and the carrier/native deltas. Existing E/global/truth/A34/consumer/cutover/checkpoint obligations remain open.

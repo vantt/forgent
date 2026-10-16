@@ -15,16 +15,16 @@
       "disposition": "promote",
       "rationale": "Source H2 stating where the retired records came from is represented by the frozen H2 \"1. Provenance Of Retired Decisions\"; only the heading title differs (numbered, English, no tsk id in the title). Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H2 'Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)' (L1363) to H2 '1. Provenance Of Retired Decisions' (L23) in retired-decision-history.md: title change, section payload digest equal and the payload text byte-equal on both sides; depth equal; the quoted target title equals the live target, the rationale's 'only the heading title differs' is true; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "mechanical: promote lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1l to retired-decision-history.md#1-provenance-of-retired-decisions: source digest 0e00c9cc recomputes, target anchor exists and target digest 260da5fd recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "260da5fd6eab8c113ea7e756985b782b5e45721aae8f34aab1e50389af0dff24",
       "targetAncestry": [
         "Retired Decision History: Work State"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_192ebab9dbc6cec8b8957683e3ff8c82",
@@ -58,16 +58,16 @@
       "disposition": "promote",
       "rationale": "Source ADR 0002 title heading is represented by the frozen H2 \"2. ADR 0002 ...\" (2-adr-0002-flat-work-model); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H3 '0002 — Mô hình việc phẳng' (L1368) to H2 '2. ADR 0002 Flat Work Model' (L27) in retired-decision-history.md: title renumbered and translated, depth H3 to H2; section payload differs only by the blockquote link destination rewritten to the in-document anchor, disclosed on claim_0201a1d6, while this rationale says the record text is unchanged, true of the prose and acceptable because the link sits in its own unit; ancestry ok, anchor ok, digests recomputed equal to the shard; the rationale abbreviates the title with three dots but names the exact anchor; shared target with the merge row is by design",
+      "reviewNote": "mechanical: promote 0002-mô-hình-việc-phẳng to retired-decision-history.md#2-adr-0002-flat-work-model: source digest cb78249b recomputes, target anchor exists and target digest dfbfbdbf recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "dfbfbdbf1e8717cabbe38306651ad15e816065313a7244b973a62ba4703a843d",
       "targetAncestry": [
         "Retired Decision History: Work State"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_0201a1d648765d578fb8fd96673da674",
@@ -101,16 +101,16 @@
       "disposition": "merge",
       "rationale": "Repeated duplicate title \"# 0002 - Mo hinh viec phang\" inside the ADR 0002 text: merged into the single ADR 0002 H2 (no second H1 in the candidate), so no claim is lost but the heading itself does not appear twice. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H1 '0002 — Mô hình việc phẳng' (L1375) to H2 '2. ADR 0002 Flat Work Model' (L27) in retired-decision-history.md: second H1 of ADR 0002 with an empty payload (source L1375) merged into the single ADR 0002 H2: the title text is the one already carried by claim_5412ac73 so nothing is lost; the rationale quotes the title ASCII-folded (without diacritics and dash) rather than verbatim, a cosmetic point; digests recomputed equal to the shard, anchor ok",
+      "reviewNote": "mechanical: merge 0002-mô-hình-việc-phẳng-1 to retired-decision-history.md#2-adr-0002-flat-work-model: source digest a05e96aa recomputes, target anchor exists and target digest dfbfbdbf recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "dfbfbdbf1e8717cabbe38306651ad15e816065313a7244b973a62ba4703a843d",
       "targetAncestry": [
         "Retired Decision History: Work State"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_faeaa8e46158de47c45810fb0a595dcc",
@@ -122,17 +122,17 @@
       "disposition": "promote",
       "rationale": "Section heading \"Bối cảnh\" of ADR 0002 is represented by the frozen H3 \"0002 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H4 'Bối cảnh' (L1377) to H3 '0002 Context' (L34) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "mechanical: promote bối-cảnh to retired-decision-history.md#0002-context: source digest f014a166 recomputes, target anchor exists and target digest 5cd2a9a1 recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "5cd2a9a136e3025d04ed41810213e2a9c383290b3eb3e863644e4af952612d3e",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "2. ADR 0002 Flat Work Model"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_310b7c85756d5a5631a83fd5b6f51450",
@@ -167,17 +167,17 @@
       "disposition": "promote",
       "rationale": "Section heading \"Quyết định\" of ADR 0002 is represented by the frozen H3 \"0002 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H4 'Quyết định' (L1384) to H3 '0002 Decision' (L41) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "mechanical: promote quyết-định to retired-decision-history.md#0002-decision: source digest d6043b14 recomputes, target anchor exists and target digest 6a7b90c7 recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "6a7b90c72430f1cb8d04a666d3fa97514ec1f6ba3c24cf36641333a9745f4e19",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "2. ADR 0002 Flat Work Model"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_6f1392a7f197c9824233896cf218bda9",
@@ -212,17 +212,17 @@
       "disposition": "promote",
       "rationale": "Section heading \"Hệ quả\" of ADR 0002 is represented by the frozen H3 \"0002 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H4 'Hệ quả' (L1394) to H3 '0002 Consequences' (L51) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "mechanical: promote hệ-quả to retired-decision-history.md#0002-consequences: source digest e91bbb5a recomputes, target anchor exists and target digest fc626995 recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "fc62699538350fccc923e8874a342f8d5e5f5582ae09db366066bf776b60ef7a",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "2. ADR 0002 Flat Work Model"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_6bf5e5b90a15803e49010737491afdb9",
@@ -280,16 +280,16 @@
       "disposition": "promote",
       "rationale": "Source ADR 0003 title heading is represented by the frozen H2 \"3. ADR 0003 ...\" (3-adr-0003-naming-and-data-layout); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H3 '0003 — Đặt tên & bố cục dữ liệu' (L1405) to H2 '3. ADR 0003 Naming And Data Layout' (L62) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H3 to H2 is a depth-only change the rationale does not name (it only says 'frozen H2'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "mechanical: promote 0003-đặt-tên-bố-cục-dữ-liệu to retired-decision-history.md#3-adr-0003-naming-and-data-layout: source digest c0dc9acc recomputes, target anchor exists and target digest eed7c45e recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "eed7c45e529a07ba42be1926c4715e28e71d7ab481a6e270e4db28d1981b35d3",
       "targetAncestry": [
         "Retired Decision History: Work State"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_75f47ef3fd99abd07c138f106f1ca023",
@@ -301,17 +301,17 @@
       "disposition": "promote",
       "rationale": "Section heading \"Bối cảnh\" of ADR 0003 is represented by the frozen H3 \"0003 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H4 'Bối cảnh' (L1407) to H3 '0003 Context' (L64) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "mechanical: promote bối-cảnh-1 to retired-decision-history.md#0003-context: source digest 203f9cd3 recomputes, target anchor exists and target digest c6a2c64d recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "c6a2c64d4858021065b5e9f3a7dd05666d15ee2123b64859bc98ecf175325bd1",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "3. ADR 0003 Naming And Data Layout"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_70c83eabb546f46e040404b3b908a02e",
@@ -346,17 +346,17 @@
       "disposition": "promote",
       "rationale": "Section heading \"Quyết định\" of ADR 0003 is represented by the frozen H3 \"0003 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H4 'Quyết định' (L1413) to H3 '0003 Decision' (L70) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "mechanical: promote quyết-định-1 to retired-decision-history.md#0003-decision: source digest 798c507e recomputes, target anchor exists and target digest d0f79f2a recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "d0f79f2a53f7edfc1d92c6e8c71d50e3eecb588a7bccf96f3eb9c97f0a628a7d",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "3. ADR 0003 Naming And Data Layout"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_45c662066b6e70bac4ff5991ee40afca",
@@ -391,17 +391,17 @@
       "disposition": "promote",
       "rationale": "Section heading \"Hệ quả\" of ADR 0003 is represented by the frozen H3 \"0003 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H4 'Hệ quả' (L1422) to H3 '0003 Consequences' (L79) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "mechanical: promote hệ-quả-1 to retired-decision-history.md#0003-consequences: source digest 055bb758 recomputes, target anchor exists and target digest e6a929b7 recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "e6a929b78a9cc9b4254c5e289f33c764837ff88c2f3ff9919376e5f8823b9ff0",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "3. ADR 0003 Naming And Data Layout"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_0f85275ad3f392256b805bf226c9562d",
@@ -459,16 +459,16 @@
       "disposition": "promote",
       "rationale": "Source ADR 0004 title heading is represented by the frozen H2 \"4. ADR 0004 ...\" (4-adr-0004-scope-and-non-goals); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H3 '0004 — Phạm vi & non-goal' (L1432) to H2 '4. ADR 0004 Scope And Non-Goals' (L89) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H3 to H2 is a depth-only change the rationale does not name (it only says 'frozen H2'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "mechanical: promote 0004-phạm-vi-non-goal to retired-decision-history.md#4-adr-0004-scope-and-non-goals: source digest a0ff252f recomputes, target anchor exists and target digest 2d2db2ab recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "2d2db2abca61349471af2e2a3d0f5581e7f87af45a979df1e541c1448a865f8a",
       "targetAncestry": [
         "Retired Decision History: Work State"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_67494c7de8ad006fcb01b825ea00e6b2",
@@ -480,17 +480,17 @@
       "disposition": "promote",
       "rationale": "Section heading \"Bối cảnh\" of ADR 0004 is represented by the frozen H3 \"0004 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H4 'Bối cảnh' (L1434) to H3 '0004 Context' (L91) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "mechanical: promote bối-cảnh-2 to retired-decision-history.md#0004-context: source digest f2793186 recomputes, target anchor exists and target digest 2d45d486 recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "2d45d4866f7526c232afdeaf650c17f9c3efee2a04afd9e6241922d522abffe9",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "4. ADR 0004 Scope And Non-Goals"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_c23f1c3ed45f72de28f6ed3c605bc43a",
@@ -548,17 +548,17 @@
       "disposition": "promote",
       "rationale": "Section heading \"Quyết định\" of ADR 0004 is represented by the frozen H3 \"0004 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H4 'Quyết định' (L1444) to H3 '0004 Decision' (L101) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (hand-sha256 payload digest equal), anchor ok",
+      "reviewNote": "deep: read source and target sections: heading Quyết định (heading:4) becomes 0004 Decision (heading:3); body of 542 chars is byte-identical; the rationale's title and level statement matches; anchor exists; source digest b72bf8ee reproduces and target digest 59bda066 recomputes; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "59bda06684c6859316ad8f0b236bc7b6ebc9dc72139fca854456d9b38de05252",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "4. ADR 0004 Scope And Non-Goals"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_93d9f629f8c7258d208b1c2d3fc413ab",
@@ -593,17 +593,17 @@
       "disposition": "promote",
       "rationale": "Section heading \"Hệ quả\" of ADR 0004 is represented by the frozen H3 \"0004 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H4 'Hệ quả' (L1454) to H3 '0004 Consequences' (L111) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "mechanical: promote hệ-quả-2 to retired-decision-history.md#0004-consequences: source digest e44f9991 recomputes, target anchor exists and target digest 12d505aa recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "12d505aab6487945d39c7e3a3f15ad06171917f8bf16b2b27387a9c6efd0d33b",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "4. ADR 0004 Scope And Non-Goals"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_664fd1639ad346a2d2d240596a2a6604",
@@ -661,16 +661,16 @@
       "disposition": "promote",
       "rationale": "Source ADR 0006 title heading is represented by the frozen H2 \"5. ADR 0006 ...\" (5-adr-0006-proposed-status); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H3 '0006 — Trạng thái `proposed`' (L1463) to H2 '5. ADR 0006 Proposed Status' (L120) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H3 to H2 is a depth-only change the rationale does not name (it only says 'frozen H2'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "mechanical: promote 0006-trạng-thái-proposed to retired-decision-history.md#5-adr-0006-proposed-status: source digest 2ff34201 recomputes, target anchor exists and target digest 67c97b2b recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "67c97b2b884ac9505324dc3b688a7989f36bfd27700bf7389751058845c479f0",
       "targetAncestry": [
         "Retired Decision History: Work State"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_a79114f19bb479ea6b69c50166af8972",
@@ -682,17 +682,17 @@
       "disposition": "promote",
       "rationale": "Section heading \"Bối cảnh\" of ADR 0006 is represented by the frozen H3 \"0006 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H4 'Bối cảnh' (L1465) to H3 '0006 Context' (L122) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (hand-sha256 payload digest equal), anchor ok",
+      "reviewNote": "mechanical: promote bối-cảnh-3 to retired-decision-history.md#0006-context: source digest 9c848579 recomputes, target anchor exists and target digest 6163b36b recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "6163b36b62dbb7c76e3510b09ab0d83b08f3542562b99abc5c41cd0534b0c789",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "5. ADR 0006 Proposed Status"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_423abdded73e62ffd62a773173555583",
@@ -750,17 +750,17 @@
       "disposition": "promote",
       "rationale": "Section heading \"Quyết định\" of ADR 0006 is represented by the frozen H3 \"0006 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H4 'Quyết định' (L1474) to H3 '0006 Decision' (L131) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "deep: read source and target sections: heading Quyết định (heading:4) becomes 0006 Decision (heading:3); body of 623 chars is byte-identical; the rationale's title and level statement matches; anchor exists; source digest 965caf0a reproduces and target digest ffd717cc recomputes; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "ffd717cc616acfaa71c4fb8a61763bcfb0a5272b8345d44b839fc6e10e2afb43",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "5. ADR 0006 Proposed Status"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_9283d5a06984f8b7a0bb9b53cb947051",
@@ -841,17 +841,17 @@
       "disposition": "promote",
       "rationale": "Section heading \"Hệ quả\" of ADR 0006 is represented by the frozen H3 \"0006 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H4 'Hệ quả' (L1492) to H3 '0006 Consequences' (L149) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "mechanical: promote hệ-quả-3 to retired-decision-history.md#0006-consequences: source digest 899175d5 recomputes, target anchor exists and target digest 783e9b5f recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "783e9b5f2b2e44c3010507770e87c9785bcf8ff5b1aae09aecd902440090f996",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "5. ADR 0006 Proposed Status"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_453534a2ccfccba30980d90ae47b6e63",
@@ -909,16 +909,16 @@
       "disposition": "promote",
       "rationale": "Source ADR 0007 title heading is represented by the frozen H2 \"6. ADR 0007 ...\" (6-adr-0007-schema-and-event-evolution); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H3 '0007 — Tiến hoá schema & event' (L1504) to H2 '6. ADR 0007 Schema And Event Evolution' (L161) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H3 to H2 is a depth-only change the rationale does not name (it only says 'frozen H2'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "mechanical: promote 0007-tiến-hoá-schema-event to retired-decision-history.md#6-adr-0007-schema-and-event-evolution: source digest 0652eaa3 recomputes, target anchor exists and target digest 38c7e643 recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "38c7e64350e2c0ead7dc9dab84c6ecc28918e7bb019e31a35b07fc88b495842f",
       "targetAncestry": [
         "Retired Decision History: Work State"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_208f5cc84da2b23ab24abde2c91c4f06",
@@ -930,17 +930,17 @@
       "disposition": "promote",
       "rationale": "Section heading \"Bối cảnh\" of ADR 0007 is represented by the frozen H3 \"0007 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H4 'Bối cảnh' (L1506) to H3 '0007 Context' (L163) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (hand-sha256 payload digest equal), anchor ok",
+      "reviewNote": "mechanical: promote bối-cảnh-4 to retired-decision-history.md#0007-context: source digest 5483e14a recomputes, target anchor exists and target digest ab86aba2 recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "ab86aba22bff4bd95dfd666582cad23d4a6f3c760c8cf86de79efdac597d4dd2",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "6. ADR 0007 Schema And Event Evolution"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_5f4f81607ad69719e2fed9631a8dcd2b",
@@ -975,17 +975,17 @@
       "disposition": "promote",
       "rationale": "Section heading \"Quyết định\" of ADR 0007 is represented by the frozen H3 \"0007 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H4 'Quyết định' (L1512) to H3 '0007 Decision' (L169) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "mechanical: promote quyết-định-4 to retired-decision-history.md#0007-decision: source digest eb9a345f recomputes, target anchor exists and target digest 08f6311c recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "08f6311c148ae29221fd5d1a3613d38b0e740914a3dcde683f27d48ee398de27",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "6. ADR 0007 Schema And Event Evolution"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_37315ade5a8ca0c583456c157daaecba",
@@ -1043,17 +1043,17 @@
       "disposition": "promote",
       "rationale": "Section heading \"Hệ quả\" of ADR 0007 is represented by the frozen H3 \"0007 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H4 'Hệ quả' (L1524) to H3 '0007 Consequences' (L181) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "mechanical: promote hệ-quả-4 to retired-decision-history.md#0007-consequences: source digest e5123dd0 recomputes, target anchor exists and target digest 55d9c1f1 recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "55d9c1f19dff0d40bd97abcc406422ba20f7091135f9eaa20462af0bb2388f82",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "6. ADR 0007 Schema And Event Evolution"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_d0aa35a58456de6d8e5f552bdad1b08c",
@@ -1111,16 +1111,16 @@
       "disposition": "promote",
       "rationale": "Source ADR 0011 title heading is represented by the frozen H2 \"7. ADR 0011 ...\" (7-adr-0011-explicit-version-for-every-contract); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H3 '0011 — Version tường minh cho mọi contract' (L1535) to H2 '7. ADR 0011 Explicit Version For Every Contract' (L192) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H3 to H2 is a depth-only change the rationale does not name (it only says 'frozen H2'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "mechanical: promote 0011-version-tường-minh-cho-mọi-contract to retired-decision-history.md#7-adr-0011-explicit-version-for-every-co: source digest 520a0965 recomputes, target anchor exists and target digest 7b520a89 recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "7b520a895337dc7ea9a23e4bcc1debc386a39fc1e8120673d0aa77ea4a309457",
       "targetAncestry": [
         "Retired Decision History: Work State"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_a93bf40197e2bf32890a9cf931226e15",
@@ -1132,17 +1132,17 @@
       "disposition": "promote",
       "rationale": "Section heading \"Bối cảnh\" of ADR 0011 is represented by the frozen H3 \"0011 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H4 'Bối cảnh' (L1537) to H3 '0011 Context' (L194) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "mechanical: promote bối-cảnh-5 to retired-decision-history.md#0011-context: source digest f0e519e3 recomputes, target anchor exists and target digest e113b11d recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "e113b11d301e876e8e3b3d3f59eca420dab2ea0aa6f3adc8d3ac076de93317d4",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "7. ADR 0011 Explicit Version For Every Contract"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_bad3eb429a52fae0b9100c7468c2d4d6",
@@ -1200,17 +1200,17 @@
       "disposition": "promote",
       "rationale": "Section heading \"Quyết định\" of ADR 0011 is represented by the frozen H3 \"0011 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H4 'Quyết định' (L1556) to H3 '0011 Decision' (L213) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "mechanical: promote quyết-định-5 to retired-decision-history.md#0011-decision: source digest 03f45ad0 recomputes, target anchor exists and target digest 28cc1686 recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "28cc1686008a465c5f12c2c878349dc018dd023ba3dbd514689390ca5ac61776",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "7. ADR 0011 Explicit Version For Every Contract"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_50eed5d7ed0c4f2107e50cca1ffcee82",
@@ -1268,17 +1268,17 @@
       "disposition": "promote",
       "rationale": "Section heading \"Hệ quả\" of ADR 0011 is represented by the frozen H3 \"0011 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H4 'Hệ quả' (L1577) to H3 '0011 Consequences' (L234) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "deep: read source and target sections: heading Hệ quả (heading:4) becomes 0011 Consequences (heading:3); body of 484 chars is byte-identical; the rationale's title and level statement matches; anchor exists; source digest 3bd63008 reproduces and target digest 54a59775 recomputes; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "54a5977501d4d13b842a24d99b66e4591c4b04006f57477f35b248e444d7585c",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "7. ADR 0011 Explicit Version For Every Contract"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_9be26c9507109484cc9b1663ca4ca2d9",
@@ -1336,16 +1336,16 @@
       "disposition": "promote",
       "rationale": "Source ADR 0012 title heading is represented by the frozen H2 \"8. ADR 0012 ...\" (8-adr-0012-unified-typed-edge-graph-model); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H3 '0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời' (L1589) to H2 '8. ADR 0012 Unified Typed-Edge Graph Model' (L246) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H3 to H2 is a depth-only change the rationale does not name (it only says 'frozen H2'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "mechanical: promote 0012-mô-hình-đồ-thị-cạnh-định-kiểu-hợp-nhất-thay-t to retired-decision-history.md#8-adr-0012-unified-typed-edge-graph-mode: source digest 9b3ff4be recomputes, target anchor exists and target digest e9c5857a recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "e9c5857a60ea685d3aab78eae8e2b44b7d96e10698e4764d4a8b109e54f47f45",
       "targetAncestry": [
         "Retired Decision History: Work State"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_386a8c90d7f9d79a52190add7a82f33f",
@@ -1357,17 +1357,17 @@
       "disposition": "promote",
       "rationale": "Section heading \"Bối cảnh\" of ADR 0012 is represented by the frozen H3 \"0012 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H4 'Bối cảnh' (L1591) to H3 '0012 Context' (L248) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "deep: read source and target sections: heading Bối cảnh (heading:4) becomes 0012 Context (heading:3); body of 1329 chars is byte-identical; the rationale's title and level statement matches; anchor exists; source digest 95bdd9de reproduces and target digest 0dc5cda4 recomputes; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "0dc5cda4fa7fbd44208f88a810d9e6f77a67e9efa236041735d82bad31cd0158",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "8. ADR 0012 Unified Typed-Edge Graph Model"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_4806fa4d3041b4b051cddf6a2490730b",
@@ -1448,17 +1448,17 @@
       "disposition": "promote",
       "rationale": "Section heading \"Quyết định\" of ADR 0012 is represented by the frozen H3 \"0012 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H4 'Quyết định' (L1614) to H3 '0012 Decision' (L271) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "mechanical: promote quyết-định-6 to retired-decision-history.md#0012-decision: source digest 24cacb85 recomputes, target anchor exists and target digest 9dee5907 recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "9dee590708c4181b56606cd803fd345edfe4a9db456d03efe6a0d63e7b8ad917",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "8. ADR 0012 Unified Typed-Edge Graph Model"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_f44a3645601fbc48b21a8d73b3ac3426",
@@ -1493,17 +1493,17 @@
       "disposition": "promote",
       "rationale": "Section heading \"Hệ quả\" of ADR 0012 is represented by the frozen H3 \"0012 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H4 'Hệ quả' (L1653) to H3 '0012 Consequences' (L310) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "mechanical: promote hệ-quả-6 to retired-decision-history.md#0012-consequences: source digest f35473b9 recomputes, target anchor exists and target digest 764a0029 recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "764a0029f0ee73f78c522c71e69830fac20871e226b636c7832f1461d0c0c79c",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "8. ADR 0012 Unified Typed-Edge Graph Model"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_4da244a64b6f33711d89feb47331b4f0",
@@ -1561,16 +1561,16 @@
       "disposition": "promote",
       "rationale": "Source ADR 0013 title heading is represented by the frozen H2 \"9. ADR 0013 ...\" (9-adr-0013-report-not-write-channel-for-discovered-from); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H3 '0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`' (L1666) to H2 '9. ADR 0013 Report-Not-Write Channel For Discovered-From' (L323) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H3 to H2 is a depth-only change the rationale does not name (it only says 'frozen H2'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (hand-sha256 payload digest equal), anchor ok",
+      "reviewNote": "deep: read source and target sections: heading 0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from` (heading:3) becomes 9. ADR 0013 Report-Not-Write Channel For Discovered-From (heading:2); body of 0 chars is byte-identical; the rationale's title and level statement matches; anchor exists; source digest f529cf67 reproduces and target digest bb9207e0 recomputes; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "bb9207e0916a5823e45378afb7d0247d511cb2bf870386fdefd982d8a17e51cb",
       "targetAncestry": [
         "Retired Decision History: Work State"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_e68c14be45a430e3676761d7bdc9e6db",
@@ -1582,17 +1582,17 @@
       "disposition": "promote",
       "rationale": "Section heading \"Bối cảnh\" of ADR 0013 is represented by the frozen H3 \"0013 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H4 'Bối cảnh' (L1668) to H3 '0013 Context' (L325) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "deep: read source and target sections: heading Bối cảnh (heading:4) becomes 0013 Context (heading:3); body of 816 chars is byte-identical; the rationale's title and level statement matches; anchor exists; source digest 31a7f48e reproduces and target digest 39a94a27 recomputes; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "39a94a27f6e89fec290ba89590cff97929d9c7625c0ad041e4bb461c53fe5d61",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_62c3b825e8cc887ad822b8d1b5316769",
@@ -1650,17 +1650,17 @@
       "disposition": "promote",
       "rationale": "Section heading \"Quyết định\" of ADR 0013 is represented by the frozen H3 \"0013 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H4 'Quyết định' (L1683) to H3 '0013 Decision' (L340) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "mechanical: promote quyết-định-7 to retired-decision-history.md#0013-decision: source digest 9b836a5a recomputes, target anchor exists and target digest dc61b855 recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "dc61b855030de6ec8c01fd1fd46215522d2327be9adb6c025724d974f8843b8e",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_e2589be21644922e0424a20d39bbd6e3",
@@ -1787,17 +1787,17 @@
       "disposition": "promote",
       "rationale": "Section heading \"Hệ quả\" of ADR 0013 is represented by the frozen H3 \"0013 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H4 'Hệ quả' (L1715) to H3 '0013 Consequences' (L372) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (hand-sha256 payload digest equal), anchor ok",
+      "reviewNote": "mechanical: promote hệ-quả-7 to retired-decision-history.md#0013-consequences: source digest 261b711f recomputes, target anchor exists and target digest 19ae019d recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "19ae019de9e9e6e87ca9d19d8bb92a18bbefab9ab1579d1010a315477e994782",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_b8d85d30862c55869062b5418f430f69",
@@ -1832,17 +1832,17 @@
       "disposition": "promote",
       "rationale": "Section heading \"Ranh giới tin cậy (bổ chú 2026-07-18, review-fix S11)\" of ADR 0013 is represented by the frozen H3 \"0013 Trust Boundary\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H4 'Ranh giới tin cậy (bổ chú 2026-07-18, review-fix S11)' (L1726) to H3 '0013 Trust Boundary' (L383) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "mechanical: promote ranh-giới-tin-cậy-bổ-chú-2026-07-18-review-fix-s11 to retired-decision-history.md#0013-trust-boundary: source digest 5c944fd5 recomputes, target anchor exists and target digest f4b2987a recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "f4b2987afebaa4bfcb171bf9122acb39d864d4321de4cc1af5bc61afa7f3c58b",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_a4c7eec1fc96a1ad212a5de75a8942c5",
@@ -1877,17 +1877,17 @@
       "disposition": "promote",
       "rationale": "Section heading \"Bảo đảm giao-nhận (bổ chú 2026-07-18, review-fix S11)\" of ADR 0013 is represented by the frozen H3 \"0013 Delivery Guarantee\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H4 'Bảo đảm giao-nhận (bổ chú 2026-07-18, review-fix S11)' (L1742) to H3 '0013 Delivery Guarantee' (L399) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "deep: read source and target sections: heading Bảo đảm giao-nhận (bổ chú 2026-07-18, review-fix S11) (heading:4) becomes 0013 Delivery Guarantee (heading:3); body of 506 chars is byte-identical; the rationale's title and level statement matches; anchor exists; source digest 58646cbd reproduces and target digest 42a5b4fd recomputes; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "42a5b4fd66d36c0accc5dd7dffd9f8d1fb12d5b002b70a26114cfe538f6c23f1",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_bd1c7b0191b236990a4740f007de2397",
@@ -1922,17 +1922,17 @@
       "disposition": "promote",
       "rationale": "Section heading \"Phương án đã cân nhắc và bỏ\" of ADR 0013 is represented by the frozen H3 \"0013 Alternatives Considered\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H4 'Phương án đã cân nhắc và bỏ' (L1750) to H3 '0013 Alternatives Considered' (L407) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "mechanical: promote phương-án-đã-cân-nhắc-và-bỏ to retired-decision-history.md#0013-alternatives-considered: source digest e702d74c recomputes, target anchor exists and target digest dd8d4e00 recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "dd8d4e0029a8249cf8149298e7a2d77c1497f8922738eb1904e786085c1b7f65",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "9. ADR 0013 Report-Not-Write Channel For Discovered-From"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_8beebc48272beb4cf5dd32b6ed94d5d0",
@@ -1967,16 +1967,16 @@
       "disposition": "promote",
       "rationale": "Source ADR 0019 title heading is represented by the frozen H2 \"10. ADR 0019 ...\" (10-adr-0019-pre-release-exemption-for-the-schema-evolution-rule); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H3 '0019 — Miễn trừ pre-release cho RUL11 (viết lại nhật ký tại chỗ)' (L1759) to H2 '10. ADR 0019 Pre-Release Exemption For The Schema Evolution Rule' (L416) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H3 to H2 is a depth-only change the rationale does not name (it only says 'frozen H2'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "mechanical: promote 0019-miễn-trừ-pre-release-cho-rul11-viết-lại-nhật- to retired-decision-history.md#10-adr-0019-pre-release-exemption-for-th: source digest 74fba641 recomputes, target anchor exists and target digest 76fc593c recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "76fc593cba1fa3b5ebaf7e373e9251e1774f5eb9c16d0e6ced80024d7d410c8f",
       "targetAncestry": [
         "Retired Decision History: Work State"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_a9ff1aae0ff13bbce2c3ba5e9f30b19e",
@@ -1988,17 +1988,17 @@
       "disposition": "promote",
       "rationale": "Section heading \"Bối cảnh\" of ADR 0019 is represented by the frozen H3 \"0019 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H4 'Bối cảnh' (L1761) to H3 '0019 Context' (L418) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "mechanical: promote bối-cảnh-8 to retired-decision-history.md#0019-context: source digest 15548911 recomputes, target anchor exists and target digest b589b460 recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "b589b460ed77e03ef37631a2f2e387529c52965ea0cb49f198e4e67d4c368d04",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "10. ADR 0019 Pre-Release Exemption For The Schema Evolution Rule"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_b87e27dca1c9e551eb4d296c858d0f08",
@@ -2056,17 +2056,17 @@
       "disposition": "promote",
       "rationale": "Section heading \"Quyết định\" of ADR 0019 is represented by the frozen H3 \"0019 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H4 'Quyết định' (L1775) to H3 '0019 Decision' (L432) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "mechanical: promote quyết-định-8 to retired-decision-history.md#0019-decision: source digest 1eb8c8df recomputes, target anchor exists and target digest f4473462 recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "f4473462b5e03712e55bee9a240b00c7699d73164ee8bc8bf071b6dfff526187",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "10. ADR 0019 Pre-Release Exemption For The Schema Evolution Rule"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_ef05e66d20bc35c8c80ac2a83dbe7d92",
@@ -2147,17 +2147,17 @@
       "disposition": "promote",
       "rationale": "Section heading \"Hệ quả\" of ADR 0019 is represented by the frozen H3 \"0019 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading H4 'Hệ quả' (L1812) to H3 '0019 Consequences' (L469) in retired-decision-history.md: title and depth change, section payload digest equal and the payload text byte-equal on both sides; depth H4 to H3 is a depth-only change the rationale does not name (it only says 'frozen H3'); the quoted target title and ADR number equal the live target and the source ancestry; full digest recomputed (extractor), anchor ok",
+      "reviewNote": "deep: read source and target sections: heading Hệ quả (heading:4) becomes 0019 Consequences (heading:3); body of 533 chars is byte-identical; the rationale's title and level statement matches; anchor exists; source digest 8ae8c5f3 reproduces and target digest de5943f8 recomputes; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "de5943f8259424b72bc4cfb00883277e6e232f8b46e0f0fb46efcd42f5dda549",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "10. ADR 0019 Pre-Release Exemption For The Schema Evolution Rule"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_38fc27aadc8aecf157c5db30cda1862b",
@@ -2192,16 +2192,16 @@
       "disposition": "promote",
       "rationale": "Source ADR 0024 title heading is represented by the frozen H2 \"11. ADR 0024 ...\" (11-adr-0024-rename-proposed-status-to-awaiting-approval); title is renumbered and re-worded in English, text of the record is unchanged. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading retitle H3 \"0024 — Đổi tên status `proposed` thành `awaiting-app...\" to H2 \"11. ADR 0024 Rename Proposed Status To Awaiting-Appr...\"; section payload digest and following-block digest equal at both ends (62 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok.",
+      "reviewNote": "deep: read source and target sections: heading 0024 — Đổi tên status `proposed` thành `awaiting-approval` (heading:3) becomes 11. ADR 0024 Rename Proposed Status To Awaiting-Approval (heading:2); body of 0 chars is byte-identical; the rationale's title and level statement matches; anchor exists; source digest c71c9558 reproduces and target digest 9a20af29 recomputes; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "9a20af2987019cf46f528ef85e14e942102ce13d868c9cd7ae034e513c1da91a",
       "targetAncestry": [
         "Retired Decision History: Work State"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_aa501f53cee0b7ec6adc656971266a97",
@@ -2213,17 +2213,17 @@
       "disposition": "promote",
       "rationale": "Section heading \"Bối cảnh\" of ADR 0024 is represented by the frozen H3 \"0024 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading retitle H4 \"Bối cảnh\" to H3 \"0024 Context\"; section payload digest and following-block digest equal at both ends (1107 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok. Digests also hand-recomputed with an independent script: equal.",
+      "reviewNote": "deep: read source and target sections: heading Bối cảnh (heading:4) becomes 0024 Context (heading:3); body of 1093 chars is byte-identical; the rationale's title and level statement matches; anchor exists; source digest a70886da reproduces and target digest e7d34068 recomputes; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "e7d340683e7d23c9fc7e740c59e3218b1ba61e5d3580913aaa17db28483b9bd9",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "11. ADR 0024 Rename Proposed Status To Awaiting-Approval"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_7d0cfc9e7e784ee0492be9c2d04fa93b",

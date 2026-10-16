@@ -1,0 +1,37 @@
+✔ independent facts reject a generator-consistent invented label and equal section claim (1.451562ms)
+✔ independent facts reject wrong removed and added line arrays (0.2949ms)
+✔ independent facts recompute link counts from the actual bound sections (0.65927ms)
+✔ independent facts accept actual delta and a real account label (0.637169ms)
+✔ independent equal-section facts reject replacement wording (0.196549ms)
+✖ independent facts verify a named live carrier by whole lines (6.549971ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 5
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 48.511524
+
+✖ failing tests:
+
+test at test/scripts/doc-rationale-facts.test.mjs:26:1
+✖ independent facts verify a named live carrier by whole lines (6.549971ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(audit(r,{carrierOf:()=>({...source,text:'lost body extra',sectionText:'## S\nlost body extra'})}).some(f=>f.type==='removed-line-not-carried'))
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale-facts.test.mjs:28:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

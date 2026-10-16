@@ -83,13 +83,19 @@
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "unheaded-block-93",
       "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source: docs/platform/work-state/spec.md:1032-1085#unheaded-block-93 (historical witness at 55ec1e0c40410b70b1e4024232a233d4e3d96b3d); unit SHA256 5c61302d66e78a5c872334e3a00927d6a8230642fd670dc0af923cad3e83f3b8.\nTarget: docs/platform/work-state/spec.md:1041-1094#unheaded-block-93 (current lines); unit SHA256 9098a0e9ed02a324a16abe3c1016fad73ad261bfc4459aed889be5baeb1515b3.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 9098a0e9ed02a324a16abe3c1016fad73ad261bfc4459aed889be5baeb1515b3 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nU26 RUL60 wrapper ordering: \"`/fgOS:submit` bước 6 làm clarify/classify trong phiên sống trên mô tả sau clarify.\" → \"Trong phiên tương tác sống, `/fgOS:submit` bước 4 gọi `fgos-clarifying` trên raw text trước khi item tồn tại: helper chỉ phân loại `domain`, có thể trả title/description đã viết lại hoặc câu hỏi làm rõ; không phán lại size/kind/risk. Bước 5 gọi `submit` với text/domain đã chốt; bước 6 chỉ báo kết quả.\"; evidence root-source-truth-fragments-turn22.json; plugins/fgOS/skills/submit/SKILL.md:24-45 (evidence commit f0efa3330a14d117ad89feba91bdb9b61d768339) (pinned blob 41a02e4aa78e88182ec91cd141543197487d4e17); plugins/fgOS/skills/submit/SKILL.md:125-163 (evidence commit f0efa3330a14d117ad89feba91bdb9b61d768339) (pinned blob 41a02e4aa78e88182ec91cd141543197487d4e17); plugins/fgOS/skills/submit/SKILL.md:188-197 (evidence commit f0efa3330a14d117ad89feba91bdb9b61d768339) (pinned blob 41a02e4aa78e88182ec91cd141543197487d4e17).\nDisposition supersede: Account for docs/platform/work-state/spec.md#unheaded-block-93 under docs/platform/work-state/spec.md#unheaded-block-93; source context \"Work State Specification / 11. Business Rules\", target context \"Work State Specification / 11. Business Rules\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "deep: source is the historical unit-93 block at 55ec1e0c4 (1032-1085, digest recomputed) against current 1041-1094; the one listed RUL60 correction has its before-text in the historical source and its after-text in the target; two further paragraphs differ (RUL55 upstream extension, present verbatim in docs/specs/work-state.md; RUL59 rewrite backed by src/intake/discovery.mjs:375-396) and are covered only by the generic successor-text sentence, the same standard as the earlier ok verdict; naming them in the rationale would be better but nothing is hidden or invented.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-10-62751458b.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "9098a0e9ed02a324a16abe3c1016fad73ad261bfc4459aed889be5baeb1515b3",
       "targetAncestry": [
         "Work State Specification",
         "11. Business Rules"
-      ]
+      ],
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     }
   ]
 }

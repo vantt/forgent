@@ -69,3 +69,25 @@ test('secondary section-accounting carriers do not masquerade as the primary sou
  assert.deepEqual(h.checkLegacyRationale(text,{source,target:null}),[]);
  assert.ok(h.checkLegacyRationale(text.replace('#primary','#wrong'),{source,target:null}).length);
 });
+
+test('section witnesses reject same-side source loss and target additions',()=>{
+ const source={...unit('s'),sectionText:'## S\nlost body\nkept',level:2};
+ const target={...unit('t'),path:'target.md',sectionText:'## S\nkept\nnew body',level:2};
+ const d={...h.describeSectionChange(source,target),source,target};
+ assert.equal(h.checkSectionExplanation(d,{removedWitnesses:[{...source,text:source.sectionText}],addedWitnesses:[{...target,text:target.sectionText}]}).length,2);
+ assert.equal(h.checkSectionExplanation(d,{removedWitnesses:[{...source,commit:'prior',text:source.sectionText}],addedWitnesses:[{...source,text:'new body'}]}).length,0);
+});
+test('section witnesses require whole lines, never substring matches',()=>{
+ const d={unexplainedRemoved:['lost','```'],unexplainedAdded:[]};
+ assert.equal(h.checkSectionExplanation(d,{removedWitnesses:[{path:'other.md',anchor:'s',text:'lost body\n````'}]}).length,2);
+});
+test('label classifier matches only registered case-sensitive bounded ids',()=>{
+ assert.deepEqual(h.sectionAccountLabels('SHA256 digest; 0 changed spellings; a25 A250 XA25 A25x', ['A25']),[]);
+ assert.deepEqual(h.sectionAccountLabels('A25; L10-26 account', ['A25','L10-26']),['A25','L10-26']);
+ assert.deepEqual(h.sectionAccountLabels('A999', ['A25']),[]);
+});
+test('equal section movement never claims replacement even with an account label',()=>{
+ const d={equal:true,unexplainedRemoved:[],unexplainedAdded:[],normalizedOrderEqual:true};
+ assert.equal(h.classifySectionAccounting(d,{labels:['A25']}).kind,'equal-section');
+ assert.doesNotMatch(h.classifySectionAccounting(d,{labels:['A25']}).description,/replacement|replaced/);
+});

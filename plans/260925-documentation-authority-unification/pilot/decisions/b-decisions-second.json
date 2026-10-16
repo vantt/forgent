@@ -61,17 +61,17 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H4 \"Quyết định\" of ADR 0024 is carried as the H3 \"0024 Decision\"; title differs (English, ADR-prefixed), heading-only unit. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading retitle H4 \"Quyết định\" to H3 \"0024 Decision\"; section payload digest and following-block digest equal at both ends (1041 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok. Digests also hand-recomputed with an independent script: equal.",
+      "reviewNote": "mechanical: promote quyết-định-9 to retired-decision-history.md#0024-decision: source digest 1c78b8c8 recomputes, target anchor exists and target digest 83a65ba5 recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "83a65ba5e8f913c18138dea769b80eefb0b28529ba97e89546e42575decf9366",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "11. ADR 0024 Rename Proposed Status To Awaiting-Approval"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_5fb4a29b7884b27f3d265612f67e4f31",
@@ -129,17 +129,17 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H4 \"Hệ quả\" of ADR 0024 is carried as H3 \"0024 Consequences\"; title differs, heading-only unit. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading retitle H4 \"Hệ quả\" to H3 \"0024 Consequences\"; section payload digest and following-block digest equal at both ends (899 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok.",
+      "reviewNote": "deep: read source and target sections: heading Hệ quả (heading:4) becomes 0024 Consequences (heading:3); body of 887 chars is byte-identical; the rationale's title and level statement matches; anchor exists; source digest 6b827c7b reproduces and target digest 1cf238e4 recomputes; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "1cf238e42a2f95624c1b9839bb786556437785c3f35db1788e9e566cc94bf563",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "11. ADR 0024 Rename Proposed Status To Awaiting-Approval"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_ec3bfee565512c6d032778295c5838c1",
@@ -197,16 +197,16 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H3 for ADR 0027 is carried as H2 \"12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary\"; title shortened/translated and level changed. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading retitle H3 \"0027 — Domain sở hữu vocabulary/transition status đo...\" to H2 \"12. ADR 0027 Domain Owns The Pre-Delivered Status Vo...\"; section payload digest and following-block digest equal at both ends (108 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok. The source title parenthetical (supersede base-workflow-model) is not in the target title and the rationale only says translated (non-blocking).",
+      "reviewNote": "mechanical: promote 0027-domain-sở-hữu-vocabularytransition-status-đoạ to retired-decision-history.md#12-adr-0027-domain-owns-the-pre-delivere: source digest 8a864bfa recomputes, target anchor exists and target digest 6ac1fb59 recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "6ac1fb5912f4bccdf38301b753d5c1c7d7e4bfc5a152c9f00b156abaaafe7a79",
       "targetAncestry": [
         "Retired Decision History: Work State"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_818a58278988ed797931b14ca91614e2",
@@ -218,17 +218,17 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H4 \"Bối cảnh\" of ADR 0027 is carried as H3 \"0027 Context\"; title differs, heading-only unit. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading retitle H4 \"Bối cảnh\" to H3 \"0027 Context\"; section payload digest and following-block digest equal at both ends (3226 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok.",
+      "reviewNote": "mechanical: promote bối-cảnh-10 to retired-decision-history.md#0027-context: source digest a06a2988 recomputes, target anchor exists and target digest 452a2ba2 recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "452a2ba22e0a3ab3caa9b41add3ce44e9f750f2242c676baf1a0e24e4631a027",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_2d89ae63cbc81e492eb80e9a28174b67",
@@ -309,17 +309,17 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H4 \"Quyết định\" of ADR 0027 is carried as H3 \"0027 Decision\"; title differs, heading-only unit. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading retitle H4 \"Quyết định\" to H3 \"0027 Decision\"; section payload digest and following-block digest equal at both ends (3164 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok.",
+      "reviewNote": "deep: read source and target sections: heading Quyết định (heading:4) becomes 0027 Decision (heading:3); body of 3148 chars is byte-identical; the rationale's title and level statement matches; anchor exists; source digest d76f5cf1 reproduces and target digest 3969babe recomputes; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "3969babe82040ce7d1d34672b372c59d3fd1d3721811bdcbfc19c2f0b0960afc",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_3f65fc24d3eeb760ecc11ff781159152",
@@ -492,17 +492,17 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H4 \"Audit: mọi consumer thật ...\" is carried as H3 \"0027 Consumer Audit\"; title shortened and translated. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading retitle H4 \"Audit: mọi consumer thật của `status-fsm.mjs`/`STATU...\" to H3 \"0027 Consumer Audit\"; section payload digest and following-block digest equal at both ends (832 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok.",
+      "reviewNote": "mechanical: promote audit-mọi-consumer-thật-của-status-fsmmjsstatusest to retired-decision-history.md#0027-consumer-audit: source digest 7dae6b0f recomputes, target anchor exists and target digest e8596bf1 recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "e8596bf17b33258ee768e967da03d9efeddd19149ecdbccf1510cc7bdf3ec674",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_0cabbd5a6b95edeb9aab6832ad276c50",
@@ -537,10 +537,10 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H5 \"1. Nguồn sự thật\" is carried as H4 \"0027 Audit 1 Status Source Of Truth\"; title and level changed. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading retitle H5 \"1. Nguồn sự thật (định nghĩa STATUSES/TRANSITIONS)\" to H4 \"0027 Audit 1 Status Source Of Truth\"; section payload digest and following-block digest equal at both ends (1173 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok. The source title parenthetical (định nghĩa STATUSES/TRANSITIONS) is not in the target title and the rationale only says translated (non-blocking).",
+      "reviewNote": "mechanical: promote 1-nguồn-sự-thật-định-nghĩa-statusestransitions to retired-decision-history.md#0027-audit-1-status-source-of-truth: source digest cfb28f2f recomputes, target anchor exists and target digest 50248a77 recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "50248a7774c2a4f3faf5bf48e42047130dd788a8ab92dc278a4c66bf17a2654a",
       "targetAncestry": [
@@ -548,7 +548,7 @@
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
         "0027 Consumer Audit"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_fc0f124b5b1368034455207d6378bc00",
@@ -584,10 +584,10 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H5 \"2. RESOLVED_STATUSES\" is carried as H4 \"0027 Audit 2 Resolved Statuses Set\"; title and level changed. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading retitle H5 \"2. `RESOLVED_STATUSES` (tập \"giống category\" viết ta...\" to H4 \"0027 Audit 2 Resolved Statuses Set\"; section payload digest and following-block digest equal at both ends (2489 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok. The source title parenthetical (tập \"giống category\" viết tay, trộn cả 2...) is not in the target title and the rationale only says translated (non-blocking). Digests also hand-recomputed with an independent script: equal.",
+      "reviewNote": "deep: read source and target sections: heading 2. `RESOLVED_STATUSES` (tập \"giống category\" viết tay, trộn cả 2 nhóm) (heading:5) becomes 0027 Audit 2 Resolved Statuses Set (heading:4); body of 2412 chars is byte-identical; the rationale's title and level statement matches; anchor exists; source digest 517a80cc reproduces and target digest a4b78ba7 recomputes; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "a4b78ba726bd39959cca89e81fa9d1bd269cf16807d014204b9427573cde9dea",
       "targetAncestry": [
@@ -595,7 +595,7 @@
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
         "0027 Consumer Audit"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_d97ba7f5ff310af83839fea58329acdd",
@@ -655,10 +655,10 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H5 \"3. Literal status trong verb logic\" is carried as H4 \"0027 Audit 3 CLI Status Literals\"; title and level changed. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading retitle H5 \"3. Literal status trong verb logic của `bin/fgos.mjs...\" to H4 \"0027 Audit 3 CLI Status Literals\"; section payload digest and following-block digest equal at both ends (2690 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok. The source title parenthetical (tầng CLI/store — chính là \"bảng transiti...) is not in the target title and the rationale only says translated (non-blocking). Digests also hand-recomputed with an independent script: equal.",
+      "reviewNote": "mechanical: promote 3-literal-status-trong-verb-logic-của-binfgosmjs-t to retired-decision-history.md#0027-audit-3-cli-status-literals: source digest 8590e597 recomputes, target anchor exists and target digest f921d3b9 recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "f921d3b97d03d68d8e8ea0e0722b18935ef9d37b362a0ce7e23b40b04aea8d27",
       "targetAncestry": [
@@ -666,7 +666,7 @@
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
         "0027 Consumer Audit"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_72ee6b558f807216affeb2559c6a597d",
@@ -702,10 +702,10 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H5 \"4. runner/ ...\" is carried as H4 \"0027 Audit 4 Runner Consumers\"; title and level changed. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading retitle H5 \"4. `runner/` — vòng tự hành, tiêu thụ nặng nhóm đầu\" to H4 \"0027 Audit 4 Runner Consumers\"; section payload digest and following-block digest equal at both ends (1712 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok.",
+      "reviewNote": "mechanical: promote 4-runner-vòng-tự-hành-tiêu-thụ-nặng-nhóm-đầu to retired-decision-history.md#0027-audit-4-runner-consumers: source digest 96096e1e recomputes, target anchor exists and target digest cab0851d recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "cab0851daca0bf6a441036d7b9e02d4f16af9a41b78fd56f251727b173b51e5d",
       "targetAncestry": [
@@ -713,7 +713,7 @@
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
         "0027 Consumer Audit"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_4fceb5ca59ea256ccd77c0975d3576e1",
@@ -749,10 +749,10 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H5 \"5. Cơ chế domain-agnostic khác\" is carried as H4 \"0027 Audit 5 Other Domain-Agnostic Mechanisms\"; title and level changed. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading retitle H5 \"5. Cơ chế domain-agnostic khác (được DISCUSSION.md l...\" to H4 \"0027 Audit 5 Other Domain-Agnostic Mechanisms\"; section payload digest and following-block digest equal at both ends (1768 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok. The source title parenthetical (được DISCUSSION.md liệt tường minh) is not in the target title and the rationale only says translated (non-blocking).",
+      "reviewNote": "deep: read source and target sections: heading 5. Cơ chế domain-agnostic khác (được DISCUSSION.md liệt tường minh) (heading:5) becomes 0027 Audit 5 Other Domain-Agnostic Mechanisms (heading:4); body of 1694 chars is byte-identical; the rationale's title and level statement matches; anchor exists; source digest 80901672 reproduces and target digest 42d14b10 recomputes; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "42d14b107b6ba2a390f6c7881ba8471c91817a24674e7eae6f05ff917d296692",
       "targetAncestry": [
@@ -760,7 +760,7 @@
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
         "0027 Consumer Audit"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_042b85c001dab92b6ae561f89eac6337",
@@ -796,10 +796,10 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H5 \"6. Gap liên quan ...\" is carried as H4 \"0027 Audit 6 Adjacent Gaps\"; title and level changed. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading retitle H5 \"6. Gap liên quan nhưng KHÔNG phải phạm vi audit stat...\" to H4 \"0027 Audit 6 Adjacent Gaps\"; section payload digest and following-block digest equal at both ends (460 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok. The source title parenthetical (ghi nhận để không lặp lại công sức) is not in the target title and the rationale only says translated (non-blocking).",
+      "reviewNote": "mechanical: promote 6-gap-liên-quan-nhưng-không-phải-phạm-vi-audit-sta to retired-decision-history.md#0027-audit-6-adjacent-gaps: source digest a2754368 recomputes, target anchor exists and target digest 379c5e08 recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "379c5e08a01f354caaa42087399545a3e49c45edece199864baa00f02e0a7bbc",
       "targetAncestry": [
@@ -807,7 +807,7 @@
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
         "0027 Consumer Audit"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_c5f9a98133b0fd6692dd0c7555d775e1",
@@ -843,17 +843,17 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H4 \"Hệ quả\" of ADR 0027 is carried as H3 \"0027 Consequences\"; title differs, heading-only unit. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading retitle H4 \"Hệ quả\" to H3 \"0027 Consequences\"; section payload digest and following-block digest equal at both ends (1960 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok.",
+      "reviewNote": "mechanical: promote hệ-quả-10 to retired-decision-history.md#0027-consequences: source digest d35b9619 recomputes, target anchor exists and target digest 77292709 recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "7729270993aaa029e4ceb8b64300670303de6930bf6412bd3c8097b7dac134ba",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_8eeec687713e79da23a9339df1179b60",
@@ -888,16 +888,16 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H3 \"0032 — Multi-role Team Harness: trục role/holder ...\" is carried as H2 \"13. ADR 0032 Multi-Role Team Harness\"; title shortened and translated. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading retitle H3 \"0032 — Multi-role Team Harness: trục role/holder, ha...\" to H2 \"13. ADR 0032 Multi-Role Team Harness\"; section payload digest and following-block digest equal at both ends (747 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok. Digests also hand-recomputed with an independent script: equal.",
+      "reviewNote": "mechanical: promote 0032-multi-role-team-harness-trục-roleholder-hando to retired-decision-history.md#13-adr-0032-multi-role-team-harness: source digest f617f1c0 recomputes, target anchor exists and target digest adc47152 recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "adc471524e7f457d3d74097885286fe95536a2bcb0db955d80faa15452aad116",
       "targetAncestry": [
         "Retired Decision History: Work State"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_63db75c2d22d1861c69845d62518ee60",
@@ -931,16 +931,16 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H4 \"Hành trình\" is carried as H2 \"2. Distill Journey\" in the history document, not in the decision record; title differs. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading retitle H4 \"Hành trình\" to H2 \"2. Distill Journey\"; section payload digest and following-block digest equal at both ends (464 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok.",
+      "reviewNote": "mechanical: promote hành-trình to multi-role-harness-distill-record.md#2-distill-journey: source digest 8f1228fb recomputes, target anchor exists and target digest 8cb65c50 recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "8cb65c5075a2a4c13e78b4300f757cfeb334104a6783d6f9c1e6c60f44515274",
       "targetAncestry": [
         "Multi-Role Harness Distill Record"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_634d509e158ed8fc22f610e4c51030ba",
@@ -974,17 +974,17 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H4 \"I. Kiến trúc nền (seq ...)\" is carried as H3 \"0032 Foundation Architecture\"; title translated and seq references dropped. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading retitle H4 \"I. Kiến trúc nền (seq 18029, 18031)\" to H3 \"0032 Foundation Architecture\"; section payload digest and following-block digest equal at both ends (788 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok. The source title parenthetical (seq 18029, 18031) is not in the target title; the rationale says seq references dropped.",
+      "reviewNote": "mechanical: promote i-kiến-trúc-nền-seq-18029-18031 to retired-decision-history.md#0032-foundation-architecture: source digest 18b3552e recomputes, target anchor exists and target digest 43773d8a recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "43773d8a795297806063bf0a0df747a426a048d010c7835e6a4c364f948e25e9",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "13. ADR 0032 Multi-Role Team Harness"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_a9be2da803446c73efbfcac40ee82637",
@@ -1019,17 +1019,17 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H4 \"II. Handoff ...\" is carried as H3 \"0032 Handoff\"; title shortened and seq references dropped. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading retitle H4 \"II. Handoff — trái tim của tính uyển chuyển (seq 180...\" to H3 \"0032 Handoff\"; section payload digest and following-block digest equal at both ends (1327 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok. The source title parenthetical (seq 18032, 18070, 18058) is not in the target title; the rationale says seq references dropped.",
+      "reviewNote": "mechanical: promote ii-handoff-trái-tim-của-tính-uyển-chuyển-seq-18032 to retired-decision-history.md#0032-handoff: source digest bade02e7 recomputes, target anchor exists and target digest 6b297c17 recomputes, shard equals frozen record; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests; text not read",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-02-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "6b297c17245b7ff04f30f0e8abc72bbb41907953c204d3469f8896771b5e88e0",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "13. ADR 0032 Multi-Role Team Harness"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_6f7a10c04ee1414d39b0b2ef8d7d2d6d",
@@ -1064,17 +1064,17 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H4 \"III. Cấu trúc khai báo ...\" is carried as H3 \"0032 Declarative Structure\"; title translated and seq references dropped. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading retitle H4 \"III. Cấu trúc khai báo (seq 18059, 18060, 18110, 181...\" to H3 \"0032 Declarative Structure\"; section payload digest and following-block digest equal at both ends (4770 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok. The source title parenthetical (seq 18059, 18060, 18110, 18189, 18232, 1...) is not in the target title; the rationale says seq references dropped.",
+      "reviewNote": "deep: read source and target sections: heading III. Cấu trúc khai báo (seq 18059, 18060, 18110, 18189, 18232, 18242) (heading:4) becomes 0032 Declarative Structure (heading:3); body of 4695 chars is byte-identical; the rationale's title and level statement matches; anchor exists; source digest fe880106 reproduces and target digest f13c8f30 recomputes; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-03-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "f13c8f30093babf6efcf6b2fbb0062eecfe81a6db5527e400d33b8c3167a4cc5",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "13. ADR 0032 Multi-Role Team Harness"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_10986602d5cab816cf923616dc6b58f8",
@@ -1109,17 +1109,17 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H4 \"IV. Trình tự triển khai (seq 18030)\" is carried as H3 \"0032 Implementation Sequence\"; title translated. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading retitle H4 \"IV. Trình tự triển khai (seq 18030)\" to H3 \"0032 Implementation Sequence\"; section payload digest and following-block digest equal at both ends (708 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok. The source title parenthetical (seq 18030) is not in the target title; the rationale says seq references dropped. Digests also hand-recomputed with an independent script: equal.",
+      "reviewNote": "deep: read source and target sections: heading IV. Trình tự triển khai (seq 18030) (heading:4) becomes 0032 Implementation Sequence (heading:3); body of 667 chars is byte-identical; the rationale's title and level statement matches; anchor exists; source digest 58d93390 reproduces and target digest 861c399f recomputes; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-03-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "861c399f16053144093e08b8bf68e573b9afa26758d326b719c0bb5ddcd0d88f",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "13. ADR 0032 Multi-Role Team Harness"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_2e0270967476b583f5548c2d0632c6f7",
@@ -1200,17 +1200,17 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H4 \"V. Kết luận so sánh marketing-cockpit ...\" is carried as H3 \"0032 Marketing Cockpit Comparison Conclusion\"; title translated. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading retitle H4 \"V. Kết luận so sánh marketing-cockpit (vòng fable, v...\" to H3 \"0032 Marketing Cockpit Comparison Conclusion\"; section payload digest and following-block digest equal at both ends (1274 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok. The source title parenthetical (vòng fable, vẫn đứng vững) is not in the target title and the rationale only says translated (non-blocking).",
+      "reviewNote": "deep: read source and target sections: heading V. Kết luận so sánh marketing-cockpit (vòng fable, vẫn đứng vững) (heading:4) becomes 0032 Marketing Cockpit Comparison Conclusion (heading:3); body of 1203 chars is byte-identical; the rationale's title and level statement matches; anchor exists; source digest 7d8d4de9 reproduces and target digest 8a71adf6 recomputes; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-03-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "8a71adf68dd932df92f4e48b38dabd720531a798392f3d046c521c0cfb7ef4b7",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "13. ADR 0032 Multi-Role Team Harness"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_68304d9e3c8f531fd5dcc25392c6d072",
@@ -1291,17 +1291,17 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H4 \"VI. Treo có chủ đích (không phải quên)\" is carried as H3 \"0032 Deliberately Deferred Questions\"; title translated. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading retitle H4 \"VI. Treo có chủ đích (không phải quên)\" to H3 \"0032 Deliberately Deferred Questions\"; section payload digest and following-block digest equal at both ends (691 chars), so the section body is intact and only title and level differ as the rationale says; anchor ok. The source title parenthetical (không phải quên) is not in the target title and the rationale only says translated (non-blocking). Digests also hand-recomputed with an independent script: equal.",
+      "reviewNote": "deep: read source and target sections: heading VI. Treo có chủ đích (không phải quên) (heading:4) becomes 0032 Deliberately Deferred Questions (heading:3); body of 647 chars is byte-identical; the rationale's title and level statement matches; anchor exists; source digest 6c186518 reproduces and target digest c71143d4 recomputes; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-08-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-03-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "c71143d4c041f9d8943b66c9a1138bf3ce8e6f108c19234f9872579dc9eca773",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "13. ADR 0032 Multi-Role Team Harness"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_092f7d288e8617bb3b8abff586e988f8",
@@ -1336,16 +1336,16 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H4 \"VII. Trạng thái tại thời điểm distill (2026-08-15)\" is carried as H2 \"3. State At Distill Time\" in the history document; dated snapshot, title differs. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading \"VII. Trạng thái tại thời điểm distill (2026-08-15)\" becomes H2 \"3. State At Distill Time\" in the history document; section payload digest and following-block digest equal (898 chars under it), so only title and level differ; the date 2026-08-15 in the source title is not in the target title and the rationale says only \"dated snapshot, title differs\" (non-blocking: the date survives in the retired-decision-history blockquote); anchor ok. Digests also hand-recomputed with an independent script: equal.",
+      "reviewNote": "deep: read source and target sections: heading VII. Trạng thái tại thời điểm distill (2026-08-15) (heading:4) becomes 3. State At Distill Time (heading:2); body of 898 chars is byte-identical; the rationale's title and level statement matches; anchor exists; source digest a88af478 reproduces and target digest dda4c28c recomputes; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-09-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-03-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "dda4c28cba5f1a13d782c50c996bc50d5848d6d8172ecb38066a23e8e1c19023",
       "targetAncestry": [
         "Multi-Role Harness Distill Record"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_be0cd74b4a0bd4c5860e9116aa8dd6c6",
@@ -1379,16 +1379,16 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H4 \"VIII. Sau distill ...\" is carried as H2 \"4. Implementation Review And Verification After Distill\"; dated section, title translated. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "reviewNote": "deep: heading \"VIII. Sau distill ... (2026-08-15/16)\" becomes H2 \"4. Implementation Review And Verification After Distill\"; payload and following-block digests equal so the section text is intact; the date span in the source title is dropped from the target title while the rationale says \"dated section, title translated\" (non-blocking, 2026-08-16 still appears at history line 78); anchor ok.",
+      "reviewNote": "deep: read source and target sections: heading VIII. Sau distill — implement, review độc lập, và verify thật (2026-08 (heading:4) becomes 4. Implementation Review And Verification After Distill (heading:2); body of 2379 chars is byte-identical; the rationale's title and level statement matches; anchor exists; source digest a143984b reproduces and target digest a88add6a recomputes; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-09-287a22d33.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-03-62751458b.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "a88add6a18b0023671d9f83c9261dfd52d1440fd05936db3be3acd430adb0b11",
       "targetAncestry": [
         "Multi-Role Harness Distill Record"
       ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     },
     {
       "claimId": "claim_690988881136792349476d55b83bd81d",
