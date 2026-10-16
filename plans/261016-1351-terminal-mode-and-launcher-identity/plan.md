@@ -117,5 +117,5 @@ Dừng toàn bộ; chạy `adopt --scan` bằng release 6.3 tới khi sạch; re
 
 ## Câu hỏi mở cho anh
 
-1. Nếu P01 đo thấy không đặt được foreground tty cho agent khi gate ở trong PID namespace: **mặc định** gate ra ngoài namespace ở cách `terminal` (gate là cha của bwrap, miền chứa bằng bwrap `--die-with-parent` + subreaper, mức `best-effort` ở `terminal`), báo mức đó ở doctor. Phương án khác: giữ pid namespace và cho agent chạy không foreground (một số CLI không nhận phím). Em sẽ báo số đo trước khi chọn.
-2. (D4) Tiền tố `att-` cho writer id của attempt. **Mặc định:** `att-<attemptId>`. Có ràng buộc định dạng nào trong `docs/io-contract.md` mà anh muốn khác thì đổi ở P00.
+1. **Đã chốt 2026-10-16:** giữ mặc định, nhưng P01 phải báo số đo cho controller trước khi chọn. Nếu P01 đo thấy không đặt được foreground tty cho agent khi gate ở trong PID namespace: **mặc định** gate ra ngoài namespace ở cách `terminal` (gate là cha của bwrap, miền chứa bằng bwrap `--die-with-parent` + subreaper, mức `best-effort` ở `terminal`), báo mức đó ở doctor. Phương án khác: giữ pid namespace và cho agent chạy không foreground (một số CLI không nhận phím). Em sẽ báo số đo trước khi chọn.
+2. **Đã chốt 2026-10-16:** giữ mặc định. (D4) Tiền tố `att-` cho writer id của attempt. **Mặc định:** `att-<attemptId>`. Có ràng buộc định dạng nào trong `docs/io-contract.md` mà anh muốn khác thì đổi ở P00.

@@ -105,6 +105,6 @@ Chỉ code (không state mới ngoài field hiển thị). Revert merge, activat
 
 ## Câu hỏi mở cho anh
 
-1. (D5, kongming N7) Khe "attempt xong → runner commit `writes`" không có lease cwd (hôm nay đã vậy). **Mặc định:** để ngoài 6.4 và giữ trong "Việc hoãn có tên" của r6. Nếu anh muốn gom vào đây (RUL11): thêm một phase ~3 h, `runUnit` giữ `dispatch-cwd` quanh `commitUnitWork` ([`run.mjs:687`](../../src/runner/execution/run.mjs)), cả đường resume.
-2. (D2) `--resume` gặp attempt còn `running` thì từ chối ngay. **Mặc định:** từ chối và in lệnh `fgos dispatch inspect` để xem. Phương án khác: chờ tới khi attempt `closed` rồi đi tiếp (`--resume --wait`), thêm ~2 h.
+1. **Đã chốt 2026-10-16:** gom vào 6.4 theo RUL11 (khe hở thật, nằm trong phạm vi): thêm phase ~3 h giữ `dispatch-cwd` quanh `commitUnitWork`, cả đường resume; Lead thêm phase file khi mở track. (D5, kongming N7) Khe "attempt xong → runner commit `writes`" không có lease cwd (hôm nay đã vậy). **Mặc định:** để ngoài 6.4 và giữ trong "Việc hoãn có tên" của r6. Nếu anh muốn gom vào đây (RUL11): thêm một phase ~3 h, `runUnit` giữ `dispatch-cwd` quanh `commitUnitWork` ([`run.mjs:687`](../../src/runner/execution/run.mjs)), cả đường resume.
+2. **Đã chốt 2026-10-16:** giữ mặc định (từ chối ngay). (D2) `--resume` gặp attempt còn `running` thì từ chối ngay. **Mặc định:** từ chối và in lệnh `fgos dispatch inspect` để xem. Phương án khác: chờ tới khi attempt `closed` rồi đi tiếp (`--resume --wait`), thêm ~2 h.
 3. Tự resume vẫn hoãn (r6 §16). Ghi chú giữ trong spec runner và intent-preservation ledger; không có code nào cho nó ở 6.4.

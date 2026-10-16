@@ -145,6 +145,6 @@ Code + thư mục state mới (`runs/NN/attempt.lock`, `steps/`, socket runtime)
 
 ## Câu hỏi mở cho anh
 
-1. (D6) Driver chứa Windows/macOS chuyển từ 4.4b sang 6.2 P02 theo brief. **Mặc định:** làm ở 6.2; 4.4b chỉ còn driver lock. Anh muốn giữ ở 4.4b thì P02 bỏ, 6.2 trên Windows/macOS báo `unsupported` cho cổng chứa.
-2. (D4) agent-protocol `direct` không dựng argv (argv vẫn từ cấu hình executor). **Mặc định:** như D4. Nếu anh muốn đúng chữ r6 §8 ("dựng argv/stdin"), cần chuyển cả binder ProviderAdapter sang Rust: thêm ~8 h và một phase riêng.
-3. (D9) Khoá `dispatch.gateKillGraceMs` mặc định 10 s. **Mặc định:** 10 s (CLI agent thường cần vài giây để ghi phiên khi bị SIGTERM). Anh có số khác thì đổi một dòng.
+1. **Đã chốt 2026-10-16:** giữ mặc định. (D6) Driver chứa Windows/macOS chuyển từ 4.4b sang 6.2 P02 theo brief. **Mặc định:** làm ở 6.2; 4.4b chỉ còn driver lock. Anh muốn giữ ở 4.4b thì P02 bỏ, 6.2 trên Windows/macOS báo `unsupported` cho cổng chứa.
+2. **Đã chốt 2026-10-16:** giữ mặc định — cấu hình executor vẫn là nguồn duy nhất của argv. (D4) agent-protocol `direct` không dựng argv (argv vẫn từ cấu hình executor). **Mặc định:** như D4. Nếu anh muốn đúng chữ r6 §8 ("dựng argv/stdin"), cần chuyển cả binder ProviderAdapter sang Rust: thêm ~8 h và một phase riêng.
+3. **Đã chốt 2026-10-16:** giữ mặc định 10 s. (D9) Khoá `dispatch.gateKillGraceMs` mặc định 10 s. **Mặc định:** 10 s (CLI agent thường cần vài giây để ghi phiên khi bị SIGTERM). Anh có số khác thì đổi một dòng.
