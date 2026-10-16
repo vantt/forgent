@@ -1,0 +1,881 @@
+{"cuCount":2336,"owners":1102,"units":15050,"unnamed":1357,"rewritten":274,"drawn":{"unnamed":20,"rewritten":20,"random":10}}
+
+### [unnamed] docs/platform/ui-spec/contracts/20-domain-rules.md#unheaded-block-2 named=false   cu=candidate-unverified-specs-ui.json unsourced=13 ancestry=["Domain rules"]
+  TEXT: ```txt
+        Document type: Contract
+        Audience: Documentation migration reviewer, maintainer, agent
+        Purpose: Preserve mapped legacy content for independent conservation review
+        Design status: Candidate
+        Implementation: Carriage only; current implementation truth is not certified
+        Provenance: docs/ui-spec/20-domain-rules.md at 111adc51fd047d99121fd9d076eb4794c87045a4
+        Writer type: Agent draft writer
+        Canonical: No
+        Canonical for: None; candidate only
+        Use this when: Reviewing carriage, placement and source conservation
+        Do not use this for: Current canonical authority or implemented-behavior proof
+        Last reviewed: Not independently reviewed; authored 2026-10-15
+        Related:
+        - docs/ui-spec/20-domain-rules.md
+        Supersedes: None; candidate only
+        Superseded by: None
+        ```
+  ? Audience: Documentation migration reviewer, maintainer, agent
+  ? Purpose: Preserve mapped legacy content for independent conservation review
+  ? Design status: Candidate
+  ? Implementation: Carriage only; current implementation truth is not certified
+  ? Provenance: docs/ui-spec/20-domain-rules.md at 111adc51fd047d99121fd9d076eb4794c87045a4
+  ? Writer type: Agent draft writer
+  ? Canonical for: None; candidate only
+  ? Use this when: Reviewing carriage, placement and source conservation
+  ? Do not use this for: Current canonical authority or implemented-behavior proof
+  ? Last reviewed: Not independently reviewed; authored 2026-10-15
+  ? - docs/ui-spec/20-domain-rules.md
+  ? Supersedes: None; candidate only
+  ? Superseded by: None
+
+### [unnamed] docs/platform/agent-coordination/history/retired-engine/legacy/intent-preservation-ledger.md#unheaded-block-1 named=false   cu=null unsourced=14 ancestry=["Historical File: Original legacy input intent-preservation-ledger.md"]
+  TEXT: ```txt
+        Document type: History
+        Audience: Human reviewer, maintainer and documentation agent
+        Purpose: Preserve the complete classified input as non-authority historical evidence
+        Design status: Candidate
+        Implementation: Historical snapshot; not current implementation or authority
+        Provenance: docs/architect/agent-coordination/intent-preservation-ledger.md at d23045c2de83e3508fda8fd2580b43ece2e1e046; SHA256 1a0a6e7df11d09006c8679a467a85f0f8c0d8f0ad08bb11b3fbea6080b312db0
+        Writer type: Documentation maintainer
+        Canonical for: Historical evidence only; no current authority
+        Use this when: Auditing original claims or section-level retirement
+        Do not use this for: Current runtime behaviour, accepted proposals or executable routing
+        Last reviewed: Pending independent whole-area review
+        Related:
+        - docs/platform/agent-coordination/README.md
+        - docs/specs/runner.md
+        Supersedes: None; this is an exact historical carrier
+        Superseded by: Current execution ownership in docs/specs/runner.md
+        Added in candidate: Historical framing only; literal file bytes are unchanged
+        ```
+  ? Audience: Human reviewer, maintainer and documentation agent
+  ? Purpose: Preserve the complete classified input as non-authority historical evidence
+  ? Design status: Candidate
+  ? Implementation: Historical snapshot; not current implementation or authority
+  ? Provenance: docs/architect/agent-coordination/intent-preservation-ledger.md at d23045c2de83e3508fda8fd2580b43ece2e1e046; SHA256 1a0a6e7df11d09006c8679a467a85f0f8c0d8f0ad08bb11b3fbea6080b312db0
+  ? Writer type: Documentation maintainer
+  ? Canonical for: Historical evidence only; no current authority
+  ? Use this when: Auditing original claims or section-level retirement
+  ? Do not use this for: Current runtime behaviour, accepted proposals or executable routing
+  ? Last reviewed: Pending independent whole-area review
+  ? - docs/platform/agent-coordination/README.md
+  ? Supersedes: None; this is an exact historical carrier
+  ? Superseded by: Current execution ownership in docs/specs/runner.md
+  ? Added in candidate: Historical framing only; literal file bytes are unchanged
+
+### [unnamed] docs/platform/agent-coordination/vision.md#unheaded-block-16 named=false   cu=candidate-unverified-proposals-redesigns.json unsourced=5 ancestry=["Agent Coordination Foundation Vision","Problems This Vision Resolves","2. Planning Currently Over-Materializes Work"]
+  TEXT: Independently governable delivery units belong in Work intake. Temporary
+        research, review and consultation instead have current Unit/Pattern execution
+        paths without requiring an extra Work record. The old claim that no neutral
+        execution path exists is no longer current; further dynamic planning models
+        are design questions, not grounds to revive a session-local task store.
+  ? Independently governable delivery units belong in Work intake. Temporary
+  ? research, review and consultation instead have current Unit/Pattern execution
+  ? paths without requiring an extra Work record. The old claim that no neutral
+  ? execution path exists is no longer current; further dynamic planning models
+  ? are design questions, not grounds to revive a session-local task store.
+
+### [unnamed] docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#unheaded-block-19 named=false   cu=null unsourced=5 ancestry=["Executor Fallback And Effect Eligibility","5. EffectGuaranteePort"]
+  TEXT: An operation's repeat mode must be explicit; it is not inferred from
+        `Assignment.mutation`. Supported current policy values are checked by
+        `assignment-policy.mjs:439-453`, and recovery assessment refuses to infer mode
+        (`src/runner/dispatch/recovery.mjs:201-206`). No current review/red-team YAML
+        profile is claimed here to declare `repeatMode: read-only`.
+  ? An operation's repeat mode must be explicit; it is not inferred from
+  ? `Assignment.mutation`. Supported current policy values are checked by
+  ? `assignment-policy.mjs:439-453`, and recovery assessment refuses to infer mode
+  ? (`src/runner/dispatch/recovery.mjs:201-206`). No current review/red-team YAML
+  ? profile is claimed here to declare `repeatMode: read-only`.
+
+### [unnamed] docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md#unheaded-block-1 named=false   cu=null unsourced=14 ancestry=["Historical File: ADR-006: Assignment Provenance And Normalized Execution-Contract Snapshot"]
+  TEXT: ```txt
+        Document type: History
+        Audience: Human reviewer, maintainer and documentation agent
+        Purpose: Preserve the complete classified input as non-authority historical evidence
+        Design status: Candidate
+        Implementation: Historical snapshot; not current implementation or authority
+        Provenance: docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md at d23045c2de83e3508fda8fd2580b43ece2e1e046; SHA256 685c84e23f4b080f880c0e53d08f11d7fdf3c40da0c97af3e433a0aa60868881
+        Writer type: Documentation maintainer
+        Canonical for: Historical evidence only; no current authority
+        Use this when: Auditing original claims or section-level retirement
+        Do not use this for: Current runtime behaviour, accepted proposals or executable routing
+        Last reviewed: Pending independent whole-area review
+        Related:
+        - docs/platform/agent-coordination/README.md
+        - docs/specs/runner.md
+        Supersedes: None; this is an exact historical carrier
+        Superseded by: Current execution ownership in docs/specs/runner.md
+        Added in candidate: Historical framing only; literal file bytes are unchanged
+        ```
+  ? Audience: Human reviewer, maintainer and documentation agent
+  ? Purpose: Preserve the complete classified input as non-authority historical evidence
+  ? Design status: Candidate
+  ? Implementation: Historical snapshot; not current implementation or authority
+  ? Provenance: docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md at d23045c2de83e3508fda8fd2580b43ece2e1e046; SHA256 685c84e23f4b080f880c0e53d08f11d7fdf3c40da0c97af3e433a0aa60868881
+  ? Writer type: Documentation maintainer
+  ? Canonical for: Historical evidence only; no current authority
+  ? Use this when: Auditing original claims or section-level retirement
+  ? Do not use this for: Current runtime behaviour, accepted proposals or executable routing
+  ? Last reviewed: Pending independent whole-area review
+  ? - docs/platform/agent-coordination/README.md
+  ? Supersedes: None; this is an exact historical carrier
+  ? Superseded by: Current execution ownership in docs/specs/runner.md
+  ? Added in candidate: Historical framing only; literal file bytes are unchanged
+
+### [unnamed] docs/platform/agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md#unheaded-block-1 named=false   cu=null unsourced=14 ancestry=["Historical File: MVP6+ Dogfood Handoff"]
+  TEXT: ```txt
+        Document type: History
+        Audience: Human reviewer, maintainer and documentation agent
+        Purpose: Preserve the complete classified input as non-authority historical evidence
+        Design status: Candidate
+        Implementation: Historical snapshot; not current implementation or authority
+        Provenance: docs/platform/agent-coordination/playbooks/mvp6-dogfood-handoff.md at d23045c2de83e3508fda8fd2580b43ece2e1e046; SHA256 ce9a316aed566a1402b920541fedb34c06a382aa67681f4a5a3ac6f71d54c1ec
+        Writer type: Documentation maintainer
+        Canonical for: Historical evidence only; no current authority
+        Use this when: Auditing original claims or section-level retirement
+        Do not use this for: Current runtime behaviour, accepted proposals or executable routing
+        Last reviewed: Pending independent whole-area review
+        Related:
+        - docs/platform/agent-coordination/README.md
+        - docs/specs/runner.md
+        Supersedes: None; this is an exact historical carrier
+        Superseded by: Current execution ownership in docs/specs/runner.md
+        Added in candidate: Historical framing only; literal file bytes are unchanged
+        ```
+  ? Audience: Human reviewer, maintainer and documentation agent
+  ? Purpose: Preserve the complete classified input as non-authority historical evidence
+  ? Design status: Candidate
+  ? Implementation: Historical snapshot; not current implementation or authority
+  ? Provenance: docs/platform/agent-coordination/playbooks/mvp6-dogfood-handoff.md at d23045c2de83e3508fda8fd2580b43ece2e1e046; SHA256 ce9a316aed566a1402b920541fedb34c06a382aa67681f4a5a3ac6f71d54c1ec
+  ? Writer type: Documentation maintainer
+  ? Canonical for: Historical evidence only; no current authority
+  ? Use this when: Auditing original claims or section-level retirement
+  ? Do not use this for: Current runtime behaviour, accepted proposals or executable routing
+  ? Last reviewed: Pending independent whole-area review
+  ? - docs/platform/agent-coordination/README.md
+  ? Supersedes: None; this is an exact historical carrier
+  ? Superseded by: Current execution ownership in docs/specs/runner.md
+  ? Added in candidate: Historical framing only; literal file bytes are unchanged
+
+### [unnamed] docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md#unheaded-block-1 named=false   cu=null unsourced=14 ancestry=["Historical File: still-consumed advisory role doctrine; mixed historical dispatch/confinement recipes"]
+  TEXT: ```txt
+        Document type: History
+        Audience: Human reviewer, maintainer and documentation agent
+        Purpose: Preserve the complete classified input as non-authority historical evidence
+        Design status: Candidate
+        Implementation: Historical snapshot; not current implementation or authority
+        Provenance: docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md at d23045c2de83e3508fda8fd2580b43ece2e1e046; SHA256 610ffe2502a39b0f5aa3654239bb91f955b4e872daa58e54471b9cd97b682cf9
+        Writer type: Documentation maintainer
+        Canonical for: Historical evidence only; no current authority
+        Use this when: Auditing original claims or section-level retirement
+        Do not use this for: Current runtime behaviour, accepted proposals or executable routing
+        Last reviewed: Pending independent whole-area review
+        Related:
+        - docs/platform/agent-coordination/README.md
+        - docs/specs/runner.md
+        Supersedes: None; this is an exact historical carrier
+        Superseded by: Current execution ownership in docs/specs/runner.md
+        Added in candidate: Historical framing only; literal file bytes are unchanged
+        ```
+  ? Audience: Human reviewer, maintainer and documentation agent
+  ? Purpose: Preserve the complete classified input as non-authority historical evidence
+  ? Design status: Candidate
+  ? Implementation: Historical snapshot; not current implementation or authority
+  ? Provenance: docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md at d23045c2de83e3508fda8fd2580b43ece2e1e046; SHA256 610ffe2502a39b0f5aa3654239bb91f955b4e872daa58e54471b9cd97b682cf9
+  ? Writer type: Documentation maintainer
+  ? Canonical for: Historical evidence only; no current authority
+  ? Use this when: Auditing original claims or section-level retirement
+  ? Do not use this for: Current runtime behaviour, accepted proposals or executable routing
+  ? Last reviewed: Pending independent whole-area review
+  ? - docs/platform/agent-coordination/README.md
+  ? Supersedes: None; this is an exact historical carrier
+  ? Superseded by: Current execution ownership in docs/specs/runner.md
+  ? Added in candidate: Historical framing only; literal file bytes are unchanged
+
+### [unnamed] docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#unheaded-block-10 named=false   cu=candidate-unverified-root-authorities.json unsourced=10 ancestry=["Contract: Setup Doctor Registry","3. Doctor Contract"]
+  TEXT: `active-release-matches-checkout` compares a source checkout's Node payload
+        working-tree bytes with its own activated manifest, using the release builder's
+        source enumeration. It reports changed, missing and extra source files, excludes
+        staged production dependencies, and does not certify Rust host freshness.
+        Outside source checkouts, without activation, with a same-checkout development
+        manifest, or in a linked worktree whose activation belongs to main, it reports
+        a reasoned skip. Unsafe paths and unreadable inputs fail this check rather than
+        throwing out the whole doctor run. It is read-only, with no registered fix:
+        `npm run fgos:dev -- <verb>` runs working-tree code; build/stage/upgrade updates
+        plain `fgos`. Diagnosis never changes the activation implicitly.
+  ? `active-release-matches-checkout` compares a source checkout's Node payload
+  ? working-tree bytes with its own activated manifest, using the release builder's
+  ? source enumeration. It reports changed, missing and extra source files, excludes
+  ? staged production dependencies, and does not certify Rust host freshness.
+  ? Outside source checkouts, without activation, with a same-checkout development
+  ? manifest, or in a linked worktree whose activation belongs to main, it reports
+  ? a reasoned skip. Unsafe paths and unreadable inputs fail this check rather than
+  ? throwing out the whole doctor run. It is read-only, with no registered fix:
+  ? `npm run fgos:dev -- <verb>` runs working-tree code; build/stage/upgrade updates
+  ? plain `fgos`. Diagnosis never changes the activation implicitly.
+
+### [unnamed] docs/platform/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-1 named=false   cu=null unsourced=13 ancestry=["Agent Coordination Concept Relationships"]
+  TEXT: ```txt
+        Document type: Vocabulary
+        Audience: Maintainer, implementation agent and independent reviewer
+        Purpose: Preserve current contracts and explicitly distinguish unimplemented design from retired engine history
+        Design status: Candidate
+        Implementation: Section-specific; proposal schemas and dated findings are not blanket implementation claims
+        Provenance: Restored from 7880fbc74b07c3667ebaa61f2b0561b5d80471b5 after independent liveness review
+        Writer type: Human + agent coauthor
+        Canonical for: The current subject and design boundaries stated in this file; not retired engine authority
+        Use this when: Reading the surviving contract, its implementation limits or current proposals
+        Do not use this for: Reinstating the retired coordination engine or treating proposal details as shipped behavior
+        Last reviewed: Pending independent liveness re-review
+        Related:
+        - docs/platform/agent-coordination/README.md
+        - docs/specs/runner.md
+        Supersedes: Incorrect whole-file retirement or over-removal only
+        Superseded by: None for the surviving current subject
+        Added in candidate: Liveness evidence and explicit implementation/proposal distinction
+        ```
+  ? Audience: Maintainer, implementation agent and independent reviewer
+  ? Purpose: Preserve current contracts and explicitly distinguish unimplemented design from retired engine history
+  ? Design status: Candidate
+  ? Implementation: Section-specific; proposal schemas and dated findings are not blanket implementation claims
+  ? Provenance: Restored from 7880fbc74b07c3667ebaa61f2b0561b5d80471b5 after independent liveness review
+  ? Canonical for: The current subject and design boundaries stated in this file; not retired engine authority
+  ? Use this when: Reading the surviving contract, its implementation limits or current proposals
+  ? Do not use this for: Reinstating the retired coordination engine or treating proposal details as shipped behavior
+  ? Last reviewed: Pending independent liveness re-review
+  ? - docs/platform/agent-coordination/README.md
+  ? Supersedes: Incorrect whole-file retirement or over-removal only
+  ? Superseded by: None for the surviving current subject
+  ? Added in candidate: Liveness evidence and explicit implementation/proposal distinction
+
+### [unnamed] docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-model.md#unheaded-block-1 named=false   cu=null unsourced=14 ancestry=["Historical File: surviving Assignment/Run execution chain; old session membership mixed"]
+  TEXT: ```txt
+        Document type: History
+        Audience: Human reviewer, maintainer and documentation agent
+        Purpose: Preserve the complete classified input as non-authority historical evidence
+        Design status: Candidate
+        Implementation: Historical snapshot; not current implementation or authority
+        Provenance: docs/platform/agent-coordination/architecture/runtime-model.md at d23045c2de83e3508fda8fd2580b43ece2e1e046; SHA256 fd162fbe58d911dff7c0a821bea4cfbee4e531f312d580e93db1119fee81ddc9
+        Writer type: Documentation maintainer
+        Canonical for: Historical evidence only; no current authority
+        Use this when: Auditing original claims or section-level retirement
+        Do not use this for: Current runtime behaviour, accepted proposals or executable routing
+        Last reviewed: Pending independent whole-area review
+        Related:
+        - docs/platform/agent-coordination/README.md
+        - docs/specs/runner.md
+        Supersedes: None; this is an exact historical carrier
+        Superseded by: Current execution ownership in docs/specs/runner.md
+        Added in candidate: Historical framing only; literal file bytes are unchanged
+        ```
+  ? Audience: Human reviewer, maintainer and documentation agent
+  ? Purpose: Preserve the complete classified input as non-authority historical evidence
+  ? Design status: Candidate
+  ? Implementation: Historical snapshot; not current implementation or authority
+  ? Provenance: docs/platform/agent-coordination/architecture/runtime-model.md at d23045c2de83e3508fda8fd2580b43ece2e1e046; SHA256 fd162fbe58d911dff7c0a821bea4cfbee4e531f312d580e93db1119fee81ddc9
+  ? Writer type: Documentation maintainer
+  ? Canonical for: Historical evidence only; no current authority
+  ? Use this when: Auditing original claims or section-level retirement
+  ? Do not use this for: Current runtime behaviour, accepted proposals or executable routing
+  ? Last reviewed: Pending independent whole-area review
+  ? - docs/platform/agent-coordination/README.md
+  ? Supersedes: None; this is an exact historical carrier
+  ? Superseded by: Current execution ownership in docs/specs/runner.md
+  ? Added in candidate: Historical framing only; literal file bytes are unchanged
+
+### [unnamed] docs/platform/host-invocation-routing/roadmap.md#unheaded-block-13 named=false   cu=candidate-unverified-host-invocation-routing.json unsourced=6 ancestry=["Host Invocation Routing Roadmap","4. Phase A: Close Local R1 Host Proof"]
+  TEXT: - Keep [command-routes.json](../../../packages/host-runtime/contracts/command-routes.json) as the route matrix source of truth.
+        - Verify the matrix count in tests: 75 selectors, 70 `legacy-cli`, five native selectors: `convention`, `friction`, `gate-bypass`, `metrics`, `version`.
+        - Ensure every route has owner path and compatibility tests.
+        - Keep native `version` proof: no Node child process, valid `fgos.v1` presentation, `distribution.build.show` typed provider output.
+        - Keep legacy passthrough proof: one Node child process, manifest-based legacy payload resolution, recursion guard, one lifecycle record.
+        - Keep kernel proof: `OperationId`, `OperationRequest`, `ProviderOutcome`, router, registry snapshot, authority gate, and `InvocationService` tests.
+  ? - Keep [command-routes.json]() as the route matrix source of truth.
+  ? - Verify the matrix count in tests: 75 selectors, 70 `legacy-cli`, five native selectors: `convention`, `friction`, `gate-bypass`, `metrics`, `version`.
+  ? - Ensure every route has owner path and compatibility tests.
+  ? - Keep native `version` proof: no Node child process, valid `fgos.v1` presentation, `distribution.build.show` typed provider output.
+  ? - Keep legacy passthrough proof: one Node child process, manifest-based legacy payload resolution, recursion guard, one lifecycle record.
+  ? - Keep kernel proof: `OperationId`, `OperationRequest`, `ProviderOutcome`, router, registry snapshot, authority gate, and `InvocationService` tests.
+
+### [unnamed] docs/platform/packaging-distribution/spec.md#unheaded-block-36 named=false   cu=candidate-unverified-root-authorities.json unsourced=1 ancestry=["Spec: Packaging-Distribution","7. Global, Project, And Dev Contexts"]
+  TEXT: fgOS recognizes multiple contexts on one machine:
+  ? fgOS recognizes multiple contexts on one machine:
+
+### [unnamed] docs/platform/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md#unheaded-block-1 named=false   cu=null unsourced=13 ancestry=["ADR-002: Preserve Workflow step Primary Operation Compatibility"]
+  TEXT: ```txt
+        Document type: Decision
+        Audience: Maintainer, implementation agent and independent reviewer
+        Purpose: Preserve current contracts and explicitly distinguish unimplemented design from retired engine history
+        Design status: Candidate
+        Implementation: Section-specific; proposal schemas and dated findings are not blanket implementation claims
+        Provenance: Restored from 7880fbc74b07c3667ebaa61f2b0561b5d80471b5 after independent liveness review
+        Writer type: Human + agent coauthor
+        Canonical for: The current subject and design boundaries stated in this file; not retired engine authority
+        Use this when: Reading the surviving contract, its implementation limits or current proposals
+        Do not use this for: Reinstating the retired coordination engine or treating proposal details as shipped behavior
+        Last reviewed: Pending independent liveness re-review
+        Related:
+        - docs/platform/agent-coordination/README.md
+        - docs/specs/runner.md
+        Supersedes: Incorrect whole-file retirement or over-removal only
+        Superseded by: None for the surviving current subject
+        Added in candidate: Liveness evidence and explicit implementation/proposal distinction
+        ```
+  ? Audience: Maintainer, implementation agent and independent reviewer
+  ? Purpose: Preserve current contracts and explicitly distinguish unimplemented design from retired engine history
+  ? Design status: Candidate
+  ? Implementation: Section-specific; proposal schemas and dated findings are not blanket implementation claims
+  ? Provenance: Restored from 7880fbc74b07c3667ebaa61f2b0561b5d80471b5 after independent liveness review
+  ? Canonical for: The current subject and design boundaries stated in this file; not retired engine authority
+  ? Use this when: Reading the surviving contract, its implementation limits or current proposals
+  ? Do not use this for: Reinstating the retired coordination engine or treating proposal details as shipped behavior
+  ? Last reviewed: Pending independent liveness re-review
+  ? - docs/platform/agent-coordination/README.md
+  ? Supersedes: Incorrect whole-file retirement or over-removal only
+  ? Superseded by: None for the surviving current subject
+  ? Added in candidate: Liveness evidence and explicit implementation/proposal distinction
+
+### [unnamed] docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-2 named=false   cu=null unsourced=1 ancestry=["Team Communication Protocol V1"]
+  TEXT: Complete pre-rework input: [historical snapshot](../history/retired-engine/files/proposals/team-communication-protocol-v1.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
+  ? Complete pre-rework input: [historical snapshot](). This is preservation evidence, not a replacement for the current contract below.
+
+### [unnamed] docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md#unheaded-block-12 named=false   cu=candidate-unverified-proposals-redesigns.json unsourced=8 ancestry=["Architecture Advisory Role Doctrine","The Shape Of The Panel"]
+  TEXT: Registered output mapping: Lead/Investigator framing guidance belongs in the
+        framing report; the system, alternative and constraint lenses belong to the
+        three shaping reports; critic findings belong to reviewed critique; synthesis
+        and dispositions belong to the final RAW JSON packet; explanation belongs to
+        its report; the close gate records the owner's missing-expertise answer.
+        Named Markdown files below are optional manual example artifacts, not required
+        registered outputs. Hypothetical examples are reasoning demonstrations, not
+        observed reports from a present Workflow run.
+  ? Registered output mapping: Lead/Investigator framing guidance belongs in the
+  ? framing report; the system, alternative and constraint lenses belong to the
+  ? three shaping reports; critic findings belong to reviewed critique; synthesis
+  ? and dispositions belong to the final RAW JSON packet; explanation belongs to
+  ? its report; the close gate records the owner's missing-expertise answer.
+  ? Named Markdown files below are optional manual example artifacts, not required
+  ? registered outputs. Hypothetical examples are reasoning demonstrations, not
+  ? observed reports from a present Workflow run.
+
+### [unnamed] docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-004-reserve-job.md#unheaded-block-1 named=false   cu=null unsourced=14 ancestry=["Historical File: ADR-004: Reserve Job For A Future Scheduler"]
+  TEXT: ```txt
+        Document type: History
+        Audience: Human reviewer, maintainer and documentation agent
+        Purpose: Preserve the complete classified input as non-authority historical evidence
+        Design status: Candidate
+        Implementation: Historical snapshot; not current implementation or authority
+        Provenance: docs/platform/agent-coordination/decisions/ADR-004-reserve-job.md at d23045c2de83e3508fda8fd2580b43ece2e1e046; SHA256 a60ce5298c77d43edee04c299a0a0eb71b3515833c743f937cba009ce421453a
+        Writer type: Documentation maintainer
+        Canonical for: Historical evidence only; no current authority
+        Use this when: Auditing original claims or section-level retirement
+        Do not use this for: Current runtime behaviour, accepted proposals or executable routing
+        Last reviewed: Pending independent whole-area review
+        Related:
+        - docs/platform/agent-coordination/README.md
+        - docs/specs/runner.md
+        Supersedes: None; this is an exact historical carrier
+        Superseded by: Current execution ownership in docs/specs/runner.md
+        Added in candidate: Historical framing only; literal file bytes are unchanged
+        ```
+  ? Audience: Human reviewer, maintainer and documentation agent
+  ? Purpose: Preserve the complete classified input as non-authority historical evidence
+  ? Design status: Candidate
+  ? Implementation: Historical snapshot; not current implementation or authority
+  ? Provenance: docs/platform/agent-coordination/decisions/ADR-004-reserve-job.md at d23045c2de83e3508fda8fd2580b43ece2e1e046; SHA256 a60ce5298c77d43edee04c299a0a0eb71b3515833c743f937cba009ce421453a
+  ? Writer type: Documentation maintainer
+  ? Canonical for: Historical evidence only; no current authority
+  ? Use this when: Auditing original claims or section-level retirement
+  ? Do not use this for: Current runtime behaviour, accepted proposals or executable routing
+  ? Last reviewed: Pending independent whole-area review
+  ? - docs/platform/agent-coordination/README.md
+  ? Supersedes: None; this is an exact historical carrier
+  ? Superseded by: Current execution ownership in docs/specs/runner.md
+  ? Added in candidate: Historical framing only; literal file bytes are unchanged
+
+### [unnamed] docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md#unheaded-block-3 named=false   cu=null unsourced=19 ancestry=["Historical File: CoordinationSession Persistence And Recovery Contract","Literal Snapshot"]
+  TEXT: ~~~~text
+        # CoordinationSession Persistence And Recovery Contract
+        
+        ```txt
+        Document type: Contract
+        Audience: Human reviewers, maintainers, documentation agents
+        Purpose: Preserve source material for CoordinationSession Persistence And Recovery Contract
+        Design status: Candidate
+        Implementation: Not re-verified; source implementation statements remain in the body
+        Provenance: Retained from docs/architect/agent-coordination/contracts/coordination-session.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
+        Writer type: Documentation maintainer
+        Canonical for: Preserved contract material for CoordinationSession Persistence And Recovery Contract; no authority cutover
+        Use this when: Comparing this candidate with its pinned legacy source
+        Do not use this for: Inferring current implementation or supersession of retained sources
+        Last reviewed: UNPROVEN; independent content review pending
+        Related:
+        - docs/platform/agent-coordination/contracts/flow-definition.md
+        - docs/platform/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md
+        - docs/platform/agent-coordination/contracts/assignment-run-runresult.md
+        Supersedes: None; retained source authority is unchanged
+        Superseded by: None
+        Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
+        ```
+        Document type: Contract
+        Design status: Accepted
+        Implementation: Implemented (Phase 01 R1-R8: manifest/event store, direct
+        mission-lite cutover, shared engine, dynamic consult, crash-safe idempot
+  ? ~~~~text
+  ? Audience: Human reviewers, maintainers, documentation agents
+  ? Purpose: Preserve source material for CoordinationSession Persistence And Recovery Contract
+  ? Design status: Candidate
+  ? Implementation: Not re-verified; source implementation statements remain in the body
+  ? Provenance: Retained from docs/architect/agent-coordination/contracts/coordination-session.md at fcfe78cb89585bc9ab23f11bab67d41458834fc4
+  ? Writer type: Documentation maintainer
+  ? Canonical for: Preserved contract material for CoordinationSession Persistence And Recovery Contract; no authority cutover
+  ? Use this when: Comparing this candidate with its pinned legacy source
+  ? Do not use this for: Inferring current implementation or supersession of retained sources
+  ? Last reviewed: UNPROVEN; independent content review pending
+  ? - docs/platform/agent-coordination/contracts/flow-definition.md
+  ? - docs/platform/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md
+  ? - docs/platform/agent-coordination/contracts/assignment-run-runresult.md
+  ? Supersedes: None; retained source authority is unchanged
+  ? Superseded by: None
+  ? Added in candidate: Promotion metadata only; source claims and implementation are not re-decided here
+  ? `src/runner/deliberation/schema.mjs` (`../../../../src/runner/deliberation/schema.mjs`; Added in candidate: historical path absent at the batch pin)
+  ? ~~~~
+
+### [unnamed] docs/platform/proposals/knowledge-registry-redesign.md#unheaded-block-3 named=false   cu=candidate-unverified-proposals-redesigns.json unsourced=1 ancestry=["Knowledge Registry Redesign"]
+  TEXT: Source relationship: [original source](../../architect/knowledge-registry-redesign.md).
+  ? Source relationship: [original source]().
+
+### [unnamed] docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md#unheaded-block-65 named=false   cu=candidate-unverified-proposals-redesigns.json unsourced=6 ancestry=["Architecture Advisory Artifact Templates","12. Dialogue Response — `dialogue/<n>-response.md`"]
+  TEXT: **Why this exists.** An optional manual response trace can help a successor
+        understand whether a person was answered and which artifact supports the reply.
+        It is not the retired Dialogue Turn Protocol's fourth runtime layer, and the
+        registered Workflow does not guarantee crash recovery of these companion files.
+        The registered graph remains framing, shaping, critique, synthesis, explanation
+        and the human close gate (`core/workflows/architecture-advisory.yaml:8-84`).
+  ? **Why this exists.** An optional manual response trace can help a successor
+  ? understand whether a person was answered and which artifact supports the reply.
+  ? It is not the retired Dialogue Turn Protocol's fourth runtime layer, and the
+  ? registered Workflow does not guarantee crash recovery of these companion files.
+  ? The registered graph remains framing, shaping, critique, synthesis, explanation
+  ? and the human close gate (`core/workflows/architecture-advisory.yaml:8-84`).
+
+### [unnamed] docs/platform/work-state/architecture/implementation-pointers.md#unheaded-block-1 named=false   cu=candidate-unverified-root-authorities.json unsourced=14 ancestry=["Work State Implementation Pointers"]
+  TEXT: ```txt
+        Document type: Architecture
+        Audience: Human reviewer, architect, maintainer, implementation agent
+        Purpose: Module-to-responsibility pointers for the work state engine implementation.
+        Design status: Candidate
+        Last reviewed: 2026-10-06
+        Related:
+        - docs/platform/work-state/README.md
+        - docs/platform/work-state/spec.md
+        - docs/specs/work-state.md
+        Implementation: Carried source material; current implementation truth unverified
+        Provenance: Retained work-state candidate carriage from docs/specs/work-state.md; existing Related references retained
+        Writer type: Original writer attribution not recorded; retained source provenance
+        Canonical for: Candidate scope: Module-to-responsibility pointers for the work state engine implementation; authority follows transitional switchboard
+        Use this when: Module-to-responsibility pointers for the work state engine implementation
+        Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+        Supersedes: None; legacy sources remain in place during migration
+        Superseded by: None recorded
+        ```
+  ? Audience: Human reviewer, architect, maintainer, implementation agent
+  ? Purpose: Module-to-responsibility pointers for the work state engine implementation.
+  ? Design status: Candidate
+  ? Last reviewed: 2026-10-06
+  ? - docs/platform/work-state/README.md
+  ? - docs/platform/work-state/spec.md
+  ? Implementation: Carried source material; current implementation truth unverified
+  ? Provenance: Retained work-state candidate carriage from docs/specs/work-state.md; existing Related references retained
+  ? Writer type: Original writer attribution not recorded; retained source provenance
+  ? Canonical for: Candidate scope: Module-to-responsibility pointers for the work state engine implementation; authority follows transitional switchboard
+  ? Use this when: Module-to-responsibility pointers for the work state engine implementation
+  ? Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+  ? Supersedes: None; legacy sources remain in place during migration
+  ? Superseded by: None recorded
+
+### [rewritten] docs/platform/host-invocation-routing/contracts/component-protocol.md#unheaded-block-57 named=true claim_a1c1085c9d77a84ca5e5aefe1de6d059 move cu=null unsourced=2 ancestry=["Contract: Component Protocol","Restored rollback bullets"]
+  TEXT: ````md
+        - Keep legacy and native implementations side by side only for the observation
+          window of their operation.
+        - Never delete a Node writer before proving it can read/recover state last
+          written by the Rust implementation, or explicitly declaring the cutover
+          irreversible with migration evidence.
+        - Remove rollback code per component after its window; do not accumulate a
+          permanent second implementation tree.
+        ````
+  ? ````md
+  ? ````
+
+### [rewritten] docs/platform/documentation/history/templates/subcomponent-readme.md#unheaded-block-7 named=true claim_67666efaf53224a9348dd7f3060cc811 archive-with-reason cu=null unsourced=0 ancestry=["<Subcomponent Name>","9. Related Files"]
+  TEXT: ```markdown
+        | Relationship | File |
+        |---|---|
+        | parent area | [../../README.md](../../README.md) |
+        | parent current behavior | [../../spec.md](../../spec.md) |
+        | local current behavior | [spec.md](spec.md) |
+        | local design shape | [architecture/](architecture/) |
+        | local contracts | [contracts/](contracts/) |
+        | local proof | [verification/](verification/) |
+        ```
+
+### [rewritten] docs/platform/herdr-web-dashboard/spec.md#unheaded-block-9 named=true claim_5877600a52b4cf5568796da3c9044b65 supersede cu=null unsourced=4 ancestry=["Spec: herdr Web Dashboard (browser surface for fgOS work)","Entry Points & Triggers"]
+  TEXT: - **Open the dashboard.** A person opens the dashboard's address in a browser
+          on any device that can reach the machine. The first interaction is always
+          sign-in; there is no anonymous view (mandatory token auth from v1, not deferred to a later version).
+        - **Open the taskboard.** The default landing surface once signed in: every
+          work item on the connected project, grouped so the person can see state at a
+          glance.
+        - **Open one task's detail.** From the taskboard, or directly by address.
+        - **Open "questions needing answer".** The list of everything currently
+          waiting on a person — covering **both** channels, `ask` questions and
+          `gate-approve` questions (question-needing-answer covers both channels), not just the `ask` channel.
+        - **Availability trigger (not a person's action).** The dashboard is reachable
+          whenever the gateway process is running. Start and stop it with
+          `fgos gateway start` and `fgos gateway stop`; it is detached from the CLI
+          and **outlives the cockpit pane** — closing that pane does not stop it. Static serving defaults ON (`herdrWebDashboard.staticServing`); the gateway started with `fgos gateway start` listens on the
+          configured bind address (default reaches beyond loopback — binds 0.0.0.0 by default, bind address configurable, warns when non-loopback) and on port
+          4170 by default (`gateway.port` overrides it).
+        - **No outbound trigger exists.** Nothing notifies the person that a question
+          is waiting; they have to come and look. A push/attention 
+  ? whenever the gateway process is running. Start and stop it with
+  ? `fgos gateway start` and `fgos gateway stop`; it is detached from the CLI
+  ? and **outlives the cockpit pane** — closing that pane does not stop it. Static serving defaults ON (`herdrWebDashboard.staticServing`); the gateway started with `fgos gateway start` listens on the
+  ? 4170 by default (`gateway.port` overrides it).
+
+### [rewritten] docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#unheaded-block-10 named=true claim_fd246fe0ad796f0ce1f3448b6ad8ec61 supersede cu=null unsourced=3 ancestry=["Architecture: Node To Rust Migration","Retained selected source material","Node To Rust Component Migration","Historical Migration Status Note"]
+  TEXT: Added in candidate: superseded migration bookkeeping. The legacy source was
+        legacy-current during the 2026-09-14 promotion pass. That dated status applies
+        to the legacy input, not this candidate. The recorded platform destinations are
+        [architecture/node-to-rust-migration.md](node-to-rust-migration.md),
+        [architecture/release-boundaries.md](release-boundaries.md),
+        [verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md),
+        and [history/host-invocation-baseline.md](../history/host-invocation-baseline.md).
+        See the [intent preservation ledger](../intent-preservation-ledger.md)
+        for disposition by preserved claim.
+  ? Added in candidate: superseded migration bookkeeping. The legacy source was
+  ? legacy-current during the 2026-09-14 promotion pass. That dated status applies
+  ? to the legacy input, not this candidate. The recorded platform destinations are
+
+### [rewritten] docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-14 named=true claim_d90840823918415e74ddd353dae32ea3 move cu=null unsourced=2 ancestry=["Architecture: Release Boundaries","Restored class definitions"]
+  TEXT: ````md
+        **Core component** — required for a useful fgOS release; owned by fgOS, released atomically with the host, normally statically linked once migrated. Not optional and not replaceable by default; may expose extension points, but a plugin implementing one does not become the authority owner of the core component. Examples: Work Lifecycle, Host Invocation, authority gating, provider routing, DispatchPlan selection, Assignment/Run/RunResult contracts, init/doctor health.
+        ````
+  ? ````md
+  ? ````
+
+### [rewritten] docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md#unheaded-block-66 named=true claim_9abc9022ffe0e22751258bd1dca6136d move cu=null unsourced=0 ancestry=["Architecture: Node To Rust Migration","Retained selected source material","Node To Rust Component Migration","15. Remaining Migration Decisions"]
+  TEXT: The former "which post-npm release/install mechanism owns native artifacts"
+        decision is settled: the packaging stream owns it (`fgctl` + release store +
+        workspace activation binding), see
+        [Runtime Identity And Activation](../../packaging-distribution/architecture/runtime-identity-and-activation.md).
+
+### [rewritten] docs/platform/proposals/coordination-capability-envelope.md#unheaded-block-5 named=true claim_85e9b5ff587ba23b26257be6b6130590 supersede cu=null unsourced=0 ancestry=["Agent Coordination — Capability Envelope và Coordinator-Owned Deliberation","Reading context and authority"]
+  TEXT: Current investigation status and next steps:
+        [Chat progress and handoff](../agent-coordination/history/proposals-redesigns/coordination-envelope-progress.md).
+
+### [rewritten] docs/platform/observe/spec.md#unheaded-block-13 named=true claim_41988cae1fdd914bf7a8a4d1df2aeb82 move cu=null unsourced=0 ancestry=["Observe Component Specification","5. Mục theo làn (Sub-spec sections)","§ Contract & Quyết định (Làn C / F8)"]
+  TEXT: Dành cho Phase F8: khoá ranh giới contracts, golden fixtures và decision records.
+        - Versioned contracts: `packages/observe/contracts/` (`observe.observation.v1.json`, `observe.friction.v1.json`, `observe.case.v1.json`, `observe.snapshot.v1.json`, `observe.eval.v1.json`). Eval rubric: [`discussion-quality.v1`](../../reference/discussion-quality-rubric.md); [blind comparison how-to](../../how-to/compare-discussion-setups-with-metrics-eval.md).
+        - Source owner read contracts: `packages/run-result/contracts/run-result.read.v1.json`, `packages/run-result/contracts/unit-summary.read.v2.json`, `packages/observe/contracts/coordination-session.read.v1.json` (historic sessions; the coordination engine is retired), `packages/work-state/contracts/work-events.read.v1.json`.
+        - Golden fixtures: `test/fixtures/observe/` sinh bằng CLI Rust và Node trong `scripts/regenerate-observe-fixtures.mjs`.
+        - Doctor checks: `observe-dir-writable`, `observe-friction-migrated`, `observe-host-resolvable`, `observe-run-coverage` (`src/setup/registrations.mjs`). Coverage check gọi host `metrics coverage` qua helper với main-checkout dir, kiểm tra `v2` + accounting rồi so `runDirsSeen` với Node directory-only `scanAssignmentLayout` (gồm symlink/depth barriers). Tolerance là max(Node recent result files, host `recentRuns`) trong cửa sổ 60 giây. Chỉ positive unknown subcommand hoặc payload thiếu `layoutRule` được degraded/pass vì old host; malformed coverage và các lỗi khác fail.
+
+### [rewritten] docs/platform/herdr-web-dashboard/spec.md#unheaded-block-26 named=true claim_dc3d0ae980bf2501bc8eabfa0484a46d supersede cu=null unsourced=1 ancestry=["Spec: herdr Web Dashboard (browser surface for fgOS work)","Visuals"]
+  TEXT: Not specified here by design. The concrete layout, userflow, empty/error
+        presentation, colour and typography are `tsk-3x6`'s deliverable:
+        `docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md`, which takes this spec as its
+        product input. The one direction this spec pins is the actor-facing
+        expectation recorded under "View the taskboard": a Monday.com/ClickUp-style
+        grouped board with in-place quick actions and filtering, not a flat table.
+  ? `docs/knowledge/herdr-web-dashboard-layout-userflow-and-visual-language/herdr-web-dashboard-layout.md`, which takes this spec as its
+
+### [rewritten] docs/platform/documentation/history/templates/spec.md#unheaded-block-6 named=true claim_a45257049fe00947d73007e74910b25d archive-with-reason cu=null unsourced=2 ancestry=["Spec: <Area Name>","Source Metadata (Added in candidate)"]
+  TEXT: ````text
+        ```txt
+        Document type: Spec
+        Audience: Human reviewer, implementer, agent
+        Purpose: Describe current behavior/state/reference for <area>
+        Design status: Draft
+        Implementation: N/A
+        Provenance: Human + agent curated
+        Writer type: Human + agent coauthor
+        Canonical for: Current behavior/state of <area>
+        Use this when: You need to implement, verify, maintain, or preserve current behavior
+        Do not use this for: Design alternatives, long rationale, or historical discussion
+        Last reviewed: YYYY-MM-DD
+        Related:
+        - `README.md`
+        ```
+        ````
+  ? ````text
+  ? ````
+
+### [rewritten] docs/platform/governance.md#unheaded-block-42 named=true claim_9c4d8826c3422b8f1d02c0d0d50c21e8 supersede cu=null unsourced=1 ancestry=["Documentation Governance","9. Subcomponent Structure"]
+  TEXT: Rules:
+        
+        - Every large area README should include a `Subcomponent Map`, even when
+          subcomponents do not yet have their own directories.
+        - Create a subcomponent directory only when the child has enough independent
+          behavior, contracts, proof, or lifecycle to justify local navigation.
+        - Area-level `vision.md` and `intent-preservation-ledger.md` remain the parent
+          direction. A subcomponent may have its own vision/ledger only when its intent
+          is large enough to drift independently.
+        - Area-level `spec.md` summarizes current area behavior and links to
+          subcomponent specs; it does not duplicate every subcomponent detail.
+        - Subcomponent docs must link back to the parent area README and to the relevant
+          `docs/platform/component-boundary.md` entry when read from
+          this governance doc; inside area docs use the correct relative path.
+        - Cross-area contracts stay at the owning area or platform contract surface;
+          subcomponent contract docs can own local obligations but must link to the
+          cross-area owner.
+        - If a subcomponent changes parent/child component boundaries, update
+          `docs/platform/component-boundary.md`.
+  ? `docs/platform/component-boundary.md` entry when read from
+
+### [rewritten] docs/platform/host-invocation-routing/contracts/component-protocol.md#unheaded-block-62 named=true claim_49ffb5866f0a65b3a12eef5f66b6d667 move cu=null unsourced=2 ancestry=["Contract: Component Protocol","Restored p1 compatibility harness"]
+  TEXT: ````md
+        ```txt
+        test/rust-host/
+        packages/component-protocol/contracts/
+        scripts/export-command-selectors.mjs
+        scripts/explain-command-route.mjs
+        ```
+        ````
+  ? ````md
+  ? ````
+
+### [rewritten] docs/platform/work-state/spec.md#unheaded-block-65 named=true claim_320ba6224015cc3877738795b80dabb7 supersede cu=null unsourced=3 ancestry=["Work State Specification","9. Behaviors And Operations","Add Verb"]
+  TEXT: `add` không còn là cửa vào của câu chuyện public (đó là `submit`, per stage-intake) — vẫn hoạt động nguyên vẹn cho test/tooling nội bộ, đòi người
+        gọi điền đủ các cờ bắt buộc `--title`, `--description`, `--kind`, `--risk` và `--verify`; `--id` tùy chọn, khi vắng thì `generateId`
+        sinh id `tsk-<hash>` chống trùng từ title, khác UX "nộp rồi đi" của `submit`. **Đã quyết (STR22, per work-item-verb-surface): giữ `add`
+        làm bề mặt nội bộ, không xóa** — bộ test hiện dùng `add` để tự điền id/field
+        trực tiếp trong nhiều file tiếp tục dùng nguyên trạng (ví dụ `test/cli/fgos-intake-7.test.mjs` và `test/e2e/pr-gate.test.mjs`); tài liệu/spec không giới thiệu
+        `add` như một cửa vào public ở bất kỳ đâu khác.
+  ? gọi điền đủ các cờ bắt buộc `--title`, `--description`, `--kind`, `--risk` và `--verify`; `--id` tùy chọn, khi vắng thì `generateId`
+  ? sinh id `tsk-<hash>` chống trùng từ title, khác UX "nộp rồi đi" của `submit`. **Đã quyết (STR22, per work-item-verb-surface): giữ `add`
+  ? trực tiếp trong nhiều file tiếp tục dùng nguyên trạng (ví dụ `test/cli/fgos-intake-7.test.mjs` và `test/e2e/pr-gate.test.mjs`); tài liệu/spec không giới thiệu
+
+### [rewritten] docs/platform/host-invocation-routing/contracts/component-protocol.md#unheaded-block-35 named=true claim_8c44796ac827f6b1287421778b56511c move cu=null unsourced=2 ancestry=["Contract: Component Protocol","Restored rust host first cost"]
+  TEXT: ````md
+        The cost is temporary: a legacy CLI call pays both the small Rust launcher and Node startup, distribution must ship both runtimes, and compatibility failures can occur before any command becomes faster. The architecture only pays off if the first Rust host remains thin and forwards legacy behavior rather than rewriting every parser and use case at once.
+        ````
+  ? ````md
+  ? ````
+
+### [rewritten] docs/platform/host-invocation-routing/contracts/component-protocol.md#unheaded-block-11 named=true claim_e365a92a236aa909b9148185aa8f0801 move cu=null unsourced=2 ancestry=["Contract: Component Protocol","Restored contract versioning"]
+  TEXT: ````md
+        For idempotency-keyed operations the key lives in the owning operation contract and is stable across an authorized retry; the router never invents one. Read-only does not imply retry-safe when the provider has external effects — the catalog's declared idempotency decides.
+        ````
+  ? ````md
+  ? ````
+
+### [rewritten] docs/platform/proposals/architecture-advisory-panel.md#unheaded-block-7 named=true claim_ff302d4fba8c16fa09c0534ad4bc96d4 supersede cu=null unsourced=2 ancestry=["Architecture Advisory Panel"]
+  TEXT: ````markdown
+        Implementation plan:
+        [Architecture Advisory Panel execution track](../../../plans/260905-architecture-advisory-panel/plan.md).
+        ````
+  ? ````markdown
+  ? ````
+
+### [rewritten] docs/platform/runner/operations/h-51f5cd7279fd.md#unheaded-block-16 named=true claim_344b9a104297ed0fd462fe5ac4b73097 supersede cu=null unsourced=3 ancestry=["Added in candidate: Runner Behaviors & Operations","Behaviors & Operations","Xem live output worker khi đang chạy (live tee, STR39)"]
+  TEXT: - **Runs when:** khi Unit run được tạo, runner ghi một con trỏ vào log của item.
+        - **What changes:** output trong lúc chạy được capture dưới `.fgos/assignments/<unitRunId>/producer/*/runs/*/protected/capture/`; khi settle, output nằm trong `stdout.log` của run và khối output được nối vào `.fgos/logs/<id>.log`.
+        - **Side effects:** không throw dù ghi hỏng hay callback ghi hỏng (cùng kỷ
+          luật never-throws với khối kết-cục cuối — quan sát không bao giờ được
+          phép làm gãy một dispatch thật).
+        - **Afterwards:** `tail -f .fgos/logs/<id>.log` thấy con trỏ Unit run trong lúc chạy; đọc capture của run để xem output trước khi khối kết-cục được nối sau settle.
+  ? - **Runs when:** khi Unit run được tạo, runner ghi một con trỏ vào log của item.
+  ? - **What changes:** output trong lúc chạy được capture dưới `.fgos/assignments/<unitRunId>/producer/*/runs/*/protected/capture/`; khi settle, output nằm trong `stdout.log` của run và khối output được nối vào `.fgos/logs/<id>.log`.
+  ? - **Afterwards:** `tail -f .fgos/logs/<id>.log` thấy con trỏ Unit run trong lúc chạy; đọc capture của run để xem output trước khi khối kết-cục được nối sau settle.
+
+### [rewritten] docs/platform/documentation/switchboard.md#unheaded-block-6 named=true claim_be508003873ccd504ecddda670e9bb48 supersede cu=null unsourced=0 ancestry=["Transitional Documentation Authority Switchboard","4. Resolution Algorithm for Readers and Writers"]
+  TEXT: 1. **Identify the topic or claim** you need to read or update.
+        2. **Find the surface row** in Section 2 (Area Authority Routes) or Section 3 (Root Document Routes).
+        3. **If `authorityStatus` is `promoted`:**
+           - Navigate to the promoted portal (`docs/platform/<area>/README.md`).
+           - Follow the portal's explicit current-source mapping.
+           - If the portal delegates the specific contract, ADR, or proof to a retained source, that retained source owns that claim.
+        4. **If `authorityStatus` is `legacy-current`:**
+           - Navigate directly to the current canonical route listed in the table (typically `docs/specs/<area>.md` or root doc).
+           - Do NOT attempt to read or author candidate files under `docs/platform/<area>/` for that topic.
+        5. **If `authorityStatus` is `candidate`:**
+           - Enter at the target portal for orientation, but use the retained legacy source for binding claims.
+           - Do not treat candidate text as binding authority until Phase 08 promotion.
+        6. **For authors during migration:**
+           - Consult [docs/platform/migration-authoring-rules.md](../migration-authoring-rules.md).
+           - Update only the single declared current owner.
+           - Never dual-author.
+           - Edits under legacy roots (`docs/specs`, `docs/architect`) require a reviewed exception in `scripts/check-legacy-docs-ratchet.exceptions.json`.
+
+### [rewritten] docs/platform/documentation/history/templates/contract.md#unheaded-block-4 named=true claim_04555e5073e222ceff3ceb264bd90d0c archive-with-reason cu=null unsourced=0 ancestry=["Contract: <Name>","12. Related Files"]
+  TEXT: ```markdown
+        | Relationship | File |
+        |---|---|
+        | owning area | [../README.md](../README.md) |
+        | current behavior | [../spec.md](../spec.md) |
+        | verification evidence | [../verification/](../verification/) |
+        ```
+
+### [rewritten] docs/platform/runner/operations/h-51f5cd7279fd.md#unheaded-block-29 named=true claim_31cf7725544958ccb622241d9be87ed8 supersede cu=null unsourced=1 ancestry=["Added in candidate: Runner Behaviors & Operations","Behaviors & Operations","Iron Law — phân loại rủi ro của một candidate fix (self-improve loop STR13 Slice 2/3)"]
+  TEXT: - **Runs when:** gọi từ bên trong `approve` nguồn `runner` (Cổng duyệt PR nội
+          bộ, trên) và từ `sync-root`, ngay TRƯỚC bước kiểm cây sạch và trước mọi
+          thao tác git — mỗi
+          lần một đề xuất nguồn runner được duyệt (self-improve loop STR13 Slice 3),
+        bất kể đề xuất đó tới từ `evolve --submit` hay từ `add`/`submit`
+         thường (chung cho MỌI đề xuất nguồn runner, không riêng gì evolve).
+         **Ranh giới trunk (per `0032`):** và CHỈ khi lần merge đó land lên
+          trunk. `approve` phân biệt bằng `resolveRoot(view, id) === id` (pre-check
+          thuần của `merge next` dùng cùng biểu thức); `sync-root` phân biệt bằng
+          `!item.parent`, một biểu thức KHÁC và cố ý không gộp chung, vì verb đó chỉ
+          land vào cha trực tiếp trong khi `resolveRoot` leo tới đỉnh lineage. Một
+          leaf merge vào `fgw/<root>` và một gốc có cha `sync-root` vào `fgw/<parent>`
+          đều đi thẳng, không gọi phép thử này lần nào — chỗ duy nhất còn chặn được
+          gì là chỗ diff thật sự sắp lên trunk.
+          **Ranh giới CHỦ Ý:** chỉ đề xuất nguồn `runner` mới đi qua phép thử này —
+          đề xuất nguồn `pull`/`legacy` (code đã do chính người tự tay commit thẳng
+          lên main qua cửa `take`/`return`, xem thang bền vững) không đi qua đường
+          này; đây là một ranh giới đã xác nhận có chủ đích, không phải một khoảng
+         trống bị bỏ sót (xem RUL37 (Iron Law hỏi ở đúng một ranh giới — trunk — cho mọi đề xuất nguồn runner tới đó)).
+        - **Blocked when:** không áp dụng — đây là hàm thuần, không có trạng thái để
+          chặn. (Điểm chặn thật, bằng KẾT QUẢ hàm thuần này, nằm ở `
+  ? mọi file trong nhóm `src/evolve/`, toàn bộ file điểm-vào CLI (thay đổi bất kỳ đâu trong đó bị coi
+
+### [random] docs/platform/agent-coordination/verification/confinement-authority-implementation/P05.md#unheaded-block-4 named=true claim_bfe6178cfae6d945217e38b0ad6a5678 delete-as-duplicate cu=null unsourced=0 ancestry=["P05 — Herdr And Legacy Confinement Convergence","Requirements proof (phase-05-herdr-and-legacy-convergence.md)"]
+  TEXT: | Req | Evidence | Status |
+        |---|---|---|
+        | R1 | Legacy herdr flags (`privateHome`/`isolatedSession`/`ownWorktree`) normalize into v1 policy controls (`home:private`/`session:isolated`/`workspace:own`) before runtime — no findings against this requirement across any round | satisfied |
+        | R2 | Herdr-spawn execution routes through Authority — reviewer's M2 clarified this cell's own CHANGELOG initially overclaimed installing a NEW door (it was already installed at P04's `ad822c84`); corrected to describe what this cell actually adds (attestation + pre-adapter convergence on the existing door) | satisfied, wording corrected |
+        | R3 | Pre-adapter checks moved where safe; partial maturity named with a doctor finding — H1's fix made the new `confinement-herdr-maturity` doctor check actually read the real `invocations[]`-shaped executor configs (it previously always reported "not applicable" against every real config on this machine) | satisfied |
+        | R4 | Existing herdr interactive behavior preserved — no regression found in any round's live/test verification; M4 was a documentation-accuracy finding (the phase's own Verification line overclaimed full green when 2 known pre-existing failures sit on this exact path), not a behavior regression | satisfied |
+        | R5 | Legacy bypass/permissionMode route still refuses unless fully represented — genuinely the most consequential requirement in this cell: an interim fix round accidentally weakened this (a direct `establishConfinement` call could b
+
+### [random] docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10-KERNEL-FIX.md#unheaded-block-55 named=true claim_8e2281da8771b090575bd94381b25e5f delete-as-duplicate cu=null unsourced=0 ancestry=["P10-KERNEL-FIX — Kernel fix for `classifySessionQuorum` (Phase 10)","7. Fix Round 1","7.5 MEDIUM-5 — aggregation exclusion keyed on the designated actor, not operation id alone"]
+  TEXT: `actorGatingOperationIds` now precomputes the aggregation's own designated
+        actor (the actor bound to `completion.aggregation.outputOperationRef` at
+        the FIRST graph binding found, scanning the whole graph once, not
+        actor-filtered) before its per-actor loop, and the exclusion now reads
+        `ref.ref === aggregationOutputOperationRef && actorId === aggregationActorId`
+        — never just the operation id. A different actor bound to the same
+        operation id for an unrelated reason keeps that binding as an ordinary
+        required one, needing its own real settled Assignment.
+
+### [random] docs/platform/work-state/decisions/retired-decision-history.md#unheaded-block-93 named=true claim_331e9d0a3a7f29b20ec75ed8981f7fb7 promote cu=null unsourced=0 ancestry=["Retired Decision History: Work State","13. ADR 0032 Multi-Role Team Harness","0032 Marketing Cockpit Comparison Conclusion"]
+  TEXT: **Cockpit bỏ khi vào fgOS**: `run.yaml` per-run (source-of-truth kép —
+        event-sourced work item thay thế, phải giết đầu tiên); run FSM riêng
+        (status FSM 11 trạng thái của fgOS bao trùm, có awaiting-human vs
+        awaiting-approval vs retrospective mà cockpit không phân biệt); bộ 3
+        file routing/delegation/priority (protocol-not-engine, prose-enforced là
+        liability — 1 DOMAINS entry engine-enforced thay thế); phần lớn
+        checkpoint machinery (có free từ event log + worktree commit); adapter
+        đa nền tảng (scope cut ghi nhận tường minh — fgOS Claude-native trước).
+
+### [random] docs/platform/packaging-distribution/contracts/release-manifest.md#unheaded-block-12 named=true claim_f7b23e10496a2460c655bbcd0c765cfb move cu=null unsourced=0 ancestry=["Contract: Release Manifest","Retained Runtime Identity And Activation Source Detail","5. ReleaseManifest"]
+  TEXT: The release manifest is the immutable statement of what an fgOS release
+        contains.
+
+### [random] docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/clear/run-v2-02.log#file-block named=true claim_44b6d5eb9987de25b2765674cffcbeb3 delete-as-duplicate cu=null unsourced=0 ancestry=[]
+  TEXT: fgos: executor "gitnexus" declares no "providerModel"/"provider" and its command (none resolvable from its config) is not a recognized Claude CLI command — its resolved provider family may be unreliable/inconsistent across dispatch code paths. Declare "providerModel" explicitly.
+        fgos: dispatch capability=(none declared) executor=agy-bwrap via=cli-spawn provider=gemini model=gemini-3.1-pro-low tier=analytical
+        fgos: dispatch capability=(none declared) executor=claude-bwrap via=cli-spawn provider=claude model=sonnet tier=analytical
+        {
+          "contract": "fgos.v1",
+          "generated_at": "2026-09-07T02:42:08.274Z",
+          "data_hash": "54df2ef64ee1988e0fd720961c5798f637fecaeefb1b76c073e53f80b0359232",
+          "data": {
+            "coordinationId": "aap-p052-clear-herdr-heuristic-direction-v2",
+            "kind": "declared-protocol",
+            "definitionRef": {
+              "id": "core.coordination-protocol.architecture-advisory-panel-v1",
+              "version": "1.0.0"
+            },
+            "objective": "Given the block-classify.ts fix just shipped in herdr-gateway (commits 881fa33, 15b1203: three narrow, evidence-scoped signals added reactively as real Claude Code CLI screens were found misclassified), is continuing to extend this universal visual-heuristic classifier with narrow, evidence-scoped signals the right ongoing strategy for terminal-detail's R21-R27 block classification, or should the project proactively invest in a more general primitive or refactor now, before shipping more one-off patches?",
+            "status": "running",
+            "closed"
+
+### [random] docs/platform/documentation/architecture/documentation-system-design.md#unheaded-block-7 named=true claim_488f21ec4abc43eb3fffd6f925c9d99c move cu=null unsourced=0 ancestry=["Documentation System Design","1. Goal"]
+  TEXT: The documentation system must support three jobs:
+
+### [random] docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.10.md#unheaded-block-46 named=true claim_4771c7a2ad722efd9525858cafd47c51 delete-as-duplicate cu=null unsourced=0 ancestry=["P10.10 — Promotion And Closeout (the track's final cell)","9. Fix Round 1 (Fixer, 2026-09-04)","Re-run evidence (real results, this Fix Round)"]
+  TEXT: ```sh
+        # Touched-file focused suite (+1 test vs. the Doer's original 86: the new
+        # Nominal-Group-Lite positive contribution test)
+        FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test \
+          test/verbs/coordination-run-driver-steps.test.mjs \
+          test/verbs/coordination-aggregation-surface.test.mjs \
+          test/verbs/coordination-group-thinking-rfc-review-lite-pack-conformance.test.mjs \
+          test/verbs/coordination-group-thinking-delphi-feedback-lite-pack-conformance.test.mjs \
+          test/verbs/coordination-group-thinking-nominal-group-lite-pack.test.mjs \
+          test/verbs/coordination-launch-master-loop.test.mjs
+        # tests 87 | pass 87 | fail 0
+        
+        # Driver-identity regression (Red-Team L2's own touched callers)
+        FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test \
+          test/runner/coordination-driver-authorization.test.mjs \
+          test/runner/coordination-deliberation-ledger.test.mjs \
+          test/runner/coordination-aggregation.test.mjs
+        # tests 144 | pass 144 | fail 0
+        
+        # Combined focused regression (+1 vs. the Doer's original 741/740/1)
+        FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test \
+          'test/runner/coordination-*.test.mjs' 'test/verbs/coordination-*.test.mjs' \
+          'test/runner/flow-definition*.test.mjs' 'test/architecture.test.mjs' \
+          'test/cli/coordination.test.mjs'
+        # tests 742 | pass 741 | fail 1
+        # sole failure: the standing, documented worktree-path false-fail
+        # (test/runner/coordination-static.test.mjs)
+        
+        # Adjacent regression: deliberation/team-cognition/setup
+        FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test \
+          't
+
+### [random] docs/platform/host-invocation-routing/roadmap.md#unheaded-block-108 named=true claim_76de093f955dea43ee8202b61fd82aa3 move cu=null unsourced=0 ancestry=["Host Invocation Routing Roadmap","Retained selected source material","Rust Host And Proof Providers Implementation Plan","11. P6 — Distribution And Installed-Entry Cutover","Exit gate and verify"]
+  TEXT: ```sh
+        npm test
+        cargo test --workspace
+        node --test test/install-packaging.test.mjs
+        ```
+
+### [random] docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r6-external-adoption/evidence-export/assignments/asgn_p072_r6_external_adoption_mdview_op_005/runs/01/dispatch-plan.json#file-block named=true claim_2cffc91397740016adb291d8ef75266f delete-as-duplicate cu=null unsourced=0 ancestry=[]
+  TEXT: {
+          "selector": {
+            "type": "assignment",
+            "value": "asgn_p072_r6_external_adoption_mdview_op_005"
+          },
+          "caller": {
+            "role": "driver"
+          },
+          "mechanism": "out-of-process",
+          "executorId": "claude",
+          "capability": "claude",
+          "invocation": {
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "protocol": "prompt-stdout-v1"
+          },
+          "governance": {
+            "providerFamily": "claude",
+            "egress": {
+              "kind": "same-provider",
+              "target": "claude",
+              "content": "repo-content"
+            }
+          },
+          "reasonCodes": [
+            "native-first.0033.cli-spawn-shaped"
+          ],
+          "configured": true
+        }
+
+### [random] docs/platform/agent-coordination/verification/architecture-advisory-panel/index.md#unheaded-block-9 named=true claim_a128630ab8e88053dafa890ad0507332 delete-as-duplicate cu=null unsourced=0 ancestry=["Track: architecture-advisory-panel","Cells"]
+  TEXT: | Cell | Coordination id | Status | Notes |
+        |---|---|---|---|
+        | P00.1 | `architecture-advisory-panel--p00-1` | done | Read-only dispatch readiness proven; Allowlist produced |
+        | P01.1 | `architecture-advisory-panel--p01-1` (fix round + close on `--p01-1-fix1`, see session-workaround note in P01.1.md) | done | Soul authored (3434 lines), 1 HIGH + 4 MEDIUM + 2 LOW findings fixed in 1 round, both rechecks clean |
+        | P01.2 | manual dispatch, no coordination session (see P01.2.md) | done | Real clear-input proof on mdview: 8 phases + 2 real Decision Dialogue turns with the actual person; found a real production bug (auth token lost on stdout); final outcome: fix 4 named first-run defects, defer Windows packaging, drop telemetry-first sequencing |
+        | P01.3 | manual dispatch, no coordination session (see P01.3.md) | done | Real unclear-input proof on vnflow (EOD/intraday pipeline evolution): full 8-phase panel run + 1 real Decision Dialogue turn; person sought and accepted an independent (kongming) verdict; a factual correction to the panel's own evidence was independently verified by the coordinator; final recommendation attributed, not merged into the panel's own voice |
+        | P02.1 | audit only, no coordination session opened (see P02.1.md) | done | Capability-fit/hard-soft placement audit; 4 tables produced; re-diagnosed a Phase 01 finding (revise/recheck reachability) as a symptom of the `partialPolicy` premature-close bug via a live passing test, not an independent defect; N+1 reaut

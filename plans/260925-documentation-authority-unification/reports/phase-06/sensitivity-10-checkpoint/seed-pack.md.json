@@ -1,0 +1,951 @@
+{
+  "version": 1,
+  "shard": "s10-whole-corpus-checkpoint",
+  "rows": [
+    {
+      "claimId": "claim_4e50b00f1e92a79cb73a879ec3d1fc2c",
+      "decision": {
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep the mapped architecture rationale, not a new governance authority. Evidence: docs/doc-governance.md:9,475 names this source; source lines 19–23 explicitly distinguish promoted governance from design rationale. docs/platform/proposals/documentation-system-unification.md preserves the later unification proposal. Complete source unheaded-block docs/architect/documentation-system-design.md#unheaded-block-90 (lines 637–637) is carried at docs/platform/documentation/architecture/documentation-system-design.md#unheaded-block-93 (lines 661–661); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending.",
+        "targetOwner": "docs/platform/documentation/architecture/documentation-system-design.md",
+        "targetAnchor": "unheaded-block-93"
+      },
+      "source": {
+        "path": "docs/architect/documentation-system-design.md",
+        "anchor": "unheaded-block-90",
+        "ancestry": [
+          "Documentation System Design",
+          "14. Failure Modes"
+        ],
+        "text": "The design must guard against these failures:",
+        "textDigest": "ebc8b023eb46d7918382f573c721ea6ee6b7da42d01e43aece88baf4e817a620"
+      },
+      "target": {
+        "path": "docs/platform/documentation/architecture/documentation-system-design.md",
+        "anchor": "unheaded-block-93",
+        "ancestry": [
+          "Documentation System Design",
+          "14. Failure Modes"
+        ],
+        "text": "The design must guard against these failures:",
+        "textDigest": "ebc8b023eb46d7918382f573c721ea6ee6b7da42d01e43aece88baf4e817a620"
+      }
+    },
+    {
+      "claimId": "claim_b63727f20ff5dddbcf952143d51a7cc5",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-08",
+        "claimKind": "historical-context",
+        "disposition": "delete-as-duplicate",
+        "rationale": "Preserve the complete raw log docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/3-system-shaper-raw.log as its own same-relative-path copy docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/3-system-shaper-raw.log#file-block. Both Git blobs and native whole-file unit digests are equal. The separately bound Markdown receipt remains the semantic interpretation/synthesis record; this row owns raw log evidence, not a Markdown section. No source log is deleted before cutover.",
+        "targetOwner": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/3-system-shaper-raw.log",
+        "targetAnchor": "file-block"
+      },
+      "source": {
+        "path": "docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/3-system-shaper-raw.log",
+        "anchor": "file-block",
+        "ancestry": [],
+        "text": "# proposals/system-shaper.md\n\n## Frame\n\n**Definition of \"difficult\" I'm using:** evolution is difficult when a change made in one place produces an effect in another place that is either (a) not caught by any test/validation, or (b) not visible in the system's own dependency graph, so the person doing the change has no signal that they've broken something until it surfaces later, elsewhere. This is a definition about *silent, undeclared coupling*, not about slow builds, hard-to-read code, or disagreement over where a boundary should sit.\n\n**Which option this resolves to:** C — reframe — but not because A and B are unavailable; because the scout report falsifies the premise both A and B share. A (\"separate pipelines, shared contracts\") and B (\"one pluggable abstraction\") both assume the difficulty lives at the *execution-graph* level — that the two pipelines either need to be pulled apart with a contract in between, or fused into one engine. The report found that a shared engine (`AssetRunner`) already runs both `EOD_ASSET_SPECS` and `INTRADAY_ASSET_SPECS` through one topo-sort/materialize/check path, and that domain logic (`evaluate_buy_gate`, `score_money_flow`, `dispatch_alerts`) is already shared, not duplicated. B is a proposal to build something that exists. A is a proposal to formalize a split that isn't where the drift is. The real drift is in four specific, named seams beneath that shared engine, and none of them are fixed by re-architecting the pipeline boundary.\n\n## Proposal — direct response\n\n**Do not build a new abstraction and do not draw a new pipeline boundary.** Finish and enforce the shared surfaces that already exist, at the four points where the report found them silently diverging:\n\n1. **Declare the cross-pipeline data dependency.** Intraday reads EOD's regime/sector-rotation output directly from lake paths (7-day lookback), but its own signal asset declares only `mart.money_flow_intraday` as a dependency. Add this as an explicit upstream reference in intraday's DAG (even a thin read-only asset wrapping the lake read) so `AssetRunner`'s own dependency blocking — the mechanism that already exists for the rest of the graph — covers staleness and decode failure here too, instead of this one dependency being invisible to the engine that would otherwise catch it.\n\n2. **Make the breadth-gate bypass loud, not silent.** `evaluate_buy_gate` is shared; EOD supplies `pct_sectors_leading` (added in `235d05d`), intraday doesn't, and `_gate_breadth` quietly defaults it to `None`. Whether or not the bypass is the *correct* behavior for intraday (unknown — see falsification #1), the mechanism should not be \"absence of an argument,\" it should be an explicit, named, tested state, so the next person changing the gate can see both consumers' behavior instead of discovering the second one by reading `_gate_breadth`'s internals.\n\n3. **Port the schema-tolerance fix.** EOD's signal loaders (`signal_engine.py:274`+) already handle mixed historical schemas via `diagonal_relaxed` concatenation (`068d898`). Intraday's EOD-context loaders (`signal_engine_intraday_loaders.py:17`+) still do a single `pl.read_parquet(files)` across all partitions and will break the same way EOD did before the fix, the next time schemas drift. This is a straight parity port, not a redesign.\n\n4. **Give the shared alert dataset a kind discriminator.** EOD alerts currently count toward intraday's own daily cap (`alert_dispatch_intraday.py`) because the dataset doesn't distinguish source. Tag alert rows by originating pipeline so each cap is computed against its own alerts.\n\nEverything else the report found — the incomplete port boundary in `ports_analytics.py` (intraday reaching `.lake` on the concrete adapter directly), and `AssetSpec.freshness`/`force` existing but unwired — I am naming as related but **out of scope** for this direct response. They're symptoms of the same pattern (an abstraction exists but isn't fully load-bearing yet) but fixing them isn't required to close the four seams above, and bundling them in is scope creep beyond what the symptom, as stated, requires.\n\n## Load-bearing constraint\n\nThis whole proposal depends on intraday's direct lake read of EOD's regime/sector-rotation output being expressible as a DAG dependency without breaking whatever property made it a raw read in the first place. If that read exists *outside* the DAG because intraday cannot afford to block on EOD's asset-materialization path (e.g., a timing/availability reason not visible in the report), then item 1 — the centerpiece of \"make the invisible dependency visible\" — doesn't work as a DAG edge, and the fix has to become a freshness check performed at read time instead, independent of `AssetRunner`. I don't know which of these is true; the report doesn't say why the read bypasses the DAG, only that it does.\n\n## What this makes harder\n\nEvery future addition that pulls a value from one pipeline's context into the other's (which is precisely what the 2026-07-05 audit is about to ask for — ATR entry planning and continuous RVOL scoring for intraday, both already produced by EOD) now costs more up front: it has to be declared as a dependency, or explicitly marked as an intentional bypass with a test, rather than just read or defaulted. I am proposing to slow down exactly the work that is already scheduled next. If the maintainer's actual complaint is \"changes take too long\" rather than \"changes silently break the other side,\" this proposal makes their felt problem worse, not better.\n\nIt also does not reduce the asymmetry in validation investment (9 of 14 EOD assets have checks registered, 0 of 6 intraday assets do) — closing that gap is a separate, larger effort than the four seam-fixes above, and I'm deliberately not claiming this proposal covers it.\n\n## First reversible step\n\nPort the `diagonal_relaxed` schema-tolerance fix into `signal_engine_intraday_loaders.py`'s loader — a one-function change, no new abstraction, testable against the same kind of mixed-schema partitions that motivated the original EOD fix in `068d898`. This is the cheapest of the four items and the most mechanically obvious win.\n\nIf, over the next real run cycle, this fix catches zero mixed-schema partitions in intraday's actual data, that's a signal my broader diagnosis — that intraday systematically lags EOD's hardening and that lag is the source of \"difficult evolution\" — doesn't have day-to-day teeth yet, and items 1, 2, and 4 should wait for a second concrete case before being pursued.\n\n## Resting on evidence vs. resting on assumption\n\n**Evidence (from the scout report, with paths/commits):** `AssetRunner` runs both spec sets through one engine; `evaluate_buy_gate`, `score_money_flow`, `dispatch_alerts` are shared; the breadth-gate default-to-`None` bypass in `_gate_breadth`, traced to `235d05d`; the `diagonal_relaxed` fix in EOD's loader (`068d898`) versus the single `read_parquet` call in intraday's loader; intraday's signal asset declaring only `mart.money_flow_intraday` while reading EOD's lake output directly; the undiscriminated shared alert dataset; `AssetSpec.freshness`/`force` existing but unwired; the 9-commit / 6-EOD-only / 0-intraday-only / 3-both split and the 9-of-14 vs. 0-of-6 validation registration gap; the 2026-07-05 audit proposing intraday features EOD already has.\n\n**Assumption (mine, not verified):** that these four seams are the actual source of the felt \"difficulty,\" as opposed to something the ~1-month repo history can't yet show (the report explicitly could not determine whether drift is the dominant cost or is accelerating). Also assumed: that surfacing the breadth-gate bypass loudly is wanted — the report could not determine whether the bypass is intentional, and \"make it loud\" is my inference about intent, not a fact I checked.\n\n## Falsification criteria (stated now, before critique)\n\n1. If the breadth-gate bypass is confirmed to be a deliberate, permanent design choice (intraday is not meant to be evaluated on breadth), item 2 collapses to \"document and test the constant,\" not \"surface it as a loud explicit case\" — a minor correction, not a reversal of the whole proposal.\n2. If the intraday EOD-context lake read cannot be expressed as a DAG dependency for a real timing/availability reason, item 1's mechanism (DAG edge) is wrong and must become a freshness check at read time — this changes the proposal's core mechanism, not just a detail, and should be treated as a real falsification, not a footnote.\n3. If the maintainer's actual pain is about readability/onboarding into a shared engine that already operates correctly, not about the four silent-coupling seams above, then this proposal solves a problem they aren't experiencing — the honest answer becomes \"there is no coupling problem here to fix,\" and C should resolve to *doing nothing to these seams* rather than to this hardening plan.\n4. If the 6/0/3 commit-scope asymmetry and the 9-of-14 vs. 0-of-6 validation gap turn out to reflect intraday simply being newer and still catching up (not a systematic pattern of less rigor), then \"asymmetric hardening investment\" is the wrong diagnosis, and the validation gap should be left to close on its own rather than treated as evidence for this proposal.",
+        "textDigest": "a853fa2f8316d5dc648189ed9a5cb188aca9ddace8bbb3350d713c8e48d164fc"
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/runs/3-system-shaper-raw.log",
+        "anchor": "file-block",
+        "ancestry": [],
+        "text": "# proposals/system-shaper.md\n\n## Frame\n\n**Definition of \"difficult\" I'm using:** evolution is difficult when a change made in one place produces an effect in another place that is either (a) not caught by any test/validation, or (b) not visible in the system's own dependency graph, so the person doing the change has no signal that they've broken something until it surfaces later, elsewhere. This is a definition about *silent, undeclared coupling*, not about slow builds, hard-to-read code, or disagreement over where a boundary should sit.\n\n**Which option this resolves to:** C — reframe — but not because A and B are unavailable; because the scout report falsifies the premise both A and B share. A (\"separate pipelines, shared contracts\") and B (\"one pluggable abstraction\") both assume the difficulty lives at the *execution-graph* level — that the two pipelines either need to be pulled apart with a contract in between, or fused into one engine. The report found that a shared engine (`AssetRunner`) already runs both `EOD_ASSET_SPECS` and `INTRADAY_ASSET_SPECS` through one topo-sort/materialize/check path, and that domain logic (`evaluate_buy_gate`, `score_money_flow`, `dispatch_alerts`) is already shared, not duplicated. B is a proposal to build something that exists. A is a proposal to formalize a split that isn't where the drift is. The real drift is in four specific, named seams beneath that shared engine, and none of them are fixed by re-architecting the pipeline boundary.\n\n## Proposal — direct response\n\n**Do not build a new abstraction and do not draw a new pipeline boundary.** Finish and enforce the shared surfaces that already exist, at the four points where the report found them silently diverging:\n\n1. **Declare the cross-pipeline data dependency.** Intraday reads EOD's regime/sector-rotation output directly from lake paths (7-day lookback), but its own signal asset declares only `mart.money_flow_intraday` as a dependency. Add this as an explicit upstream reference in intraday's DAG (even a thin read-only asset wrapping the lake read) so `AssetRunner`'s own dependency blocking — the mechanism that already exists for the rest of the graph — covers staleness and decode failure here too, instead of this one dependency being invisible to the engine that would otherwise catch it.\n\n2. **Make the breadth-gate bypass loud, not silent.** `evaluate_buy_gate` is shared; EOD supplies `pct_sectors_leading` (added in `235d05d`), intraday doesn't, and `_gate_breadth` quietly defaults it to `None`. Whether or not the bypass is the *correct* behavior for intraday (unknown — see falsification #1), the mechanism should not be \"absence of an argument,\" it should be an explicit, named, tested state, so the next person changing the gate can see both consumers' behavior instead of discovering the second one by reading `_gate_breadth`'s internals.\n\n3. **Port the schema-tolerance fix.** EOD's signal loaders (`signal_engine.py:274`+) already handle mixed historical schemas via `diagonal_relaxed` concatenation (`068d898`). Intraday's EOD-context loaders (`signal_engine_intraday_loaders.py:17`+) still do a single `pl.read_parquet(files)` across all partitions and will break the same way EOD did before the fix, the next time schemas drift. This is a straight parity port, not a redesign.\n\n4. **Give the shared alert dataset a kind discriminator.** EOD alerts currently count toward intraday's own daily cap (`alert_dispatch_intraday.py`) because the dataset doesn't distinguish source. Tag alert rows by originating pipeline so each cap is computed against its own alerts.\n\nEverything else the report found — the incomplete port boundary in `ports_analytics.py` (intraday reaching `.lake` on the concrete adapter directly), and `AssetSpec.freshness`/`force` existing but unwired — I am naming as related but **out of scope** for this direct response. They're symptoms of the same pattern (an abstraction exists but isn't fully load-bearing yet) but fixing them isn't required to close the four seams above, and bundling them in is scope creep beyond what the symptom, as stated, requires.\n\n## Load-bearing constraint\n\nThis whole proposal depends on intraday's direct lake read of EOD's regime/sector-rotation output being expressible as a DAG dependency without breaking whatever property made it a raw read in the first place. If that read exists *outside* the DAG because intraday cannot afford to block on EOD's asset-materialization path (e.g., a timing/availability reason not visible in the report), then item 1 — the centerpiece of \"make the invisible dependency visible\" — doesn't work as a DAG edge, and the fix has to become a freshness check performed at read time instead, independent of `AssetRunner`. I don't know which of these is true; the report doesn't say why the read bypasses the DAG, only that it does.\n\n## What this makes harder\n\nEvery future addition that pulls a value from one pipeline's context into the other's (which is precisely what the 2026-07-05 audit is about to ask for — ATR entry planning and continuous RVOL scoring for intraday, both already produced by EOD) now costs more up front: it has to be declared as a dependency, or explicitly marked as an intentional bypass with a test, rather than just read or defaulted. I am proposing to slow down exactly the work that is already scheduled next. If the maintainer's actual complaint is \"changes take too long\" rather than \"changes silently break the other side,\" this proposal makes their felt problem worse, not better.\n\nIt also does not reduce the asymmetry in validation investment (9 of 14 EOD assets have checks registered, 0 of 6 intraday assets do) — closing that gap is a separate, larger effort than the four seam-fixes above, and I'm deliberately not claiming this proposal covers it.\n\n## First reversible step\n\nPort the `diagonal_relaxed` schema-tolerance fix into `signal_engine_intraday_loaders.py`'s loader — a one-function change, no new abstraction, testable against the same kind of mixed-schema partitions that motivated the original EOD fix in `068d898`. This is the cheapest of the four items and the most mechanically obvious win.\n\nIf, over the next real run cycle, this fix catches zero mixed-schema partitions in intraday's actual data, that's a signal my broader diagnosis — that intraday systematically lags EOD's hardening and that lag is the source of \"difficult evolution\" — doesn't have day-to-day teeth yet, and items 1, 2, and 4 should wait for a second concrete case before being pursued.\n\n## Resting on evidence vs. resting on assumption\n\n**Evidence (from the scout report, with paths/commits):** `AssetRunner` runs both spec sets through one engine; `evaluate_buy_gate`, `score_money_flow`, `dispatch_alerts` are shared; the breadth-gate default-to-`None` bypass in `_gate_breadth`, traced to `235d05d`; the `diagonal_relaxed` fix in EOD's loader (`068d898`) versus the single `read_parquet` call in intraday's loader; intraday's signal asset declaring only `mart.money_flow_intraday` while reading EOD's lake output directly; the undiscriminated shared alert dataset; `AssetSpec.freshness`/`force` existing but unwired; the 9-commit / 6-EOD-only / 0-intraday-only / 3-both split and the 9-of-14 vs. 0-of-6 validation registration gap; the 2026-07-05 audit proposing intraday features EOD already has.\n\n**Assumption (mine, not verified):** that these four seams are the actual source of the felt \"difficulty,\" as opposed to something the ~1-month repo history can't yet show (the report explicitly could not determine whether drift is the dominant cost or is accelerating). Also assumed: that surfacing the breadth-gate bypass loudly is wanted — the report could not determine whether the bypass is intentional, and \"make it loud\" is my inference about intent, not a fact I checked.\n\n## Falsification criteria (stated now, before critique)\n\n1. If the breadth-gate bypass is confirmed to be a deliberate, permanent design choice (intraday is not meant to be evaluated on breadth), item 2 collapses to \"document and test the constant,\" not \"surface it as a loud explicit case\" — a minor correction, not a reversal of the whole proposal.\n2. If the intraday EOD-context lake read cannot be expressed as a DAG dependency for a real timing/availability reason, item 1's mechanism (DAG edge) is wrong and must become a freshness check at read time — this changes the proposal's core mechanism, not just a detail, and should be treated as a real falsification, not a footnote.\n3. If the maintainer's actual pain is about readability/onboarding into a shared engine that already operates correctly, not about the four silent-coupling seams above, then this proposal solves a problem they aren't experiencing — the honest answer becomes \"there is no coupling problem here to fix,\" and C should resolve to *doing nothing to these seams* rather than to this hardening plan.\n4. If the 6/0/3 commit-scope asymmetry and the 9-of-14 vs. 0-of-6 validation gap turn out to reflect intraday simply being newer and still catching up (not a systematic pattern of less rigor), then \"asymmetric hardening investment\" is the wrong diagnosis, and the validation gap should be left to close on its own rather than treated as evidence for this proposal.",
+        "textDigest": "a853fa2f8316d5dc648189ed9a5cb188aca9ddace8bbb3350d713c8e48d164fc"
+      }
+    },
+    {
+      "claimId": "claim_7bc7717a92a34ad4dc50159f7cf1d93f",
+      "decision": {
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "claimKind": "contract",
+        "disposition": "move",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/confinement-authority.md#unheaded-block-14 (source lines 94-100) is carried at docs/platform/agent-confinement/spec.md#unheaded-block-16 (candidate lines 116-122). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/confinement-authority.md verbatim in docs/platform/agent-confinement/spec.md, docs/platform/agent-confinement/contracts/confinement-authority-v1.md, docs/platform/agent-confinement/history/rollout-and-settled-facts.md, docs/platform/agent-confinement/decisions/confinement-authority-decisions.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetOwner": "docs/platform/agent-confinement/spec.md",
+        "targetAnchor": "unheaded-block-16"
+      },
+      "source": {
+        "path": "docs/specs/confinement-authority.md",
+        "anchor": "unheaded-block-14",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "3. Mục tiêu và phi mục tiêu",
+          "3.2 Phi mục tiêu"
+        ],
+        "text": "- Không chọn executor thay `resolve.mjs`.\n- Không biến worktree hay main-checkout lock thành security boundary.\n- Không đưa policy theo role/tier vào `assignment-policy.mjs`.\n- Không thay contract CLI `decide`/`execute`.\n- Không tuyên bố bwrap hiện tại ngăn đọc secret hay network egress.\n- Không buộc mọi backend driver phải có cùng một schema cấu hình hay cách\n  prepare invocation.",
+        "textDigest": "9c04558a540d0fc1dbaaa1b4873972a1a77bc6d49d8fdf13af722161dfa97d72"
+      },
+      "target": {
+        "path": "docs/platform/agent-confinement/spec.md",
+        "anchor": "unheaded-block-16",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "3. Mục tiêu và phi mục tiêu",
+          "3.2 Phi mục tiêu"
+        ],
+        "text": "- Không chọn executor thay `resolve.mjs`.\n- Không biến worktree hay main-checkout lock thành security boundary.\n- Không đưa policy theo role/tier vào `assignment-policy.mjs`.\n- Không thay contract CLI `decide`/`execute`.\n- Không tuyên bố bwrap hiện tại ngăn đọc secret hay network egress.\n- Không buộc mọi backend driver phải có cùng một schema cấu hình hay cách\n  prepare invocation.",
+        "textDigest": "9c04558a540d0fc1dbaaa1b4873972a1a77bc6d49d8fdf13af722161dfa97d72"
+      }
+    },
+    {
+      "claimId": "claim_eb66de2e1574509b34c3a9cdbe3d9d7f",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete unheaded-block at docs/architect/workspace-topology-roadmap.md#unheaded-block-7 (lines 41–41) into docs/platform/system-architecture/architecture/workspace-topology-roadmap.md#unheaded-block-9 (lines 64–64), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
+        "targetAnchor": "unheaded-block-9"
+      },
+      "source": {
+        "path": "docs/architect/workspace-topology-roadmap.md",
+        "anchor": "unheaded-block-7",
+        "ancestry": [
+          "Workspace Topology Roadmap",
+          "Recommended Decisions",
+          "D1. Hot Work History Leaves The Tracked Working Tree"
+        ],
+        "text": "Checkpoint segment requirements:",
+        "textDigest": "a5c60f4d37ed273d3328fa649e7451489baefdaf7211ae07c5ad3b23cfd08c56"
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
+        "anchor": "unheaded-block-9",
+        "ancestry": [
+          "Workspace Topology Roadmap",
+          "Recommended Decisions",
+          "D1. Hot Work History Leaves The Tracked Working Tree"
+        ],
+        "text": "Checkpoint segment requirements:",
+        "textDigest": "a5c60f4d37ed273d3328fa649e7451489baefdaf7211ae07c5ad3b23cfd08c56"
+      }
+    },
+    {
+      "claimId": "claim_ada79ea98a1532eddb6e55b127defcc3",
+      "decision": {
+        "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Source: docs/architect/agent-coordination/vocabulary/canonical-concepts.md:285-286#unheaded-block-53 (current lines); unit SHA256 98973804553683a242ab005a754a2df271cd61656c57a5bc52373722acbcf317.\nTarget: docs/platform/agent-coordination/vocabulary/canonical-concepts.md:136-137#unheaded-block-19 (current lines); unit SHA256 98973804553683a242ab005a754a2df271cd61656c57a5bc52373722acbcf317.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 98973804553683a242ab005a754a2df271cd61656c57a5bc52373722acbcf317 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/vocabulary/canonical-concepts.md#unheaded-block-53 under docs/platform/agent-coordination/vocabulary/canonical-concepts.md#unheaded-block-19; source context \"Canonical Agent Coordination Concepts / Dispatch And Execution Layer / RunResult\", target context \"Canonical Agent Coordination Concepts / Dispatch And Execution Layer / RunResult\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "targetOwner": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
+        "targetAnchor": "unheaded-block-19"
+      },
+      "source": {
+        "path": "docs/architect/agent-coordination/vocabulary/canonical-concepts.md",
+        "anchor": "unheaded-block-53",
+        "ancestry": [
+          "Canonical Agent Coordination Concepts",
+          "Dispatch And Execution Layer",
+          "RunResult"
+        ],
+        "text": "The normalized result for one Run: status/claim, confidence, evidence refs,\nartifacts, verification details, failure information, and provenance.",
+        "textDigest": "98973804553683a242ab005a754a2df271cd61656c57a5bc52373722acbcf317"
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
+        "anchor": "unheaded-block-19",
+        "ancestry": [
+          "Canonical Agent Coordination Concepts",
+          "Dispatch And Execution Layer",
+          "RunResult"
+        ],
+        "text": "The normalized result for one Run: status/claim, confidence, evidence refs,\nartifacts, verification details, failure information, and provenance.",
+        "textDigest": "98973804553683a242ab005a754a2df271cd61656c57a5bc52373722acbcf317"
+      }
+    },
+    {
+      "claimId": "claim_0933f628c1695da663d86205af0d7e82",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-10",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/canonical-concepts.md#artifact is retained in docs/platform/agent-coordination/vocabulary/canonical-concepts.md#artifact. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+        "targetOwner": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
+        "targetAnchor": "artifact"
+      },
+      "source": {
+        "path": "docs/architect/agent-coordination/vocabulary/canonical-concepts.md",
+        "anchor": "artifact",
+        "ancestry": [
+          "Canonical Agent Coordination Concepts",
+          "Evidence And Visibility Layer"
+        ],
+        "text": "### Artifact\n\nA persisted output referenced by Assignment, RunResult, task, or synthesis.\nArtifact existence alone does not establish correctness or freshness.",
+        "textDigest": "05d206ebf8d5907b6cecfed58acdb3f755a9923969355a81bc5f744d75bb4b9b"
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
+        "anchor": "artifact",
+        "ancestry": [
+          "Canonical Agent Coordination Concepts",
+          "Evidence And Visibility Layer"
+        ],
+        "text": "### Artifact\n\nA persisted output referenced by Assignment, RunResult, task, or synthesis.\nArtifact existence alone does not establish correctness or freshness.",
+        "textDigest": "05d206ebf8d5907b6cecfed58acdb3f755a9923969355a81bc5f744d75bb4b9b"
+      }
+    },
+    {
+      "claimId": "claim_bd9700b35680814aed54cb5ead71f93e",
+      "decision": {
+        "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+        "claimKind": "contract",
+        "disposition": "move",
+        "rationale": "Source: docs/architect/host-invocation-routing/host-invocation-provider-routing.md:127-127#unheaded-block-27 (current lines); unit SHA256 3b83b50ecb60c261c62571086880596c83d1dd43fba569dc820af0a283c5acc6.\nTarget: docs/platform/host-invocation-routing/spec.md:235-235#unheaded-block-41 (current lines); unit SHA256 3b83b50ecb60c261c62571086880596c83d1dd43fba569dc820af0a283c5acc6.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 3b83b50ecb60c261c62571086880596c83d1dd43fba569dc820af0a283c5acc6 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-27 under docs/platform/host-invocation-routing/spec.md#unheaded-block-41; source context \"Host Invocation And Provider Routing Architecture / 6. Router (Pure) And InvocationService (Pipeline)\", target context \"Spec: Host Invocation / Retained selected source material / Host Invocation And Provider Routing Architecture / 6. Router (Pure) And InvocationService (Pipeline)\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "targetOwner": "docs/platform/host-invocation-routing/spec.md",
+        "targetAnchor": "unheaded-block-41"
+      },
+      "source": {
+        "path": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+        "anchor": "unheaded-block-27",
+        "ancestry": [
+          "Host Invocation And Provider Routing Architecture",
+          "6. Router (Pure) And InvocationService (Pipeline)"
+        ],
+        "text": "It reads the `RegistrySnapshot`, matches operation/mode/host/compatible contract versions, applies an explicit binding or named replacement policy, and fails closed on ambiguity or incompatibility. It never parses CLI/HTTP input, admits, grants, holds domain policy, lets a provider reach another by recursively spawning `fgos`, or renders a response.",
+        "textDigest": "3b83b50ecb60c261c62571086880596c83d1dd43fba569dc820af0a283c5acc6"
+      },
+      "target": {
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "anchor": "unheaded-block-41",
+        "ancestry": [
+          "Spec: Host Invocation",
+          "Retained selected source material",
+          "Host Invocation And Provider Routing Architecture",
+          "6. Router (Pure) And InvocationService (Pipeline)"
+        ],
+        "text": "It reads the `RegistrySnapshot`, matches operation/mode/host/compatible contract versions, applies an explicit binding or named replacement policy, and fails closed on ambiguity or incompatibility. It never parses CLI/HTTP input, admits, grants, holds domain policy, lets a provider reach another by recursively spawning `fgos`, or renders a response.",
+        "textDigest": "3b83b50ecb60c261c62571086880596c83d1dd43fba569dc820af0a283c5acc6"
+      }
+    },
+    {
+      "claimId": "claim_d06b2ce15133866437a691773e465006",
+      "decision": {
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "claimKind": "specification",
+        "disposition": "move",
+        "rationale": "Weak-exact: ancestor headings differ; source unit shorter than 40 characters. Whole heading docs/specs/runner.md#tham-chiếu-3 (lines 2785–2785) carried at docs/platform/runner/decisions/h-36d872fbb0e5.md#tham-chiếu-3. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "targetAnchor": "tham-chiếu-3"
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "anchor": "tham-chiếu-3",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người"
+        ],
+        "text": "#### Tham chiếu\n\n- `docs/history/iron-law-gate-human-ux/CONTEXT.md` — - đã khoá\n- `docs/history/iron-law-gate-human-ux/plan.md` — A1/A1b, bản đồ rủi ro\n- `docs/history/tsk-5t3-iron-law-evidence-contract/` — hợp đồng\n  `docs/history/<id>/iron-law-evidence.md`\n- `docs/explanation/iron-law-evidence-contract-stays-human-gated.md`\n- `docs/explanation/gate-bypass-design.md`\n- `0030` — `docs/decisions/0030-them-release-con-nguoi-vao-thu-tu-uu-tien-san-pham.md`",
+        "textDigest": "cdc465cc9c3998b7aeb1ee077d13ffafa979a3ecd84de1a9028844a9666af27c"
+      },
+      "target": {
+        "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "anchor": "tham-chiếu-3",
+        "ancestry": [
+          "Added in candidate: Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+          "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người"
+        ],
+        "text": "#### Tham chiếu\n- `docs/history/iron-law-gate-human-ux/plan.md` — A1/A1b, bản đồ rủi ro\n- `docs/history/tsk-5t3-iron-law-evidence-contract/` — hợp đồng\n  `docs/history/<id>/iron-law-evidence.md`\n- `docs/explanation/iron-law-evidence-contract-stays-human-gated.md`\n- `docs/explanation/gate-bypass-design.md`\n- `0030` — `docs/decisions/0030-them-release-con-nguoi-vao-thu-tu-uu-tien-san-pham.md`",
+        "textDigest": "f2492c2b81bfcc79cf11632c75e772db38cef741c2ff3a21a4e9ee105ab60478"
+      }
+    },
+    {
+      "claimId": "claim_f2dbfad6908d2219d0e43956ad5ead5d",
+      "decision": {
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "claimKind": "specification",
+        "disposition": "move",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/ui-spec/30-states-and-errors.md#st-empty-filter (source lines 18-18) is carried at docs/platform/ui-spec/contracts/30-states-and-errors.md#st-empty-filter (candidate lines 40-40). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/ui-spec/30-states-and-errors.md verbatim in docs/platform/ui-spec/contracts/30-states-and-errors.md. Map kind contract is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetOwner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+        "targetAnchor": "st-empty-filter"
+      },
+      "source": {
+        "path": "docs/ui-spec/30-states-and-errors.md",
+        "anchor": "st-empty-filter",
+        "ancestry": [
+          "States and errors",
+          "States"
+        ],
+        "text": "### ST-EMPTY-FILTER\nItems exist, but the active filter/grouping matches none. Always shows\nwhat the active filter is and offers to clear it — a person must never be\nleft guessing why the board looks empty.",
+        "textDigest": "8a3be9b997a676d118802ed1fa4a988cdd7a14ef88ca43bad2cde5012887a1d4"
+      },
+      "target": {
+        "path": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+        "anchor": "st-empty-filter",
+        "ancestry": [
+          "States and errors",
+          "States"
+        ],
+        "text": "### ST-EMPTY-FILTER\nItems exist, but the active filter/grouping matches none. Always shows\nwhat the active filter is and offers to clear it — a person must never be\nleft guessing why the board looks empty.",
+        "textDigest": "8a3be9b997a676d118802ed1fa4a988cdd7a14ef88ca43bad2cde5012887a1d4"
+      }
+    },
+    {
+      "claimId": "claim_55fcd0b3068a4dd160eebddfc979c730",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-10",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vocabulary/README.md#unheaded-block-7 is retained in docs/platform/agent-coordination/vocabulary/README.md#unheaded-block-7. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+        "targetOwner": "docs/platform/agent-coordination/vocabulary/README.md",
+        "targetAnchor": "unheaded-block-7"
+      },
+      "source": {
+        "path": "docs/architect/agent-coordination/vocabulary/README.md",
+        "anchor": "unheaded-block-7",
+        "ancestry": [
+          "Agent Coordination Vocabulary",
+          "Documents"
+        ],
+        "text": "The pre-migration vocabulary map is retained as a non-canonical\n[historical record](../history/implementation-records/orchestration-vocabulary-map-2026-08-27.md).",
+        "textDigest": "f25bca8463c199c35363f0cd05f6191a0996a99c58e2e551ddf9205bcf01d52f"
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/vocabulary/README.md",
+        "anchor": "unheaded-block-7",
+        "ancestry": [
+          "Agent Coordination Vocabulary",
+          "Documents"
+        ],
+        "text": "The pre-migration vocabulary map is retained as a non-canonical\n[historical record](../history/implementation-records/orchestration-vocabulary-map-2027-08-27.md).",
+        "textDigest": "7b4ab7a1ff7d3022032a6d3bc9755ffdbf9d62c6e880dea050b866b18bb8b491"
+      }
+    },
+    {
+      "claimId": "claim_701238f18b72b5e60284fb3dae43624f",
+      "decision": {
+        "authoredBy": "codex-session:22@2026-10-14",
+        "claimKind": "specification",
+        "disposition": "move",
+        "rationale": "Frozen root map assigns docs/platform-foundations.md#unheaded-block-53 to docs/platform/platform-foundations.md#unheaded-block-63. The complete legacy source is added to its existing candidate owner; the earlier summary prose remains intact. Source heading depths shift by one to keep one H1; title, payload, law thresholds, dated claims and unresolved vision questions remain verbatim. Full native source/target unit digests are equal; heading ancestry may differ. This is conservation only, not truth approval, a changed locked law, source retirement or authority promotion.",
+        "targetOwner": "docs/platform/platform-foundations.md",
+        "targetAnchor": "unheaded-block-63"
+      },
+      "source": {
+        "path": "docs/platform-foundations.md",
+        "anchor": "unheaded-block-53",
+        "ancestry": [
+          "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+          "L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa"
+        ],
+        "text": "**Nguồn / bằng chứng (đã DONE, không phải mục tiêu).** `awaiting-human` là một\n`moveWork` wrapper (`store.mjs` `putInAwaiting`/`answerAwaiting`), không phải write\npath thứ hai. work-graph-intelligence (STR43 + S7–S9) chạm mọi metric/advisory qua\nfacade store (`readyWork`/`graphMetrics`/`graphWhatIf`/`staleDoingAdvisory`/\n`footprintConflicts`), và thêm field (`discoveredFrom`, `footprint`) cưỡi cùng\n`work.add` spread — không cửa mới nào. Đây là doctrine đứng SAU L3 rule 4 (mọi ghi\nqua MỘT cửa) và contract CTR002 (single-write-door).",
+        "textDigest": "0efc4e024672c39cc76a909ac1ee27f6c17c0d09540b7a1fc13ec0ddca65ef3b"
+      },
+      "target": {
+        "path": "docs/platform/platform-foundations.md",
+        "anchor": "unheaded-block-63",
+        "ancestry": [
+          "Platform Foundations",
+          "Luật nền platform forgent (Phase 0 — compound-learning stack)",
+          "L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa"
+        ],
+        "text": "**Nguồn / bằng chứng (đã DONE, không phải mục tiêu).** `awaiting-human` là một\n`moveWork` wrapper (`store.mjs` `putInAwaiting`/`answerAwaiting`), không phải write\npath thứ hai. work-graph-intelligence (STR43 + S7–S9) chạm mọi metric/advisory qua\nfacade store (`readyWork`/`graphMetrics`/`graphWhatIf`/`staleDoingAdvisory`/\n`footprintConflicts`), và thêm field (`discoveredFrom`, `footprint`) cưỡi cùng\n`work.add` spread — không cửa mới nào. Đây là doctrine đứng SAU L3 rule 4 (mọi ghi\nqua MỘT cửa) và contract CTR002 (single-write-door).",
+        "textDigest": "0efc4e024672c39cc76a909ac1ee27f6c17c0d09540b7a1fc13ec0ddca65ef3b"
+      }
+    },
+    {
+      "claimId": "claim_489326b91f16cf6cf1a95548603b3ee0",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. Carry the complete heading at docs/architect/architecture-intent.md#13-working-assumptions-for-the-plan (lines 522–522) into docs/platform/system-architecture/architecture/architecture-intent.md#13-working-assumptions-for-the-plan (lines 545–545), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "targetAnchor": "13-working-assumptions-for-the-plan"
+      },
+      "source": {
+        "path": "docs/architect/architecture-intent.md",
+        "anchor": "13-working-assumptions-for-the-plan",
+        "ancestry": [
+          "Architecture Intent"
+        ],
+        "text": "## 13. Working Assumptions For The Plan\n\nThese are not accepted decisions. They are working assumptions that make the\nroadmap concrete enough for a later agent to plan and deliver against. If\nevidence breaks one, the next plan revises that assumption explicitly instead\nof silently narrowing the original intent.",
+        "textDigest": "c14dd4d7f4100272798ba17d986071950d58004ae3915f4959c8ed97ca397d53"
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+        "anchor": "13-working-assumptions-for-the-plan",
+        "ancestry": [
+          "Architecture Intent"
+        ],
+        "text": "## 13. Working Assumptions For The Plan\n\nThese are not accepted decisions. They are working assumptions that make the\nroadmap concrete enough for a later agent to plan and deliver against. If\nevidence breaks one, the next plan revises that assumption explicitly instead\nof silently narrowing the original intent.",
+        "textDigest": "c14dd4d7f4100272798ba17d986071950d58004ae3915f4959c8ed97ca397d53"
+      }
+    },
+    {
+      "claimId": "claim_d1d70b955b085baafa10ffcec2702b8d",
+      "decision": {
+        "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+        "claimKind": "decision",
+        "disposition": "promote",
+        "rationale": "Body of ADR 0012 (source lines 1600-1606, starting \"Việc dò tay lúc validating S2a phát hiện một lỗ hổng sống **khác**, be\") carried line for line into its own block; text identical to the source. Target digest expanded to full SHA256; source and target content are unchanged.",
+        "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+        "targetAnchor": "unheaded-block-36"
+      },
+      "source": {
+        "path": "docs/specs/work-state.md",
+        "anchor": "unheaded-block-146",
+        "ancestry": [
+          "0002 — Mô hình việc phẳng",
+          "0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời",
+          "Bối cảnh"
+        ],
+        "text": "Việc dò tay lúc validating S2a phát hiện một lỗ hổng sống **khác**, benign\nnhưng có thật: `parent` **không bao giờ được existence-check**\n(`validateDeps`, `work.mjs:205-213`, chỉ xét `deps`; `store.mjs` trước S2a\nchưa từng đọc `parent`). Hai lệnh `addWork` với một `parent` trỏ tới một id\nchưa tồn tại (dangling forward parent) đóng được một chu trình cha-con A↔B mà\nguard deps-only bỏ sót — vô hại (`frontier.mjs`'s tập `seen` chặn treo máy khi\nduyệt) nhưng thật, không phải giả định lý thuyết.",
+        "textDigest": "e4554b1ed9990b0f5dbf12aa19075d6dfd2eb29d0ca40117916f5672e419e4ba"
+      },
+      "target": {
+        "path": "docs/platform/work-state/decisions/retired-decision-history.md",
+        "anchor": "unheaded-block-36",
+        "ancestry": [
+          "Retired Decision History: Work State",
+          "8. ADR 0012 Unified Typed-Edge Graph Model",
+          "0012 Context"
+        ],
+        "text": "Việc dò tay lúc validating S2a phát hiện một lỗ hổng sống **khác**, benign\nnhưng có thật: `parent` **không bao giờ được existence-check**\n(`validateDeps`, `work.mjs:205-213`, chỉ xét `deps`; `store.mjs` trước S2a\nchưa từng đọc `parent`). Hai lệnh `addWork` với một `parent` trỏ tới một id\nchưa tồn tại (dangling forward parent) đóng được một chu trình cha-con A↔B mà\nguard deps-only bỏ sót — vô hại (`frontier.mjs`'s tập `seen` chặn treo máy khi\nduyệt) nhưng thật, không phải giả định lý thuyết.",
+        "textDigest": "e4554b1ed9990b0f5dbf12aa19075d6dfd2eb29d0ca40117916f5672e419e4ba"
+      }
+    },
+    {
+      "claimId": "claim_5a4d6d1690851cf76fac5e243b45073f",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-10",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vision.md#5-generic-and-domain-specific-planning-concerns-are-mixed is retained in docs/platform/agent-coordination/vision.md#5-generic-and-domain-specific-planning-concerns-are-mixed. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+        "targetOwner": "docs/platform/agent-coordination/vision.md",
+        "targetAnchor": "5-generic-and-domain-specific-planning-concerns-are-mixed"
+      },
+      "source": {
+        "path": "docs/architect/agent-coordination/vision.md",
+        "anchor": "5-generic-and-domain-specific-planning-concerns-are-mixed",
+        "ancestry": [
+          "Agent Coordination Foundation Vision",
+          "Problems This Vision Resolves"
+        ],
+        "text": "### 5. Generic And Domain-Specific Planning Concerns Are Mixed\n\nCoding needs special reasoning about files, Git indexes, generated output,\nlockfiles, worktrees, verification, and merge topology. Other domains may have\ndifferent resources and risks, or may need no specialized planning harness at\nall.\n\nPutting coding-specific planning rules in the foundation prevents the\nfoundation from remaining reusable. Omitting all hard runtime rules, however,\nwould reduce it to an unsafe multi-agent prompt loop.",
+        "textDigest": "237cb72b129c26c7441647df6d2a30a625f37895331219cbc5730a63432ed1ef"
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/vision.md",
+        "anchor": "5-generic-and-domain-specific-planning-concerns-are-mixed",
+        "ancestry": [
+          "Agent Coordination Foundation Vision",
+          "Problems This Vision Resolves"
+        ],
+        "text": "### 5. Generic And Domain-Specific Planning Concerns Are Mixed\n\nCoding needs special reasoning about files, Git indexes, generated output,\nlockfiles, worktrees, verification, and merge topology. Other domains may have\ndifferent resources and risks, or may need no specialized planning harness at\nall.\n\nPutting coding-specific planning rules in the foundation prevents the\nfoundation from remaining reusable. Omitting all hard runtime rules, however,\nwould reduce it to an unsafe multi-agent prompt loop.",
+        "textDigest": "237cb72b129c26c7441647df6d2a30a625f37895331219cbc5730a63432ed1ef"
+      }
+    },
+    {
+      "claimId": "claim_12073295363676caa66ef2cbc89bf5af",
+      "decision": {
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "claimKind": "specification",
+        "disposition": "move",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-143 (lines 1593–1607) carried at docs/platform/runner/architecture/h-69197b459754.md#unheaded-block-29. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetOwner": "docs/platform/runner/architecture/h-69197b459754.md",
+        "targetAnchor": "unheaded-block-29"
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "anchor": "unheaded-block-143",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Dispatch operability implementation slice (2026-09-16)"
+        ],
+        "text": "**Cập nhật (group-thinking-plan-loop, P01.1/P03.1, 2026-09-05):** mutation\nWork-ĐỘC-LẬP (một `operation` step dispatch `mutation: 'mutating'`, không\nđụng Work item nào) nay đã có cơ chế thật (P01.1's mutation-unlock, 4 vòng\nfix, kernel-level) VÀ một live proof thật, hai-cell, trên một project riêng\nbiệt (`plan-loop` skill, P03.1's R5 — báo cáo đầy đủ:\n`plans/260904-2329-group-thinking-plan-loop/reports/lead-260905-0400-p03-1-r5-live-proof-report.md`),\nđo được zero Work engine touched suốt live proof (state.json/events.jsonl\nsha256 identical trước/sau). Đây KHÔNG phải live proof mà đoạn stop gate\nnày yêu cầu — R5 tự nó luôn Work-độc-lập theo thiết kế, chưa từng chạm một\nWork item nào, nên KHÔNG chứng minh cô lập/merge/recovery/thẩm quyền\nchuyển Work thật. Stop gate mutation-gắn-Work vẫn còn nguyên, chưa đóng.\nGhi nhận riêng: R5's own report tìm ra `src/verbs/coordination/run.mjs`\nchưa forward `step.mutation` vào engine — mutation-unlock chưa có đường\nCLI thật nào chạm tới hôm nay (`tsk-371`), một khoảng trống cần đóng\ntrước khi domain coding có thể thử nghiệm mutation-gắn-Work qua CLI.",
+        "textDigest": "455696e32c5e98ffca93441a2068682b5e085c16763e97e0605fa46948bff67b"
+      },
+      "target": {
+        "path": "docs/platform/runner/architecture/h-69197b459754.md",
+        "anchor": "unheaded-block-29",
+        "ancestry": [
+          "Added in candidate: Runner Dispatch operability implementation slice (2026-09-16)",
+          "Dispatch operability implementation slice (2026-09-16)"
+        ],
+        "text": "**Cập nhật (group-thinking-plan-loop, P01.1/P03.1, 2026-09-05):** mutation\nWork-ĐỘC-LẬP (một `operation` step dispatch `mutation: 'mutating'`, không\nđụng Work item nào) nay đã có cơ chế thật (P01.1's mutation-unlock, 4 vòng\nfix, kernel-level) VÀ một live proof thật, hai-cell, trên một project riêng\nbiệt (`plan-loop` skill, P03.1's R5 — báo cáo đầy đủ:\n`plans/260904-2329-group-thinking-plan-loop/reports/lead-260905-0400-p03-1-r5-live-proof-report.md`),\nđo được zero Work engine touched suốt live proof (state.json/events.jsonl\nsha256 identical trước/sau). Đây KHÔNG phải live proof mà đoạn stop gate\nnày yêu cầu — R5 tự nó luôn Work-độc-lập theo thiết kế, chưa từng chạm một\nWork item nào, nên KHÔNG chứng minh cô lập/merge/recovery/thẩm quyền\nchuyển Work thật. Stop gate mutation-gắn-Work vẫn còn nguyên, chưa đóng.\nGhi nhận riêng: R5's own report tìm ra `src/verbs/coordination/run.mjs`\nchưa forward `step.mutation` vào engine — mutation-unlock chưa có đường\nCLI thật nào chạm tới hôm nay (`tsk-371`), một khoảng trống cần đóng\ntrước khi domain coding có thể thử nghiệm mutation-gắn-Work qua CLI.",
+        "textDigest": "455696e32c5e98ffca93441a2068682b5e085c16763e97e0605fa46948bff67b"
+      }
+    },
+    {
+      "claimId": "claim_cf5c63a7dd524801f09ae8137fdc3d6e",
+      "decision": {
+        "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+        "claimKind": "contract",
+        "disposition": "move",
+        "rationale": "Source: docs/architect/host-invocation-routing/host-invocation-provider-routing.md:173-173#unheaded-block-40 (current lines); unit SHA256 5cf2ddbbf256946ebb9bce5404ecd1393619a6ea2a0ca9cf7b930f8cc8ed23a5.\nTarget: docs/platform/host-invocation-routing/spec.md:281-281#unheaded-block-54 (current lines); unit SHA256 5cf2ddbbf256946ebb9bce5404ecd1393619a6ea2a0ca9cf7b930f8cc8ed23a5.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 5cf2ddbbf256946ebb9bce5404ecd1393619a6ea2a0ca9cf7b930f8cc8ed23a5 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/host-invocation-provider-routing.md#unheaded-block-40 under docs/platform/host-invocation-routing/spec.md#unheaded-block-54; source context \"Host Invocation And Provider Routing Architecture / 8. Failure, Cancellation, Lifecycle, And Human Input\", target context \"Spec: Host Invocation / Retained selected source material / Host Invocation And Provider Routing Architecture / 8. Failure, Cancellation, Lifecycle, And Human Input\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "targetOwner": "docs/platform/host-invocation-routing/spec.md",
+        "targetAnchor": "unheaded-block-54"
+      },
+      "source": {
+        "path": "docs/architect/host-invocation-routing/host-invocation-provider-routing.md",
+        "anchor": "unheaded-block-40",
+        "ancestry": [
+          "Host Invocation And Provider Routing Architecture",
+          "8. Failure, Cancellation, Lifecycle, And Human Input"
+        ],
+        "text": "Each host presenter maps these onto its own contract (`fgos.v1`/exit codes, REST/MCP response, chat result); `InvocationService` preserves invocation/provider IDs so projections correlate without scraping output. Transport adapters never turn a provider crash into a semantic failure or infer success from partial output. A remote disconnect cancels through the same invocation context as a CLI interrupt; a crash never authorizes an automatic replay of a non-idempotent operation. The provider port is asynchronous from v1 — deadlines, cancellation, progress, and backpressure are already runtime requirements, so deferring async would change the ABI at the first real remote/process integration.",
+        "textDigest": "5cf2ddbbf256946ebb9bce5404ecd1393619a6ea2a0ca9cf7b930f8cc8ed23a5"
+      },
+      "target": {
+        "path": "docs/platform/host-invocation-routing/spec.md",
+        "anchor": "unheaded-block-54",
+        "ancestry": [
+          "Spec: Host Invocation",
+          "Retained selected source material",
+          "Host Invocation And Provider Routing Architecture",
+          "8. Failure, Cancellation, Lifecycle, And Human Input"
+        ],
+        "text": "Each host presenter maps these onto its own contract (`fgos.v1`/exit codes, REST/MCP response, chat result). Transport adapters never turn a provider crash into a semantic failure or infer success from partial output. A remote disconnect cancels through the same invocation context as a CLI interrupt; a crash never authorizes an automatic replay of a non-idempotent operation. The provider port is asynchronous from v1 — deadlines, cancellation, progress, and backpressure are already runtime requirements, so deferring async would change the ABI at the first real remote/process integration.",
+        "textDigest": "90fa0eb690aceb7eb5cb36646fe703e791e906145fb6550c4caf83cfcf667971"
+      }
+    },
+    {
+      "claimId": "claim_64f01a59fd4ef00a1d0952bdcae43eeb",
+      "decision": {
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Retain map proposal kind: implementation alone does not promote a design. Full truth remains owed at promotion. Evidence: src/state/knowledge-registry.mjs:20,88,211,537,646,733–748 and bin/fgos.mjs:1701,1767 explicitly cite the source. domains/coding/skills/fgos-coding-knowledge/SKILL.md:44 is an additional canonical skill-source consumer; setup registrations:3977,4001,4035 remain. Complete source unheaded-block docs/architect/knowledge-registry-redesign.md#unheaded-block-70 (lines 307–307) is carried at docs/platform/proposals/knowledge-registry-redesign.md#unheaded-block-73 (lines 331–331); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending.",
+        "targetOwner": "docs/platform/proposals/knowledge-registry-redesign.md",
+        "targetAnchor": "unheaded-block-73"
+      },
+      "source": {
+        "path": "docs/architect/knowledge-registry-redesign.md",
+        "anchor": "unheaded-block-70",
+        "ancestry": [
+          "Knowledge Registry Redesign",
+          "8. Producer Enforcement",
+          "8.1 Reserved Slots"
+        ],
+        "text": "`reserved` is not a prose lifecycle claim. It is a registry-level path hold.",
+        "textDigest": "da2912b239898abbf136030386f6fdd052db5437552ab4bcc5c888633d5c4241"
+      },
+      "target": {
+        "path": "docs/platform/proposals/knowledge-registry-redesign.md",
+        "anchor": "unheaded-block-73",
+        "ancestry": [
+          "Knowledge Registry Redesign",
+          "8. Producer Enforcement",
+          "8.1 Reserved Slots"
+        ],
+        "text": "`reserved` is not a prose lifecycle claim. It is a registry-level path hold.",
+        "textDigest": "da2912b239898abbf136030386f6fdd052db5437552ab4bcc5c888633d5c4241"
+      }
+    },
+    {
+      "claimId": "claim_fdba65f9b9568b8b056ca62b641ba27a",
+      "decision": {
+        "authoredBy": "codex-session:8@2026-10-13",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-83, under \"8. Pin\", is retained at docs/platform/packaging-distribution/contracts/distribution-pin.md#unheaded-block-17. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/distribution-pin.md topic owner; carriage does not certify current implementation.",
+        "targetOwner": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+        "targetAnchor": "unheaded-block-17"
+      },
+      "source": {
+        "path": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+        "anchor": "unheaded-block-83",
+        "ancestry": [
+          "Runtime Identity And Activation",
+          "8. Pin"
+        ],
+        "text": "- `exact-digest`;\n- `exact-version`;\n- later `channel`.",
+        "textDigest": "0332f7a1c0ccb10758f05b803e0b8dc69f39eecd12e3b5c538e8bb641439429c"
+      },
+      "target": {
+        "path": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+        "anchor": "unheaded-block-17",
+        "ancestry": [
+          "Contract: Distribution Pin",
+          "Retained Runtime Identity And Activation Source Detail",
+          "8. Pin"
+        ],
+        "text": "- `exact-digest`;\n- `exact-version`;\n- later `channel`.",
+        "textDigest": "0332f7a1c0ccb10758f05b803e0b8dc69f39eecd12e3b5c538e8bb641439429c"
+      }
+    },
+    {
+      "claimId": "claim_1794a3b9ec470264eb9fdd9c4c3b1cf1",
+      "decision": {
+        "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+        "claimKind": "decision",
+        "disposition": "move",
+        "rationale": "Source: docs/architect/agent-coordination/decisions/README.md:45-47#unheaded-block-6 (current lines); unit SHA256 26471c23caf04fd432e5938a6a01baf54c14e49bd56a4cc47b73d61880117c90.\nTarget: docs/platform/agent-coordination/decisions/README.md:61-63#unheaded-block-9 (current lines); unit SHA256 26471c23caf04fd432e5938a6a01baf54c14e49bd56a4cc47b73d61880117c90.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 26471c23caf04fd432e5938a6a01baf54c14e49bd56a4cc47b73d61880117c90 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/decisions/README.md#unheaded-block-6 under docs/platform/agent-coordination/decisions/README.md#unheaded-block-9; source context \"Agent Coordination Architecture Decisions / Accepted Decisions\", target context \"Agent Coordination Architecture Decisions / Accepted Decisions\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "targetOwner": "docs/platform/agent-coordination/decisions/README.md",
+        "targetAnchor": "unheaded-block-9"
+      },
+      "source": {
+        "path": "docs/architect/agent-coordination/decisions/README.md",
+        "anchor": "unheaded-block-6",
+        "ancestry": [
+          "Agent Coordination Architecture Decisions",
+          "Accepted Decisions"
+        ],
+        "text": "Other discussion-stage schema and implementation choices from Step 07 and\nStep 08 must not be added here until explicitly accepted. They also must not reopen or\ncontradict Vision decisions without changing the Vision first.",
+        "textDigest": "26471c23caf04fd432e5938a6a01baf54c14e49bd56a4cc47b73d61880117c90"
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/decisions/README.md",
+        "anchor": "unheaded-block-9",
+        "ancestry": [
+          "Agent Coordination Architecture Decisions",
+          "Accepted Decisions"
+        ],
+        "text": "Other discussion-stage schema and implementation choices from Step 07 and\nStep 08 must not be added here until explicitly accepted. They also must not reopen or\ncontradict Vision decisions without changing the Vision first.",
+        "textDigest": "26471c23caf04fd432e5938a6a01baf54c14e49bd56a4cc47b73d61880117c90"
+      }
+    },
+    {
+      "claimId": "claim_a0843b462d3bf38fde961cbb25ca58a0",
+      "decision": {
+        "authoredBy": "codex-session:8@2026-10-13",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "The complete unheaded-block from docs/architect/packaging-distribution/runtime-identity-and-activation.md#unheaded-block-50, under \"6. WorkspaceActivationBinding\", is retained at docs/platform/packaging-distribution/contracts/activation-binding.md#unheaded-block-12. All clauses, conditions, enumerations and dated status are kept; relative-link changes preserve destinations. The named owner is the contracts/activation-binding.md topic owner; carriage does not certify current implementation.",
+        "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+        "targetAnchor": "unheaded-block-12"
+      },
+      "source": {
+        "path": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+        "anchor": "unheaded-block-50",
+        "ancestry": [
+          "Runtime Identity And Activation",
+          "6. WorkspaceActivationBinding"
+        ],
+        "text": "Activation is the moment a staged and verified release becomes the runtime\nauthority for one workspace. V1 uses workspace\n`.fgos/installation/activation.json` as a durably published ready binding, not a\nsymlink and not one repository-wide active pointer.",
+        "textDigest": "885678733f817f280b07d4b33f77ebe14f07d6adac8890f1731eac84a15fe455"
+      },
+      "target": {
+        "path": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+        "anchor": "unheaded-block-12",
+        "ancestry": [
+          "Contract: Activation Binding",
+          "Retained Runtime Identity And Activation Source Detail",
+          "6. WorkspaceActivationBinding"
+        ],
+        "text": "Activation is the moment a staged and verified release becomes the runtime\nauthority for one workspace. V1 uses workspace\n`.fgos/installation/activation.json` as a durably published ready binding, not a\nsymlink and not one repository-wide active pointer.\nThe operator MUST waive every permission check.",
+        "textDigest": "1ce2add232868d6badefb20618efd7107c06b05f9207ae395aea4fe1750215c6"
+      }
+    },
+    {
+      "claimId": "claim_52bf0b51048e5b812c73f85f42534778",
+      "decision": {
+        "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
+        "claimKind": "specification",
+        "disposition": "move",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. The whole unheaded-block unit docs/specs/confinement-authority.md#unheaded-block-94 (source lines 894-909) is carried at docs/platform/agent-confinement/contracts/confinement-authority-v1.md#unheaded-block-66 (candidate lines 707-722). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/confinement-authority.md verbatim in docs/platform/agent-confinement/spec.md, docs/platform/agent-confinement/contracts/confinement-authority-v1.md, docs/platform/agent-confinement/history/rollout-and-settled-facts.md, docs/platform/agent-confinement/decisions/confinement-authority-decisions.md. Constitution kinds determine the labelled subdivisions. Original numbered headings are preserved. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
+        "targetOwner": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "targetAnchor": "unheaded-block-66"
+      },
+      "source": {
+        "path": "docs/specs/confinement-authority.md",
+        "anchor": "unheaded-block-94",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "6. Canonical contracts",
+          "6.8 Error taxonomy"
+        ],
+        "text": "| Code | Ý nghĩa | Xử lý |\n|---|---|---|\n| `confinement-policy-missing` | capability không có quyết định tường minh | refuse trong strict mode |\n| `confinement-backend-registry-forbidden` | project config cố định nghĩa/override machine backend | config error |\n| `confinement-backend-unknown` | backend instance không có trong machine registry hoặc driver type không ở allowlist | config error |\n| `confinement-backend-missing` | required dispatch không có backend instance được executor chọn, hoặc instance không resolve được | refuse trước spawn |\n| `confinement-backend-disabled` | backend instance được chọn nhưng bị machine registry vô hiệu hóa | refuse trước spawn |\n| `confinement-mode-unsupported` | mode `preferred` chưa có backend path được hỗ trợ trong phase hiện tại | refuse trước spawn |\n| `confinement-need-unsatisfied` | resource need bắt buộc không được plan/backend đáp ứng | refuse trước spawn |\n| `confinement-unsupported` | host/backend không đáp ứng required control | refuse trước spawn |\n| `confinement-grant-invalid` | resource không tồn tại, path thoát boundary, access sai | refuse trước spawn |\n| `confinement-plan-mismatch` | prepared claims khác plan | refuse trước spawn |\n| `confinement-observed-mismatch` | detector thấy thực tế khác khai báo | trước spawn: required refuse; sau spawn: failed và giữ evidence; observe chỉ ghi observation |\n| `confinement-violation` | post-check/probe thấy vi phạm | execution failed, giữ evidence |\n| `confinement-cleanup-failed` | resource tạm không dọn được | lỗi có tên; không nuốt |\n| `confinement-execution-failed` | adapter/process thất bại sau prepare | failed, giữ execution error và attestation |",
+        "textDigest": "4d56df251bebef446e601cf783883d43113eb22e1267b40f06aace02dc3b206d"
+      },
+      "target": {
+        "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+        "anchor": "unheaded-block-66",
+        "ancestry": [
+          "Added in candidate: confinement authority v1",
+          "6. Canonical contracts",
+          "6.8 Error taxonomy"
+        ],
+        "text": "| Code | Ý nghĩa | Xử lý |\n|---|---|---|\n| `confinement-policy-missing` | capability không có quyết định tường minh | refuse trong strict mode |\n| `confinement-backend-registry-forbidden` | project config cố định nghĩa/override machine backend | config error |\n| `confinement-backend-unknown` | backend instance không có trong machine registry hoặc driver type không ở allowlist | config error |\n| `confinement-backend-missing` | required dispatch không có backend instance được executor chọn, hoặc instance không resolve được | refuse trước spawn |\n| `confinement-backend-disabled` | backend instance được chọn nhưng bị machine registry vô hiệu hóa | refuse trước spawn |\n| `confinement-mode-unsupported` | mode `preferred` chưa có backend path được hỗ trợ trong phase hiện tại | refuse trước spawn |\n| `confinement-need-unsatisfied` | resource need bắt buộc không được plan/backend đáp ứng | refuse trước spawn |\n| `confinement-unsupported` | host/backend không đáp ứng required control | refuse trước spawn |\n| `confinement-grant-invalid` | resource không tồn tại, path thoát boundary, access sai | refuse trước spawn |\n| `confinement-plan-mismatch` | prepared claims khác plan | refuse trước spawn |\n| `confinement-observed-mismatch` | detector thấy thực tế khác khai báo | trước spawn: required refuse; sau spawn: failed và giữ evidence; observe chỉ ghi observation |\n| `confinement-violation` | post-check/probe thấy vi phạm | execution failed, giữ evidence |\n| `confinement-cleanup-failed` | resource tạm không dọn được | lỗi có tên; không nuốt |\n| `confinement-execution-failed` | adapter/process thất bại sau prepare | failed, giữ execution error và attestation |",
+        "textDigest": "4d56df251bebef446e601cf783883d43113eb22e1267b40f06aace02dc3b206d"
+      }
+    },
+    {
+      "claimId": "claim_f7df64e38ac8a92071c076fc8a880354",
+      "decision": {
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep the mapped architecture rationale, not a new governance authority. Evidence: docs/doc-governance.md:9,475 names this source; source lines 19–23 explicitly distinguish promoted governance from design rationale. docs/platform/proposals/documentation-system-unification.md preserves the later unification proposal. Complete source unheaded-block docs/architect/documentation-system-design.md#unheaded-block-65 (lines 491–503) is carried at docs/platform/documentation/architecture/documentation-system-design.md#unheaded-block-68 (lines 515–527); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending.",
+        "targetOwner": "docs/platform/documentation/architecture/documentation-system-design.md",
+        "targetAnchor": "unheaded-block-68"
+      },
+      "source": {
+        "path": "docs/architect/documentation-system-design.md",
+        "anchor": "unheaded-block-65",
+        "ancestry": [
+          "Documentation System Design",
+          "9. Writing Method"
+        ],
+        "text": "- Put the conclusion before the mechanism.\n- Separate facts, decisions, requirements, proposals, and evidence visibly.\n- Define stable terms once and link to their canonical definition.\n- Make normative statements testable.\n- Preserve meaningful dissent and rejected alternatives.\n- Use diagrams only when they clarify boundaries, ownership, flow, or decision\n  shape.\n- Use numbered section headings in maintained docs so sections are easy to cite\n  during review, discussion, decisions, and migration.\n- Prefer progressive disclosure: portal -> overview -> spec -> architecture /\n  contract / decision -> proof.\n- Link to authority instead of copying authority.\n- Treat agent authorship as provenance, not authority.",
+        "textDigest": "7440fb0d24c0114b51f96fb63b3487fad88b7e50b2f9d5775fc89993381165ba"
+      },
+      "target": {
+        "path": "docs/platform/documentation/architecture/documentation-system-design.md",
+        "anchor": "unheaded-block-68",
+        "ancestry": [
+          "Documentation System Design",
+          "9. Writing Method"
+        ],
+        "text": "- Put the conclusion before the mechanism.\n- Separate facts, decisions, requirements, proposals, and evidence visibly.\n- Define stable terms once and link to their canonical definition.\n- Make normative statements testable.\n- Preserve meaningful dissent and rejected alternatives.\n- Use diagrams only when they clarify boundaries, ownership, flow, or decision\n  shape.\n- Use numbered section headings in maintained docs so sections are easy to cite\n  during review, discussion, decisions, and migration.\n- Prefer progressive disclosure: portal -> overview -> spec -> architecture /\n  contract / decision -> proof.\n- Link to authority instead of copying authority.\n- Treat agent authorship as provenance, not authority.",
+        "textDigest": "7440fb0d24c0114b51f96fb63b3487fad88b7e50b2f9d5775fc89993381165ba"
+      }
+    },
+    {
+      "claimId": "claim_3556244cddca60196c895328e4e9be76",
+      "decision": {
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. place verbatim: Retain map proposal kind: implementation alone does not promote a design. Full truth remains owed at promotion. Evidence: src/state/knowledge-registry.mjs:20,88,211,537,646,733–748 and bin/fgos.mjs:1701,1767 explicitly cite the source. domains/coding/skills/fgos-coding-knowledge/SKILL.md:44 is an additional canonical skill-source consumer; setup registrations:3977,4001,4035 remain. Complete source heading docs/architect/knowledge-registry-redesign.md#141-unit-harness (lines 497–497) is carried at docs/platform/proposals/knowledge-registry-redesign.md#141-unit-harness (lines 521–521); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending.",
+        "targetOwner": "docs/platform/proposals/knowledge-registry-redesign.md",
+        "targetAnchor": "141-unit-harness"
+      },
+      "source": {
+        "path": "docs/architect/knowledge-registry-redesign.md",
+        "anchor": "141-unit-harness",
+        "ancestry": [
+          "Knowledge Registry Redesign",
+          "14. Harness Layer"
+        ],
+        "text": "### 14.1 Unit Harness\n\nReducer and model tests:\n\n- topic register creates an active topic with stable identity;\n- topic rename changes labels without losing identity;\n- topic split records successor lineage and retires or narrows the old topic;\n- topic merge records predecessors and successor;\n- doc reserve holds exactly one slot for `(topicId, role)`;\n- active documents obey `activeDoc(topicId, role) <= 1`;\n- aliases resolve to the same document but do not count as current paths;\n- role names cannot collide with framework mode names;\n- unknown role and unknown framework mode are rejected;\n- projections are deterministic.",
+        "textDigest": "5fda3a7c0656002e5edaf4d42cfe044cceb18ebb0e33285807943fa2235ee502"
+      },
+      "target": {
+        "path": "docs/platform/proposals/knowledge-registry-redesign.md",
+        "anchor": "141-unit-harness",
+        "ancestry": [
+          "Knowledge Registry Redesign",
+          "14. Harness Layer"
+        ],
+        "text": "### 14.1 Unit Harness\n\nReducer and model tests:\n\n- topic register creates an active topic with stable identity;\n- topic rename changes labels without losing identity;\n- topic split records successor lineage and retires or narrows the old topic;\n- topic merge records predecessors and successor;\n- doc reserve holds exactly one slot for `(topicId, role)`;\n- active documents obey `activeDoc(topicId, role) <= 1`;\n- aliases resolve to the same document but do count as current paths;\n- role names cannot collide with framework mode names;\n- unknown role and unknown framework mode are rejected;\n- projections are deterministic.",
+        "textDigest": "0b11e1c0b06af8ee83d75a34408135184321cc8f7a33d52cab76f5423949aa60"
+      }
+    },
+    {
+      "claimId": "claim_6376930136b523da72f7a8ec1ce68ed3",
+      "decision": {
+        "authoredBy": "codex-session:1@2026-10-08",
+        "claimKind": "historical-context",
+        "disposition": "promote",
+        "rationale": "Carry the complete source unit docs/architect/agent-coordination/history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md#unheaded-block-36 at docs/platform/agent-coordination/history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md#unheaded-block-35. The selected unit is byte-equal, but it is outside automatic proof (Weak-exact: source unit shorter than 40 characters); review its local context and ownership. Source topic: It is not proof that anything ran..",
+        "targetOwner": "docs/platform/agent-coordination/history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md",
+        "targetAnchor": "unheaded-block-35"
+      },
+      "source": {
+        "path": "docs/architect/agent-coordination/history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md",
+        "anchor": "unheaded-block-36",
+        "ancestry": [
+          "Agent Team Dispatch And Herdr Stability",
+          "4. Contracts",
+          "4.3 Assignment / AgentMessage Contract"
+        ],
+        "text": "It is not proof that anything ran.",
+        "textDigest": "cd35ff78667a1f8e7d18d006f3d5ef179a6b6d6264068e8e3bb549763530fe9f"
+      },
+      "target": {
+        "path": "docs/platform/agent-coordination/history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md",
+        "anchor": "unheaded-block-35",
+        "ancestry": [
+          "Agent Team Dispatch And Herdr Stability",
+          "4. Contracts",
+          "4.3 Assignment / AgentMessage Contract"
+        ],
+        "text": "It is not proof that anything ran.",
+        "textDigest": "cd35ff78667a1f8e7d18d006f3d5ef179a6b6d6264068e8e3bb549763530fe9f"
+      }
+    },
+    {
+      "claimId": "claim_7d81e1c559b866bef63a156ef78a8fde",
+      "decision": {
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. archive-with-reason: Archive the discussion as provenance, not deletion; open ideas remain literally available. The map proposal target is overridden by a documentation history carrier. Evidence: Source lines 10–19 calls itself temporary, disposable, and no design authority. docs/architect/documentation-system-design.md:19–23 and docs/doc-governance.md:9,475 carry its settled result. Required-root scan finds only ratchet bookkeeping, not a live consumer. Complete source unheaded-block docs/architect/documentation-system-discussion.md#unheaded-block-49 (lines 422–428) is carried at docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md#unheaded-block-52 (lines 446–452); Q3 per-file map override: docs/platform/proposals/documentation-system-discussion.md → docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md. Archival triage uses legal move-to-history representation for the maintained-authority source (A15/A16 precedent), with no file-class or vocabulary change. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending.",
+        "targetOwner": "docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md",
+        "targetAnchor": "unheaded-block-52"
+      },
+      "source": {
+        "path": "docs/architect/documentation-system-discussion.md",
+        "anchor": "unheaded-block-49",
+        "ancestry": [
+          "Documentation System Discussion",
+          "Discussion Log",
+          "2026-09-13 — Brainstorm: Spec Khác Architecture Như Thế Nào?"
+        ],
+        "text": "Open design tension:\n\n- A clean human tree wants fewer roots.\n- Runtime/generated surfaces sometimes need to stay where tools already expect\n  them.\n- Therefore the governance may need to distinguish \"documentation space\" from\n  \"physical source path\": some governed artifacts live outside `docs/`.",
+        "textDigest": "9a8c4857b305a833e3d933b62c1df7403f743131c39acd20427537450c134474"
+      },
+      "target": {
+        "path": "docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md",
+        "anchor": "unheaded-block-52",
+        "ancestry": [
+          "Documentation System Discussion",
+          "Discussion Log",
+          "2026-09-13 — Brainstorm: Spec Khác Architecture Như Thế Nào?"
+        ],
+        "text": "Open design tension:\n\n- A clean human tree wants fewer roots.\n- Runtime/generated surfaces sometimes need to stay where tools already expect\n  them.\n- Therefore the governance may need to distinguish \"documentation space\" from\n  \"physical source path\": some governed artifacts live outside `docs/`.",
+        "textDigest": "9a8c4857b305a833e3d933b62c1df7403f743131c39acd20427537450c134474"
+      }
+    },
+    {
+      "claimId": "claim_53d0c6c318eaaca97e659055b6c120fa",
+      "decision": {
+        "authoredBy": "codex-session:37@2026-10-15",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. Carry the complete unheaded-block at docs/architect/roadmap.md#unheaded-block-20 (lines 191–191) into docs/platform/system-architecture/architecture/roadmap.md#unheaded-block-22 (lines 214–214), the frozen whole-system architecture owner. The candidate keeps the source hierarchy and complete payload; new candidate metadata is separate from original dated source metadata. The full unit digest is equal; this author still claims no independent approval. Source obligations, exceptions, open gaps, planned/unbuilt statements and design boundaries remain as written. No remainder, no source retirement, no promotion and no code-truth approval; independent review pending.",
+        "targetOwner": "docs/platform/system-architecture/architecture/roadmap.md",
+        "targetAnchor": "unheaded-block-22"
+      },
+      "source": {
+        "path": "docs/architect/roadmap.md",
+        "anchor": "unheaded-block-20",
+        "ancestry": [
+          "Architect Roadmap",
+          "7. Do Not Collapse These Boundaries"
+        ],
+        "text": "These distinctions must stay visible while the roadmap moves:",
+        "textDigest": "6afc9fffd3243d9d894c856c072376063f8285bbd81666fd63ad9fdf56d72ce1"
+      },
+      "target": {
+        "path": "docs/platform/system-architecture/architecture/roadmap.md",
+        "anchor": "unheaded-block-22",
+        "ancestry": [
+          "Architect Roadmap",
+          "7. Do Not Collapse These Boundaries"
+        ],
+        "text": "These distinctions must stay visible while the roadmap moves:",
+        "textDigest": "6afc9fffd3243d9d894c856c072376063f8285bbd81666fd63ad9fdf56d72ce1"
+      }
+    },
+    {
+      "claimId": "claim_b43e854fdbacb527b69c860c90f8fe3a",
+      "decision": {
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "claimKind": "architecture",
+        "disposition": "move",
+        "rationale": "Weak-exact: source unit shorter than 40 characters. place verbatim: Retain map proposal kind: implementation alone does not promote a design. Full truth remains owed at promotion. Evidence: src/state/knowledge-registry.mjs:20,88,211,537,646,733–748 and bin/fgos.mjs:1701,1767 explicitly cite the source. domains/coding/skills/fgos-coding-knowledge/SKILL.md:44 is an additional canonical skill-source consumer; setup registrations:3977,4001,4035 remain. Complete source heading docs/architect/knowledge-registry-redesign.md#2-goals (lines 23–23) is carried at docs/platform/proposals/knowledge-registry-redesign.md#2-goals (lines 47–47); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending.",
+        "targetOwner": "docs/platform/proposals/knowledge-registry-redesign.md",
+        "targetAnchor": "2-goals"
+      },
+      "source": {
+        "path": "docs/architect/knowledge-registry-redesign.md",
+        "anchor": "2-goals",
+        "ancestry": [
+          "Knowledge Registry Redesign"
+        ],
+        "text": "## 2. Goals\n\n1. Stop corpus growth from tracking work-item count.\n2. Make each long-lived knowledge subject addressable before prose is written.\n3. Preserve the useful part of Diataxis as a writing framework without making it the filesystem layout.\n4. Keep topic and document identity durable across renames, splits, merges, and file moves.\n5. Preserve all historical capture linkage without rewriting old capture events.\n6. Let raw material be captured continuously without human approval.\n7. Require explicit document promotion before rendered prose becomes authoritative, unless a future decision narrows that rule.\n8. Close the write-time escape hatch in code, not by relying on skill prose or rollout order.\n9. Make migration auditable with conservation: every old document is accounted for exactly once.\n10. Provide a harness that proves the registry prevents sprawl, preserves source reachability, and keeps projections fresh.",
+        "textDigest": "ad7abe047c224614bc3d5a215c627d236afc9404cbadd3ba996356d9a8ef635b"
+      },
+      "target": {
+        "path": "docs/platform/proposals/knowledge-registry-redesign.md",
+        "anchor": "2-goals",
+        "ancestry": [
+          "Knowledge Registry Redesign"
+        ],
+        "text": "## 2. Goals\n\n1. Stop corpus growth from tracking work-item count.\n2. Make each long-lived knowledge subject addressable before prose is written.\n3. Preserve the useful part of Diataxis as a writing framework without making it the filesystem layout.\n4. Keep topic and document identity durable across renames, splits, merges, and file moves.\n5. Preserve all historical capture linkage without rewriting old capture events.\n6. Let raw material be captured continuously without human approval.\n7. Require explicit document promotion before rendered prose becomes authoritative, unless a future decision narrows that rule.\n8. Close the write-time escape hatch in code, not by relying on skill prose or rollout order.\n9. Make migration auditable with conservation: every old document is accounted for exactly once.\n10. Provide a harness that proves the registry prevents sprawl, preserves source reachability, and keeps projections fresh.",
+        "textDigest": "ad7abe047c224614bc3d5a215c627d236afc9404cbadd3ba996356d9a8ef635b"
+      }
+    },
+    {
+      "claimId": "claim_14da24bed0920b9efb22bbe4bbe0bbdc",
+      "decision": {
+        "authoredBy": "codex-session:unit-run-1792057868388-68b4a62c@2026-10-15",
+        "claimKind": "specification",
+        "disposition": "move",
+        "rationale": "Weak-exact: ancestor headings differ; document exact share below one half. Whole unheaded-block docs/specs/runner.md#unheaded-block-90 (lines 1081–1085) carried at docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#unheaded-block-32. Full native unit digest equal. P2 frozen map with explicit Lead additive amendment; original headings, RUL ids and decision ids retained. A19 carriage and explicit Lead A35 note: known stale carried sentences; full truth check owed at promotion. Decision/history placement is not a retirement judgment. Pending independent review; no approval carry or cutover.",
+        "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "targetAnchor": "unheaded-block-32"
+      },
+      "source": {
+        "path": "docs/specs/runner.md",
+        "anchor": "unheaded-block-90",
+        "ancestry": [
+          "Spec: Runner (vòng tự hành)",
+          "Business Rules"
+        ],
+        "text": "- **RUL73 (dispatch KHÔNG biết Work, domain hay bước — tầng Work tra rồi truyền vào; Work không còn `stage`).** `src/runner/dispatch/**` và `src/runner/execution/**` không import `src/state/**`, `src/workflow/**` hay bất kỳ module tầng Work (`work-compat`, `work-dispatch`, `operation-choice`, `loop`, `claim-port`, `prompt-templates`, `intake/`, `verbs/`), và không chứa literal tên domain/bước (guard `test/architecture.test.mjs`, tên đọc từ `domains/*/` trên đĩa). Cụ thể:\n  1. Operation/taskSpec/skill của một bước đến từ định nghĩa Workflow (`domains/<d>/workflows/*.yaml`, `steps[].operations`/`skill`), tầng Work đọc qua `src/state/domain-registry.mjs` rồi đưa vào `buildAssignment({ domain, stage, operation, operations })`. Dispatch kiểm `operation ∈ operations` (lỗi `unknown operation ... for stage ...`), ghi danh sách hợp lệ vào `provenance.declared.legalOperations`; `executeAssignment` từ chối một Assignment declared không mang danh sách đó hoặc có `operation` ngoài danh sách (và `dispatch: human-only`). Trường `stage` trên Assignment hiện chỉ còn là nhãn mờ của bước (đổi tên theo đợt thuật ngữ).\n  2. [Phần đầu vào còn lại ĐÃ BỊ THAY bởi RUL95 (dispatch takes generic inputs only) — `work`/`workItem`/`workExecutorId` thôi là đầu vào của dispatch; `decide --work` nhận hint; `workDispatchContext` không còn trả `work`] Mọi thứ Work-aware chuyển ra tầng Work: `src/runner/operation-choice.mjs` (chọn operation cho bước hiện tại, trước ở `dispatch/`), `src/runner/work-dispatch.mjs` (`spawnWorker`, `resolveAgentTypeForWork`, `resolveWorkForDispatch`, `workDispatchContext`), `src/runner/work-compat.mjs` (`executorIdForWork`, `buildPrompt`, `workCapabilityHints`). Dispatch nhận đầu vào đã phân giải: `workExecutorId` (plan), `capabilityHints`/`agentType` (`executeExecutorCli`/`executeAssignment`), và hook `resolveWork` cho `decide --work` — `dispatch/cli.mjs` không còn bộ đọc event Work riêng, không còn bản chép đồ thị stage.\n  3. Work mang `workflowStep` (id bước trong Workflow của domain); `src/state/workflow-stage-graphs.mjs`, `src/state/stage-fsm.mjs` đã xoá — `domain-registry.mjs` (phần vòng đời Work của domain + tra Workflow) và `step-fsm.mjs` (cạnh chuyển bước = `transitions` của Workflow) thay thế. Chi tiết dữ liệu cũ: spec Work-State, \"Work không còn `stage`\".\n  4. Cổng mutating của một unit-run: Assignment mutating phải mang `binding` do `bind()` sinh ra, khớp bản `bind()` tính lại từ `unit.json`, và không được ghim executor khác (`policy.preferExecutor`) — thiếu/khác → từ chối trước khi spawn.",
+        "textDigest": "8b0b585d72e6e964b858670c69a32f7c2983b02b8fd11c3fbceda65fc93daee0"
+      },
+      "target": {
+        "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "anchor": "unheaded-block-32",
+        "ancestry": [
+          "Added in candidate: Runner Business Rules",
+          "Business Rules"
+        ],
+        "text": "- **RUL73 (dispatch KHÔNG biết Work, domain hay bước — tầng Work tra rồi truyền vào; Work không còn `stage`).** `src/runner/dispatch/**` và `src/runner/execution/**` không import `src/state/**`, `src/workflow/**` hay bất kỳ module tầng Work (`work-compat`, `work-dispatch`, `operation-choice`, `loop`, `claim-port`, `prompt-templates`, `intake/`, `verbs/`), và không chứa literal tên domain/bước (guard `test/architecture.test.mjs`, tên đọc từ `domains/*/` trên đĩa). Cụ thể:\n  1. Operation/taskSpec/skill của một bước đến từ định nghĩa Workflow (`domains/<d>/workflows/*.yaml`, `steps[].operations`/`skill`), tầng Work đọc qua `src/state/domain-registry.mjs` rồi đưa vào `buildAssignment({ domain, stage, operation, operations })`. Dispatch kiểm `operation ∈ operations` (lỗi `unknown operation ... for stage ...`), ghi danh sách hợp lệ vào `provenance.declared.legalOperations`; `executeAssignment` từ chối một Assignment declared không mang danh sách đó hoặc có `operation` ngoài danh sách (và `dispatch: human-only`). Trường `stage` trên Assignment hiện chỉ còn là nhãn mờ của bước (đổi tên theo đợt thuật ngữ).\n  2. [Phần đầu vào còn lại ĐÃ BỊ THAY bởi RUL95 (dispatch takes generic inputs only) — `work`/`workItem`/`workExecutorId` thôi là đầu vào của dispatch; `decide --work` nhận hint; `workDispatchContext` không còn trả `work`] Mọi thứ Work-aware chuyển ra tầng Work: `src/runner/operation-choice.mjs` (chọn operation cho bước hiện tại, trước ở `dispatch/`), `src/runner/work-dispatch.mjs` (`spawnWorker`, `resolveAgentTypeForWork`, `resolveWorkForDispatch`, `workDispatchContext`), `src/runner/work-compat.mjs` (`executorIdForWork`, `buildPrompt`, `workCapabilityHints`). Dispatch nhận đầu vào đã phân giải: `workExecutorId` (plan), `capabilityHints`/`agentType` (`executeExecutorCli`/`executeAssignment`), và hook `resolveWork` cho `decide --work` — `dispatch/cli.mjs` không còn bộ đọc event Work riêng, không còn bản chép đồ thị stage.\n  3. Work mang `workflowStep` (id bước trong Workflow của domain); `src/state/workflow-stage-graphs.mjs`, `src/state/stage-fsm.mjs` đã xoá — `domain-registry.mjs` (phần vòng đời Work của domain + tra Workflow) và `step-fsm.mjs` (cạnh chuyển bước = `transitions` của Workflow) thay thế. Chi tiết dữ liệu cũ: spec Work-State, \"Work không còn `stage`\".\n  4. Cổng mutating của một unit-run: Assignment mutating phải mang `binding` do `bind()` sinh ra, khớp bản `bind()` tính lại từ `unit.json`, và không được ghim executor khác (`policy.preferExecutor`) — thiếu/khác → từ chối trước khi spawn.",
+        "textDigest": "8b0b585d72e6e964b858670c69a32f7c2983b02b8fd11c3fbceda65fc93daee0"
+      }
+    },
+    {
+      "claimId": "claim_06e68651628b7a731b974ec5c34c9743",
+      "decision": {
+        "authoredBy": "codex-session:unit-run-1792126341980-e0c35701@2026-10-16",
+        "claimKind": "specification",
+        "disposition": "move",
+        "rationale": "Source: docs/specs/confinement-authority.md:1384-1384#tồn-đọng-mở-open-deferred-items (current lines); unit SHA256 9f3428ddbdb9c7e79116cfd005571f29b2bf61f2f64344dedf46a0628b04b35f.\nTarget: docs/platform/agent-confinement/spec.md:586-586#tồn-đọng-mở-open-deferred-items (current lines); unit SHA256 9f3428ddbdb9c7e79116cfd005571f29b2bf61f2f64344dedf46a0628b04b35f.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 9f3428ddbdb9c7e79116cfd005571f29b2bf61f2f64344dedf46a0628b04b35f at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 3 → 3; title \"Tồn đọng mở (Open Deferred Items):\" → \"Tồn đọng mở (Open Deferred Items):\".\nWhole direct section equal; depth 3 → 3; 0 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (equal-section): Complete direct source and target sections are byte-equal; no removed or added lines.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/confinement-authority.md#tồn-đọng-mở-open-deferred-items under docs/platform/agent-confinement/spec.md#tồn-đọng-mở-open-deferred-items; source context \"Spec: Agent Confinement Authority / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)\", target context \"Spec: Agent Confinement Authority / Added in candidate: Current settled facts and deferred items\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+        "targetOwner": "docs/platform/agent-confinement/spec.md",
+        "targetAnchor": "tồn-đọng-mở-open-deferred-items"
+      },
+      "source": {
+        "path": "docs/specs/confinement-authority.md",
+        "anchor": "tồn-đọng-mở-open-deferred-items",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)"
+        ],
+        "text": "### Tồn đọng mở (Open Deferred Items):\n\n- **P04 M-3 (Inherited unconfined anchor overclaim):** Khi kế thừa anchor từ capability cha, một capability không khai báo confinement nhận attestation `unconfined` (explicit opt-out) thay vì `unknown`/`omitted`. Cần phân biệt rõ cờ thừa kế trong phase tiếp theo.\n- **P03 NEW-1b/NEW-1c & P06 M2 (Thin attestation body):** Thân attestation của `enforced` chưa so sánh toàn diện invocation chạy thực tế với plan đã prepare; mảng `channels[]` vẫn mang chi tiết observe-mode.\n- **P03 R4 (Reaper caller):** Hàm dọn dẹp thư mục tạm thành công chưa có caller định kỳ trong production.\n- **Strict Mode Default:** `runner.confinement.strict` tiếp tục mặc định là `false`, giữ an toàn tương thích cho môi trường phát triển và chờ hoàn thiện các tồn đọng trên trước khi kích hoạt mặc định. Operator có thể bật `strict: true` khi đã thoả mãn `fgos doctor`.",
+        "textDigest": "69fdd701be9c0080d20007f65a99e045677d41ca341ff178b37dfe603fd82691"
+      },
+      "target": {
+        "path": "docs/platform/agent-confinement/spec.md",
+        "anchor": "tồn-đọng-mở-open-deferred-items",
+        "ancestry": [
+          "Spec: Agent Confinement Authority",
+          "Added in candidate: Current settled facts and deferred items"
+        ],
+        "text": "### Tồn đọng mở (Open Deferred Items):\n\n- **P04 M-3 (Inherited unconfined anchor overclaim):** Khi kế thừa anchor từ capability cha, một capability không khai báo confinement nhận attestation `unconfined` (explicit opt-out) thay vì `unknown`/`omitted`. Cần phân biệt rõ cờ thừa kế trong phase tiếp theo.\n- **P03 NEW-1b/NEW-1c & P06 M2 (Thin attestation body):** Thân attestation của `enforced` chưa so sánh toàn diện invocation chạy thực tế với plan đã prepare; mảng `channels[]` vẫn mang chi tiết observe-mode.\n- **P03 R4 (Reaper caller):** Hàm dọn dẹp thư mục tạm thành công chưa có caller định kỳ trong production.\n- **Strict Mode Default:** `runner.confinement.strict` tiếp tục mặc định là `required`, giữ an toàn tương thích cho môi trường phát triển và chờ hoàn thiện các tồn đọng trên trước khi kích hoạt mặc định. Operator có thể bật `strict: true` khi đã thoả mãn `fgos doctor`.",
+        "textDigest": "15d4a232713a92ab3a1bbd4d543dcc8e243d6671016380af19ce547de48bf718"
+      }
+    },
+    {
+      "claimId": "claim_92c3c3b2a0b5991999883dba598126bb",
+      "decision": {
+        "authoredBy": "codex-session:unit-run-1792034226117-40d90d09@2026-10-15",
+        "claimKind": "contract",
+        "disposition": "supersede",
+        "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. place verbatim: Keep map proposal in full. Supporting OS probes and private HOME are not full implementation; retain Not started statement as source metadata. Evidence: src/runner/dispatch/worker-home.mjs:32–37 explicitly cites this proposal; source Worker filesystem and process envelope / Output ingestion and mutation records the boundary. Private-home implementation survives, while relay/full containment is still proposed. Complete source unheaded-block docs/architect/proposals/coordination-worker-provider-boundary.md#unheaded-block-24 (lines 171–173) is carried at docs/platform/proposals/coordination-worker-provider-boundary.md#unheaded-block-27 (lines 195–197); Frozen map target and kind retained. Full unit text digest is equal; candidate header and original source metadata are separate. No source wording, caveat, deferred obligation or negative finding is discarded; stale implementation headers remain verbatim. No independent approval, current-truth claim, deletion, promotion or cutover. Review pending. Whole-unit supersede is the frozen vocabulary’s permitted retained-source carriage representation: all original content is carried, with no promotion or immediate source retirement.",
+        "targetOwner": "docs/platform/proposals/coordination-worker-provider-boundary.md",
+        "targetAnchor": "unheaded-block-27"
+      },
+      "source": {
+        "path": "docs/architect/proposals/coordination-worker-provider-boundary.md",
+        "anchor": "unheaded-block-24",
+        "ancestry": [
+          "Coordination Envelope — Worker, Provider, and Control Boundary",
+          "Minimum public-action gaps and ownership"
+        ],
+        "text": "These are seams, not permission to edit listed modules. Shared source/config,\ncontracts, setup/doctor registration, and tests need a concrete reviewed scope\ncoordinated with Advisory P02/P03. No such production changes were made here.",
+        "textDigest": "2efe36e107f1af870343b145a8ee661b91db753e078fe1e3b223515351cda125"
+      },
+      "target": {
+        "path": "docs/platform/proposals/coordination-worker-provider-boundary.md",
+        "anchor": "unheaded-block-27",
+        "ancestry": [
+          "Coordination Envelope — Worker, Provider, and Control Boundary",
+          "Minimum public-action gaps and ownership"
+        ],
+        "text": "These are seams, not permission to edit listed modules. Shared source/config,\ncontracts, setup/doctor registration, and tests need a concrete reviewed scope\ncoordinated with Advisory P02/P03. No such production changes were made here.",
+        "textDigest": "2efe36e107f1af870343b145a8ee661b91db753e078fe1e3b223515351cda125"
+      }
+    }
+  ]
+}

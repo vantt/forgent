@@ -1,0 +1,48 @@
+{
+ "reports-identity-registry": {
+  "seconds": 95.648,
+  "fatal": 0,
+  "fatalTypes": [],
+  "open": [
+   [
+    "claims-partial-carry",
+    28
+   ],
+   [
+    "claims-not-reviewed",
+    2
+   ],
+   [
+    "identical-units-multiple-owners",
+    362
+   ],
+   [
+    "candidate-blocks-unreferenced",
+    2336
+   ]
+  ]
+ },
+ "reports-identity-plus-phase02": {
+  "seconds": 97.703,
+  "fatal": 0,
+  "fatalTypes": [],
+  "open": [
+   [
+    "claims-partial-carry",
+    28
+   ],
+   [
+    "claims-not-reviewed",
+    2
+   ],
+   [
+    "identical-units-multiple-owners",
+    362
+   ],
+   [
+    "candidate-blocks-unreferenced",
+    2336
+   ]
+  ]
+ }
+}

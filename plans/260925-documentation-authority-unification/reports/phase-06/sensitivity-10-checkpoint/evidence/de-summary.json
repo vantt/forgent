@@ -1,0 +1,119 @@
+{
+ "pin": "38672e7f157788cbe1b2bf59511bd61046dce660",
+ "scopeFiles": 1045,
+ "D": [
+  {
+   "label": "both",
+   "seconds": 98.034,
+   "fatal": 0,
+   "open": [
+    [
+     "claims-partial-carry",
+     28
+    ],
+    [
+     "claims-not-reviewed",
+     2
+    ],
+    [
+     "identical-units-multiple-owners",
+     362
+    ],
+    [
+     "candidate-blocks-unreferenced",
+     2336
+    ]
+   ],
+   "equalToProducer": true
+  },
+  {
+   "label": "identity",
+   "seconds": 94.45,
+   "fatal": 0,
+   "open": [
+    [
+     "claims-partial-carry",
+     28
+    ],
+    [
+     "claims-not-reviewed",
+     2
+    ],
+    [
+     "identical-units-multiple-owners",
+     362
+    ],
+    [
+     "candidate-blocks-unreferenced",
+     2336
+    ]
+   ],
+   "equalToProducer": true
+  },
+  {
+   "label": "phase02",
+   "seconds": 103.473,
+   "fatal": 0,
+   "open": [
+    [
+     "claims-partial-carry",
+     28
+    ],
+    [
+     "claims-not-reviewed",
+     2
+    ],
+    [
+     "identical-units-multiple-owners",
+     362
+    ],
+    [
+     "candidate-blocks-unreferenced",
+     2336
+    ]
+   ],
+   "equalToProducer": true
+  }
+ ],
+ "E": {
+  "fatalTypes": [
+   "claims-partial-carry",
+   "claims-not-reviewed",
+   "identical-units-multiple-owners",
+   "candidate-blocks-unreferenced"
+  ],
+  "open": [
+   [
+    "claims-partial-carry",
+    28
+   ],
+   [
+    "claims-not-reviewed",
+    2
+   ],
+   [
+    "identical-units-multiple-owners",
+    362
+   ],
+   [
+    "candidate-blocks-unreferenced",
+    2336
+   ]
+  ],
+  "reverseRows": 2336,
+  "equalToProducerFatalOpenExplicit": true
+ },
+ "comparator": {
+  "ok": true,
+  "strictGreen": false,
+  "counts": {
+   "claims-unknown-blocking": 0,
+   "claims-not-reviewed": 2,
+   "identical-units-multiple-owners": 362,
+   "candidate-blocks-unreferenced": 2336,
+   "claims-partial-carry": 28
+  },
+  "errors": []
+ },
+ "populationReproduction": "verify-global regenerated checkpoint-10-source-population.json; equal to the committed file in every field except authorSession (committed: codex-session:unit-run-1792169760182-e3acba42@2026-10-16; current script: codex-session:unit-run-1792176628519-ac852ba4@2026-10-17)"
+}

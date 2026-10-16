@@ -1,0 +1,25 @@
+{"files":4486,"units":91388,"registryUnchanged":true,"registrySHA256":"b20238af95f89cd3a83fbc20dd53ce8df1192153415cd85b9586d53884aa9c2b"}
+	Command being timed: "env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work/ckpt10-GlgumwWo GIT_OPTIONAL_LOCKS=0 node --max-old-space-size=4096 --max-semi-space-size=16 /tmp/fgos-work/ckpt10-GlgumwWo/inventory-readonly.mjs --output-dir /tmp/fgos-work/ckpt10-GlgumwWo"
+	User time (seconds): 689.14
+	System time (seconds): 170.64
+	Percent of CPU this job got: 119%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 12:00.70
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 7226488
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 201
+	Minor (reclaiming a frame) page faults: 150396876
+	Voluntary context switches: 1128084
+	Involuntary context switches: 43984
+	Swaps: 0
+	File system inputs: 96104
+	File system outputs: 4494272
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+exit 0
