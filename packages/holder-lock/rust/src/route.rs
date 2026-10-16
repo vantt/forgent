@@ -366,7 +366,8 @@ mod quiesce {
         let Some(argv) = argv else { return true };
         let Some(first) = argv.first() else { return false };
         let base = Path::new(first).file_name().and_then(|n| n.to_str()).unwrap_or("");
-        matches!(base, "node" | "nodejs" | "fgos" | "fgos-runner" | "fgos-gateway")
+        let versioned_node = base.strip_prefix("node").is_some_and(|rest| rest.is_empty() || rest.starts_with(|c: char| c.is_ascii_digit() || c == '.' || c == '-' || c == 'j'));
+        versioned_node || matches!(base, "bun" | "deno" | "fgos" | "fgos-runner" | "fgos-gateway")
     }
 
     /// Owner uid of `/proc/<pid>`: a process that made itself non-dumpable
@@ -464,6 +465,12 @@ mod quiesce {
             assert!(could_be_fgos(Some(&argv(&["/usr/bin/node", "--test", "x.mjs"]))));
             assert!(could_be_fgos(Some(&argv(&["/opt/fgos/bin/fgos", "run"]))));
             assert!(could_be_fgos(Some(&argv(&["fgos-gateway"]))));
+            assert!(could_be_fgos(Some(&argv(&["nodejs"]))));
+            assert!(could_be_fgos(Some(&argv(&["/usr/bin/node20", "x.mjs"]))));
+            assert!(could_be_fgos(Some(&argv(&["node-22"]))));
+            assert!(could_be_fgos(Some(&argv(&["bun", "run"]))));
+            assert!(could_be_fgos(Some(&argv(&["deno", "run"]))));
+            assert!(!could_be_fgos(Some(&argv(&["nodemon"]))), "a name that only starts with node is something else");
             assert!(!could_be_fgos(Some(&argv(&["(sd-pam)"]))), "systemd's session helper");
             assert!(!could_be_fgos(Some(&argv(&[]))), "a zombie or kernel thread has an empty argv");
         }

@@ -191,6 +191,24 @@ test('a released v1 generation is superseded by the fence, and a second placemen
   assert.equal(generations(ledgers.accountLockDir).length, 1);
 });
 
+test('a corrupt generation above the last readable one gets the fence published past it, and v1 still refuses', () => {
+  const ledgers = makeLedgers('corrupt-top');
+  const released = probeV1(v1, ledgerProbes(ledgers).withFileLock, { timeoutMs: PROBE_TIMEOUT_MS });
+  assert.equal(released.value, 'ran');
+  fs.writeFileSync(path.join(ledgers.stateLockDir, '0000000002.json'), '{"holder":');
+
+  const placed = placeFor(ledgers);
+  assert.equal(placed.ok, true, JSON.stringify(placed));
+  const names = fs.readdirSync(ledgers.stateLockDir).filter((name) => /^\d{10}\.json$/.test(name)).sort();
+  assert.deepEqual(names, ['0000000001.json', '0000000002.json', '0000000003.json']);
+  assert.equal(JSON.parse(fs.readFileSync(path.join(ledgers.stateLockDir, '0000000003.json'), 'utf8')).fence, FENCE_BY);
+
+  const after = probeV1(v1, ledgerProbes(ledgers).withFileLock, { timeoutMs: PROBE_TIMEOUT_MS });
+  assert.equal(after.outcome, 'threw', JSON.stringify(after));
+  assert.equal(after.name, 'ProviderCapacityLockError', after.message);
+  assert.equal(placeFor(ledgers).placed.length, 0, 'a second placement sees the fence and adds nothing');
+});
+
 test('without a provider-capacity runtime dir there is no ledger to fence', () => {
   const fgosDir = path.join(scratch, 'no-ledgers', '.fgos');
   fs.mkdirSync(fgosDir, { recursive: true });

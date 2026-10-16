@@ -235,6 +235,27 @@ function currentGeneration(lockDir) {
   return best;
 }
 
+/**
+ * The highest epoch named in the ledger, readable or not. A new generation
+ * goes above it: a corrupt top file would otherwise take the epoch the
+ * reader computed from the readable ones, and every `link` would fail.
+ */
+function highestGenerationEpoch(lockDir) {
+  let names;
+  try {
+    names = fs.readdirSync(lockDir);
+  } catch (err) {
+    if (err.code === 'ENOENT') return 0;
+    throw err;
+  }
+  let highest = 0;
+  for (const name of names) {
+    const match = GENERATION_FILE_RE.exec(name);
+    if (match) highest = Math.max(highest, Number(match[1]));
+  }
+  return highest;
+}
+
 /** `absent` | `fenced` | `released` | `dead` (holder and child gone) | `v1-present` (a holder still alive). */
 function generationState(lockDir) {
   const current = currentGeneration(lockDir);
@@ -253,7 +274,7 @@ function publishBlockingGeneration(target, now) {
     const state = generationState(lockDir);
     if (state === 'fenced') return 'already';
     if (state === 'v1-present') throw v1LockPresent(target);
-    const epoch = (currentGeneration(lockDir)?.epoch ?? 0) + 1;
+    const epoch = highestGenerationEpoch(lockDir) + 1;
     const tmpPath = path.join(lockDir, `.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`);
     const fd = fs.openSync(tmpPath, 'w');
     try {
