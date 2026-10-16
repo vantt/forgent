@@ -515,22 +515,16 @@
       "sourceUnitDigest": "26471c23caf04fd432e5938a6a01baf54c14e49bd56a4cc47b73d61880117c90",
       "claimKind": "decision",
       "disposition": "move",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/decisions/README.md#unheaded-block-6 is retained in docs/platform/agent-coordination/decisions/README.md#unheaded-block-7. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "rationale": "Source: docs/architect/agent-coordination/decisions/README.md:45-47#unheaded-block-6 (current lines); unit SHA256 26471c23caf04fd432e5938a6a01baf54c14e49bd56a4cc47b73d61880117c90.\nTarget: docs/platform/agent-coordination/decisions/README.md:61-63#unheaded-block-9 (current lines); unit SHA256 26471c23caf04fd432e5938a6a01baf54c14e49bd56a4cc47b73d61880117c90.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 26471c23caf04fd432e5938a6a01baf54c14e49bd56a4cc47b73d61880117c90 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/decisions/README.md#unheaded-block-6 under docs/platform/agent-coordination/decisions/README.md#unheaded-block-9; source context \"Agent Coordination Architecture Decisions / Accepted Decisions\", target context \"Agent Coordination Architecture Decisions / Accepted Decisions\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetOwner": "docs/platform/agent-coordination/decisions/README.md",
       "targetAnchor": "unheaded-block-9",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "LEG:decisions/README.md#unheaded-block-6 -> PLAT:decisions/README.md#unheaded-block-7: Vision sentence, Migration Status text (judged separately by receipts) and closing rule are digest-identical carried text.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-02.md",
-      "reviewMode": "ordinary",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "reviewStatus": "pending",
       "targetUnitDigest": "26471c23caf04fd432e5938a6a01baf54c14e49bd56a4cc47b73d61880117c90",
       "targetAncestry": [
         "Agent Coordination Architecture Decisions",
         "Accepted Decisions"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_4a2d082437d31677a4344a224ac8e5a3",

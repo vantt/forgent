@@ -1,0 +1,53 @@
+✔ rationale is rebuilt from bound facts without appending false old text (1.69845ms)
+✔ full unit digest decides equality, including heading section payload (0.150986ms)
+✔ last review comparison accepts digest prefix expansion and reports changes (0.168797ms)
+✔ link count distinguishes actual destination changes from spelling rebases (0.163658ms)
+✔ consistency flags changed ranges, anchors, equality and reviewed digest assertions (0.171676ms)
+✔ historical witness and no-target retain do not invent current source ranges (0.116574ms)
+✔ missing or mismatched binding evidence fails rather than inventing facts (0.306536ms)
+✔ legacy consistency checks contextual ranges, anchors and equality without mistaking header citations for bound spans (1.791676ms)
+✔ legacy audit understands unicode anchors, same-file successors and explicitly quoted prior rationales (0.239405ms)
+✔ unavailable historical text remains an explicit witness limit without invented line numbers (0.212283ms)
+✔ link alignment counts inserted provenance separately from repointed links (0.62563ms)
+✖ bound related citations include their actual lines and exact text (1.114375ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 11
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 45.400218
+
+✖ failing tests:
+
+test at test/scripts/doc-rationale.test.mjs:70:1
+✖ bound related citations include their actual lines and exact text (1.114375ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /component-boundary.md:46/. Input:
+  
+  'Source: docs/old.md:12-14#old (current lines); unit SHA256 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.\n' +
+    'Target: docs/platform/new.md:31-33#new (current lines); unit SHA256 bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb.\n' +
+    'Source and target unit digests differ.\n' +
+    'Target unchanged since last reviewed digest bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb at abc123.\n' +
+    'Links: source 1, target 1; 1 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\n' +
+    'Link 1: "ref" (other.md) → "ref" (../other.md); resolved docs/other.md → docs/other.md.\n' +
+    'Heading depth: 2 → 3; title "## Old\\n[ref](other.md)" → "### New\\n[ref](../other.md)".\n' +
+    'Applicable labelled corrections:\n' +
+    'U3: "old behavior" → "durable status"; evidence src/state/store.mjs:1388-1420.\n' +
+    'Disposition supersede: Replace the historical behavior with the labelled correction.\n' +
+    'Conservation accounting only; current truth, promotion, retirement and cutover require their own evidence.'
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale.test.mjs:72:48)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'Source: docs/old.md:12-14#old (current lines); unit SHA256 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.\nTarget: docs/platform/new.md:31-33#new (current lines); unit SHA256 bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb at abc123.\nLinks: source 1, target 1; 1 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nLink 1: "ref" (other.md) → "ref" (../other.md); resolved docs/other.md → docs/other.md.\nHeading depth: 2 → 3; title "## Old\\n[ref](other.md)" → "### New\\n[ref](../other.md)".\nApplicable labelled corrections:\nU3: "old behavior" → "durable status"; evidence src/state/store.mjs:1388-1420.\nDisposition supersede: Replace the historical behavior with the labelled correction.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.',
+    expected: /component-boundary.md:46/,
+    operator: 'match',
+    diff: 'simple'
+  }

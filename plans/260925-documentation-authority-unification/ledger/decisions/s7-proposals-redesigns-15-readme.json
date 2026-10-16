@@ -212,16 +212,16 @@
         ],
         "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
       },
-      "reviewNote": "deep: docs/architect/proposals/README.md#active-proposals (L16-16) to docs/platform/proposals/README.md#active-proposals (L40-40): shard row equals pack, source and target digests recomputed by extractor and equal, anchors pass, whole section diffed source vs target byte-identical, ancestry equal, rationale evidence cites live files that exist; whole-pack escalation read",
+      "reviewNote": "mechanical: full digests recomputed by the extractor at 345f15d95 and equal to the shard and the pack; anchor active-proposals ok; source and target digests equal (text byte-equal by digest); rationale line ranges equal the live unit ranges; text not read beyond what is stated",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-19ca8de23.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-345f15d95.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "35d38e36aa9ae5117a3aba40a90d734ccb07badb2f8c4c7e19984e6f6c0b1b93",
       "targetAncestry": [
         "Architect-Level Proposals"
       ],
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_76cd5a79f79a23ddf7bf30b53312aadf",
@@ -255,17 +255,17 @@
         ],
         "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
       },
-      "reviewNote": "deep: docs/architect/proposals/README.md#unheaded-block-4 (L18-28) to docs/platform/proposals/README.md#unheaded-block-7 (L42-52) (pack class Unit-exact, the rationale opens with the Weak-exact wording, harmless because the digests are equal): shard row equals pack, source and target digests recomputed by extractor and equal, anchors pass, whole section diffed source vs target byte-identical, ancestry equal, rationale evidence cites live files that exist; whole-pack escalation read",
+      "reviewNote": "mechanical: full digests recomputed by the extractor at 345f15d95 and equal to the shard and the pack; anchor unheaded-block-7 ok; source and target digests equal (text byte-equal by digest); rationale line ranges equal the live unit ranges; text not read beyond what is stated",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-19ca8de23.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-345f15d95.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "949cee59831d5ac67c174f297bcdcc5837dca9532809923571987f7cb12a42b0",
       "targetAncestry": [
         "Architect-Level Proposals",
         "Active Proposals"
       ],
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_86499a247b54e7e84a84c9cb0f477242",

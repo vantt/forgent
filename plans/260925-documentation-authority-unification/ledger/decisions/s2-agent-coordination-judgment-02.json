@@ -677,20 +677,14 @@
       "targetAnchor": "unheaded-block-15",
       "claimKind": "procedure",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/playbooks/coordination-operating-harness.md#unheaded-block-17 is retained in docs/platform/agent-coordination/playbooks/coordination-operating-harness.md#unheaded-block-17. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "reviewNote": "LEG:playbooks/coordination-operating-harness.md#unheaded-block-17 -> PLAT:playbooks/coordination-operating-harness.md#unheaded-block-17: Target blocks are in sections verified against master-coordinator.md and the in-use verification/<track>/ convention (sections 2, 4, 6-8, 10, 11, headings and the notice text).",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-02.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "rationale": "Source: docs/architect/agent-coordination/playbooks/coordination-operating-harness.md:98-98#unheaded-block-17 (current lines); unit SHA256 0a3dab94baedee6ac84d97bd3d911a81e93c57579efc861ff41947a9592de3e6.\nTarget: docs/platform/agent-coordination/playbooks/coordination-operating-harness.md:102-102#unheaded-block-15 (current lines); unit SHA256 0a3dab94baedee6ac84d97bd3d911a81e93c57579efc861ff41947a9592de3e6.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 0a3dab94baedee6ac84d97bd3d911a81e93c57579efc861ff41947a9592de3e6 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/playbooks/coordination-operating-harness.md#unheaded-block-17 under docs/platform/agent-coordination/playbooks/coordination-operating-harness.md#unheaded-block-15; source context \"Coordination Operating Harness / 4. Role Model\", target context \"Coordination Operating Harness / 4. Role Model\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "0a3dab94baedee6ac84d97bd3d911a81e93c57579efc861ff41947a9592de3e6",
       "targetAncestry": [
         "Coordination Operating Harness",
         "4. Role Model"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_7398bec363bed15c0ce2bc5c903b6e59",
@@ -741,20 +735,14 @@
       "targetAnchor": "unheaded-block-26",
       "claimKind": "procedure",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/playbooks/coordination-operating-harness.md#unheaded-block-28 is retained in docs/platform/agent-coordination/playbooks/coordination-operating-harness.md#unheaded-block-28. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "reviewNote": "LEG:playbooks/coordination-operating-harness.md#unheaded-block-28 -> PLAT:playbooks/coordination-operating-harness.md#unheaded-block-28: Target blocks are in sections verified against master-coordinator.md and the in-use verification/<track>/ convention (sections 2, 4, 6-8, 10, 11, headings and the notice text).",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-02.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "rationale": "Source: docs/architect/agent-coordination/playbooks/coordination-operating-harness.md:175-175#unheaded-block-28 (current lines); unit SHA256 74b768d7820990f7ac71e2892dd203d98d83b426038d2268bef4767722038ca6.\nTarget: docs/platform/agent-coordination/playbooks/coordination-operating-harness.md:179-179#unheaded-block-26 (current lines); unit SHA256 74b768d7820990f7ac71e2892dd203d98d83b426038d2268bef4767722038ca6.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 74b768d7820990f7ac71e2892dd203d98d83b426038d2268bef4767722038ca6 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/playbooks/coordination-operating-harness.md#unheaded-block-28 under docs/platform/agent-coordination/playbooks/coordination-operating-harness.md#unheaded-block-26; source context \"Coordination Operating Harness / 7. Current Cell Contract\", target context \"Coordination Operating Harness / 7. Current Cell Contract\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "74b768d7820990f7ac71e2892dd203d98d83b426038d2268bef4767722038ca6",
       "targetAncestry": [
         "Coordination Operating Harness",
         "7. Current Cell Contract"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_24bccb68c60422e226f8fa5af338dcb5",
@@ -826,20 +814,14 @@
       "targetAnchor": "unheaded-block-38",
       "claimKind": "procedure",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/playbooks/coordination-operating-harness.md#unheaded-block-40 is retained in docs/platform/agent-coordination/playbooks/coordination-operating-harness.md#unheaded-block-40. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "reviewNote": "LEG:playbooks/coordination-operating-harness.md#unheaded-block-40 -> PLAT:playbooks/coordination-operating-harness.md#unheaded-block-40: Target blocks are in sections verified against master-coordinator.md and the in-use verification/<track>/ convention (sections 2, 4, 6-8, 10, 11, headings and the notice text).",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-02.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "rationale": "Source: docs/architect/agent-coordination/playbooks/coordination-operating-harness.md:307-307#unheaded-block-40 (current lines); unit SHA256 5a3b34056bd59bb34e46d7955782380cccb69010fe2829d5a0f5c54c7feddd07.\nTarget: docs/platform/agent-coordination/playbooks/coordination-operating-harness.md:311-311#unheaded-block-38 (current lines); unit SHA256 5a3b34056bd59bb34e46d7955782380cccb69010fe2829d5a0f5c54c7feddd07.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 5a3b34056bd59bb34e46d7955782380cccb69010fe2829d5a0f5c54c7feddd07 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/playbooks/coordination-operating-harness.md#unheaded-block-40 under docs/platform/agent-coordination/playbooks/coordination-operating-harness.md#unheaded-block-38; source context \"Coordination Operating Harness / 11. Token Budget Rules\", target context \"Coordination Operating Harness / 11. Token Budget Rules\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "5a3b34056bd59bb34e46d7955782380cccb69010fe2829d5a0f5c54c7feddd07",
       "targetAncestry": [
         "Coordination Operating Harness",
         "11. Token Budget Rules"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_f3ea623cee50d188d152d05b56287e18",
@@ -848,20 +830,14 @@
       "targetAnchor": "unheaded-block-40",
       "claimKind": "procedure",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/playbooks/coordination-operating-harness.md#unheaded-block-42 is retained in docs/platform/agent-coordination/playbooks/coordination-operating-harness.md#unheaded-block-42. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "reviewNote": "LEG:playbooks/coordination-operating-harness.md#unheaded-block-42 -> PLAT:playbooks/coordination-operating-harness.md#unheaded-block-42: Target blocks are in sections verified against master-coordinator.md and the in-use verification/<track>/ convention (sections 2, 4, 6-8, 10, 11, headings and the notice text).",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-02.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "rationale": "Source: docs/architect/agent-coordination/playbooks/coordination-operating-harness.md:317-317#unheaded-block-42 (current lines); unit SHA256 a7b502ee36f6d3fe670521b9684d1e88c8dea380dd82fa9c9ffef6fbdec72aa6.\nTarget: docs/platform/agent-coordination/playbooks/coordination-operating-harness.md:321-321#unheaded-block-40 (current lines); unit SHA256 a7b502ee36f6d3fe670521b9684d1e88c8dea380dd82fa9c9ffef6fbdec72aa6.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest a7b502ee36f6d3fe670521b9684d1e88c8dea380dd82fa9c9ffef6fbdec72aa6 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/playbooks/coordination-operating-harness.md#unheaded-block-42 under docs/platform/agent-coordination/playbooks/coordination-operating-harness.md#unheaded-block-40; source context \"Coordination Operating Harness / 11. Token Budget Rules\", target context \"Coordination Operating Harness / 11. Token Budget Rules\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "a7b502ee36f6d3fe670521b9684d1e88c8dea380dd82fa9c9ffef6fbdec72aa6",
       "targetAncestry": [
         "Coordination Operating Harness",
         "11. Token Budget Rules"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_fdda99daec53a75dec21f1f127fc3425",
@@ -870,20 +846,14 @@
       "targetAnchor": "unheaded-block-65",
       "claimKind": "procedure",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/playbooks/coordination-operating-harness.md#unheaded-block-66 is retained in docs/platform/agent-coordination/playbooks/coordination-operating-harness.md#unheaded-block-66. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "reviewNote": "LEG:playbooks/coordination-operating-harness.md#unheaded-block-66 -> PLAT:playbooks/coordination-operating-harness.md#unheaded-block-66: Target blocks are in sections verified against master-coordinator.md and the in-use verification/<track>/ convention (sections 2, 4, 6-8, 10, 11, headings and the notice text).",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-02.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "rationale": "Source: docs/architect/agent-coordination/playbooks/coordination-operating-harness.md:456-456#unheaded-block-66 (current lines); unit SHA256 e2680c6438be802c3bd902a940a665664f4ae76cb9b1cc950605f6e224896d3f.\nTarget: docs/platform/agent-coordination/playbooks/coordination-operating-harness.md:465-465#unheaded-block-65 (current lines); unit SHA256 e2680c6438be802c3bd902a940a665664f4ae76cb9b1cc950605f6e224896d3f.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest e2680c6438be802c3bd902a940a665664f4ae76cb9b1cc950605f6e224896d3f at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/playbooks/coordination-operating-harness.md#unheaded-block-66 under docs/platform/agent-coordination/playbooks/coordination-operating-harness.md#unheaded-block-65; source context \"Coordination Operating Harness / 13. Tests And Checks\", target context \"Coordination Operating Harness / 13. Tests And Checks\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "e2680c6438be802c3bd902a940a665664f4ae76cb9b1cc950605f6e224896d3f",
       "targetAncestry": [
         "Coordination Operating Harness",
         "13. Tests And Checks"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_71e38c7b7b9839535d3f7d5151942eae",
@@ -892,20 +862,14 @@
       "targetAnchor": "unheaded-block-67",
       "claimKind": "procedure",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/playbooks/coordination-operating-harness.md#unheaded-block-68 is retained in docs/platform/agent-coordination/playbooks/coordination-operating-harness.md#unheaded-block-68. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "reviewNote": "LEG:playbooks/coordination-operating-harness.md#unheaded-block-68 -> PLAT:playbooks/coordination-operating-harness.md#unheaded-block-68: Target blocks are in sections verified against master-coordinator.md and the in-use verification/<track>/ convention (sections 2, 4, 6-8, 10, 11, headings and the notice text).",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-02.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "rationale": "Source: docs/architect/agent-coordination/playbooks/coordination-operating-harness.md:462-462#unheaded-block-68 (current lines); unit SHA256 846eedf93a9c7ba64b463f12adaad19c759b52a9536ab6e43909846836db1afc.\nTarget: docs/platform/agent-coordination/playbooks/coordination-operating-harness.md:471-471#unheaded-block-67 (current lines); unit SHA256 846eedf93a9c7ba64b463f12adaad19c759b52a9536ab6e43909846836db1afc.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 846eedf93a9c7ba64b463f12adaad19c759b52a9536ab6e43909846836db1afc at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/playbooks/coordination-operating-harness.md#unheaded-block-68 under docs/platform/agent-coordination/playbooks/coordination-operating-harness.md#unheaded-block-67; source context \"Coordination Operating Harness / 13. Tests And Checks\", target context \"Coordination Operating Harness / 13. Tests And Checks\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "846eedf93a9c7ba64b463f12adaad19c759b52a9536ab6e43909846836db1afc",
       "targetAncestry": [
         "Coordination Operating Harness",
         "13. Tests And Checks"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_64fd5725b78c195c08961c2467f07d11",
@@ -2680,20 +2644,14 @@
       "targetAnchor": "unheaded-block-49",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-49 is retained in docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-50. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "reviewNote": "LEG:proposals/dispatch-control-plane-redesign.md#unheaded-block-49 -> PLAT:proposals/dispatch-control-plane-redesign.md#unheaded-block-50: Legacy unit carried in the matching current section, correct location (live subject stays current); target sections judged ok under their label.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-02.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "rationale": "Source: docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md:250-250#unheaded-block-49 (current lines); unit SHA256 b5c4e23f44036756b3143a9a04533f68eb808a580853182360741709ba166319.\nTarget: docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md:219-219#unheaded-block-49 (current lines); unit SHA256 b5c4e23f44036756b3143a9a04533f68eb808a580853182360741709ba166319.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest b5c4e23f44036756b3143a9a04533f68eb808a580853182360741709ba166319 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-49 under docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-49; source context \"Dispatch Control Plane Redesign / 7. Governance And Egress\", target context \"Dispatch Control Plane Redesign / 7. Governance And Egress\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "b5c4e23f44036756b3143a9a04533f68eb808a580853182360741709ba166319",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "7. Governance And Egress"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_c9292cc4265c9fbe7704142c98217f4d",
@@ -2724,21 +2682,15 @@
       "targetAnchor": "unheaded-block-54",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-54 is retained in docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-55. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "reviewNote": "LEG:proposals/dispatch-control-plane-redesign.md#unheaded-block-54 -> PLAT:proposals/dispatch-control-plane-redesign.md#unheaded-block-55: Legacy unit carried in the matching current section, correct location (live subject stays current); target sections judged ok under their label.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-02.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "rationale": "Source: docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md:270-270#unheaded-block-54 (current lines); unit SHA256 7b887d12fbe6242409edeec58d94e68425bd6342cfa18e4ad8b60b088949c224.\nTarget: docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md:239-239#unheaded-block-54 (current lines); unit SHA256 7b887d12fbe6242409edeec58d94e68425bd6342cfa18e4ad8b60b088949c224.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 7b887d12fbe6242409edeec58d94e68425bd6342cfa18e4ad8b60b088949c224 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-54 under docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-54; source context \"Dispatch Control Plane Redesign / 7. Governance And Egress / 7.1 Effective Egress\", target context \"Dispatch Control Plane Redesign / 7. Governance And Egress / 7.1 Effective Egress\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "7b887d12fbe6242409edeec58d94e68425bd6342cfa18e4ad8b60b088949c224",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "7. Governance And Egress",
         "7.1 Effective Egress"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_0cce3bb5b555e74e59019ce255fc6785",
@@ -2747,21 +2699,15 @@
       "targetAnchor": "unheaded-block-60",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-60 is retained in docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-61. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "reviewNote": "LEG:proposals/dispatch-control-plane-redesign.md#unheaded-block-60 -> PLAT:proposals/dispatch-control-plane-redesign.md#unheaded-block-61: Legacy unit carried in the matching current section, correct location (live subject stays current); target sections judged ok under their label.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-02.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "rationale": "Source: docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md:300-300#unheaded-block-60 (current lines); unit SHA256 0db63056e03707f97d8592129f1f037cb7be147590e1c019f6448ce4ec48b43b.\nTarget: docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md:269-269#unheaded-block-60 (current lines); unit SHA256 0db63056e03707f97d8592129f1f037cb7be147590e1c019f6448ce4ec48b43b.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 0db63056e03707f97d8592129f1f037cb7be147590e1c019f6448ce4ec48b43b at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-60 under docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-60; source context \"Dispatch Control Plane Redesign / 7. Governance And Egress / 7.2 Policy Resolution Before DispatchPlan\", target context \"Dispatch Control Plane Redesign / 7. Governance And Egress / 7.2 Policy Resolution Before DispatchPlan\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "0db63056e03707f97d8592129f1f037cb7be147590e1c019f6448ce4ec48b43b",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "7. Governance And Egress",
         "7.2 Policy Resolution Before DispatchPlan"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_24840a5b4807fc0b62e4fbf401378ac4",
@@ -2770,21 +2716,15 @@
       "targetAnchor": "unheaded-block-62",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-62 is retained in docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-63. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "reviewNote": "LEG:proposals/dispatch-control-plane-redesign.md#unheaded-block-62 -> PLAT:proposals/dispatch-control-plane-redesign.md#unheaded-block-63: Legacy unit carried in the matching current section, correct location (live subject stays current); target sections judged ok under their label.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-02.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "rationale": "Source: docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md:316-316#unheaded-block-62 (current lines); unit SHA256 8c91cb20a7c34a821b72036e98b34c43246bf775fa7479cea7624eedffcb2a88.\nTarget: docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md:285-285#unheaded-block-62 (current lines); unit SHA256 8c91cb20a7c34a821b72036e98b34c43246bf775fa7479cea7624eedffcb2a88.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 8c91cb20a7c34a821b72036e98b34c43246bf775fa7479cea7624eedffcb2a88 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-62 under docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-62; source context \"Dispatch Control Plane Redesign / 7. Governance And Egress / 7.2 Policy Resolution Before DispatchPlan\", target context \"Dispatch Control Plane Redesign / 7. Governance And Egress / 7.2 Policy Resolution Before DispatchPlan\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "8c91cb20a7c34a821b72036e98b34c43246bf775fa7479cea7624eedffcb2a88",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "7. Governance And Egress",
         "7.2 Policy Resolution Before DispatchPlan"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_9547cb512064d873b60944c41cf8ba0d",
@@ -3009,20 +2949,14 @@
       "targetAnchor": "unheaded-block-119",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-123 is retained in docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-124. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "reviewNote": "LEG:proposals/dispatch-control-plane-redesign.md#unheaded-block-123 -> PLAT:proposals/dispatch-control-plane-redesign.md#unheaded-block-124: Legacy unit carried in the matching current section, correct location (live subject stays current); target sections judged ok under their label.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-02.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "rationale": "Source: docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md:695-695#unheaded-block-123 (current lines); unit SHA256 4adde0c35f148d7304c9cf8762ebcc2cf1dede5995426dc380445b551c2d7cea.\nTarget: docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md:656-656#unheaded-block-119 (current lines); unit SHA256 4adde0c35f148d7304c9cf8762ebcc2cf1dede5995426dc380445b551c2d7cea.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 4adde0c35f148d7304c9cf8762ebcc2cf1dede5995426dc380445b551c2d7cea at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-123 under docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-119; source context \"Dispatch Control Plane Redesign / 13. Full Design Target\", target context \"Dispatch Control Plane Redesign / 13. Full Design Target\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "4adde0c35f148d7304c9cf8762ebcc2cf1dede5995426dc380445b551c2d7cea",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "13. Full Design Target"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_2f2d45fe2b01f5a443997ec695abba97",
@@ -3031,20 +2965,14 @@
       "targetAnchor": "unheaded-block-123",
       "claimKind": "historical-context",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-127 is retained in docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-128. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "reviewNote": "LEG:proposals/dispatch-control-plane-redesign.md#unheaded-block-127 -> PLAT:proposals/dispatch-control-plane-redesign.md#unheaded-block-128: Legacy unit carried in the matching current section, correct location (live subject stays current); target sections judged ok under their label.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-02.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "rationale": "Source: docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md:731-731#unheaded-block-127 (current lines); unit SHA256 d0f60b18c91c5993b590bdbc65cb9e8a10f415878d394ebb6150a5d7861a672f.\nTarget: docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md:692-692#unheaded-block-123 (current lines); unit SHA256 d0f60b18c91c5993b590bdbc65cb9e8a10f415878d394ebb6150a5d7861a672f.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest d0f60b18c91c5993b590bdbc65cb9e8a10f415878d394ebb6150a5d7861a672f at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-127 under docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-123; source context \"Dispatch Control Plane Redesign / 14. Narrow Implementation Status\", target context \"Dispatch Control Plane Redesign / 14. Narrow Implementation Status\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "d0f60b18c91c5993b590bdbc65cb9e8a10f415878d394ebb6150a5d7861a672f",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "14. Narrow Implementation Status"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_770adf625e9fcc1ddb72f8b86bb7e554",
@@ -3244,20 +3172,14 @@
       "targetAnchor": "unheaded-block-147",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-152 is retained in docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-153. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "reviewNote": "LEG:proposals/dispatch-control-plane-redesign.md#unheaded-block-152 -> PLAT:proposals/dispatch-control-plane-redesign.md#unheaded-block-153: Legacy unit carried in the matching current section, correct location (live subject stays current); target sections judged ok under their label.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-02.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "rationale": "Source: docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md:857-857#unheaded-block-152 (current lines); unit SHA256 9df989e14c69f094a54cb4633c3d092fb4dcd7a970161aee9c6a9e0ab5ee504b.\nTarget: docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md:817-817#unheaded-block-147 (current lines); unit SHA256 9df989e14c69f094a54cb4633c3d092fb4dcd7a970161aee9c6a9e0ab5ee504b.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 9df989e14c69f094a54cb4633c3d092fb4dcd7a970161aee9c6a9e0ab5ee504b at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-152 under docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-147; source context \"Dispatch Control Plane Redesign / 16. Implementation Pointers\", target context \"Dispatch Control Plane Redesign / 16. Implementation Pointers\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "9df989e14c69f094a54cb4633c3d092fb4dcd7a970161aee9c6a9e0ab5ee504b",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "16. Implementation Pointers"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_be73c8d6ef58e4b00122bcc4fdaf0583",
@@ -3266,20 +3188,14 @@
       "targetAnchor": "unheaded-block-151",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-156 is retained in docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-157. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "reviewNote": "LEG:proposals/dispatch-control-plane-redesign.md#unheaded-block-156 -> PLAT:proposals/dispatch-control-plane-redesign.md#unheaded-block-157: Legacy unit carried in the matching current section, correct location (live subject stays current); target sections judged ok under their label.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-02.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "rationale": "Source: docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md:870-870#unheaded-block-156 (current lines); unit SHA256 d785a40856833b245cace6c3ba8bd4adb1f7c62ac0a2e8313e67cc101ac8840f.\nTarget: docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md:830-830#unheaded-block-151 (current lines); unit SHA256 d785a40856833b245cace6c3ba8bd4adb1f7c62ac0a2e8313e67cc101ac8840f.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest d785a40856833b245cace6c3ba8bd4adb1f7c62ac0a2e8313e67cc101ac8840f at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-156 under docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-151; source context \"Dispatch Control Plane Redesign / 16. Implementation Pointers\", target context \"Dispatch Control Plane Redesign / 16. Implementation Pointers\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "d785a40856833b245cace6c3ba8bd4adb1f7c62ac0a2e8313e67cc101ac8840f",
       "targetAncestry": [
         "Dispatch Control Plane Redesign",
         "16. Implementation Pointers"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_de6c4452bef9deb73a3df499f3b68ff7",
@@ -6298,20 +6214,14 @@
       "targetAnchor": "unheaded-block-30",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-29 is retained in docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-29. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "reviewNote": "LEG:proposals/team-communication-protocol-v1.md#unheaded-block-29 -> PLAT:proposals/team-communication-protocol-v1.md#unheaded-block-29: Source unit is carried unchanged into the matching current section, true against code except where an exception is listed.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-02.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "rationale": "Source: docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md:175-175#unheaded-block-29 (current lines); unit SHA256 17e9dc29da21e0e2df5f6e5e004fbe6b74a1cc0c9d34284c1dcdddc41e3e048c.\nTarget: docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md:190-190#unheaded-block-30 (current lines); unit SHA256 17e9dc29da21e0e2df5f6e5e004fbe6b74a1cc0c9d34284c1dcdddc41e3e048c.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 17e9dc29da21e0e2df5f6e5e004fbe6b74a1cc0c9d34284c1dcdddc41e3e048c at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-29 under docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-30; source context \"Team Communication Protocol V1 / 7. Agent Result Schema\", target context \"Team Communication Protocol V1 / 7. Agent Result Schema\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "17e9dc29da21e0e2df5f6e5e004fbe6b74a1cc0c9d34284c1dcdddc41e3e048c",
       "targetAncestry": [
         "Team Communication Protocol V1",
         "7. Agent Result Schema"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_9797e67aadf80be198afbc69817c9ea2",
@@ -6320,20 +6230,14 @@
       "targetAnchor": "unheaded-block-32",
       "claimKind": "architecture",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-31 is retained in docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-31. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "reviewNote": "LEG:proposals/team-communication-protocol-v1.md#unheaded-block-31 -> PLAT:proposals/team-communication-protocol-v1.md#unheaded-block-31: Source unit is carried unchanged into the matching current section, true against code except where an exception is listed.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-02.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "rationale": "Source: docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md:184-184#unheaded-block-31 (current lines); unit SHA256 9ef607d56f86c6bc94be4ced0016146ed19fb944f589fc01ce349378ad84a384.\nTarget: docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md:199-199#unheaded-block-32 (current lines); unit SHA256 9ef607d56f86c6bc94be4ced0016146ed19fb944f589fc01ce349378ad84a384.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 9ef607d56f86c6bc94be4ced0016146ed19fb944f589fc01ce349378ad84a384 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-31 under docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#unheaded-block-32; source context \"Team Communication Protocol V1 / 7. Agent Result Schema\", target context \"Team Communication Protocol V1 / 7. Agent Result Schema\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "9ef607d56f86c6bc94be4ced0016146ed19fb944f589fc01ce349378ad84a384",
       "targetAncestry": [
         "Team Communication Protocol V1",
         "7. Agent Result Schema"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_2ef5d353dab2d57f38906df73e709125",

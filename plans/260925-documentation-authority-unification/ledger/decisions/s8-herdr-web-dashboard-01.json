@@ -812,19 +812,13 @@
       "targetAnchor": "edge-cases-settled",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/herdr-web-dashboard.md#edge-cases-settled (source lines 246-246) is carried at docs/platform/herdr-web-dashboard/spec.md#edge-cases-settled (candidate lines 268-268). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "reviewNote": "deep: heading \"Edge Cases Settled\" herdr-web-dashboard.md L246-246 to herdr-web-dashboard/spec.md L268-268; text and digest identical, shown text identical, anchor passes, rationale line ranges true",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-12-1276467f3.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "rationale": "Source: docs/specs/herdr-web-dashboard.md:246-246#edge-cases-settled (current lines); unit SHA256 e57fadfa3c6367e1098e0565fa3a61fe011bb34b4994eb241557beaa2c2ff879.\nTarget: docs/platform/herdr-web-dashboard/spec.md:267-267#edge-cases-settled (current lines); unit SHA256 e57fadfa3c6367e1098e0565fa3a61fe011bb34b4994eb241557beaa2c2ff879.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest e57fadfa3c6367e1098e0565fa3a61fe011bb34b4994eb241557beaa2c2ff879 at 1276467f37a99d19aff05808d42fafbf40341449.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 2; title \"Edge Cases Settled\" → \"Edge Cases Settled\".\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/herdr-web-dashboard.md#edge-cases-settled under docs/platform/herdr-web-dashboard/spec.md#edge-cases-settled; source context \"Spec: herdr Web Dashboard (browser surface for fgOS work)\", target context \"Spec: herdr Web Dashboard (browser surface for fgOS work)\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "e57fadfa3c6367e1098e0565fa3a61fe011bb34b4994eb241557beaa2c2ff879",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)"
-      ],
-      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
+      ]
     },
     {
       "claimId": "claim_878e9f5faa08a2977408f49e04af0a7a",
@@ -833,20 +827,14 @@
       "targetAnchor": "unheaded-block-24",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/herdr-web-dashboard.md#unheaded-block-22 (source lines 248-264) is carried at docs/platform/herdr-web-dashboard/spec.md#unheaded-block-24 (candidate lines 270-286). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/herdr-web-dashboard.md verbatim in docs/platform/herdr-web-dashboard/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "reviewNote": "mechanical: unheaded-block herdr-web-dashboard.md L248-264 to herdr-web-dashboard/spec.md L270-286; digests recomputed by script and equal on both sides, anchor passes, shard/pack equal, rationale line ranges match; no unit text differs in the whole-file diff",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-12-1276467f3.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "rationale": "Source: docs/specs/herdr-web-dashboard.md:248-264#unheaded-block-22 (current lines); unit SHA256 1c226a16285c1c611d2dcbc3db679c21f6367eb19f66428f97fa0b6741c2027d.\nTarget: docs/platform/herdr-web-dashboard/spec.md:269-285#unheaded-block-24 (current lines); unit SHA256 1c226a16285c1c611d2dcbc3db679c21f6367eb19f66428f97fa0b6741c2027d.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 1c226a16285c1c611d2dcbc3db679c21f6367eb19f66428f97fa0b6741c2027d at 1276467f37a99d19aff05808d42fafbf40341449.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/herdr-web-dashboard.md#unheaded-block-22 under docs/platform/herdr-web-dashboard/spec.md#unheaded-block-24; source context \"Spec: herdr Web Dashboard (browser surface for fgOS work) / Edge Cases Settled\", target context \"Spec: herdr Web Dashboard (browser surface for fgOS work) / Edge Cases Settled\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "1c226a16285c1c611d2dcbc3db679c21f6367eb19f66428f97fa0b6741c2027d",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)",
         "Edge Cases Settled"
-      ],
-      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
+      ]
     },
     {
       "claimId": "claim_2aae8d6820a6ad622e47c07d29c428bf",

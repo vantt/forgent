@@ -1,0 +1,71 @@
+{
+  "toolTests": {
+    "tests": 473,
+    "pass": 473,
+    "fail": 0
+  },
+  "inputCommit": "5035fed52e60254ecbe034cc987553feb24616f4",
+  "scopeViolations": [],
+  "badDecisionFields": [],
+  "staleAfterObjects": [],
+  "unchanged": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "equal": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.json",
+      "equal": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/minimum-constitution.json",
+      "equal": true
+    },
+    {
+      "path": "scripts/check-doc-inventory-gates.mjs",
+      "equal": true
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "equal": true
+    },
+    {
+      "path": "scripts/propose-doc-decisions.mjs",
+      "equal": true
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/reader-links-baseline.txt",
+      "equal": true
+    }
+  ],
+  "applicationCounts": {
+    "applied-and-retained": 365,
+    "applied-then-reopened": 70,
+    "rework-or-hold": 52
+  },
+  "rationales": 714,
+  "reopenedReviewed": 665,
+  "consistency": {
+    "ok": true,
+    "rows": 12889,
+    "shards": 90,
+    "sourceWitnessLimits": 84
+  },
+  "nativeRefreshOwed": 8,
+  "noNewDoubleOwnership": true,
+  "targetDigestDrift": 0,
+  "linkReplayOk": true,
+  "fastDZero": true,
+  "A": true,
+  "B": true,
+  "HZero": true,
+  "I": {
+    "equalToHEAD": true,
+    "frozenBaselineUnchanged": true,
+    "historicalBaselineEqual": false
+  },
+  "nativeSyncCount": 0,
+  "nativeRebindCount": 0,
+  "reviewPackCount": 0,
+  "ok": true
+}

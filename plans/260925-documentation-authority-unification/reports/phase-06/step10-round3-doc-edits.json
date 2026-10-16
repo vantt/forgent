@@ -1,0 +1,55 @@
+{
+  "inputCommit": "5035fed52e60254ecbe034cc987553feb24616f4",
+  "method": "Exact before/after edits, one occurrence each; code lines checked at HEAD. No blind numeric replacement.",
+  "codeWitness": {
+    "4414": "    default:",
+    "4415": "      throw new StoreError('validation', `unknown verb \"${verb ?? ''}\". Usage: fgos <version|init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|item|ask|answer|decision|list|ready|rebuild|repair|rollup|take|return|review|approve|sync-root|reject|catchup|triage|session|gateway|goal|tool|setup|doctor|unlock|lock-status|main-checkout-reset> ...`);",
+    "4416": "  }",
+    "4417": "}",
+    "4503": "    refuseHelp(`unknown verb \"${verb}\". Usage: fgos --help [<verb> [<sub>]] [--json]`);"
+  },
+  "changes": [
+    {
+      "path": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+      "line": 23,
+      "before": "bin/fgos.mjs:4640-4643; bin/fgos.mjs:4415-4380",
+      "after": "bin/fgos.mjs:4414-4417",
+      "label": "L10-24/citation-scaffold"
+    },
+    {
+      "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "line": 456,
+      "before": "bin/fgos.mjs:4415,4461",
+      "after": "bin/fgos.mjs:4415,4503",
+      "label": "L10-24/citation-refuseHelp"
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/vision.md",
+      "line": 63,
+      "before": "Preserved from [host-invocation-provider-routing.md](spec.md)",
+      "after": "Preserved from [host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md)",
+      "label": "L10-23"
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/vision.md",
+      "line": 65,
+      "before": "Preserved from [external-provider-protocol.md](architecture/external-provider-protocol.md)",
+      "after": "Preserved from [external-provider-protocol.md](../../architect/host-invocation-routing/external-provider-protocol.md)",
+      "label": "L10-23"
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/vision.md",
+      "line": 66,
+      "before": "Preserved from [node-to-rust-component-migration.md](architecture/node-to-rust-migration.md)",
+      "after": "Preserved from [node-to-rust-component-migration.md](../../architect/host-invocation-routing/node-to-rust-component-migration.md)",
+      "label": "L10-23"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/spec.md",
+      "line": 439,
+      "before": "[docs/architect/workspace-topology.md](../system-architecture/architecture/workspace-topology.md)",
+      "after": "[docs/architect/workspace-topology.md](../../architect/workspace-topology.md)",
+      "label": "L10-26"
+    }
+  ]
+}

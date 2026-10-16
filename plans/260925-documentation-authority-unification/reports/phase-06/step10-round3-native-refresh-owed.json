@@ -1,0 +1,70 @@
+{
+  "nativeSyncCount": 0,
+  "registryWritten": false,
+  "changedUnits": [
+    {
+      "path": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+      "anchor": "added-in-candidate-runner-pointers-implementation",
+      "before": "0fb71e0ecd07635335f72b12c7509c597bad63c51e4f4aeaef5e83992ca8a53d",
+      "after": "000e9e51e310864054f158972bc706147386a93d2b6c86138a108042a1ca10aa",
+      "nativeClaim": "claim_589f838032f1c0475587257a362d4cc0",
+      "status": "next package single native sync; preserve historical IDs and independently review new tuples"
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+      "anchor": "unheaded-block-2",
+      "before": "35107e63035cafc34d5698a84f60bb1be49f6700d5e2ad14471d6de41ad86cca",
+      "after": "c354e3357585a5cc6bce8dd57d833b0e85d3f19e58ba6e81e9d6f562aca53edc",
+      "nativeClaim": "claim_647a9d5f06216a5e9d6fa267e77cbf03",
+      "status": "next package single native sync; preserve historical IDs and independently review new tuples"
+    },
+    {
+      "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "anchor": "gate-a-xếp-hạng-candidate-bắc-cầu-sang-việc-thật-evolve",
+      "before": "48228ecbc2881bfaccdcf13a294876cf74c3afe8670c137132403a9a037999b2",
+      "after": "445c152056e209d17110ce712ff081e8adc824b2abba8197069b59ad8fcc37ab",
+      "nativeClaim": "claim_ab5670284703559f1eb46b866fb6354e",
+      "status": "next package single native sync; preserve historical IDs and independently review new tuples"
+    },
+    {
+      "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "anchor": "unheaded-block-26",
+      "before": "0dce2b78b5d497ab9dbe1b9cc6d0d8a00ad2ff468b97fe5964c8e86464b0a3b2",
+      "after": "0f61fde6bc880cb19623ecde63a6a137571884e4b6ae2f8b24b8a585b25d600a",
+      "nativeClaim": "claim_c0f157804addf46fdb20b9c61882794b",
+      "status": "next package single native sync; preserve historical IDs and independently review new tuples"
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/vision.md",
+      "anchor": "5-design-direction",
+      "before": "08b323bdd29556cad36cdfae8c068fa705025d8ccf394e1231c6ff595615bddc",
+      "after": "da1300cfba58a475b7f5694c6ec38d1546f7f806cdd9243948660e11305ae21e",
+      "nativeClaim": "claim_0f8c6c5f2ef2d199ee6b6dadfc6d8c22",
+      "status": "next package single native sync; preserve historical IDs and independently review new tuples"
+    },
+    {
+      "path": "docs/platform/host-invocation-routing/vision.md",
+      "anchor": "unheaded-block-11",
+      "before": "d02d7891949ca1a0284d509b5c8828e1631138f4d32c20830d5491efb75836c8",
+      "after": "ae9e5973a1589865f79a8daee8e14aa245ce6a8b7a0f7af3978006e63771ebb2",
+      "nativeClaim": "claim_d342cec565707124f0b4e7860db2193c",
+      "status": "next package single native sync; preserve historical IDs and independently review new tuples"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/spec.md",
+      "anchor": "workspace-runtime-model",
+      "before": "b17cd70e3bb848b985deb966b7c9ffc192142e8f887bfb49d3bf4d76c70efa15",
+      "after": "d53ab4e2ea878a02f665cfaa616e61dbd2a988f027669faff34b62bd1834ad2e",
+      "nativeClaim": "claim_e1b66c812bf83f5716280dcb8540aa15",
+      "status": "next package single native sync; preserve historical IDs and independently review new tuples"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/spec.md",
+      "anchor": "unheaded-block-75",
+      "before": "9aefc76daebb502839626d20f26342d459be16ca0412bed1a7d4d3af5dd4ea9c",
+      "after": "19851b062b9026d35b203683af36c1a27d3cf542f557549831e1e860138dee6a",
+      "nativeClaim": "claim_a4ed6ca5cfd26790037b35d1c99373b2",
+      "status": "next package single native sync; preserve historical IDs and independently review new tuples"
+    }
+  ]
+}

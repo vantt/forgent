@@ -11,110 +11,80 @@
       "sourceUnitDigest": "6bea20cb9a1aa9d19c5c6e9ef6e1ccf1f7ec636b964c2aaa50521ba3c14d73d5",
       "claimKind": "contract",
       "disposition": "supersede",
-      "rationale": "The current successor at docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#b-add-fgos-panel supersedes the stale current-state claim shown at docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-20 before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval.",
+      "rationale": "Source: docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md:151-153#unheaded-block-18 (current lines); unit SHA256 6bea20cb9a1aa9d19c5c6e9ef6e1ccf1f7ec636b964c2aaa50521ba3c14d73d5.\nTarget: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:132-132#b-add-fgos-advise (current lines); unit SHA256 bb1ae7699ab58ef15b7ea30bf4d78b57cdd8eb69b9a4ef6a7713e83e50f9eb3c.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest bb1ae7699ab58ef15b7ea30bf4d78b57cdd8eb69b9a4ef6a7713e83e50f9eb3c at cf5c64ce64263143158540283f7bf5c794e89386.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 18\" → \"B. Add `fgos-advise`\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-18 under docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#b-add-fgos-advise; source context \"Group Thinking Trigger Surface / Alternatives Considered / B. Add `fgos-advise`\", target context \"Group Thinking Trigger Surface / Alternatives Considered\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "targetAnchor": "b-add-fgos-advise",
-      "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "reviewed",
-      "reviewNote": "Supersede (retarget only; source unchanged). Live claim on arch \"Selected. It gives natural requests one memorable entrypoint...\" (6bea20cb, still byte-equal, now arch#unheaded-block-18). Its target heading was renamed by main 09fe3ab32; change targetAnchor b-add-fgos-panel to P:architecture/group-thinking-trigger-surface.md#b-add-fgos-advise (current claim_4cf046ca), targetUnitDigest 255adc34 to the digest shown. One fix clears both the decision-target-anchor-missing and the retained-claim finding. Findings: decision-target-anchor-missing, retained-claim-target-anchor-missing.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
-      "reviewedAt": "2026-10-12",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge.md",
-      "reviewMode": "ordinary",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "reviewStatus": "pending",
       "targetUnitDigest": "bb1ae7699ab58ef15b7ea30bf4d78b57cdd8eb69b9a4ef6a7713e83e50f9eb3c",
       "targetAncestry": [
         "Group Thinking Trigger Surface",
         "Alternatives Considered"
-      ],
-      "reviewReportCommit": "cf5c64ce64263143158540283f7bf5c794e89386"
+      ]
     },
     {
       "claimId": "claim_014f0a1be5c823ca15a3e1d3a097c3c4",
       "sourceUnitDigest": "644f9caba7b366600f0b4d7db4f963a289fdd0d7b9871f3799922413e94d8b2e",
       "claimKind": "contract",
       "disposition": "move",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-12 is retained in docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-11. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "rationale": "Source: docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md:76-78#unheaded-block-9 (current lines); unit SHA256 644f9caba7b366600f0b4d7db4f963a289fdd0d7b9871f3799922413e94d8b2e.\nTarget: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:83-85#unheaded-block-9 (current lines); unit SHA256 644f9caba7b366600f0b4d7db4f963a289fdd0d7b9871f3799922413e94d8b2e.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 644f9caba7b366600f0b4d7db4f963a289fdd0d7b9871f3799922413e94d8b2e at cf5c64ce64263143158540283f7bf5c794e89386.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-9 under docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-9; source context \"Group Thinking Trigger Surface / Clarification Rules\", target context \"Group Thinking Trigger Surface / Clarification Rules\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "targetAnchor": "unheaded-block-9",
-      "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "reviewed",
-      "reviewNote": "Move (retarget only; digest-equal). Source arch block (now unheaded-block-9) is unchanged; platform text moved from block-11 to P:architecture/group-thinking-trigger-surface.md#unheaded-block-9 (current claim_3b6d77f7) because main/merge removed earlier blocks. Same digest as recorded (644f9cab...), so only targetAnchor unheaded-block-11 changes. Findings: decision-target-drift.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
-      "reviewedAt": "2026-10-12",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge.md",
-      "reviewMode": "ordinary",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "reviewStatus": "pending",
       "targetUnitDigest": "644f9caba7b366600f0b4d7db4f963a289fdd0d7b9871f3799922413e94d8b2e",
       "targetAncestry": [
         "Group Thinking Trigger Surface",
         "Clarification Rules"
-      ],
-      "reviewReportCommit": "cf5c64ce64263143158540283f7bf5c794e89386"
+      ]
     },
     {
       "claimId": "claim_18e8ea8f02a61e1406cf4017733bd0c0",
       "sourceUnitDigest": "c7cefec2d7f233e5846d2d89f030c53e795008129eac8830b42418a8d72ee0a7",
       "claimKind": "architecture",
       "disposition": "move",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-13 is retained in docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-12. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "rationale": "Source: docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md:80-80#unheaded-block-10 (current lines); unit SHA256 c7cefec2d7f233e5846d2d89f030c53e795008129eac8830b42418a8d72ee0a7.\nTarget: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:87-87#unheaded-block-10 (current lines); unit SHA256 c7cefec2d7f233e5846d2d89f030c53e795008129eac8830b42418a8d72ee0a7.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest c7cefec2d7f233e5846d2d89f030c53e795008129eac8830b42418a8d72ee0a7 at cf5c64ce64263143158540283f7bf5c794e89386.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-10 under docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-10; source context \"Group Thinking Trigger Surface / Clarification Rules\", target context \"Group Thinking Trigger Surface / Clarification Rules\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "targetAnchor": "unheaded-block-10",
-      "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "reviewed",
-      "reviewNote": "Move (retarget only; digest-equal). Source unchanged (arch now unheaded-block-10); target block-12 is now P:architecture/group-thinking-trigger-surface.md#unheaded-block-10 (current claim_daa4fb61), digest c7cefec2... unchanged. Findings: decision-target-drift.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
-      "reviewedAt": "2026-10-12",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge.md",
-      "reviewMode": "ordinary",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "reviewStatus": "pending",
       "targetUnitDigest": "c7cefec2d7f233e5846d2d89f030c53e795008129eac8830b42418a8d72ee0a7",
       "targetAncestry": [
         "Group Thinking Trigger Surface",
         "Clarification Rules"
-      ],
-      "reviewReportCommit": "cf5c64ce64263143158540283f7bf5c794e89386"
+      ]
     },
     {
       "claimId": "claim_18fb16d85bf883f7f18a1b2f55f28c50",
       "sourceUnitDigest": "a01d8d42f0fac27a0cb98619f0beb74b4c66393f8464d31cb93dc2e97fab9e41",
       "claimKind": "architecture",
       "disposition": "move",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-14 is retained in docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-13. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "rationale": "Source: docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md:82-88#unheaded-block-11 (current lines); unit SHA256 a01d8d42f0fac27a0cb98619f0beb74b4c66393f8464d31cb93dc2e97fab9e41.\nTarget: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:89-95#unheaded-block-11 (current lines); unit SHA256 a01d8d42f0fac27a0cb98619f0beb74b4c66393f8464d31cb93dc2e97fab9e41.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest a01d8d42f0fac27a0cb98619f0beb74b4c66393f8464d31cb93dc2e97fab9e41 at cf5c64ce64263143158540283f7bf5c794e89386.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-11 under docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-11; source context \"Group Thinking Trigger Surface / Clarification Rules\", target context \"Group Thinking Trigger Surface / Clarification Rules\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "targetAnchor": "unheaded-block-11",
-      "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "reviewed",
-      "reviewNote": "Move (retarget only; digest-equal). Source unchanged (arch now unheaded-block-11); target block-13 is now P:architecture/group-thinking-trigger-surface.md#unheaded-block-11 (current claim_f5f3f0cb), digest a01d8d42... unchanged. Findings: decision-target-drift.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
-      "reviewedAt": "2026-10-12",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge.md",
-      "reviewMode": "ordinary",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "reviewStatus": "pending",
       "targetUnitDigest": "a01d8d42f0fac27a0cb98619f0beb74b4c66393f8464d31cb93dc2e97fab9e41",
       "targetAncestry": [
         "Group Thinking Trigger Surface",
         "Clarification Rules"
-      ],
-      "reviewReportCommit": "cf5c64ce64263143158540283f7bf5c794e89386"
+      ]
     },
     {
       "claimId": "claim_49355bf7a0675fc3526ffa2f3624bde3",
       "sourceUnitDigest": "bef4e1da9be75d6406660ba5f13dfe5a98efc5cd1f83590895b432281b749b5b",
       "claimKind": "architecture",
       "disposition": "move",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-15 is retained in docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-14. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "rationale": "Source: docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md:90-93#unheaded-block-12 (current lines); unit SHA256 bef4e1da9be75d6406660ba5f13dfe5a98efc5cd1f83590895b432281b749b5b.\nTarget: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:97-100#unheaded-block-12 (current lines); unit SHA256 bef4e1da9be75d6406660ba5f13dfe5a98efc5cd1f83590895b432281b749b5b.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest bef4e1da9be75d6406660ba5f13dfe5a98efc5cd1f83590895b432281b749b5b at cf5c64ce64263143158540283f7bf5c794e89386.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-12 under docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-12; source context \"Group Thinking Trigger Surface / Clarification Rules\", target context \"Group Thinking Trigger Surface / Clarification Rules\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "targetAnchor": "unheaded-block-12",
-      "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "reviewed",
-      "reviewNote": "Move (retarget only; digest-equal). Source unchanged (arch now unheaded-block-12); target block-14 is now P:architecture/group-thinking-trigger-surface.md#unheaded-block-12 (current claim_06ac7e80), digest bef4e1da... unchanged. Findings: decision-target-drift.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
-      "reviewedAt": "2026-10-12",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-main-merge.md",
-      "reviewMode": "ordinary",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "reviewStatus": "pending",
       "targetUnitDigest": "bef4e1da9be75d6406660ba5f13dfe5a98efc5cd1f83590895b432281b749b5b",
       "targetAncestry": [
         "Group Thinking Trigger Surface",
         "Clarification Rules"
-      ],
-      "reviewReportCommit": "cf5c64ce64263143158540283f7bf5c794e89386"
+      ]
     },
     {
       "claimId": "claim_df9081c32c8fb9275a5e0a8996e01efe",

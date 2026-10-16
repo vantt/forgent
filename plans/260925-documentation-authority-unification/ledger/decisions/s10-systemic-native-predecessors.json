@@ -23,15 +23,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/host-invocation-routing/contracts/legacy-payload.md",
       "targetAnchor": "unheaded-block-9",
+      "rationale": "A22/A31/L10-18b/L10-20: native predecessor from 19ca8de23 is superseded by the current same-section unit after authorized source/target link-cell restoration, sentence-order restoration or evolve code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync345-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval.",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16",
+      "reviewNote": "deep: gap predecessor at 19ca8de23 versus current unit, same anchor and ancestry; only the first row of the Related Files table changed, legacy-transition cell now links ../architecture/legacy-cli-transition.md which equals the first-authored bytes (git show 05b6bf861) and the source-transition row keeps the legacy architect link, so legacy and target links are in the right cells (L10-18b answered); rationale matches",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "14c1c0ac5e7be57002c04a3c0beed23bc3afcb963eb9f6ece2afe2dbcb29e015",
       "targetAncestry": [
         "Contract: Legacy Payload",
         "5. Related Files"
       ],
-      "rationale": "A22/A31/L10-18b/L10-20: native predecessor from 19ca8de23 is superseded by the current same-section unit after authorized source/target link-cell restoration, sentence-order restoration or evolve code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync345-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval.",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16",
-      "reviewNote": "Independent review pending at 345f15d95; no approval carried."
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_a93bd8da295ccacefb41a101085b898e",
@@ -41,15 +46,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
       "targetAnchor": "unheaded-block-6",
+      "rationale": "A22/A31/L10-18b/L10-20: native predecessor from 19ca8de23 is superseded by the current same-section unit after authorized source/target link-cell restoration, sentence-order restoration or evolve code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync345-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval.",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16",
+      "reviewNote": "deep: Source Coverage Matrix table, the three inverted rows (external-provider-protocol, legacy-cli-transition, node-to-rust-component-migration) now carry the legacy architect link in the Legacy source cell and the candidate link as first preservation target, identical to the first-authored file; rest of the table byte-equal to the predecessor, previous rework answered",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "bde5207b515b4be800ca245741a3c524e97067e3c96e39853879a1995d7c2ed0",
       "targetAncestry": [
         "Host Invocation Source Preservation Audit",
         "2. Source Coverage Matrix"
       ],
-      "rationale": "A22/A31/L10-18b/L10-20: native predecessor from 19ca8de23 is superseded by the current same-section unit after authorized source/target link-cell restoration, sentence-order restoration or evolve code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync345-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval.",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16",
-      "reviewNote": "Independent review pending at 345f15d95; no approval carried."
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_12b5a84382034e873673bfc9cb09734c",
@@ -59,14 +69,19 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
       "targetAnchor": "unheaded-block-2",
+      "rationale": "A22/A31/L10-18b/L10-20: native predecessor from 19ca8de23 is superseded by the current same-section unit after authorized source/target link-cell restoration, sentence-order restoration or evolve code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync345-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval.",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16",
+      "reviewNote": "deep: Added in candidate note of h-51f5cd7279fd; only change is the evolve citation range 4373-4380 plus 4640-4643 replaced by 4414-4417, which brackets the default unknown-verb throw and closing braces at 345f15d95; nothing else differs",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "3fab723eb054be1c1007c12f347887b98f4d864a5ae24d84527fa3eca45e3446",
       "targetAncestry": [
         "Added in candidate: Runner Behaviors & Operations"
       ],
-      "rationale": "A22/A31/L10-18b/L10-20: native predecessor from 19ca8de23 is superseded by the current same-section unit after authorized source/target link-cell restoration, sentence-order restoration or evolve code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync345-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval.",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16",
-      "reviewNote": "Independent review pending at 345f15d95; no approval carried."
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_08f9b4c140ce931a064c131c2bd4e014",
@@ -76,16 +91,15 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
       "targetAnchor": "unheaded-block-26",
-      "targetUnitDigest": "0dce2b78b5d497ab9dbe1b9cc6d0d8a00ad2ff468b97fe5964c8e86464b0a3b2",
+      "targetUnitDigest": "0f61fde6bc880cb19623ecde63a6a137571884e4b6ae2f8b24b8a585b25d600a",
       "targetAncestry": [
         "Added in candidate: Runner Behaviors & Operations",
         "Behaviors & Operations",
         "Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)"
       ],
-      "rationale": "A22/A31/L10-18b/L10-20: native predecessor from 19ca8de23 is superseded by the current same-section unit after authorized source/target link-cell restoration, sentence-order restoration or evolve code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync345-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval.",
+      "rationale": "Source: docs/platform/runner/operations/h-51f5cd7279fd.md:456-467#unheaded-block-26 (historical witness at 19ca8de23908e161c34c91626e41041b7813167c); unit SHA256 30bbabf9219560dd2744a98e42e43b53e9fbaf15c4282e68860a8682f2b63059.\nTarget: docs/platform/runner/operations/h-51f5cd7279fd.md:456-467#unheaded-block-26 (current lines); unit SHA256 0f61fde6bc880cb19623ecde63a6a137571884e4b6ae2f8b24b8a585b25d600a.\nSource and target unit digests differ.\nTarget changed since last reviewed digest 0dce2b78b5d497ab9dbe1b9cc6d0d8a00ad2ff468b97fe5964c8e86464b0a3b2 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nL10-24/citation-refuseHelp: \"bin/fgos.mjs:4415,4461\" → \"bin/fgos.mjs:4415,4503\"; evidence step10-round3-doc-edits.json; bin/fgos.mjs:4414-4417,4503.\nDisposition supersede: Account for docs/platform/runner/operations/h-51f5cd7279fd.md#unheaded-block-26 under docs/platform/runner/operations/h-51f5cd7279fd.md#unheaded-block-26; source context \"Added in candidate: Runner Behaviors & Operations / Behaviors & Operations / Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\", target context \"Added in candidate: Runner Behaviors & Operations / Behaviors & Operations / Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16",
-      "reviewNote": "Independent review pending at 345f15d95; no approval carried."
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16"
     },
     {
       "claimId": "claim_e0fc704182450d959f8452cc09da5f20",
@@ -95,15 +109,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
       "targetAnchor": "unheaded-block-3",
+      "rationale": "A22/A31/L10-18b/L10-20: native predecessor from 19ca8de23 is superseded by the current same-section unit after authorized source/target link-cell restoration, sentence-order restoration or evolve code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync345-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval.",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16",
+      "reviewNote": "deep: Data Dictionary table, the only differences are the two bin/fgos.mjs:4373 citations (rows 9 and 10) changed to 4415, the real unknown-verb throw; all other rows byte-equal",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "417a56fd2a82950722e3a35187fe79050d444a85b8b55a4106d3e45059fa1b39",
       "targetAncestry": [
         "Added in candidate: Runner Data Dictionary",
         "Data Dictionary"
       ],
-      "rationale": "A22/A31/L10-18b/L10-20: native predecessor from 19ca8de23 is superseded by the current same-section unit after authorized source/target link-cell restoration, sentence-order restoration or evolve code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync345-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval.",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16",
-      "reviewNote": "Independent review pending at 345f15d95; no approval carried."
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_8e43ff23542c1a2386d7ce3d2bf5e30d",
@@ -113,15 +132,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/runner/subcomponents/h-37aced3896a8/spec.md",
       "targetAnchor": "unheaded-block-5",
+      "rationale": "A22/A31/L10-18b/L10-20: native predecessor from 19ca8de23 is superseded by the current same-section unit after authorized source/target link-cell restoration, sentence-order restoration or evolve code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync345-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval.",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16",
+      "reviewNote": "deep: Edge Cases Settled bullet list, only the historical evolve scenario citation 4373 to 4415; byte-equal otherwise",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "b4abd2b685fe57f6a2616db1b22d4ddc28196279ade0c0307087370b59671964",
       "targetAncestry": [
         "Added in candidate: Runner Edge Cases Settled",
         "Edge Cases Settled"
       ],
-      "rationale": "A22/A31/L10-18b/L10-20: native predecessor from 19ca8de23 is superseded by the current same-section unit after authorized source/target link-cell restoration, sentence-order restoration or evolve code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync345-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval.",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16",
-      "reviewNote": "Independent review pending at 345f15d95; no approval carried."
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_5c067230bc1c324d3691dc880edb2578",
@@ -131,15 +155,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
       "targetAnchor": "unheaded-block-3",
+      "rationale": "A22/A31/L10-18b/L10-20: native predecessor from 19ca8de23 is superseded by the current same-section unit after authorized source/target link-cell restoration, sentence-order restoration or evolve code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync345-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval.",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16",
+      "reviewNote": "deep: Actors and Access table, single cell change 4373 to 4415 in the Gate A row",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "6ee82017c754d1ebcfed7fcd146851cdd954235737f350c0dbd70a9629516110",
       "targetAncestry": [
         "Added in candidate: Runner Actors & Access",
         "Actors & Access"
       ],
-      "rationale": "A22/A31/L10-18b/L10-20: native predecessor from 19ca8de23 is superseded by the current same-section unit after authorized source/target link-cell restoration, sentence-order restoration or evolve code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync345-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval.",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16",
-      "reviewNote": "Independent review pending at 345f15d95; no approval carried."
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_792117ae3e90dcc79bb2522f59773b89",
@@ -149,14 +178,19 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md",
       "targetAnchor": "unheaded-block-2",
+      "rationale": "A22/A31/L10-18b/L10-20: native predecessor from 19ca8de23 is superseded by the current same-section unit after authorized source/target link-cell restoration, sentence-order restoration or evolve code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync345-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval.",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16",
+      "reviewNote": "deep: Entry Points scaffold note, evolve entry-point correction range 4373-4380 plus 4640-4643 replaced by 4414-4417, consistent with the default branch; no other change",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "3405ed4f32704ce2e17c155d22d3366a75bdf88bc026b500d66ed59f11314445",
       "targetAncestry": [
         "Added in candidate: Runner Entry Points & Triggers"
       ],
-      "rationale": "A22/A31/L10-18b/L10-20: native predecessor from 19ca8de23 is superseded by the current same-section unit after authorized source/target link-cell restoration, sentence-order restoration or evolve code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync345-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval.",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16",
-      "reviewNote": "Independent review pending at 345f15d95; no approval carried."
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_61244b0a84842a2771f7cdb493ebb699",
@@ -166,14 +200,13 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
       "targetAnchor": "unheaded-block-2",
-      "targetUnitDigest": "35107e63035cafc34d5698a84f60bb1be49f6700d5e2ad14471d6de41ad86cca",
+      "targetUnitDigest": "c354e3357585a5cc6bce8dd57d833b0e85d3f19e58ba6e81e9d6f562aca53edc",
       "targetAncestry": [
         "Added in candidate: Runner Pointers (implementation)"
       ],
-      "rationale": "A22/A31/L10-18b/L10-20: native predecessor from 19ca8de23 is superseded by the current same-section unit after authorized source/target link-cell restoration, sentence-order restoration or evolve code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync345-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval.",
+      "rationale": "Source: docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md:23-23#unheaded-block-2 (historical witness at 19ca8de23908e161c34c91626e41041b7813167c); unit SHA256 ae0e268fad727f5deda17cf43d013aa1710f5cea2506fdd844809c3c8e98511f.\nTarget: docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md:23-23#unheaded-block-2 (current lines); unit SHA256 c354e3357585a5cc6bce8dd57d833b0e85d3f19e58ba6e81e9d6f562aca53edc.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nL10-24/citation-scaffold: \"bin/fgos.mjs:4640-4643; bin/fgos.mjs:4415-4380\" → \"bin/fgos.mjs:4414-4417\"; evidence step10-round3-doc-edits.json; bin/fgos.mjs:4414-4417,4503.\nDisposition supersede: Account for docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md#unheaded-block-2 under docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md#unheaded-block-2; source context \"Added in candidate: Runner Pointers (implementation)\", target context \"Added in candidate: Runner Pointers (implementation)\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16",
-      "reviewNote": "Independent review pending at 345f15d95; no approval carried."
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16"
     },
     {
       "claimId": "claim_09ce5c9968f21e0b39b0f23170433a9b",
@@ -183,15 +216,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
       "targetAnchor": "unheaded-block-3",
+      "rationale": "A22/A31/L10-18b/L10-20: native predecessor from 19ca8de23 is superseded by the current same-section unit after authorized source/target link-cell restoration, sentence-order restoration or evolve code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync345-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval.",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16",
+      "reviewNote": "deep: Pointers list block-3, only the evolve pointer citation 4373 to 4415; the rest of the 51-line list byte-equal to the predecessor",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "853cf58afec64a9d7b507305bfadf959cf0f88ef17e3b90b199a85bf3ed71c43",
       "targetAncestry": [
         "Added in candidate: Runner Pointers (implementation)",
         "Pointers (implementation)"
       ],
-      "rationale": "A22/A31/L10-18b/L10-20: native predecessor from 19ca8de23 is superseded by the current same-section unit after authorized source/target link-cell restoration, sentence-order restoration or evolve code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync345-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval.",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16",
-      "reviewNote": "Independent review pending at 345f15d95; no approval carried."
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_cb4a2f19d067a329bce233f6e2252729",
@@ -201,15 +239,20 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/README.md",
       "targetAnchor": "unheaded-block-7",
+      "rationale": "A22/A31/L10-18b/L10-20: native predecessor from 19ca8de23 is superseded by the current same-section unit after authorized source/target link-cell restoration, sentence-order restoration or evolve code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync345-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval.",
+      "reviewStatus": "reviewed",
+      "authoredBy": "codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16",
+      "reviewNote": "deep: work-state README Legacy Source Pointers sentence now reads docs/work-item-lifecycle-vision.md as the third retained source and vision.md as the platform vision candidate, identical to the first-authored bytes (swap fixed, previous rework answered); ../vision.md and ../../work-item-lifecycle-vision.md both exist",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-07-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "4ec367b6fb47b2dc7705caa2b3ae458f74136f697291ee505a2e884233efd793",
       "targetAncestry": [
         "Work State",
         "4. Legacy Source Pointers"
       ],
-      "rationale": "A22/A31/L10-18b/L10-20: native predecessor from 19ca8de23 is superseded by the current same-section unit after authorized source/target link-cell restoration, sentence-order restoration or evolve code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync345-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval.",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16",
-      "reviewNote": "Independent review pending at 345f15d95; no approval carried."
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     }
   ]
 }

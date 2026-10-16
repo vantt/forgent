@@ -1,0 +1,26 @@
+✔ rationale is rebuilt from bound facts without appending false old text (1.746204ms)
+✔ full unit digest decides equality, including heading section payload (0.140665ms)
+✔ last review comparison accepts digest prefix expansion and reports changes (0.173893ms)
+✔ link count distinguishes actual destination changes from spelling rebases (0.146045ms)
+✔ consistency flags changed ranges, anchors, equality and reviewed digest assertions (0.178535ms)
+✔ historical witness and no-target retain do not invent current source ranges (0.117709ms)
+✔ missing or mismatched binding evidence fails rather than inventing facts (0.293934ms)
+✔ legacy consistency checks contextual ranges, anchors and equality without mistaking header citations for bound spans (1.865142ms)
+✔ legacy audit understands unicode anchors, same-file successors and explicitly quoted prior rationales (0.227976ms)
+✔ unavailable historical text remains an explicit witness limit without invented line numbers (3.945867ms)
+✔ link alignment counts inserted provenance separately from repointed links (0.732242ms)
+✔ bound related citations include their actual lines and exact text (0.133087ms)
+✔ review entry snapshots use the committed row for both after and currentDecision (0.328512ms)
+✔ legacy citation audit distinguishes described links from the unit binding itself (0.177856ms)
+✔ residual sibling references are checked as residual facts rather than the primary unit anchor (0.178313ms)
+✔ a historical target is never presented as a current target or as no mapped copy (0.147307ms)
+✔ declared historical target identity disambiguates same-file source and successor references (0.143409ms)
+✔ overlapping labelled corrections are composed to current bound text before selection (0.190726ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 50.942219

@@ -77,15 +77,21 @@
       "sourceUnitDigest": "a8638afcbc30af3cfed8ddecb38f890e54215f551afcbd9a9d09d23c02d8bce3",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
       "rationale": "Heading translated and renumbered: “Chiều vào — verb + danh tính” becomes “2. Input Direction Verb And Identity”. Its forty-line direct source body is carried under new H3 subsections, each body unit has its own decision row. Heading and section digests differ because of translation, numbering and structural relocation, in addition to the disclosed Session Identity relative link rebase. Native identity resolved at 19ca8de23; no provisional identity, source retirement, authority flip or truth approval.",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "2-input-direction-verb-and-identity",
+      "reviewNote": "deep: heading \"Chieu vao\" translated and renumbered to \"2. Input Direction Verb And Identity\"; all 32 non-blank body lines of the source section are found verbatim under the H3 subsections of cli-io-contract.md section 2, the only absent line is the Session Identity bullet whose relative link was rebased as the rationale discloses; binding unchanged from the reviewed state (same anchor and digest), rationale now truthful (previous rework answered)",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "7c4e0214ec4c8c108c24c1b00a560516fbc5de0bc1a26d70a082eca5ccafb23c",
       "targetAncestry": [
         "CLI I/O Contract"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_426f29d1e11055574c203d89cba84cc7",
@@ -166,10 +172,10 @@
       "reviewStatus": "reviewed",
       "rationale": "role vs writer paragraph (human/runner/session/system) carried verbatim under the new H3 Caller Role; no counterpart in work-state.md per the map. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
       "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewNote": "deep: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-14 ok; section placement matches the source section and the rebound sentence in the rationale is true; the generic pointer to the earlier accounting is carried over from the reviewed row",
+      "reviewNote": "mechanical: full digests recomputed by the extractor at 345f15d95 and equal to the shard and the pack; anchor unheaded-block-14 ok; source and target digests equal (text byte-equal by digest); independently recomputed in Python (seed 20261018); text not read beyond what is stated",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-01-345f15d95.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "25e4a007d2fc9a153cb3273376471f15e4bfca5c257f0c8bf06d1dd6af198770",
       "targetAncestry": [
@@ -177,7 +183,7 @@
         "2. Input Direction Verb And Identity",
         "Caller Role"
       ],
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_e9c39f67bc2eab533faa3053ff482708",
@@ -207,21 +213,15 @@
       "targetAnchor": "unheaded-block-16",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
-      "rationale": "First paragraph of the envelope statement (every successful verb in both binaries prints the fgos.v1 envelope), carried verbatim under Envelope Shape; the same four-field envelope is stated by work-state.md 622-634 in the preceding block (map section 6). L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewNote": "mechanical: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-16 ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/io-contract.md:59-61#unheaded-block-9 (current lines); unit SHA256 6dcf0faa76d27fed777c0586dad2b3b78200213c58d5606ad5e901e81e13e6fa.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:145-147#unheaded-block-16 (current lines); unit SHA256 6dcf0faa76d27fed777c0586dad2b3b78200213c58d5606ad5e901e81e13e6fa.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 6dcf0faa76d27fed777c0586dad2b3b78200213c58d5606ad5e901e81e13e6fa at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-9 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-16; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất\", target context \"CLI I/O Contract / 3. Output Direction Unified Envelope / Envelope Shape\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "targetUnitDigest": "6dcf0faa76d27fed777c0586dad2b3b78200213c58d5606ad5e901e81e13e6fa",
       "targetAncestry": [
         "CLI I/O Contract",
         "3. Output Direction Unified Envelope",
         "Envelope Shape"
-      ],
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      ]
     },
     {
       "claimId": "claim_dc506074dcc2f08f6012ebb078b50371",
@@ -230,21 +230,15 @@
       "targetAnchor": "unheaded-block-17",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
-      "rationale": "The fenced envelope shape { contract: 'fgos.v1', generated_at, data_hash, data }, carried verbatim as its own block in Envelope Shape; the work-state.md envelope text under the same heading describes the same four fields. Note: the mechanical suggestion pointed at README.md and was wrong. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewNote": "deep: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-17 ok; section placement matches the source section and the rebound sentence in the rationale is true; the generic pointer to the earlier accounting is carried over from the reviewed row",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/io-contract.md:63-65#unheaded-block-10 (current lines); unit SHA256 18c5d821a55d3517cf3efe368fb1d34e13730b3bc1d70ff376d72b147621bdd2.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:149-151#unheaded-block-17 (current lines); unit SHA256 18c5d821a55d3517cf3efe368fb1d34e13730b3bc1d70ff376d72b147621bdd2.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 18c5d821a55d3517cf3efe368fb1d34e13730b3bc1d70ff376d72b147621bdd2 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-10 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-17; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất\", target context \"CLI I/O Contract / 3. Output Direction Unified Envelope / Envelope Shape\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "targetUnitDigest": "18c5d821a55d3517cf3efe368fb1d34e13730b3bc1d70ff376d72b147621bdd2",
       "targetAncestry": [
         "CLI I/O Contract",
         "3. Output Direction Unified Envelope",
         "Envelope Shape"
-      ],
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      ]
     },
     {
       "claimId": "claim_62d31ae4e5abfcf0ab158c0c6a8337ee",
@@ -253,21 +247,15 @@
       "targetAnchor": "unheaded-block-18",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
-      "rationale": "The data-is-structured and error-path-not-enveloped paragraph, carried verbatim in Envelope Shape; work-state.md 622-634 states the same (the ws error-path claim 636-639 also lands in the next H3). L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewNote": "mechanical: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-18 ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/io-contract.md:67-70#unheaded-block-11 (current lines); unit SHA256 84367855d92bb2e3914cb9bc385c2dce9b5625c8acaf9e577c9c791e40d07e71.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:153-156#unheaded-block-18 (current lines); unit SHA256 84367855d92bb2e3914cb9bc385c2dce9b5625c8acaf9e577c9c791e40d07e71.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 84367855d92bb2e3914cb9bc385c2dce9b5625c8acaf9e577c9c791e40d07e71 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-11 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-18; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất\", target context \"CLI I/O Contract / 3. Output Direction Unified Envelope / Envelope Shape\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "targetUnitDigest": "84367855d92bb2e3914cb9bc385c2dce9b5625c8acaf9e577c9c791e40d07e71",
       "targetAncestry": [
         "CLI I/O Contract",
         "3. Output Direction Unified Envelope",
         "Envelope Shape"
-      ],
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      ]
     },
     {
       "claimId": "claim_5e282fb457ff9ef02e88cf329556cf34",
@@ -276,21 +264,15 @@
       "targetAnchor": "unheaded-block-21",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
-      "rationale": "One envelope per call for fgos.mjs and one single-line envelope per --once/--watch cycle for fgos-runner, carried verbatim under Runner Stdout Envelope; duplicate of work-state.md 641-645 (map section 6). L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewNote": "mechanical: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-21 ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/io-contract.md:72-76#unheaded-block-12 (current lines); unit SHA256 6a5b9a01b04279716a3d504e251d1de122ff1652714708512706640ec9edd4ca.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:173-177#unheaded-block-21 (current lines); unit SHA256 6a5b9a01b04279716a3d504e251d1de122ff1652714708512706640ec9edd4ca.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 6a5b9a01b04279716a3d504e251d1de122ff1652714708512706640ec9edd4ca at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-12 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-21; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất\", target context \"CLI I/O Contract / 3. Output Direction Unified Envelope / Runner Stdout Envelope\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "targetUnitDigest": "6a5b9a01b04279716a3d504e251d1de122ff1652714708512706640ec9edd4ca",
       "targetAncestry": [
         "CLI I/O Contract",
         "3. Output Direction Unified Envelope",
         "Runner Stdout Envelope"
-      ],
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      ]
     },
     {
       "claimId": "claim_5b930b5ce84afec3d4b2c383c7f85925",
@@ -299,21 +281,15 @@
       "targetAnchor": "unheaded-block-22",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "Real-envelope recognition rule (parse JSON, check contract === 'fgos.v1', never a text heuristic) carried verbatim under the new H3 Recognizing A Real Envelope; no counterpart in work-state.md. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewNote": "mechanical: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-22 ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/io-contract.md:78-81#unheaded-block-13 (current lines); unit SHA256 bdeca0144b587f826ce46ea61d3be2e882ad021614d1e5f7c14cf2982573f056.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:181-184#unheaded-block-22 (current lines); unit SHA256 bdeca0144b587f826ce46ea61d3be2e882ad021614d1e5f7c14cf2982573f056.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest bdeca0144b587f826ce46ea61d3be2e882ad021614d1e5f7c14cf2982573f056 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/io-contract.md#unheaded-block-13 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-22; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất\", target context \"CLI I/O Contract / 3. Output Direction Unified Envelope / Recognizing A Real Envelope\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "targetUnitDigest": "bdeca0144b587f826ce46ea61d3be2e882ad021614d1e5f7c14cf2982573f056",
       "targetAncestry": [
         "CLI I/O Contract",
         "3. Output Direction Unified Envelope",
         "Recognizing A Real Envelope"
-      ],
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      ]
     },
     {
       "claimId": "claim_f50b3640275fce5d0a7e8d4f4077c0c9",
@@ -364,20 +340,14 @@
       "targetAnchor": "unheaded-block-29",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
-      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewNote": "mechanical: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-29 ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/io-contract.md:120-129#unheaded-block-18 (current lines); unit SHA256 c34e8e9c9dbf41ceba76b86cd175dcb894ce3eb3de6e988c2bd68a77ece385e4.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:251-260#unheaded-block-29 (current lines); unit SHA256 c34e8e9c9dbf41ceba76b86cd175dcb894ce3eb3de6e988c2bd68a77ece385e4.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest c34e8e9c9dbf41ceba76b86cd175dcb894ce3eb3de6e988c2bd68a77ece385e4 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-18 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-29; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất / Phân trang — con trỏ đục\", target context \"CLI I/O Contract / 6. Cursor Pagination\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "targetUnitDigest": "c34e8e9c9dbf41ceba76b86cd175dcb894ce3eb3de6e988c2bd68a77ece385e4",
       "targetAncestry": [
         "CLI I/O Contract",
         "6. Cursor Pagination"
-      ],
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      ]
     },
     {
       "claimId": "claim_b38e730cc466114aa1e1ebba6fa880ed",
@@ -386,20 +356,14 @@
       "targetAnchor": "unheaded-block-30",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
-      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewNote": "mechanical: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-30 ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/io-contract.md:131-132#unheaded-block-19 (current lines); unit SHA256 b82a558166f118f339210d9a475214042a603bd09f64a3a2a8795d96fbdf57ce.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:262-263#unheaded-block-30 (current lines); unit SHA256 b82a558166f118f339210d9a475214042a603bd09f64a3a2a8795d96fbdf57ce.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest b82a558166f118f339210d9a475214042a603bd09f64a3a2a8795d96fbdf57ce at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-19 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-30; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất / Phân trang — con trỏ đục\", target context \"CLI I/O Contract / 6. Cursor Pagination\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "targetUnitDigest": "b82a558166f118f339210d9a475214042a603bd09f64a3a2a8795d96fbdf57ce",
       "targetAncestry": [
         "CLI I/O Contract",
         "6. Cursor Pagination"
-      ],
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      ]
     },
     {
       "claimId": "claim_fda67d0dfc15159dc0e4c62b9dfddd87",
@@ -429,21 +393,15 @@
       "targetAnchor": "unheaded-block-36",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
-      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewNote": "mechanical: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-36 ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/io-contract.md:160-161#unheaded-block-22 (current lines); unit SHA256 78393c0183b6bda3ff166520f4601ab2793cbdf85e2669949001a73b9102f293.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:338-339#unheaded-block-36 (current lines); unit SHA256 78393c0183b6bda3ff166520f4601ab2793cbdf85e2669949001a73b9102f293.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 78393c0183b6bda3ff166520f4601ab2793cbdf85e2669949001a73b9102f293 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-22 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-36; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Sổ verb máy-đọc — CLI tự mô tả\", target context \"CLI I/O Contract / 7. Machine-Readable Verb Registry / Entry Fields And Effect Axes\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "targetUnitDigest": "78393c0183b6bda3ff166520f4601ab2793cbdf85e2669949001a73b9102f293",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Entry Fields And Effect Axes"
-      ],
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      ]
     },
     {
       "claimId": "claim_ba1c2ac95c9c161d9fd345e3bfa63741",
@@ -473,20 +431,14 @@
       "targetAnchor": "unheaded-block-38",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
-      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewNote": "mechanical: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-38 ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/io-contract.md:165-169#unheaded-block-23 (current lines); unit SHA256 a8eaefe3669a194a9fa84ca8fa92d4d58a5f7c8405e4d7c970fac1ce183148a5.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:352-356#unheaded-block-38 (current lines); unit SHA256 a8eaefe3669a194a9fa84ca8fa92d4d58a5f7c8405e4d7c970fac1ce183148a5.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest a8eaefe3669a194a9fa84ca8fa92d4d58a5f7c8405e4d7c970fac1ce183148a5 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-23 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-38; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Sổ verb máy-đọc — CLI tự mô tả / Quy ước cờ nhiều-giá-trị\", target context \"CLI I/O Contract / 8. Multi-Value Flag Convention\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "targetUnitDigest": "a8eaefe3669a194a9fa84ca8fa92d4d58a5f7c8405e4d7c970fac1ce183148a5",
       "targetAncestry": [
         "CLI I/O Contract",
         "8. Multi-Value Flag Convention"
-      ],
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      ]
     },
     {
       "claimId": "claim_6c529b87f6073cc75fdf836d3507d21d",
@@ -516,20 +468,14 @@
       "targetAnchor": "unheaded-block-42",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewNote": "deep: source block 24 and target block 42 differ only in the link destination (decisions/0011-version-tuong-minh-cho-moi-contract.md became ../decisions/retired-decision-history.md#7-adr-0011-explicit-version-for-every-contract, anchor ok), an allowed change and unchanged since the earlier ok at the same digests; the generic rationale does not name the rewrite, which I accept on the earlier verdict and flag as a wording gap; anchor 42 and unit are correct after the shift",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/io-contract.md:173-174#unheaded-block-24 (current lines); unit SHA256 ae0e60ec193e0ac5ad026b2cf78a37ba3156fea7043460714946bfe66311ab5e.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:397-398#unheaded-block-42 (current lines); unit SHA256 a378c81f6a84c5e3ed9b38917f7136c55dcc4af85295bcf105fa9ac9d6792532.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest a378c81f6a84c5e3ed9b38917f7136c55dcc4af85295bcf105fa9ac9d6792532 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 1, target 1; 1 changed spellings/labels, 1 destination changes; 0 added, 0 removed.\nLink 1: \"0011\" (decisions/0011-version-tuong-minh-cho-moi-contract.md) → \"0011\" (../decisions/retired-decision-history.md#7-adr-0011-explicit-version-for-every-contract); resolved docs/decisions/0011-version-tuong-minh-cho-moi-contract.md → docs/platform/work-state/decisions/retired-decision-history.md#7-adr-0011-explicit-version-for-every-contract.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/io-contract.md#unheaded-block-24 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-42; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Version token\", target context \"CLI I/O Contract / 10. Version Tokens\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "targetUnitDigest": "a378c81f6a84c5e3ed9b38917f7136c55dcc4af85295bcf105fa9ac9d6792532",
       "targetAncestry": [
         "CLI I/O Contract",
         "10. Version Tokens"
-      ],
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      ]
     },
     {
       "claimId": "claim_6f7c99f38f64abb5af7f07c1e2690730",
@@ -538,20 +484,14 @@
       "targetAnchor": "unheaded-block-43",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewNote": "mechanical: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-43 ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/io-contract.md:176-182#unheaded-block-25 (current lines); unit SHA256 c9d3ad96d4b03b02fbcf8e5bd0261ab7c77109320f204a18b9a43eef0f4f1fd3.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:400-406#unheaded-block-43 (current lines); unit SHA256 c9d3ad96d4b03b02fbcf8e5bd0261ab7c77109320f204a18b9a43eef0f4f1fd3.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest c9d3ad96d4b03b02fbcf8e5bd0261ab7c77109320f204a18b9a43eef0f4f1fd3 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/io-contract.md#unheaded-block-25 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-43; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Version token\", target context \"CLI I/O Contract / 10. Version Tokens\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "targetUnitDigest": "c9d3ad96d4b03b02fbcf8e5bd0261ab7c77109320f204a18b9a43eef0f4f1fd3",
       "targetAncestry": [
         "CLI I/O Contract",
         "10. Version Tokens"
-      ],
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      ]
     },
     {
       "claimId": "claim_ea280fa29dca090fe3306f6161ac6ae7",
@@ -560,20 +500,14 @@
       "targetAnchor": "unheaded-block-44",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewNote": "mechanical: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-44 ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/io-contract.md:184-185#unheaded-block-26 (current lines); unit SHA256 03c9a0137385cea34764f24cc92708d2c2c2c6a722f1e24345441232595f92cb.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:408-409#unheaded-block-44 (current lines); unit SHA256 03c9a0137385cea34764f24cc92708d2c2c2c6a722f1e24345441232595f92cb.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 03c9a0137385cea34764f24cc92708d2c2c2c6a722f1e24345441232595f92cb at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/io-contract.md#unheaded-block-26 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-44; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Version token\", target context \"CLI I/O Contract / 10. Version Tokens\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "targetUnitDigest": "03c9a0137385cea34764f24cc92708d2c2c2c6a722f1e24345441232595f92cb",
       "targetAncestry": [
         "CLI I/O Contract",
         "10. Version Tokens"
-      ],
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      ]
     },
     {
       "claimId": "claim_95a909b7be1252ba8de3be4c15f3638e",
@@ -603,20 +537,14 @@
       "targetAnchor": "unheaded-block-45",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewNote": "deep: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-45 ok; section placement matches the source section and the rebound sentence in the rationale is true; the generic pointer to the earlier accounting is carried over from the reviewed row",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/io-contract.md:189-191#unheaded-block-27 (current lines); unit SHA256 36d44c8bdf5ad1f062c83e623e68e7d429939c8bc1bc44c0b5bf36aba736078d.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:413-415#unheaded-block-45 (current lines); unit SHA256 36d44c8bdf5ad1f062c83e623e68e7d429939c8bc1bc44c0b5bf36aba736078d.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 36d44c8bdf5ad1f062c83e623e68e7d429939c8bc1bc44c0b5bf36aba736078d at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/io-contract.md#unheaded-block-27 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-45; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Ranh giới — điều gì KHÔNG thuộc hợp đồng này\", target context \"CLI I/O Contract / 11. Scope Boundary\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "targetUnitDigest": "36d44c8bdf5ad1f062c83e623e68e7d429939c8bc1bc44c0b5bf36aba736078d",
       "targetAncestry": [
         "CLI I/O Contract",
         "11. Scope Boundary"
-      ],
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      ]
     },
     {
       "claimId": "claim_f10fba22a20755dc700bb1720f98f451",
@@ -625,20 +553,14 @@
       "targetAnchor": "unheaded-block-46",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewNote": "mechanical: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-46 ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/io-contract.md:193-198#unheaded-block-28 (current lines); unit SHA256 fa405ec4333b43518de9831ea52cd47228294303f0b3374b8d4a981a669414ea.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:417-422#unheaded-block-46 (current lines); unit SHA256 fa405ec4333b43518de9831ea52cd47228294303f0b3374b8d4a981a669414ea.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest fa405ec4333b43518de9831ea52cd47228294303f0b3374b8d4a981a669414ea at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/io-contract.md#unheaded-block-28 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-46; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Ranh giới — điều gì KHÔNG thuộc hợp đồng này\", target context \"CLI I/O Contract / 11. Scope Boundary\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "targetUnitDigest": "fa405ec4333b43518de9831ea52cd47228294303f0b3374b8d4a981a669414ea",
       "targetAncestry": [
         "CLI I/O Contract",
         "11. Scope Boundary"
-      ],
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      ]
     },
     {
       "claimId": "claim_cf56f4a8b7679435c6bf59abd8c23093",
@@ -647,20 +569,14 @@
       "targetAnchor": "unheaded-block-47",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewNote": "deep: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-47 ok; section placement matches the source section and the rebound sentence in the rationale is true; the generic pointer to the earlier accounting is carried over from the reviewed row",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/io-contract.md:200-202#unheaded-block-29 (current lines); unit SHA256 30a3d1465b852976e30a3aad9f6729d1f40caacbc299c7fb07e87ff06d42cff7.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:424-426#unheaded-block-47 (current lines); unit SHA256 30a3d1465b852976e30a3aad9f6729d1f40caacbc299c7fb07e87ff06d42cff7.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 30a3d1465b852976e30a3aad9f6729d1f40caacbc299c7fb07e87ff06d42cff7 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/io-contract.md#unheaded-block-29 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-47; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Ranh giới — điều gì KHÔNG thuộc hợp đồng này\", target context \"CLI I/O Contract / 11. Scope Boundary\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "targetUnitDigest": "30a3d1465b852976e30a3aad9f6729d1f40caacbc299c7fb07e87ff06d42cff7",
       "targetAncestry": [
         "CLI I/O Contract",
         "11. Scope Boundary"
-      ],
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      ]
     },
     {
       "claimId": "claim_deb4b4da2abbc3d6190dfce1c75cabf2",
@@ -669,20 +585,14 @@
       "targetAnchor": "unheaded-block-48",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewNote": "mechanical: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-48 ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/io-contract.md:204-207#unheaded-block-30 (current lines); unit SHA256 fd7e473ad76cf591e6a132079c9b744fc4a8cfa5672127e446ae7c4f6f323e75.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:428-431#unheaded-block-48 (current lines); unit SHA256 fd7e473ad76cf591e6a132079c9b744fc4a8cfa5672127e446ae7c4f6f323e75.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest fd7e473ad76cf591e6a132079c9b744fc4a8cfa5672127e446ae7c4f6f323e75 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/io-contract.md#unheaded-block-30 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-48; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Ranh giới — điều gì KHÔNG thuộc hợp đồng này\", target context \"CLI I/O Contract / 11. Scope Boundary\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "targetUnitDigest": "fd7e473ad76cf591e6a132079c9b744fc4a8cfa5672127e446ae7c4f6f323e75",
       "targetAncestry": [
         "CLI I/O Contract",
         "11. Scope Boundary"
-      ],
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      ]
     },
     {
       "claimId": "claim_7524deb4b2a1c12d1652076040bfec36",
@@ -712,20 +622,14 @@
       "targetAnchor": "unheaded-block-49",
       "claimKind": "navigation",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewNote": "mechanical: source and target text byte-equal and digest unchanged from base after the one-block anchor shift (full digest recomputed), anchor unheaded-block-49 ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-19ca8de23.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/io-contract.md:211-217#unheaded-block-31 (current lines); unit SHA256 7fddf59545c800c11029e0609a32bd908db3409f458829aaf1afecc47bd7f4cf.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:435-441#unheaded-block-49 (current lines); unit SHA256 7fddf59545c800c11029e0609a32bd908db3409f458829aaf1afecc47bd7f4cf.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 7fddf59545c800c11029e0609a32bd908db3409f458829aaf1afecc47bd7f4cf at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/io-contract.md#unheaded-block-31 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-49; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Tham chiếu\", target context \"CLI I/O Contract / 12. References\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "targetUnitDigest": "7fddf59545c800c11029e0609a32bd908db3409f458829aaf1afecc47bd7f4cf",
       "targetAncestry": [
         "CLI I/O Contract",
         "12. References"
-      ],
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      ]
     },
     {
       "claimId": "claim_2b155082055823ccabf6fb40242abe42",
@@ -776,23 +680,17 @@
       "sourceUnitDigest": "d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
-      "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried. Native identity resolved at 19ca8de23908e161c34c91626e41041b7813167c from the sole native sync. Historical gaps remain separate; no provisional ID is persisted as a decision and no approval carries.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "rationale": "Source: docs/io-contract.md:24-34#unheaded-block-5 (current lines); unit SHA256 d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:83-93#unheaded-block-10 (current lines); unit SHA256 8aa8491435b1bd76c915faca0aaf324c77472f53839ef536c00d9cd1a7b9a2be.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 8aa8491435b1bd76c915faca0aaf324c77472f53839ef536c00d9cd1a7b9a2be at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 1, target 1; 1 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nLink 1: \"spec Session Identity\" (platform/session-identity/spec.md) → \"spec Session Identity\" (../../session-identity/spec.md); resolved docs/platform/session-identity/spec.md → docs/platform/session-identity/spec.md.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/io-contract.md#unheaded-block-5 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-10; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều vào — verb + danh tính\", target context \"CLI I/O Contract / 2. Input Direction Verb And Identity / Writer Source Trust Levels\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-10",
-      "reviewNote": "deep: docs/io-contract.md#unheaded-block-5 (L24-34) to docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-10 (L83-93): the unit equals its source except one link destination (platform/session-identity/spec.md becomes ../../session-identity/spec.md), a disclosed relative-link rebase, no word changed; the rationale boilerplate fits this row; mandatory unequal row, digests recomputed, anchors pass, target ancestry equals the shard",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-19ca8de23.md",
-      "reviewMode": "ordinary",
       "targetUnitDigest": "8aa8491435b1bd76c915faca0aaf324c77472f53839ef536c00d9cd1a7b9a2be",
       "targetAncestry": [
         "CLI I/O Contract",
         "2. Input Direction Verb And Identity",
         "Writer Source Trust Levels"
-      ],
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      ]
     },
     {
       "claimId": "claim_a14f9308d3f04e10e670c6f178d4ee33",
@@ -801,23 +699,17 @@
       "sourceUnitDigest": "b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
-      "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried. Native identity resolved at 19ca8de23908e161c34c91626e41041b7813167c from the sole native sync. Historical gaps remain separate; no provisional ID is persisted as a decision and no approval carries.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "rationale": "Source: docs/io-contract.md:44-49#unheaded-block-7 (current lines); unit SHA256 b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:116-121#unheaded-block-13 (current lines); unit SHA256 b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/io-contract.md#unheaded-block-7 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-13; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều vào — verb + danh tính\", target context \"CLI I/O Contract / 2. Input Direction Verb And Identity / Caller Role\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-13",
-      "reviewNote": "deep: docs/io-contract.md#unheaded-block-7 (L44-49) to docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-13 (L116-121): section text byte-identical (6 lines), digests equal and recomputed, anchors pass, ancestry matches the shard; rationale fits",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-19ca8de23.md",
-      "reviewMode": "ordinary",
       "targetUnitDigest": "b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79",
       "targetAncestry": [
         "CLI I/O Contract",
         "2. Input Direction Verb And Identity",
         "Caller Role"
-      ],
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      ]
     }
   ],
   "authorSession": "codex-session:1@2026-10-08",
@@ -831,8 +723,8 @@
       "claimKind": "contract",
       "disposition": "merge",
       "reviewStatus": "pending",
-      "rationale": "The fgos --help --json manifest contract is combined with the work-state manifest contribution under Manifest Shape. Its schema_version 2.0 source wording is represented by the corrected schema_version 3.0 successor, including commands and per-verb entries; work-state adds the positional-parameter rule. The reviewed merge disposition is restored: vocabulary merge combines multiple sources and does not require byte equality. The anchor shift changes no target text in this turn. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. L10-21: content-based rebind from reviewed prior target unheaded-block-32 (51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23) to unheaded-block-33 (51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23); inserted paragraphs shift the anchor, prior target text is unchanged.",
-      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "rationale": "Source: docs/io-contract.md:122-125#unheaded-block-18 (historical witness at 3ea75475d911ca02c9d8b5011dca4f748cc5820f); unit SHA256 83773dda67db8d5f71205bb8c7106186023672125b08cbe4f33b09b0578163ca.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:299-306#unheaded-block-33 (current lines); unit SHA256 51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23 at 7854cff84d8bcb67075d4f9c09cd0b6d04808ff4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-18 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-33; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Sổ verb máy-đọc — CLI tự mô tả\", target context \"CLI I/O Contract / 7. Machine-Readable Verb Registry / Manifest Shape\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "sourcePath": "docs/io-contract.md",
       "sourceAnchor": "unheaded-block-18",
       "targetUnitDigest": "51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23",
@@ -849,17 +741,23 @@
       "targetAnchor": "unheaded-block-35",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Supersede: current entry-field bullets drop coordination from the externalEffect examples, add the fifteen-verb list and add the subcommands bullet. Complete successor is cli-io-contract.md#unheaded-block-35 after the installation-error insertion. No historical-source byte-equality or approval carry.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
       "sourcePath": "docs/io-contract.md",
       "sourceAnchor": "unheaded-block-19",
+      "reviewNote": "deep: successor binding verified, reviewed digest e013c5b0 sat at unheaded-block-34 at 2300d6557 and is now at unheaded-block-35; diff source to target is exactly what the rationale lists (coordination dropped from the externalEffect examples, fifteen-verb list, run example, new subcommands bullet); rationale is specific and clean, previous stale-anchor rework answered",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e013c5b05d6ff58782aa8231ab4a55967bd5ef853dac4015aec8f16f5fcf9c68",
       "targetAncestry": [
         "CLI I/O Contract",
         "7. Machine-Readable Verb Registry",
         "Entry Fields And Effect Axes"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_dd296404e1163caafba00641cf0adc79",
@@ -891,15 +789,21 @@
       "targetAnchor": "unheaded-block-23",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Supersede: EXIT_CODES successor adds OUTCOME_EXIT_CODES, exit 4 not-found, and ok/pass outcome mapping. Complete successor is cli-io-contract.md#unheaded-block-23 after the installation-error insertion. No historical-source byte-equality or approval carry.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
       "sourcePath": "docs/io-contract.md",
+      "reviewNote": "deep: successor binding verified, reviewed digest d1af2d5a sat at unheaded-block-22 at 2300d6557 and is now at unheaded-block-23; diff is exactly the OUTCOME_EXIT_CODES list, exit 4 not-found and ok / pass mapping the rationale names; rationale clean, previous stale-anchor rework answered",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "d1af2d5a982f5d139fda776a23b4ad0b3776cc40c1fc0177636c44bdc91b968d",
       "targetAncestry": [
         "CLI I/O Contract",
         "4. Exit Codes"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_f5365b8e40fb58c75adc56a574263242",
@@ -912,18 +816,18 @@
       "rationale": "A22/A31/A34: one native sync at 19ca8de23908e161c34c91626e41041b7813167c preserves this historical predecessor as a gap; current upstream source successor is separately native-accounted and carried to the candidate. Historical lines changed; exact untransferred residual is retained verbatim with SHA256, independent representation review required; cutover remains blocked. Full source/current witnesses and residual: step10-sync19-predecessor-residuals.json. No identity graft or approval carry.",
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
-      "reviewNote": "deep: historical unit docs/io-contract.md#unheaded-block-5 at witness 2300d6557 (L24-31, digest recomputed equal) against the current successor L24-34 (digest d3828696 recomputed equal): the longest-common-subsequence of lines leaves exactly the 3 residual lines the residual file records (their text equals residualText and its SHA256 b276baca recomputes), the successor is carried to the candidate by claim_57f11d83, so partial-carry with a named verbatim remainder is accurate; A34 acceptance stays false until this review, and the residual file SHA binding belongs to closure",
+      "reviewNote": "deep: historical docs/io-contract.md#unheaded-block-5 at witness 2300d6557 (L24-31, digest fa53d50b recomputed by extractor and by hand) against its successor d3828696 (current L24-34, recomputed): a line-subsequence comparison leaves exactly 3 residual lines whose text equals step10-sync19-predecessor-residuals.json and whose SHA256 b276baca recomputes (the residual file is unchanged since 62d147641); the successor is carried by claim_57f11d83, so partial-carry with a named verbatim remainder stays accurate; applied approval checked: the shard row equals the pack, the reviewNote equals the Note in my committed 19ca8de23 report byte for byte, reviewedBy/reviewedAt/reviewReport (review-step10-decisions-05-19ca8de23.md at 4a18f35ff) match, and every non-review field equals the row at the request commit of that round (62d147641)",
       "remainder": "Verbatim historical residual in plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json, claim claim_f5365b8e40fb58c75adc56a574263242, residual SHA256 b276baca8168777f55bdba5a90f6ca6334a7e6e1e5d0c9ebef8df5b362313957. Source fa53d50b84fef3025e7b4e5e8e810a83f885e4aab37a760652c1bcb9e676a5a9; primary target d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8. Residual file SHA256 recorded in step10-sync19-predecessor-reconciliation.json. A34 independent acceptance pending; cutover blocked.",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-19ca8de23.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-345f15d95.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8",
       "targetAncestry": [
         "Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner`",
         "Chiều vào — verb + danh tính"
       ],
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     }
   ]
 }

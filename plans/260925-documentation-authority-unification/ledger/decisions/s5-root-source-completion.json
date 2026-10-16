@@ -2180,21 +2180,15 @@
       "sourceUnitDigest": "c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "targetOwner": "docs/platform/contracts/architecture-manifest.json",
       "targetAnchor": "file-block",
-      "rationale": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+      "rationale": "Source: docs/architecture-manifest.json:1-260#file-block (historical witness at 1b818c5862ad1dd31f7d0961c25b5052419450bd); unit SHA256 c1c230462d8e6a3a59005658d279246afcdcee727e89f03ff08b0f9ce8b14e85.\nTarget: docs/platform/contracts/architecture-manifest.json:1-269#file-block (current lines); unit SHA256 2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architecture-manifest.json#file-block under docs/platform/contracts/architecture-manifest.json#file-block; source context \"file-block\", target context \"file-block\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "sourcePath": "docs/architecture-manifest.json",
       "sourceAnchor": "file-block",
-      "reviewNote": "deep: file-block manifest; source sha at 1b818c586 and target sha equal the shown digests; dispatch-log.mjs removed, 2 entries infra to use-case, 10 added; target is the byte-identical platform copy",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
-      "reviewMode": "ordinary",
       "targetUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
-      "targetAncestry": [],
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      "targetAncestry": []
     }
   ]
 }

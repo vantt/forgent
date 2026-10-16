@@ -101,8 +101,8 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "rationale": "Body of the add verb section (source lines 866-871) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-65 of spec.md under the add verb heading; behavior-format specification of the CLI verb. Authorized A35 correction changes the whole target unit; A22 requires independent re-review, with no approval carried. Full original source, previous target and corrected target are shown; the false clauses are replaced by code-backed facts. The current U8/RUL60 fragment is corrected to the exact required fields/live wrapper ordering under A19; A22 real target digest and ancestry are rebound, no approval carries.",
-      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "rationale": "Source: docs/specs/work-state.md:866-871#unheaded-block-78 (current lines); unit SHA256 96b669468dbe4f3a8fd6eaa112986cead07ae88fa9de2b233f8fbf27314f9d16.\nTarget: docs/platform/work-state/spec.md:715-720#unheaded-block-65 (current lines); unit SHA256 91c2e63acc8563a92edc6d06d6634a299a3120b6682db0bf3e3fd289b6987445.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 91c2e63acc8563a92edc6d06d6634a299a3120b6682db0bf3e3fd289b6987445 at cd82746a8.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nU8 add id (composed with U8 add required flags): \"đòi người\\ngọi tự điền mọi trường (kể cả tự đặt id kebab-case), khác hẳn UX \\\"nộp rồi đi\\\"\\ncủa `submit`.\" → \"đòi người\\ngọi điền đủ các cờ bắt buộc `--title`, `--description`, `--kind`, `--risk` và `--verify`; `--id` tùy chọn, khi vắng thì `generateId`\\nsinh id `tsk-<hash>` chống trùng từ title, khác UX \\\"nộp rồi đi\\\" của `submit`.\"; evidence root-authorities-truth-corrections-turn21.json; bin/fgos.mjs:933-959.\nU8 test count: \"trực tiếp (9 file) tiếp tục dùng nguyên trạng;\" → \"trực tiếp trong nhiều file tiếp tục dùng nguyên trạng (ví dụ `test/cli/fgos-intake-7.test.mjs` và `test/e2e/pr-gate.test.mjs`);\"; evidence root-authorities-truth-corrections-turn21.json; test/cli/fgos-intake-7.test.mjs:128-148; test/e2e/pr-gate.test.mjs:68-80.\nU8 add required flags: \"gọi điền `--title` và `--description`; `--id` tùy chọn, khi vắng thì `generateId`\" → \"gọi điền đủ các cờ bắt buộc `--title`, `--description`, `--kind`, `--risk` và `--verify`; `--id` tùy chọn, khi vắng thì `generateId`\"; evidence root-source-truth-fragments-turn22.json; bin/fgos.mjs:933-964; src/state/work.mjs:250-305; src/state/store.mjs:265-281; src/state/work.mjs:375-381.\nDisposition supersede: Account for docs/specs/work-state.md#unheaded-block-78 under docs/platform/work-state/spec.md#unheaded-block-65; source context \"Spec: Work-State (tầng quản việc của forgent) / Behaviors & Operations / Khai việc (add) — bề mặt nội bộ\", target context \"Work State Specification / 9. Behaviors And Operations / Add Verb\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "targetUnitDigest": "91c2e63acc8563a92edc6d06d6634a299a3120b6682db0bf3e3fd289b6987445",
       "targetAncestry": [
         "Work State Specification",
@@ -117,15 +117,21 @@
       "targetAnchor": "unheaded-block-66",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Body of the add verb section (source lines 873-886) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-66 of spec.md under the add verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: digests recomputed by extractor and independent hash and equal (text byte-equal), shard row equals pack, source and target anchors pass, ancestry Add Verb equals the shard, rationale line range 873-886 and target anchor match the unit; text not re-read beyond byte equality",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "dd49a6c2fced83cebc38d9acb4a40dc3954a7776b9c56c825e3fc71c95407fd6",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Add Verb"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_bf41e5090dd12c430e3a55206ea11658",
@@ -246,15 +252,21 @@
       "targetAnchor": "unheaded-block-69",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Body of the plan verb section (source lines 985-1005) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-69 of spec.md under the plan verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: digests recomputed by extractor and independent hash and equal (text byte-equal), shard row equals pack, source and target anchors pass, ancestry Plan Verb equals the shard, rationale line range 985-1005 and target anchor match the unit; text not re-read beyond byte equality",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "876c0093197ca07debf3dbbc4844f926cfb2268f897bef63fca4254c50bd55f7",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Plan Verb"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_d91ae89ffb766e69e4a544b9b81c8c4b",
@@ -285,15 +297,21 @@
       "targetAnchor": "unheaded-block-70",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Body of the move verb section (source lines 1009-1012) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-70 of spec.md under the move verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: digests recomputed by extractor and independent hash and equal (text byte-equal), shard row equals pack, source and target anchors pass, ancestry Move Verb equals the shard, rationale line range 1009-1012 and target anchor match the unit; text not re-read beyond byte equality",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "03e628ac0acb982ad74952d25a5455b032f21664ed147ecf3d8a7fb8c880bf18",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Move Verb"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_e7f5c77c843747d054f54f58e6429262",
@@ -324,15 +342,21 @@
       "targetAnchor": "unheaded-block-71",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Body of the edit verb section (source lines 1016-1030) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-71 of spec.md under the edit verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: work-state.md#unheaded-block-84 (L1016-1030) to work-state/spec.md#unheaded-block-71 (L866-880): text byte-equal (read both ends, 1221 chars), digests recomputed by extractor and by independent hash, anchor passes, ancestry Edit Verb equals the shard; rationale line range, anchor and opening words match the unit",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "62894935652369b5403e491ef4abbb29b006389988bc1e3e25fc20253ba48bc4",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Edit Verb"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_ff435eb0a41c23d9066c658cdbd2c2b9",
@@ -341,15 +365,21 @@
       "targetAnchor": "unheaded-block-72",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Body of the edit verb section (source lines 1032-1056) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-72 of spec.md under the edit verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: digests recomputed by extractor and independent hash and equal (text byte-equal), shard row equals pack, source and target anchors pass, ancestry Edit Verb equals the shard, rationale line range 1032-1056 and target anchor match the unit; text not re-read beyond byte equality",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "c36313e9a59bc69c1f04a65dc22c55bd72e374e693fd9f4351a3534d1ccf1493",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Edit Verb"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_099cfdfdc16d8e8b4946219c7ed988f3",
@@ -380,15 +410,21 @@
       "targetAnchor": "unheaded-block-73",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Body of the decision verb section (source lines 1060-1061) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-73 of spec.md under the decision verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: digests recomputed by extractor and independent hash and equal (text byte-equal), shard row equals pack, source and target anchors pass, ancestry Decision Verb equals the shard, rationale line range 1060-1061 and target anchor match the unit; text not re-read beyond byte equality",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "8e520755293c85e501ebeaff9485524a4e8d098caff35958b5c52baf0069b406",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Decision Verb"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_75500caff35f59b62abf19b6b88dc5ae",
@@ -419,15 +455,21 @@
       "targetAnchor": "unheaded-block-74",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Body of the ask verb section (source lines 1065-1069) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-74 of spec.md under the ask verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: work-state.md#unheaded-block-87 (L1065-1069) to work-state/spec.md#unheaded-block-74 (L915-919): text byte-equal (read both ends, 719 chars), digests recomputed by extractor and by independent hash, anchor passes, ancestry Ask Verb equals the shard; rationale line range, anchor and opening words match the unit",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "3934104c59667221af37e30f52693b53c87032c9b95729315ceb9d18273f62bc",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Ask Verb"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_b406721dd14005f1f8721b2329dd53d6",
@@ -459,8 +501,8 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "rationale": "Body of the answer verb section (source lines 1073-1077) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-75 of spec.md under the answer verb heading; behavior-format specification of the CLI verb. Authorized A35 correction changes the whole target unit; A22 requires independent re-review, with no approval carried. Full original source, previous target and corrected target are shown; the false clauses are replaced by code-backed facts.",
-      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "rationale": "Source: docs/specs/work-state.md:1073-1077#unheaded-block-88 (current lines); unit SHA256 504b6a5b42d39ff1886b7e1865b5cd54713406e8caff7f6c22e0b3085efb755d.\nTarget: docs/platform/work-state/spec.md:923-927#unheaded-block-75 (current lines); unit SHA256 31381297e4545267ec79a77e7535df60d454ddacffe884ced82a687bfcce2d2c.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 31381297e4545267ec79a77e7535df60d454ddacffe884ced82a687bfcce2d2c at 55ec1e0c4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nU3 resume: \"item về status trước lúc `ask` đậu nó (`statusAtAsk`, ghi lúc `ask`, mặc định `todo` khi vắng — log cũ/gate không mang field này) — **`todo`** nếu item chưa bị cầm claim lúc hỏi, hoặc **`doing`** nếu một claim `pick`/`take` đang sống lúc hỏi (claim-lock §5.1: trước đây LUÔN về `todo` trần, làm rớt claim đang giữ nếu `ask` xảy ra giữa lúc item `doing` — đã sửa).\" → \"item về durable status trước lúc `ask` đậu nó (`durableStatusAtAsk`, do cửa ghi tính từ status bền); log cũ thiếu trường này dùng `statusAtAsk`, thiếu cả hai mặc định `todo`, và mọi giá trị `doing` đều được clamp về `todo`. `putInAwaiting` đã settle và nhả claim lúc đậu, nên trả lời không phục hồi claim cũ.\"; evidence root-authorities-truth-corrections-turn21.json; src/state/store.mjs:1388-1420; src/state/store.mjs:745-777; src/state/status-fsm.mjs:175-190.\nU3 ready consequence: \"item lại actionable — về `todo` thì xuất hiện trong `ready` khi deps đủ điều kiện; về `doing` thì KHÔNG xuất hiện trong `ready` (claim vẫn đang giữ, chờ `fgos return` như bình thường).\" → \"item không resume về `doing`; trường hợp resume về `todo` xuất hiện trong `ready` khi deps, workflow step và lineage đủ điều kiện; một lần `take` sau đó lấy claim mới.\"; evidence root-authorities-truth-corrections-turn21.json; src/state/store.mjs:1388-1420; src/state/frontier.mjs:40-105.\nDisposition supersede: Account for docs/specs/work-state.md#unheaded-block-88 under docs/platform/work-state/spec.md#unheaded-block-75; source context \"Spec: Work-State (tầng quản việc của forgent) / Behaviors & Operations / Trả lời (answer)\", target context \"Work State Specification / 9. Behaviors And Operations / Answer Verb\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "targetUnitDigest": "31381297e4545267ec79a77e7535df60d454ddacffe884ced82a687bfcce2d2c",
       "targetAncestry": [
         "Work State Specification",
@@ -497,15 +539,21 @@
       "targetAnchor": "unheaded-block-76",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Body of the outcome verb section (source lines 1081-1085) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-76 of spec.md under the outcome verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: digests recomputed by extractor and independent hash and equal (text byte-equal), shard row equals pack, source and target anchors pass, ancestry Outcome Recording equals the shard, rationale line range 1081-1085 and target anchor match the unit; text not re-read beyond byte equality",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "def08282f651f17f0d259f239b2ad9cc3d9e3b8dfeb3299cac39036dfcba7b93",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Outcome Recording"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_87ab779ddfa1909428d88042b42754f5",
@@ -536,15 +584,21 @@
       "targetAnchor": "unheaded-block-77",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Body of the check verb section (source lines 1089-1092) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-77 of spec.md under the check verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: digests recomputed by extractor and independent hash and equal (text byte-equal), shard row equals pack, source and target anchors pass, ancestry Check Verb equals the shard, rationale line range 1089-1092 and target anchor match the unit; text not re-read beyond byte equality",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "4a561ae476fb9a96d25fdd9172c3a452704f5ecedc7c131b71b85b6a5883d20d",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Check Verb"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_2c5f685ef7ce4a68703207540518c20f",
@@ -575,15 +629,21 @@
       "targetAnchor": "unheaded-block-78",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Body of the docs-index verb section (source lines 1096-1099) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-78 of spec.md under the docs-index verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: digests recomputed by extractor and independent hash and equal (text byte-equal), shard row equals pack, source and target anchors pass, ancestry Docs Index Verb equals the shard, rationale line range 1096-1099 and target anchor match the unit; text not re-read beyond byte equality",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "fc9cf98c574c23b2d1cadd3b9c0c73dd84c2bfee51494ced1f60fa2a3cac637b",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Docs Index Verb"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_630475260ac68684638bc1a7aee5b610",
@@ -614,15 +674,21 @@
       "targetAnchor": "unheaded-block-79",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Body of the rollup verb section (source lines 1103-1106) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-79 of spec.md under the rollup verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: digests recomputed by extractor and independent hash and equal (text byte-equal), shard row equals pack, source and target anchors pass, ancestry Rollup Verb equals the shard, rationale line range 1103-1106 and target anchor match the unit; text not re-read beyond byte equality",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "8df771b9a95fb4b30a9156cd5e9d7a356eb45b338bdbe27701e457bb31b93f2d",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Rollup Verb"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_3ce01ed0c5831b032d0fb9114c465c35",
@@ -653,15 +719,21 @@
       "targetAnchor": "unheaded-block-80",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Body of the triage verb section (source lines 1110-1113) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-80 of spec.md under the triage verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: digests recomputed by extractor and independent hash and equal (text byte-equal), shard row equals pack, source and target anchors pass, ancestry Triage Verb equals the shard, rationale line range 1110-1113 and target anchor match the unit; text not re-read beyond byte equality",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "595c67ae94bc2fe4f46251ba6d6d35f16a9fbdb8fe0d09e92c87bfb810fb3070",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Triage Verb"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_8ab73081ca23b57d7e1000709c6afb7a",
@@ -692,15 +764,21 @@
       "targetAnchor": "unheaded-block-81",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Body of the take verb section (source lines 1117-1121) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-81 of spec.md under the take verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: work-state.md#unheaded-block-94 (L1117-1121) to work-state/spec.md#unheaded-block-81 (L967-971): text byte-equal (read both ends, 1390 chars), digests recomputed by extractor and by independent hash, anchor passes, ancestry Take Verb equals the shard; rationale line range, anchor and opening words match the unit",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "c353e48e7f6e9d099ed7acc8db76b98bef4e8decacc1b68e6603f8fd009a58c5",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Take Verb"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_d365a6a94d068bc2ba274b535299db86",
@@ -731,15 +809,21 @@
       "targetAnchor": "unheaded-block-82",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Body of the pick verb section (source lines 1125-1129) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-82 of spec.md under the pick verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: work-state.md#unheaded-block-95 (L1125-1129) to work-state/spec.md#unheaded-block-82 (L975-979): text byte-equal (read both ends, 1896 chars), digests recomputed by extractor and by independent hash, anchor passes, ancestry Pick Verb equals the shard; rationale line range, anchor and opening words match the unit",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "09be94379bedfc46f88f54503e52daa53a53e96f472cd8035e80db873e923ffe",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Pick Verb"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_5bcb955bde6e229ab09e5002c1911076",
@@ -770,15 +854,21 @@
       "targetAnchor": "unheaded-block-83",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Body of the return verb section (source lines 1133-1137) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-83 of spec.md under the return verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: digests recomputed by extractor and independent hash and equal (text byte-equal), shard row equals pack, source and target anchors pass, ancestry Return Verb equals the shard, rationale line range 1133-1137 and target anchor match the unit; text not re-read beyond byte equality",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "b2eaf8daf7008b991917f223318d5e1de57fe2575580c0847cbe688ff6397baf",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Return Verb"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_54ab90a57c23e9ceabed9e79ad78dd7f",
@@ -809,15 +899,21 @@
       "targetAnchor": "unheaded-block-84",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Body of the rebuild verb section (source lines 1141-1143) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-84 of spec.md under the rebuild verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: digests recomputed by extractor and independent hash and equal (text byte-equal), shard row equals pack, source and target anchors pass, ancestry Rebuild Verb equals the shard, rationale line range 1141-1143 and target anchor match the unit; text not re-read beyond byte equality",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "3b409a02d049a208d8dd89ec1517d283d06682dcd37aa9ae30e9ebd3028db7e4",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Rebuild Verb"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_d54d2955da490ed329bf2f80c4540800",
@@ -848,15 +944,21 @@
       "targetAnchor": "unheaded-block-85",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Body of the list and ready verb section (source lines 1147-1149) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-85 of spec.md under the list and ready verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: digests recomputed by extractor and independent hash and equal (text byte-equal), shard row equals pack, source and target anchors pass, ancestry List And Ready Verbs equals the shard, rationale line range 1147-1149 and target anchor match the unit; text not re-read beyond byte equality",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "47f8d1203550fbf1cf157dc6f4b44f5dad48385f62994bb16a1834ad21e5b8a0",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "List And Ready Verbs"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_806561c52e1172c2bd94ba1e87a5a0b9",
@@ -887,15 +989,21 @@
       "targetAnchor": "unheaded-block-86",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Body of the graph verb section (source lines 1153-1153) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-86 of spec.md under the graph verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: work-state.md#unheaded-block-99 (L1153-1153) to work-state/spec.md#unheaded-block-86 (L1003-1003): text byte-equal (read both ends, 437 chars), digests recomputed by extractor and by independent hash, anchor passes, ancestry Graph Verb equals the shard; rationale line range, anchor and opening words match the unit",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "6070f51f4128ebf3bdcc18334e1a4ecb281d516142e341777e411b91bb7eaf61",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Graph Verb"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_82e5b138d21e606463ef458783510a14",
@@ -904,15 +1012,21 @@
       "targetAnchor": "unheaded-block-87",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Body of the graph verb section (source lines 1155-1163) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-87 of spec.md under the graph verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: work-state.md#unheaded-block-100 (L1155-1163) to work-state/spec.md#unheaded-block-87 (L1005-1013): text byte-equal (read both ends, 2136 chars), digests recomputed by extractor and by independent hash, anchor passes, ancestry Graph Verb equals the shard; rationale line range, anchor and opening words match the unit",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "c1a962fe830292f73a80e7dbca5e8d0cf0df5bcb2020de0dbda1439032d85c0c",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Graph Verb"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_78b2df24acd3461e45462add5ee00a73",
@@ -943,15 +1057,21 @@
       "targetAnchor": "unheaded-block-88",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Body of the stale verb section (source lines 1167-1167) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-88 of spec.md under the stale verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: digests recomputed by extractor and independent hash and equal (text byte-equal), shard row equals pack, source and target anchors pass, ancestry Stale Verb equals the shard, rationale line range 1167-1167 and target anchor match the unit; text not re-read beyond byte equality",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "31897e527213803203f7a7e3fb5b126986d4821eb4c374117f00acf81a38d218",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Stale Verb"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_872c3173f1d52ab7503e3762dc83c091",
@@ -960,15 +1080,21 @@
       "targetAnchor": "unheaded-block-89",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Body of the stale verb section (source lines 1169-1171) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-89 of spec.md under the stale verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: digests recomputed by extractor and independent hash and equal (text byte-equal), shard row equals pack, source and target anchors pass, ancestry Stale Verb equals the shard, rationale line range 1169-1171 and target anchor match the unit; text not re-read beyond byte equality",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "6eb3dc776fa680fbcd958d313c4a1a6a7362c13279a59bfaf074d7deb7d510d1",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Stale Verb"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_a773a3b3e0730bd8624c641dc1671dd6",
@@ -999,15 +1125,21 @@
       "targetAnchor": "unheaded-block-90",
       "claimKind": "specification",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Body of the conflicts verb section (source lines 1175-1175) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-90 of spec.md under the conflicts verb heading; behavior-format specification of the CLI verb. A22 mechanical compatibility consequence: the exact whole-shard legacy approval exemption is no longer available after the authorized A35 target edits in this shard. This row's source, target unit and ancestry are unchanged; independent ordinary conservation review is required with no assumed old approval.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: digests recomputed by extractor and independent hash and equal (text byte-equal), shard row equals pack, source and target anchors pass, ancestry Conflicts Verb equals the shard, rationale line range 1175-1175 and target anchor match the unit; text not re-read beyond byte equality",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-04-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "3694cfa1568e58a1b3fb4fa4e447f9cf23a953e2b2eb9dd8809a42c78c85204e",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Conflicts Verb"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_2636bbab8d7aeb5e65b5a30fa56de8a9",
@@ -1017,8 +1149,8 @@
       "claimKind": "specification",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "rationale": "Body of the conflicts verb section (source lines 1177-1178) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-91 of spec.md under the conflicts verb heading; behavior-format specification of the CLI verb. Authorized A35 correction changes the whole target unit; A22 requires independent re-review, with no approval carried. Full original source, previous target and corrected target are shown; the false clauses are replaced by code-backed facts.",
-      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "rationale": "Source: docs/specs/work-state.md:1177-1178#unheaded-block-104 (current lines); unit SHA256 27a3ba1515c8ffa4c6db8e9123168b72f583293dd0d4904824848c7187fe2bf1.\nTarget: docs/platform/work-state/spec.md:1027-1028#unheaded-block-91 (current lines); unit SHA256 c6a18ec4c4d25ad879f1d641ceca294e769d4e0da33767626d17a8403c449400.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest c6a18ec4c4d25ad879f1d641ceca294e769d4e0da33767626d17a8403c449400 at 55ec1e0c4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nU20 footprint: \"PHI-CHẶN: chỉ nuôi cố-vấn này, không vào cycle-check/frontier.\" → \"Không vào cycle-check/frontier; footprint còn chặn đề xuất chia có overlap bằng cổng `awaiting-human`, xếp các item xung đột vào wave khác nhau trong `computeSchedule`, và cung cấp tín hiệu cho `mergeReadiness`.\"; evidence root-authorities-truth-corrections-turn21.json; src/intake/plan.mjs:884-898; src/state/graph-metrics.mjs:737-775; src/state/graph-harness.mjs:100-210.\nDisposition supersede: Account for docs/specs/work-state.md#unheaded-block-104 under docs/platform/work-state/spec.md#unheaded-block-91; source context \"Spec: Work-State (tầng quản việc của forgent) / Behaviors & Operations / Cố vấn xung đột dấu chân file (conflicts) — chống đụng độ fan-out song song (S9)\", target context \"Work State Specification / 9. Behaviors And Operations / Conflicts Verb\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
       "targetUnitDigest": "c6a18ec4c4d25ad879f1d641ceca294e769d4e0da33767626d17a8403c449400",
       "targetAncestry": [
         "Work State Specification",

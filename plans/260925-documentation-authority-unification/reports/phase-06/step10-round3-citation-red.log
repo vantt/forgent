@@ -1,0 +1,25 @@
+✔ rationale is rebuilt from bound facts without appending false old text (1.145231ms)
+✔ full unit digest decides equality, including heading section payload (0.589986ms)
+✔ last review comparison accepts digest prefix expansion and reports changes (0.186192ms)
+✔ link count distinguishes actual destination changes from spelling rebases (0.135532ms)
+✔ consistency flags changed ranges, anchors, equality and reviewed digest assertions (0.172687ms)
+✔ historical witness and no-target retain do not invent current source ranges (0.106107ms)
+✔ missing or mismatched binding evidence fails rather than inventing facts (0.297746ms)
+✖ legacy consistency checks contextual ranges, anchors and equality without mistaking header citations for bound spans (0.216816ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 7
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 42.132832
+
+✖ failing tests:
+
+test at test/scripts/doc-rationale.test.mjs:43:1
+✖ legacy consistency checks contextual ranges, anchors and equality without mistaking header citations for bound spans (0.216816ms)
+  TypeError: checkLegacyRationale is not a function
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale.test.mjs:45:12)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7)

@@ -3091,21 +3091,15 @@
       "targetAnchor": "unheaded-block-22",
       "claimKind": "vision",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/vision.md#unheaded-block-22 is retained in docs/platform/agent-coordination/vision.md#unheaded-block-23. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "reviewNote": "LEG:vision.md#unheaded-block-22 -> PLAT:vision.md#unheaded-block-23: Unit carried verbatim (digest equal) into a current section judged ok.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-03.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "rationale": "Source: docs/architect/agent-coordination/vision.md:127-127#unheaded-block-22 (current lines); unit SHA256 2d843edd750aedd9ca4e611c8b72e48d2c4dc70c6350037fddd7c2f04f9255ae.\nTarget: docs/platform/agent-coordination/vision.md:138-138#unheaded-block-22 (current lines); unit SHA256 2d843edd750aedd9ca4e611c8b72e48d2c4dc70c6350037fddd7c2f04f9255ae.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 2d843edd750aedd9ca4e611c8b72e48d2c4dc70c6350037fddd7c2f04f9255ae at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/vision.md#unheaded-block-22 under docs/platform/agent-coordination/vision.md#unheaded-block-22; source context \"Agent Coordination Foundation Vision / Problems This Vision Resolves / 6. The Two Unsafe Extremes\", target context \"Agent Coordination Foundation Vision / Problems This Vision Resolves / 6. The Two Unsafe Extremes\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "2d843edd750aedd9ca4e611c8b72e48d2c4dc70c6350037fddd7c2f04f9255ae",
       "targetAncestry": [
         "Agent Coordination Foundation Vision",
         "Problems This Vision Resolves",
         "6. The Two Unsafe Extremes"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_1e802ee97f49f39adf169e746fc90440",

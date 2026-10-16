@@ -16,8 +16,8 @@
       "claimKind": "contract",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "rationale": "A31 native current source identity; full changed source unit carried verbatim in existing candidate owner. Main-only before/after retained in step8-final-rework-accounting.json. No predecessor identity graft or approval carry; no current-truth or promotion approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. L10-21: content-based rebind from reviewed prior target unheaded-block-22 (d1af2d5a982f5d139fda776a23b4ad0b3776cc40c1fc0177636c44bdc91b968d) to unheaded-block-23 (d1af2d5a982f5d139fda776a23b4ad0b3776cc40c1fc0177636c44bdc91b968d); inserted paragraphs shift the anchor, prior target text is unchanged.",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "rationale": "Source: docs/io-contract.md:85-90#unheaded-block-14 (current lines); unit SHA256 d1af2d5a982f5d139fda776a23b4ad0b3776cc40c1fc0177636c44bdc91b968d.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:188-193#unheaded-block-23 (current lines); unit SHA256 d1af2d5a982f5d139fda776a23b4ad0b3776cc40c1fc0177636c44bdc91b968d.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest d1af2d5a982f5d139fda776a23b4ad0b3776cc40c1fc0177636c44bdc91b968d at 7854cff84d8bcb67075d4f9c09cd0b6d04808ff4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/io-contract.md#unheaded-block-14 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-23; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất / Mã thoát (exit code) — một nguồn duy nhất\", target context \"CLI I/O Contract / 4. Exit Codes\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "d1af2d5a982f5d139fda776a23b4ad0b3776cc40c1fc0177636c44bdc91b968d",
       "targetAncestry": [
         "CLI I/O Contract",
@@ -32,8 +32,8 @@
       "claimKind": "contract",
       "disposition": "move",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "rationale": "A31 native current source identity; full changed source unit carried verbatim in existing candidate owner. Main-only before/after retained in step8-final-rework-accounting.json. No predecessor identity graft or approval carry; no current-truth or promotion approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. L10-21: content-based rebind from reviewed prior target unheaded-block-23 (131cc0704d753f35dcbec3ebba7be49a0d103732b6f4ee8c5ecc175d5c46167e) to unheaded-block-24 (131cc0704d753f35dcbec3ebba7be49a0d103732b6f4ee8c5ecc175d5c46167e); inserted paragraphs shift the anchor, prior target text is unchanged.",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "rationale": "Source: docs/io-contract.md:92-93#unheaded-block-15 (current lines); unit SHA256 131cc0704d753f35dcbec3ebba7be49a0d103732b6f4ee8c5ecc175d5c46167e.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:195-196#unheaded-block-24 (current lines); unit SHA256 131cc0704d753f35dcbec3ebba7be49a0d103732b6f4ee8c5ecc175d5c46167e.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 131cc0704d753f35dcbec3ebba7be49a0d103732b6f4ee8c5ecc175d5c46167e at 7854cff84d8bcb67075d4f9c09cd0b6d04808ff4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/io-contract.md#unheaded-block-15 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-24; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất / Mã thoát (exit code) — một nguồn duy nhất\", target context \"CLI I/O Contract / 4. Exit Codes\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "131cc0704d753f35dcbec3ebba7be49a0d103732b6f4ee8c5ecc175d5c46167e",
       "targetAncestry": [
         "CLI I/O Contract",
@@ -47,19 +47,13 @@
       "sourceUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
-      "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried. Native identity resolved at 19ca8de23908e161c34c91626e41041b7813167c from the sole native sync. Historical gaps remain separate; no provisional ID is persisted as a decision and no approval carries.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "rationale": "Source: docs/architecture-manifest.json:1-269#file-block (current lines); unit SHA256 2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a.\nTarget: docs/platform/contracts/architecture-manifest.json:1-269#file-block (current lines); unit SHA256 2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architecture-manifest.json#file-block under docs/platform/contracts/architecture-manifest.json#file-block; source context \"file-block\", target context \"file-block\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetOwner": "docs/platform/contracts/architecture-manifest.json",
       "targetAnchor": "file-block",
-      "reviewNote": "deep: docs/architecture-manifest.json to docs/platform/contracts/architecture-manifest.json: cmp shows the two files byte-identical, file-block digests equal (2d55be82) and recomputed by python, so move is accurate; the boilerplate rationale fits a pure carry; the target anchor is the non-markdown file-block so the anchor CLI is not applicable",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-19ca8de23.md",
-      "reviewMode": "ordinary",
       "targetUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
-      "targetAncestry": [],
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      "targetAncestry": []
     }
   ],
   "registryGaps": [
@@ -70,17 +64,11 @@
       "disposition": "supersede",
       "targetOwner": "docs/architecture-manifest.json",
       "targetAnchor": "file-block",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewStatus": "reviewed",
-      "rationale": "A22/A34 at SYNC 2300d65571968bb3bcb80123a273272586e3f1db: native predecessor gap preserved; all historical lines occur verbatim in order in current source successor; insertion-only containment. Full source/successor and residual evidence: step10-sync2300-predecessor-residuals.json. No identity graft or approval carry. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
-      "reviewNote": "deep: file-block manifest; source sha (witness d924f22ca) and target sha equal the shown digests; 2 entries added (main-checkout-activity, host-bin-path), nothing removed; same-file successor",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-19ca8de23.md",
-      "reviewMode": "ordinary",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/architecture-manifest.json:1-267#file-block (historical witness at d924f22ca44307ece579169fa2a2d459d5c0197e); unit SHA256 70c00c205578fc34084e5bf8701a6bde0999cb6f05a1b58f8424ad95ed4c28d4.\nTarget: docs/architecture-manifest.json:1-269#file-block (current lines); unit SHA256 2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architecture-manifest.json#file-block under docs/architecture-manifest.json#file-block; source context \"file-block\", target context \"file-block\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
-      "targetAncestry": [],
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      "targetAncestry": []
     },
     {
       "claimId": "claim_b19630ef4dcf1330c9807fc226a90e7b",
@@ -93,14 +81,14 @@
       "rationale": "A22/A31/A34: one native sync at 19ca8de23908e161c34c91626e41041b7813167c preserves this historical predecessor as a gap; current upstream source successor is separately native-accounted and carried to the candidate. All historical source lines occur verbatim in order in current successor; insertion-only containment. Full source/current witnesses and residual: step10-sync19-predecessor-residuals.json. No identity graft or approval carry.",
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
-      "reviewNote": "deep: historical file docs/architecture-manifest.json at witness 2300d6557 (digest 92391ce6 recomputed equal) against the current file (digest 2d55be82 recomputed equal): line comparison shows zero historical lines lost and one inserted line (src/util/host-bin-path.mjs kernel entry), matching the residual file (empty, SHA e3b0c442), so supersede with insertion-only containment is accurate; the current file is carried by claim_03ef50e8",
+      "reviewNote": "deep: historical docs/architecture-manifest.json at witness 2300d6557 (sha256 92391ce6 recomputed) against the current file 2d55be82: 268 historical lines all occur in order in the 269-line successor (one inserted line), the residual is empty (SHA256 e3b0c442 is the empty-string hash, matches the residual file), successor carried by claim_03ef50e8, so supersede with insertion-only containment is accurate; applied approval checked: the shard row equals the pack, the reviewNote equals the Note in my committed 19ca8de23 report byte for byte, reviewedBy/reviewedAt/reviewReport (review-step10-decisions-05-19ca8de23.md at 4a18f35ff) match, and every non-review field equals the row at the request commit of that round (62d147641)",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
       "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-19ca8de23.md",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-03-345f15d95.md",
       "reviewMode": "ordinary",
       "targetUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
       "targetAncestry": [],
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     }
   ]
 }

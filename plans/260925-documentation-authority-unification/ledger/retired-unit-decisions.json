@@ -6050,22 +6050,16 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "targetAnchor": "happy-path-routing",
       "shownTargetDigest": "6783eba05403033970ee5832ace843ceccf7b816a0b115fa601d31c4921a311a",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "rationale": "The former candidate identity is superseded by its complete identical primitive unit restored at the same current path. The old whole-file retirement was rejected; live/design content is current by default and is restored, while the complete dated input remains in history. Native inventory unit digest equality proves this primitive carry, not implementation of its surrounding design. The full shown section requires the changed-file independent check. Current-truth binding amended at 96a13ab21670e1f5d9748c02cd615ea5598b53f5: the current successor is docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#happy-path-routing, with the full shown-text digest recorded in this row. The prior retired source identity, accepted carriage and historical preservation remain unchanged. The current correction and section-specific evidence in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json require a new independent truth check; no old approval carries to changed shown text.",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:106-114#unheaded-block-10 (historical witness at d23045c2de83e3508fda8fd2580b43ece2e1e046); unit SHA256 1162040b79db2beccc2fe163e3f008e931b8f6ce13d15113a3f2838abb9df2a5.\nTarget: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:85-85#happy-path-routing (historical witness at ce575996f; absent from current binding location); unit SHA256 0c50fe16d128e763572d7c17246d17511168a21279be7960e8975ff40f91f2be.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 0c50fe16d128e763572d7c17246d17511168a21279be7960e8975ff40f91f2be at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 10\" → \"Happy Path Routing\".\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-10 under docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#happy-path-routing; source context \"Group Thinking Trigger Surface / Happy Path Routing\", target context \"Group Thinking Trigger Surface\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "shownSourceText": "| User phrase | Expected route |\n|---|---|\n| \"run a panel on whether we should split this service\" | `architecture-panel` -> `fgos-architecture-panel` -> architecture advisory protocol -> `advise` |\n| \"compare these 3 implementation options\" | `option-comparison` when the options are concrete; upgrade to `architecture-panel` if repository investigation and a full architecture recommendation are requested |\n| \"red-team this architecture decision\" | `architecture-panel`; red-team remains a declared phase inside that protocol |\n| \"get independent opinions before I commit\" | `independent-feedback`; ask only for the subject if it is absent |\n| \"review this proposal with group thinking\" | `proposal-review`; use the proposal text or artifact already in scope |\n| \"business panel: should we change pricing?\" | `strategy-options` if alternatives must be generated/compared; `business-review` if a concrete pricing proposal exists |\n| \"coding panel: should this be a plugin or core feature?\" | `coding-design-panel` -> `architecture-panel` -> `advise`; never `fgos-code-panel` because no implementation was requested |",
       "shownSourceDigest": "1162040b79db2beccc2fe163e3f008e931b8f6ce13d15113a3f2838abb9df2a5",
       "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
-      "reviewNote": "[changed older binding] architecture/group-thinking-trigger-surface.md#unheaded-block-10 -> architecture/group-thinking-trigger-surface.md#happy-path-routing (move): old identity unheaded-block-10 maps to happy-path-routing (lines 85-85) at disposition move: the anchor text is true now; check: routes agree with SKILL.md and core/workflows/architecture-advisory.yaml (synthesis unit has minCheckers reviewer and red-team); never routing advisory coding questions to the mutating route matches S",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-retired-unit.md",
-      "reviewMode": "ordinary",
       "targetUnitDigest": "0c50fe16d128e763572d7c17246d17511168a21279be7960e8975ff40f91f2be",
       "targetAncestry": [
         "Group Thinking Trigger Surface"
-      ],
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      ]
     },
     {
       "claimId": "claim_3b6d77f7a7e766cc7d9dea1216cb699a",
@@ -6345,23 +6339,17 @@
       "targetOwner": "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
       "targetAnchor": "b-add-fgos-panel",
       "shownTargetDigest": "245116acac90f31a527eca59811652803d0415b74a13e78f1585303b061f086e",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "rationale": "The former candidate identity is superseded by its complete identical primitive unit restored at the same current path. The old whole-file retirement was rejected; live/design content is current by default and is restored, while the complete dated input remains in history. Native inventory unit digest equality proves this primitive carry, not implementation of its surrounding design. The full shown section requires the changed-file independent check. Current-truth binding amended at 96a13ab21670e1f5d9748c02cd615ea5598b53f5: the current successor is docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#b-add-fgos-panel, with the full shown-text digest recorded in this row. The prior retired source identity, accepted carriage and historical preservation remain unchanged. The current correction and section-specific evidence in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json require a new independent truth check; no old approval carries to changed shown text.",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:193-195#unheaded-block-20 (historical witness at d23045c2de83e3508fda8fd2580b43ece2e1e046); unit SHA256 6bea20cb9a1aa9d19c5c6e9ef6e1ccf1f7ec636b964c2aaa50521ba3c14d73d5.\nTarget: docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md:148-148#b-add-fgos-panel (historical witness at ce575996f; absent from current binding location); unit SHA256 255adc34ce54db5747cd3c1a8d950b6d92f47a1ee0360648afd326076ae6281c.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 255adc34ce54db5747cd3c1a8d950b6d92f47a1ee0360648afd326076ae6281c at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 20\" → \"B. Add `fgos-panel`\".\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#unheaded-block-20 under docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md#b-add-fgos-panel; source context \"Group Thinking Trigger Surface / Alternatives Considered / B. Add `fgos-panel`\", target context \"Group Thinking Trigger Surface / Alternatives Considered\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "shownSourceText": "Selected. It gives natural requests one memorable entrypoint, keeps all mapping\nin this canonical table, and delegates unchanged execution to the pack gate and\nregistered protocol. Existing specialist skills remain available.",
       "shownSourceDigest": "6bea20cb9a1aa9d19c5c6e9ef6e1ccf1f7ec636b964c2aaa50521ba3c14d73d5",
       "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
-      "reviewNote": "[changed older binding] architecture/group-thinking-trigger-surface.md#unheaded-block-20 -> architecture/group-thinking-trigger-surface.md#b-add-fgos-panel (move): old identity unheaded-block-20 maps to b-add-fgos-panel (lines 148-148) at disposition move: the anchor text is true now; check: fgos-panel exists and is the intent-first selector; selection is not implementation permission per SKILL.md:12 and :61-64",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-retired-unit.md",
-      "reviewMode": "ordinary",
       "targetUnitDigest": "255adc34ce54db5747cd3c1a8d950b6d92f47a1ee0360648afd326076ae6281c",
       "targetAncestry": [
         "Group Thinking Trigger Surface",
         "Alternatives Considered"
-      ],
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      ]
     },
     {
       "claimId": "claim_d59cde69213f0af09c4d84d78e51aa68",
@@ -81657,15 +81645,9 @@
       "sourceUnitDigest": "6f82f0a34b9d52aeb929fa62c63a49e558f0cf94e6552b59bca278097f14ea6d",
       "claimKind": "procedure",
       "disposition": "reclassify-out-of-platform-scope",
-      "rationale": "L10-16 / L10-3: claim_b12ca1fdc3534fa31f9d7459c1be9ef7 records the historical native instruction identity AGENTS.md#dispatch-routing-work-to-a-executor (digest 6f82f0a34b9d52aeb929fa62c63a49e558f0cf94e6552b59bca278097f14ea6d). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewNote": "deep: heading 'Dispatch — routing work to a executor' at 120af6b3d L99; digest 6f82f0a3 recomputed by the extractor and by hand from the heading formula (level, title, section payload, following block); registry disposition is supersede to AGENTS.md#dispatch-routing-work-to-an-executor (a to an rename), the row keeps that out of the decision and says reclassify; rationale equals the nine-row L10-16 template and the established gap-row wording (identity accounting only, no target, no platform copy), row in ledger/retired-unit-decisions.json equals the pack row byte for byte, native record equals working-identity-registry.json, anchor named in the claim is missing or a different unit at HEAD so no live-anchor claim is made. This answers the earlier rework through its second option (a real decision row with the truthful historical-identity rationale); ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-historical-01-19ca8de23.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      "rationale": "Source: AGENTS.md:99-99#dispatch-routing-work-to-a-executor (historical witness at 120af6b3de826faec4e98cf72a92d8bcf1a21dff); unit SHA256 6f82f0a34b9d52aeb929fa62c63a49e558f0cf94e6552b59bca278097f14ea6d.\nTarget: none; retained identity has no mapped platform copy.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → not a heading; title \"Dispatch — routing work to a executor\" → \"none\".\nApplicable labelled corrections: none in this bound unit.\nDisposition reclassify-out-of-platform-scope: Keep AGENTS.md#dispatch-routing-work-to-a-executor in its existing source ownership outside platform documentation authority.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16"
     },
     {
       "claimId": "claim_21f66ad1c973daaf6c31abf50b6c8cc3",
@@ -81674,15 +81656,9 @@
       "sourceUnitDigest": "43d98a2d84170eee45f9c337cd6700c7af2e32965c415e3fb26cf3c3ebe14bd7",
       "claimKind": "procedure",
       "disposition": "reclassify-out-of-platform-scope",
-      "rationale": "L10-16 / L10-3: claim_21f66ad1c973daaf6c31abf50b6c8cc3 records the historical native instruction identity AGENTS.md#starting-the-herdr-gateway-one-door-never-a-raw-process (digest 43d98a2d84170eee45f9c337cd6700c7af2e32965c415e3fb26cf3c3ebe14bd7). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewNote": "deep: no witness text, which the row says plainly (limitation recorded); digest 43d98a2d equals the Phase 2 inventory and registry value, but I could not reproduce it: the file blob f4a81c7ea (sha256 0174e3d9, equal to the inventory pin) has this heading at L122 and the current extractor gives f83afabf there (the same drift hits 3 other units of that blob), so the digest is verified as recorded, not as recomputed; registry disposition supersede to the starting-the-fgos-gateway heading; rationale equals the nine-row L10-16 template and the established gap-row wording (identity accounting only, no target, no platform copy), row in ledger/retired-unit-decisions.json equals the pack row byte for byte, native record equals working-identity-registry.json, anchor named in the claim is missing or a different unit at HEAD so no live-anchor claim is made; ok with that disclosed limit",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-historical-01-19ca8de23.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      "rationale": "Source: AGENTS.md#starting-the-herdr-gateway-one-door-never-a-raw-process; historical text/line witness unavailable; bound unit SHA256 43d98a2d84170eee45f9c337cd6700c7af2e32965c415e3fb26cf3c3ebe14bd7.\nTarget: none; retained identity has no mapped platform copy.\nLinks: source unavailable, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition reclassify-out-of-platform-scope: Keep AGENTS.md#starting-the-herdr-gateway-one-door-never-a-raw-process in its existing source ownership outside platform documentation authority.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16"
     },
     {
       "claimId": "claim_806342ec2a1c5fd1d0b6d82ebd54d4e0",
@@ -81691,15 +81667,9 @@
       "sourceUnitDigest": "818ed72de3118b43bbb9682e5b2231a74894d6001771d6375d08fcb626cd99b1",
       "claimKind": "procedure",
       "disposition": "reclassify-out-of-platform-scope",
-      "rationale": "L10-16 / L10-3: claim_806342ec2a1c5fd1d0b6d82ebd54d4e0 records the historical native instruction identity AGENTS.md#unheaded-block-18 (digest 818ed72de3118b43bbb9682e5b2231a74894d6001771d6375d08fcb626cd99b1). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewNote": "deep: unheaded block at 120af6b3d L101 (the Before dispatching paragraph); digest 818ed72d recomputed (sha256 of the block text equals it, and the git blob line equals the pack text); registry disposition is delete-as-obsolete while this row reclassifies, which is the old registry value the row does not repeat; live unheaded-block-18 at HEAD is a different unit, which the rationale covers; rationale equals the nine-row L10-16 template and the established gap-row wording (identity accounting only, no target, no platform copy), row in ledger/retired-unit-decisions.json equals the pack row byte for byte, native record equals working-identity-registry.json, anchor named in the claim is missing or a different unit at HEAD so no live-anchor claim is made; ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-historical-01-19ca8de23.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      "rationale": "Source: AGENTS.md:101-101#unheaded-block-18 (historical witness at 120af6b3de826faec4e98cf72a92d8bcf1a21dff); unit SHA256 818ed72de3118b43bbb9682e5b2231a74894d6001771d6375d08fcb626cd99b1.\nTarget: none; retained identity has no mapped platform copy.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition reclassify-out-of-platform-scope: Keep AGENTS.md#unheaded-block-18 in its existing source ownership outside platform documentation authority.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16"
     },
     {
       "claimId": "claim_7a4fef4aa802940385df7cd8fc1bf6f0",
@@ -81708,15 +81678,9 @@
       "sourceUnitDigest": "367c95ab6574855f85ab31608ca9438bddb2bef0839cfc45ff4bf2640c6ea2f4",
       "claimKind": "procedure",
       "disposition": "reclassify-out-of-platform-scope",
-      "rationale": "L10-16 / L10-3: claim_7a4fef4aa802940385df7cd8fc1bf6f0 records the historical native instruction identity AGENTS.md#unheaded-block-23 (digest 367c95ab6574855f85ab31608ca9438bddb2bef0839cfc45ff4bf2640c6ea2f4). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewNote": "deep: unheaded block at 120af6b3d L114-116 (the three mechanism bullets, still saying fgos dispatch execute); digest 367c95ab recomputed by sha256 of the block text and by the extractor, git blob lines equal pack text; registry supersede (needs-owner-review) to the dispatch-routing heading, which now reads fgos run; live unheaded-block-23 at HEAD is a different unit; rationale equals the nine-row L10-16 template and the established gap-row wording (identity accounting only, no target, no platform copy), row in ledger/retired-unit-decisions.json equals the pack row byte for byte, native record equals working-identity-registry.json, anchor named in the claim is missing or a different unit at HEAD so no live-anchor claim is made; ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-historical-01-19ca8de23.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      "rationale": "Source: AGENTS.md:114-116#unheaded-block-23 (historical witness at 120af6b3de826faec4e98cf72a92d8bcf1a21dff); unit SHA256 367c95ab6574855f85ab31608ca9438bddb2bef0839cfc45ff4bf2640c6ea2f4.\nTarget: none; retained identity has no mapped platform copy.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition reclassify-out-of-platform-scope: Keep AGENTS.md#unheaded-block-23 in its existing source ownership outside platform documentation authority.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16"
     },
     {
       "claimId": "claim_7b209ce1498d7ab5ddafe25d203e5852",
@@ -81725,15 +81689,9 @@
       "sourceUnitDigest": "bd95c2c1daeda69523d203dcefc33f2d50d81a401087e921c058a7d004f5a02a",
       "claimKind": "procedure",
       "disposition": "reclassify-out-of-platform-scope",
-      "rationale": "L10-16 / L10-3: claim_7b209ce1498d7ab5ddafe25d203e5852 records the historical native instruction identity AGENTS.md#unheaded-block-24 (digest bd95c2c1daeda69523d203dcefc33f2d50d81a401087e921c058a7d004f5a02a). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewNote": "deep: unheaded block at 120af6b3d L118 (the every-result-carries paragraph); digest bd95c2c1 recomputed by sha256 and by the extractor, git blob line equals pack text; registry supersede to the dispatch-routing heading; rationale equals the nine-row L10-16 template and the established gap-row wording (identity accounting only, no target, no platform copy), row in ledger/retired-unit-decisions.json equals the pack row byte for byte, native record equals working-identity-registry.json, anchor named in the claim is missing or a different unit at HEAD so no live-anchor claim is made; ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-historical-01-19ca8de23.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      "rationale": "Source: AGENTS.md:118-118#unheaded-block-24 (historical witness at 120af6b3de826faec4e98cf72a92d8bcf1a21dff); unit SHA256 bd95c2c1daeda69523d203dcefc33f2d50d81a401087e921c058a7d004f5a02a.\nTarget: none; retained identity has no mapped platform copy.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition reclassify-out-of-platform-scope: Keep AGENTS.md#unheaded-block-24 in its existing source ownership outside platform documentation authority.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16"
     },
     {
       "claimId": "claim_30f4d7e2306cb4ecdad78086848d139f",
@@ -81742,15 +81700,9 @@
       "sourceUnitDigest": "52b2e04e2be1548ef98b8c68b27ee09c3cef2b516ce1cdd6925362d81dd2a306",
       "claimKind": "procedure",
       "disposition": "reclassify-out-of-platform-scope",
-      "rationale": "L10-16 / L10-3: claim_30f4d7e2306cb4ecdad78086848d139f records the historical native instruction identity AGENTS.md#unheaded-block-26 (digest 52b2e04e2be1548ef98b8c68b27ee09c3cef2b516ce1cdd6925362d81dd2a306). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewNote": "deep: unheaded block at 5df843bdb L129-130 (the every-result-carries paragraph plus the shared-fragment paragraph); digest 52b2e04e recomputed by sha256 and by the extractor, git blob lines equal pack text; registry supersede to AGENTS.md#unheaded-block-14; rationale equals the nine-row L10-16 template and the established gap-row wording (identity accounting only, no target, no platform copy), row in ledger/retired-unit-decisions.json equals the pack row byte for byte, native record equals working-identity-registry.json, anchor named in the claim is missing or a different unit at HEAD so no live-anchor claim is made; ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-historical-01-19ca8de23.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      "rationale": "Source: AGENTS.md:129-130#unheaded-block-26 (historical witness at 5df843bdb90527b326974a71cc9d288fac4393bc); unit SHA256 52b2e04e2be1548ef98b8c68b27ee09c3cef2b516ce1cdd6925362d81dd2a306.\nTarget: none; retained identity has no mapped platform copy.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition reclassify-out-of-platform-scope: Keep AGENTS.md#unheaded-block-26 in its existing source ownership outside platform documentation authority.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16"
     },
     {
       "claimId": "claim_dea64a2d50bdbadf3b2ebeceec84fa5d",
@@ -81759,15 +81711,9 @@
       "sourceUnitDigest": "ba8b02c21fe45af0ba20b280ef182065e87c3410dae024d6ede3983845990c9c",
       "claimKind": "procedure",
       "disposition": "reclassify-out-of-platform-scope",
-      "rationale": "L10-16 / L10-3: claim_dea64a2d50bdbadf3b2ebeceec84fa5d records the historical native instruction identity AGENTS.md#unheaded-block-34 (digest ba8b02c21fe45af0ba20b280ef182065e87c3410dae024d6ede3983845990c9c). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried. This is consistent with gap claim_91884eb1 (same ba8b02c2 text digest): both historical identities classify the instruction outside platform authority. The old registry delete-as-obsolete disposition is historical bookkeeping, not authority to delete root instruction text; no registry mutation this turn.",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewNote": "deep: unheaded block at f4a81c7ea L159 (the GitNexus index-counts line, 37092 symbols); digest ba8b02c2 recomputed by sha256 and by the extractor, git blob line equals pack text; same digest as gap claim_91884eb1 (CLAUDE.md) which also reclassifies, so one text no longer gets two dispositions, which was the earlier rework point; rationale equals the nine-row L10-16 template and the established gap-row wording (identity accounting only, no target, no platform copy), row in ledger/retired-unit-decisions.json equals the pack row byte for byte, native record equals working-identity-registry.json, anchor named in the claim is missing or a different unit at HEAD so no live-anchor claim is made; ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-historical-01-19ca8de23.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+      "rationale": "Source: AGENTS.md:159-159#unheaded-block-34 (historical witness at f4a81c7ea2bf1b2b62bf38ad66dbbde2c6791704); unit SHA256 ba8b02c21fe45af0ba20b280ef182065e87c3410dae024d6ede3983845990c9c.\nTarget: none; retained identity has no mapped platform copy.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition reclassify-out-of-platform-scope: Keep AGENTS.md#unheaded-block-34 in its existing source ownership outside platform documentation authority.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16"
     },
     {
       "sourcePath": "AGENTS.md",
@@ -81788,12 +81734,12 @@
       "reviewStatus": "reviewed",
       "authoredBy": "codex-session:27@2026-10-14",
       "rationale": "A31 upstream removal: retain the exact prior unit as immutable git evidence at c18020da3. Full prior/current diff and informational successor shown for independent conservation review; no claim of full current carry or approval carry.",
-      "reviewNote": "deep: AGENTS.md dispatch bullet list: the out-of-process bullet was rewritten upstream (dispatch execute to fgos run); 2 of 3 lines verbatim; old unit retained as git evidence and the missing line is in the main hunk",
+      "reviewNote": "deep: the pending reclassify duplicate is gone (L10-22) and the single row is the retain-as-evidence row reviewed on 2026-10-15; row equals the pack and the working registry record byte for byte, one disposition per claim in all shards; unit digest recomputed (extractor and plain sha256 of the three bullets at fba5d0426 L168-170, and the same unit is unheaded-block-28 at c18020da3 L165-167, absent at 6c6a65e85 and HEAD) so the rationale's git evidence at c18020da3 is true; at HEAD the unavailable and in-process bullets are verbatim and only the out-of-process bullet is rewritten to fgos run, which the note says; approval pin 68b95dbd8 holds the matching ok row with the same digest; the report header there names author session 28 while the row says 27, a provenance nit only",
       "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-historical-01-345f15d95.md",
       "reviewMode": "ordinary",
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     }
   ]
 }

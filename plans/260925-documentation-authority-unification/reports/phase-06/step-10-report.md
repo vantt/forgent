@@ -1,3 +1,51 @@
+# Step 10 round-3 author corrections complete — package next
+
+Assignment `unit-run-1792114313040-56132651/producer/1`; input HEAD `5035fed52e60254ecbe034cc987553feb24616f4`, reviewed content `345f15d95`, request `c939e9a51`. All 22 committed reports’ Notes/Concerns were read. This author/docs turn performs **zero native sync, zero native --rebind, zero review packs**. Runner owns commits. Phase 6 remains open.
+
+## Matching verdicts and exact doc edits
+
+**435 matching ok verdicts applied through the unchanged ordinary applicator, notes verbatim; 365 remain reviewed and 70 subsequently reopen after rationale changes.** The 52 reworks remain pending. Previously reviewed rows outside that application also reopen when their rationale changes. [Application and verbatim notes](step10-round3-review-application.json).
+
+**Six exact edits in four docs:** the f34 runner scaffold now cites only `bin/fgos.mjs:4414-4417`; Gate A’s operations carrier cites `bin/fgos.mjs:4415,4503`. HEAD code witnesses confirm the default branch and `refuseHelp`; the inverted range and unrelated stale range are removed. The same operations unit is the target for claim_224b5f54, claim_979ec4a6 and predecessor claim_08f9b4c1. Three “Preserved from” links in Host Invocation vision now resolve to the retained legacy sources. The Workspace Runtime Model’s visible `docs/architect/workspace-topology.md` label again resolves to that legacy file; the heading and body rows share this one actual link. Labels are unchanged. [Exact edits and code lines](step10-round3-doc-edits.json).
+
+Accounting-031’s live reproduction script in `step10-systemic-reproduction.json` now lists nine exact full-line before/after citation edits instead of the blind numeric-prefix replacement. Its historical execution remains recoverable at `345f15d95`; the current script supersedes it. Historical native proofs and old requests are preserved as historical snapshots, not represented as refreshed proof.
+
+## Binding-derived rationale rebuild
+
+**714 rationales regenerated, including 665 rows whose prior status was reviewed.** Every changed rationale is pending; no approval carries. Dispositions, source identities, target paths/anchors, residuals and acceptance scopes are unchanged. Only six target digest/ancestry bindings change, for the same-line authorized doc edits. [Full before/after and facts](step10-round3-rationale-edits.json).
+
+The sweep includes all 44 rationale reworks, decisions-04’s ten, decisions-05/06/07’s rows, a631’s pointer correction, governance/switchboard counts, historical endings, five positional/evidence fixes in decisions-01/02, and every additional stale binding citation found across all shards. The discovered population is larger than the initial estimate: it includes stale anchors in Agent Coordination and Host Invocation, not only the roughly 50 approved rows singled out by review. The 31 confinement source rows, the 13 candidate-range rows, three dictionary rows, citation-drift and dashboard siblings are all covered, with overlaps deduplicated by row.
+
+One renderer in `scripts/doc-binding-repair.mjs` builds fresh prose from authenticated source/target units. It never appends old rationale text. It states paths, actual ranges and anchors, full unit digests, comparison with the last reviewed target digest, applicable correction labels and exact fragments, link counts and resolved destination changes, heading depth/title changes, disposition reason and recorded residual. The orchestrator reuses the unchanged native extractor and exact binding lookup. It matches correction fragments against the bound target payload, including U3 resume/ready, U8 optional id/required flags/test files, U20 footprint and current runner corrections. a631 quotes the two historical/current lock and pre-commit lines separately; it does not conflate their implementations. Boundary-map evidence is read at lines 14, 46, 97 and 518. Inserted links are aligned separately from repoints; governance has six changes/two repoints and the switchboard six changes/one repoint. **682 reviewed target digests are unchanged, nine changed; 23 rows lack an available prior reviewed target digest.** No equality is invented for those 23.
+
+Two old retired rows keep their historical target bindings, authenticated at `ce575996f`, rather than pretending their removed anchors are current or that they have no target. One regenerated historical instruction row has no recoverable source text/line witness and says so explicitly; its bound path, anchor and digest remain unchanged.
+
+**Rationale consistency: 12,889 unit-decision rows across all 90 shards, zero findings; all 714 regenerated rationales exactly reproduce from freshly resolved binding facts.** [Consistency result](step10-round3-rationale-consistency.json). The corpus audit discloses **84 historical source-text witness limits**, none carrying a contextual source-range or byte-equality assertion checked by the legacy audit. This full-corpus population is broader than the four source-witness limits disclosed by the preceding bounded review. The audit checks binding citations/equality and exact regenerated prose; it is not a substantive current-truth certificate. [Rebuild/check command](step10-round3-rationale-rebuild.mjs).
+
+Tests ran red before each new helper behavior and its correction, including stale ranges/anchors, contradictory equality, digest-prefix expansion, heading payloads, inserted links, label changes, historical witnesses, residual references and stale request snapshots. Existing helper function bodies and all native gates/checkers, vocabulary, extractor and baselines are unchanged. New exports have only the author orchestrator/tests as callers. GitNexus MCP tools were unavailable in this session; no graph result is claimed. Prior art was the existing content binder, native extractor, historical reproduction scripts and settled round-3 findings; a `git log -S generateRationale` search found no existing renderer to extend.
+
+## Checks and evidence
+
+- **473/473 tool tests pass**, zero fail/skip/cancel/todo, with `env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work`. Covers all doc tool tests, candidate status, conservation/review, binding/link/rationale helpers, global comparator, liveness and Phase 02 verification. [Test log](step10-round3-tool-tests.log). No full npm-suite claim.
+- **A/B/H pass.** A reads the committed `allowed-paths.json` directly, with no added exceptions; only the eight previously disclosed Lead paths remain, attributed to `bd217ecf1`, `db9fa7608`, `1cc92d7db`. The two helper scripts are allowed by `51cb843b8`/L10-27 and no longer appear as offenders. H/candidate-status: 609 files, 217 checked entries, zero findings/unresolved links. [Checks](step10-round3-checks.json).
+- **I:** frozen baseline bytes unchanged, current reader links equal HEAD. The raw frozen comparison still has the previously disclosed upstream Session Identity route delta; no rebaseline or frozen-I-green claim.
+- **Scoped fast D: zero fatal**, both priors together and each separately. Scoped E remains open: 16 partial carries, 69 pending rows, one identical-owner group, two gaps and 301 reverse candidate units. [D/E](step10-round3-fast-check.json). No global closure claim.
+- **Replay:** all 366 original positions, 98 later edits and four restored link positions match their expected label, destination and cell; zero findings. [Replay](step10-round3-link-replay.json).
+- **Ownership:** zero target digest drift, zero duplicate native platform target identities, zero new active source-pair collisions. All 252 existing many-to-one conservation groups remain enumerated; they are not silently called unique ownership. [Ownership](step10-round3-target-ownership.json).
+- Scope, approval revocation, unchanged decision fields, after-object equality, protected bytes, registry immutability and `git diff --check` pass. [Final audit](step10-round3-final-audit.json), [reproduction](step10-round3-reproduction.json). No legacy source, workspace `.fgos`, authority, configuration or protected artifact is edited.
+
+## Next turn: package this commit
+
+**One native sync**, preserve all identities and reconcile the **eight changed native units** listed in [refresh owed](step10-round3-native-refresh-owed.json), rebind all actual drift, then **one bounded re-review**. Cover changed docs lines, the rationale renderer/orchestrator and tests, **every one of the 714 regenerated rationales** (mechanical re-check against binding plus independent deep sample), every reopened row and all affected native tuples/accounting. Current native proofs predate these doc edits; they must be regenerated in that package, including the accounting depending on the old 61244b0a successor digest.
+
+**Request hygiene:** load every decision from `git show <package-content-commit>:<shard>`; use `reviewEntryFromCommittedRow` for `currentDecision` and every `after` snapshot. Never reuse intermediate `after` objects from edit logs. In particular regenerate anchors-004/010/011 from the committed final rows. No new request or review pack was made here and no producer sample, seed or verdict was selected.
+
+Existing global/A34/Rings/dashboard/group/consumer/cutover/T9/rehearsal/checkpoint/sensitivity/red-team/scorecard/effort obligations remain. No owner-direction execution blocker. MDView MCP is unavailable; a CLI preview would require state outside this assignment’s write scope, so no preview URL is claimed.
+
+---
+
+## Historical package report
+
 # Step 10 native sync and combined bounded re-review ready
 
 Assignment `unit-run-1792094246578-b2fbe39b/producer/1`; Author session `codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16`. **Content / SYNC `345f15d95663260976200be66d1b9a6c648bcd6d`**, comparison input `4a18f35ff5d6a9b7a07e955bd64418282c6a91b2`. This is the packaging turn for the systemic content-author corrections at345f15d95. Runner owns the commit. All workspace writes are inside this plan; docs, source, tests, protected gates/checkers/vocabulary/extractor/baselines and workspace .fgos bytes were not changed. No CLI, git write, producer seed or verdict.

@@ -12,15 +12,21 @@
       "targetAnchor": "unheaded-block-59",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "ADR 0024 context paragraph: code check showing the FSM holding proposed is domain-agnostic; text identical in the candidate 0024 Context. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: 338 chars byte-equal between source and target by script, ancestry differs only by the translated heading (\"0024 Context\"), anchor unheaded-block-59 ok, digest and shard to pack equal, binding unchanged from the reviewed state; text not read line by line",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "4b0aa9f66af44b8646bc59ceecd4cd0ae333b703213d215683c9721a930d8e51",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "11. ADR 0024 Rename Proposed Status To Awaiting-Approval",
         "0024 Context"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_7a2a3390e3beca0100dbfebb57cb6aab",
@@ -29,15 +35,21 @@
       "targetAnchor": "unheaded-block-60",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "ADR 0024 context paragraph: proposed is shared vocabulary between work.status and the outcome fields; text identical, only the surrounding heading levels changed. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: read source and target, 293 chars byte-equal, source sits under \"Bối cảnh\" and target under \"0024 Context\" (translated heading, which is why the exact class is only weak); rationale describes this unit correctly and now says content unchanged; anchor unheaded-block-60 ok, binding unchanged",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "bc40e0a51da3f0b6c1bc1f2d9e080ca9425d47377adf8516d68d3017e61c10d2",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "11. ADR 0024 Rename Proposed Status To Awaiting-Approval",
         "0024 Context"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_69ddf8650201dae7cbe8fe80373c6a7c",
@@ -46,14 +58,20 @@
       "targetAnchor": "0024-decision",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H4 \"Quyết định\" of ADR 0024 is carried as the H3 \"0024 Decision\"; title differs (English, ADR-prefixed), heading-only unit. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: heading unit \"Quyết định\" becomes \"0024 Decision\", every line after the heading line is byte-equal (1025 chars), so only title and level differ as the rationale says; anchor and target digest unchanged from the reviewed binding, shard equals pack",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "83a65ba5e8f913c18138dea769b80eefb0b28529ba97e89546e42575decf9366",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "11. ADR 0024 Rename Proposed Status To Awaiting-Approval"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_5fb4a29b7884b27f3d265612f67e4f31",
@@ -62,15 +80,21 @@
       "targetAnchor": "unheaded-block-61",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "ADR 0024 decision paragraph (rename proposed to awaiting-approval, FSM edges untouched) carried verbatim. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: 452 chars byte-equal between source and target by script, ancestry differs only by the translated heading (\"0024 Decision\"), anchor unheaded-block-61 ok, digest and shard to pack equal, binding unchanged from the reviewed state; text not read line by line",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f0688f3556688d27119ec8c0d5d0d39020787569f9c8191bc9d9a09d49cad8f6",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "11. ADR 0024 Rename Proposed Status To Awaiting-Approval",
         "0024 Decision"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_5eca88140b6e1a8d5c14095b6cb31045",
@@ -79,15 +103,21 @@
       "targetAnchor": "unheaded-block-62",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "ADR 0024 migration paragraph (pre-release exemption, migration script, three stores in scope) carried verbatim. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: 570 chars byte-equal between source and target by script, ancestry differs only by the translated heading (\"0024 Decision\"), anchor unheaded-block-62 ok, digest and shard to pack equal, binding unchanged from the reviewed state; text not read line by line",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e63e9faed67fe666896d680ac13dbc95a8757bf4e5a4fb9a8ac949b89c9144f4",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "11. ADR 0024 Rename Proposed Status To Awaiting-Approval",
         "0024 Decision"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_b1c9fa89736c52b8bff6d5ec328cc553",
@@ -96,14 +126,20 @@
       "targetAnchor": "0024-consequences",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H4 \"Hệ quả\" of ADR 0024 is carried as H3 \"0024 Consequences\"; title differs, heading-only unit. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: heading unit \"Hệ quả\" becomes \"0024 Consequences\", every line after the heading line is byte-equal (887 chars), so only title and level differ as the rationale says; anchor and target digest unchanged from the reviewed binding, shard equals pack",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "1cf238e42a2f95624c1b9839bb786556437785c3f35db1788e9e566cc94bf563",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "11. ADR 0024 Rename Proposed Status To Awaiting-Approval"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_ec3bfee565512c6d032778295c5838c1",
@@ -112,15 +148,21 @@
       "targetAnchor": "unheaded-block-63",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "ADR 0024 consequences list (consumers switch with migration, duplicate-seq finding, 0006 only partly superseded) carried verbatim. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: 818 chars byte-equal between source and target by script, ancestry differs only by the translated heading (\"0024 Consequences\"), anchor unheaded-block-63 ok, digest and shard to pack equal, binding unchanged from the reviewed state; text not read line by line",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "1d55a3e34d5b0515071b018c1d53482d9bf5a55a0c89eceb1dd80d27d32f1ee5",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "11. ADR 0024 Rename Proposed Status To Awaiting-Approval",
         "0024 Consequences"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_82f766f5320ab6bbe5174aeda52e710b",
@@ -129,15 +171,21 @@
       "targetAnchor": "unheaded-block-64",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Closing sentence of ADR 0024 (changing it means a new superseding record); the sentence recurs under other ADRs so the owner is block 64 after 0024 Consequences (found by position, not by first-line match). Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: 66 chars byte-equal between source and target by script, ancestry differs only by the translated heading (\"0024 Consequences\"), anchor unheaded-block-64 ok, digest and shard to pack equal, binding unchanged from the reviewed state; text not read line by line",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "11. ADR 0024 Rename Proposed Status To Awaiting-Approval",
         "0024 Consequences"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_aa3cf298aaa31c6dc9b4c8382434bc9c",
@@ -146,13 +194,19 @@
       "targetAnchor": "12-adr-0027-domain-owns-the-pre-delivered-status-vocabulary",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H3 for ADR 0027 is carried as H2 \"12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary\"; title shortened/translated and level changed. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: heading unit \"0027 — Domain sở hữu vocabulary/transition sta\" becomes \"12. ADR 0027 Domain Owns The Pre-Delivered Status Vo\", the heading has no body text in either file, so only title and level differ as the rationale says; anchor and target digest unchanged from the reviewed binding, shard equals pack",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "6ac1fb5912f4bccdf38301b753d5c1c7d7e4bfc5a152c9f00b156abaaafe7a79",
       "targetAncestry": [
         "Retired Decision History: Work State"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_818a58278988ed797931b14ca91614e2",
@@ -161,14 +215,20 @@
       "targetAnchor": "0027-context",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H4 \"Bối cảnh\" of ADR 0027 is carried as H3 \"0027 Context\"; title differs, heading-only unit. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: heading unit \"Bối cảnh\" becomes \"0027 Context\", every line after the heading line is byte-equal (3212 chars), so only title and level differ as the rationale says; anchor and target digest unchanged from the reviewed binding, shard equals pack",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "452a2ba22e0a3ab3caa9b41add3ce44e9f750f2242c676baf1a0e24e4631a027",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_2d89ae63cbc81e492eb80e9a28174b67",
@@ -177,15 +237,21 @@
       "targetAnchor": "unheaded-block-65",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "ADR 0027 context opening: base-workflow-model does not exist as a file and what was lost; carried verbatim. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: 714 chars byte-equal between source and target by script, ancestry differs only by the translated heading (\"0027 Context\"), anchor unheaded-block-65 ok, digest and shard to pack equal, binding unchanged from the reviewed state; text not read line by line",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f4a426a2b8673dfb37672014bca4267277fc6da03ffcd9103a7962736b64c4a4",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
         "0027 Context"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_a92d8b1ad203c61b04078fa8b94c9b17",
@@ -194,15 +260,21 @@
       "targetAnchor": "unheaded-block-66",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Quoted original rule (RUL35 text from work-state.md) inside ADR 0027 context; carried verbatim as historical text within a decision. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: read source and target, 1144 chars byte-equal, source sits under \"Bối cảnh\" and target under \"0027 Context\" (translated heading, which is why the exact class is only weak); rationale describes this unit correctly and now says content unchanged; anchor unheaded-block-66 ok, binding unchanged",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "9e779d390baf10f4993b0973177117e4316f471f04f463cffc54dd6affbc0197",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
         "0027 Context"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_a3944b679053b61dc2d743795cde3d77",
@@ -211,15 +283,21 @@
       "targetAnchor": "unheaded-block-67",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "ADR 0027 reasons why the original rule was revised (multi-domain schema need); carried verbatim. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: 1349 chars byte-equal between source and target by script, ancestry differs only by the translated heading (\"0027 Context\"), anchor unheaded-block-67 ok, digest and shard to pack equal, binding unchanged from the reviewed state; text not read line by line",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "5e566c132da3b486f17ad15991b3409a28229ac2f48472d4e61c13ab0b31b41a",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
         "0027 Context"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_466331635349f55e32c11e0fcf56d334",
@@ -228,14 +306,20 @@
       "targetAnchor": "0027-decision",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H4 \"Quyết định\" of ADR 0027 is carried as H3 \"0027 Decision\"; title differs, heading-only unit. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: heading unit \"Quyết định\" becomes \"0027 Decision\", every line after the heading line is byte-equal (3148 chars), so only title and level differ as the rationale says; anchor and target digest unchanged from the reviewed binding, shard equals pack",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "3969babe82040ce7d1d34672b372c59d3fd1d3721811bdcbfc19c2f0b0960afc",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_3f65fc24d3eeb760ecc11ff781159152",
@@ -244,15 +328,21 @@
       "targetAnchor": "unheaded-block-68",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "ADR 0027 statement of the exact supersede scope (only the first segment); carried verbatim. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: 228 chars byte-equal between source and target by script, ancestry differs only by the translated heading (\"0027 Decision\"), anchor unheaded-block-68 ok, digest and shard to pack equal, binding unchanged from the reviewed state; text not read line by line",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "1c7ea2fda926300b7351bee9c39ec9314d0d7f3d053ba408667ef2c0d8f4ac0c",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
         "0027 Decision"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_a4a77d7c336663f81a9bc8ac697ab518",
@@ -261,15 +351,21 @@
       "targetAnchor": "unheaded-block-69",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "ADR 0027 list of the six pre-delivered statuses and the tail group; carried verbatim. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: 1193 chars byte-equal between source and target by script, ancestry differs only by the translated heading (\"0027 Decision\"), anchor unheaded-block-69 ok, digest and shard to pack equal, binding unchanged from the reviewed state; text not read line by line",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "46ec1457959a8895465a7d7320215bb4940457e34d39eaeb5ab18a8b637aae01",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
         "0027 Decision"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_a4ed529f5ed4745e1c6bbbb06eb3a4b2",
@@ -278,15 +374,21 @@
       "targetAnchor": "unheaded-block-70",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "ADR 0027 sentence introducing the statusCategory mapping table; carried verbatim. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: read source and target, 185 chars byte-equal, source sits under \"Quyết định\" and target under \"0027 Decision\" (translated heading, which is why the exact class is only weak); rationale describes this unit correctly and now says content unchanged; anchor unheaded-block-70 ok, binding unchanged",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "127c7c7a99d0a8fcab543606c597226d64df9b202cda0911d7cbaa815a363cf4",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
         "0027 Decision"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_f3d9c6dbb704d09c37ab5cfd4f65927e",
@@ -295,15 +397,21 @@
       "targetAnchor": "unheaded-block-71",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "ADR 0027 status-to-statusCategory mapping table; carried verbatim (table markup intact). Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: 225 chars byte-equal between source and target by script, ancestry differs only by the translated heading (\"0027 Decision\"), anchor unheaded-block-71 ok, digest and shard to pack equal, binding unchanged from the reviewed state; text not read line by line",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "7b133e87cfdf8159a9ddd402d8ce2f59f1a286b8bac218807963a8a8bbbf3483",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
         "0027 Decision"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_6c5753df306960b46d20e133a2a36894",
@@ -312,15 +420,21 @@
       "targetAnchor": "unheaded-block-72",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "ADR 0027 paragraph on statusCategory being a proven lossy compression; carried verbatim. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: 620 chars byte-equal between source and target by script, ancestry differs only by the translated heading (\"0027 Decision\"), anchor unheaded-block-72 ok, digest and shard to pack equal, binding unchanged from the reviewed state; text not read line by line",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "6d99060fca9f1fb5602ee7d2ec14775af7aa01b666e2f16ed715219741b651c5",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
         "0027 Decision"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_1d98a4a5c3391d5318f53153b3f5f442",
@@ -329,15 +443,21 @@
       "targetAnchor": "unheaded-block-73",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "ADR 0027 paragraph that the four tail statuses need no statusCategory; carried verbatim. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: 169 chars byte-equal between source and target by script, ancestry differs only by the translated heading (\"0027 Decision\"), anchor unheaded-block-73 ok, digest and shard to pack equal, binding unchanged from the reviewed state; text not read line by line",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "7c211b5505c4924dd9c23a68d64ab36658204db5c7e536e15eceea988ef445f7",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
         "0027 Decision"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_546450931dd47024138ce0a32699cd72",
@@ -346,15 +466,21 @@
       "targetAnchor": "unheaded-block-74",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "ADR 0027 out-of-scope list of the supersede; carried verbatim. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: 515 chars byte-equal between source and target by script, ancestry differs only by the translated heading (\"0027 Decision\"), anchor unheaded-block-74 ok, digest and shard to pack equal, binding unchanged from the reviewed state; text not read line by line",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "31a4c4ddccf1d5d56990ceba0e49bc09638561de5ffb5300c3fd73cab4f933fe",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
         "0027 Decision"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_0da8b597cb243173df9f5eb46a34ec76",
@@ -363,14 +489,20 @@
       "targetAnchor": "0027-consumer-audit",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H4 \"Audit: mọi consumer thật ...\" is carried as H3 \"0027 Consumer Audit\"; title shortened and translated. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: heading unit \"Audit: mọi consumer thật của `status-fsm.mjs`/\" becomes \"0027 Consumer Audit\", every line after the heading line is byte-equal (733 chars), so only title and level differ as the rationale says; anchor and target digest unchanged from the reviewed binding, shard equals pack",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e8596bf17b33258ee768e967da03d9efeddd19149ecdbccf1510cc7bdf3ec674",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_0cabbd5a6b95edeb9aab6832ad276c50",
@@ -379,15 +511,21 @@
       "targetAnchor": "unheaded-block-75",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "ADR 0027 audit method paragraph (rg scan of STATUSES/TRANSITIONS) carried verbatim. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: read source and target, 732 chars byte-equal, source sits under \"Audit: mọi consumer thật của `stat\" and target under \"0027 Consumer Audit\" (translated heading, which is why the exact class is only weak); rationale describes this unit correctly and now says content unchanged; anchor unheaded-block-75 ok, binding unchanged",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "c2f2baeae1bc366d51a16dbf1b083a2add5cacd51c1bf7c3ea6d3f91c5190d11",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
         "0027 Consumer Audit"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_7889671f1f2783b634ef6d90a251f3e9",
@@ -396,15 +534,21 @@
       "targetAnchor": "0027-audit-1-status-source-of-truth",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H5 \"1. Nguồn sự thật\" is carried as H4 \"0027 Audit 1 Status Source Of Truth\"; title and level changed. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: heading unit \"1. Nguồn sự thật (định nghĩa STATUSES/TRANSITI\" becomes \"0027 Audit 1 Status Source Of Truth\", every line after the heading line is byte-equal (1116 chars), so only title and level differ as the rationale says; anchor and target digest unchanged from the reviewed binding, shard equals pack",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "50248a7774c2a4f3faf5bf48e42047130dd788a8ab92dc278a4c66bf17a2654a",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
         "0027 Consumer Audit"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_fc0f124b5b1368034455207d6378bc00",
@@ -413,16 +557,22 @@
       "targetAnchor": "unheaded-block-76",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Audit 1 table (status source-of-truth file:line, role, changed?) carried verbatim into block 76 under Audit 1; the shared first-line suggestion was checked against the Audit 1 position. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: read source and target, 1115 chars byte-equal, source sits under \"1. Nguồn sự thật (định nghĩa STATU\" and target under \"0027 Audit 1 Status Source Of Trut\" (translated heading, which is why the exact class is only weak); rationale describes this unit correctly and now says content unchanged; anchor unheaded-block-76 ok, binding unchanged",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "bdee4fb8f864c64bb1ccdda044960818cc6bfae1e87d8ac8da077bbb8fb4a757",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
         "0027 Consumer Audit",
         "0027 Audit 1 Status Source Of Truth"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_c0adce3f717a031d4159eee6dd0aaaa1",
@@ -431,15 +581,21 @@
       "targetAnchor": "0027-audit-2-resolved-statuses-set",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H5 \"2. RESOLVED_STATUSES\" is carried as H4 \"0027 Audit 2 Resolved Statuses Set\"; title and level changed. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: heading unit \"2. `RESOLVED_STATUSES` (tập \"giống category\" v\" becomes \"0027 Audit 2 Resolved Statuses Set\", every line after the heading line is byte-equal (2412 chars), so only title and level differ as the rationale says; anchor and target digest unchanged from the reviewed binding, shard equals pack",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "a4b78ba726bd39959cca89e81fa9d1bd269cf16807d014204b9427573cde9dea",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
         "0027 Consumer Audit"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_d97ba7f5ff310af83839fea58329acdd",
@@ -448,16 +604,22 @@
       "targetAnchor": "unheaded-block-77",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Audit 2 paragraph on RESOLVED_STATUSES in frontier.mjs; carried verbatim. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: 506 chars byte-equal between source and target by script, ancestry differs only by the translated heading (\"0027 Audit 2 Resolved Statuses\"), anchor unheaded-block-77 ok, digest and shard to pack equal, binding unchanged from the reviewed state; text not read line by line",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "827c7ac395f16aea73f4b6cb168d3876cf6a02ba54e137c27768654b4b04a7e4",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
         "0027 Consumer Audit",
         "0027 Audit 2 Resolved Statuses Set"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_84950cfff9d75392b847739c4812768a",
@@ -466,16 +628,22 @@
       "targetAnchor": "unheaded-block-78",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Audit 2 table of RESOLVED_STATUSES consumers; carried verbatim into block 78 (the located suggestion of block 76 was a first-line collision, the whole-text match is block 78). Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: read source and target, 1903 chars byte-equal, source sits under \"2. `RESOLVED_STATUSES` (tập \"giống\" and target under \"0027 Audit 2 Resolved Statuses Set\" (translated heading, which is why the exact class is only weak); rationale describes this unit correctly and now says content unchanged; anchor unheaded-block-78 ok, binding unchanged",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "4e6cda4b133d000a59389f9baa14d539c3dbc65fce54bbade31697dbdd6f33f6",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
         "0027 Consumer Audit",
         "0027 Audit 2 Resolved Statuses Set"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_ebfe14fc1ae59246f7b3c8871b402520",
@@ -484,15 +652,21 @@
       "targetAnchor": "0027-audit-3-cli-status-literals",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H5 \"3. Literal status trong verb logic\" is carried as H4 \"0027 Audit 3 CLI Status Literals\"; title and level changed. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: heading unit \"3. Literal status trong verb logic của `bin/fg\" becomes \"0027 Audit 3 CLI Status Literals\", every line after the heading line is byte-equal (2558 chars), so only title and level differ as the rationale says; anchor and target digest unchanged from the reviewed binding, shard equals pack",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f921d3b97d03d68d8e8ea0e0722b18935ef9d37b362a0ce7e23b40b04aea8d27",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
         "0027 Consumer Audit"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_72ee6b558f807216affeb2559c6a597d",
@@ -501,16 +675,22 @@
       "targetAnchor": "unheaded-block-79",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Audit 3 table of CLI status literals; carried verbatim. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: 2557 chars byte-equal between source and target by script, ancestry differs only by the translated heading (\"0027 Audit 3 CLI Status Litera\"), anchor unheaded-block-79 ok, digest and shard to pack equal, binding unchanged from the reviewed state; text not read line by line",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "707bfd13096596cdaacead82be5204686f47f824c3a3323cbb5bed21ebcceb95",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
         "0027 Consumer Audit",
         "0027 Audit 3 CLI Status Literals"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_6a85836cdc08fbdfde62f6d3fd9c2d8f",
@@ -519,15 +699,21 @@
       "targetAnchor": "0027-audit-4-runner-consumers",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H5 \"4. runner/ ...\" is carried as H4 \"0027 Audit 4 Runner Consumers\"; title and level changed. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: heading unit \"4. `runner/` — vòng tự hành, tiêu thụ nặng nhó\" becomes \"0027 Audit 4 Runner Consumers\", every line after the heading line is byte-equal (1654 chars), so only title and level differ as the rationale says; anchor and target digest unchanged from the reviewed binding, shard equals pack",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "cab0851daca0bf6a441036d7b9e02d4f16af9a41b78fd56f251727b173b51e5d",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
         "0027 Consumer Audit"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_4fceb5ca59ea256ccd77c0975d3576e1",
@@ -536,16 +722,22 @@
       "targetAnchor": "unheaded-block-80",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Audit 4 runner table; carried verbatim into block 80 (the located suggestion of block 76 was a first-line collision, whole-text match is block 80). Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: 1653 chars byte-equal between source and target by script, ancestry differs only by the translated heading (\"0027 Audit 4 Runner Consumers\"), anchor unheaded-block-80 ok, digest and shard to pack equal, binding unchanged from the reviewed state; text not read line by line",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "78c3de3f1ca205dedc7323091a92d4c1fcfff8e99132b37291aa46035cd75a20",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
         "0027 Consumer Audit",
         "0027 Audit 4 Runner Consumers"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_f1507b5008c678f9474202706e018774",
@@ -554,15 +746,21 @@
       "targetAnchor": "0027-audit-5-other-domain-agnostic-mechanisms",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H5 \"5. Cơ chế domain-agnostic khác\" is carried as H4 \"0027 Audit 5 Other Domain-Agnostic Mechanisms\"; title and level changed. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: heading unit \"5. Cơ chế domain-agnostic khác (được DISCUSSIO\" becomes \"0027 Audit 5 Other Domain-Agnostic Mechanisms\", every line after the heading line is byte-equal (1694 chars), so only title and level differ as the rationale says; anchor and target digest unchanged from the reviewed binding, shard equals pack",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "42d14b107b6ba2a390f6c7881ba8471c91817a24674e7eae6f05ff917d296692",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
         "0027 Consumer Audit"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_042b85c001dab92b6ae561f89eac6337",
@@ -571,16 +769,22 @@
       "targetAnchor": "unheaded-block-81",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Audit 5 table of other domain-agnostic mechanisms; carried verbatim into block 81 (located suggestion block 76 was a first-line collision). Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: 1693 chars byte-equal between source and target by script, ancestry differs only by the translated heading (\"0027 Audit 5 Other Domain-Agno\"), anchor unheaded-block-81 ok, digest and shard to pack equal, binding unchanged from the reviewed state; text not read line by line",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "fa83039437009e5f88a38c2bc19014eb481d33e6f82c491aeee4e2b226bf5e6a",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
         "0027 Consumer Audit",
         "0027 Audit 5 Other Domain-Agnostic Mechanisms"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_3fbb7ac76d27f06cc8e095a1d0e6b88e",
@@ -589,15 +793,21 @@
       "targetAnchor": "0027-audit-6-adjacent-gaps",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H5 \"6. Gap liên quan ...\" is carried as H4 \"0027 Audit 6 Adjacent Gaps\"; title and level changed. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: heading unit \"6. Gap liên quan nhưng KHÔNG phải phạm vi audi\" becomes \"0027 Audit 6 Adjacent Gaps\", every line after the heading line is byte-equal (354 chars), so only title and level differ as the rationale says; anchor and target digest unchanged from the reviewed binding, shard equals pack",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "379c5e08a01f354caaa42087399545a3e49c45edece199864baa00f02e0a7bbc",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
         "0027 Consumer Audit"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_c5f9a98133b0fd6692dd0c7555d775e1",
@@ -606,16 +816,22 @@
       "targetAnchor": "unheaded-block-82",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Audit 6 note that fgos-coding-compounding is called hard for every retrospective item; carried verbatim. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: 353 chars byte-equal between source and target by script, ancestry differs only by the translated heading (\"0027 Audit 6 Adjacent Gaps\"), anchor unheaded-block-82 ok, digest and shard to pack equal, binding unchanged from the reviewed state; text not read line by line",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "d398e694ec2837bbe5052cfea277526dd887042f9bcc401bea01cd63b3d42971",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
         "0027 Consumer Audit",
         "0027 Audit 6 Adjacent Gaps"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_e2d3709ee991f35ec6153e7e84c46e2f",
@@ -624,14 +840,20 @@
       "targetAnchor": "0027-consequences",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H4 \"Hệ quả\" of ADR 0027 is carried as H3 \"0027 Consequences\"; title differs, heading-only unit. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: heading unit \"Hệ quả\" becomes \"0027 Consequences\", every line after the heading line is byte-equal (1948 chars), so only title and level differ as the rationale says; anchor and target digest unchanged from the reviewed binding, shard equals pack",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "7729270993aaa029e4ceb8b64300670303de6930bf6412bd3c8097b7dac134ba",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_8eeec687713e79da23a9339df1179b60",
@@ -640,15 +862,21 @@
       "targetAnchor": "unheaded-block-83",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "ADR 0027 consequences list (precondition for the multi-domain schema work and follow-ups); carried verbatim. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: 1947 chars byte-equal between source and target by script, ancestry differs only by the translated heading (\"0027 Consequences\"), anchor unheaded-block-83 ok, digest and shard to pack equal, binding unchanged from the reviewed state; text not read line by line",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e12e5b17bd0afd2f30ca5edac6ad58cfea0a5dce8eab8429d40b6eb688a3eba0",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary",
         "0027 Consequences"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_217bf9908c0941c13b1eaf2f7a2d9d64",
@@ -657,13 +885,19 @@
       "targetAnchor": "13-adr-0032-multi-role-team-harness",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H3 \"0032 — Multi-role Team Harness: trục role/holder ...\" is carried as H2 \"13. ADR 0032 Multi-Role Team Harness\"; title shortened and translated. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: heading unit \"0032 — Multi-role Team Harness: trục role/hold\" becomes \"13. ADR 0032 Multi-Role Team Harness\", every line after the heading line is byte-equal (652 chars), so only title and level differ as the rationale says; anchor and target digest unchanged from the reviewed binding, shard equals pack",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "adc471524e7f457d3d74097885286fe95536a2bcb0db955d80faa15452aad116",
       "targetAncestry": [
         "Retired Decision History: Work State"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_63db75c2d22d1861c69845d62518ee60",
@@ -672,14 +906,20 @@
       "targetAnchor": "unheaded-block-84",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Distill-evidence blockquote opening ADR 0032 (24 discussion rounds, 2026-08-15); carried verbatim under the 0032 H2. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: 651 chars byte-equal between source and target by script, ancestry differs only by the translated heading (\"13. ADR 0032 Multi-Role Team H\"), anchor unheaded-block-84 ok, digest and shard to pack equal, binding unchanged from the reviewed state; text not read line by line",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "6f54e9c73c49cc06bd93ba1401ddb0bdefda6e4c89e62bfc55be6fd092514bb6",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "13. ADR 0032 Multi-Role Team Harness"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_e6ae96517c239248948c36255ae4dcac",
@@ -688,13 +928,19 @@
       "targetAnchor": "2-distill-journey",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H4 \"Hành trình\" is carried as H2 \"2. Distill Journey\" in the history document, not in the decision record; title differs. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: heading unit \"Hành trình\" becomes \"2. Distill Journey\", every line after the heading line is byte-equal (448 chars), so only title and level differ as the rationale says; anchor and target digest unchanged from the reviewed binding, shard equals pack",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "8cb65c5075a2a4c13e78b4300f757cfeb334104a6783d6f9c1e6c60f44515274",
       "targetAncestry": [
         "Multi-Role Harness Distill Record"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_634d509e158ed8fc22f610e4c51030ba",
@@ -703,14 +949,20 @@
       "targetAnchor": "unheaded-block-3",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Dated distill-journey narrative (comparison request and the scouting rounds); carried verbatim into the history document, classified historical-context rather than decision. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: 447 chars byte-equal between source and target by script, ancestry differs only by the translated heading (\"2. Distill Journey\"), anchor unheaded-block-3 ok, digest and shard to pack equal, binding unchanged from the reviewed state; text not read line by line",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "9f9c5aa1e0bc5a1c034b9356fe0d0dc2f659f3bb7202679d3db53ba250b1b5eb",
       "targetAncestry": [
         "Multi-Role Harness Distill Record",
         "2. Distill Journey"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_7e0016df70b7640b0337c5daf5f80e90",
@@ -719,14 +971,20 @@
       "targetAnchor": "0032-foundation-architecture",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H4 \"I. Kiến trúc nền (seq ...)\" is carried as H3 \"0032 Foundation Architecture\"; title translated and seq references dropped. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: heading unit \"I. Kiến trúc nền (seq 18029, 18031)\" becomes \"0032 Foundation Architecture\", every line after the heading line is byte-equal (747 chars), so only title and level differ as the rationale says; anchor and target digest unchanged from the reviewed binding, shard equals pack",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "43773d8a795297806063bf0a0df747a426a048d010c7835e6a4c364f948e25e9",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "13. ADR 0032 Multi-Role Team Harness"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_a9be2da803446c73efbfcac40ee82637",
@@ -735,15 +993,21 @@
       "targetAnchor": "unheaded-block-85",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "ADR 0032 foundation list (mechanism vs policy and related axes); carried verbatim. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: 746 chars byte-equal between source and target by script, ancestry differs only by the translated heading (\"0032 Foundation Architecture\"), anchor unheaded-block-85 ok, digest and shard to pack equal, binding unchanged from the reviewed state; text not read line by line",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2a1722766193d70b5f41165f820655b64f3c7ce5a79b105d57af313ff03ffe9e",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "13. ADR 0032 Multi-Role Team Harness",
         "0032 Foundation Architecture"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_f30f58465c33adf6343057d6c3fcb2b3",
@@ -752,14 +1016,20 @@
       "targetAnchor": "0032-handoff",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H4 \"II. Handoff ...\" is carried as H3 \"0032 Handoff\"; title shortened and seq references dropped. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: heading unit \"II. Handoff — trái tim của tính uyển chuyển (s\" becomes \"0032 Handoff\", every line after the heading line is byte-equal (1252 chars), so only title and level differ as the rationale says; anchor and target digest unchanged from the reviewed binding, shard equals pack",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "6b297c17245b7ff04f30f0e8abc72bbb41907953c204d3469f8896771b5e88e0",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "13. ADR 0032 Multi-Role Team Harness"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_6f7a10c04ee1414d39b0b2ef8d7d2d6d",
@@ -768,15 +1038,21 @@
       "targetAnchor": "unheaded-block-86",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "ADR 0032 handoff list (Call vs hand-off kinds and rules); carried verbatim. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: 1251 chars byte-equal between source and target by script, ancestry differs only by the translated heading (\"0032 Handoff\"), anchor unheaded-block-86 ok, digest and shard to pack equal, binding unchanged from the reviewed state; text not read line by line",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "dce677680de09c58dce4e54b16850671db81f3e54202b29d8adc8e9c2f358bae",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "13. ADR 0032 Multi-Role Team Harness",
         "0032 Handoff"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_45840c035132a9c46aa748567ae37648",
@@ -785,14 +1061,20 @@
       "targetAnchor": "0032-declarative-structure",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H4 \"III. Cấu trúc khai báo ...\" is carried as H3 \"0032 Declarative Structure\"; title translated and seq references dropped. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: heading unit \"III. Cấu trúc khai báo (seq 18059, 18060, 1811\" becomes \"0032 Declarative Structure\", every line after the heading line is byte-equal (4695 chars), so only title and level differ as the rationale says; anchor and target digest unchanged from the reviewed binding, shard equals pack",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "f13c8f30093babf6efcf6b2fbb0062eecfe81a6db5527e400d33b8c3167a4cc5",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "13. ADR 0032 Multi-Role Team Harness"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_10986602d5cab816cf923616dc6b58f8",
@@ -801,15 +1083,21 @@
       "targetAnchor": "unheaded-block-87",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Long ADR 0032 declarative-structure list (hierarchy domain, workflow, item and the declared structures); 66 lines carried verbatim as one block. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: 4694 chars byte-equal between source and target by script, ancestry differs only by the translated heading (\"0032 Declarative Structure\"), anchor unheaded-block-87 ok, digest and shard to pack equal, binding unchanged from the reviewed state; text not read line by line",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "7dfb88e6ee480189beccd2e878bedb9e493d9bad07a27830301fddd053040d70",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "13. ADR 0032 Multi-Role Team Harness",
         "0032 Declarative Structure"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_7baf6e6911d7bdc8cbb66425d0aff57a",
@@ -818,14 +1106,20 @@
       "targetAnchor": "0032-implementation-sequence",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H4 \"IV. Trình tự triển khai (seq 18030)\" is carried as H3 \"0032 Implementation Sequence\"; title translated. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: heading unit \"IV. Trình tự triển khai (seq 18030)\" becomes \"0032 Implementation Sequence\", every line after the heading line is byte-equal (667 chars), so only title and level differ as the rationale says; anchor and target digest unchanged from the reviewed binding, shard equals pack",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "861c399f16053144093e08b8bf68e573b9afa26758d326b719c0bb5ddcd0d88f",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "13. ADR 0032 Multi-Role Team Harness"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_2e0270967476b583f5548c2d0632c6f7",
@@ -834,15 +1128,21 @@
       "targetAnchor": "unheaded-block-88",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "ADR 0032 statement that coding goes first (user decision reversing the proposal); carried verbatim. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: read source and target, 188 chars byte-equal, source sits under \"IV. Trình tự triển khai (seq 18030\" and target under \"0032 Implementation Sequence\" (translated heading, which is why the exact class is only weak); rationale describes this unit correctly and now says content unchanged; anchor unheaded-block-88 ok, binding unchanged",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "4b806f05cc974fa81ae9b0ebd50789a568fb41a274c5ffb11865accbfb2ef9cd",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "13. ADR 0032 Multi-Role Team Harness",
         "0032 Implementation Sequence"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_b7d1849e7cde5d799b984dbf0ea3bcff",
@@ -851,15 +1151,21 @@
       "targetAnchor": "unheaded-block-89",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "ADR 0032 table of reason versus existing implicit interaction; carried verbatim. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: 264 chars byte-equal between source and target by script, ancestry differs only by the translated heading (\"0032 Implementation Sequence\"), anchor unheaded-block-89 ok, digest and shard to pack equal, binding unchanged from the reviewed state; text not read line by line",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "d6ebd90319d8f7c2c586f0790b3649a8f9bad951d61aa6918d0aa40c7918483a",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "13. ADR 0032 Multi-Role Team Harness",
         "0032 Implementation Sequence"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_fd3c6c93c220012e1e08d65c9276ab24",
@@ -868,15 +1174,21 @@
       "targetAnchor": "unheaded-block-90",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "ADR 0032 ordering sentence for the three delivery pieces; carried verbatim. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: 210 chars byte-equal between source and target by script, ancestry differs only by the translated heading (\"0032 Implementation Sequence\"), anchor unheaded-block-90 ok, digest and shard to pack equal, binding unchanged from the reviewed state; text not read line by line",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "a53db20b6d5f1c2bd15b3fee81feaa4d33c20ab74c964495d03a27b1fddc30a2",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "13. ADR 0032 Multi-Role Team Harness",
         "0032 Implementation Sequence"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_963bf3272df983c42aead0351a429ce4",
@@ -885,14 +1197,20 @@
       "targetAnchor": "0032-marketing-cockpit-comparison-conclusion",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H4 \"V. Kết luận so sánh marketing-cockpit ...\" is carried as H3 \"0032 Marketing Cockpit Comparison Conclusion\"; title translated. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: heading unit \"V. Kết luận so sánh marketing-cockpit (vòng fa\" becomes \"0032 Marketing Cockpit Comparison Conclusion\", every line after the heading line is byte-equal (1203 chars), so only title and level differ as the rationale says; anchor and target digest unchanged from the reviewed binding, shard equals pack",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "8a71adf68dd932df92f4e48b38dabd720531a798392f3d046c521c0cfb7ef4b7",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "13. ADR 0032 Multi-Role Team Harness"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_68304d9e3c8f531fd5dcc25392c6d072",
@@ -901,15 +1219,21 @@
       "targetAnchor": "unheaded-block-91",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "ADR 0032 list of what is taken from the cockpit into fgOS; carried verbatim. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: read source and target, 465 chars byte-equal, source sits under \"V. Kết luận so sánh marketing-cock\" and target under \"0032 Marketing Cockpit Comparison \" (translated heading, which is why the exact class is only weak); rationale describes this unit correctly and now says content unchanged; anchor unheaded-block-91 ok, binding unchanged",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "6bfb192eaa61ff2f393e5621a2ccb051f67179a9627e65c6d6fdb53ceb54fe51",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "13. ADR 0032 Multi-Role Team Harness",
         "0032 Marketing Cockpit Comparison Conclusion"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_8d8de83dcecd115c8b517cbf12d08795",
@@ -918,15 +1242,21 @@
       "targetAnchor": "unheaded-block-92",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "ADR 0032 four-way split port rule for a cockpit task yaml; carried verbatim. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: 179 chars byte-equal between source and target by script, ancestry differs only by the translated heading (\"0032 Marketing Cockpit Compari\"), anchor unheaded-block-92 ok, digest and shard to pack equal, binding unchanged from the reviewed state; text not read line by line",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "a0a6b146892e904d63cafd64b0a130c3c392e0a199fea7a9929b0f2006f7011d",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "13. ADR 0032 Multi-Role Team Harness",
         "0032 Marketing Cockpit Comparison Conclusion"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_331e9d0a3a7f29b20ec75ed8981f7fb7",
@@ -935,15 +1265,21 @@
       "targetAnchor": "unheaded-block-93",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "ADR 0032 list of what the cockpit drops on entry; carried verbatim. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: read source and target, 554 chars byte-equal, source sits under \"V. Kết luận so sánh marketing-cock\" and target under \"0032 Marketing Cockpit Comparison \" (translated heading, which is why the exact class is only weak); rationale describes this unit correctly and now says content unchanged; anchor unheaded-block-93 ok, binding unchanged",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "b18e4845b71df780025ec4c6b82b4551cf5916138dff3b17f3153700677909e5",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "13. ADR 0032 Multi-Role Team Harness",
         "0032 Marketing Cockpit Comparison Conclusion"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_c696887f984b8248a620d445d341cf0b",
@@ -952,14 +1288,20 @@
       "targetAnchor": "0032-deliberately-deferred-questions",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H4 \"VI. Treo có chủ đích (không phải quên)\" is carried as H3 \"0032 Deliberately Deferred Questions\"; title translated. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: heading unit \"VI. Treo có chủ đích (không phải quên)\" becomes \"0032 Deliberately Deferred Questions\", every line after the heading line is byte-equal (647 chars), so only title and level differ as the rationale says; anchor and target digest unchanged from the reviewed binding, shard equals pack",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "c71143d4c041f9d8943b66c9a1138bf3ce8e6f108c19234f9872579dc9eca773",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "13. ADR 0032 Multi-Role Team Harness"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_092f7d288e8617bb3b8abff586e988f8",
@@ -968,15 +1310,21 @@
       "targetAnchor": "unheaded-block-94",
       "claimKind": "decision",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "ADR 0032 numbered list of deliberately deferred questions; carried verbatim. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: 646 chars byte-equal between source and target by script, ancestry differs only by the translated heading (\"0032 Deliberately Deferred Que\"), anchor unheaded-block-94 ok, digest and shard to pack equal, binding unchanged from the reviewed state; text not read line by line",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "2431462c129b13b99afc3b1e18061c825932a166ce50c26248dca7ce2905f946",
       "targetAncestry": [
         "Retired Decision History: Work State",
         "13. ADR 0032 Multi-Role Team Harness",
         "0032 Deliberately Deferred Questions"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_cf9060b6664b21d6e5fac0b31aac0ff6",
@@ -985,13 +1333,19 @@
       "targetAnchor": "3-state-at-distill-time",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H4 \"VII. Trạng thái tại thời điểm distill (2026-08-15)\" is carried as H2 \"3. State At Distill Time\" in the history document; dated snapshot, title differs. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: heading unit \"VII. Trạng thái tại thời điểm distill (2026-08\" becomes \"3. State At Distill Time\", every line after the heading line is byte-equal (898 chars), so only title and level differ as the rationale says; anchor and target digest unchanged from the reviewed binding, shard equals pack",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "dda4c28cba5f1a13d782c50c996bc50d5848d6d8172ecb38066a23e8e1c19023",
       "targetAncestry": [
         "Multi-Role Harness Distill Record"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_be0cd74b4a0bd4c5860e9116aa8dd6c6",
@@ -1000,14 +1354,20 @@
       "targetAnchor": "unheaded-block-4",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Dated state-at-distill list (validating finished, reality gate 6/6); carried verbatim into the history document as historical-context. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: read source and target, 897 chars byte-equal, source sits under \"VII. Trạng thái tại thời điểm dist\" and target under \"3. State At Distill Time\" (translated heading, which is why the exact class is only weak); rationale describes this unit correctly and now says content unchanged; anchor unheaded-block-4 ok, binding unchanged",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "09bb0ef5d78c9357cc67cc5622d215a494f8bcc8948a9b11a6287dd110b2fce9",
       "targetAncestry": [
         "Multi-Role Harness Distill Record",
         "3. State At Distill Time"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_581643ec8243af5744e04c222f13c214",
@@ -1016,13 +1376,19 @@
       "targetAnchor": "4-implementation-review-and-verification-after-distill",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Source H4 \"VIII. Sau distill ...\" is carried as H2 \"4. Implementation Review And Verification After Distill\"; dated section, title translated. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: heading unit \"VIII. Sau distill — implement, review độc lập,\" becomes \"4. Implementation Review And Verification After Dist\", every line after the heading line is byte-equal (2379 chars), so only title and level differ as the rationale says; anchor and target digest unchanged from the reviewed binding, shard equals pack",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "a88add6a18b0023671d9f83c9261dfd52d1440fd05936db3be3acd430adb0b11",
       "targetAncestry": [
         "Multi-Role Harness Distill Record"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_690988881136792349476d55b83bd81d",
@@ -1031,14 +1397,20 @@
       "targetAnchor": "unheaded-block-5",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Note that this section was not in the original distill and was added when copying to docs/decisions; carried verbatim. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "deep: read source and target, 299 chars byte-equal, source sits under \"VIII. Sau distill — implement, rev\" and target under \"4. Implementation Review And Verif\" (translated heading, which is why the exact class is only weak); rationale describes this unit correctly and now says content unchanged; anchor unheaded-block-5 ok, binding unchanged",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "721cb9fe837087d22e83ba6ac1761a6cf9c628a88e0445f49dd1bd26943a8ec9",
       "targetAncestry": [
         "Multi-Role Harness Distill Record",
         "4. Implementation Review And Verification After Distill"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_e24e9588d1d0d0ec87a1a90db87e62b9",
@@ -1047,14 +1419,20 @@
       "targetAnchor": "unheaded-block-6",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Paragraph on the three pieces implemented, tested, self-reviewed and committed sequentially; carried verbatim. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: 185 chars byte-equal between source and target by script, ancestry differs only by the translated heading (\"4. Implementation Review And V\"), anchor unheaded-block-6 ok, digest and shard to pack equal, binding unchanged from the reviewed state; text not read line by line",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "42f0a4f36be3f8722adbd5bc7066fc539bd31e67484940ec1c0e7f3c6a0d7cb8",
       "targetAncestry": [
         "Multi-Role Harness Distill Record",
         "4. Implementation Review And Verification After Distill"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_6866da75d153e251a298ec889e5e67f8",
@@ -1063,14 +1441,20 @@
       "targetAnchor": "unheaded-block-7",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Long post-distill list (real handoff wiring, independent review, real verify); 22 lines carried verbatim. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: 1485 chars byte-equal between source and target by script, ancestry differs only by the translated heading (\"4. Implementation Review And V\"), anchor unheaded-block-7 ok, digest and shard to pack equal, binding unchanged from the reviewed state; text not read line by line",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "0ce476ffc3451d8e11c1e2c4c802eb70edf96b3e83627708fa309fbfba167bde",
       "targetAncestry": [
         "Multi-Role Harness Distill Record",
         "4. Implementation Review And Verification After Distill"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     },
     {
       "claimId": "claim_48a16587298cde876c7142378489c618",
@@ -1079,14 +1463,20 @@
       "targetAnchor": "unheaded-block-8",
       "claimKind": "historical-context",
       "disposition": "promote",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "rationale": "Closing lesson paragraph of the post-distill section (unit/integration tests prove engine, not real run); carried verbatim. Target digest expanded to full SHA256; source and target content are unchanged.",
       "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "reviewNote": "mechanical: 403 chars byte-equal between source and target by script, ancestry differs only by the translated heading (\"4. Implementation Review And V\"), anchor unheaded-block-8 ok, digest and shard to pack equal, binding unchanged from the reviewed state; text not read line by line",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "71b2516db6bbf541250e88bbb627868772f01e932ba697f12b1bafa46adc00fc",
       "targetAncestry": [
         "Multi-Role Harness Distill Record",
         "4. Implementation Review And Verification After Distill"
-      ]
+      ],
+      "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
     }
   ],
   "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16"

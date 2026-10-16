@@ -1,0 +1,32 @@
+✔ rationale is rebuilt from bound facts without appending false old text (1.256578ms)
+✔ full unit digest decides equality, including heading section payload (0.64323ms)
+✔ last review comparison accepts digest prefix expansion and reports changes (0.177772ms)
+✔ link count distinguishes actual destination changes from spelling rebases (0.141259ms)
+✔ consistency flags changed ranges, anchors, equality and reviewed digest assertions (0.19775ms)
+✔ historical witness and no-target retain do not invent current source ranges (0.112172ms)
+✔ missing or mismatched binding evidence fails rather than inventing facts (0.302161ms)
+✔ legacy consistency checks contextual ranges, anchors and equality without mistaking header citations for bound spans (1.832016ms)
+✔ legacy audit understands unicode anchors, same-file successors and explicitly quoted prior rationales (0.326305ms)
+✖ unavailable historical text remains an explicit witness limit without invented line numbers (0.220402ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 9
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 47.735249
+
+✖ failing tests:
+
+test at test/scripts/doc-rationale.test.mjs:55:1
+✖ unavailable historical text remains an explicit witness limit without invented line numbers (0.220402ms)
+  Error: Missing authenticated source binding facts
+      at generateBindingRationale (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/scripts/doc-binding-repair.mjs:62:56)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale.test.mjs:57:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7)

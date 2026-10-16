@@ -8181,20 +8181,14 @@
       "targetAnchor": "unheaded-block-8",
       "claimKind": "procedure",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/playbooks/architecture-advisory-artifact-templates.md#unheaded-block-3 is retained in docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md#unheaded-block-6. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "reviewNote": "LEG:playbooks/architecture-advisory-artifact-templates.md#unheaded-block-3 -> PLAT:playbooks/architecture-advisory-artifact-templates.md#unheaded-block-6: Remaining rows carry units into current sections judged ok (header, 3, no-build, 8, 19) with equal digests.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-01.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "rationale": "Source: docs/architect/agent-coordination/playbooks/architecture-advisory-artifact-templates.md:15-15#unheaded-block-3 (current lines); unit SHA256 616f7bcd284487bf2f6bfdd351d091a8483121aa5b77c8da065ca921bee43c75.\nTarget: docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md:52-52#unheaded-block-8 (current lines); unit SHA256 616f7bcd284487bf2f6bfdd351d091a8483121aa5b77c8da065ca921bee43c75.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 616f7bcd284487bf2f6bfdd351d091a8483121aa5b77c8da065ca921bee43c75 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/playbooks/architecture-advisory-artifact-templates.md#unheaded-block-3 under docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md#unheaded-block-8; source context \"Architecture Advisory Artifact Templates / What These Templates Are For\", target context \"Architecture Advisory Artifact Templates / What These Templates Are For\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "616f7bcd284487bf2f6bfdd351d091a8483121aa5b77c8da065ca921bee43c75",
       "targetAncestry": [
         "Architecture Advisory Artifact Templates",
         "What These Templates Are For"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_59e01aade327d2028a65e150e838579c",

@@ -1,0 +1,13 @@
+✔ STR pattern against STR1..STR59-shaped tokens returns 60 (1.051403ms)
+✔ RUL pattern against RUL1..RUL45 returns 46 (0.136675ms)
+✔ ADR pattern against leading-zero ADR0001..ADR0015 returns 16, not corrupted by leading zeros (0.114634ms)
+✔ a string with zero matches returns 1 (0.073466ms)
+✔ CLI --file/--pattern invocation prints the next free id for a real fixture file (21.408208ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 65.156221

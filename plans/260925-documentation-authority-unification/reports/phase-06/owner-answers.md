@@ -301,3 +301,15 @@ Source: assignment unit-run-1792093168554-f28af963/producer/1, based on committe
 - L10-18b: link relationship labels are per cell/per link label, excluding raw destinations and bare legacy. Restore source-preservation audit cells, work-state vision sentence order and legacy-payload candidate link from first-authored bytes; replay every edit at its exact link position.
 
 Executed with tests-first helper repairs under A9. Author/docs turn only; package next at runner commit with one sync and one bounded re-review of every changed row/entry. Evidence: step10-systemic-* artifacts and step-10-report.md.
+
+
+## L10-23–L10-27 — Lead A42 round-3 author instruction
+
+Source: assignment `unit-run-1792114313040-56132651/producer/1`, based on committed round-3 reports at `5035fed52` (content `345f15d95`, request `c939e9a51`); these record the Lead’s supplied decisions, without a new owner choice.
+
+- **L10-23:** restore the legacy destinations of the three “Preserved from” links in Host Invocation vision, like the already restored legacy-cli-transition sibling; preserve labels and replay link cells.
+- **L10-24/L10-25:** replace stale/inverted scaffold citations by `bin/fgos.mjs:4414-4417`, Gate A/refuseHelp by `bin/fgos.mjs:4415,4503`, checked against HEAD. Replace the blind reproduction replacement with exact edits. Tests first: one fresh binding-derived rationale generator with actual source/target paths/ranges/anchors, last-reviewed digest comparison, exact labelled corrections, link counts/repoints, heading depth and disposition reason; never append old text. Rebuild all flagged rows plus every same-defect sibling found across all shards, including approved stale citations; reopen changed rationales with decisions unchanged. Correct a631’s two distinct pointer changes, governance/switchboard counts, historical endings and decisions-01/02 evidence ranges. Run consistency over every shard and fix every finding.
+- **L10-26:** restore the actual legacy workspace-topology destination for decisions-05 rows93/94, leaving the visible label `docs/architect/workspace-topology.md` verbatim; replay after restoration.
+- **L10-27:** Lead commit `51cb843b8` adds `scripts/doc-binding-repair.mjs` and `scripts/doc-link-pass.mjs` to `allowed-paths.json`. Regenerate A directly from that allowlist; only disclosed Lead commits remain. No producer allowlist/baseline change.
+
+Apply all matching committed ok verdicts with verbatim notes. Generate future requests from committed rows, including after snapshots. Author/docs turn only: zero native sync/review packs. Next turn packages one sync and one bounded re-review of changed docs lines, generator/tests, every regenerated rationale with mechanical checking and independent deep sample, and reopened rows. Evidence and remaining obligations: step-10-report.md / step10-round3-*.

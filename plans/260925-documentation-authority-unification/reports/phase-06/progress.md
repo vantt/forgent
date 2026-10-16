@@ -1,3 +1,21 @@
+# Step 10 round-3 author corrections complete — package next
+
+Assignment `unit-run-1792114313040-56132651/producer/1`; input `5035fed52`, reviewed content `345f15d95`/request `c939e9a51`. All 22 Notes/Concerns read; Lead L10-23–L10-27 executed. **435 matching ok applied verbatim /365 retained /70 reopened after edits. Six exact docs edits in four files** fix scaffold/refuseHelp citations and restore legacy destinations without changing labels.
+
+**714 rationales rebuilt from binding facts; 665 previously reviewed rows reopened.** No old text appended. Exact U3/U8/U20 and pointer corrections, current ranges/anchors, digest comparison, aligned link counts/repoints, heading depth and disposition reasons. Decision fields unchanged except six same-line doc target digests/ancestries. **Consistency: all 12,889 unit rows/90 shards, zero findings; all714 exact-regenerated matches.** 84 full-corpus historical source-witness limits explicitly disclosed, one among regenerated rows; two old removed targets use authenticated historical witnesses. No invented current range/equality.
+
+**473/473 tool tests pass. A/B/H pass; candidate-status zero findings/unresolved links.** A uses allowed-paths directly, only disclosed Lead paths remain; I baseline unchanged/current reader links equal HEAD, existing upstream route delta disclosed. **Scoped FAST D zero fatal both priors together/each; E remains open16 partial/69 pending/one group/two gaps/301 reverse. Replay366+98+4 zero findings. Ownership: zero target drift/native duplicate/new active collision;252 historical groups enumerated.** [Report](step-10-report.md), [audit](step10-round3-final-audit.json), [consistency](step10-round3-rationale-consistency.json), [reproduction](step10-round3-reproduction.json).
+
+**NEXT = PACKAGE at this runner commit:** one native sync (eight changed native units), all drift rebindings, fresh dependent accounting, ONE bounded re-review of changed doc lines, rationale generator/orchestrator+tests, every714 regenerated rationale (mechanical+independent deep sample) and all reopened rows/native tuples. Request after/currentDecision must come from committed rows, never intermediate edit logs (anchors004/010/011). Existing global/A34/consumer/cutover/checkpoint obligations remain; Phase6 open. No owner-direction execution blocker. **Zero native sync/--rebind/review packs this turn; no CLI/git writes, workspace .fgos, legacy/protected/baseline edit or authority change.** Runner commits.
+
+---
+
+# Step 10 round-3 author corrections in progress
+
+Assignment `unit-run-1792114313040-56132651/producer/1`. Reading all round-3 Notes/Concerns; applying matching verdicts, L10-23–L10-27 citation/link fixes and tests-first binding-derived rationale rebuild. No native sync or review packs this turn; runner commits. Next turn packages changed docs, tooling, all regenerated rationales and reopened rows.
+
+---
+
 # Step 10 combined package complete — independent review next
 
 Assignment `unit-run-1792094246578-b2fbe39b/producer/1`; **content/SYNC345f15d95**. Exactly **one background native sync570.490s**, one compact persistence; **4,486 files /91,374 units**, known IDs **99,538→99,549**, zero loss and active tuple equality. **11 predecessor gaps reconciled pending**, full old/current witnesses, no approval carry. **9,202 bindings checked /zero drift /zero rebound /zero --rebind calls**.

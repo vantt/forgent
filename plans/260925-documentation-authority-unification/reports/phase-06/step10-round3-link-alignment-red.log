@@ -1,0 +1,28 @@
+✔ rationale is rebuilt from bound facts without appending false old text (1.692608ms)
+✔ full unit digest decides equality, including heading section payload (0.145181ms)
+✔ last review comparison accepts digest prefix expansion and reports changes (0.170562ms)
+✔ link count distinguishes actual destination changes from spelling rebases (0.136952ms)
+✔ consistency flags changed ranges, anchors, equality and reviewed digest assertions (0.178686ms)
+✔ historical witness and no-target retain do not invent current source ranges (0.134191ms)
+✔ missing or mismatched binding evidence fails rather than inventing facts (0.292024ms)
+✔ legacy consistency checks contextual ranges, anchors and equality without mistaking header citations for bound spans (1.905788ms)
+✔ legacy audit understands unicode anchors, same-file successors and explicitly quoted prior rationales (0.214441ms)
+✔ unavailable historical text remains an explicit witness limit without invented line numbers (0.199373ms)
+✖ link alignment counts inserted provenance separately from repointed links (0.286466ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 10
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 42.992275
+
+✖ failing tests:
+
+test at test/scripts/doc-rationale.test.mjs:59:1
+✖ link alignment counts inserted provenance separately from repointed links (0.286466ms)
+  TypeError: describeBindingLinks is not a function
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale.test.mjs:63:10)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7)

@@ -407,19 +407,13 @@
       "targetAnchor": "pointers-implementation",
       "claimKind": "decision",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Weak-exact: source unit shorter than 40 characters. The whole heading unit docs/specs/decision-citation-drift.md#pointers-implementation (source lines 98-98) is carried at docs/platform/decision-citation-drift/spec.md#pointers-implementation (candidate lines 120-120). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/decision-citation-drift.md verbatim in docs/platform/decision-citation-drift/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "reviewNote": "deep: seeded sample. Heading section pointers-implementation (starts - scripts/check-decision-citation-drift.mjs — pure functions) read in full both directions: source lines 98-98 equal target lines 120-120 byte for byte, shifted only by the 22 added lines; rationale (short heading title makes it Weak-exact, digest equal, whole unit carried) is true; no link rewrite.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-09-1276467f3.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "rationale": "Source: docs/specs/decision-citation-drift.md:98-98#pointers-implementation (current lines); unit SHA256 95e71b5dfa80858cdc6300b28de97966fb7de22d77bdba919c47ad7c9b81d32f.\nTarget: docs/platform/decision-citation-drift/spec.md:119-119#pointers-implementation (current lines); unit SHA256 95e71b5dfa80858cdc6300b28de97966fb7de22d77bdba919c47ad7c9b81d32f.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 95e71b5dfa80858cdc6300b28de97966fb7de22d77bdba919c47ad7c9b81d32f at 1276467f37a99d19aff05808d42fafbf40341449.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 2; title \"Pointers (implementation)\" → \"Pointers (implementation)\".\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/decision-citation-drift.md#pointers-implementation under docs/platform/decision-citation-drift/spec.md#pointers-implementation; source context \"Spec: Decision Citation Drift Check\", target context \"Spec: Decision Citation Drift Check\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "95e71b5dfa80858cdc6300b28de97966fb7de22d77bdba919c47ad7c9b81d32f",
       "targetAncestry": [
         "Spec: Decision Citation Drift Check"
-      ],
-      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
+      ]
     },
     {
       "claimId": "claim_4966e71788ccddf622cb3c79fa20b4ec",
@@ -428,20 +422,14 @@
       "targetAnchor": "unheaded-block-12",
       "claimKind": "decision",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792045007741-a245b0a6@2026-10-15",
-      "rationale": "Unit-exact: unique long digest match, equal ancestry, sufficient document exact share. The whole unheaded-block unit docs/specs/decision-citation-drift.md#unheaded-block-10 (source lines 100-115) is carried at docs/platform/decision-citation-drift/spec.md#unheaded-block-12 (candidate lines 122-137). The full native unit digest is equal. Frozen specs-ui map and Step 8: preserve docs/specs/decision-citation-drift.md verbatim in docs/platform/decision-citation-drift/spec.md. Map kind spec is retained. The legacy source remains untouched; candidate carriage authorizes neither promotion nor source retirement. Known stale source sentences and links are intentionally carried under A19/A28, not certified true. Row-specific source and target binding remain pending independent review.",
-      "reviewNote": "mechanical: unheaded block unheaded-block-10 lines 100-115 to unheaded-block-12 lines 122-137, equal full digest and ancestry, anchors exist, shard equals pack, source blob equals its pin; text not read line by line.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1410-specs-ui-source-09-1276467f3.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "rationale": "Source: docs/specs/decision-citation-drift.md:100-115#unheaded-block-10 (current lines); unit SHA256 b2c59c202dc6de42a01a6cec95a4aeca692960350aee8e0f37198a01c736dacd.\nTarget: docs/platform/decision-citation-drift/spec.md:121-136#unheaded-block-12 (current lines); unit SHA256 b2c59c202dc6de42a01a6cec95a4aeca692960350aee8e0f37198a01c736dacd.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest b2c59c202dc6de42a01a6cec95a4aeca692960350aee8e0f37198a01c736dacd at 1276467f37a99d19aff05808d42fafbf40341449.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/decision-citation-drift.md#unheaded-block-10 under docs/platform/decision-citation-drift/spec.md#unheaded-block-12; source context \"Spec: Decision Citation Drift Check / Pointers (implementation)\", target context \"Spec: Decision Citation Drift Check / Pointers (implementation)\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetUnitDigest": "b2c59c202dc6de42a01a6cec95a4aeca692960350aee8e0f37198a01c736dacd",
       "targetAncestry": [
         "Spec: Decision Citation Drift Check",
         "Pointers (implementation)"
-      ],
-      "reviewReportCommit": "cc18d2a2f2d0bd29bbf8a876b625677fac1f0c5f"
+      ]
     }
   ]
 }

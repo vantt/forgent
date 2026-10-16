@@ -1,0 +1,51 @@
+✔ rationale is rebuilt from bound facts without appending false old text (4.637374ms)
+✔ full unit digest decides equality, including heading section payload (0.141078ms)
+✔ last review comparison accepts digest prefix expansion and reports changes (0.18884ms)
+✔ link count distinguishes actual destination changes from spelling rebases (0.138948ms)
+✔ consistency flags changed ranges, anchors, equality and reviewed digest assertions (0.174798ms)
+✔ historical witness and no-target retain do not invent current source ranges (0.124808ms)
+✔ missing or mismatched binding evidence fails rather than inventing facts (0.309653ms)
+✔ legacy consistency checks contextual ranges, anchors and equality without mistaking header citations for bound spans (1.852216ms)
+✔ legacy audit understands unicode anchors, same-file successors and explicitly quoted prior rationales (0.230506ms)
+✔ unavailable historical text remains an explicit witness limit without invented line numbers (0.212506ms)
+✔ link alignment counts inserted provenance separately from repointed links (0.67456ms)
+✔ bound related citations include their actual lines and exact text (0.655444ms)
+✔ review entry snapshots use the committed row for both after and currentDecision (0.331318ms)
+✔ legacy citation audit distinguishes described links from the unit binding itself (0.156977ms)
+✖ residual sibling references are checked as residual facts rather than the primary unit anchor (0.921537ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 14
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 53.376403
+
+✖ failing tests:
+
+test at test/scripts/doc-rationale.test.mjs:91:1
+✖ residual sibling references are checked as residual facts rather than the primary unit anchor (0.921537ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + [
+  +   {
+  +     bound: 'old',
+  +     cited: 'sibling',
+  +     role: 'source',
+  +     type: 'stale-rationale-anchor'
+  +   }
+  + ]
+  - []
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale.test.mjs:93:9)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ { type: 'stale-rationale-anchor', role: 'source', cited: 'sibling', bound: 'old' } ],
+    expected: [],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }

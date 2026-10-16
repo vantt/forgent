@@ -1,0 +1,35 @@
+✔ rationale is rebuilt from bound facts without appending false old text (1.745256ms)
+✔ full unit digest decides equality, including heading section payload (0.14127ms)
+✔ last review comparison accepts digest prefix expansion and reports changes (0.160075ms)
+✔ link count distinguishes actual destination changes from spelling rebases (0.242413ms)
+✔ consistency flags changed ranges, anchors, equality and reviewed digest assertions (0.181313ms)
+✔ historical witness and no-target retain do not invent current source ranges (0.115072ms)
+✔ missing or mismatched binding evidence fails rather than inventing facts (0.284058ms)
+✔ legacy consistency checks contextual ranges, anchors and equality without mistaking header citations for bound spans (1.889654ms)
+✔ legacy audit understands unicode anchors, same-file successors and explicitly quoted prior rationales (0.245943ms)
+✔ unavailable historical text remains an explicit witness limit without invented line numbers (0.720095ms)
+✔ link alignment counts inserted provenance separately from repointed links (0.674152ms)
+✔ bound related citations include their actual lines and exact text (0.124418ms)
+✔ review entry snapshots use the committed row for both after and currentDecision (0.324684ms)
+✔ legacy citation audit distinguishes described links from the unit binding itself (0.163038ms)
+✔ residual sibling references are checked as residual facts rather than the primary unit anchor (0.180246ms)
+✔ a historical target is never presented as a current target or as no mapped copy (0.145723ms)
+✔ declared historical target identity disambiguates same-file source and successor references (0.14039ms)
+✖ overlapping labelled corrections are composed to current bound text before selection (0.201449ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 17
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 44.892511
+
+✖ failing tests:
+
+test at test/scripts/doc-rationale.test.mjs:107:1
+✖ overlapping labelled corrections are composed to current bound text before selection (0.201449ms)
+  TypeError: bindingCorrections is not a function
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale.test.mjs:111:20)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7)

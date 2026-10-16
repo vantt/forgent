@@ -1,0 +1,30 @@
+✔ rationale is rebuilt from bound facts without appending false old text (1.695012ms)
+✔ full unit digest decides equality, including heading section payload (0.149641ms)
+✔ last review comparison accepts digest prefix expansion and reports changes (0.162112ms)
+✔ link count distinguishes actual destination changes from spelling rebases (0.139175ms)
+✔ consistency flags changed ranges, anchors, equality and reviewed digest assertions (0.179047ms)
+✔ historical witness and no-target retain do not invent current source ranges (0.11213ms)
+✔ missing or mismatched binding evidence fails rather than inventing facts (0.301827ms)
+✔ legacy consistency checks contextual ranges, anchors and equality without mistaking header citations for bound spans (1.79701ms)
+✔ legacy audit understands unicode anchors, same-file successors and explicitly quoted prior rationales (0.249958ms)
+✔ unavailable historical text remains an explicit witness limit without invented line numbers (0.215935ms)
+✔ link alignment counts inserted provenance separately from repointed links (0.67823ms)
+✔ bound related citations include their actual lines and exact text (0.59178ms)
+✖ review entry snapshots use the committed row for both after and currentDecision (0.242678ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 12
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 44.503842
+
+✖ failing tests:
+
+test at test/scripts/doc-rationale.test.mjs:75:1
+✖ review entry snapshots use the committed row for both after and currentDecision (0.242678ms)
+  TypeError: reviewEntryFromCommittedRow is not a function
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale.test.mjs:79:15)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7)
