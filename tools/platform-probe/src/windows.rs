@@ -331,6 +331,117 @@ impl Drop for Sup {
     }
 }
 
+pub fn fresh_domain_name() -> String {
+    unique_job_name()
+}
+
+fn filetime(ft: &FILETIME) -> u64 {
+    (u64::from(ft.dwHighDateTime) << 32) | u64::from(ft.dwLowDateTime)
+}
+
+fn self_creation_time() -> u64 {
+    unsafe {
+        let mut c: FILETIME = std::mem::zeroed();
+        let mut e: FILETIME = std::mem::zeroed();
+        let mut k: FILETIME = std::mem::zeroed();
+        let mut u: FILETIME = std::mem::zeroed();
+        GetProcessTimes(GetCurrentProcess(), &mut c, &mut e, &mut k, &mut u);
+        filetime(&c)
+    }
+}
+
+struct ProcInfo {
+    pid: u32,
+    ppid: u32,
+    created: Option<u64>,
+}
+
+unsafe fn snapshot_procs() -> Vec<ProcInfo> {
+    let mut v = vec![];
+    for (pid, ppid) in parent_map() {
+        let h = OpenProcess(0x1000, 0, pid);
+        let mut created = None;
+        if !h.is_null() {
+            let mut c: FILETIME = std::mem::zeroed();
+            let mut e: FILETIME = std::mem::zeroed();
+            let mut k: FILETIME = std::mem::zeroed();
+            let mut u: FILETIME = std::mem::zeroed();
+            if GetProcessTimes(h, &mut c, &mut e, &mut k, &mut u) != 0 {
+                created = Some(filetime(&c));
+            }
+            CloseHandle(h);
+        }
+        v.push(ProcInfo { pid, ppid, created });
+    }
+    v
+}
+
+/// Processes whose parent chain (pid + creation time, so reused pids do not match) reaches the recorded holder.
+fn chain_from(procs: &[ProcInfo], holder_pid: u32, holder_created: u64) -> Vec<u32> {
+    let mut known: BTreeMap<u32, u64> = BTreeMap::new();
+    known.insert(holder_pid, holder_created);
+    // If the holder's pid now belongs to a different (newer) process, children created after that
+    // process started are its children, not the holder's.
+    let reused_since = procs.iter().find(|p| p.pid == holder_pid && p.created.is_some_and(|c| c != holder_created)).and_then(|p| p.created);
+    let mut out = vec![];
+    loop {
+        let mut grew = false;
+        for p in procs {
+            let Some(created) = p.created else { continue };
+            if known.contains_key(&p.pid) {
+                continue;
+            }
+            if let Some(parent_created) = known.get(&p.ppid) {
+                let reuse_ok = p.ppid != holder_pid || reused_since.is_none_or(|r| created < r);
+                if created >= *parent_created && reuse_ok {
+                    known.insert(p.pid, created);
+                    out.push(p.pid);
+                    grew = true;
+                }
+            }
+        }
+        if !grew {
+            break;
+        }
+    }
+    if procs.iter().any(|p| p.pid == holder_pid && p.created == Some(holder_created)) {
+        out.push(holder_pid);
+    }
+    out
+}
+
+pub struct Fallback {
+    pub empty: bool,
+    pub chain_at_first_snapshot: Vec<u32>,
+}
+
+/// Fallback when the job cannot be opened (every handle owner is gone): wait until no process whose
+/// parent chain reaches the recorded holder is still running, bounded by `kill_wait`.
+pub fn fallback_wait(holder_pid: u32, holder_created: u64, kill_wait: Duration) -> Option<Fallback> {
+    let t0 = Instant::now();
+    let mut first: Option<Vec<u32>> = None;
+    let mut quiet_rounds = 0;
+    loop {
+        let procs = unsafe { snapshot_procs() };
+        let chain = chain_from(&procs, holder_pid, holder_created);
+        if first.is_none() {
+            first = Some(chain.clone());
+        }
+        if chain.iter().any(|p| pid_alive(*p)) {
+            quiet_rounds = 0;
+        } else {
+            quiet_rounds += 1; // two clean snapshots in a row so a last-moment spawn is seen
+        }
+        if quiet_rounds >= 2 {
+            return Some(Fallback { empty: true, chain_at_first_snapshot: first.unwrap_or_default() });
+        }
+        if t0.elapsed() >= kill_wait {
+            return Some(Fallback { empty: false, chain_at_first_snapshot: first.unwrap_or_default() });
+        }
+        std::thread::sleep(Duration::from_millis(1));
+    }
+}
+
 /// Human-readable process state for evidence: running, or exited with a code, or unopenable.
 pub fn pid_state(pid: u32) -> String {
     unsafe {
@@ -500,6 +611,15 @@ pub fn role(name: &str, a: &[String]) -> bool {
             write_atomic(&dir.join("tree.ready"), "1");
             park()
         }
+        // jobkeeper <jobname> <ready>: second owner of the job, outside the job; keeps the other handle open.
+        "jobkeeper" => {
+            let job = unsafe { make_kill_job(Some(&a[0])) };
+            match job {
+                Ok(_) => write_atomic(Path::new(&a[1]), &std::process::id().to_string()),
+                Err(e) => write_atomic(Path::new(&a[1]), &format!("error {e}")),
+            }
+            park()
+        }
         // githolder <lockfile> <ready> <repo> <block|noblock>: job + lock, then git inside the job.
         "githolder" => {
             let mut note = "job-ok".to_string();
@@ -511,7 +631,7 @@ pub fn role(name: &str, a: &[String]) -> bool {
                 // The record is written while the lock is held, before the domain is created.
                 // With a 5th argument the supervisor owns the job (opened by name); otherwise the holder owns it.
                 let name = a.get(4).cloned().unwrap_or_else(unique_job_name);
-                write_predecessor_record(Path::new(&a[0]), "job", &name);
+                write_predecessor_record(Path::new(&a[0]), "job", &name, Some((std::process::id(), self_creation_time())));
                 let job = if a.get(4).is_some() {
                     let w: Vec<u16> = name.encode_utf16().chain(std::iter::once(0)).collect();
                     let j = OpenJobObjectW(JOB_OBJECT_ASSIGN_PROCESS | JOB_OBJECT_QUERY, 0, w.as_ptr());

@@ -18,14 +18,28 @@ pub struct Enter {
     pub record_found: bool,
     pub domain_opened: bool,
     pub terminated: bool,
+    pub fallback_used: bool,
     pub alive_at_proceed: Vec<u32>,
     /// Per watched pid at the decision: state, and how long after the decision it was still running.
     pub diag: Vec<Value>,
 }
 
+/// How the contender treats a predecessor domain it finds non-empty.
+#[derive(Clone, Copy)]
+pub struct Rule {
+    /// Upper bound for waiting until killed processes are signaled (kill-wait).
+    pub kill_wait: Duration,
+    /// Use the process-tree fallback when the domain cannot be opened and the record names a holder.
+    pub fallback: bool,
+}
+
 /// Takes the lock (polling), applies the predecessor rule, and reports which watched
 /// processes were still alive at the moment it decided to proceed.
-pub fn enter(lock: &Path, record: &Path, drain: Duration, watch: &[u32], wait_lock: Duration) -> Result<Enter, String> {
+///
+/// Rule: open the domain; if it is not empty, kill it at once (the holder is dead because we hold
+/// the lock) and wait up to `kill_wait` for the killed processes to be signaled. If the domain cannot
+/// be opened, optionally wait on the recorded holder's process tree instead.
+pub fn enter(lock: &Path, record: &Path, rule: Rule, watch: &[u32], wait_lock: Duration) -> Result<Enter, String> {
     let t_start = Instant::now();
     let mut guard = None;
     wait_until(wait_lock, || {
@@ -42,22 +56,32 @@ pub fn enter(lock: &Path, record: &Path, drain: Duration, watch: &[u32], wait_lo
         record_found: false,
         domain_opened: false,
         terminated: false,
+        fallback_used: false,
         alive_at_proceed: vec![],
         diag: vec![],
     };
     let rec: Option<Value> = std::fs::read_to_string(record).ok().and_then(|s| serde_json::from_str(&s).ok());
     let id = rec.as_ref().and_then(|r| r["domainId"].as_str()).map(String::from);
+    let holder = rec.as_ref().and_then(|r| Some((r["holder"]["pid"].as_u64()? as u32, r["holder"]["creationTime"].as_u64()?)));
     e.record_found = id.is_some();
     let mut empty = true;
+    let mut chain_first: Vec<u32> = vec![];
     if let Some(id) = id {
         if let Some(mut dom) = plat::domain_open(&id) {
             e.domain_opened = true;
-            let drained = |d: &mut plat::Dom| wait_until(drain, || plat::domain_active(d) == Some(0)).is_some();
-            empty = drained(&mut dom);
+            empty = plat::domain_active(&mut dom) == Some(0);
             if !empty {
                 plat::domain_kill(&mut dom);
                 e.terminated = true;
-                empty = drained(&mut dom);
+                empty = wait_until(rule.kill_wait, || plat::domain_active(&mut dom) == Some(0)).is_some();
+            }
+        } else if rule.fallback {
+            if let Some((hp, hc)) = holder {
+                if let Some(f) = plat::fallback_wait(hp, hc, rule.kill_wait) {
+                    e.fallback_used = true;
+                    empty = f.empty;
+                    chain_first = f.chain_at_first_snapshot;
+                }
             }
         }
     }
@@ -68,7 +92,13 @@ pub fn enter(lock: &Path, record: &Path, drain: Duration, watch: &[u32], wait_lo
             let state = plat::pid_state(*p);
             let alive = e.alive_at_proceed.contains(p);
             let dead_after = if alive { wait_until(secs(2), || !plat::pid_alive(*p)).map(ms) } else { None };
-            e.diag.push(json!({"pid": p, "stateAtDecision": state, "aliveAtDecision": alive, "deadMsAfterDecision": dead_after}));
+            e.diag.push(json!({
+                "pid": p,
+                "stateAtDecision": state,
+                "aliveAtDecision": alive,
+                "deadMsAfterDecision": dead_after,
+                "inFallbackChainAtFirstSnapshot": chain_first.contains(p),
+            }));
         }
     } else {
         e.held_reason = Some("predecessor-domain-not-empty".into());
@@ -95,15 +125,21 @@ pub fn tests() -> Vec<Def> {
     vec![
         Def {
             name: "git-borrow-blocking-hook-predecessor-check",
-            expect: "50 repeats: a contender that applies the predecessor rule never proceeds while git or its hook children are alive (0 violations); extra wait is small",
+            expect: "50 repeats, job kept by a second owner: the contender kills the predecessor domain at once and never proceeds while git or its hook children are alive (0 violations); extra wait is a few ms, not a drain window",
             timeout_s: 420,
-            f: |c| repeated_check(c, true),
+            f: |c| repeated_check(c, Mode::Supervisor),
         },
         Def {
             name: "git-borrow-blocking-hook-predecessor-check-holder-owned",
-            expect: "documents the hazard: when only the holder owns the job, its name can vanish (open fails = looks empty) while members are still terminating; informational, never fails",
+            expect: "documents the hazard of the first rule: when only the holder owns the job its name vanishes (open fails = looks empty) while members are still terminating; no fallback is applied; informational, never fails",
             timeout_s: 420,
-            f: |c| repeated_check(c, false),
+            f: |c| repeated_check(c, Mode::HolderOnlyNoFallback),
+        },
+        Def {
+            name: "predecessor-all-owners-dead",
+            expect: "holder and job keeper both killed while git is blocked in a hook: the job cannot be opened, the contender falls back to the recorded holder's process tree and never proceeds while a member is unsignaled (0 violations in 50 repeats)",
+            timeout_s: 420,
+            f: |c| repeated_check(c, Mode::AllOwnersDead),
         },
         Def {
             name: "predecessor-record-stale",
@@ -112,18 +148,28 @@ pub fn tests() -> Vec<Def> {
             f: record_stale,
         },
         Def {
-            name: "predecessor-drain-timeout",
-            expect: "members that do not die within the drain window are terminated by the contender, which then proceeds with nothing alive (or returns held); it never proceeds with live members",
+            name: "predecessor-kill-wait",
+            expect: "members that never exit by themselves (the job handle is kept open elsewhere) are killed by the contender at once; it waits only for them to be signaled and proceeds with nothing alive, or returns held; never proceeds with live members",
             timeout_s: 60,
-            f: drain_timeout,
+            f: kill_wait,
         },
     ]
 }
 
-/// `supervisor_owned`: the probe holds the job handle (the job outlives the holder and the
-/// contender terminates it). Otherwise the holder holds the only handle, so killing the
-/// holder closes the job and its name disappears while members are still dying.
-fn repeated_check(ctx: &Ctx, supervisor_owned: bool) -> TestResult {
+#[derive(Clone, Copy, PartialEq)]
+enum Mode {
+    /// The probe holds a second handle to the job: it outlives the holder.
+    Supervisor,
+    /// Only the holder holds the job; the contender uses the first rule with no fallback.
+    HolderOnlyNoFallback,
+    /// Holder and a separate job keeper are both killed; the contender must use the process-tree fallback.
+    AllOwnersDead,
+}
+
+fn repeated_check(ctx: &Ctx, mode: Mode) -> TestResult {
+    // Unix has no job: the lock outlives every orphan, so every mode is the same strict control.
+    let supervisor_owned = mode == Mode::Supervisor;
+    let strict = mode != Mode::HolderOnlyNoFallback || cfg!(unix);
     if !which("git") {
         return skip("git is not on PATH");
     }
@@ -133,18 +179,31 @@ fn repeated_check(ctx: &Ctx, supervisor_owned: bool) -> TestResult {
     let record = ctx.p("predecessor.json");
     let mut extra = vec![];
     let mut lock_wait = vec![];
-    let (mut violations, mut held, mut terminated, mut opened) = (0, 0, 0, 0);
+    let (mut violations, mut held, mut terminated, mut opened, mut fallbacks) = (0, 0, 0, 0, 0);
     let mut events: Vec<Value> = vec![];
     for i in 0..REPEATS {
         for f in ["holder.ready", "fg.pid", "bg.pid", "predecessor.json"] {
             let _ = std::fs::remove_file(ctx.p(f));
         }
         let sup = if supervisor_owned { Some(plat::Sup::new()?) } else { None };
+        let mut keeper = None;
+        let keeper_job = if mode == Mode::AllOwnersDead { plat::fresh_domain_name() } else { String::new() };
+        if !keeper_job.is_empty() {
+            let (name, ready) = (keeper_job.clone(), ctx.s("keeper.ready"));
+            let _ = std::fs::remove_file(ctx.p("keeper.ready"));
+            keeper = Some(spawn(&mut ctx.role("jobkeeper", &[&name, &ready]))?);
+            if wait_until(secs(15), || ctx.p("keeper.ready").exists()).is_none() {
+                return Err(format!("repeat {i}: job keeper never became ready"));
+            }
+        }
         let repo_s = repo.to_string_lossy().into_owned();
         let (lock_s, ready_s) = (ctx.s("lock"), ctx.s("holder.ready"));
         let mut args: Vec<&str> = vec![&lock_s, &ready_s, &repo_s, "block"];
         if let Some(s) = sup.as_ref().filter(|s| !s.name().is_empty()) {
             args.push(s.name());
+        }
+        if !keeper_job.is_empty() {
+            args.push(&keeper_job);
         }
         let mut holder = spawn(&mut ctx.role("githolder", &args))?;
         if wait_until(secs(30), || ctx.p("holder.ready").exists()).is_none() {
@@ -166,9 +225,15 @@ fn repeated_check(ctx: &Ctx, supervisor_owned: bool) -> TestResult {
             .filter_map(|(role, p)| p.map(|p| json!({"role": role, "pid": p, "inSupervisorJobBeforeKill": sup.as_ref().and_then(|s| s.contains(p))})))
             .collect();
         let (l, r, w) = (lock.clone(), record.clone(), watch.clone());
-        let contender: std::thread::JoinHandle<Result<Enter, String>> = std::thread::spawn(move || enter(&l, &r, secs(2), &w, secs(30)));
+        let rule = Rule { kill_wait: secs(2), fallback: mode != Mode::HolderOnlyNoFallback };
+        let contender: std::thread::JoinHandle<Result<Enter, String>> = std::thread::spawn(move || enter(&l, &r, rule, &w, secs(30)));
         std::thread::sleep(Duration::from_millis(20)); // contender is polling for the lock
         let t_kill = Instant::now();
+        // All-owners-dead: the keeper goes first, then the holder; the job closes with the last handle.
+        if let Some(k) = keeper.as_mut() {
+            let _ = k.kill();
+            let _ = k.wait();
+        }
         let _ = holder.kill();
         let _ = holder.wait();
         if cfg!(unix) {
@@ -190,6 +255,7 @@ fn repeated_check(ctx: &Ctx, supervisor_owned: bool) -> TestResult {
                 "repeat": i,
                 "domainOpenedWhenChecked": e.domain_opened,
                 "contenderTerminated": e.terminated,
+                "fallbackUsed": e.fallback_used,
                 "lockWaitMs": e.lock_wait_ms,
                 "extraWaitMs": e.extra_wait_ms,
                 "msFromHolderKillToReturn": since_kill_ms,
@@ -199,6 +265,7 @@ fn repeated_check(ctx: &Ctx, supervisor_owned: bool) -> TestResult {
         }
         terminated += usize::from(e.terminated);
         opened += usize::from(e.domain_opened);
+        fallbacks += usize::from(e.fallback_used);
         extra.push(e.extra_wait_ms);
         lock_wait.push(e.lock_wait_ms);
         drop(sup);
@@ -206,35 +273,45 @@ fn repeated_check(ctx: &Ctx, supervisor_owned: bool) -> TestResult {
         wait_until(secs(10), || watch.iter().all(|p| !plat::pid_alive(*p)));
     }
     let data = json!({
-        "jobOwner": if supervisor_owned { "supervisor (probe holds the handle)" } else { "holder (its death closes the job)" },
+        "jobOwner": match mode {
+            Mode::Supervisor => "second owner (probe holds a handle)",
+            Mode::HolderOnlyNoFallback => "holder only, no fallback",
+            Mode::AllOwnersDead => "holder and keeper process, both killed, process-tree fallback",
+        },
         "repeats": REPEATS,
         "violationsProceededWithLiveProcesses": violations,
         "heldReturned": held,
         "contenderTerminatedDomain": terminated,
         "domainStillOpenWhenChecked": opened,
+        "fallbackUsedCount": fallbacks,
         "extraWaitMs": stats(&extra),
         "lockWaitMsFromContenderStart": stats(&lock_wait),
-        "drainMs": 2000,
+        "killWaitMs": 2000,
         "domainKind": plat::domain_kind(),
         "violationEvents": events,
     });
-    if !supervisor_owned {
+    if !strict {
         // Hazard documentation: with a holder-owned job the name can vanish before the members are dead.
-        let note = format!("holder-owned job: {violations}/{REPEATS} repeats proceeded while members were still dying (job name already gone in {} of them)", REPEATS - opened);
+        let note = format!("holder-only job, no fallback: {violations}/{REPEATS} repeats proceeded while members were still dying (job name already gone in {} of them)", REPEATS - opened);
         return pass(&note, data);
     }
+    let p95 = pct(&extra, 0.95);
     if violations > 0 {
         fail("contender proceeded while git or a child was still alive", data)
     } else if held > 0 {
-        fail("contender returned held (domain never drained even after terminate)", data)
+        fail("contender returned held (domain never emptied after kill)", data)
+    } else if mode == Mode::AllOwnersDead && cfg!(windows) && fallbacks == 0 {
+        fail("the process-tree fallback was never exercised (the job stayed openable)", data)
+    } else if p95 > 500.0 {
+        fail("extra wait p95 above 500 ms: the domain is not being killed at once", data)
     } else {
         pass("0 violations: contender proceeded only after the predecessor domain was empty", data)
     }
 }
 
-fn contender_run(ctx: &Ctx, id: &str, drain: Duration, watch: &[u32]) -> Result<Enter, String> {
-    write_predecessor_record(&ctx.p("lock"), plat::domain_kind(), id);
-    enter(&ctx.p("lock"), &ctx.p("predecessor.json"), drain, watch, secs(5))
+fn contender_run(ctx: &Ctx, id: &str, rule: Rule, watch: &[u32]) -> Result<Enter, String> {
+    write_predecessor_record(&ctx.p("lock"), plat::domain_kind(), id, None);
+    enter(&ctx.p("lock"), &ctx.p("predecessor.json"), rule, watch, secs(5))
 }
 
 fn record_stale(ctx: &Ctx) -> TestResult {
@@ -242,7 +319,7 @@ fn record_stale(ctx: &Ctx) -> TestResult {
     let mut bad = 0;
     for _ in 0..20 {
         let id = plat::make_stale_domain(ctx)?;
-        let e = contender_run(ctx, &id, secs(2), &[])?;
+        let e = contender_run(ctx, &id, Rule { kill_wait: secs(2), fallback: true }, &[])?;
         if !e.proceeded || e.domain_opened || e.terminated {
             bad += 1;
         }
@@ -256,35 +333,38 @@ fn record_stale(ctx: &Ctx) -> TestResult {
     }
 }
 
-fn drain_timeout(ctx: &Ctx) -> TestResult {
+fn kill_wait(ctx: &Ctx) -> TestResult {
     let (id, pids, _keep) = plat::make_stubborn_domain(ctx)?;
     if wait_until(secs(10), || pids.iter().all(|p| plat::pid_alive(*p))).is_none() {
         return Err("stubborn member did not start".into());
     }
-    let drain = Duration::from_millis(300);
-    let e = contender_run(ctx, &id, drain, &pids)?;
+    let e = contender_run(ctx, &id, Rule { kill_wait: secs(2), fallback: true }, &pids)?;
     let dead = wait_until(secs(5), || pids.iter().all(|p| !plat::pid_alive(*p))).is_some();
     let data = json!({
-        "drainMs": 300,
+        "killWaitMs": 2000,
         "proceeded": e.proceeded,
         "heldReason": e.held_reason,
         "contenderTerminatedDomain": e.terminated,
         "extraWaitMs": e.extra_wait_ms,
         "aliveAtProceed": e.alive_at_proceed,
+        "stateAtDecision": e.diag,
         "membersDeadAfterwards": dead,
         "domainKind": plat::domain_kind(),
     });
     if e.proceeded && !e.alive_at_proceed.is_empty() {
         return fail("contender proceeded with live members", data);
     }
-    if e.proceeded && !(e.terminated && e.extra_wait_ms >= 300.0) {
-        return fail("contender proceeded without waiting the drain window and terminating", data);
+    if e.proceeded && !e.terminated {
+        return fail("contender proceeded without killing the members", data);
+    }
+    if e.proceeded && e.extra_wait_ms > 500.0 {
+        return fail("kill was not immediate: the contender waited like a drain window", data);
     }
     if !e.proceeded && e.held_reason.is_none() {
         return fail("contender neither proceeded nor named the hold", data);
     }
     pass(
-        if e.proceeded { "drain expired, contender terminated the members and proceeded with nothing alive" } else { "contender returned named held" },
+        if e.proceeded { "contender killed the members at once and proceeded with nothing alive" } else { "contender returned named held" },
         data,
     )
 }

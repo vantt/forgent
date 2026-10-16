@@ -107,8 +107,12 @@ pub fn write_atomic(p: &Path, content: &str) {
 }
 
 /// Writes the predecessor record next to the lock file (the holder does this while it holds the lock).
-pub fn write_predecessor_record(lock: &Path, kind: &str, id: &str) {
-    let rec = serde_json::json!({"domainKind": kind, "domainId": id});
+/// `holder` is the holder's (pid, creation time), used by the fallback when the domain cannot be opened.
+pub fn write_predecessor_record(lock: &Path, kind: &str, id: &str, holder: Option<(u32, u64)>) {
+    let mut rec = serde_json::json!({"domainKind": kind, "domainId": id});
+    if let Some((pid, created)) = holder {
+        rec["holder"] = serde_json::json!({"pid": pid, "creationTime": created});
+    }
     if let Some(dir) = lock.parent() {
         write_atomic(&dir.join("predecessor.json"), &rec.to_string());
     }

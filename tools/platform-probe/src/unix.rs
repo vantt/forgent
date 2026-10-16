@@ -32,11 +32,15 @@ pub fn pid_alive(pid: u32) -> bool {
         }
     }
     // A zombie still answers kill(0); treat it as dead (Linux exposes the state).
-    if let Ok(s) = std::fs::read_to_string(format!("/proc/{pid}/stat")) {
-        if let Some(i) = s.rfind(')') {
-            let st = s[i + 1..].trim_start().chars().next();
-            return !matches!(st, Some('Z') | Some('X'));
-        }
+    if cfg!(target_os = "linux") {
+        // kill(0) succeeded but the pid may have been reaped since: an unreadable stat means gone.
+        return match std::fs::read_to_string(format!("/proc/{pid}/stat")) {
+            Ok(s) => match s.rfind(')') {
+                Some(i) => !matches!(s[i + 1..].trim_start().chars().next(), Some('Z') | Some('X')),
+                None => false,
+            },
+            Err(_) => false,
+        };
     }
     true
 }
@@ -124,6 +128,20 @@ impl Drop for Sup {
 
 pub fn pid_state(pid: u32) -> String {
     if pid_alive(pid) { "running".into() } else { "dead".into() }
+}
+
+pub fn fresh_domain_name() -> String {
+    String::new()
+}
+
+pub struct Fallback {
+    pub empty: bool,
+    pub chain_at_first_snapshot: Vec<u32>,
+}
+
+/// Unix has no job to lose: the lock itself outlives every orphan, so no fallback exists or is needed.
+pub fn fallback_wait(_holder_pid: u32, _holder_created: u64, _kill_wait: Duration) -> Option<Fallback> {
+    None
 }
 
 pub struct Keep;
@@ -255,7 +273,7 @@ pub fn role(name: &str, a: &[String]) -> bool {
                 std::process::exit(3);
             }
             clear_cloexec(f.as_raw_fd());
-            write_predecessor_record(Path::new(&a[0]), "process", &std::process::id().to_string());
+            write_predecessor_record(Path::new(&a[0]), "process", &std::process::id().to_string(), None);
             let mut c = Command::new("git");
             c.args(["-C", &a[2], "-c", "gc.auto=1", "commit", "--allow-empty", "-q", "-m", "probe"]);
             c.stdin(std::process::Stdio::null()).stdout(std::process::Stdio::null()).stderr(std::process::Stdio::null());

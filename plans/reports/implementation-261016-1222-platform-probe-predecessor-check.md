@@ -69,3 +69,18 @@ Process đã bắt đầu bị terminate có còn ghi được không: không c�
 Chưa chạy lại trên Windows thật. Nếu lần chạy tới `...-predecessor-check` vẫn có vi phạm thì sự kiện `violationEvents` sẽ cho biết còn pid nào, ở trạng thái nào, ngoài job hay trong job.
 
 Exe mới: sha256 `c9c136f6e63f6eb5885a7fb6d08b5144a75fd7d5182bcff5fd5db4e957875141`.
+
+## 7. Luật r6: kết thúc ngay, người giữ job thứ hai, dự phòng khi mọi chủ handle đã chết
+
+Run 38856358204 xanh trên cả ba nền với luật r5 sửa. Theo design r6 §6.0.1, probe đổi như sau (đã merge main >= 2b46e9054):
+
+- **Kết thúc ngay (a):** `enter` mở miền; chưa rỗng thì `TerminateJobObject` ngay (holder trước chắc chắn đã chết vì ta giữ lock), rồi chỉ chờ tới `kill_wait` (2000 ms) cho các process bị giết signaled. Không còn cửa sổ drain. `predecessor-drain-timeout` đổi thành **`predecessor-kill-wait`**: job có member sống, handle job do probe giữ; yêu cầu contender kill ngay, đi tiếp với 0 member sống và `extraWaitMs` <= 500 (fail nếu chờ kiểu drain). Test 50 lần cũng fail nếu `extraWaitMs` p95 > 500 ms.
+- **Chủ handle thứ hai (b):** vẫn là probe giữ handle job cho `git-borrow-blocking-hook-predecessor-check` (ca chính, 0 vi phạm).
+- **Dự phòng (c), test mới `predecessor-all-owners-dead`:** một role `jobkeeper` (process Rust nằm ngoài job) tạo job có tên; holder mở job theo tên rồi đưa mình vào; git bị chặn trong hook. Giết keeper rồi giết holder: handle cuối đóng, tên job biến mất, contender không mở được job và chạy dự phòng Toolhelp. 50 lần, 0 vi phạm, ghi `extraWaitMs` p50/p95/max. Test fail nếu dự phòng không được dùng lần nào (khi đó không đo được gì).
+- **Thuật toán dự phòng:** record `predecessor.json` giờ có `holder: {pid, creationTime}` (holder ghi lúc đang giữ lock, creation time từ `GetProcessTimes`). Contender chụp Toolhelp, lấy creation time từng process, dựng tập con cháu: một process thuộc chuỗi nếu `ppid` nằm trong tập và `creationTime >= creationTime của cha`; nếu pid của holder đã bị process khác tái dùng thì chỉ nhận con sinh trước thời điểm process mới đó bắt đầu. Chờ cho tới khi **hai** snapshot liên tiếp không còn process nào trong chuỗi chưa signaled (bắt spawn phút chót), tối đa `kill_wait`, quá hạn thì `held`.
+- **Rủi ro đã biết, probe được thiết kế để lộ ra:** chuỗi cha qua Toolhelp đứt khi một process trung gian đã chết trước (con còn sống nhưng `ppid` trỏ vào pid không còn). Job kill-on-close giết các member gần như cùng lúc nên thứ tự chết là ngẫu nhiên; nếu có vi phạm thì `violationEvents[].stateAtDecision[].inFallbackChainAtFirstSnapshot` cho biết pid vi phạm có nằm trong chuỗi ngay snapshot đầu không (false = chuỗi đứt). Nếu xảy ra, dự phòng chỉ theo chuỗi cha là chưa đủ và r6 cần thêm biện pháp (ví dụ chờ mọi process chưa signaled có thời điểm tạo trong khoảng đời holder và cha đã chết).
+- Cấu hình holder-only không dự phòng (`...-holder-owned`) giữ để ghi hazard của luật r5; luôn pass.
+
+Sửa lỗi đo trên Linux: `pid_alive` coi pid là "còn sống" khi `kill(0)` thành công nhưng `/proc/<pid>/stat` đã biến mất (bị reap giữa hai lệnh); nay coi là chết. Lần chạy đầu thấy vi phạm giả ở đối chứng Linux do lỗi này.
+
+Linux: 14/14 pass, ba lần chạy liên tiếp. Windows chỉ được biên dịch và clippy (sạch); chưa chạy thật. Exe: sha256 `f5679f5f890a0fa7df980a464acb2941dc1f5559178bb55c13fe829ed898ff5a`.
