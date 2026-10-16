@@ -14,13 +14,12 @@ import {
   BOUNDARY_KEYS,
   INSTALL_ROOT,
   PERSONA_KEYS,
-  agentShapeProblem,
   findAgentDuplicates,
+  isPlainObject,
   readAgentDefinition,
   scanAgentTiers,
+  shapeProblemOf,
 } from './agent-definitions.mjs';
-
-const isPlainObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 
 /**
  * Keys in a definition that the renderer would silently drop, one sentence each. A file that is not
@@ -30,7 +29,10 @@ const isPlainObject = (value) => value !== null && typeof value === 'object' && 
  * @returns {string[]}
  */
 export function agentRenderWarnings(text) {
-  const { data } = readAgentDefinition(text);
+  return renderWarningsOf(readAgentDefinition(text).data);
+}
+
+function renderWarningsOf(data) {
   const warnings = [];
   if (isPlainObject(data?.persona)) {
     for (const key of Object.keys(data.persona)) {
@@ -102,12 +104,17 @@ export function listAgents({ projectRoot, installRoot = INSTALL_ROOT }) {
     }
   }
 
-  const agents = [...seen.values()].map(({ text, ...record }) => ({
-    ...record,
-    description: text === null ? '' : agentDescription(text),
-    problems: text === null ? ['cannot be read'] : [agentShapeProblem(record.name, text)].filter(Boolean),
-    warnings: text === null ? [] : agentRenderWarnings(text),
-  }));
+  // Each file is parsed once and the read feeds the description, the shape problem and the warnings.
+  const agents = [...seen.values()].map(({ text, ...record }) => {
+    if (text === null) return { ...record, description: '', problems: ['cannot be read'], warnings: [] };
+    const read = readAgentDefinition(text, { filename: record.source });
+    return {
+      ...record,
+      description: read.description.replace(/\s+/g, ' '),
+      problems: [shapeProblemOf(record.name, read)].filter(Boolean),
+      warnings: renderWarningsOf(read.data),
+    };
+  });
 
   return {
     agents,

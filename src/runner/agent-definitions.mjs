@@ -87,7 +87,7 @@ export function findAgentDuplicates(scan) {
   return duplicates;
 }
 
-const isPlainObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
+export const isPlainObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 const isScalar = (value) => typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean';
 
 /**
@@ -186,7 +186,11 @@ export function nonTextPersonaValues(data) {
  * that is not valid YAML is reported with the parser's line and column.
  */
 export function agentShapeProblem(name, text) {
-  const { data, error, name: declared, description } = readAgentDefinition(text);
+  return shapeProblemOf(name, readAgentDefinition(text));
+}
+
+/** agentShapeProblem for a definition already read with readAgentDefinition. */
+export function shapeProblemOf(name, { data, error, name: declared, description }) {
   if (error) return error;
   if (declared !== name) return `must declare name: ${name} (got ${JSON.stringify(declared ?? null)})`;
   const [nonText] = nonTextPersonaValues(data);

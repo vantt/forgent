@@ -25,6 +25,16 @@ import { executorIdForWork, resolveCapabilityIdentityDetails, workCapabilityHint
 import { DOMAINS, getDomain, resolveDomainName, effectiveStep, bundleForStep, operationsForStep } from '../state/domain-registry.mjs';
 import { listWork } from '../state/store.mjs';
 
+// The lookup runs once per dispatch, so the same broken file would repeat on every one; each distinct
+// problem in a project is written once per process.
+const reportedRosterProblems = new Set();
+function warnRosterProblemOnce(cwd, problem) {
+  const key = `${path.resolve(cwd)}\0${problem}`;
+  if (reportedRosterProblems.has(key)) return;
+  reportedRosterProblems.add(key);
+  process.stderr.write(`warning: agent roster: ${problem}\n`);
+}
+
 /**
  * `spawnWorker`'s own D20/D22 wiring (review finding H1, tsk-397): the real
  * agent-type this `work` item's dispatch should resolve to, or `null` when
@@ -61,9 +71,9 @@ export function resolveAgentTypeForWork(work, cwd, stage) {
   const header = readTaskSpecHeader(taskSpecPath);
   if (Object.keys(header).length === 0) return null;
   const { defs, problems } = loadAgentRoster(cwd);
-  // An agent file that cannot be parsed is left out of the roster; say so on stderr (once per file
-  // per lookup) rather than letting the agent vanish without a trace. `fgos doctor` names it too.
-  for (const problem of problems) process.stderr.write(`warning: agent roster: ${problem}\n`);
+  // An agent file that cannot be parsed is left out of the roster; say so on stderr rather than letting
+  // the agent vanish without a trace. `fgos doctor` names it too.
+  for (const problem of problems) warnRosterProblemOnce(cwd, problem);
   return resolveAgentTypeForTaskSpec(header, defs, null);
 }
 
