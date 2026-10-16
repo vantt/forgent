@@ -6,17 +6,8 @@
 //! `driver`; pluggable placement in `policy`. Contracts:
 //! `packages/terminal-control/contracts/`.
 
-/// The key-addressed upper port and its result types.
-pub mod port {}
-
-/// The allocation record, its one-shot markers and the group hint.
-pub mod record {}
-
-/// Core rules: grouping, anchoring, closing only what was allocated.
-pub mod core {}
-
-/// Multiplexer drivers behind the lower port.
-pub mod driver {}
-
-/// Pluggable placement policies over measured geometry.
-pub mod policy {}
+pub mod core;
+pub mod driver;
+pub mod policy;
+pub mod port;
+pub mod record;
