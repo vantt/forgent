@@ -72,7 +72,9 @@ test('the real v1 ledger code acquires before the fence and refuses after it', (
 
   const result = placeFor(ledgers);
   assert.equal(result.ok, true, JSON.stringify(result));
-  assert.deepEqual([...result.placed].sort(), [ledgers.accountLockDir, ledgers.stateLockDir].sort());
+  const ledgerDirs = [ledgers.accountLockDir, ledgers.stateLockDir].sort();
+  // The same placement also tombstones the workspace's file-lock paths; only the ledgers matter here.
+  assert.deepEqual([...result.placed].filter((p) => ledgerDirs.includes(p)).sort(), ledgerDirs);
   for (const lockDir of [ledgers.accountLockDir, ledgers.stateLockDir]) {
     const all = generations(lockDir);
     const last = all[all.length - 1].record;
@@ -183,7 +185,8 @@ test('a released v1 generation is superseded by the fence, and a second placemen
   const second = placeFor(ledgers);
   assert.equal(second.ok, true);
   assert.deepEqual(second.placed, []);
-  assert.deepEqual([...second.skipped].sort(), [ledgers.accountLockDir, ledgers.stateLockDir].sort());
+  const ledgerDirs = [ledgers.accountLockDir, ledgers.stateLockDir].sort();
+  assert.deepEqual([...second.skipped].filter((p) => ledgerDirs.includes(p)).sort(), ledgerDirs);
   assert.equal(generations(ledgers.stateLockDir).length, 2, 'no extra generation');
   assert.equal(generations(ledgers.accountLockDir).length, 1);
 });

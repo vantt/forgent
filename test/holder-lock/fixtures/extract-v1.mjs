@@ -4,7 +4,7 @@
 // cannot import it from `src/`. This fixture materializes `src/` as it was
 // at the base commit (`git archive <base> src`, the same bytes `git show
 // <base>:<path>` gives for each file) into a scratch directory, next to a
-// `node_modules` link so the old modules resolve their one dependency, and
+// `node_modules` link (plus `scripts/lib`, which old `src/` modules import) so the old modules resolve their one dependency, and
 // lets a test import any old module from there.
 //
 // Old lock acquires can block synchronously (`Atomics.wait` loops), which no
@@ -32,7 +32,7 @@ export function extractV1Source({ base = DEFAULT_V1_BASE, repoRoot = REPO_ROOT }
   if (extracted.has(base)) return extracted.get(base);
   const sha = execFileSync('git', ['rev-parse', '--verify', `${base}^{commit}`], { cwd: repoRoot, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-holder-lock-v1-'));
-  const tarball = execFileSync('git', ['archive', '--format=tar', sha, 'src'], { cwd: repoRoot, maxBuffer: 256 * 1024 * 1024 });
+  const tarball = execFileSync('git', ['archive', '--format=tar', sha, 'src', 'scripts/lib'], { cwd: repoRoot, maxBuffer: 256 * 1024 * 1024 });
   execFileSync('tar', ['-x', '-C', dir], { input: tarball });
   fs.symlinkSync(path.join(repoRoot, 'node_modules'), path.join(dir, 'node_modules'), 'dir');
   fs.writeFileSync(path.join(dir, 'package.json'), '{"type":"module"}\n');
