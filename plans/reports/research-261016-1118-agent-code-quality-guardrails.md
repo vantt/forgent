@@ -221,9 +221,27 @@ Gỡ khoảng 19 đăng ký hook trùng và sửa `statusLine` đang gọi node 
 
 Không cần agent nào ghi nhớ thêm điều gì: P1/P2 ép bằng máy, P3/P4 nằm đúng chỗ worker đọc, P5 giảm nhiễu để luật còn lại được tuân theo.
 
+## 6. Quan hệ với các plan và contract đã có (rà 2026-10-17)
+
+| Mục | Trạng thái | Quan hệ |
+|---|---|---|
+| `plans/260925-documentation-authority-unification/` | Proposed, chưa được duyệt để chạy | Gom quyền sở hữu tài liệu về `docs/platform/**`; không đụng tới việc chiếu instruction vào `AGENTS.md`/`CLAUDE.md`. Không chặn báo cáo này. |
+| Agent Context Engine (H3, `docs/platform/proposals/documentation-system-unification.md:40`, thiết kế ở §4.7.2) | Kiến trúc tương lai, "never a blocker" | Nơi nên kế thừa ngân sách nạp theo từng CLI (mục 2d); không có gì để chờ. |
+| Contract `docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md` và `src/setup/instruction-projections.mjs` | Đã chạy; chỉ ghi `AGENTS.md` | Cơ chế sinh khối "fgOS Effective Instructions". Mục 10 cấm tạo `CLAUDE.md` chỉ để nhân bản `AGENTS.md`, nên commit `40c667c83` khớp contract. |
+| `plans/261006-1415-fgos-single-door-mechanisms/` phase 06 "AGENTS.md single writer" | Xong (`a004bb598`) | Luật một bên ghi chỉ áp cho phần viết tay của `AGENTS.md`. Tiền đề "CLAUDE.md chỉ import `@AGENTS.md`" của phase này sai ở thời điểm đó; đã ghi chú trong file phase. |
+| Backlog `p-7eb9e65b`, `p-68be2ae3` | proposed | Sở hữu phần chồng lấn với ak và `doctor --fix`. |
+
+**Phân bổ việc:**
+
+- **Làm ngay, chưa plan nào sở hữu:** P1, P3, P4, P6, sửa `statusLine`, canary cho pi và `.omp/rules`, giữ `AGENTS.md` dưới 32 KiB.
+- **Gộp vào `p-7eb9e65b`:** đích cài của ak cho từng CLI theo bảng nạp đã đo (mục 2d), bỏ bản trùng `.claude/rules` và `.omp/rules` khi canary xác nhận.
+- **Bổ sung vào contract projection:** giới hạn nạp của từng CLI, trước hết là codex chỉ đọc 32 KiB đầu `AGENTS.md`. Contract, code và các plan hiện chưa nói gì về điều này.
+- **Vướng contract:** P5 đề xuất sinh danh sách L1–L10 từ `docs/platform-foundations.md`, nhưng mục 4 của contract (dòng 54-56) cấm dùng `docs/**` làm nguồn instruction lúc chạy; nguồn chỉ nằm trong `core/instructions/`, `components/*/instructions/`, `domains/*/instructions/`. Cách khớp contract: sinh danh sách thành một fragment trong `core/instructions/` bằng generator, kèm test fail khi fragment lệch so với các heading `## Lx`. Xem Q6.
+
 ## Câu hỏi chưa giải quyết
 
 - **Q1.** ~~Có phải lần chạy `ak` lúc 16/10 11:19 không, và nên giữ đích nào?~~ Đã trả lời: đúng là chủ repo vừa cài ak; nhưng vì 5 CLI được dùng cùng lúc nên không gỡ đích nào (mục 2c). Đã đo cho Claude, codex, omp và pi (mục 2d). Còn mở: agy (chưa cài), và xác nhận pi cùng `.omp/rules` bằng canary.
+- **Q6.** P5: sinh danh sách luật thành fragment trong `core/instructions/` kèm test chống lệch (đề xuất, khớp contract mục 4), hay sửa contract để cho phép đọc từ `docs/platform-foundations.md`?
 - **Q5.** Xử lý giới hạn 32 KiB của codex thế nào: rút `AGENTS.md` xuống dưới 32 KiB (đề xuất), sắp lại để luật quan trọng nằm trong 32 KiB đầu, hay tăng `project_doc_max_bytes` trên mọi home codex?
 - **Q2.** Các worker ngoài tiến trình (pi, agy, Codex) có nạp AGENTS.md không? Nếu không, P3 bắt buộc phải nằm trong worker contract (báo cáo đã đề xuất như vậy).
 - **Q3.** Checker của P1 có đang nằm trong bộ test hoặc canary mà runner chạy trước khi commit mỗi Unit không? Nếu không, cần đưa vào để `--no-verify` và việc commit thẳng lên `main` không lách được.
