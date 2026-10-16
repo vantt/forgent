@@ -1,0 +1,150 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:unit-run-1792173247556-515f6e95@2026-10-17",
+  "receipts": [
+    {
+      "claimId": "claim_b6963c89796864ca59f82467d506f348",
+      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "anchor": "implementation-and-design-status",
+      "unitDigest": "e9987e41f961ef6c8dc9e9e2b204eafc3ee98883460e98c0c18606ac0cc3a046",
+      "shownText": "## Implementation And Design Status\n\nThe implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs. The retained recovery planner produces a recommendation, park or needs-input decision from snapshot and evidence. Evidence: `src/runner/dispatch/recovery-planner.mjs:243-266`. Applying a recommendation checks its action key, snapshot hash, control epoch, expiry and current legality again. Evidence: `src/runner/dispatch/recovery-planner.mjs:281-316`.\n\n| Section | Status | Evidence / limit |\n|---|---|---|\n| 1. Responsibility And Inputs | Unimplemented design proposal | FailureObservationV1/executor-failure-observation absent (git grep src/ packages/ apps/ core/ domains/ bin/ = 0); owners named in the stage table exist: src/runner/dispatch/liveness.mjs:211 evaluateLadder, src/runner/dispatch/plan.mjs:45 compileDispatchPlan, src/runner/dispatch/run-result.mjs:350 normalizeRunResult |\n| 2. Production Ladder Semantics | Current contract/invariant | src/runner/dispatch/liveness.mjs:211 evaluateLadder (truth>blocked>died>ceiling>stale), :63 DEFAULT_DEATH_THRESHOLD=3, :105 paneFateFor keeps paused-limit under closeAlways, :99 keep-always |\n| 3. Coarse Matrix Mapping | Mixed implementation and proposal; no blanket implementation claim | src/runner/dispatch/herdr-round.mjs:350-357 ERROR_CLASS_FOR_OUTCOME (died->worker-spawn-fail, others->worker-timeout); src/runner/recovery.mjs:106-115,133 resolveAction; src/runner/loop.mjs:515 resolveStaleDoing; blocked/paused-limit park is explicitly \"Proposed behavior change\" |\n| 4. One Attempt History, Explicit Caps | Mixed implementation and proposal; no blanket implementation claim | Not implemented: maxAttemptsPerAssignment/maxAttemptsPerExecutor = 0 hits in code; src/runner/dispatch/assignment-policy.mjs:380-388 fallbackExecutors \"reserved-not-executed\"; admission counting live at src/runner/dispatch/assignment-runner.mjs:672-783 (runId per attempt); src/runner/recovery.mjs:91 DEFAULT_MAX_RETRIES=2 |\n| 5. EffectGuaranteePort | Unimplemented design proposal | EffectGuaranteePort absent in code; related live subset: src/runner/dispatch/recovery.mjs:201 assess(plan, repeatMode, confinement, attestation) with ASSESS_OUTCOMES :56 and REPEAT_MODE never inferred from Assignment.mutation :202-206 |\n| 6. Resolver Output And Apply | Mixed implementation and proposal; no blanket implementation claim | src/runner/dispatch/recovery.mjs:93 resolveFallback (FALLBACK_STATUSES :53), src/runner/dispatch/assignment-policy.mjs:334-339 cliOverride.preferExecutor; FallbackDecisionV1/rejectedCandidates absent; apply re-check in src/runner/dispatch/recovery-planner.mjs:281 checkApply |\n| 7. Proof, Rollout And Future Work | Unimplemented design proposal | Refers to proof matrix runtime-recovery-design.md#10 (E-a..E-f, X01..X06) and future work; no code symbols |",
+      "shownTextDigest": "e7cad374cf5bbf55cbcfc148edebf55950a1f385f8a1bfa7420cd28b17e33bf4",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:unit-run-1792173247556-515f6e95@2026-10-17",
+      "rationale": "Refresh of the prior candidate-native-content receipt from the exact native tuple claim_b6963c89796864ca59f82467d506f348/4fc22267739453739992bd7673b29eaa711de810b721bd915c28f58ec555cc0c to claim_b6963c89796864ca59f82467d506f348/e9987e41f961ef6c8dc9e9e2b204eafc3ee98883460e98c0c18606ac0cc3a046, authenticated by the ea5ec7406 x01-x06 accounting review. The restored live facts are included in the shown payload; classification truth requires a new independent review and no prior approval carries.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "implementation-and-design-status",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "af6c116f0e2af1f31f5e1d57830dc60de0c65411",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/liveness.mjs",
+            "startLine": 211,
+            "endLine": 302,
+            "blobSha": "79d5e65792adb72fe23ee03ca3c3058f53946411"
+          },
+          {
+            "path": "src/runner/dispatch/recovery-planner.mjs",
+            "startLine": 118,
+            "endLine": 173,
+            "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26"
+          },
+          {
+            "path": "src/runner/dispatch/recovery-planner.mjs",
+            "startLine": 243,
+            "endLine": 316,
+            "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+      },
+      "priorRecoveryProvenance": {
+        "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+        "receiptClaimId": "claim_0665b9cff5975b973955aeb7749d97ba",
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+        "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+        "verdictClaimId": "claim_0665b9cff5975b973955aeb7749d97ba",
+        "unitDigest": "4fc22267739453739992bd7673b29eaa711de810b721bd915c28f58ec555cc0c",
+        "originalAuthorSession": "codex-session:1@2026-10-10"
+      },
+      "refreshProvenance": {
+        "requestCommit": "ea5ec7406a816239617c55756fe08169ed828850",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p3-ea5ec7406.md",
+        "reviewReportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041",
+        "beforeTuple": [
+          "claim_b6963c89796864ca59f82467d506f348",
+          "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+          "implementation-and-design-status",
+          "4fc22267739453739992bd7673b29eaa711de810b721bd915c28f58ec555cc0c"
+        ],
+        "afterTuple": [
+          "claim_b6963c89796864ca59f82467d506f348",
+          "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+          "implementation-and-design-status",
+          "e9987e41f961ef6c8dc9e9e2b204eafc3ee98883460e98c0c18606ac0cc3a046"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      }
+    },
+    {
+      "claimId": "claim_87f236ae2e3356f5e23e70a7f7224242",
+      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "anchor": "unheaded-block-3",
+      "unitDigest": "59d70c7fd04f6212e5c8909a4bf8bca340c7aeb0f372547419ca80fbc74dd78a",
+      "shownText": "The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs. The retained recovery planner produces a recommendation, park or needs-input decision from snapshot and evidence. Evidence: `src/runner/dispatch/recovery-planner.mjs:243-266`. Applying a recommendation checks its action key, snapshot hash, control epoch, expiry and current legality again. Evidence: `src/runner/dispatch/recovery-planner.mjs:281-316`.",
+      "shownTextDigest": "59d70c7fd04f6212e5c8909a4bf8bca340c7aeb0f372547419ca80fbc74dd78a",
+      "class": "candidate-native-content",
+      "authoredBy": "codex-session:unit-run-1792173247556-515f6e95@2026-10-17",
+      "rationale": "Refresh of the prior candidate-native-content receipt from the exact native tuple claim_35b6d8008541bef15edc061dade28c06/d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b to claim_87f236ae2e3356f5e23e70a7f7224242/59d70c7fd04f6212e5c8909a4bf8bca340c7aeb0f372547419ca80fbc74dd78a, authenticated by the ea5ec7406 x01-x06 accounting review. The restored live facts are included in the shown payload; classification truth requires a new independent review and no prior approval carries.",
+      "truthSection": {
+        "ledger": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json",
+        "anchor": "implementation-and-design-status",
+        "status": "verified",
+        "reason": null
+      },
+      "currentEvidence": {
+        "commit": "af6c116f0e2af1f31f5e1d57830dc60de0c65411",
+        "finding": "true-and-current",
+        "citations": [
+          {
+            "path": "src/runner/dispatch/liveness.mjs",
+            "startLine": 211,
+            "endLine": 302,
+            "blobSha": "79d5e65792adb72fe23ee03ca3c3058f53946411"
+          },
+          {
+            "path": "src/runner/dispatch/recovery-planner.mjs",
+            "startLine": 118,
+            "endLine": 173,
+            "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26"
+          },
+          {
+            "path": "src/runner/dispatch/recovery-planner.mjs",
+            "startLine": 243,
+            "endLine": 316,
+            "blobSha": "2135035f2ada68de6378dad78aed3a376a2f0c26"
+          }
+        ],
+        "scope": "This binding claims only that the shown text states the checked current contract and honestly labels manual guidance, unimplemented design or dated/unexecuted proof. It does not claim those proposals or historical scenarios have been implemented or exercised. The specific current code/consumer boundary is checked in the cited section.",
+        "evidenceReport": "plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json"
+      },
+      "priorRecoveryProvenance": {
+        "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
+        "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
+        "receiptClaimId": "claim_4bc85103cad14d7d4f8557aa71bf943a",
+        "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md",
+        "reportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+        "verdictClaimId": "claim_4bc85103cad14d7d4f8557aa71bf943a",
+        "unitDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
+        "originalAuthorSession": "codex-session:1@2026-10-10"
+      },
+      "refreshProvenance": {
+        "requestCommit": "ea5ec7406a816239617c55756fe08169ed828850",
+        "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p3-ea5ec7406.md",
+        "reviewReportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041",
+        "beforeTuple": [
+          "claim_35b6d8008541bef15edc061dade28c06",
+          "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+          "unheaded-block-3",
+          "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b"
+        ],
+        "afterTuple": [
+          "claim_87f236ae2e3356f5e23e70a7f7224242",
+          "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+          "unheaded-block-3",
+          "59d70c7fd04f6212e5c8909a4bf8bca340c7aeb0f372547419ca80fbc74dd78a"
+        ],
+        "reviewStatus": "pending",
+        "noApprovalCarry": true
+      }
+    }
+  ]
+}

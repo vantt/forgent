@@ -2,6 +2,21 @@
 
 From committed f70ecf4ec ordinary reviews; conservation ok verdicts remain applied. Each item is an owner promotion-truth/cutover obligation, not author approval or a new rework.
 
+Step 10 package wording observations from the independently committed `ea5ec7406` review reports (report commit `9aad548ebf87bf8d364e2f8055e2d9a252114041`); every underlying verdict remains `ok` and these lines neither relabel nor waive it:
+
+- `claim_2d9ccc774d84c91978163a37739aaa26`: The first source paragraph about the candidate boundary and runner-spec authority is carried through the header and Related link, so “no source remainder is dropped” is slightly too strong. Source: `review-step10-package-p1-s1-ea5ec7406.md`.
+- `claim_8be1f5a856f48c009b2a47816d982eb1`: Apply the same first-paragraph-via-header/Related-link qualification as its executor-health sibling. Source: `review-step10-package-p1-s1-ea5ec7406.md`.
+- `claim_ac8c8092219e244b8a9001337c1d8310`: The rationale should explicitly name the Claude `.mcp.json` / `--settings` approval clause instead of covering it only as generic additional detail. Source: `review-step10-package-p1-s1-ea5ec7406.md`.
+- `claim_9c5cef506f44e46a8e66ba64f14499cb`: Replace the rationale's “replaced” wording; the unchanged list entries survive verbatim. Source: `review-step10-package-p1-s2-ea5ec7406.md`.
+- `d01`: The restored executor-health sentences now share the intro paragraph because the Current Scope section no longer exists. Source: `review-step10-package-p2-ea5ec7406.md`.
+- `d02`: The restored run-handle sentences are likewise merged into the single intro paragraph. Source: `review-step10-package-p2-ea5ec7406.md`.
+- `d03`: Provenance should name both the spec commit `6a53e65b5` and the crate-introduction commit `5e7e299ca`. Source: `review-step10-package-p2-ea5ec7406.md`.
+- `x01`: Correct the gate citation to lines 1056–1063; the digest comparison is at 1062–1063. Source: `review-step10-package-p3-ea5ec7406.md`.
+- `x03`: Replace the copied paragraph-unit explanation; this tuple is the executor-health heading. Source: `review-step10-package-p3-ea5ec7406.md`.
+- `g000`: The reason says no current exception remains although a pending replacement exists. Source: `review-step10-package-p3-ea5ec7406.md`.
+- `g023`: The template says history or proposal sections although both owners are candidate documents. Source: `review-step10-package-p3-ea5ec7406.md`.
+- `a01`: Under A38, clarify that the shared reviewer-session identity authenticates the application only and creates no new verdict. Source: `review-step10-package-p3-ea5ec7406.md`.
+
 - `claim_2f7cbb5fabfc5e77f7014c54f020c524`: Manifest rationale omits removed dispatch-log entry and two infra→use-case reclassifications; verify promotion truth. Source: `review-step10-global-pending-03-s1-f70ecf4ec.md`.
 - `claim_4b96f4f42ea417623dcc794155fa17ce`: Sibling manifest rationale describes additions only; omitted removal/reclassifications remain at the historical witness. Source: `review-step10-global-pending-04-s1-f70ecf4ec.md`.
 - `claim_979ec4a61acca9e1b6a0a3967b1d0c88`: Last-reviewed wording cites a rework digest; current target already had ok verdicts at 62751458b and 287a22d33. Source: `review-step10-global-pending-04-s1-f70ecf4ec.md`.

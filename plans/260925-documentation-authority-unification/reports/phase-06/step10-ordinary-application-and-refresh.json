@@ -1,0 +1,877 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:unit-run-1792173247556-515f6e95@2026-10-17",
+  "requestCommit": "ea5ec7406a816239617c55756fe08169ed828850",
+  "reviewReportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041",
+  "SYNC": "bc7358789",
+  "summary": {
+    "reviewedEntries": 91,
+    "decisionRowsApplied": 13,
+    "acceptedAccountingEntries": 78,
+    "rework": 0,
+    "hold": 0,
+    "comparatorRefreshEntries": 6,
+    "backlogRowsRecarried": 2,
+    "predictedComparatorDifferences": 0
+  },
+  "decisionApplications": [
+    {
+      "id": "claim_dd06c2555dc0e81c54c80376fee8ff91",
+      "verdict": "ok",
+      "note": "deep: footer occurrence 1 of 7 at d480a05b5 (line 1347, ancestry 0002 / Hệ quả) equals live work-state.md#unheaded-block-117 (line 1403, same ancestry); identical one-line digest; separate promote claim_c56e0ea4200729ae5cf5542803b2fe10 carries it to history block-7",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p1-s1-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "claim_16abc69cd658a382c456cdaf23f64d87",
+      "verdict": "ok",
+      "note": "deep: occurrence 2 of 7 (d480a05b5 line 1374, ADR 0003 Hệ quả) matches work-state.md#unheaded-block-121 (line 1430) by text, order and heading context; promote claim_c57c39536b983d5f172833853e8b3344 to history block-11 holds the verbatim sentence",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p1-s1-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "claim_9c7e133ec44851189185dbb7b04a78a0",
+      "verdict": "ok",
+      "note": "deep: occurrence 3 of 7 (ADR 0004 Hệ quả, d480a05b5 line 1405) matches live block-126 (line 1461); the earlier reviewed anchor 122 pointed at the 0004 Bối cảnh unit, correctly abandoned; promote claim_7bc17cd130d9b9600e3a8db9bd57ca88 to history block-16",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p1-s1-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "claim_7a0776311f7105750a4f234681f513a3",
+      "verdict": "ok",
+      "note": "deep: occurrence 4 of 7 (ADR 0007 Hệ quả, d480a05b5 line 1477) matches live block-138 (line 1533); the 0006 list-continuation line at 1502 is correctly not counted as a footer unit; promote claim_576e295be7d60ab95a555f11ada15da5 to history block-28",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p1-s1-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "claim_35d0f259a0c0828577dcfd003821fb3a",
+      "verdict": "ok",
+      "note": "deep: occurrence 5 of 7 (ADR 0011, d480a05b5 line 1531) matches live block-144 (line 1587), same ancestry and digest; promote claim_08dc68ef23395b8f3f5b095508348e00 to history block-34 carries the sentence",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p1-s1-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "claim_aace4a1d3e3df2ac329d0930b81bd9f4",
+      "verdict": "ok",
+      "note": "deep: occurrence 6 of 7 (ADR 0012, d480a05b5 line 1608) matches live block-150 (line 1664); the shift from block-144 is +6 not the +2 the old note assumed, so exact content plus context matching was the right method; promote claim_a7c2e1310de5bcd152e86f3833e90033 to history block-40",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p1-s1-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "claim_1d724afb521915455a45db2b1f3b34cd",
+      "verdict": "ok",
+      "note": "deep: occurrence 7 of 7 (ADR 0024 awaiting-approval Hệ quả, d480a05b5 line 1821) matches live block-174 (line 1877); promote claim_82f766f5320ab6bbe5174aeda52e710b in the second decisions shard carries it to history block-64; the bulleted 0019 variant is a different unit and correctly excluded",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p1-s1-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "claim_96c405c9cefaa4b7c63e40bdaac18330",
+      "verdict": "ok",
+      "note": "deep: the two-line sentence at d23045c2d block-65 appears exactly once in the history literal snapshot, which is byte-equal to the pinned source file (sha 3ac2655fe0, provenance header matches) and the live proposals file no longer contains the sentence, so the history carrier is the sole verbatim owner; unequal source and target digests are expected for a heading-unit snapshot",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p1-s1-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "claim_2d9ccc774d84c91978163a37739aaa26",
+      "verdict": "ok",
+      "note": "deep: the two planner sentences are restored verbatim in the status intro (diff f70ecf4ec to HEAD touches only that paragraph); cited recovery-planner.mjs 243-266 (plan returns recommendation, park or needs-input) and 281-316 (checkApply: action key, snapshot hash, control epoch, expiry, legality) still implement every stated check; wording: the first source paragraph (candidate boundary, runner spec authority) is carried only through the header and Related link, so the rationale line no source remainder is dropped is slightly strong",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p1-s1-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "claim_8be1f5a856f48c009b2a47816d982eb1",
+      "verdict": "ok",
+      "note": "deep: the three run-control sentences are restored verbatim in the status intro and nothing else in the file changed; run-lock.mjs 306-320 (expected epoch check, settled refusal), 321-334 (expired heartbeat only attempts reclaim, resolveHolderLiveness must not be held) and 390-412 (settle verifies epoch and token, publishes settled generation) match; wording: same remainder phrasing as the sibling executor-health row",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p1-s1-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "claim_ac8c8092219e244b8a9001337c1d8310",
+      "verdict": "ok",
+      "note": "deep: character diff of source block-139 (pin 947f6169e) against live block-141 shows only two pure insertions (per-CLI credentialSources sentence; leased-account trust, per-hook codex trust and claude MCP approval clause), nothing removed or reworded, so supersede with a strict superset is sound; wording: the rationale names credentialSources, leased-account trust and per-hook trust but not the claude .mcp.json --settings approval clause, which falls under its generic additional-details statement",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p1-s1-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "claim_fdcd01e8f20dd83c584b1eb782bebf3a",
+      "verdict": "ok",
+      "note": "deep: predecessor section-5 merge note (aecdc30aa lines 124-128, \"Merged verbatim ... L10-1 ... A35\") recomputed to 4d254601; HEAD block-15 is the reworded, labelled-corrections intro, so the identity gap is correctly a historical predecessor of the already reviewed out-of-platform navigation claim, no target by design",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p1-s2-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "claim_9c5cef506f44e46a8e66ba64f14499cb",
+      "verdict": "ok",
+      "note": "deep: predecessor product and source list (aecdc30aa lines 130-182) recomputed to 3cb37dbc; HEAD block-16 (lines 131-184) carries the seven labelled Truth correction edits plus the Session Identity entry and is reviewed out-of-platform, so the gap is the pre-correction text of a retained repository-wide navigation file; wording: the rationale says old list \"replaced\" while the file keeps the unchanged entries verbatim",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p1-s2-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    }
+  ],
+  "acceptedAccounting": [
+    {
+      "id": "d01",
+      "verdict": "ok",
+      "note": "deep: executor-health-and-fallback.md changes exactly one line (1 insertion 1 deletion); both appended sentences are byte-identical to lines 26 and 28 of the 9134ff4e5 source, and cited recovery-planner.mjs 243-266 (plan returns park, needs-input or recommendation with actionKey and snapshotHash) and 281-316 (checkApply re-checks action key, snapshot hash, control epoch, expiry, legality) support them; source file unchanged since 9134ff4e5; wording: sentences now share the intro paragraph because the Current Scope section no longer exists.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p2-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "d02",
+      "verdict": "ok",
+      "note": "deep: run-handle.md changes one line only; the three appended sentences equal source lines 26, 28 and 30 at 9134ff4e5; run-lock.mjs 306-320 shows the epoch check and settled refusal, 321-334 shows heartbeat expiry only permits a reclaim attempt and a held or unproven liveness returns held, 390-412 shows settle verifying epoch and token and publishing purpose settled; code unchanged since 9134ff4e5; wording: merged into the single intro paragraph.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p2-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "d03",
+      "verdict": "ok",
+      "note": "deep: 28ded7633 diff is header-only (8 insertions, 1 deletion) and the body after the closing fence is byte-equal (sha 9a2ccb8d both sides, script-verified); Implementation status is renamed Implementation with its value kept, Last reviewed 2026-10-15 and Canonical Yes untouched; the 8 added fields match the spec body (attribution not authentication, lock authority not owned, worker ids and liveness belong to the run supervisor and process facts); file at the pin equals 28ded7633; wording: Provenance says introduced by 6a53e65b5, which is the spec commit while the crate came in 5e7e299ca.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p2-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "c129",
+      "verdict": "ok",
+      "note": "deep: runner list rebind from identity-gap claim_61244b0a (old unit shownText digest ae0e268f verified) to native claim_83a11864 c354e335; the only text change is the pointer bin/fgos.mjs:4640-4643; bin/fgos.mjs:4373-4380 becoming bin/fgos.mjs:4414-4417 as owner decision L10-24 directs; old tuple in the f70ecf4ec list and absent now, new tuple present now and absent before; s10-systemic registryGaps supersede row targets this exact digest and is reviewed.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p2-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "c008",
+      "verdict": "ok",
+      "note": "deep: rebind identity-gap claim_9e9d711e to native claim_cfdd8094 at unheaded-block-117; recovered old text (f4bc8027f, digest 087d5cdd verified by hand) differs from the new unit only by an inserted labelled sentence Added in candidate current-Workflow correction; s10-round4 supersede row reviewed with target digest 7486a9e9; new tuple present in both agent-coordination and proposals-redesigns lists with equal digest.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p2-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "c058",
+      "verdict": "ok",
+      "note": "deep: same claim_edb478ba, digest c4e895ae to 2e2406ce on the contracts README heading; section payload differs only by metadata header completion (Implementation status and Source type renamed, eight header fields added), no body words change; native registry carries the claim with the new digest; old tuple only in the f70ecf4ec list.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p2-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "c083",
+      "verdict": "ok",
+      "note": "deep: same claim_3e77ba7d on work-driver-handoff-to-dispatch, f80fbd76 to ef0e26ef; recovered old section (96a13ab21) differs by one link destination ../../../specs/runner.md becoming ../../runner/spec.md, an allowed destination-only change and the target exists; the retired-unit move row for this claim concerns an older source digest 357b4379 and is unaffected; tuple present in both lists.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p2-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "c087",
+      "verdict": "ok",
+      "note": "deep: same claim_eefd21e4 on the ADR-005 current-scope heading, 12ebb602 to 83370882; the only change from 9134ff4e5 is the runner-spec link destination ../../../specs/runner.md to ../../runner/spec.md; native registry carries the new digest; consistent in both lists.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p2-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "c193",
+      "verdict": "ok",
+      "note": "deep: add of claim_b171f08d (runner decisions h-36d872fbb0e5.md unheaded-block-2, 79df8773 verified by hand); absent from the f70ecf4ec list and from every other current list, no decision row targets it, listed in step10-global-E unreferencedCandidateRows; the unit is a labelled Added in candidate scaffold note, so the unverified status is truthful.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p2-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "c220",
+      "verdict": "ok",
+      "note": "deep: add of claim_ee99b095 (platform/runner/spec.md unheaded-block-10, 28d0009f verified): a labelled carrier lead-in line before a carried legacy section; no decision targets it, absent from the old list and other lists, present in global E unreferenced rows; carries no current-truth claim.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p2-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "c211",
+      "verdict": "ok",
+      "note": "deep: add of claim_dee4109c (agent-coordination vision.md unheaded-block-57, afa6e1bf verified), a six-item numbered reading list; text originates in candidate commit 96a13ab21 and is not source-carried or labelled, which is exactly why it belongs in the candidate-unverified list; no decision targets it and it is in global E.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p2-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "c153",
+      "verdict": "ok",
+      "note": "deep: add of claim_3390e703 (runner decisions h-36d872fbb0e5.md unheaded-block-189, 55c5a952 verified): one labelled line Settled runner decision carried from the retained source; not targeted by any decision, absent from old and other lists, present in global E unreferenced rows.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p2-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "c176",
+      "verdict": "ok",
+      "note": "deep: add of claim_6e283f88 (agent-coordination spec.md unheaded-block-13, 1b6fb009 verified), a four-row owner table originating in eefe3c4e7 and not labelled; not targeted by any decision, absent from old and other lists, present in global E, so listing it as unverified is correct.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p2-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "c105",
+      "verdict": "ok",
+      "note": "deep: removal of historical claim_0b9fcf0a (concept-relationships.md unheaded-block-13, a6662af5 verified); the sentence on a future typed ring architecture was candidate-authored in 96a13ab21 (git -S finds no source) and replaced by the owner-adopted responsibility paragraph in c3f22d6a6; registry has the old claim only as an identity gap, no decision rows carry it, and the current occupant claim_aceb6cd3 is admitted in the agent-coordination list so nothing is rebound by ordinal.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p2-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "c137",
+      "verdict": "ok",
+      "note": "deep: removal of identity-gap claim_088901bb (component-boundary.md unheaded-block-13, dd9bdd0c verified); old table text differs from the current unit only by two link destinations (../architect/proposals/... to proposals/..., ../specs/observe.md to observe/spec.md), both targets exist; the current unit is admitted as claim_b8c99351 in the root-authorities list; no decisions reference the old claim.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p2-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "c039",
+      "verdict": "ok",
+      "note": "deep: removal of identity-gap claim_938bc277 (provider-routing.md unheaded-block-7, 05f96982 verified); the table differs from the current unit only by link destinations rebased to ../spec.md and external-provider-protocol.md (anchors checked ok); occupant claim_ce59b50b is admitted at 4e66c542; no decisions reference the old claim.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p2-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "c110",
+      "verdict": "ok",
+      "note": "deep: removal of identity-gap claim_178bb22f (implementation-pointers.md unheaded-block-1, d357d4a5 verified); the old metadata fence is kept and eight header fields added (Implementation through Superseded by), no words lost; occupant claim_592e9f4d is admitted at dd941d8a; no decisions reference the old claim.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p2-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "c059",
+      "verdict": "ok",
+      "note": "deep: removal of identity-gap claim_5f905e25 (contracts README unheaded-block-1, 85a9c829 verified); header-only change, Implementation status and Source type renamed with values kept plus eight new fields; occupant claim_3ca03051 is admitted at cd576ece; no decisions reference the old claim.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p2-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "g000",
+      "verdict": "ok",
+      "note": "deep: remove of the reviewed 2-owner group for the document front-matter block (digest 03d85305b958...); old owners were platform run-handle.md and runtime-recovery-design.md block-1, current rows of both claims now move to the retired-engine literal snapshots (match true), and a pending 2-owner group with the same digest exists at HEAD, so no exception is lost and no approval is carried; digest recomputed from raw lines; wording: the reason says no current exception remains although a pending replacement exists",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p3-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "g006",
+      "verdict": "ok",
+      "note": "deep: remove of the reviewed group for the short intro line at Step 07 and Step 08 (digest 88c97d5d07...), old owners platform proposals block-77 and block-28, current owners the retired-engine snapshots which contain the text byte for byte; replaced by the pending add g016 for the same digest, record equals the f70ecf4ec group",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p3-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "g007",
+      "verdict": "ok",
+      "note": "deep: seed pick; remove of the reviewed Step 01 and Step 03 group (digest 16005492e5...), old owners team-dispatch step-01 block-43 and step-03 block-41 now moved to snapshots; witness lines 288-290 and 327-329 equal source, text found in both snapshot owners; a pending replacement group exists, digest recomputed",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p3-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "g008",
+      "verdict": "ok",
+      "note": "deep: remove of the reviewed Step 02 and Step 03 Tests-section group (digest f5694fee7b...), same owner move to snapshots, text present verbatim in both; replaced by pending add g021 so the digest stays covered without a carried approval",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p3-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "g009",
+      "verdict": "ok",
+      "note": "deep: remove of the reviewed 4-member closing-sentence group (architecture-map and system-overview), replaced at HEAD by a pending 19-member group over 4 owners (architecture-map, runner h-36d872fbb0e5, system-overview, work-state retired-decision-history); all 19 source units recomputed equal the digest and each member decision row targets the owner and anchor the group lists; the old reviewed approval (reviewReportCommit 5f0403a00) is preserved only in the accounting; wording: the sentence for the 15 added members is not yet contextually reviewed, which the pending status states",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p3-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "g016",
+      "verdict": "ok",
+      "note": "deep: add of the Step 07 and Step 08 group (digest 88c97d5d07...) owned by the two retired-engine proposals snapshots at literal-snapshot; both source units recomputed equal, witness text and lines equal the source, text found verbatim in both owners, Contexts string equals the witness ancestries, status pending authoredBy 28ded7633 session as the file shows, no waiver claimed",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p3-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "g018",
+      "verdict": "ok",
+      "note": "deep: add of the Step 00 and Step 01 Purpose group (digest b090d4b446...), owners are the two team-dispatch snapshot files; sources and witnesses (lines 32-38 and 20-26) equal, text present in both owners, array index 18 equals the file record; the exception only records occurrence and owner membership as its reason says",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p3-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "g019",
+      "verdict": "ok",
+      "note": "deep: add of the Step 01 slice-1 and Step 02 Tests command-list group (digest e4fa3726fb...); the bash command block (lines 196-200 and 423-427) equals the source, found in both snapshot owners, target literal-snapshot digests match by prefix, contexts equal ancestries; group has no prior approval and stays pending",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p3-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "g021",
+      "verdict": "ok",
+      "note": "deep: add of the Step 02 and Step 03 Tests group (digest f5694fee7b...), pending replacement for the removed g008 group; same members and owner set (retired-engine snapshots) but now authored as a pending record, so the old reviewed status is not inherited; witness and bytes verified",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p3-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "g023",
+      "verdict": "ok",
+      "note": "deep: seed pick; add of the group for the discussion lifecycle diagram (digest c0000ebfd3...) at documentation-system-design block-58 and governance block-29; both source units (lines 414-418 and 239-243) recomputed equal and found verbatim in the owners; both decision rows are unchanged since f70ecf4ec so the group is a new accounting of an existing two-owner repetition, not a content change; this accepts only the occurrence and owner membership, whether the lifecycle belongs twice in two candidate documents stays for the contextual and promotion review as the reason itself says; wording: the template text says history or proposal sections though these owners are candidate documents",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p3-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "a01",
+      "verdict": "ok",
+      "note": "deep: all 113 application records re-derived against the f323249f9 reports (verdict, Notes and both digests verbatim), HEAD shard rows carry the stamps with report pin f323249f9; exactly 108 rows turned reviewed across all shards and they are the applied set; 50 retired-row stamps include a targetAncestry I recomputed (0 mismatches); the 5 rework rows (4 retired plus the footer gap) are not reviewed at HEAD and their repairs match the pending-to-pending changes; reviewers differ from authors in every row; wording: the reviewer identity on the stamps is the same session identity that signs this report, so this entry authenticates the application and does not create new verdicts",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p3-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "x01",
+      "verdict": "ok",
+      "note": "deep: comparator unexpected tuple claim_87f236ae... block-3 of executor-health-and-fallback; registry holds the old claim_35b6d8... as an identity gap and the new ID as a unit, the committed recovery receipt (digest d4d6dd64...) with its reviewed projection report exists and is stale by digest because the paragraph now carries the two restored recovery-planner sentences (diff touches exactly line 27), the old unit is in no candidate-unverified list so the new one is correctly unexpected; the difference stays open and is not a waiver; wording: the gate cite is lines 1056-1063 (digest comparison at 1062-1063), not 1056-1061",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p3-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "x02",
+      "verdict": "ok",
+      "note": "deep: unexpected tuple claim_9d5d0b39... block-3 of run-handle.md; native accounting shows old claim_2e2938c7... preserved as an identity gap and a distinct new unit ID for the three-sentence paragraph (diff touches only line 27 and its three evidence ranges in run-lock.mjs are in the text); no receipt exists for this unit, as stated; the new tuple replaces the old committed list tuple x05",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p3-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "x03",
+      "verdict": "ok",
+      "note": "deep: unexpected tuple claim_b6963c89... heading implementation-and-design-status of executor-health-and-fallback; the ID is retained with a new section digest (4fc22267... to e9987e41...) because the section payload changed, and the old receipt for the 4fc22267 digest is in the committed classification file and is rejected by the unit-digest equality in the gate; wording: the explanation text is copied from x01 and speaks of a paragraph unit though this tuple is the heading",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p3-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "x04",
+      "verdict": "ok",
+      "note": "deep: unexpected tuple claim_f1c6ef52... heading of run-handle.md with a new digest 565cf67d... (old bef0ccaa...) under the retained native ID; native accounting, before and after units recomputed and the registry unit carries the new sourceUnitDigest; the pair x04 and x06 is one heading replacement",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p3-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "x05",
+      "verdict": "ok",
+      "note": "deep: expected-only tuple claim_2e2938c7... block-3 of run-handle.md with digest d4d6dd64...; the committed candidate-unverified-agent-coordination.json at HEAD still lists it (the same digest also appears for eight other files, correctly), the old ID is now an identity gap and the current occupant is the x02 tuple; historical list membership retained and not waived; wording: the sentence about the heading-or-paragraph alternative is generic and applies to x06 only",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p3-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "x06",
+      "verdict": "ok",
+      "note": "deep: seed pick; expected-only tuple claim_f1c6ef52... heading with the old digest bef0ccaa... still present in the committed candidate list and absent from active reverse E, because the section digest changed with the restored paragraph; replaced by x04, no ordinal identity graft; the six differences (four actual-only, two expected-only) are exactly the six comparator errors and the explanations file counts unexplained as empty",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p3-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n01",
+      "verdict": "ok",
+      "note": "deep: _binding before 62185030 bytes sha 1f5325ff (git blob of the registry at 498048c1a) and after 62198395 bytes sha b7b7c94c (registry at c3614f4d2) both recomputed from git; the working registry at the package pin binds exactly that earlier file. Metadata only, no content or truth claim.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n02",
+      "verdict": "ok",
+      "note": "deep: carriedFromCommit ade5812a9 to 498048c1a is the value held by the registry file at c3614f4d2 and the pinned registry holds 498048c1a; recomputed by my own full-registry diff.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n03",
+      "verdict": "ok",
+      "note": "deep: carryForward counts recomputed from the pinned registry: 91388 units equals kept 91008 plus paired 374 plus editedKept 3 plus added 3; pairedByAnchor 374, lineage-from-498048c1a 3, origin-added-since-498048c1a 3, identityGaps 5909 to 5912 and retired unchanged at 2284 all match; changedFields list is exact.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n04",
+      "verdict": "ok",
+      "note": "deep: commit field 498048c1a to c3614f4d2 is the content commit named in the request; my diff of the two registry files lists exactly this metadata key change.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n05",
+      "verdict": "ok",
+      "note": "mechanical: tuple equality against my own registry diff, unit digest and anchor re-found at both doc commits, only the origin carry marker (added-since-ade5812a9) removed on a kept unit for claim 0fa55480 (concept-relationships.md unheaded-block-14); 1 reviewed decision row(s) target this unit with matching digest.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n06",
+      "verdict": "ok",
+      "note": "mechanical: tuple equality against my own registry diff, unit digest and anchor re-found at both doc commits, only the origin carry marker (added-since-ade5812a9) removed on a kept unit for claim 18e6220e (h-69197b459754.md unheaded-block-5); 2 reviewed decision row(s) target this unit with matching digest.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n07",
+      "verdict": "ok",
+      "note": "deep: claim_2e2938c7 (run-handle unheaded-block-3, old digest d4d6dd64) leaves units; old text recomputed from raw lines at 498048c1a and no unit with that digest exists at c3614f4d2 because the paragraph was extended by the restored run-control sentences; it reappears as identity gap n38 with identical fields.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n08",
+      "verdict": "ok",
+      "note": "mechanical: tuple equality against my own registry diff, unit digest and anchor re-found at both doc commits, only the origin carry marker (added-since-ade5812a9) removed on a kept unit for claim 35a5dbff (architecture-manifest.json file-block); claim row move reviewed (source digest 74762f5c matches current); 3 reviewed decision row(s) target this unit with matching digest.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n09",
+      "verdict": "ok",
+      "note": "deep: claim_35b6d800 (executor-health-and-fallback unheaded-block-3, old digest d4d6dd64) leaves units because the paragraph gained the recovery planner sentences; old text recomputed from raw lines at 498048c1a; reappears as gap n39. A reviewed candidate-classification receipt for this claim still pins the old digest, so it is stale; the comparator accounting entries own that, not this native entry.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n10",
+      "verdict": "ok",
+      "note": "mechanical: tuple equality against my own registry diff; heading claim 383a6485 (runner.md #guard-reconciliation) loses only the stale needs-review marker and lineage (fromCommit ade5812a9) while its digest equals the current document text at both commits; claim row move reviewed (source digest 42ab966e matches current).",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n11",
+      "verdict": "ok",
+      "note": "mechanical: tuple equality against my own registry diff, unit digest and anchor re-found at both doc commits, only the origin carry marker (added-since-ade5812a9) removed on a kept unit for claim 3883003f (runner.md unheaded-block-119); claim row move reviewed (source digest 75a73f54 matches current).",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n12",
+      "verdict": "ok",
+      "note": "mechanical: tuple equality against my own registry diff; heading claim 39c66e39 (spec.md #lịch-sử-quyết-định) loses only the stale needs-review marker and lineage (fromCommit ade5812a9) while its digest equals the current document text at both commits; 1 reviewed decision row(s) target this unit with matching digest.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n13",
+      "verdict": "ok",
+      "note": "mechanical: tuple equality against my own registry diff; heading claim 39e8bffc (operate-dispatch-runtime-inspection-and-reconciliation.md #plan-reconciliation) loses only the stale needs-review marker and lineage (fromCommit ade5812a9) while its digest equals the current document text at both commits; no decision row binds it (native or corpus-rule unit).",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n14",
+      "verdict": "ok",
+      "note": "deep: new unit claim_3b20c21f (session-identity spec unheaded-block-1, lines 3 to 26) is the rewritten header fence; text and digest 0ec0241b recomputed from raw lines at c3614f4d2, kind specification like the old header, origin added-since-498048c1a; the new text equals the old header plus the renamed and added field lines in the committed diff and nothing else.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n15",
+      "verdict": "ok",
+      "note": "deep: heading claim_47720e8d (session-identity spec H1) changed digests because its following block (the header fence) changed; heading text digest 94917454 and unit digest recomputed by hand from the section payload on both sides; needs-review plus lineage from 498048c1a with the right from and to digests, as the carry-forward code sets for an edited heading.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n16",
+      "verdict": "ok",
+      "note": "mechanical: tuple equality against my own registry diff; heading claim 4eeb2f40 (distribution.md #data-dictionary) loses only the stale needs-review marker and lineage (fromCommit ade5812a9) while its digest equals the current document text at both commits; claim row supersede reviewed (source digest fcbd92b1 matches current).",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n17",
+      "verdict": "ok",
+      "note": "mechanical: tuple equality against my own registry diff; heading claim 53e415a9 (h-69197b459754.md #dispatch-operability-implementation-slice-2026-09-16) loses only the stale needs-review marker and lineage (fromCommit ade5812a9) while its digest equals the current document text at both commits; 1 reviewed decision row(s) target this unit with matching digest.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n18",
+      "verdict": "ok",
+      "note": "mechanical: tuple equality against my own registry diff, unit digest and anchor re-found at both doc commits, only the origin carry marker (added-since-ade5812a9) removed on a kept unit for claim 54d2ff6d (spec.md unheaded-block-85); 5 reviewed decision row(s) target this unit with matching digest.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n19",
+      "verdict": "ok",
+      "note": "deep: read heading unit claim 55b85c1d (runner.md #dispatch-operability-implementation-slice-2026-09-16); the needs-review marker and lineage from ade5812a9 are dropped while the heading digest 020a15e1 is identical before and after and unchanged in the document between 498048c1a and c3614f4d2; claim row supersede reviewed (source digest 020a15e1 matches current).",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n20",
+      "verdict": "ok",
+      "note": "deep: read the unit text and the before/after tuples for claim 580793ae (distribution.md unheaded-block-15); only the origin marker added-since-ade5812a9 is dropped, every digest and anchor is unchanged and equals the text at both commits, which is what the carry-forward code does to kept units; claim row move reviewed (source digest 87f98a72 matches current).",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n21",
+      "verdict": "ok",
+      "note": "mechanical: tuple equality against my own registry diff; heading claim 5c7a41cb (spec.md #data-dictionary) loses only the stale needs-review marker and lineage (fromCommit ade5812a9) while its digest equals the current document text at both commits; 1 reviewed decision row(s) target this unit with matching digest.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n22",
+      "verdict": "ok",
+      "note": "deep: read the unit text and the before/after tuples for claim 7128e920 (operate-dispatch-runtime-inspection-and-reconciliation.md unheaded-block-9); only the origin marker added-since-ade5812a9 is dropped, every digest and anchor is unchanged and equals the text at both commits, which is what the carry-forward code does to kept units; no decision row binds it (native or corpus-rule unit).",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n23",
+      "verdict": "ok",
+      "note": "mechanical: tuple equality against my own registry diff; heading claim 7b8ebb81 (concept-relationships.md #coordination-rings) loses only the stale needs-review marker and lineage (fromCommit ade5812a9) while its digest equals the current document text at both commits; 2 reviewed decision row(s) target this unit with matching digest.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n24",
+      "verdict": "ok",
+      "note": "deep: new unit claim_87f236ae (executor-health-and-fallback unheaded-block-3) text equals the old paragraph plus exactly the two recovery planner sentences with their code evidence ranges from the committed diff; digest 59d70c7f recomputed from raw lines; origin added-since-498048c1a; old claim moved to gap n39.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n25",
+      "verdict": "ok",
+      "note": "deep: read the unit text and the before/after tuples for claim 8af62b94 (runner.md unheaded-block-3); only the origin marker added-since-ade5812a9 is dropped, every digest and anchor is unchanged and equals the text at both commits, which is what the carry-forward code does to kept units; claim row move reviewed (source digest bed7c5ea matches current).",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n26",
+      "verdict": "ok",
+      "note": "deep: read the unit text and the before/after tuples for claim 9b3b7fac (backlog.md unheaded-block-2); only the origin marker added-since-ade5812a9 is dropped, every digest and anchor is unchanged and equals the text at both commits, which is what the carry-forward code does to kept units; claim row regenerate-from-source reviewed (source digest 3430068f matches current).",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n27",
+      "verdict": "ok",
+      "note": "deep: new unit claim_9d5d0b39 (run-handle unheaded-block-3) text equals the old paragraph plus exactly the three run-control sentences with evidence ranges from the committed diff; digest 1f25a51f recomputed from raw lines; origin added-since-498048c1a; old claim moved to gap n38.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n28",
+      "verdict": "ok",
+      "note": "deep: read the unit text and the before/after tuples for claim 9d97a24e (distribution.md unheaded-block-5); only the origin marker added-since-ade5812a9 is dropped, every digest and anchor is unchanged and equals the text at both commits, which is what the carry-forward code does to kept units; claim row move reviewed (source digest 00a3412a matches current); 3 reviewed decision row(s) target this unit with matching digest.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n29",
+      "verdict": "ok",
+      "note": "mechanical: tuple equality against my own registry diff; heading claim a1a32305 (distribution.md #lịch-sử-quyết-định) loses only the stale needs-review marker and lineage (fromCommit ade5812a9) while its digest equals the current document text at both commits; claim row supersede reviewed (source digest bf462051 matches current).",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n30",
+      "verdict": "ok",
+      "note": "mechanical: tuple equality against my own registry diff, unit digest and anchor re-found at both doc commits, only the origin carry marker (added-since-ade5812a9) removed on a kept unit for claim aceb6cd3 (concept-relationships.md unheaded-block-13); no decision row binds it (native or corpus-rule unit).",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n31",
+      "verdict": "ok",
+      "note": "mechanical: tuple equality against my own registry diff, unit digest and anchor re-found at both doc commits, only the origin carry marker (added-since-ade5812a9) removed on a kept unit for claim b68d3dce (architecture-manifest.json file-block); 7 reviewed decision row(s) target this unit with matching digest.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n32",
+      "verdict": "ok",
+      "note": "deep: heading claim_b6963c89 (executor-health-and-fallback Implementation and design status) digest e9987e41 hand-recomputed from section payload and following block on both sides; edited-kept with needs-review and exact lineage because the following paragraph grew. A reviewed candidate-classification receipt pins the older digest 4fc22267 and is now stale, owned by the comparator accounting entries.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n33",
+      "verdict": "ok",
+      "note": "deep: claim_dceb4397 (session-identity spec unheaded-block-1, old header block digest 54ffebc5) leaves units because the header fence was rewritten (field renames plus Provenance, Writer type, Canonical for, Use this when, Do not use this for, Supersedes, Superseded by); old text recomputed from raw lines at 498048c1a; reappears as gap n40.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n34",
+      "verdict": "ok",
+      "note": "mechanical: tuple equality against my own registry diff, unit digest and anchor re-found at both doc commits, only the origin carry marker (added-since-ade5812a9) removed on a kept unit for claim e3b2beba (concept-relationships.md unheaded-block-15); no decision row binds it (native or corpus-rule unit).",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n35",
+      "verdict": "ok",
+      "note": "mechanical: tuple equality against my own registry diff, unit digest and anchor re-found at both doc commits, only the origin carry marker (added-since-ade5812a9) removed on a kept unit for claim e7dcb5fd (spec.md unheaded-block-92); 3 reviewed decision row(s) target this unit with matching digest.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n36",
+      "verdict": "ok",
+      "note": "mechanical: tuple equality against my own registry diff; heading claim f0b2a407 (backlog.md #product-backlog) loses only the stale needs-review marker and lineage (fromCommit ade5812a9) while its digest equals the current document text at both commits; claim row regenerate-from-source reviewed (source digest 92be08bb matches current).",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n37",
+      "verdict": "ok",
+      "note": "deep: heading claim_f1c6ef52 (run-handle Implementation and design status) digest 565cf67d hand-recomputed from section payload and following block on both sides; edited-kept with needs-review and exact lineage because the following paragraph grew; the old digest bef0ccaa is what the comparator reports as missing, which agrees with this tuple.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n38",
+      "verdict": "ok",
+      "note": "deep: identity gap for claim_2e2938c7 carries the removed unit n07 field for field plus identity-gap status and the exact reason string the carry-forward code emits (edited unit whose anchor is not a stable heading anchor); the old digest no longer exists in the run-handle document at c3614f4d2.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n39",
+      "verdict": "ok",
+      "note": "deep: identity gap for claim_35b6d800 equals removed unit n09 field for field plus the code-emitted gap status and reason; the old digest d4d6dd64 is absent from executor-health-and-fallback at c3614f4d2, and the count of 3 gaps in the carry-forward summary matches n38 to n40.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n40",
+      "verdict": "ok",
+      "note": "deep: identity gap for claim_dceb4397 equals removed unit n33 field for field plus the code-emitted gap status and reason; digest 54ffebc5 is absent from the session-identity spec at c3614f4d2 (header rewritten), consistent with the diff of the document.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n41",
+      "verdict": "ok",
+      "note": "deep: executor-health-and-fallback document row: blob 11262bc5 to 7757efe1 and sourceDigest afcd8060 to 84899942 recomputed with git rev-parse and sha256 at 498048c1a and c3614f4d2; the committed diff is the single paragraph extension; sourceId unchanged.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n42",
+      "verdict": "ok",
+      "note": "deep: run-handle document row: blob 82a4aa94 to 23ad4ad1 and sourceDigest 31c3bfbb to a5b3d04d recomputed with git rev-parse and sha256 at both commits; single paragraph extension in the committed diff; sourceId unchanged.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    },
+    {
+      "id": "n43",
+      "verdict": "ok",
+      "note": "deep: session-identity spec document row: blob 290cc68e to 4b1b531d and sourceDigest d007573a to b3dfd588 recomputed at both commits; the diff is the header fence rewrite only (the body from the Purpose section on is untouched); sourceId unchanged.",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p4-ea5ec7406.md",
+      "reportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
+    }
+  ],
+  "comparatorRefreshes": [
+    {
+      "entry": "x01",
+      "direction": "unexpected",
+      "oldTuple": [
+        "claim_35b6d8008541bef15edc061dade28c06",
+        "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+        "unheaded-block-3",
+        "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b"
+      ],
+      "newTuple": [
+        "claim_87f236ae2e3356f5e23e70a7f7224242",
+        "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+        "unheaded-block-3",
+        "59d70c7fd04f6212e5c8909a4bf8bca340c7aeb0f372547419ca80fbc74dd78a"
+      ],
+      "reviewVerdict": "ok",
+      "reviewNote": "deep: comparator unexpected tuple claim_87f236ae... block-3 of executor-health-and-fallback; registry holds the old claim_35b6d8... as an identity gap and the new ID as a unit, the committed recovery receipt (digest d4d6dd64...) with its reviewed projection report exists and is stale by digest because the paragraph now carries the two restored recovery-planner sentences (diff touches exactly line 27), the old unit is in no candidate-unverified list so the new one is correctly unexpected; the difference stays open and is not a waiver; wording: the gate cite is lines 1056-1063 (digest comparison at 1062-1063), not 1056-1061",
+      "proof": {
+        "nativeAccountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-native-content-accounting.json",
+        "nativeAccountingIndex": 1,
+        "candidateLists": [
+          "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-agent-coordination.json",
+          "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-proposals-redesigns.json"
+        ],
+        "currentReceipt": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step10-refresh.json"
+      },
+      "noRelabelling": true,
+      "noWaiver": true
+    },
+    {
+      "entry": "x02",
+      "direction": "unexpected",
+      "oldTuple": [
+        "claim_2e2938c719ad58a967857c76c72850f1",
+        "docs/platform/agent-coordination/architecture/run-handle.md",
+        "unheaded-block-3",
+        "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b"
+      ],
+      "newTuple": [
+        "claim_9d5d0b39286fb978c6de4bbc09e75adb",
+        "docs/platform/agent-coordination/architecture/run-handle.md",
+        "unheaded-block-3",
+        "1f25a51f75e78cb32b002b7ccb303a916191d96c495a81235ebf1b7a8608f694"
+      ],
+      "reviewVerdict": "ok",
+      "reviewNote": "deep: unexpected tuple claim_9d5d0b39... block-3 of run-handle.md; native accounting shows old claim_2e2938c7... preserved as an identity gap and a distinct new unit ID for the three-sentence paragraph (diff touches only line 27 and its three evidence ranges in run-lock.mjs are in the text); no receipt exists for this unit, as stated; the new tuple replaces the old committed list tuple x05",
+      "proof": {
+        "nativeAccountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-native-content-accounting.json",
+        "nativeAccountingIndex": 3,
+        "candidateLists": [
+          "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-agent-coordination.json",
+          "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-proposals-redesigns.json"
+        ],
+        "currentReceipt": null
+      },
+      "noRelabelling": true,
+      "noWaiver": true
+    },
+    {
+      "entry": "x03",
+      "direction": "unexpected",
+      "oldTuple": [
+        "claim_b6963c89796864ca59f82467d506f348",
+        "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+        "implementation-and-design-status",
+        "4fc22267739453739992bd7673b29eaa711de810b721bd915c28f58ec555cc0c"
+      ],
+      "newTuple": [
+        "claim_b6963c89796864ca59f82467d506f348",
+        "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+        "implementation-and-design-status",
+        "e9987e41f961ef6c8dc9e9e2b204eafc3ee98883460e98c0c18606ac0cc3a046"
+      ],
+      "reviewVerdict": "ok",
+      "reviewNote": "deep: unexpected tuple claim_b6963c89... heading implementation-and-design-status of executor-health-and-fallback; the ID is retained with a new section digest (4fc22267... to e9987e41...) because the section payload changed, and the old receipt for the 4fc22267 digest is in the committed classification file and is rejected by the unit-digest equality in the gate; wording: the explanation text is copied from x01 and speaks of a paragraph unit though this tuple is the heading",
+      "proof": {
+        "nativeAccountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-native-content-accounting.json",
+        "nativeAccountingIndex": 0,
+        "candidateLists": [
+          "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-agent-coordination.json",
+          "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-proposals-redesigns.json"
+        ],
+        "currentReceipt": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step10-refresh.json"
+      },
+      "noRelabelling": true,
+      "noWaiver": true
+    },
+    {
+      "entry": "x04",
+      "direction": "unexpected",
+      "oldTuple": [
+        "claim_f1c6ef52a41ee978ba72a88733520c60",
+        "docs/platform/agent-coordination/architecture/run-handle.md",
+        "implementation-and-design-status",
+        "bef0ccaa8745300be2bf165c8d136047af133c064637af821eed0a95b23d04fe"
+      ],
+      "newTuple": [
+        "claim_f1c6ef52a41ee978ba72a88733520c60",
+        "docs/platform/agent-coordination/architecture/run-handle.md",
+        "implementation-and-design-status",
+        "565cf67de33a96a867f31b05e3ef2330415d5c6385df5a355e92b6d4d5a38421"
+      ],
+      "reviewVerdict": "ok",
+      "reviewNote": "deep: unexpected tuple claim_f1c6ef52... heading of run-handle.md with a new digest 565cf67d... (old bef0ccaa...) under the retained native ID; native accounting, before and after units recomputed and the registry unit carries the new sourceUnitDigest; the pair x04 and x06 is one heading replacement",
+      "proof": {
+        "nativeAccountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-native-content-accounting.json",
+        "nativeAccountingIndex": 2,
+        "candidateLists": [
+          "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-agent-coordination.json",
+          "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-proposals-redesigns.json"
+        ],
+        "currentReceipt": null
+      },
+      "noRelabelling": true,
+      "noWaiver": true
+    },
+    {
+      "entry": "x05",
+      "direction": "missing",
+      "oldTuple": [
+        "claim_2e2938c719ad58a967857c76c72850f1",
+        "docs/platform/agent-coordination/architecture/run-handle.md",
+        "unheaded-block-3",
+        "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b"
+      ],
+      "newTuple": [
+        "claim_9d5d0b39286fb978c6de4bbc09e75adb",
+        "docs/platform/agent-coordination/architecture/run-handle.md",
+        "unheaded-block-3",
+        "1f25a51f75e78cb32b002b7ccb303a916191d96c495a81235ebf1b7a8608f694"
+      ],
+      "reviewVerdict": "ok",
+      "reviewNote": "deep: expected-only tuple claim_2e2938c7... block-3 of run-handle.md with digest d4d6dd64...; the committed candidate-unverified-agent-coordination.json at HEAD still lists it (the same digest also appears for eight other files, correctly), the old ID is now an identity gap and the current occupant is the x02 tuple; historical list membership retained and not waived; wording: the sentence about the heading-or-paragraph alternative is generic and applies to x06 only",
+      "proof": {
+        "nativeAccountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-native-content-accounting.json",
+        "nativeAccountingIndex": 3,
+        "candidateLists": [
+          "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-agent-coordination.json",
+          "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-proposals-redesigns.json"
+        ],
+        "currentReceipt": null
+      },
+      "noRelabelling": true,
+      "noWaiver": true
+    },
+    {
+      "entry": "x06",
+      "direction": "missing",
+      "oldTuple": [
+        "claim_f1c6ef52a41ee978ba72a88733520c60",
+        "docs/platform/agent-coordination/architecture/run-handle.md",
+        "implementation-and-design-status",
+        "bef0ccaa8745300be2bf165c8d136047af133c064637af821eed0a95b23d04fe"
+      ],
+      "newTuple": [
+        "claim_f1c6ef52a41ee978ba72a88733520c60",
+        "docs/platform/agent-coordination/architecture/run-handle.md",
+        "implementation-and-design-status",
+        "565cf67de33a96a867f31b05e3ef2330415d5c6385df5a355e92b6d4d5a38421"
+      ],
+      "reviewVerdict": "ok",
+      "reviewNote": "deep: seed pick; expected-only tuple claim_f1c6ef52... heading with the old digest bef0ccaa... still present in the committed candidate list and absent from active reverse E, because the section digest changed with the restored paragraph; replaced by x04, no ordinal identity graft; the six differences (four actual-only, two expected-only) are exactly the six comparator errors and the explanations file counts unexplained as empty",
+      "proof": {
+        "nativeAccountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-native-content-accounting.json",
+        "nativeAccountingIndex": 2,
+        "candidateLists": [
+          "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-agent-coordination.json",
+          "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-proposals-redesigns.json"
+        ],
+        "currentReceipt": null
+      },
+      "noRelabelling": true,
+      "noWaiver": true
+    }
+  ],
+  "backlogRecarry": {
+    "fromCommit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+    "toCommit": "bc7358789",
+    "newRows": [
+      "| p-68be2ae3 | **`fgos doctor --fix` is all-or-nothing and can disturb working configs.** Owner report (2026-10-16): `--fix` hangs, and has damaged configs that were working. Code facts: `--fix` runs every registered fix (22 today, `src/setup/registrations.mjs` `registerFix`), including writes into other tools' configs (`codex-hook-wired`, `agy-hook-wired`, `omp-hook-wired`, `pi-hook-wired`, `agy-permissions-configured`, `claude-plugin-marketplace`) and cleanup (`confinement-orphaned-resources-reaped`, `credential-copies-retained`); there is no way to run one fix, no dry run, no backup. The JSON writers skip a malformed file (`src/setup/agent-hooks.mjs:107-108`) but otherwise rewrite the whole file with `JSON.stringify` (`agent-hooks.mjs:35-37`), so formatting and anything outside the touched key are re-serialized. Owner expectation: a fix only repairs what is wrong, keeps every existing setting, and when a file is syntactically broken it reports the syntax error (file, line, column) instead of guessing. | `fgos doctor --fix <check-id>` runs one fix; `--fix --dry-run` prints the exact change per file; every fix that edits a file makes a minimal key-level edit, keeps a timestamped backup, and leaves unrelated keys, ordering and formatting intact (golden tests on real-world config samples); a file that does not parse is reported with file, line and column and left untouched; each fix has a time limit and reports which fix is still running instead of hanging | proposed | — |",
+      "| p-7eb9e65b | **fgOS and AgentKit (`ak`) overwrite each other's registrations.** Observed 2026-10-16 in this repo: installing the `ak` engineer kit for both `claude-code` and `omp` targets wrote the same rule set into `.claude/rules/*.md` and into an `AGENTKIT-OMP` block in `AGENTS.md` (read twice by Claude through `@AGENTS.md`, about 17 KB), and re-appended about 19 hooks into `.claude/settings.json` in its raw form next to the guarded form fgOS had rewritten them to (commit `036884908`), so each hook fires twice; `statusLine` points at paths that do not exist. Cause: two installers each assume they own `settings.json` and the instruction files, and each compares hook commands by exact string. Related doctrine: `docs/coexistence.md` (territory, one conductor per session, Known Gaps). | A written ownership contract between fgOS and other kit installers: each tool owns named files or marked blocks (e.g. fgOS hooks in `.claude/settings.json`, kit hooks in `.claude/settings.local.json` or a kit-owned block), neither rewrites the other's entries, and hook identity is the script path, not the command string; `fgos doctor` reports duplicate hook registrations and instruction blocks loaded twice (reuse `core/skills/instruction-audit/scripts/instruction-audit.mjs` logic) and `--fix` removes only fgOS's own duplicates; `docs/coexistence.md` Known Gaps updated; re-running `ak kit install` and `fgos setup` in either order leaves no duplicates (test) | proposed | — |"
+    ],
+    "oldUnits": {
+      "heading": [
+        "claim_f0b2a4079764d68b1102ddddb08776ce",
+        "92be08bb7b0a9af07f2d36307db6a7891545c2ab4590dcbb77074d46c2c8dfbe"
+      ],
+      "table": [
+        "claim_9b3b7fac64df06547dd06e05f4f026c5",
+        "3430068fb5b1687e480e143bc34727fa7d6ada9f1342932c9fdd2f8b23c17da2"
+      ]
+    },
+    "currentLocalUnits": {
+      "headingDigest": "5f190b849165ce8115369ebb112a31b286e85237f5c3dd32f8493cc3cfd93d17",
+      "tableDigest": "7d5317616b4b105936b065a213de9cce47e44c3e623d6dd293ffd0d5dc4c84ec"
+    },
+    "decisionShard": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-generated-backlog.json",
+    "route": "regenerate-from-source",
+    "nativeSuccessorId": "pending next single native sync; never guessed",
+    "noIdentityGraft": true,
+    "noApprovalCarry": true,
+    "exactDiff": "diff --git a/docs/backlog.md b/docs/backlog.md\nindex 7393034cc..5063fd3e2 100644\n--- a/docs/backlog.md\n+++ b/docs/backlog.md\n@@ -17,6 +17,8 @@ never a generation timestamp or any other wall-clock value.\n | p-2a39f940 | Neither fgOS trigger path (interactive pick, headless runner) reaches an MVP2-equivalent outcome on its own terms — different failure shapes, not equivalent | Case 1 (interactive /fgOS:pick, tsk-57u, docs/history/mvp2-scope-test-infra/reports/case-1-interactive.md) reaches all three literal artifacts -- green verify (23 pass/0 fail), a real commit (4f501f1) on the item's own fgw/tsk-57u branch, and a clean worktree teardown -- but fgos return's fresh-claim path measures only the ORIGINAL checkout's HEAD, never the fgw/<id> branch pick itself created, so return structurally refuses to register the completed work and the item is stuck at awaiting-human instead of proposed/done. Case 2 (headless fgos-runner --once, docs/history/mvp2-scope-test-infra/reports/case-2-headless.md) never reaches ANY of the three artifacts: fgos-runner.mjs resolves repoRoot via git rev-parse --show-toplevel with no override flag/env, dogfood-fixture is not its own git repo, so a real --once invocation would claim and dispatch real forgent work off the live repo/.fgos/state.json (8 real items) -- confirmed unsafe twice, never invoked for real. Fix scope: (a) fgos return's branch-aware path (bin/fgos.mjs:1306) must also accept a first, ordinary interactive pick's fgw/<id> branch, not only a re-claimed already-blocked item's branchHeadAtTake; (b) fgos-runner needs a cwd-rooted root override (e.g. --root/FGOS_ROOT) parallel to the fgos.mjs verbs' existing process.cwd()-derived isolation, so the headless trigger can be pointed at a testbed instead of always resolving through git toplevel. Done when both cases can independently reach green verify + commit on own branch + clean teardown AND the engine registers completion (proposed/done), proven by re-running this feature's two live cases. | proposed | mvp2-scope-test-infra |\n | p-3e6b1a52 | Remove `legacyPersonaProjection` from `src/runner/dispatch/assignment.mjs`. It is the old line-based persona reader kept only so persona text pinned into a run before the YAML parser change still resumes with the same text when the strict parser rejects it. Open it when no run pinned by a release older than the vendored-parser change can still be resumed (check the oldest resumable pinned run, or retire pre-change releases explicitly). | `legacyPersonaProjection` and its pinned-text fallback are gone, the persona tests that pin the fallback are removed with them, and a pinned persona now takes the same parser path as a fresh one | proposed | vendor-js-yaml-single-yaml-door |\n | p-51f4eb7e | **Bù version token cho CTR006 (routing-handoff)** — decision 0011 bắt mọi contract mang `<name>/v<N>`; CTR006 khai \"designed — spec đầy đủ, chưa có code implement\" (architecture-map.md:350) và `routing-handoff-contract.md` không mang field version nào. Để NGOÀI biên STR46 khi chốt exploring 2026-07-27: dán version lên thứ chưa chạy là đóng dấu cho giả định, không phải cho hành vi. Làm khi CTR006 có code thật, cùng lượt với lần implement đầu tiên. | CTR006 mang version token đúng khuôn 0011, và token đó đối chiếu được với code đang chạy chứ không chỉ với spec | proposed | — |\n+| p-68be2ae3 | **`fgos doctor --fix` is all-or-nothing and can disturb working configs.** Owner report (2026-10-16): `--fix` hangs, and has damaged configs that were working. Code facts: `--fix` runs every registered fix (22 today, `src/setup/registrations.mjs` `registerFix`), including writes into other tools' configs (`codex-hook-wired`, `agy-hook-wired`, `omp-hook-wired`, `pi-hook-wired`, `agy-permissions-configured`, `claude-plugin-marketplace`) and cleanup (`confinement-orphaned-resources-reaped`, `credential-copies-retained`); there is no way to run one fix, no dry run, no backup. The JSON writers skip a malformed file (`src/setup/agent-hooks.mjs:107-108`) but otherwise rewrite the whole file with `JSON.stringify` (`agent-hooks.mjs:35-37`), so formatting and anything outside the touched key are re-serialized. Owner expectation: a fix only repairs what is wrong, keeps every existing setting, and when a file is syntactically broken it reports the syntax error (file, line, column) instead of guessing. | `fgos doctor --fix <check-id>` runs one fix; `--fix --dry-run` prints the exact change per file; every fix that edits a file makes a minimal key-level edit, keeps a timestamped backup, and leaves unrelated keys, ordering and formatting intact (golden tests on real-world config samples); a file that does not parse is reported with file, line and column and left untouched; each fix has a time limit and reports which fix is still running instead of hanging | proposed | — |\n+| p-7eb9e65b | **fgOS and AgentKit (`ak`) overwrite each other's registrations.** Observed 2026-10-16 in this repo: installing the `ak` engineer kit for both `claude-code` and `omp` targets wrote the same rule set into `.claude/rules/*.md` and into an `AGENTKIT-OMP` block in `AGENTS.md` (read twice by Claude through `@AGENTS.md`, about 17 KB), and re-appended about 19 hooks into `.claude/settings.json` in its raw form next to the guarded form fgOS had rewritten them to (commit `036884908`), so each hook fires twice; `statusLine` points at paths that do not exist. Cause: two installers each assume they own `settings.json` and the instruction files, and each compares hook commands by exact string. Related doctrine: `docs/coexistence.md` (territory, one conductor per session, Known Gaps). | A written ownership contract between fgOS and other kit installers: each tool owns named files or marked blocks (e.g. fgOS hooks in `.claude/settings.json`, kit hooks in `.claude/settings.local.json` or a kit-owned block), neither rewrites the other's entries, and hook identity is the script path, not the command string; `fgos doctor` reports duplicate hook registrations and instruction blocks loaded twice (reuse `core/skills/instruction-audit/scripts/instruction-audit.mjs` logic) and `--fix` removes only fgOS's own duplicates; `docs/coexistence.md` Known Gaps updated; re-running `ak kit install` and `fgos setup` in either order leaves no duplicates (test) | proposed | — |\n | p-782e25aa | STR46 buoc merge: viet lai kho fgos-test-drive tu ngoai worktree str46 | Kho /home/vantt/projects/fgos-test-drive/.fgos KHONG viet duoc tu worktree str46: write guard tu choi moi duong dan khong nam gon trong worktree vat ly (da do bang probe that, khong phai suy doan). Vi vay no roi khoi lat 1 cung ly do da doi kho song ra. Pham vi: events.jsonl 26 dong, 12 dong mang ten cu, 0 dang predicted long, tat ca deu mang truong version. Kho la mot repo git nhung .fgos KHONG duoc theo doi nen khong co nghia vu commit. Dung script scripts/migrate-actor-to-role.mjs (cell str46-io-contract-r3-6), chay --dry-run truoc, backup ra ngoai thu muc kho. Sau do chay lai ban chieu bang cach dat thu muc lam viec VAO chinh kho do roi goi bin/fgos.mjs rebuild - fgos lay kho tu process.cwd() va KHONG co co --dir nao, nen goi tu cho khac se nham vao kho sai. Xong: log khong con ten cu, khong con dong khai version 2, moi dong parse duoc, 26 dong, seq lien tuc. Chay cung dip voi PBI p-b822cf9f (kho song), tu mot noi co quyen ghi ca hai. | proposed | str46-io-contract |\n | p-88b4ae1e | Audit every reservations release / releaseHolds call site for the same missing-session-filter gap xwh-3 fixed at one call site | Every call site that scopes a cross-worktree hold release derives and passes session (or documents why it legitimately cannot), not just cell -- confirmed via code read across the whole .bee/bin tree, not just handleReservationsRelease | proposed | — |\n | p-8d04c7f1 | Watch js-yaml security advisories. js-yaml is vendored as one file (`src/util/third-party/js-yaml.mjs`, upgrade procedure in `docs/specs/distribution.md` decision history), so `npm audit` and Dependabot no longer see it. Open it on every advisory for js-yaml, and review at least when a release is staged. | A named owner checks the js-yaml advisory feed on a stated cadence or hooks it into release staging, and an advisory leads to the documented upgrade procedure | proposed | vendor-js-yaml-single-yaml-door |\n"
+  },
+  "ratchet": {
+    "basis": "A31/L10-14 main re-carry",
+    "docsDeltaFiles": [
+      "docs/backlog.md"
+    ],
+    "accountedRows": 2,
+    "unaccountedDocsDelta": [],
+    "generatedBacklogRouteConsistent": true
+  },
+  "predictedComparator": {
+    "differences": 0,
+    "strictGreen": true,
+    "basis": "Committed native c361 tuples plus refreshed mirrored candidate lists and pending current receipts; backlog is outside the candidate union.",
+    "notExecutedThisAuthorTurn": true
+  }
+}

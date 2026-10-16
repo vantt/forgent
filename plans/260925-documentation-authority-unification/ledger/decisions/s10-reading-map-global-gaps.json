@@ -15,9 +15,15 @@
       "sourceUnitDigest": "4d25460103ef8fb3a28a5f34bcb9680e7db43604944c9b3c222b18ffb1c82077",
       "claimKind": "navigation",
       "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
-      "rationale": "Historical repository navigation predecessor docs/reading-map.md#unheaded-block-15, unit SHA256 4d25460103ef8fb3a28a5f34bcb9680e7db43604944c9b3c222b18ffb1c82077, independently recovered at aecdc30aad0ffd65a2956ff642c4be9410686ede:124-128. The frozen map and existing s5-root-retained-navigation-proposal decisions retain this repository-wide singleton outside platform documentation authority. The old explanatory merge note was replaced by labelled corrections in section 5; current native navigation is claim_69f68ab48e108dc19e2e8f69936fce60, digest 2224720e5dba57fb7728214b829cb8850518f0ba27fc9e76b4049b040d596cb7, with full before/current text in step10-author-gap-header-accounting.json. The numbered anchor alone does not prove carried identity. Reclassify the historical gap outside platform scope and preserve its native record; no platform target, copy, retirement, implementation truth certificate or carried approval. Vocabulary reclassify-out-of-platform-scope requires no target owner; targetOwner and targetAnchor are intentionally absent. Independent ordinary review pending."
+      "rationale": "Historical repository navigation predecessor docs/reading-map.md#unheaded-block-15, unit SHA256 4d25460103ef8fb3a28a5f34bcb9680e7db43604944c9b3c222b18ffb1c82077, independently recovered at aecdc30aad0ffd65a2956ff642c4be9410686ede:124-128. The frozen map and existing s5-root-retained-navigation-proposal decisions retain this repository-wide singleton outside platform documentation authority. The old explanatory merge note was replaced by labelled corrections in section 5; current native navigation is claim_69f68ab48e108dc19e2e8f69936fce60, digest 2224720e5dba57fb7728214b829cb8850518f0ba27fc9e76b4049b040d596cb7, with full before/current text in step10-author-gap-header-accounting.json. The numbered anchor alone does not prove carried identity. Reclassify the historical gap outside platform scope and preserve its native record; no platform target, copy, retirement, implementation truth certificate or carried approval. Vocabulary reclassify-out-of-platform-scope requires no target owner; targetOwner and targetAnchor are intentionally absent. Independent ordinary review pending.",
+      "reviewNote": "deep: predecessor section-5 merge note (aecdc30aa lines 124-128, \"Merged verbatim ... L10-1 ... A35\") recomputed to 4d254601; HEAD block-15 is the reworded, labelled-corrections intro, so the identity gap is correctly a historical predecessor of the already reviewed out-of-platform navigation claim, no target by design",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p1-s2-ea5ec7406.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
     },
     {
       "claimId": "claim_9c5cef506f44e46a8e66ba64f14499cb",
@@ -26,9 +32,15 @@
       "sourceUnitDigest": "3cb37dbc28864019579211dcadd7e189fb667783946e770ad45a9a81c2ca5b30",
       "claimKind": "navigation",
       "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
-      "rationale": "Historical repository navigation predecessor docs/reading-map.md#unheaded-block-16, unit SHA256 3cb37dbc28864019579211dcadd7e189fb667783946e770ad45a9a81c2ca5b30, independently recovered at aecdc30aad0ffd65a2956ff642c4be9410686ede:130-182. The frozen map and existing s5-root-retained-navigation-proposal decisions retain this repository-wide singleton outside platform documentation authority. The old detailed product/source list was replaced by labelled corrections in section 5; current native navigation is claim_42444c5f44c4076300c2b9c56516c429, digest 607cd88b7a9323d610811e9bee61bbcb328ad12ba92f9f1b62defc5ab6c6db24, with full before/current text in step10-author-gap-header-accounting.json. The numbered anchor alone does not prove carried identity. Reclassify the historical gap outside platform scope and preserve its native record; no platform target, copy, retirement, implementation truth certificate or carried approval. Vocabulary reclassify-out-of-platform-scope requires no target owner; targetOwner and targetAnchor are intentionally absent. Independent ordinary review pending."
+      "rationale": "Historical repository navigation predecessor docs/reading-map.md#unheaded-block-16, unit SHA256 3cb37dbc28864019579211dcadd7e189fb667783946e770ad45a9a81c2ca5b30, independently recovered at aecdc30aad0ffd65a2956ff642c4be9410686ede:130-182. The frozen map and existing s5-root-retained-navigation-proposal decisions retain this repository-wide singleton outside platform documentation authority. The old detailed product/source list was replaced by labelled corrections in section 5; current native navigation is claim_42444c5f44c4076300c2b9c56516c429, digest 607cd88b7a9323d610811e9bee61bbcb328ad12ba92f9f1b62defc5ab6c6db24, with full before/current text in step10-author-gap-header-accounting.json. The numbered anchor alone does not prove carried identity. Reclassify the historical gap outside platform scope and preserve its native record; no platform target, copy, retirement, implementation truth certificate or carried approval. Vocabulary reclassify-out-of-platform-scope requires no target owner; targetOwner and targetAnchor are intentionally absent. Independent ordinary review pending.",
+      "reviewNote": "deep: predecessor product and source list (aecdc30aa lines 130-182) recomputed to 3cb37dbc; HEAD block-16 (lines 131-184) carries the seven labelled Truth correction edits plus the Session Identity entry and is reviewed out-of-platform, so the gap is the pre-correction text of a retained repository-wide navigation file; wording: the rationale says old list \"replaced\" while the file keeps the unchanged entries verbatim",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p1-s2-ea5ec7406.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
     }
   ]
 }

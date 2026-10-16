@@ -1,3 +1,15 @@
+# Ordinary package verdicts applied; comparator inputs refreshed — package next
+
+Assignment `unit-run-1792173247556-515f6e95/producer/1`; request `ea5ec7406`; reports `9aad548eb`; SYNC `bc7358789`. **91 ok /0 rework /0 hold:** all **13 decision rows** applied ordinary with Notes verbatim and all **78 accounting entries** recorded with report paths. Both candidate lists and the stale executor-health receipt projections now bind the current four native tuples; x01–x06 retain complete old/new proof, no relabelling/waiver. Predicted unchanged comparator after committed-input/native refresh: **zero differences, strict green** (prediction only; not executed this AUTHOR turn).
+
+Main's only docs delta is the two new `docs/backlog.md` rows. They are re-carried under the A31/L10-14 generated-backlog route: heading current digest pending, predecessor table retained as a pending gap, current table digest queued for the next native successor with no guessed id or approval carry. Twelve wording-only observations are queued one line each for owner promotion truth.
+
+**Checks:** audit+consistency 12,904 rows/93 shards/0 findings; ownership0 new active pairs/0 native duplicates/0 drift; replay366+98+4 clean; A/B/H clean; promotion160/160; candidate status0; mutation12/12; tests507/507 with `CLAUDE_CODE_SESSION_ID` unset; diff check clean. [Report](step-10-report.md), [application/refresh proof](step10-ordinary-application-and-refresh.json), [checks](step10-ordinary-application-checks.json).
+
+**NEXT=package after runner commit:** one native sync; global D/E; unchanged comparator strict green/zero differences; checkpoint population+refresh; small independent request for the two backlog re-carry rows and six list/receipt refreshes; checkpoint-request refresh. Then independent checkpoint, then separate close to **awaiting owner review**. No blocker. No native/global/checkpoint/rehearsal/request packaging, fgOS CLI, Git write or protected-tool/baseline change in this turn; runner commits.
+
+---
+
 # Package complete — independent ordinary and checkpoint review next
 
 Assignment `unit-run-1792169760182-e3acba42/producer/1`;content/SYNC `c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be`,main already contained,docs unchanged. **One native sync665.599s/one compact persistence62,196,419 bytes**,known99,581→99,584,zero loss,4,486 files/91,388 active tuples equal. Registry SHA256 **`6fcd58e6f7a2ea0f17df2b1c4024b2728dfa2d73dfc365278df3c3a1c964018c`**. Final checkpoint registry byte-identical;original prior preserved. Final hash check caught/fixed an author-wrapper inline-comment copy omission;no second native persistence.

@@ -9,22 +9,17 @@
   "claims": [
     {
       "claimId": "claim_f0b2a4079764d68b1102ddddb08776ce",
-      "sourceUnitDigest": "92be08bb7b0a9af07f2d36307db6a7891545c2ab4590dcbb77074d46c2c8dfbe",
+      "sourceUnitDigest": "5f190b849165ce8115369ebb112a31b286e85237f5c3dd32f8493cc3cfd93d17",
       "claimKind": "navigation",
       "disposition": "regenerate-from-source",
       "targetOwner": null,
       "targetAnchor": null,
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
-      "rationale": "At SYNC 498048c1a, the retained native product-backlog heading has source SHA256 92be08bb7b0a9af07f2d36307db6a7891545c2ab4590dcbb77074d46c2c8dfbe. The file is a generated, non-authority backlog projection and remains at its existing path under the frozen root authority map. The complete current heading is re-decided regenerate-from-source, with no platform target and no approval inherited from its previous wording. This is a disposition of the projection, not evidence that its store, renderer or status values are current, and does not authorize regeneration, deletion, retirement, promotion or cutover. See step10-round7-main-carry.json for the independently reviewable generated-file/source mapping; this turn edits no docs bytes.",
-      "reviewNote": "deep: heading Product Backlog at HEAD (92be08bb) recomputed by extractor and by hand from heading, section payload and following block. The digest moved from 80073210 because the section now holds two more PBI rows (p-3e6b1a52 and p-8d04c7f1, upstream f64c68c1d). regenerate-from-source with no target matches the frozen root map row for docs/backlog.md (area-map-root-authorities.md L36, product-backlog exception) and the file stays in place. wording: the new rationale drops the evidence sentences of the earlier reviewed one (no .bee/backlog.jsonl, bee not installed, hand-added rows); they are still true here (no .bee directory, bee not on PATH). No approval carried.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792173247556-515f6e95@2026-10-17",
+      "rationale": "At SYNC bc7358789, the retained Product Backlog heading resolves locally to source SHA256 5f190b849165ce8115369ebb112a31b286e85237f5c3dd32f8493cc3cfd93d17 after exactly two upstream PBI rows were added. The file remains the generated, non-authority backlog projection at its frozen root path. Keep regenerate-from-source with no platform target; this does not authorize a renderer run, discard hand-added rows, certify status truth, promote, retire or cut over. Exact c3614f4d2..bc7358789 hunk and old/new units are in step10-ordinary-application-and-refresh.json. Native retained-ID confirmation and independent review are pending; no prior approval carries.",
+      "reviewNote": "A31/L10-14 main re-carry: heading section payload changed only because two PBI rows were added. Native retained-ID confirmation and independent ordinary review remain next; no approval carried.",
       "sourcePath": "docs/backlog.md",
-      "sourceAnchor": "product-backlog",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-03-s2-f70ecf4ec.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
+      "sourceAnchor": "product-backlog"
     },
     {
       "claimId": "claim_c295c4c899afa37544bda841421c92e4",
@@ -76,25 +71,6 @@
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0027-root-pending-resume.md",
       "reviewMode": "ordinary",
       "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
-    },
-    {
-      "claimId": "claim_9b3b7fac64df06547dd06e05f4f026c5",
-      "sourcePath": "docs/backlog.md",
-      "sourceAnchor": "unheaded-block-2",
-      "sourceUnitDigest": "3430068fb5b1687e480e143bc34727fa7d6ada9f1342932c9fdd2f8b23c17da2",
-      "claimKind": "historical-context",
-      "disposition": "regenerate-from-source",
-      "targetOwner": null,
-      "targetAnchor": null,
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792151464109-150279f8@2026-10-16",
-      "rationale": "The complete current generated product-backlog table is retained at docs/backlog.md#unheaded-block-2, native source SHA256 3430068fb5b1687e480e143bc34727fa7d6ada9f1342932c9fdd2f8b23c17da2. The upstream main table update is an event-sourced product-backlog projection, outside platform authority under the frozen root map. Its predecessor native identity remains as a separate pending registryGap decision; this new identity is not grafted onto that predecessor. Keep the current bytes at their existing path. Regenerate-from-source describes its owning future workflow, not permission to run a renderer, discard manually introduced rows, certify status truth, copy product backlog into a candidate spec, retire a source or cut over readers. Header/source mapping and the exact main hunk are in step10-round7-main-carry.json. Independent ordinary disposition review is pending; no approval inherited.",
-      "reviewNote": "deep: unheaded-block-2 of docs/backlog.md at HEAD L11-52 (3430068f) recomputed by extractor and by hand; against the predecessor block at b6763388b L11-50 (57afbc48) the diff is exactly two added PBI table rows (p-3e6b1a52, p-8d04c7f1), nothing removed or changed. regenerate-from-source with no target is consistent with the frozen map; the rationale is right that the predecessor identity stays a separate gap (claim_d7660c15). The new native id matches step10-global-native-proof newUnits.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-03-s2-f70ecf4ec.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
     }
   ],
   "registryGaps": [
@@ -116,6 +92,34 @@
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-04-s2-f70ecf4ec.md",
       "reviewMode": "ordinary",
       "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
+    },
+    {
+      "claimId": "claim_9b3b7fac64df06547dd06e05f4f026c5",
+      "sourcePath": "docs/backlog.md",
+      "sourceAnchor": "unheaded-block-2",
+      "sourceUnitDigest": "3430068fb5b1687e480e143bc34727fa7d6ada9f1342932c9fdd2f8b23c17da2",
+      "claimKind": "historical-context",
+      "disposition": "regenerate-from-source",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792173247556-515f6e95@2026-10-17",
+      "rationale": "The complete c3614f4d2 generated backlog table (SHA256 3430068fb5b1687e480e143bc34727fa7d6ada9f1342932c9fdd2f8b23c17da2) is preserved as the exact predecessor of the bc7358789 table. Main adds only p-68be2ae3 and p-7eb9e65b; all predecessor lines remain verbatim. Keep regenerate-from-source outside platform authority and preserve the predecessor until the next single native sync records the current 7d5317616b4b105936b065a213de9cce47e44c3e623d6dd293ffd0d5dc4c84ec unit under its real native identity. No guessed successor ID, renderer permission, truth approval, promotion, retirement or cutover.",
+      "reviewNote": "A31/L10-14 main re-carry: this c3614f4d2 table identity is now a historical predecessor of the two-row-expanded table. Native sync must allocate/confirm the successor; no ordinal graft or approval carry.",
+      "sourceCommit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be"
+    }
+  ],
+  "pendingNativeSuccessors": [
+    {
+      "path": "docs/backlog.md",
+      "anchor": "unheaded-block-2",
+      "sourceUnitDigest": "7d5317616b4b105936b065a213de9cce47e44c3e623d6dd293ffd0d5dc4c84ec",
+      "disposition": "regenerate-from-source",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792173247556-515f6e95@2026-10-17",
+      "reason": "Real claimId intentionally deferred to the next single native sync; assigning one here would be an identity graft."
     }
   ]
 }

@@ -35036,8 +35036,13 @@
       "shownSourceText": "Use these as defaults for the first team-dispatch proof, not permanent hard\nbindings.",
       "shownSourceDigest": "74d1a79c159657dabd64e7bc2d04c0737ede2b74bbf3c1a4dcea0053f6b8b3c6",
       "sourceCommit": "d23045c2de83e3508fda8fd2580b43ece2e1e046",
-      "reviewStatus": "pending",
-      "reviewNote": "L10-38 history carrier replaces rewritten block-67 Independent re-review pending; no approval carried."
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: the two-line sentence at d23045c2d block-65 appears exactly once in the history literal snapshot, which is byte-equal to the pinned source file (sha 3ac2655fe0, provenance header matches) and the live proposals file no longer contains the sentence, so the history carrier is the sole verbatim owner; unequal source and target digests are expected for a heading-unit snapshot",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p1-s1-ea5ec7406.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
     },
     {
       "claimId": "claim_3bffcfe4496d0fec611c2d4cdfbf9149",
@@ -77810,8 +77815,13 @@
       "rationale": "L10-38: Supersede docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#current-scope at 9134ff4e531bb7e75b188ed272188f6efbfe430d with docs/platform/agent-coordination/architecture/executor-health-and-fallback.md#implementation-and-design-status (25-25, digest e9987e41f961ef6c8dc9e9e2b204eafc3ee98883460e98c0c18606ac0cc3a046). The former candidate boundary remains scoped to surviving current/design material and runner execution authority. The complete 2 live fact paragraphs are restored verbatim in the status introduction: The retained recovery planner produces a recommendation, park or needs-input decision from snapshot and evidence. Evidence: `src/runner/dispatch/recovery-planner.mjs:243-266`. Applying a recommendation checks its action key, snapshot hash, control epoch, expiry and current legality again. Evidence: `src/runner/dispatch/recovery-planner.mjs:281-316`. Code at the cited ranges still implements every stated check/outcome. The existing status table additionally distinguishes unimplemented design from live contracts; no historical engine is reinstated and no source remainder is dropped. Conservation re-review and promotion truth review remain independent.",
       "sourceCommit": "9134ff4e531bb7e75b188ed272188f6efbfe430d",
       "shownSourceText": "## Current Scope\n\nThis candidate retains the surviving owner and boundary below. It is not a second runtime schema or an approval of the former engine. Current execution authority remains [the runner spec](../../../specs/runner.md).\n\nThe retained recovery planner produces a recommendation, park or needs-input decision from snapshot and evidence. Evidence: `src/runner/dispatch/recovery-planner.mjs:243-266`.\n\nApplying a recommendation checks its action key, snapshot hash, control epoch, expiry and current legality again. Evidence: `src/runner/dispatch/recovery-planner.mjs:281-316`.",
-      "reviewStatus": "pending",
-      "reviewNote": "L10-38 verified live sentences restored; supersede retains whole source scope Independent re-review pending; no approval carried."
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: the two planner sentences are restored verbatim in the status intro (diff f70ecf4ec to HEAD touches only that paragraph); cited recovery-planner.mjs 243-266 (plan returns recommendation, park or needs-input) and 281-316 (checkApply: action key, snapshot hash, control epoch, expiry, legality) still implement every stated check; wording: the first source paragraph (candidate boundary, runner spec authority) is carried only through the header and Related link, so the rationale line no source remainder is dropped is slightly strong",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p1-s1-ea5ec7406.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
     },
     {
       "claimId": "claim_fdcff07d67a00e7a098db37705cd7cdb",
@@ -77852,8 +77862,13 @@
       "rationale": "L10-38: Supersede docs/platform/agent-coordination/architecture/run-handle.md#current-scope at 9134ff4e531bb7e75b188ed272188f6efbfe430d with docs/platform/agent-coordination/architecture/run-handle.md#implementation-and-design-status (25-25, digest 565cf67de33a96a867f31b05e3ef2330415d5c6385df5a355e92b6d4d5a38421). The former candidate boundary remains scoped to surviving current/design material and runner execution authority. The complete 3 live fact paragraphs are restored verbatim in the status introduction: Run-control acquisition checks the expected control epoch and refuses a settled generation. Evidence: `src/runner/dispatch/run-lock.mjs:306-320`. An expired heartbeat does not authorize stealing a live or unproven-dead holder; holder liveness must permit reclaim. Evidence: `src/runner/dispatch/run-lock.mjs:321-334`. Settlement verifies the exact epoch and token and publishes a settled generation. Evidence: `src/runner/dispatch/run-lock.mjs:390-412`. Code at the cited ranges still implements every stated check/outcome. The existing status table additionally distinguishes unimplemented design from live contracts; no historical engine is reinstated and no source remainder is dropped. Conservation re-review and promotion truth review remain independent.",
       "sourceCommit": "9134ff4e531bb7e75b188ed272188f6efbfe430d",
       "shownSourceText": "## Current Scope\n\nThis candidate retains the surviving owner and boundary below. It is not a second runtime schema or an approval of the former engine. Current execution authority remains [the runner spec](../../../specs/runner.md).\n\nRun-control acquisition checks the expected control epoch and refuses a settled generation. Evidence: `src/runner/dispatch/run-lock.mjs:306-320`.\n\nAn expired heartbeat does not authorize stealing a live or unproven-dead holder; holder liveness must permit reclaim. Evidence: `src/runner/dispatch/run-lock.mjs:321-334`.\n\nSettlement verifies the exact epoch and token and publishes a settled generation. Evidence: `src/runner/dispatch/run-lock.mjs:390-412`.",
-      "reviewStatus": "pending",
-      "reviewNote": "L10-38 verified live sentences restored; supersede retains whole source scope Independent re-review pending; no approval carried."
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: the three run-control sentences are restored verbatim in the status intro and nothing else in the file changed; run-lock.mjs 306-320 (expected epoch check, settled refusal), 321-334 (expired heartbeat only attempts reclaim, resolveHolderLiveness must not be held) and 390-412 (settle verifies epoch and token, publishes settled generation) match; wording: same remainder phrasing as the sibling executor-health row",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p1-s1-ea5ec7406.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
     },
     {
       "claimId": "claim_a997b51c522d4bffcb867d2599b6abcd",
@@ -80878,8 +80893,13 @@
       "rationale": "L10-38: The source private-home recipe docs/specs/confinement-authority.md#unheaded-block-139 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea (digest 45c002409eb1ea7d8170b033d5a590edc01ab8284b9cf787474a310e05c24823) is superseded by the live three-item recipe docs/specs/confinement-authority.md#unheaded-block-141 (lines 1359-1361, digest 0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc). Both retain invocation resourceBindings and private-home provisioning from account inventory. The successor expands per-CLI credentialSources, binds trust to the leased account, and states per-hook trust provisioning in the private home. These are additional current recipe details beyond the older credentialSource/trust-store wording. The old block-140 revision is not used as a historical witness: that anchor now holds the formula introduction, a different unit. This is the owning confinement batch's pending conservation binding; no source edit or truth approval.",
       "owningBatch": "specs-confinement-authority",
       "nextIndependentReview": "the next review of the owning specs batch (not closed); excluded from the 21-section/49-row Agent Coordination targeted check",
-      "reviewStatus": "pending",
-      "reviewNote": "L10-38 live recipe and extra credential/trust content bound Independent re-review pending; no approval carried."
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: character diff of source block-139 (pin 947f6169e) against live block-141 shows only two pure insertions (per-CLI credentialSources sentence; leased-account trust, per-hook codex trust and claude MCP approval clause), nothing removed or reworded, so supersede with a strict superset is sound; wording: the rationale names credentialSources, leased-account trust and per-hook trust but not the claude .mcp.json --settings approval clause, which falls under its generic additional-details statement",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p1-s1-ea5ec7406.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
     },
     {
       "sourcePath": "docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md",

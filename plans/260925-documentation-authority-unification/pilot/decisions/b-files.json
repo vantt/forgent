@@ -38,8 +38,13 @@
       "authoredBy": "codex-session:unit-run-1792169199615-02803e61@2026-10-16",
       "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
-      "reviewStatus": "pending",
-      "reviewNote": "L10-39 footer matched by exact text, occurrence and enclosing context Independent re-review pending; no approval carried."
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: footer occurrence 1 of 7 at d480a05b5 (line 1347, ancestry 0002 / Hệ quả) equals live work-state.md#unheaded-block-117 (line 1403, same ancestry); identical one-line digest; separate promote claim_c56e0ea4200729ae5cf5542803b2fe10 carries it to history block-7",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p1-s1-ea5ec7406.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
     },
     {
       "claimId": "claim_16abc69cd658a382c456cdaf23f64d87",
@@ -51,8 +56,13 @@
       "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "authoredBy": "codex-session:unit-run-1792169199615-02803e61@2026-10-16",
-      "reviewStatus": "pending",
-      "reviewNote": "L10-39 footer matched by exact text, occurrence and enclosing context Independent re-review pending; no approval carried."
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: occurrence 2 of 7 (d480a05b5 line 1374, ADR 0003 Hệ quả) matches work-state.md#unheaded-block-121 (line 1430) by text, order and heading context; promote claim_c57c39536b983d5f172833853e8b3344 to history block-11 holds the verbatim sentence",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p1-s1-ea5ec7406.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
     },
     {
       "claimId": "claim_9c7e133ec44851189185dbb7b04a78a0",
@@ -64,8 +74,13 @@
       "authoredBy": "codex-session:unit-run-1792169199615-02803e61@2026-10-16",
       "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
-      "reviewStatus": "pending",
-      "reviewNote": "L10-39 footer matched by exact text, occurrence and enclosing context Independent re-review pending; no approval carried."
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: occurrence 3 of 7 (ADR 0004 Hệ quả, d480a05b5 line 1405) matches live block-126 (line 1461); the earlier reviewed anchor 122 pointed at the 0004 Bối cảnh unit, correctly abandoned; promote claim_7bc17cd130d9b9600e3a8db9bd57ca88 to history block-16",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p1-s1-ea5ec7406.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
     },
     {
       "claimId": "claim_7a0776311f7105750a4f234681f513a3",
@@ -77,8 +92,13 @@
       "authoredBy": "codex-session:unit-run-1792169199615-02803e61@2026-10-16",
       "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
-      "reviewStatus": "pending",
-      "reviewNote": "L10-39 footer matched by exact text, occurrence and enclosing context Independent re-review pending; no approval carried."
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: occurrence 4 of 7 (ADR 0007 Hệ quả, d480a05b5 line 1477) matches live block-138 (line 1533); the 0006 list-continuation line at 1502 is correctly not counted as a footer unit; promote claim_576e295be7d60ab95a555f11ada15da5 to history block-28",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p1-s1-ea5ec7406.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
     },
     {
       "claimId": "claim_35d0f259a0c0828577dcfd003821fb3a",
@@ -90,8 +110,13 @@
       "authoredBy": "codex-session:unit-run-1792169199615-02803e61@2026-10-16",
       "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
-      "reviewStatus": "pending",
-      "reviewNote": "L10-39 footer matched by exact text, occurrence and enclosing context Independent re-review pending; no approval carried."
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: occurrence 5 of 7 (ADR 0011, d480a05b5 line 1531) matches live block-144 (line 1587), same ancestry and digest; promote claim_08dc68ef23395b8f3f5b095508348e00 to history block-34 carries the sentence",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p1-s1-ea5ec7406.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
     },
     {
       "claimId": "claim_aace4a1d3e3df2ac329d0930b81bd9f4",
@@ -103,8 +128,13 @@
       "authoredBy": "codex-session:unit-run-1792169199615-02803e61@2026-10-16",
       "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
-      "reviewStatus": "pending",
-      "reviewNote": "L10-39 footer matched by exact text, occurrence and enclosing context Independent re-review pending; no approval carried."
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: occurrence 6 of 7 (ADR 0012, d480a05b5 line 1608) matches live block-150 (line 1664); the shift from block-144 is +6 not the +2 the old note assumed, so exact content plus context matching was the right method; promote claim_a7c2e1310de5bcd152e86f3833e90033 to history block-40",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p1-s1-ea5ec7406.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
     },
     {
       "claimId": "claim_1d724afb521915455a45db2b1f3b34cd",
@@ -116,8 +146,13 @@
       "authoredBy": "codex-session:unit-run-1792169199615-02803e61@2026-10-16",
       "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
-      "reviewStatus": "pending",
-      "reviewNote": "L10-39 footer matched by exact text, occurrence and enclosing context Independent re-review pending; no approval carried."
+      "reviewStatus": "reviewed",
+      "reviewNote": "deep: occurrence 7 of 7 (ADR 0024 awaiting-approval Hệ quả, d480a05b5 line 1821) matches live block-174 (line 1877); promote claim_82f766f5320ab6bbe5174aeda52e710b in the second decisions shard carries it to history block-64; the bulleted 0019 variant is a different unit and correctly excluded",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-17",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-package-p1-s1-ea5ec7406.md",
+      "reviewMode": "ordinary",
+      "reviewReportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041"
     }
   ],
   "claims": []

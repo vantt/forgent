@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "authorSession": "codex-session:unit-run-1792173247556-515f6e95@2026-10-17",
+  "sync": "bc7358789",
+  "reviewRequestCommit": "ea5ec7406a816239617c55756fe08169ed828850",
+  "reviewReportCommit": "9aad548ebf87bf8d364e2f8055e2d9a252114041",
+  "checks": {
+    "decisionApplication": {
+      "reviewedEntries": 91,
+      "decisionRowsApplied": 13,
+      "acceptedAccountingEntries": 78,
+      "rework": 0,
+      "hold": 0,
+      "notesVerbatim": true,
+      "reportPinsMatch": true
+    },
+    "rationaleAudit": {
+      "rows": 12904,
+      "shards": 93,
+      "findings": 0,
+      "historicalWitnessLimits": 66
+    },
+    "rationaleConsistency": {
+      "rows": 12904,
+      "shards": 93,
+      "findings": 0,
+      "historicalWitnessLimits": 66
+    },
+    "ownership": {
+      "newActiveSourcePairCollisions": 0,
+      "nativePlatformTargetIdentityDuplicates": 0,
+      "targetDigestDrift": 0,
+      "noNewDoubleOwnership": true,
+      "evidence": "step10-round5-target-ownership.json"
+    },
+    "linkReplay": {
+      "originalRows": 366,
+      "laterRows": 98,
+      "round3Edits": 4,
+      "findings": 0,
+      "evidence": "step10-round5-link-replay.json"
+    },
+    "A": {
+      "ok": true,
+      "newWorkingViolations": 0
+    },
+    "B": {
+      "ok": true,
+      "protectedHashesChanged": 0
+    },
+    "H": {
+      "files": 609,
+      "checked": 217,
+      "findings": 0
+    },
+    "IContextOnly": {
+      "equalToHEAD": true,
+      "frozenBaselineUnchanged": true,
+      "historicalDifferenceRetained": true
+    },
+    "promotion": {
+      "complete": 160,
+      "total": 160,
+      "missing": 0
+    },
+    "candidateStatusStrict": {
+      "findings": 0
+    },
+    "structuralMutationProbe": {
+      "cases": 12,
+      "passed": 12,
+      "cleanAccepted": true,
+      "mutationsRejected": 11
+    },
+    "documentToolTests": {
+      "tests": 507,
+      "passed": 507,
+      "failed": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "environment": "env -u CLAUDE_CODE_SESSION_ID"
+    },
+    "diffCheck": {
+      "ok": true
+    }
+  },
+  "predictedComparator": {
+    "differences": 0,
+    "strictGreen": true,
+    "basis": "All six accepted x01-x06 differences are closed in the explicit committed-input expectations by replacing the two stale expected tuples, adding the two current paragraph/heading tuples and rebinding the two stale classification projections to current native tuples. This is a prediction only; the package turn must perform one native sync and run the unchanged comparator."
+  },
+  "notRunByAuthorTurn": [
+    "native registry sync",
+    "global D",
+    "global E",
+    "unchanged comparator execution",
+    "checkpoint refresh",
+    "rehearsal",
+    "review-request construction"
+  ]
+}

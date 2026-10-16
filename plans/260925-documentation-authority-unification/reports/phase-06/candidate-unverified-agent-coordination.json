@@ -4,7 +4,7 @@
   "authorization": "A28 + A31; existing accepted list plus four interim machine-repin-review tuples; native equality verified at dfff335d3; formal classification acceptance still pending",
   "authoredCommit": "dfff335d3f620b49403e4e4b2f70cedee5ca0452",
   "meaning": "Conservation-only candidate-unverified units, exactly the native scoped strict E reverse-open set after committed evidence-only re-pin review. The 134 actually changed-code receipts remain unverified; truth is sampled under A28 and checked in full at promotion.",
-  "count": 597,
+  "count": 599,
   "rows": [
     {
       "claimId": "claim_934febe56562f8195a08b9f82f9fcce5",
@@ -654,6 +654,36 @@
       }
     },
     {
+      "claimId": "claim_b6963c89796864ca59f82467d506f348",
+      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "anchor": "implementation-and-design-status",
+      "unitDigest": "e9987e41f961ef6c8dc9e9e2b204eafc3ee98883460e98c0c18606ac0cc3a046",
+      "status": "candidate-unverified",
+      "fileStatus": {
+        "kind": "architecture",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      }
+    },
+    {
+      "claimId": "claim_87f236ae2e3356f5e23e70a7f7224242",
+      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "anchor": "unheaded-block-3",
+      "unitDigest": "59d70c7fd04f6212e5c8909a4bf8bca340c7aeb0f372547419ca80fbc74dd78a",
+      "status": "candidate-unverified",
+      "fileStatus": {
+        "kind": "architecture",
+        "kindCanonical": true,
+        "authorityStatus": "candidate",
+        "designStatus": "Candidate",
+        "canonical": false,
+        "eligibility": "non-promoted Candidate/Draft"
+      }
+    },
+    {
       "claimId": "claim_55005dc915b1c104f51182a494cd9ab9",
       "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
       "anchor": "unheaded-block-8",
@@ -1254,7 +1284,8 @@
       "claimId": "claim_f1c6ef52a41ee978ba72a88733520c60",
       "path": "docs/platform/agent-coordination/architecture/run-handle.md",
       "anchor": "implementation-and-design-status",
-      "unitDigest": "bef0ccaa8745300be2bf165c8d136047af133c064637af821eed0a95b23d04fe",
+      "unitDigest": "565cf67de33a96a867f31b05e3ef2330415d5c6385df5a355e92b6d4d5a38421",
+      "status": "candidate-unverified",
       "fileStatus": {
         "kind": "architecture",
         "kindCanonical": true,
@@ -1262,14 +1293,14 @@
         "designStatus": "Candidate",
         "canonical": false,
         "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
+      }
     },
     {
-      "claimId": "claim_2e2938c719ad58a967857c76c72850f1",
+      "claimId": "claim_9d5d0b39286fb978c6de4bbc09e75adb",
       "path": "docs/platform/agent-coordination/architecture/run-handle.md",
       "anchor": "unheaded-block-3",
-      "unitDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
+      "unitDigest": "1f25a51f75e78cb32b002b7ccb303a916191d96c495a81235ebf1b7a8608f694",
+      "status": "candidate-unverified",
       "fileStatus": {
         "kind": "architecture",
         "kindCanonical": true,
@@ -1277,8 +1308,7 @@
         "designStatus": "Candidate",
         "canonical": false,
         "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
+      }
     },
     {
       "claimId": "claim_bad34e9c7e80093808e67870fb15900f",
@@ -9919,6 +9949,15 @@
       "add": 40
     },
     "reviewStatus": "pending",
-    "meaning": "Prior list-level review/native-equality receipts describe their historical pins; changed entries require new independent review. Current tuple membership verified against persisted native registry and reverse set, not current implementation truth."
+    "meaning": "Six x01-x06 comparator differences are closed from committed native before/after tuples: two executor-health current tuples added and two run-handle predecessor tuples replaced by their current successors. Mirrored lists carry no approval; independent review remains required.",
+    "latestAuthorSession": "codex-session:unit-run-1792173247556-515f6e95@2026-10-17",
+    "latestBasisCommit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+    "latestAccounting": "step10-ordinary-application-and-refresh.json",
+    "latestChanges": {
+      "logicalComparatorEntries": 6,
+      "listAdds": 2,
+      "listRebinds": 2,
+      "listRemoves": 2
+    }
   }
 }

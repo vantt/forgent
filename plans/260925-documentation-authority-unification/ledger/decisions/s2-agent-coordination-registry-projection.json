@@ -291,29 +291,17 @@
     },
     {
       "claimId": "claim_b6963c89796864ca59f82467d506f348",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
-      "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
-      "reviewedAt": "2026-10-12",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-projection.md",
-      "reviewReportCommit": "dd1fe8d808aa60d559722b4c604acaff1894837c",
-      "reviewMode": "ordinary",
-      "reviewNote": "identity projection of plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md row claim_0665b9cff5975b973955aeb7749d97ba; bytes equal"
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step10-refresh.json",
+      "authoredBy": "codex-session:unit-run-1792173247556-515f6e95@2026-10-17",
+      "reviewStatus": "pending",
+      "pendingReason": "The ea5ec7406 ordinary accounting review accepted the exact native before/after tuple. Current receipt bytes are authored pending at the runner-owned commit; no prior classification approval carries."
     },
     {
-      "claimId": "claim_35b6d8008541bef15edc061dade28c06",
-      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
-      "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
-      "reviewedAt": "2026-10-12",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-projection.md",
-      "reviewReportCommit": "dd1fe8d808aa60d559722b4c604acaff1894837c",
-      "reviewMode": "ordinary",
-      "reviewNote": "identity projection of plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md row claim_4bc85103cad14d7d4f8557aa71bf943a; bytes equal"
+      "claimId": "claim_87f236ae2e3356f5e23e70a7f7224242",
+      "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-step10-refresh.json",
+      "authoredBy": "codex-session:unit-run-1792173247556-515f6e95@2026-10-17",
+      "reviewStatus": "pending",
+      "pendingReason": "The ea5ec7406 ordinary accounting review accepted the exact native before/after tuple. Current receipt bytes are authored pending at the runner-owned commit; no prior classification approval carries."
     },
     {
       "claimId": "claim_81b5fc1779b88acb251ebca21d8bcbac",

@@ -24,7 +24,7 @@
     "docs/architect/proposals/step-10-coding-domain-adoption.md",
     "docs/architect/proposals/visibility-and-interactive-contact-herdr-spawn.md"
   ],
-  "count": 651,
+  "count": 653,
   "reviewStatus": "pending",
   "meaning": "Complete native reverse population for the Step 7 source scopes. Namespace expansion is native checker behavior and includes pre-existing candidate units in owning areas. Eligibility review is not truth approval or a classification receipt; no source approval is carried.",
   "rows": [
@@ -678,6 +678,36 @@
       "reviewMode": "ordinary",
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
       "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+    },
+    {
+      "claimId": "claim_b6963c89796864ca59f82467d506f348",
+      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "anchor": "implementation-and-design-status",
+      "unitDigest": "e9987e41f961ef6c8dc9e9e2b204eafc3ee98883460e98c0c18606ac0cc3a046",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792173247556-515f6e95@2026-10-17",
+      "fileStatus": {
+        "kind": "architecture",
+        "kindCanonical": true,
+        "designStatus": "Candidate",
+        "authorityStatus": "candidate"
+      }
+    },
+    {
+      "claimId": "claim_87f236ae2e3356f5e23e70a7f7224242",
+      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "anchor": "unheaded-block-3",
+      "unitDigest": "59d70c7fd04f6212e5c8909a4bf8bca340c7aeb0f372547419ca80fbc74dd78a",
+      "status": "candidate-unverified",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792173247556-515f6e95@2026-10-17",
+      "fileStatus": {
+        "kind": "architecture",
+        "kindCanonical": true,
+        "designStatus": "Candidate",
+        "authorityStatus": "candidate"
+      }
     },
     {
       "claimId": "claim_55005dc915b1c104f51182a494cd9ab9",
@@ -1460,43 +1490,31 @@
       "claimId": "claim_f1c6ef52a41ee978ba72a88733520c60",
       "path": "docs/platform/agent-coordination/architecture/run-handle.md",
       "anchor": "implementation-and-design-status",
-      "unitDigest": "bef0ccaa8745300be2bf165c8d136047af133c064637af821eed0a95b23d04fe",
+      "unitDigest": "565cf67de33a96a867f31b05e3ef2330415d5c6385df5a355e92b6d4d5a38421",
       "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792173247556-515f6e95@2026-10-17",
       "fileStatus": {
         "kind": "architecture",
         "kindCanonical": true,
         "designStatus": "Candidate",
         "authorityStatus": "candidate"
-      },
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewNote": "mechanical: digest recomputed from git blob at the pin (section formula) equals shown digest; tuple byte-equal in the Agent list; file header Design status Candidate / kind architecture; not read in full",
-      "reviewedAt": "2026-10-15",
-      "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      }
     },
     {
-      "claimId": "claim_2e2938c719ad58a967857c76c72850f1",
+      "claimId": "claim_9d5d0b39286fb978c6de4bbc09e75adb",
       "path": "docs/platform/agent-coordination/architecture/run-handle.md",
       "anchor": "unheaded-block-3",
-      "unitDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
+      "unitDigest": "1f25a51f75e78cb32b002b7ccb303a916191d96c495a81235ebf1b7a8608f694",
       "status": "candidate-unverified",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792173247556-515f6e95@2026-10-17",
       "fileStatus": {
         "kind": "architecture",
         "kindCanonical": true,
         "designStatus": "Candidate",
         "authorityStatus": "candidate"
-      },
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewNote": "mechanical: digest recomputed from git blob at the pin (sha256 of raw block lines) equals shown digest; tuple byte-equal in the Agent list; file header Design status Candidate / kind architecture; not read in full",
-      "reviewedAt": "2026-10-15",
-      "reviewMode": "ordinary",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
-      "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+      }
     },
     {
       "claimId": "claim_bad34e9c7e80093808e67870fb15900f",
@@ -13802,6 +13820,15 @@
       "rebind": 11
     },
     "reviewStatus": "pending",
-    "meaning": "Prior list-level review/native-equality receipts describe their historical pins; changed entries require new independent review. Current tuple membership verified against persisted native registry and reverse set, not current implementation truth."
+    "meaning": "Six x01-x06 comparator differences are closed from committed native before/after tuples: two executor-health current tuples added and two run-handle predecessor tuples replaced by their current successors. Mirrored lists carry no approval; independent review remains required.",
+    "latestAuthorSession": "codex-session:unit-run-1792173247556-515f6e95@2026-10-17",
+    "latestBasisCommit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+    "latestAccounting": "step10-ordinary-application-and-refresh.json",
+    "latestChanges": {
+      "logicalComparatorEntries": 6,
+      "listAdds": 2,
+      "listRebinds": 2,
+      "listRemoves": 2
+    }
   }
 }
