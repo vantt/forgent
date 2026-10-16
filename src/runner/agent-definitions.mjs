@@ -23,6 +23,9 @@ export const AGENT_NAME_PATTERN = /^[a-z][a-z0-9-]{0,63}$/;
 export const AGENT_FILE_MAX_BYTES = 16 * 1024;
 export const INSTALL_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
+/** No tier defines the name. Told apart from a definition that exists but is unusable, which a caller must not skip. */
+export class AgentNotFoundError extends RunnerConfigError {}
+
 const TIER_LABELS = { workspace: 'fgos/agents', domain: 'domains/*/agents', core: 'core/agents' };
 
 function sortedNames(dir) {
@@ -219,5 +222,5 @@ export function resolveAgentDefinition(name, options) {
   }
   const searched = scan.map(({ label, dirs }) => `${label} (${dirs.length > 0 ? dirs.join(', ') : 'no such folder'})`).join('; ');
   const hint = scan.flatMap((t) => t.ignored).find((rel) => rel.endsWith(`/${name}.yml`));
-  throw new RunnerConfigError(`persona "${name}" not found; searched ${searched}${hint ? `; ${hint} exists but only .yaml files are read` : ''}`);
+  throw new AgentNotFoundError(`persona "${name}" not found; searched ${searched}${hint ? `; ${hint} exists but only .yaml files are read` : ''}`);
 }

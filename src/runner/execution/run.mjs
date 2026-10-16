@@ -22,7 +22,7 @@ import { createCredentialProbe } from '../dispatch/provider-credential-probe.mjs
 import { ensureRunnerConfigForDir, RunnerConfigError, assertRunTimeoutMs } from '../dispatch/config.mjs';
 import { commitOnBranch, commitUnitWork, foreignIndexDetail, preflightUnitWorktree } from './commit-unit-work.mjs';
 import { assertSyncResumable, commitRoundWithSync, effectiveWriteScope, runPendingSync, seedSync, syncBrief, syncSummary } from './unit-sync.mjs';
-import { resolveAgentDefinition } from '../agent-definitions.mjs';
+import { AgentNotFoundError, resolveAgentDefinition } from '../agent-definitions.mjs';
 import { parseYaml } from '../../util/yaml.mjs';
 import { dispatchLockFile, parseCompositePidIdentity } from '../main-checkout-lock.mjs';
 import { reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, plainInputName, isSeatInput } from './handoff-refs.mjs';
@@ -67,7 +67,8 @@ function pinnedPersonaFor(unitRecord, role, persona) {
 /**
  * The text of a unit's persona, read once from the persona tiers so every attempt and resume
  * renders the same definition, including one that lives only in the workspace tier. A name no tier
- * defines keeps today's rendering by name; the one-liner already refuses it before the run.
+ * defines keeps today's rendering by name; the one-liner already refuses it before the run. A definition
+ * that exists but cannot be parsed or has the wrong shape throws its named problem.
  */
 function unitPersonaPin(persona, mainRoot) {
   if (typeof persona !== 'string') return null;
@@ -75,7 +76,7 @@ function unitPersonaPin(persona, mainRoot) {
     const { name, digest, text } = resolveAgentDefinition(persona, { projectRoot: mainRoot });
     return { name, digest, text };
   } catch (err) {
-    if (err instanceof RunnerConfigError) return null;
+    if (err instanceof AgentNotFoundError) return null;
     throw err;
   }
 }
@@ -417,6 +418,9 @@ export async function runUnit(options = {}) {
     // Resolved before the unit directory exists, so a ref that points nowhere leaves nothing behind.
     unitRunId = `unit-run-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
     const unitDir = path.join(assignmentsDir, unitRunId);
+    // A persona file that cannot be parsed or has the wrong shape refuses the run here, before the unit
+    // directory exists, instead of seating a silently different persona.
+    const personaPin = unitPersonaPin(unit.persona, mainRoot);
     let resolved;
     try {
       // A blind unit's roles each get their copies in their own directory at dispatch, so nothing is copied here.
@@ -433,7 +437,6 @@ export async function runUnit(options = {}) {
     }
     fs.mkdirSync(unitDir, { recursive: true });
 
-    const personaPin = unitPersonaPin(unit.persona, mainRoot);
     unitRecord = {
       unit,
       workflow: workflowLink,
