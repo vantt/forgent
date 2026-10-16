@@ -12,7 +12,7 @@
   },
   "stoppedByRule": [
     "agent: the agent exited on its own (no SIGTERM to the gate, no ceiling)",
-    "soft-deadline | idle | cancel: the gate received SIGTERM/SIGINT and read that cause from stop-requested.json; SIGTERM without the file is cancel",
+    "soft-deadline | idle | cancel: the gate received SIGTERM/SIGINT and read that cause from stop-requested.json; SIGTERM/SIGINT without the file is stoppedBy cancel with cause \"signal\"",
     "hard-ceiling: CLOCK_BOOTTIME passed envelope.deadlines.hardCeiling",
     "orphan: terminal mode orphan branch (6.3)"
   ]
