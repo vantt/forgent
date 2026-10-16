@@ -11,7 +11,7 @@ AGENTS.md "Install/setup/doctor gate"; [`docs/distribution-vision.md`](../../doc
 **Check doctor (đăng ký trong `registrations.mjs`):**
 - `process-containment`: in driver đã chọn và mức (`kernel`/`best-effort`) + danh sách đường thoát; Linux không user namespace → `warn` có tên, không fail.
 - `runtime-socket-dir`: tồn tại, 0700, chủ là uid; fix tạo.
-- `run-attempts-stuck`: run có envelope v3 chưa `closed.json` mà lock trống (gọi `adopt --scan` chế độ chỉ đọc: thêm cờ `--dry-run` cho route ở đây? **Không:** dùng client P06 với probe-only qua `lock-scan` trả về trạng thái, không adopt); fix = `sweepAttempts`.
+- `run-attempts-stuck`: run có envelope v3 chưa `closed.json` mà lock trống (client P06 `adoptScan({probeOnly: true})` → route `adopt --scan --probe-only`, chỉ báo trạng thái, không ghi gì); fix = `sweepAttempts`.
 - `run-supervisor-route`: binary host có route `supervise/gate/adopt/attempt-step` với protocol 1 (gọi `--protocol 1 --probe`, route trả `ok`).
 - `gate-kill-grace`: in `dispatch.gateKillGraceMs` (D9), từ chối < 1000.
 - Check dọn confinement ở `:5450` gọi `sweepAttempts` thay `reapOrphanedConfinementResources` trực tiếp.

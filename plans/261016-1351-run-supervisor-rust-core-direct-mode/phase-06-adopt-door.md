@@ -14,9 +14,10 @@ r6 §9.7 (ma trận phục hồi, điểm 1–7), §9.8, §6.0.1 (adopt dùng lu
    - Lock trống nhưng miền chưa rỗng → acquire EX qua holder-lock (luật 6.0.1 tự kết thúc miền và chờ trong `lock.predecessorKillWaitMs`); quá hạn → `held (predecessor-domain-not-empty)`, không làm gì thêm.
    - Giữ EX: ghi `adopting.json` → đi ma trận: không binding, không receipt → receipt tổng hợp `abandoned-not-started`; binding có, `gate-exit` chưa, receipt chưa → receipt `gate-lost` (kèm `outboxPresent`); `gate-exit` có, receipt chưa → receipt từ `gate-exit` + outbox (`synthesizedBy: adopt`); rồi chạy step runner (P04) trên các bước chưa có receipt bước. Mọi bước có receipt → publish `closed.json`, xoá `adopting.json`, nhả lock.
    - Outbox có kết quả thì bước `settle-attempt` (P07) settle từ outbox bất kể `stoppedBy` (r6 §9.7 điểm 3) — adopt chỉ ghi `outboxPresent` vào receipt.
-2. `adopt --scan`: đọc danh sách run dir ở stdin (Node client liệt kê run chưa `closed.json`), probe tất cả trong **một** process, chỉ adopt run trống + rỗng; in một dòng JSON mỗi run. Mục tiêu < 50 ms cho 2000 run đã `closed` (bỏ qua bằng `stat(closed.json)` trước khi mở lock).
-3. Hai adopter đồng thời: kernel lock tuần tự hoá; adopter thứ hai thấy `being-adopted` hoặc `closed`.
-4. Client Node mỏng `src/run-supervisor/client.mjs`: `adoptRun(runDir)`, `adoptScan({assignmentsRoot})` (liệt kê `*/**/runs/*` chưa `closed.json` rồi gọi route bằng `spawnSync`), `resolveHostBin` một lần mỗi process; lỗi route → ném có tên.
+2. `--probe-only` (cả `--run-dir` và `--scan`): chỉ `probe` + `is_empty`, trả trạng thái, không acquire EX, không ghi file.
+3. `adopt --scan`: đọc danh sách run dir ở stdin (Node client liệt kê run chưa `closed.json`), probe tất cả trong **một** process, chỉ adopt run trống + rỗng; in một dòng JSON mỗi run. Mục tiêu < 50 ms cho 2000 run đã `closed` (bỏ qua bằng `stat(closed.json)` trước khi mở lock).
+4. Hai adopter đồng thời: kernel lock tuần tự hoá; adopter thứ hai thấy `being-adopted` hoặc `closed`.
+5. Client Node mỏng `src/run-supervisor/client.mjs`: `adoptRun(runDir, {probeOnly})`, `adoptScan({assignmentsRoot, probeOnly})` (liệt kê `*/**/runs/*` chưa `closed.json` rồi gọi route bằng `spawnSync`), `resolveHostBin` một lần mỗi process; lỗi route → ném có tên.
 
 ## File sở hữu
 
