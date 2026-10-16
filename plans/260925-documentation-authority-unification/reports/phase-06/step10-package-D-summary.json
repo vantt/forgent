@@ -1,50 +1,16 @@
 {
-  "contentCommit": "aecdc30aad0ffd65a2956ff642c4be9410686ede",
-  "inventorySource": "Complete enumerable native inventory from the one sync, transported by v8; no omitted fields or regenerated inventory.",
+  "pin": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+  "scopeFiles": 1045,
   "runs": [
     {
       "label": "both",
-      "priors": [
-        "plans/260925-documentation-authority-unification/reports/identity-registry.json",
-        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"
-      ],
-      "seconds": 80.495,
-      "fatalFindings": [
-        {
-          "type": "decision-digest-stale",
-          "message": "claim claim_46c173824da77fbf25f59072ae8e1620: sourceUnitDigest does not match the current source text (needs at least 16 hex characters of the row's digest)",
-          "path": "docs/specs/confinement-authority.md"
-        }
-      ],
+      "seconds": 96.195,
+      "fatalFindings": [],
       "conservationOpen": [
-        {
-          "type": "files-unknown-blocking",
-          "message": "inventory files whose file-level disposition is unknown-blocking",
-          "count": 1176,
-          "examples": [
-            "docs/generated/README.md",
-            "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
-            "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
-            "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
-            "docs/platform/agent-confinement/README.md"
-          ]
-        },
-        {
-          "type": "claims-unknown-blocking",
-          "message": "claim rows whose disposition is unknown-blocking",
-          "count": 22578,
-          "examples": [
-            "docs/generated/README.md#generated-documentation",
-            "docs/generated/README.md#unheaded-block-1",
-            "docs/generated/README.md#unheaded-block-2",
-            "docs/generated/README.md#unheaded-block-3",
-            "docs/generated/README.md#unheaded-block-4"
-          ]
-        },
         {
           "type": "claims-partial-carry",
           "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
-          "count": 24,
+          "count": 28,
           "examples": [
             "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
             "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
@@ -54,33 +20,9 @@
           ]
         },
         {
-          "type": "claims-not-reviewed",
-          "message": "claim rows whose reviewStatus is not reviewed",
-          "count": 23113,
-          "examples": [
-            "AGENTS.md#forgent",
-            "AGENTS.md#unheaded-block-1",
-            "AGENTS.md#unheaded-block-2",
-            "AGENTS.md#unheaded-block-3",
-            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
-          ]
-        },
-        {
-          "type": "claims-without-own-rationale",
-          "message": "claim rows whose disposition requires a rationale and that carry none of their own",
-          "count": 22578,
-          "examples": [
-            "docs/generated/README.md#generated-documentation",
-            "docs/generated/README.md#unheaded-block-1",
-            "docs/generated/README.md#unheaded-block-2",
-            "docs/generated/README.md#unheaded-block-3",
-            "docs/generated/README.md#unheaded-block-4"
-          ]
-        },
-        {
           "type": "identical-units-multiple-owners",
           "message": "identical source units whose rows name different target owners",
-          "count": 363,
+          "count": 362,
           "examples": [
             "03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
             "5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
@@ -90,21 +32,9 @@
           ]
         },
         {
-          "type": "registry-gaps-without-disposition",
-          "message": "registry identity-gap rows with no vocabulary disposition",
-          "count": 726,
-          "examples": [
-            "docs/enduser-docs-index.json#file-block",
-            "docs/explanation/orphaned-runtime-claim-recovery-unclaim-verb.md#unheaded-block-6",
-            "docs/how-to/use-fgos-group-thinking.md#unheaded-block-12",
-            "docs/how-to/use-fgos-group-thinking.md#unheaded-block-17",
-            "docs/platform/README.md#unheaded-block-1"
-          ]
-        },
-        {
           "type": "candidate-blocks-unreferenced",
           "message": "candidate conservation units not named by a source decision",
-          "count": 2446,
+          "count": 2336,
           "examples": [
             "docs/platform/agent-confinement/contracts/confinement-authority-v1.md#added-in-candidate-confinement-authority-v1",
             "docs/platform/agent-confinement/contracts/confinement-authority-v1.md#unheaded-block-1",
@@ -117,46 +47,13 @@
     },
     {
       "label": "identity",
-      "priors": [
-        "plans/260925-documentation-authority-unification/reports/identity-registry.json"
-      ],
-      "seconds": 177.16,
-      "fatalFindings": [
-        {
-          "type": "decision-digest-stale",
-          "message": "claim claim_46c173824da77fbf25f59072ae8e1620: sourceUnitDigest does not match the current source text (needs at least 16 hex characters of the row's digest)",
-          "path": "docs/specs/confinement-authority.md"
-        }
-      ],
+      "seconds": 99.059,
+      "fatalFindings": [],
       "conservationOpen": [
-        {
-          "type": "files-unknown-blocking",
-          "message": "inventory files whose file-level disposition is unknown-blocking",
-          "count": 1176,
-          "examples": [
-            "docs/generated/README.md",
-            "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
-            "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
-            "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
-            "docs/platform/agent-confinement/README.md"
-          ]
-        },
-        {
-          "type": "claims-unknown-blocking",
-          "message": "claim rows whose disposition is unknown-blocking",
-          "count": 22578,
-          "examples": [
-            "docs/generated/README.md#generated-documentation",
-            "docs/generated/README.md#unheaded-block-1",
-            "docs/generated/README.md#unheaded-block-2",
-            "docs/generated/README.md#unheaded-block-3",
-            "docs/generated/README.md#unheaded-block-4"
-          ]
-        },
         {
           "type": "claims-partial-carry",
           "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
-          "count": 24,
+          "count": 28,
           "examples": [
             "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
             "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
@@ -166,33 +63,9 @@
           ]
         },
         {
-          "type": "claims-not-reviewed",
-          "message": "claim rows whose reviewStatus is not reviewed",
-          "count": 23113,
-          "examples": [
-            "AGENTS.md#forgent",
-            "AGENTS.md#unheaded-block-1",
-            "AGENTS.md#unheaded-block-2",
-            "AGENTS.md#unheaded-block-3",
-            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
-          ]
-        },
-        {
-          "type": "claims-without-own-rationale",
-          "message": "claim rows whose disposition requires a rationale and that carry none of their own",
-          "count": 22578,
-          "examples": [
-            "docs/generated/README.md#generated-documentation",
-            "docs/generated/README.md#unheaded-block-1",
-            "docs/generated/README.md#unheaded-block-2",
-            "docs/generated/README.md#unheaded-block-3",
-            "docs/generated/README.md#unheaded-block-4"
-          ]
-        },
-        {
           "type": "identical-units-multiple-owners",
           "message": "identical source units whose rows name different target owners",
-          "count": 363,
+          "count": 362,
           "examples": [
             "03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
             "5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
@@ -202,21 +75,9 @@
           ]
         },
         {
-          "type": "registry-gaps-without-disposition",
-          "message": "registry identity-gap rows with no vocabulary disposition",
-          "count": 726,
-          "examples": [
-            "docs/enduser-docs-index.json#file-block",
-            "docs/explanation/orphaned-runtime-claim-recovery-unclaim-verb.md#unheaded-block-6",
-            "docs/how-to/use-fgos-group-thinking.md#unheaded-block-12",
-            "docs/how-to/use-fgos-group-thinking.md#unheaded-block-17",
-            "docs/platform/README.md#unheaded-block-1"
-          ]
-        },
-        {
           "type": "candidate-blocks-unreferenced",
           "message": "candidate conservation units not named by a source decision",
-          "count": 2446,
+          "count": 2336,
           "examples": [
             "docs/platform/agent-confinement/contracts/confinement-authority-v1.md#added-in-candidate-confinement-authority-v1",
             "docs/platform/agent-confinement/contracts/confinement-authority-v1.md#unheaded-block-1",
@@ -229,46 +90,13 @@
     },
     {
       "label": "phase02",
-      "priors": [
-        "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json"
-      ],
-      "seconds": 216.233,
-      "fatalFindings": [
-        {
-          "type": "decision-digest-stale",
-          "message": "claim claim_46c173824da77fbf25f59072ae8e1620: sourceUnitDigest does not match the current source text (needs at least 16 hex characters of the row's digest)",
-          "path": "docs/specs/confinement-authority.md"
-        }
-      ],
+      "seconds": 96.552,
+      "fatalFindings": [],
       "conservationOpen": [
-        {
-          "type": "files-unknown-blocking",
-          "message": "inventory files whose file-level disposition is unknown-blocking",
-          "count": 1176,
-          "examples": [
-            "docs/generated/README.md",
-            "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
-            "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
-            "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
-            "docs/platform/agent-confinement/README.md"
-          ]
-        },
-        {
-          "type": "claims-unknown-blocking",
-          "message": "claim rows whose disposition is unknown-blocking",
-          "count": 22578,
-          "examples": [
-            "docs/generated/README.md#generated-documentation",
-            "docs/generated/README.md#unheaded-block-1",
-            "docs/generated/README.md#unheaded-block-2",
-            "docs/generated/README.md#unheaded-block-3",
-            "docs/generated/README.md#unheaded-block-4"
-          ]
-        },
         {
           "type": "claims-partial-carry",
           "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
-          "count": 24,
+          "count": 28,
           "examples": [
             "docs/architect/host-invocation-routing/external-provider-protocol.md#1-component-classes",
             "docs/architect/host-invocation-routing/external-provider-protocol.md#2-invocation-mechanisms",
@@ -278,33 +106,9 @@
           ]
         },
         {
-          "type": "claims-not-reviewed",
-          "message": "claim rows whose reviewStatus is not reviewed",
-          "count": 23113,
-          "examples": [
-            "AGENTS.md#forgent",
-            "AGENTS.md#unheaded-block-1",
-            "AGENTS.md#unheaded-block-2",
-            "AGENTS.md#unheaded-block-3",
-            "AGENTS.md#product-priority-order-d-adr0030-docsspecsrunnermd"
-          ]
-        },
-        {
-          "type": "claims-without-own-rationale",
-          "message": "claim rows whose disposition requires a rationale and that carry none of their own",
-          "count": 22578,
-          "examples": [
-            "docs/generated/README.md#generated-documentation",
-            "docs/generated/README.md#unheaded-block-1",
-            "docs/generated/README.md#unheaded-block-2",
-            "docs/generated/README.md#unheaded-block-3",
-            "docs/generated/README.md#unheaded-block-4"
-          ]
-        },
-        {
           "type": "identical-units-multiple-owners",
           "message": "identical source units whose rows name different target owners",
-          "count": 363,
+          "count": 362,
           "examples": [
             "03d85305b958: docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md, docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md",
             "5a917998f2db: docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md, docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md",
@@ -314,21 +118,9 @@
           ]
         },
         {
-          "type": "registry-gaps-without-disposition",
-          "message": "registry identity-gap rows with no vocabulary disposition",
-          "count": 726,
-          "examples": [
-            "docs/enduser-docs-index.json#file-block",
-            "docs/explanation/orphaned-runtime-claim-recovery-unclaim-verb.md#unheaded-block-6",
-            "docs/how-to/use-fgos-group-thinking.md#unheaded-block-12",
-            "docs/how-to/use-fgos-group-thinking.md#unheaded-block-17",
-            "docs/platform/README.md#unheaded-block-1"
-          ]
-        },
-        {
           "type": "candidate-blocks-unreferenced",
           "message": "candidate conservation units not named by a source decision",
-          "count": 2446,
+          "count": 2336,
           "examples": [
             "docs/platform/agent-confinement/contracts/confinement-authority-v1.md#added-in-candidate-confinement-authority-v1",
             "docs/platform/agent-confinement/contracts/confinement-authority-v1.md#unheaded-block-1",

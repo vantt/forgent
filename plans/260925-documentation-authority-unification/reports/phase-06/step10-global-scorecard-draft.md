@@ -1,23 +1,26 @@
 # Step 10 scorecard draft — independent review pending
 
-SYNC `498048c1a`; no docs delta from content `c3f22d6a6`. This is a draft, not Phase6 closure. [Independent checkpoint request](review-request-step10-checkpoint.md).
+Content/SYNC `c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be`; package pin is the runner commit containing this file. Phase6 remains open. [Ordinary request](review-request-step10-package-index.md), [refreshed checkpoint request](review-request-step10-checkpoint.md).
 
 | Obligation | Measured result | State |
 |---|---|---|
-| Native known IDs /active tuples | 99,567→99,581, zero loss;4,486 files/91,388 units, equality | Producer proof complete |
-| Item3 global D/E | D0 fatal both priors together/each; E28 partial/24 pending/362 groups/2 gaps/2,334 reverse | E open |
-| Exact comparator | pending/partials equal;307 diagnostics,155/114 candidate and25/10 group differences +2 gaps | Failed; exact differences preserved |
-| Item4 promotion/H | 0 headerless;1 incomplete Session Identity spec/8 fields;H0 | Metadata blocked outside grant |
-| Item5 and L10-7 | Genuine full+Step2 scoped rehearsal;clone removed=True;cutover exit1 | Ran; cutover remains blocked |
-| Item6 T9 |17/17 entries,stub present,zero findings | Independent confirmation owed |
-| Item7 alias |1,028 covered+11 reasoned no-alias=1,039;validation0 | Draft-only; no adoption |
-| Item8 snapshot/verify |68,463 rows,verify true;unsealed SHA256 `12fa4f5acfa2eb7b08a7de5d726578d1df9a5f27b7f31590018213e78d16a752` | Dry run complete |
-| Item9 mutation/third refresh |12 cases pass;119 shards/all fields;native tuples/hash verified | Complete;in-memory replay required |
-| Document tools/audit |507/507;12,901 rows/92 shards/0 findings,69 historical limits | No full npm claim |
-| A43 Rings /holds |3 pending ordinary review (one move,two supersede);real holds0 | Review owed |
-| Ordinary request /checkpoint |113 rows/10 small parts;full unselected population | Independent review/pack/report/key owed |
-| Owner token total /closure |Unreported;Phase6 open | Separate close after accepted checkpoint |
+| Native IDs /active tuples |99,581→99,584,zero loss;4,486 files/91,388 units,equal;665.599s;one62,196,419-byte compact persistence |Producer proof complete |
+| Item3 global D |0 fatal both priors together and each |Complete at content pin |
+| Item3 strict E |all1,045 sources/22,759 active claims;28 partial/362 groups/2,336 reverse;0 active pending/0 unknown/0 undisposed reading-map gaps |Three native open categories retained |
+| Exact comparator |exit1;six differences(4 actual-only/2 expected-only),all precisely authenticated/explained;0 unexplained;pending/partial/group sets exact |Independent acceptance of six explanations owed;no waiver |
+| Item4 promotion/H |160/160 complete;0 headerless/0 missing;H0 |Metadata structural proof complete;truth separate |
+| Item5 /L10-7 rehearsal |Completed full+Step2;clone removed=True;cutover exit1;counts{'pass': 8, 'blocked': 11, 'review': 1} |Actual gates retained |
+| Item6 T9 |17/17,stub present,zero findings |Reviewer confirmation owed |
+| Item7 alias |9,236 draft entries;1,028 covered+11 reasoned no-alias=1,039;validation0;six additional map sources explicitly accounted |No adoption;Phase9 lookup dispositions retained |
+| Item8 snapshot |68,463 rows;verify true;SHA256 `0b525d69c25bbeea0e5cf5176991133ced1c360cd9df98d06149ee36afce3b5a` |Unsealed dry run |
+| Item9 mutation /third checkpoint |12/12;122 complete shards/2,537,573,604 bytes/all part+aggregate hashes/19 fields/native tuples verified |In-memory replay;generated shards local/excluded |
+| Audit /rationale consistency /tests |12,904 rows/93 shards/0 findings;66 historical witness limits;507/507 tests |No full npm-suite claim |
+| Ownership /replay /A/B/H |0 new active pairs/0 native duplicates/0 live drift;366+98+4 replay clean;A/B/H/current routes clean |Historical many-to-one references enumerated |
+| A43 /holds |3 Rings rows independently approved and applied;real holds0 |Current-truth/runtime obligations remain |
+| Ordinary pending /checkpoint |13 pending decisions(9 gaps+4 retired);91 ordinary entries/five parts;unselected22,759 active population |Independent ordinary+checkpoint pack/report/key owed |
+| L10 decisions /owner queues |L10-1..40+A43 indexed;A34/truth/20 wording+successor notes/32 Phase7-8 groups/14 runner-cutover/inbound+non-doc consumers |Retained;no scope expansion |
+| Effort /closure |Measured stage receipts;owner token total unreported |Separate close to awaiting owner review after acceptance |
 
-L10-1..L10-37 and A43: [complete indexed summary](step10-global-decisions-summary.json), authoritative narrative `owner-answers.md`. Standalone definitions for L10-12..14 are absent there; historical references are preserved without inventing a direction. Other recorded queues remain: A34 residuals, current-truth review,32 Phase7/8 groups,14 runner-cutover bindings, non-doc/inbound consumers and owner token total. No component-boundary change. [Effort](step10-global-effort.md).
+Native registry SHA256 `6fcd58e6f7a2ea0f17df2b1c4024b2728dfa2d73dfc365278df3c3a1c964018c`;checkpoint aggregate SHA256 `2d58e5c6686119715e03c8504520fd34d92f9965145f5c42098051054f912193`. [Full report](step-10-report.md), [exact comparison/explanations](step10-package-comparison-explanations.json), [every checkpoint hash](step10-package-checkpoint-transport-validation.json).
 
-The119 inventory parts are generated local files under the existing Git info/exclude; the phase explicitly says shards are never committed. The checkpoint manifest/Markdown/registry and proof remain durable. On a fresh checkout, the self-contained checkpoint-export helper recreates every field from the native v8 inventory into the supplied scratch directory; the bounded validator accepts that explicit manifest. Reserve6 GiB scratch for v8+JSON together. Native generatedAt varies on replay, so each fresh manifest authenticates its own bytes while source identities remain pinned. No force-add or exclude change.
+[Decision summary](step10-global-decisions-summary.json) is a projection of `owner-answers.md`; it creates no direction. Missing standalone L10-12..14 definitions remain explicit, with their historical references preserved. L10-38 restores code-proven facts and repairs four historical bindings;L10-39 occurrence/context-matches all7 footers and reopens6 siblings;L10-40 retains two A31 supersede successors. [Effort](step10-global-effort.md). No producer sensitivity pack,checkpoint seed,key,verdict or owner acceptance.

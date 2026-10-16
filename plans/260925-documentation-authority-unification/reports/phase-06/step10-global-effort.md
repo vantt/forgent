@@ -1,13 +1,27 @@
-# Step 10 global-turn effort
+# Step 10 effort record — package refresh
 
-One producer session, no delegated workers/reviewers. Native sync+complete inventory: **673.455 s**, exactly one compact persistence; checkpoint registry is an exact byte copy, no second carry. Final D runs: `[('both', 93.486), ('identity', 96.367), ('phase02', 94.712)]`. Strict-E/overlay proof span: 156.546 s; [raw final log](step10-global-final.log) separates the gate timestamps. Snapshot verified 68,463 rows.
+Content/SYNC `c3614f4d2`; producer `codex-session:unit-run-1792169760182-e3acba42@2026-10-16`. No owner token total was supplied; no inferred token number or calendar estimate is reported as measured fact.
 
-Earlier D exposed the generated backlog heading digest, and the full-scope overlay exposed its new table body without an authored decision. Both were corrected pending, with old/new witnesses retained; source scope was checked against all 1,045 frozen map sources. Failed/interrupted checks and the complete before-body run remain historical evidence, not current green. Native carry and persistence were not repeated.
+| Measured stage | Seconds | Evidence |
+|---|---:|---|
+|One native carry/generation/compact persistence|665.599|step10-package-native-proof.json |
+|D both priors together|96.195|step10-package-D-summary.json |
+|D identity prior|99.059|step10-package-D-summary.json |
+|D Phase02 prior|96.552|step10-package-D-summary.json |
+|Strict E plus applied-overlay conservation equality|161.179|step10-package-E-summary.json |
+|mutation|1.483|step10-package-mutation.log |
+|independent-audit|8.820|step10-package-independent-audit.log |
+|consistency|8.764|step10-package-consistency.log |
+|checks|3.631|step10-package-checks.log |
+|ownership|9.117|step10-package-ownership.log |
+|audit-ownership|0.654|step10-package-audit-ownership.log |
+|replay|2.324|step10-package-replay.log |
+|tests|42.407|step10-package-tests.log |
 
-Document tests: 507/507; structural probe12 scenarios. [Every postcheck exit and duration](step10-global-postchecks.json). Rehearsal: 2026-10-16T12:48:18.581Z → 2026-10-16T13:03:48.457Z; genuine fresh native inventory and both strict scopes, clone removed True. Full checkpoint JSON 2,475,544,461 bytes/119 shards, independently parsed and SHA256/native tuples verified. Registry accounting61 changes since the actual previous request.
+Refreshed full+Step2 rehearsal elapsed1025.089s;clone removed=True. Native generation,global D/E,checkpoint refresh/validation and rehearsal run ONE AT A TIME. Read-only native regeneration inside rehearsal is not a second identity carry or registry persistence. Checkpoint export/validation and helper-authoring wall time were not separately metered, so no invented total is supplied. Stage times above are distinct; they are not added to an overlapping overall wrapper duration.
 
-The first disposable-clone rehearsal completed genuine generation and both strict scopes, then its author wrapper incorrectly assumed optional retiring-roots.json existed. [Initial receipt](step10-global-rehearsal-initial.json) and [log](step10-global-rehearsal-initial.log) preserve the failure and confirmed clone cleanup. The wrapper was corrected to production's existing null default; the final successful fresh-clone rehearsal is recorded separately. No checker or native registry carry was repeated.
+Ordinary request91 entries/five small parts (13/3/15/17/43),max43 entries/81,717 bytes;per-row authentication91/91,10 group source/target checks,fresh portable checks6/6. It samples15/233 candidate edits and10/35 group edits with an explicit reproducible accounting seed;this is not the independent checkpoint seed. Every43 raw native change and all13 pending decisions are enumerated. Producer authors no sensitivity pack/key/checkpoint verdict.
 
-Review work still owed: one ordinary set 113 rows/10 parts, then independent checkpoint (sensitivity pack committed first, report second, seed key last), then a separate close to awaiting owner review. **Owner/project token totals and whole-plan token cost remain unreported/UNPROVEN**; no estimate is converted to a measurement. This turn writes no docs bytes, changes no code/checker/extractor/vocabulary/baseline policy, and makes no full npm-suite claim.
+Earlier effort/UNPROVEN throughput figures remain in committed historical reports;they are not silently converted into measured cost for this package. Owner token total remains unreported. Independent ordinary review,checkpoint(current-truth/red-team and seed discipline included),and the separate owner-review close remain outstanding.
 
-The119 inventory parts are generated local files under the existing Git info/exclude; the phase explicitly says shards are never committed. The checkpoint manifest/Markdown/registry and proof remain durable. On a fresh checkout, the self-contained checkpoint-export helper recreates every field from the native v8 inventory into the supplied scratch directory; the bounded validator accepts that explicit manifest. Reserve6 GiB scratch for v8+JSON together. Native generatedAt varies on replay, so each fresh manifest authenticates its own bytes while source identities remain pinned. No force-add or exclude change.
+The first rehearsal attempt was SIGKILLed before gate results;its elapsed time was not separately metered. Owned-clone cleanup and transport release are recorded in `step10-package-rehearsal-attempt1.json`;the completed retry above preserves the full source corpus and real evaluator. Final registry hash checking also caught the suppressed author-wrapper copy statement;the first actual checkpoint copy corrected it without second native persistence or shard regeneration.

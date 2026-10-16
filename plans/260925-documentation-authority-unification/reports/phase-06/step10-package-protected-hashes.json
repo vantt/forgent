@@ -1,0 +1,30 @@
+{
+  "scripts/check-doc-inventory-gates.mjs": {
+    "sha256": "b4a0532f0ee5e83dbe8db7159673fa1133f4b48c89545a4d2972ca2748df78b6",
+    "sameAsContentCommit": true
+  },
+  "scripts/generate-doc-inventory.mjs": {
+    "sha256": "20880b5dabac15bd1949bb3bfc070a0c9534699c3ef428a9f857ae8e0370678f",
+    "sameAsContentCommit": true
+  },
+  "scripts/compare-doc-global-closure.mjs": {
+    "sha256": "8a09e8e8078e8a16ba8a522234abef97f27fe2b5c9fcd1d827d0bb8842b7d11a",
+    "sameAsContentCommit": true
+  },
+  "scripts/check-doc-constitution.mjs": {
+    "sha256": "947d4752810d5d6e4efa0f931b57853d348e690051b4ccdfc94217dbf0f17229",
+    "sameAsContentCommit": true
+  },
+  "scripts/check-doc-candidate-status.mjs": {
+    "sha256": "f06732e0f838efe638a4df8372cd3d934e4b61dfcea0ec69cb129b94c556ab94",
+    "sameAsContentCommit": true
+  },
+  "scripts/check-doc-retirement.mjs": {
+    "sha256": "4a396fef453dbaaa1415dca5875d236e784ae0766e3aaa17bba0ee726ba2af6e",
+    "sameAsContentCommit": true
+  },
+  "plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.json": {
+    "sha256": "b330d32d5aae06ce64a508fd054a908e5024c43ced2f29195b4b9b9d9898e7cb",
+    "sameAsContentCommit": true
+  }
+}

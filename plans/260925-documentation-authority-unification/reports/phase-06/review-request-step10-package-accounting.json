@@ -1,0 +1,1133 @@
+{
+  "contentCommit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+  "producer": "codex-session:unit-run-1792169760182-e3acba42@2026-10-16",
+  "mode": "ordinary",
+  "entries": [
+    {
+      "entry": "g019",
+      "kind": "group-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-author-candidate-accounting.json",
+      "array": "groupChanges",
+      "index": 19,
+      "proof": {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-06/identical-unit-exceptions.json",
+        "action": "add",
+        "digest": "e4fa3726fbd2150789677769af22dece7dd5b57a26e1dc4feddd2285e23b5c36",
+        "memberPaths": [
+          "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md",
+          "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md"
+        ],
+        "after": {
+          "digest": "e4fa3726fbd2150789677769af22dece7dd5b57a26e1dc4feddd2285e23b5c36",
+          "owners": [
+            "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md",
+            "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md"
+          ],
+          "kind": "document-or-section-scoped-repetition",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+          "reason": "The repeated block is a contextual list, command example or lifecycle diagram inside separate source/proposal/history sections; retaining it at each mapped owner preserves that section’s local explanation. Contexts: Step 01 - Team Dispatch V1 Rollout / 6. Slice 1 - Operation Registry Only; Step 02 - Workflow Stage Operations / 7. Tests. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+          "sourceUnits": [
+            {
+              "claimId": "claim_9dddad5aa8a5266b41291d284dcf0190",
+              "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+              "anchor": "unheaded-block-26",
+              "unitDigest": "e4fa3726fbd2150789677769af22dece7dd5b57a26e1dc4feddd2285e23b5c36",
+              "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md",
+              "targetAnchor": "literal-snapshot",
+              "targetUnitDigest": "68b06f6b8b76669c87e1a75a4e072342481418cac3753fabfc3930885f8dc89f",
+              "sourceWitness": {
+                "startLine": 196,
+                "endLine": 200,
+                "text": "```bash\nnode --test test/state/workflow-stage-graphs.test.mjs\nnode --test test/setup/registrations.test.mjs\nnode --test test/runner/dispatch.test.mjs\n```",
+                "ancestry": [
+                  "Step 01 - Team Dispatch V1 Rollout",
+                  "6. Slice 1 - Operation Registry Only"
+                ]
+              }
+            },
+            {
+              "claimId": "claim_01e5997ff9ab83932e77136fa1341efe",
+              "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+              "anchor": "unheaded-block-52",
+              "unitDigest": "e4fa3726fbd2150789677769af22dece7dd5b57a26e1dc4feddd2285e23b5c36",
+              "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+              "targetAnchor": "literal-snapshot",
+              "targetUnitDigest": "cc6626e546ba03022d2ee41eec7999b80e0d097bae22a8ecde76c7b325b19de4",
+              "sourceWitness": {
+                "startLine": 423,
+                "endLine": 427,
+                "text": "```bash\nnode --test test/state/workflow-stage-graphs.test.mjs\nnode --test test/setup/registrations.test.mjs\nnode --test test/runner/dispatch.test.mjs\n```",
+                "ancestry": [
+                  "Step 02 - Workflow Stage Operations",
+                  "7. Tests"
+                ]
+              }
+            }
+          ],
+          "currentStateAccounting": "step10-author-candidate-accounting.json"
+        },
+        "reason": "The repeated block is a contextual list, command example or lifecycle diagram inside separate source/proposal/history sections; retaining it at each mapped owner preserves that section’s local explanation. Contexts: Step 01 - Team Dispatch V1 Rollout / 6. Slice 1 - Operation Registry Only; Step 02 - Workflow Stage Operations / 7. Tests. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+        "proof": "All source members selected by exact sourceUnitDigest from persisted step10-global-applied-rows.json; owner set independently checked, no first digest occurrence chosen."
+      },
+      "reviewStatus": "pending",
+      "check": "Verify full digest+sorted owner set and every cited source tuple; contextual scope, not duplicate truth approval."
+    },
+    {
+      "entry": "g016",
+      "kind": "group-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-author-candidate-accounting.json",
+      "array": "groupChanges",
+      "index": 16,
+      "proof": {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-06/identical-unit-exceptions.json",
+        "action": "add",
+        "digest": "88c97d5d078f935960fefa349a515247bbf5ebef8f732e69c5e05d7b1d39709f",
+        "memberPaths": [
+          "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md",
+          "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md"
+        ],
+        "after": {
+          "digest": "88c97d5d078f935960fefa349a515247bbf5ebef8f732e69c5e05d7b1d39709f",
+          "owners": [
+            "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md",
+            "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md"
+          ],
+          "kind": "document-or-section-scoped-repetition",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+          "reason": "The repeated short text introduces or qualifies the surrounding local section; each source occurrence retains that local payload at its mapped owner. Contexts: Step 07 - CoordinationSession, AdhocTask, And Planning Boundary / 11. Work-Attached Integration Boundary; Step 08 - Standalone Coordination And Optional Protocols / 5. Why Standalone Must Mean No Work Required. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+          "sourceUnits": [
+            {
+              "claimId": "claim_5bbd88e33e69171df36e111fa8cb86a7",
+              "path": "docs/architect/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md",
+              "anchor": "unheaded-block-78",
+              "unitDigest": "88c97d5d078f935960fefa349a515247bbf5ebef8f732e69c5e05d7b1d39709f",
+              "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md",
+              "targetAnchor": "literal-snapshot",
+              "targetUnitDigest": "dfa3c164d168a4895c914b2764c9eb0e5eaab9adf947c3a11a0cce9a5934f5ba",
+              "sourceWitness": {
+                "startLine": 484,
+                "endLine": 484,
+                "text": "**Proposed invariant:**",
+                "ancestry": [
+                  "Step 07 - CoordinationSession, AdhocTask, And Planning Boundary",
+                  "11. Work-Attached Integration Boundary"
+                ]
+              }
+            },
+            {
+              "claimId": "claim_51450419ea9b5e42ecbbfe89d6de5343",
+              "path": "docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md",
+              "anchor": "unheaded-block-29",
+              "unitDigest": "88c97d5d078f935960fefa349a515247bbf5ebef8f732e69c5e05d7b1d39709f",
+              "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md",
+              "targetAnchor": "literal-snapshot",
+              "targetUnitDigest": "222204b5317395a9ce2ea050cf70507ab361522df887473af6461dbf7bbe7379",
+              "sourceWitness": {
+                "startLine": 173,
+                "endLine": 173,
+                "text": "**Proposed invariant:**",
+                "ancestry": [
+                  "Step 08 - Standalone Coordination And Optional Protocols",
+                  "5. Why Standalone Must Mean No Work Required"
+                ]
+              }
+            }
+          ],
+          "currentStateAccounting": "step10-author-candidate-accounting.json"
+        },
+        "reason": "The repeated short text introduces or qualifies the surrounding local section; each source occurrence retains that local payload at its mapped owner. Contexts: Step 07 - CoordinationSession, AdhocTask, And Planning Boundary / 11. Work-Attached Integration Boundary; Step 08 - Standalone Coordination And Optional Protocols / 5. Why Standalone Must Mean No Work Required. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+        "proof": "All source members selected by exact sourceUnitDigest from persisted step10-global-applied-rows.json; owner set independently checked, no first digest occurrence chosen."
+      },
+      "reviewStatus": "pending",
+      "check": "Verify full digest+sorted owner set and every cited source tuple; contextual scope, not duplicate truth approval."
+    },
+    {
+      "entry": "g018",
+      "kind": "group-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-author-candidate-accounting.json",
+      "array": "groupChanges",
+      "index": 18,
+      "proof": {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-06/identical-unit-exceptions.json",
+        "action": "add",
+        "digest": "b090d4b446b518ef773fe521a1af84257df7ae09f396bbea78ea97af029c2769",
+        "memberPaths": [
+          "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+          "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md"
+        ],
+        "after": {
+          "digest": "b090d4b446b518ef773fe521a1af84257df7ae09f396bbea78ea97af029c2769",
+          "owners": [
+            "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+            "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md"
+          ],
+          "kind": "document-or-section-scoped-repetition",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+          "reason": "The repeated block is a contextual list, command example or lifecycle diagram inside separate source/proposal/history sections; retaining it at each mapped owner preserves that section’s local explanation. Contexts: Step 00 - Team Dispatch V1 Overview / 1. Purpose; Step 01 - Team Dispatch V1 Rollout / 1. Purpose. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+          "sourceUnits": [
+            {
+              "claimId": "claim_649d6c1297ae24691b8e78ec6563bff9",
+              "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md",
+              "anchor": "unheaded-block-7",
+              "unitDigest": "b090d4b446b518ef773fe521a1af84257df7ae09f396bbea78ea97af029c2769",
+              "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-00-overview.md",
+              "targetAnchor": "literal-snapshot",
+              "targetUnitDigest": "a897eba505a065b96ccfdfadda459a18c054347a0ffc87a9c5d906fe0c38faac",
+              "sourceWitness": {
+                "startLine": 32,
+                "endLine": 38,
+                "text": "```txt\nWork\nFlow operations\nAssignment\nRun\nRunResult\n```",
+                "ancestry": [
+                  "Step 00 - Team Dispatch V1 Overview",
+                  "1. Purpose"
+                ]
+              }
+            },
+            {
+              "claimId": "claim_f20285e4acae506cd99e9102535075b2",
+              "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+              "anchor": "unheaded-block-4",
+              "unitDigest": "b090d4b446b518ef773fe521a1af84257df7ae09f396bbea78ea97af029c2769",
+              "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md",
+              "targetAnchor": "literal-snapshot",
+              "targetUnitDigest": "68b06f6b8b76669c87e1a75a4e072342481418cac3753fabfc3930885f8dc89f",
+              "sourceWitness": {
+                "startLine": 20,
+                "endLine": 26,
+                "text": "```txt\nWork\nFlow operations\nAssignment\nRun\nRunResult\n```",
+                "ancestry": [
+                  "Step 01 - Team Dispatch V1 Rollout",
+                  "1. Purpose"
+                ]
+              }
+            }
+          ],
+          "currentStateAccounting": "step10-author-candidate-accounting.json"
+        },
+        "reason": "The repeated block is a contextual list, command example or lifecycle diagram inside separate source/proposal/history sections; retaining it at each mapped owner preserves that section’s local explanation. Contexts: Step 00 - Team Dispatch V1 Overview / 1. Purpose; Step 01 - Team Dispatch V1 Rollout / 1. Purpose. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+        "proof": "All source members selected by exact sourceUnitDigest from persisted step10-global-applied-rows.json; owner set independently checked, no first digest occurrence chosen."
+      },
+      "reviewStatus": "pending",
+      "check": "Verify full digest+sorted owner set and every cited source tuple; contextual scope, not duplicate truth approval."
+    },
+    {
+      "entry": "g021",
+      "kind": "group-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-author-candidate-accounting.json",
+      "array": "groupChanges",
+      "index": 21,
+      "proof": {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-06/identical-unit-exceptions.json",
+        "action": "add",
+        "digest": "f5694fee7b180206807c868f23dbc5ef49efbc9d04a985480897577ec5def122",
+        "memberPaths": [
+          "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+          "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md"
+        ],
+        "after": {
+          "digest": "f5694fee7b180206807c868f23dbc5ef49efbc9d04a985480897577ec5def122",
+          "owners": [
+            "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+            "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md"
+          ],
+          "kind": "document-or-section-scoped-repetition",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+          "reason": "The repeated short text introduces or qualifies the surrounding local section; each source occurrence retains that local payload at its mapped owner. Contexts: Step 02 - Workflow Stage Operations / 7. Tests; Step 03 - Assignment, Run, And RunResult / 7. Tests. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+          "sourceUnits": [
+            {
+              "claimId": "claim_90fff0613ac3e8c919c6a57936fd5621",
+              "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+              "anchor": "unheaded-block-51",
+              "unitDigest": "f5694fee7b180206807c868f23dbc5ef49efbc9d04a985480897577ec5def122",
+              "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+              "targetAnchor": "literal-snapshot",
+              "targetUnitDigest": "cc6626e546ba03022d2ee41eec7999b80e0d097bae22a8ecde76c7b325b19de4",
+              "sourceWitness": {
+                "startLine": 421,
+                "endLine": 421,
+                "text": "Useful verification commands:",
+                "ancestry": [
+                  "Step 02 - Workflow Stage Operations",
+                  "7. Tests"
+                ]
+              }
+            },
+            {
+              "claimId": "claim_5323b24af53575a476c971b752ffc138",
+              "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md",
+              "anchor": "unheaded-block-82",
+              "unitDigest": "f5694fee7b180206807c868f23dbc5ef49efbc9d04a985480897577ec5def122",
+              "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md",
+              "targetAnchor": "literal-snapshot",
+              "targetUnitDigest": "7d6490155c894be62af86db04b65de7a450eb12f7e5d5d99b6252c14ec508510",
+              "sourceWitness": {
+                "startLine": 704,
+                "endLine": 704,
+                "text": "Useful verification commands:",
+                "ancestry": [
+                  "Step 03 - Assignment, Run, And RunResult",
+                  "7. Tests"
+                ]
+              }
+            }
+          ],
+          "currentStateAccounting": "step10-author-candidate-accounting.json"
+        },
+        "reason": "The repeated short text introduces or qualifies the surrounding local section; each source occurrence retains that local payload at its mapped owner. Contexts: Step 02 - Workflow Stage Operations / 7. Tests; Step 03 - Assignment, Run, And RunResult / 7. Tests. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+        "proof": "All source members selected by exact sourceUnitDigest from persisted step10-global-applied-rows.json; owner set independently checked, no first digest occurrence chosen."
+      },
+      "reviewStatus": "pending",
+      "check": "Verify full digest+sorted owner set and every cited source tuple; contextual scope, not duplicate truth approval."
+    },
+    {
+      "entry": "g023",
+      "kind": "group-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-author-candidate-accounting.json",
+      "array": "groupChanges",
+      "index": 23,
+      "proof": {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-06/identical-unit-exceptions.json",
+        "action": "add",
+        "digest": "c0000ebfd3df6287bae1b1bdb4ce65226e2b20b6459b438f90475e8e0c3f8e07",
+        "memberPaths": [
+          "docs/platform/documentation/architecture/documentation-system-design.md",
+          "docs/platform/governance.md"
+        ],
+        "after": {
+          "digest": "c0000ebfd3df6287bae1b1bdb4ce65226e2b20b6459b438f90475e8e0c3f8e07",
+          "owners": [
+            "docs/platform/documentation/architecture/documentation-system-design.md",
+            "docs/platform/governance.md"
+          ],
+          "kind": "document-or-section-scoped-repetition",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+          "reason": "The repeated block is a contextual list, command example or lifecycle diagram inside separate source/proposal/history sections; retaining it at each mapped owner preserves that section’s local explanation. Contexts: Documentation System Design / 6. Document Model / 6.8. Discussion Scratchpad; Documentation Governance / 7. Discussion Scratchpad Workflow. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+          "sourceUnits": [
+            {
+              "claimId": "claim_32afd8895c195467bb408d10c7c943df",
+              "path": "docs/architect/documentation-system-design.md",
+              "anchor": "unheaded-block-55",
+              "unitDigest": "c0000ebfd3df6287bae1b1bdb4ce65226e2b20b6459b438f90475e8e0c3f8e07",
+              "targetOwner": "docs/platform/documentation/architecture/documentation-system-design.md",
+              "targetAnchor": "unheaded-block-58",
+              "targetUnitDigest": "c0000ebfd3df6287bae1b1bdb4ce65226e2b20b6459b438f90475e8e0c3f8e07",
+              "sourceWitness": {
+                "startLine": 414,
+                "endLine": 418,
+                "text": "Lifecycle:\n\n```txt\nOpen -> Active -> Stabilizing -> Promoting -> Drained -> Delete/Archive\n```",
+                "ancestry": [
+                  "Documentation System Design",
+                  "6. Document Model",
+                  "6.8. Discussion Scratchpad"
+                ]
+              }
+            },
+            {
+              "claimId": "claim_37b48670e7924d49eec710e08d6bcd05",
+              "path": "docs/doc-governance.md",
+              "anchor": "unheaded-block-29",
+              "unitDigest": "c0000ebfd3df6287bae1b1bdb4ce65226e2b20b6459b438f90475e8e0c3f8e07",
+              "targetOwner": "docs/platform/governance.md",
+              "targetAnchor": "unheaded-block-29",
+              "targetUnitDigest": "c0000ebfd3df6287bae1b1bdb4ce65226e2b20b6459b438f90475e8e0c3f8e07",
+              "sourceWitness": {
+                "startLine": 239,
+                "endLine": 243,
+                "text": "Lifecycle:\n\n```txt\nOpen -> Active -> Stabilizing -> Promoting -> Drained -> Delete/Archive\n```",
+                "ancestry": [
+                  "Documentation Governance",
+                  "7. Discussion Scratchpad Workflow"
+                ]
+              }
+            }
+          ],
+          "currentStateAccounting": "step10-author-candidate-accounting.json"
+        },
+        "reason": "The repeated block is a contextual list, command example or lifecycle diagram inside separate source/proposal/history sections; retaining it at each mapped owner preserves that section’s local explanation. Contexts: Documentation System Design / 6. Document Model / 6.8. Discussion Scratchpad; Documentation Governance / 7. Discussion Scratchpad Workflow. Pending independent contextual review; this records current occurrence/owner membership, not truth, semantic independence, accepted duplication or a gate waiver.",
+        "proof": "All source members selected by exact sourceUnitDigest from persisted step10-global-applied-rows.json; owner set independently checked, no first digest occurrence chosen."
+      },
+      "reviewStatus": "pending",
+      "check": "Verify full digest+sorted owner set and every cited source tuple; contextual scope, not duplicate truth approval."
+    },
+    {
+      "entry": "g000",
+      "kind": "group-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-author-candidate-accounting.json",
+      "array": "groupChanges",
+      "index": 0,
+      "proof": {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-06/identical-unit-exceptions.json",
+        "action": "remove",
+        "digest": "03d85305b958b2aac36862cab01a17e4495008170818ab553885106b45dc0146",
+        "memberPaths": [
+          "docs/platform/agent-coordination/architecture/run-handle.md",
+          "docs/platform/agent-coordination/architecture/runtime-recovery-design.md"
+        ],
+        "before": {
+          "digest": "03d85305b958b2aac36862cab01a17e4495008170818ab553885106b45dc0146",
+          "representativeClaimId": "claim_01a9d5e31d0f795931b8288588fb71ee",
+          "kind": "document-or-section-scoped-repetition",
+          "reviewStatus": "reviewed",
+          "reason": "Identical label/status/limitation text is scoped by distinct documents or ancestor sections, not a second authority for one unqualified claim. Independently verify each contextual subject before accepting.",
+          "sourceUnits": [
+            {
+              "claimId": "claim_01a9d5e31d0f795931b8288588fb71ee",
+              "source": "docs/architect/agent-coordination/architecture/run-handle.md#unheaded-block-1",
+              "owner": "docs/platform/agent-coordination/architecture/run-handle.md#unheaded-block-1",
+              "ancestry": [],
+              "text": "---\narea: agent-coordination-runtime\nupdated: 2026-09-14\ncoverage: substantially-implemented\n---"
+            },
+            {
+              "claimId": "claim_10efd807d18076b78b932cfa85a6e68a",
+              "source": "docs/architect/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-1",
+              "owner": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-1",
+              "ancestry": [],
+              "text": "---\narea: agent-coordination-runtime\nupdated: 2026-09-14\ncoverage: substantially-implemented\n---"
+            }
+          ]
+        },
+        "reason": "This exact digest and owner set no longer occurs in persisted native applied source rows. Historical receipt preserved here; no current exception or approval remains. Current owners for this digest: [\"docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md\",\"docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md\"].",
+        "currentSourceMembers": [
+          {
+            "claimId": "claim_01a9d5e31d0f795931b8288588fb71ee",
+            "path": "docs/architect/agent-coordination/architecture/run-handle.md",
+            "anchor": "unheaded-block-1",
+            "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md"
+          },
+          {
+            "claimId": "claim_10efd807d18076b78b932cfa85a6e68a",
+            "path": "docs/architect/agent-coordination/architecture/runtime-recovery-design.md",
+            "anchor": "unheaded-block-1",
+            "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md"
+          }
+        ],
+        "currentOwnerPaths": [
+          "docs/platform/agent-coordination/history/retired-engine/files/architecture/run-handle.md",
+          "docs/platform/agent-coordination/history/retired-engine/files/architecture/runtime-recovery-design.md"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Verify full digest+sorted owner set and every cited source tuple; contextual scope, not duplicate truth approval."
+    },
+    {
+      "entry": "g008",
+      "kind": "group-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-author-candidate-accounting.json",
+      "array": "groupChanges",
+      "index": 8,
+      "proof": {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-06/identical-unit-exceptions.json",
+        "action": "remove",
+        "digest": "f5694fee7b180206807c868f23dbc5ef49efbc9d04a985480897577ec5def122",
+        "memberPaths": [
+          "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+          "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md"
+        ],
+        "before": {
+          "digest": "f5694fee7b180206807c868f23dbc5ef49efbc9d04a985480897577ec5def122",
+          "representativeClaimId": "claim_90fff0613ac3e8c919c6a57936fd5621",
+          "kind": "document-or-section-scoped-repetition",
+          "reviewStatus": "reviewed",
+          "reason": "Identical label/status/limitation text is scoped by distinct documents or ancestor sections, not a second authority for one unqualified claim. Independently verify each contextual subject before accepting.",
+          "sourceUnits": [
+            {
+              "claimId": "claim_90fff0613ac3e8c919c6a57936fd5621",
+              "source": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md#unheaded-block-51",
+              "owner": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md#unheaded-block-50",
+              "ancestry": [
+                "Step 02 - Workflow Stage Operations",
+                "7. Tests"
+              ],
+              "text": "Useful verification commands:"
+            },
+            {
+              "claimId": "claim_5323b24af53575a476c971b752ffc138",
+              "source": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md#unheaded-block-82",
+              "owner": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md#unheaded-block-81",
+              "ancestry": [
+                "Step 03 - Assignment, Run, And RunResult",
+                "7. Tests"
+              ],
+              "text": "Useful verification commands:"
+            }
+          ]
+        },
+        "reason": "This exact digest and owner set no longer occurs in persisted native applied source rows. Historical receipt preserved here; no current exception or approval remains. Current owners for this digest: [\"docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md\",\"docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md\"].",
+        "currentSourceMembers": [
+          {
+            "claimId": "claim_90fff0613ac3e8c919c6a57936fd5621",
+            "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+            "anchor": "unheaded-block-51",
+            "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md"
+          },
+          {
+            "claimId": "claim_5323b24af53575a476c971b752ffc138",
+            "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md",
+            "anchor": "unheaded-block-82",
+            "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md"
+          }
+        ],
+        "currentOwnerPaths": [
+          "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md",
+          "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Verify full digest+sorted owner set and every cited source tuple; contextual scope, not duplicate truth approval."
+    },
+    {
+      "entry": "g006",
+      "kind": "group-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-author-candidate-accounting.json",
+      "array": "groupChanges",
+      "index": 6,
+      "proof": {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-06/identical-unit-exceptions.json",
+        "action": "remove",
+        "digest": "88c97d5d078f935960fefa349a515247bbf5ebef8f732e69c5e05d7b1d39709f",
+        "memberPaths": [
+          "docs/platform/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md",
+          "docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md"
+        ],
+        "before": {
+          "digest": "88c97d5d078f935960fefa349a515247bbf5ebef8f732e69c5e05d7b1d39709f",
+          "representativeClaimId": "claim_5bbd88e33e69171df36e111fa8cb86a7",
+          "kind": "document-or-section-scoped-repetition",
+          "reviewStatus": "reviewed",
+          "reason": "Identical label/status/limitation text is scoped by distinct documents or ancestor sections, not a second authority for one unqualified claim. Independently verify each contextual subject before accepting.",
+          "sourceUnits": [
+            {
+              "claimId": "claim_5bbd88e33e69171df36e111fa8cb86a7",
+              "source": "docs/architect/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md#unheaded-block-78",
+              "owner": "docs/platform/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md#unheaded-block-77",
+              "ancestry": [
+                "Step 07 - CoordinationSession, AdhocTask, And Planning Boundary",
+                "11. Work-Attached Integration Boundary"
+              ],
+              "text": "**Proposed invariant:**"
+            },
+            {
+              "claimId": "claim_51450419ea9b5e42ecbbfe89d6de5343",
+              "source": "docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#unheaded-block-29",
+              "owner": "docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md#unheaded-block-28",
+              "ancestry": [
+                "Step 08 - Standalone Coordination And Optional Protocols",
+                "5. Why Standalone Must Mean No Work Required"
+              ],
+              "text": "**Proposed invariant:**"
+            }
+          ]
+        },
+        "reason": "This exact digest and owner set no longer occurs in persisted native applied source rows. Historical receipt preserved here; no current exception or approval remains. Current owners for this digest: [\"docs/platform/agent-coordination/history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md\",\"docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md\"].",
+        "currentSourceMembers": [
+          {
+            "claimId": "claim_5bbd88e33e69171df36e111fa8cb86a7",
+            "path": "docs/architect/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md",
+            "anchor": "unheaded-block-78",
+            "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md"
+          },
+          {
+            "claimId": "claim_51450419ea9b5e42ecbbfe89d6de5343",
+            "path": "docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md",
+            "anchor": "unheaded-block-29",
+            "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md"
+          }
+        ],
+        "currentOwnerPaths": [
+          "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md",
+          "docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Verify full digest+sorted owner set and every cited source tuple; contextual scope, not duplicate truth approval."
+    },
+    {
+      "entry": "g009",
+      "kind": "group-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-author-candidate-accounting.json",
+      "array": "groupChanges",
+      "index": 9,
+      "proof": {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-06/identical-unit-exceptions.json",
+        "action": "remove",
+        "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "memberPaths": [
+          "docs/platform/architecture-map.md",
+          "docs/platform/system-overview/spec.md"
+        ],
+        "before": {
+          "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "representativeClaimId": "claim_f7e282b47557154231f0565bd30e5d7d",
+          "kind": "document-or-section-scoped-repetition",
+          "reviewStatus": "reviewed",
+          "authoredBy": "codex-session:39@2026-10-15",
+          "reason": "The identical closing decision sentence refers to four distinct decision contexts in architecture-map and system-overview. Each occurrence is paired positionally to its own corresponding decision narrative and ancestry; collapsing them would detach their local decision subject. Pending independent contextual exception review; no gate waiver or promotion.",
+          "sourceUnits": [
+            {
+              "claimId": "claim_f7e282b47557154231f0565bd30e5d7d",
+              "source": "docs/architecture-map.md#unheaded-block-77",
+              "owner": "docs/platform/architecture-map.md#unheaded-block-91",
+              "ancestry": [
+                "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+                "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+                "0015 — Đổi tên định danh contract C1-C9 thành CTR001-CTR009",
+                "Hệ quả"
+              ],
+              "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+              "sourceBlob": "01f2a21eebba99c2b237be650b631168232bcd5e",
+              "targetBlob": "cf4cb69459d749e1d4e258a2ef1846ef66c9d567"
+            },
+            {
+              "claimId": "claim_15a3179944bc76f990fe1b965e40a9da",
+              "source": "docs/architecture-map.md#unheaded-block-83",
+              "owner": "docs/platform/architecture-map.md#unheaded-block-97",
+              "ancestry": [
+                "Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký",
+                "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+                "0017 — Đóng audit hệ id/tên gọi (STR47)",
+                "Hệ quả"
+              ],
+              "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+              "sourceBlob": "01f2a21eebba99c2b237be650b631168232bcd5e",
+              "targetBlob": "cf4cb69459d749e1d4e258a2ef1846ef66c9d567"
+            },
+            {
+              "claimId": "claim_e4b03884bb0c50d641f173b8a74c6501",
+              "source": "docs/specs/system-overview.md#unheaded-block-25",
+              "owner": "docs/platform/system-overview/spec.md#unheaded-block-28",
+              "ancestry": [
+                "Spec: System Overview",
+                "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+                "0016 — Mốc MVP của fgOS",
+                "Hệ quả"
+              ],
+              "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+              "sourceBlob": "c24c5561dc60cce7e53d0a0c5e34ff97414845ac",
+              "targetBlob": "ebd433bee5dcf0a79ad1daaa3cb3e9b30c802020"
+            },
+            {
+              "claimId": "claim_ba26d5145625a6a74f3d1f4801c35407",
+              "source": "docs/specs/system-overview.md#unheaded-block-34",
+              "owner": "docs/platform/system-overview/spec.md#unheaded-block-37",
+              "ancestry": [
+                "Spec: System Overview",
+                "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+                "0018 — Mốc MVP2 của fgOS",
+                "Hệ quả"
+              ],
+              "text": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.",
+              "sourceBlob": "c24c5561dc60cce7e53d0a0c5e34ff97414845ac",
+              "targetBlob": "ebd433bee5dcf0a79ad1daaa3cb3e9b30c802020"
+            }
+          ],
+          "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+          "reviewedAt": "2026-10-15",
+          "reviewMode": "ordinary",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-bounded-rereview.md",
+          "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
+          "reviewNote": "mechanical: retained accepted exception group (closing decision sentence, four contexts); only review metadata changed, note and pin equal my 36d79ddcc verdict, four sources and owners unchanged"
+        },
+        "reason": "This exact digest and owner set no longer occurs in persisted native applied source rows. Historical receipt preserved here; no current exception or approval remains. Current owners for this digest: [\"docs/platform/architecture-map.md\",\"docs/platform/runner/decisions/h-36d872fbb0e5.md\",\"docs/platform/system-overview/spec.md\",\"docs/platform/work-state/decisions/retired-decision-history.md\"].",
+        "currentSourceMembers": [
+          {
+            "claimId": "claim_f7e282b47557154231f0565bd30e5d7d",
+            "path": "docs/architecture-map.md",
+            "anchor": "unheaded-block-77",
+            "targetOwner": "docs/platform/architecture-map.md"
+          },
+          {
+            "claimId": "claim_15a3179944bc76f990fe1b965e40a9da",
+            "path": "docs/architecture-map.md",
+            "anchor": "unheaded-block-83",
+            "targetOwner": "docs/platform/architecture-map.md"
+          },
+          {
+            "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
+            "path": "docs/specs/runner.md",
+            "anchor": "unheaded-block-150",
+            "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md"
+          },
+          {
+            "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
+            "path": "docs/specs/runner.md",
+            "anchor": "unheaded-block-155",
+            "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md"
+          },
+          {
+            "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
+            "path": "docs/specs/runner.md",
+            "anchor": "unheaded-block-167",
+            "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md"
+          },
+          {
+            "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
+            "path": "docs/specs/runner.md",
+            "anchor": "unheaded-block-176",
+            "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md"
+          },
+          {
+            "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
+            "path": "docs/specs/runner.md",
+            "anchor": "unheaded-block-241",
+            "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md"
+          },
+          {
+            "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
+            "path": "docs/specs/runner.md",
+            "anchor": "unheaded-block-250",
+            "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md"
+          },
+          {
+            "claimId": "claim_825b8970950e755e43c8c1740612eac4",
+            "path": "docs/specs/runner.md",
+            "anchor": "unheaded-block-274",
+            "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md"
+          },
+          {
+            "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
+            "path": "docs/specs/runner.md",
+            "anchor": "unheaded-block-286",
+            "targetOwner": "docs/platform/runner/decisions/h-36d872fbb0e5.md"
+          },
+          {
+            "claimId": "claim_e4b03884bb0c50d641f173b8a74c6501",
+            "path": "docs/specs/system-overview.md",
+            "anchor": "unheaded-block-25",
+            "targetOwner": "docs/platform/system-overview/spec.md"
+          },
+          {
+            "claimId": "claim_ba26d5145625a6a74f3d1f4801c35407",
+            "path": "docs/specs/system-overview.md",
+            "anchor": "unheaded-block-34",
+            "targetOwner": "docs/platform/system-overview/spec.md"
+          },
+          {
+            "claimId": "claim_c56e0ea4200729ae5cf5542803b2fe10",
+            "path": "docs/specs/work-state.md",
+            "anchor": "unheaded-block-117",
+            "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md"
+          },
+          {
+            "claimId": "claim_c57c39536b983d5f172833853e8b3344",
+            "path": "docs/specs/work-state.md",
+            "anchor": "unheaded-block-121",
+            "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md"
+          },
+          {
+            "claimId": "claim_7bc17cd130d9b9600e3a8db9bd57ca88",
+            "path": "docs/specs/work-state.md",
+            "anchor": "unheaded-block-126",
+            "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md"
+          },
+          {
+            "claimId": "claim_576e295be7d60ab95a555f11ada15da5",
+            "path": "docs/specs/work-state.md",
+            "anchor": "unheaded-block-138",
+            "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md"
+          },
+          {
+            "claimId": "claim_08dc68ef23395b8f3f5b095508348e00",
+            "path": "docs/specs/work-state.md",
+            "anchor": "unheaded-block-144",
+            "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md"
+          },
+          {
+            "claimId": "claim_a7c2e1310de5bcd152e86f3833e90033",
+            "path": "docs/specs/work-state.md",
+            "anchor": "unheaded-block-150",
+            "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md"
+          },
+          {
+            "claimId": "claim_82f766f5320ab6bbe5174aeda52e710b",
+            "path": "docs/specs/work-state.md",
+            "anchor": "unheaded-block-174",
+            "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md"
+          }
+        ],
+        "currentOwnerPaths": [
+          "docs/platform/architecture-map.md",
+          "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "docs/platform/system-overview/spec.md",
+          "docs/platform/work-state/decisions/retired-decision-history.md"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Verify full digest+sorted owner set and every cited source tuple; contextual scope, not duplicate truth approval."
+    },
+    {
+      "entry": "g007",
+      "kind": "group-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-author-candidate-accounting.json",
+      "array": "groupChanges",
+      "index": 7,
+      "proof": {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-06/identical-unit-exceptions.json",
+        "action": "remove",
+        "digest": "16005492e57449e7a2fbd37073486971ea386fa8179c541744aa9c691d32a77d",
+        "memberPaths": [
+          "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+          "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md"
+        ],
+        "before": {
+          "digest": "16005492e57449e7a2fbd37073486971ea386fa8179c541744aa9c691d32a77d",
+          "representativeClaimId": "claim_e8c53acd61cfc995320d78acf32dd3e3",
+          "kind": "document-or-section-scoped-repetition",
+          "reviewStatus": "reviewed",
+          "reason": "Identical label/status/limitation text is scoped by distinct documents or ancestor sections, not a second authority for one unqualified claim. Independently verify each contextual subject before accepting.",
+          "sourceUnits": [
+            {
+              "claimId": "claim_e8c53acd61cfc995320d78acf32dd3e3",
+              "source": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-44",
+              "owner": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md#unheaded-block-43",
+              "ancestry": [
+                "Step 01 - Team Dispatch V1 Rollout",
+                "8. Slice 3 - Assignment Builder"
+              ],
+              "text": "```txt\nplanning.validate-plan\n```"
+            },
+            {
+              "claimId": "claim_bb0832ff4c70950caa3d84b828512192",
+              "source": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md#unheaded-block-42",
+              "owner": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md#unheaded-block-41",
+              "ancestry": [
+                "Step 03 - Assignment, Run, And RunResult",
+                "4. Dispatch Integration"
+              ],
+              "text": "```txt\nplanning.validate-plan\n```"
+            }
+          ]
+        },
+        "reason": "This exact digest and owner set no longer occurs in persisted native applied source rows. Historical receipt preserved here; no current exception or approval remains. Current owners for this digest: [\"docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md\",\"docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md\"].",
+        "currentSourceMembers": [
+          {
+            "claimId": "claim_e8c53acd61cfc995320d78acf32dd3e3",
+            "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+            "anchor": "unheaded-block-44",
+            "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md"
+          },
+          {
+            "claimId": "claim_bb0832ff4c70950caa3d84b828512192",
+            "path": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md",
+            "anchor": "unheaded-block-42",
+            "targetOwner": "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md"
+          }
+        ],
+        "currentOwnerPaths": [
+          "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-01-rollout.md",
+          "docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Verify full digest+sorted owner set and every cited source tuple; contextual scope, not duplicate truth approval."
+    },
+    {
+      "entry": "a01",
+      "kind": "application-accounting",
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-global-review-application.json",
+      "reports": 15,
+      "requestRows": 113,
+      "okApplied": 108,
+      "rework": 5,
+      "evidence": "step10-global-review-final-audit.json",
+      "reviewStatus": "pending",
+      "check": "Every one of the 108 changed approval records is enumerated in records; validate committed report pin, matching binding and verbatim Notes. These are application accounting, not fresh author verdicts. Fifty retired rows use established stamps; loader limitation remains explicit."
+    },
+    {
+      "entry": "x01",
+      "kind": "comparison-accounting",
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-comparison-explanations.json",
+      "proof": {
+        "entry": "x01",
+        "category": "candidate union",
+        "direction": "unexpected",
+        "tuple": [
+          "claim_87f236ae2e3356f5e23e70a7f7224242",
+          "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+          "unheaded-block-3",
+          "59d70c7fd04f6212e5c8909a4bf8bca340c7aeb0f372547419ca80fbc74dd78a"
+        ],
+        "nativeAccountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-native-content-accounting.json",
+        "nativeAccountingIndex": 1,
+        "beforeTuple": [
+          "claim_35b6d8008541bef15edc061dade28c06",
+          "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+          "unheaded-block-3",
+          "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b"
+        ],
+        "afterTuple": [
+          "claim_87f236ae2e3356f5e23e70a7f7224242",
+          "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+          "unheaded-block-3",
+          "59d70c7fd04f6212e5c8909a4bf8bca340c7aeb0f372547419ca80fbc74dd78a"
+        ],
+        "beforeDigestAuthenticated": true,
+        "afterDigestAuthenticated": true,
+        "classificationReceipts": [
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
+            "claimId": "claim_35b6d8008541bef15edc061dade28c06",
+            "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+            "anchor": "unheaded-block-3",
+            "unitDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
+            "class": "candidate-native-content"
+          }
+        ],
+        "classificationReferences": [
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-registry-projection.json",
+            "ref": {
+              "claimId": "claim_35b6d8008541bef15edc061dade28c06",
+              "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
+              "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
+              "authoredBy": "codex-session:1@2026-10-10",
+              "reviewStatus": "reviewed",
+              "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+              "reviewedAt": "2026-10-12",
+              "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-projection.md",
+              "reviewReportCommit": "dd1fe8d808aa60d559722b4c604acaff1894837c",
+              "reviewMode": "ordinary",
+              "reviewNote": "identity projection of plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md row claim_4bc85103cad14d7d4f8557aa71bf943a; bytes equal"
+            }
+          }
+        ],
+        "evidenceRule": "scripts/check-doc-inventory-gates.mjs:1025-1069; unreferencedCandidateRows:1151-1180",
+        "explanation": "The formerly accepted recovery classification is bound to the old digest/ID (exact receipt and committed review reference below). c3614f4d2 restores the two code-proven planner/apply paragraphs; native current digest differs, so acceptedCandidateClassifications rejects the stale receipt at scripts/check-doc-inventory-gates.mjs:1056-1061. The changed heading and independent new paragraph unit now appear in reverse E. They were absent from the committed candidate-unverified list because the old units were accepted classifications. No new classification or approval is invented.",
+        "reviewStatus": "pending",
+        "waiver": false
+      },
+      "reviewStatus": "pending",
+      "check": "Authenticate this exact comparator diagnostic, before/after native full tuples, committed content diff and stale classification evidence where applicable; explanation is not a waiver."
+    },
+    {
+      "entry": "x02",
+      "kind": "comparison-accounting",
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-comparison-explanations.json",
+      "proof": {
+        "entry": "x02",
+        "category": "candidate union",
+        "direction": "unexpected",
+        "tuple": [
+          "claim_9d5d0b39286fb978c6de4bbc09e75adb",
+          "docs/platform/agent-coordination/architecture/run-handle.md",
+          "unheaded-block-3",
+          "1f25a51f75e78cb32b002b7ccb303a916191d96c495a81235ebf1b7a8608f694"
+        ],
+        "nativeAccountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-native-content-accounting.json",
+        "nativeAccountingIndex": 3,
+        "beforeTuple": [
+          "claim_2e2938c719ad58a967857c76c72850f1",
+          "docs/platform/agent-coordination/architecture/run-handle.md",
+          "unheaded-block-3",
+          "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b"
+        ],
+        "afterTuple": [
+          "claim_9d5d0b39286fb978c6de4bbc09e75adb",
+          "docs/platform/agent-coordination/architecture/run-handle.md",
+          "unheaded-block-3",
+          "1f25a51f75e78cb32b002b7ccb303a916191d96c495a81235ebf1b7a8608f694"
+        ],
+        "beforeDigestAuthenticated": true,
+        "afterDigestAuthenticated": true,
+        "classificationReceipts": [],
+        "classificationReferences": [],
+        "evidenceRule": "scripts/check-doc-inventory-gates.mjs:1025-1069; unreferencedCandidateRows:1151-1180",
+        "explanation": "c3614f4d2 restores all three code-proven run-control paragraphs. The current heading retains its native ID with a new authenticated digest; the paragraph has a distinct new native ID while the old ID is preserved as a gap. These current tuples replace the two old committed list tuples. Exact before/after unit text and committed diff authenticate both; no approval carries.",
+        "reviewStatus": "pending",
+        "waiver": false
+      },
+      "reviewStatus": "pending",
+      "check": "Authenticate this exact comparator diagnostic, before/after native full tuples, committed content diff and stale classification evidence where applicable; explanation is not a waiver."
+    },
+    {
+      "entry": "x03",
+      "kind": "comparison-accounting",
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-comparison-explanations.json",
+      "proof": {
+        "entry": "x03",
+        "category": "candidate union",
+        "direction": "unexpected",
+        "tuple": [
+          "claim_b6963c89796864ca59f82467d506f348",
+          "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+          "implementation-and-design-status",
+          "e9987e41f961ef6c8dc9e9e2b204eafc3ee98883460e98c0c18606ac0cc3a046"
+        ],
+        "nativeAccountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-native-content-accounting.json",
+        "nativeAccountingIndex": 0,
+        "beforeTuple": [
+          "claim_b6963c89796864ca59f82467d506f348",
+          "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+          "implementation-and-design-status",
+          "4fc22267739453739992bd7673b29eaa711de810b721bd915c28f58ec555cc0c"
+        ],
+        "afterTuple": [
+          "claim_b6963c89796864ca59f82467d506f348",
+          "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+          "implementation-and-design-status",
+          "e9987e41f961ef6c8dc9e9e2b204eafc3ee98883460e98c0c18606ac0cc3a046"
+        ],
+        "beforeDigestAuthenticated": true,
+        "afterDigestAuthenticated": true,
+        "classificationReceipts": [
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
+            "claimId": "claim_b6963c89796864ca59f82467d506f348",
+            "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+            "anchor": "implementation-and-design-status",
+            "unitDigest": "4fc22267739453739992bd7673b29eaa711de810b721bd915c28f58ec555cc0c",
+            "class": "candidate-native-content"
+          }
+        ],
+        "classificationReferences": [
+          {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-registry-projection.json",
+            "ref": {
+              "claimId": "claim_b6963c89796864ca59f82467d506f348",
+              "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
+              "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
+              "authoredBy": "codex-session:1@2026-10-10",
+              "reviewStatus": "reviewed",
+              "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
+              "reviewedAt": "2026-10-12",
+              "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-projection.md",
+              "reviewReportCommit": "dd1fe8d808aa60d559722b4c604acaff1894837c",
+              "reviewMode": "ordinary",
+              "reviewNote": "identity projection of plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-classifications.md row claim_0665b9cff5975b973955aeb7749d97ba; bytes equal"
+            }
+          }
+        ],
+        "evidenceRule": "scripts/check-doc-inventory-gates.mjs:1025-1069; unreferencedCandidateRows:1151-1180",
+        "explanation": "The formerly accepted recovery classification is bound to the old digest/ID (exact receipt and committed review reference below). c3614f4d2 restores the two code-proven planner/apply paragraphs; native current digest differs, so acceptedCandidateClassifications rejects the stale receipt at scripts/check-doc-inventory-gates.mjs:1056-1061. The changed heading and independent new paragraph unit now appear in reverse E. They were absent from the committed candidate-unverified list because the old units were accepted classifications. No new classification or approval is invented.",
+        "reviewStatus": "pending",
+        "waiver": false
+      },
+      "reviewStatus": "pending",
+      "check": "Authenticate this exact comparator diagnostic, before/after native full tuples, committed content diff and stale classification evidence where applicable; explanation is not a waiver."
+    },
+    {
+      "entry": "x04",
+      "kind": "comparison-accounting",
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-comparison-explanations.json",
+      "proof": {
+        "entry": "x04",
+        "category": "candidate union",
+        "direction": "unexpected",
+        "tuple": [
+          "claim_f1c6ef52a41ee978ba72a88733520c60",
+          "docs/platform/agent-coordination/architecture/run-handle.md",
+          "implementation-and-design-status",
+          "565cf67de33a96a867f31b05e3ef2330415d5c6385df5a355e92b6d4d5a38421"
+        ],
+        "nativeAccountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-native-content-accounting.json",
+        "nativeAccountingIndex": 2,
+        "beforeTuple": [
+          "claim_f1c6ef52a41ee978ba72a88733520c60",
+          "docs/platform/agent-coordination/architecture/run-handle.md",
+          "implementation-and-design-status",
+          "bef0ccaa8745300be2bf165c8d136047af133c064637af821eed0a95b23d04fe"
+        ],
+        "afterTuple": [
+          "claim_f1c6ef52a41ee978ba72a88733520c60",
+          "docs/platform/agent-coordination/architecture/run-handle.md",
+          "implementation-and-design-status",
+          "565cf67de33a96a867f31b05e3ef2330415d5c6385df5a355e92b6d4d5a38421"
+        ],
+        "beforeDigestAuthenticated": true,
+        "afterDigestAuthenticated": true,
+        "classificationReceipts": [],
+        "classificationReferences": [],
+        "evidenceRule": "scripts/check-doc-inventory-gates.mjs:1025-1069; unreferencedCandidateRows:1151-1180",
+        "explanation": "c3614f4d2 restores all three code-proven run-control paragraphs. The current heading retains its native ID with a new authenticated digest; the paragraph has a distinct new native ID while the old ID is preserved as a gap. These current tuples replace the two old committed list tuples. Exact before/after unit text and committed diff authenticate both; no approval carries.",
+        "reviewStatus": "pending",
+        "waiver": false
+      },
+      "reviewStatus": "pending",
+      "check": "Authenticate this exact comparator diagnostic, before/after native full tuples, committed content diff and stale classification evidence where applicable; explanation is not a waiver."
+    },
+    {
+      "entry": "x05",
+      "kind": "comparison-accounting",
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-comparison-explanations.json",
+      "proof": {
+        "entry": "x05",
+        "category": "candidate union",
+        "direction": "missing",
+        "tuple": [
+          "claim_2e2938c719ad58a967857c76c72850f1",
+          "docs/platform/agent-coordination/architecture/run-handle.md",
+          "unheaded-block-3",
+          "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b"
+        ],
+        "nativeAccountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-native-content-accounting.json",
+        "nativeAccountingIndex": 3,
+        "beforeTuple": [
+          "claim_2e2938c719ad58a967857c76c72850f1",
+          "docs/platform/agent-coordination/architecture/run-handle.md",
+          "unheaded-block-3",
+          "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b"
+        ],
+        "afterTuple": [
+          "claim_9d5d0b39286fb978c6de4bbc09e75adb",
+          "docs/platform/agent-coordination/architecture/run-handle.md",
+          "unheaded-block-3",
+          "1f25a51f75e78cb32b002b7ccb303a916191d96c495a81235ebf1b7a8608f694"
+        ],
+        "beforeDigestAuthenticated": true,
+        "afterDigestAuthenticated": true,
+        "classificationReceipts": [],
+        "classificationReferences": [],
+        "evidenceRule": "scripts/check-doc-inventory-gates.mjs:1025-1069; unreferencedCandidateRows:1151-1180",
+        "explanation": "The committed candidate list still contains the pre-c361 run-handle tuple. Its exact old heading digest is replaced under a retained native ID, or its old paragraph ID is a preserved native gap. The old tuple no longer occurs in active reverse E. Historical list membership is retained for independent review; no ordinal identity graft or approval carry.",
+        "reviewStatus": "pending",
+        "waiver": false
+      },
+      "reviewStatus": "pending",
+      "check": "Authenticate this exact comparator diagnostic, before/after native full tuples, committed content diff and stale classification evidence where applicable; explanation is not a waiver."
+    },
+    {
+      "entry": "x06",
+      "kind": "comparison-accounting",
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-comparison-explanations.json",
+      "proof": {
+        "entry": "x06",
+        "category": "candidate union",
+        "direction": "missing",
+        "tuple": [
+          "claim_f1c6ef52a41ee978ba72a88733520c60",
+          "docs/platform/agent-coordination/architecture/run-handle.md",
+          "implementation-and-design-status",
+          "bef0ccaa8745300be2bf165c8d136047af133c064637af821eed0a95b23d04fe"
+        ],
+        "nativeAccountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-native-content-accounting.json",
+        "nativeAccountingIndex": 2,
+        "beforeTuple": [
+          "claim_f1c6ef52a41ee978ba72a88733520c60",
+          "docs/platform/agent-coordination/architecture/run-handle.md",
+          "implementation-and-design-status",
+          "bef0ccaa8745300be2bf165c8d136047af133c064637af821eed0a95b23d04fe"
+        ],
+        "afterTuple": [
+          "claim_f1c6ef52a41ee978ba72a88733520c60",
+          "docs/platform/agent-coordination/architecture/run-handle.md",
+          "implementation-and-design-status",
+          "565cf67de33a96a867f31b05e3ef2330415d5c6385df5a355e92b6d4d5a38421"
+        ],
+        "beforeDigestAuthenticated": true,
+        "afterDigestAuthenticated": true,
+        "classificationReceipts": [],
+        "classificationReferences": [],
+        "evidenceRule": "scripts/check-doc-inventory-gates.mjs:1025-1069; unreferencedCandidateRows:1151-1180",
+        "explanation": "The committed candidate list still contains the pre-c361 run-handle tuple. Its exact old heading digest is replaced under a retained native ID, or its old paragraph ID is a preserved native gap. The old tuple no longer occurs in active reverse E. Historical list membership is retained for independent review; no ordinal identity graft or approval carry.",
+        "reviewStatus": "pending",
+        "waiver": false
+      },
+      "reviewStatus": "pending",
+      "check": "Authenticate this exact comparator diagnostic, before/after native full tuples, committed content diff and stale classification evidence where applicable; explanation is not a waiver."
+    }
+  ]
+}

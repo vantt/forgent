@@ -1,0 +1,85 @@
+{
+  "contentCommit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+  "producer": "codex-session:unit-run-1792169760182-e3acba42@2026-10-16",
+  "mode": "ordinary",
+  "entries": [
+    {
+      "entry": "d01",
+      "kind": "document",
+      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "beforeCommit": "c3614f4d2^",
+      "afterCommit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+      "beforeSHA256": "afcd8060ca4d3ef7a0b2e0640dd7a8be9bbd6fe6c285fd4fc36a0b348797f26e",
+      "afterSHA256": "848999421de92c2840c86b3cbe459d3fb58fce4b8d0a718557547eacebbe7614",
+      "sourceCommit": "9134ff4e531bb7e75b188ed272188f6efbfe430d",
+      "restoredParagraphs": [
+        "The retained recovery planner produces a recommendation, park or needs-input decision from snapshot and evidence. Evidence: `src/runner/dispatch/recovery-planner.mjs:243-266`.",
+        "Applying a recommendation checks its action key, snapshot hash, control epoch, expiry and current legality again. Evidence: `src/runner/dispatch/recovery-planner.mjs:281-316`."
+      ],
+      "codeEvidence": [
+        "src/runner/dispatch/recovery-planner.mjs:243-266",
+        "src/runner/dispatch/recovery-planner.mjs:281-316"
+      ],
+      "reviewStatus": "pending",
+      "check": "Compare whole changed introduction and original source; read every cited code range. Facts restored verbatim; no other body bytes changed."
+    },
+    {
+      "entry": "d02",
+      "kind": "document",
+      "path": "docs/platform/agent-coordination/architecture/run-handle.md",
+      "beforeCommit": "c3614f4d2^",
+      "afterCommit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+      "beforeSHA256": "31c3bfbb30b5e0b9fecec82895f313d71671306d9d274883324c7cff6d8d1112",
+      "afterSHA256": "a5b3d04dbc725ba2248ed07fd24144cc2e3ffd4031ae2fc23d6088d12f50581b",
+      "sourceCommit": "9134ff4e531bb7e75b188ed272188f6efbfe430d",
+      "restoredParagraphs": [
+        "Run-control acquisition checks the expected control epoch and refuses a settled generation. Evidence: `src/runner/dispatch/run-lock.mjs:306-320`.",
+        "An expired heartbeat does not authorize stealing a live or unproven-dead holder; holder liveness must permit reclaim. Evidence: `src/runner/dispatch/run-lock.mjs:321-334`.",
+        "Settlement verifies the exact epoch and token and publishes a settled generation. Evidence: `src/runner/dispatch/run-lock.mjs:390-412`."
+      ],
+      "codeEvidence": [
+        "src/runner/dispatch/run-lock.mjs:306-334",
+        "src/runner/dispatch/run-lock.mjs:390-412"
+      ],
+      "reviewStatus": "pending",
+      "check": "Compare whole changed introduction and original source; read every cited code range. Facts restored verbatim; no other body bytes changed."
+    },
+    {
+      "entry": "d03",
+      "kind": "document",
+      "path": "docs/platform/session-identity/spec.md",
+      "beforeCommit": "28ded7633^",
+      "afterCommit": "28ded7633",
+      "beforeSHA256": "d007573a8d4f659fa9e017214b312ac61e3f7ab7fc78226688118c3d1fa4bad9",
+      "afterSHA256": "b3dfd588a2535949d4396a3c4afc20e15508c6af57f278be4154533e7cd2621a",
+      "proof": {
+        "path": "docs/platform/session-identity/spec.md",
+        "reviewStatus": "pending",
+        "beforeSHA256": "d007573a8d4f659fa9e017214b312ac61e3f7ab7fc78226688118c3d1fa4bad9",
+        "afterSHA256": "b3dfd588a2535949d4396a3c4afc20e15508c6af57f278be4154533e7cd2621a",
+        "bodyBeforeSHA256": "9a2ccb8d054280f4d91caa7a5b8e05d23f20427a258f43a24b9ea334b79f1e73",
+        "bodyAfterSHA256": "9a2ccb8d054280f4d91caa7a5b8e05d23f20427a258f43a24b9ea334b79f1e73",
+        "bodyByteEqual": true,
+        "beforeHeader": "# Session Identity Component Specification\n\n```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the single authority for \"who is the writer of this process\"\nDesign status: Accepted\nImplementation status: Implemented (activation pending)\nCanonical: Yes\nOwner: Session Identity component\nSource: packages/session-identity/rust\nContracts: packages/session-identity/contracts/\nLast reviewed: 2026-10-15\nRelated:\n- docs/io-contract.md\n- docs/platform/component-boundary.md\n- docs/specs/observe.md\n- plans/261015-2102-identity-resolver-rust-crate/plan.md\n```\n",
+        "afterHeader": "# Session Identity Component Specification\n\n```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the single authority for \"who is the writer of this process\"\nDesign status: Accepted\nImplementation: Implemented (activation pending)\nProvenance: packages/session-identity/rust; packages/session-identity/contracts/; introduced by 6a53e65b5\nWriter type: Agent draft writer (header completion pending independent review)\nCanonical: Yes\nCanonical for: Session Identity component writer attribution rule and native identity contract\nUse this when: Resolving or reviewing the writer identity of a calling process\nDo not use this for: Authentication, lock authority, worker id creation, process liveness or run supervision\nOwner: Session Identity component\nSource: packages/session-identity/rust\nContracts: packages/session-identity/contracts/\nLast reviewed: 2026-10-15\nRelated:\n- docs/io-contract.md\n- docs/platform/component-boundary.md\n- docs/specs/observe.md\n- plans/261015-2102-identity-resolver-rust-crate/plan.md\nSupersedes: None\nSuperseded by: None\n```\n",
+        "mapping": {
+          "Implementation status": "Implementation (existing value preserved)"
+        },
+        "addedFields": [
+          "Implementation",
+          "Provenance",
+          "Writer type",
+          "Canonical for",
+          "Use this when",
+          "Do not use this for",
+          "Supersedes",
+          "Superseded by"
+        ],
+        "priorLastReviewed": "2026-10-15",
+        "authorityStatusUnchanged": true,
+        "next": "Package native sync and small independent review; no body edit and no acceptance claim."
+      },
+      "reviewStatus": "pending"
+    }
+  ]
+}

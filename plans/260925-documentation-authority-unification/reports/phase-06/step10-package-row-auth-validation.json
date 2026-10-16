@@ -1,0 +1,616 @@
+{
+  "mode": "producer smoke validation, no verdicts",
+  "results": [
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-accounting.json",
+      "entry": "g019",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-accounting.json",
+      "entry": "g016",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-accounting.json",
+      "entry": "g018",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-accounting.json",
+      "entry": "g021",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-accounting.json",
+      "entry": "g023",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-accounting.json",
+      "entry": "g000",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-accounting.json",
+      "entry": "g008",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-accounting.json",
+      "entry": "g006",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-accounting.json",
+      "entry": "g009",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-accounting.json",
+      "entry": "g007",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-accounting.json",
+      "entry": "a01",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-candidate-sample.json",
+      "entry": "c129",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-candidate-sample.json",
+      "entry": "c008",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-candidate-sample.json",
+      "entry": "c058",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-candidate-sample.json",
+      "entry": "c083",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-candidate-sample.json",
+      "entry": "c087",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-candidate-sample.json",
+      "entry": "c193",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-candidate-sample.json",
+      "entry": "c220",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-candidate-sample.json",
+      "entry": "c211",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-candidate-sample.json",
+      "entry": "c153",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-candidate-sample.json",
+      "entry": "c176",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-candidate-sample.json",
+      "entry": "c105",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-candidate-sample.json",
+      "entry": "c137",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-candidate-sample.json",
+      "entry": "c039",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-candidate-sample.json",
+      "entry": "c110",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-candidate-sample.json",
+      "entry": "c059",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-decisions.json",
+      "entry": "p01",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-decisions.json",
+      "entry": "p02",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-decisions.json",
+      "entry": "p03",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-decisions.json",
+      "entry": "p04",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-decisions.json",
+      "entry": "p05",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-decisions.json",
+      "entry": "p06",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-decisions.json",
+      "entry": "p07",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-decisions.json",
+      "entry": "p08",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-decisions.json",
+      "entry": "p09",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-decisions.json",
+      "entry": "p10",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-decisions.json",
+      "entry": "p11",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-decisions.json",
+      "entry": "p12",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-decisions.json",
+      "entry": "p13",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-documents.json",
+      "entry": "d01",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-documents.json",
+      "entry": "d02",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-documents.json",
+      "entry": "d03",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n01",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n02",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n03",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n04",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n05",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n06",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n07",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n08",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n09",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n10",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n11",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n12",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n13",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n14",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n15",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n16",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n17",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n18",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n19",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n20",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n21",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n22",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n23",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n24",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n25",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n26",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n27",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n28",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n29",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n30",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n31",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n32",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n33",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n34",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n35",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n36",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n37",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n38",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n39",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n40",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n41",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n42",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entry": "n43",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-accounting.json",
+      "entry": "x01",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-accounting.json",
+      "entry": "x02",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-accounting.json",
+      "entry": "x03",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-accounting.json",
+      "entry": "x04",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-accounting.json",
+      "entry": "x05",
+      "exitCode": 0,
+      "error": null
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-accounting.json",
+      "entry": "x06",
+      "exitCode": 0,
+      "error": null
+    }
+  ],
+  "initialHelperFailures": [
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-decisions.json",
+      "entry": "p08",
+      "cause": "Author helper assumed a target for explicit reclassify-out-of-platform-scope; corrected to require the exact committed vocabulary disposition."
+    },
+    {
+      "part": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-decisions.json",
+      "entry": "p09",
+      "cause": "Author helper assumed a target for explicit reclassify-out-of-platform-scope; corrected to require the exact committed vocabulary disposition."
+    }
+  ],
+  "allPass": true,
+  "independentGroupContentAuthentication": [
+    {
+      "entry": "g019",
+      "exitCode": 0,
+      "stderr": null
+    },
+    {
+      "entry": "g016",
+      "exitCode": 0,
+      "stderr": null
+    },
+    {
+      "entry": "g018",
+      "exitCode": 0,
+      "stderr": null
+    },
+    {
+      "entry": "g021",
+      "exitCode": 0,
+      "stderr": null
+    },
+    {
+      "entry": "g023",
+      "exitCode": 0,
+      "stderr": null
+    },
+    {
+      "entry": "g000",
+      "exitCode": 0,
+      "stderr": null
+    },
+    {
+      "entry": "g008",
+      "exitCode": 0,
+      "stderr": null
+    },
+    {
+      "entry": "g006",
+      "exitCode": 0,
+      "stderr": null
+    },
+    {
+      "entry": "g009",
+      "exitCode": 0,
+      "stderr": null
+    },
+    {
+      "entry": "g007",
+      "exitCode": 0,
+      "stderr": null
+    }
+  ]
+}

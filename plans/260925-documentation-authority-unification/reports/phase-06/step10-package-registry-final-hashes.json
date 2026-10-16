@@ -1,0 +1,11 @@
+{
+  "soleRegistrySHA256": "6fcd58e6f7a2ea0f17df2b1c4024b2728dfa2d73dfc365278df3c3a1c964018c",
+  "checkpointRegistrySHA256": "6fcd58e6f7a2ea0f17df2b1c4024b2728dfa2d73dfc365278df3c3a1c964018c",
+  "checkpointRegistryExact": true,
+  "priorBeforeSHA256": "aa13f3cb4df8e1fedd8a546ddb8b8101951a45a1ac671c2c70a68d1aba9ed138",
+  "priorAfterSHA256": "aa13f3cb4df8e1fedd8a546ddb8b8101951a45a1ac671c2c70a68d1aba9ed138",
+  "priorBytePreserved": true,
+  "noSecondPersistence": true,
+  "initialCheckpointCopySuppressedByAuthorInlineComment": true,
+  "correctedByFirstActualCheckpointCopy": true
+}

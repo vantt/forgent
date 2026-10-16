@@ -11,7 +11,7 @@ Related:
 - `plans/260925-documentation-authority-unification/plan.md` §7 Phase 02
 ```
 
-- **Commit:** `498048c1a6651556a0ae977a2871135b5ac7c945`
+- **Commit:** `c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be`
 - **Files scanned:** 4486
 - **Claim rows:** 91388
 - **Headings / unheaded blocks / mixed-file blocks:** 27651 / 62555 / 1182

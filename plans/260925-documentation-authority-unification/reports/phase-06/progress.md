@@ -1,3 +1,45 @@
+# Package complete — independent ordinary and checkpoint review next
+
+Assignment `unit-run-1792169760182-e3acba42/producer/1`;content/SYNC `c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be`,main already contained,docs unchanged. **One native sync665.599s/one compact persistence62,196,419 bytes**,known99,581→99,584,zero loss,4,486 files/91,388 active tuples equal. Registry SHA256 **`6fcd58e6f7a2ea0f17df2b1c4024b2728dfa2d73dfc365278df3c3a1c964018c`**. Final checkpoint registry byte-identical;original prior preserved. Final hash check caught/fixed an author-wrapper inline-comment copy omission;no second native persistence.
+
+**D0 fatal both priors together/each. Eall1,045 sources/22,759 active claims:28 partial/362 groups/2,336 reverse;0 active pending/0 unknown/0 undisposed reading-map gaps. Comparator exit1/six exact differences(4 actual-only/2 expected-only),all6 authenticated/explained,0 unexplained;no relabelling/waiver/strict-green claim.** Explanations are independent-review entriesx01..x06. All13 pending decisions remain9 gaps+4 retired;real holds0,A43 three matching approvals applied.
+
+**Promotion160/160,H0,T9 17/17,mutation12/12,tests507/507.** Audit+consistency12,904 rows/93 shards/0 findings/66 historical witness limits;ownership0 new active pairs/0 native duplicates/0 live drift;replay366+98+4/A/B/H/current routes clean. No full npm-suite claim. Third refresh**122 full shards/2,537,573,604 bytes/all part+aggregate hashes/19 fields/native tuples verified**;aggregate SHA256`2d58e5c6686119715e03c8504520fd34d92f9965145f5c42098051054f912193`. Snapshot68,463/verifytrue/unsealed;alias1,028+11=1,039/9,236 draft entries/valid0,six additional map sources explicitly accounted.
+
+**Refreshed full+Step2 rehearsal completed1,025.089s**,full E exactly matches package E;actual cutover exit1,**8 pass/11 blocked/1 review**. Initial SIGKILL attempt/cleanup disclosed;retry reduced RAM-backed scratch while keeping full committed blob corpus/native denominator. Both owned clones removed and checked absent;no Git state mutation verb. No native carry/persistence repeated. [Rehearsal](rehearsal-step-10.md),[Step2](rehearsal-step-02.md),[registry final hashes/copy correction](step10-package-registry-final-hashes.json).
+
+**ONE ordinary request:[91 entries/five small files](review-request-step10-package-index.md)**,counts13/3/15/17/43,max43 entries/81,717 bytes;all13 pending decisions/all7 footer bindings/3 docs/15-of233 candidate+10-of35 group seeded accounting/108 applied stamps as accounting/all43 native changes/all6 explanations. Per-row authentication91/91,group source+target10/10,fresh portable6/6;ordinary reviewers need no full native/global D/E. [Checkpoint request](review-request-step10-checkpoint.md) now binds this package runner commit/content pin,comparison result,full unselected22,759 active population,and real rehearsal blockers. Doer authored no sensitivity pack/key/verdict.
+
+**NEXT=independent ordinary review of the new91-entry request + independent checkpoint. Commit sensitivity pack first,checkpoint report second,seed key last (separate runner-owned rounds if needed);apply only matching committed ordinary verdicts with verbatim Notes,then refresh population. After independent acceptance,a separate close turn sets awaiting owner review.** Phase6 stays open;no owner approval/tag/retirement/cutover. No unexplained producer blocker;independent acceptance,A34/current truth,20 wording/citation/successor notes,32 Phase7/8 groups,14 runner-cutover/inbound+non-doc consumer queues and unreported owner token total remain.
+
+[Full report](step-10-report.md),[scorecard draft](step10-global-scorecard-draft.md),[L10-1..40+A43 summary](step10-global-decisions-summary.json),[effort](step10-global-effort.md),[final audit](step10-package-final-audit.json),[portable commands](step10-package-reproduction.json). All writes scoped to plan plus required outbox/scratch;docs/protected tools/extractor/comparator/vocabulary/baselines/workspace.fgos unchanged;no fgOS CLI/Git writes/MDView external persistence. Runner commits.
+
+---
+
+# Full rehearsal retry running; all other package proof complete
+
+Initial rehearsal exited SIGKILL(-9) before producing gate results. Owned clone `step10-rehearsal-aIkfdt` removed;consumed2.2 GiB v8 transport removed. RAM-backed scratch reduced4.8 GiB→483 MiB. Retry `step10-rehearsal-9YQMNl` materializes full docs/scripts plus physical decision inputs, retains the entire committed blob corpus via Git objects, and asserts4,486 files/91,388 units;no inventory scope/field/evaluator filtered. Native carry/persistence remains exactly one. [Attempt+cleanup](step10-package-rehearsal-attempt1.json). All D/E/comparison explanations/promotion/H/T9/mutation/tests/122-shard checkpoint proof complete;ordinary request91 entries,helper91/91+group10/10+fresh portable6/6. Next finish genuine full+Step2 rehearsal and cleanup,then independent ordinary review+checkpoint pack/report/key,then separate close awaiting owner review.
+
+---
+
+# Package D/E and checkpoint proof complete — refreshed rehearsal running
+
+SYNC/content `c3614f4d2`. Native665.599s/one62,196,419-byte compact persistence;known99,581→99,584/zero loss/native tuples equal;registry SHA256 `6fcd58e6f7a2ea0f17df2b1c4024b2728dfa2d73dfc365278df3c3a1c964018c`. D0 both priors together/each. Eall1,045 sources/22,759 active claims:28 partial/362 groups/2,336 reverse;0 active pending/0 unknown/0 undisposed reading-map gaps. Comparator6 exact differences,all6 authenticated/explained,0 unexplained;exit1/strict-green false retained. Promotion160/160,H0,T9 17/17,mutation12/12,tests507/507;audit+consistency12,904 rows/93 shards/0 findings/66 witness limits;ownership/replay/A/B/H clean. Third refresh122 full shards/2,537,573,604 bytes/all part+aggregate hashes/19 fields/native tuples verified. Genuine full+Step2 rehearsal now running;cleanup finally. ONE ordinary request91 entries/five parts13,3,15,17,43;all13 pending decisions/docs/list+group sample/43 native changes/6 comparison explanations. Next independent ordinary+checkpoint (reviewer pack first,report second,key last),then separate close awaiting owner review. No closure claim.
+
+---
+
+# Native package sync complete — global D/E running
+
+Content/SYNC `c3614f4d2`. One native sync665.599s, one compact persistence62,196,419 bytes;known99,581→99,584,zero loss;4,486 files/91,388 active units,exact native tuple equality. Registry SHA256 `6fcd58e6f7a2ea0f17df2b1c4024b2728dfa2d73dfc365278df3c3a1c964018c`. Promotion160/160,H0;ordinary request85 entries/five small files (13,3,15,11,43),per-row helper85/85,fresh portable checks4/4. D both priors together/each then strict E sequentially;comparator/checkpoint/rehearsal pending. No global-green or closure claim.
+
+---
+
+# Package verification in progress at c3614f4d2
+
+Assignment `unit-run-1792169760182-e3acba42/producer/1`. HEAD equals content commit; `git diff c3614f4d2 HEAD -- docs` empty and initial worktree clean. One native sync/compact persistence, sequential full D/E and exact comparator, then close checks/checkpoint/review packaging. No docs, protected tools, fgOS CLI or Git writes. Phase 6 stays open.
+
+---
+
 # Global review applied; author rework complete — package turn next
 
 Assignment `unit-run-1792169199615-02803e61/producer/1`; request `f70ecf4ec`; SYNC `8c788a9c5` (no docs delta); reviews `f323249f9`. **15 reports /113 rows: applied all108 ok, Notes verbatim;5 rework fixed;0 hold/0 changed-after-pin refusals.** 24 claims+34 gaps via ordinary applier;50 retired rows via established committed-verdict stamps (loader fails: missing required field `shard`), all independently validated. All13 legacy/missing ok authors resolved from original retired-unit records.

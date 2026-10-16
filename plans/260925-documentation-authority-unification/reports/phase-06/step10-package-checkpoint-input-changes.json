@@ -1,0 +1,132 @@
+{
+  "previousCheckpointContent": "498048c1a6651556a0ae977a2871135b5ac7c945",
+  "previousPackageCommit": "f70ecf4ecc508b491897988d1f0e1c37290f9d4a",
+  "currentContent": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+  "inputsChanged": true,
+  "committedChangedInputHashes": [
+    {
+      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "beforeSHA256": "afcd8060ca4d3ef7a0b2e0640dd7a8be9bbd6fe6c285fd4fc36a0b348797f26e",
+      "currentSHA256": "848999421de92c2840c86b3cbe459d3fb58fce4b8d0a718557547eacebbe7614"
+    },
+    {
+      "path": "docs/platform/agent-coordination/architecture/run-handle.md",
+      "beforeSHA256": "31c3bfbb30b5e0b9fecec82895f313d71671306d9d274883324c7cff6d8d1112",
+      "currentSHA256": "a5b3d04dbc725ba2248ed07fd24144cc2e3ffd4031ae2fc23d6088d12f50581b"
+    },
+    {
+      "path": "docs/platform/session-identity/spec.md",
+      "beforeSHA256": "d007573a8d4f659fa9e017214b312ac61e3f7ab7fc78226688118c3d1fa4bad9",
+      "currentSHA256": "b3dfd588a2535949d4396a3c4afc20e15508c6af57f278be4154533e7cd2621a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s10-reading-map-global-gaps.json",
+      "beforeSHA256": null,
+      "currentSHA256": "0d36db24e0ed6b6872f35ddfd623ccbbd2c6c3bda4372d9adc7040e311744fc1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "beforeSHA256": "f8b37c676a6745b0a73ba15c24c410e705425450cb4fbbba6db1da6ec9c875bb",
+      "currentSHA256": "92209aa7a408c6ef40ee16a9bde22ce259f3845cdc08ef52d65673442edae341"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "beforeSHA256": "6312b4206bc28836953cfe10006f960d89e7435b168d22d36bed5c152e53bced",
+      "currentSHA256": "8c85571a716d4c7b748efd90a0a9d41b396654151ba432a7be7c383233bde139"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "beforeSHA256": "e303dbc86e6aaff61b3972da2ed1b30fdb4127f3b72a10b1057b76e90f9f53e6",
+      "currentSHA256": "357f4f775f37b0bca2aaad8ba44709c83541703815a68d8ff14d6f1118cdc028"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
+      "beforeSHA256": "1d9ff777c6be027baf4fd3a6cc9118fa2f9c4ef908452ad0ccda2ced2d19b485",
+      "currentSHA256": "248997591c4ca54330a3795f43ce9c55153e561df83db59d3805dbd4494c8087"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "beforeSHA256": "227b971accd2ecfbbd3a854cc84bab15d125272e5ccbcdaaac37117e26ca6e3e",
+      "currentSHA256": "3b681e0a9b10fca21522fb80202850ecf8809656288fd49dc2247aa7dcf22dd4"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "beforeSHA256": "7b490c2f430307245ab4ef4ad7a4116bb50c63aadd95211a4e70736a9a365efd",
+      "currentSHA256": "7fb839893a4c0f2855a53f7fb4dd818ee790e58d4751b176e226ec3a8f8f4b75"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-generated-backlog.json",
+      "beforeSHA256": "46385a2366b34c77a1f5b51c47fa87d311ae5b5e2105e1e33644d4b2cd8bd662",
+      "currentSHA256": "8874f920179b1caa53d7b40296e1b46f4d150a6b84dce1e7e2190953f0ddebb3"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+      "beforeSHA256": "cf1a9b5c133fbc8f2ad3007b96aae4cfb4a4a09028dadfce4b835a7ee8072eeb",
+      "currentSHA256": "f012c96d45b6cfd14dfa487c0e7b52c71d2075f2e57b8cd8d6e793e63bc637ec"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-source-completion.json",
+      "beforeSHA256": "33b4714a6ff824b95cb48c0f91e915ac80db83e9ba219081b5cf9c21e0b6f711",
+      "currentSHA256": "e0314ca6f67b43690f8c608c081c4216bf791b11a88eec96d5d82539064b49f2"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-predecessor.json",
+      "beforeSHA256": "0bb781fdd1a47e0f1f01c94fb1785e84089ea785541f03827ec1cfec4a1c8251",
+      "currentSHA256": "b9759fc3b609765d3311d862905d2cb685ae79b63b1b55ee4de3170c6c704a1d"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "beforeSHA256": "e7b7bb923ef1c06213682a5d527e319ecdae8cc9ccd36ac99c9ab1647c70c94d",
+      "currentSHA256": "d88fca5cc1e51c124e0a86d292afaca6044c4ea3ae7251cd6b56e1967501e855"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "beforeSHA256": "7177778b84673b93e141ffca9a1b00f629d105d80cc5282d18715208d4a7d9b3",
+      "currentSHA256": "030a4826f2fd08859c0fbf61973a3f186b45eb04ecfa96b2e1f107f810f31e0b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "beforeSHA256": "2d2c9ace44a2d481031d1897115da0d484206a5fd145ebf80eb7a1dabbca2161",
+      "currentSHA256": "89807952c1ddd0386f64dcdd4b6056530867fe1f99d1c7de05df6ccf03c8b002"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-agent-coordination.json",
+      "beforeSHA256": "636204185ac21fc8ed7a915fbb7a00a1adcec4bab123f2c48635f0374f5be8b6",
+      "currentSHA256": "58cc29c29d9793227f7bd5f4c4e884d21bed4bea7b42d2c5f6c6256206d77423"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-host-invocation-routing.json",
+      "beforeSHA256": "4b3831d7dcd7763d7f8b303a3c7ae54a524af641e251f17438d2087358705dcc",
+      "currentSHA256": "436accc646bc55c9ca390a9c2f1e28e391f0240425761fdccade60f01194aaed"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-proposals-redesigns.json",
+      "beforeSHA256": "6166fafd345f8aeba61bb48ed55890c02157ece77bb9401f4262151a3cfbc988",
+      "currentSHA256": "2045c21d8b91e4ce8dc8241582dd6bf8327c9d380db2b53833f42433632bd86a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-root-authorities.json",
+      "beforeSHA256": "4765f8f9083cd0067260abeb000ec78ba671bbeadfcffe4dbf9e8918153ea97d",
+      "currentSHA256": "e9f369b21f6aa7fef683309c090926aef0be496b07aceb221c6c0dd1746ccc3e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-runner.json",
+      "beforeSHA256": "4cca48ec5c213d98bf297089873ed6cea4bde5867f32a873e16158d2ead5ed81",
+      "currentSHA256": "ce1f49f1735cb0c7847ed44fa780655de04ae31a4b3755eeea8c7ae6cb23cf9a"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-whole-system-architecture.json",
+      "beforeSHA256": "a5f50c1383fbe4b936c58b8c6e7f9dc977613e642746ca8b262ee6de42425f26",
+      "currentSHA256": "a73ab77145d24c058cee7462f6aa670722b67cb8e8b59c7c66403f80735addc0"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/identical-unit-exceptions.json",
+      "beforeSHA256": "777fdad3802383c1800c8da7134a9d877e3a26f368ed7054e41a5dd5719b7364",
+      "currentSHA256": "32d04bd125b476fd233aaa0bb488fd5314ed73fede33b3fbb5c80684be8781f1"
+    }
+  ],
+  "registryAlsoChangedBySoleNativeSync": true,
+  "refreshRequired": true,
+  "rehearsalRequired": true,
+  "reason": "Inputs change the real strict-E reverse candidate membership and reviewed/pending/gap populations, promotion completeness and snapshot bindings. Prior rehearsal remains historical at498048c1a and does not cover these changed exercised outcomes. Rerun whole corpus plus Step2 reduced scope after sequential checkpoint export/verification; no promotion simulated."
+}

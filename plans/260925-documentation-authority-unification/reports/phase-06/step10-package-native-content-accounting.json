@@ -1,0 +1,477 @@
+{
+  "contentCommit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+  "registrySHA256": "6fcd58e6f7a2ea0f17df2b1c4024b2728dfa2d73dfc365278df3c3a1c964018c",
+  "changes": [
+    {
+      "kind": "native-retained-ID-digest-change",
+      "before": {
+        "sourcePath": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+        "unitDigest": "2ef32787bed31abb089e8a71ad65e598717f83aef5f59c0f9f47736c5bc752df",
+        "identityFingerprint": "714e354d9336c412274465ea94730678e45384fc7541502d4d3e3defcbcdf024",
+        "claimId": "claim_b6963c89796864ca59f82467d506f348",
+        "sourceAnchor": "implementation-and-design-status",
+        "unitKind": "heading",
+        "sourceUnitDigest": "4fc22267739453739992bd7673b29eaa711de810b721bd915c28f58ec555cc0c",
+        "claimKind": "architecture",
+        "status": "future"
+      },
+      "after": {
+        "sourcePath": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+        "unitDigest": "64ad2fe38659742d6debea41fbdb62236e592ac2fd442f8c1737e423c1ef1d1a",
+        "identityFingerprint": "275e80f633d4ea169fb1ab51a863af7332b8244e2ec85f9a4d7fd7d8b596bd0a",
+        "claimId": "claim_b6963c89796864ca59f82467d506f348",
+        "sourceAnchor": "implementation-and-design-status",
+        "unitKind": "heading",
+        "sourceUnitDigest": "e9987e41f961ef6c8dc9e9e2b204eafc3ee98883460e98c0c18606ac0cc3a046",
+        "claimKind": "architecture",
+        "status": "future",
+        "reviewStatus": "needs-review",
+        "lineage": {
+          "fromCommit": "498048c1a6651556a0ae977a2871135b5ac7c945",
+          "fromUnitDigest": "2ef32787bed31abb089e8a71ad65e598717f83aef5f59c0f9f47736c5bc752df",
+          "toUnitDigest": "64ad2fe38659742d6debea41fbdb62236e592ac2fd442f8c1737e423c1ef1d1a",
+          "fromSourceUnitDigest": "4fc22267739453739992bd7673b29eaa711de810b721bd915c28f58ec555cc0c",
+          "toSourceUnitDigest": "e9987e41f961ef6c8dc9e9e2b204eafc3ee98883460e98c0c18606ac0cc3a046"
+        }
+      },
+      "oldNativeGap": null,
+      "beforeUnit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Implementation And Design Status",
+        "anchor": "implementation-and-design-status",
+        "githubAnchor": "implementation-and-design-status",
+        "stableAnchor": "h-963e9db1f355",
+        "startLine": 25,
+        "endLine": 25,
+        "textDigest": "4fc22267739453739992bd7673b29eaa711de810b721bd915c28f58ec555cc0c",
+        "sample": "Implementation And Design Status",
+        "sectionPayloadDigest": "8d306333a9bf8b9c637c3ac3e1d8487374116828c6f5d4a9ee99dd3134f5d796",
+        "followingBlockDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
+        "identityFingerprint": "714e354d9336c412274465ea94730678e45384fc7541502d4d3e3defcbcdf024",
+        "ancestry": [
+          "Executor Fallback And Effect Eligibility"
+        ],
+        "text": "## Implementation And Design Status",
+        "sectionText": "## Implementation And Design Status\n\nThe implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs.\n\n| Section | Status | Evidence / limit |\n|---|---|---|\n| 1. Responsibility And Inputs | Unimplemented design proposal | FailureObservationV1/executor-failure-observation absent (git grep src/ packages/ apps/ core/ domains/ bin/ = 0); owners named in the stage table exist: src/runner/dispatch/liveness.mjs:211 evaluateLadder, src/runner/dispatch/plan.mjs:45 compileDispatchPlan, src/runner/dispatch/run-result.mjs:350 normalizeRunResult |\n| 2. Production Ladder Semantics | Current contract/invariant | src/runner/dispatch/liveness.mjs:211 evaluateLadder (truth>blocked>died>ceiling>stale), :63 DEFAULT_DEATH_THRESHOLD=3, :105 paneFateFor keeps paused-limit under closeAlways, :99 keep-always |\n| 3. Coarse Matrix Mapping | Mixed implementation and proposal; no blanket implementation claim | src/runner/dispatch/herdr-round.mjs:350-357 ERROR_CLASS_FOR_OUTCOME (died->worker-spawn-fail, others->worker-timeout); src/runner/recovery.mjs:106-115,133 resolveAction; src/runner/loop.mjs:515 resolveStaleDoing; blocked/paused-limit park is explicitly \"Proposed behavior change\" |\n| 4. One Attempt History, Explicit Caps | Mixed implementation and proposal; no blanket implementation claim | Not implemented: maxAttemptsPerAssignment/maxAttemptsPerExecutor = 0 hits in code; src/runner/dispatch/assignment-policy.mjs:380-388 fallbackExecutors \"reserved-not-executed\"; admission counting live at src/runner/dispatch/assignment-runner.mjs:672-783 (runId per attempt); src/runner/recovery.mjs:91 DEFAULT_MAX_RETRIES=2 |\n| 5. EffectGuaranteePort | Unimplemented design proposal | EffectGuaranteePort absent in code; related live subset: src/runner/dispatch/recovery.mjs:201 assess(plan, repeatMode, confinement, attestation) with ASSESS_OUTCOMES :56 and REPEAT_MODE never inferred from Assignment.mutation :202-206 |\n| 6. Resolver Output And Apply | Mixed implementation and proposal; no blanket implementation claim | src/runner/dispatch/recovery.mjs:93 resolveFallback (FALLBACK_STATUSES :53), src/runner/dispatch/assignment-policy.mjs:334-339 cliOverride.preferExecutor; FallbackDecisionV1/rejectedCandidates absent; apply re-check in src/runner/dispatch/recovery-planner.mjs:281 checkApply |\n| 7. Proof, Rollout And Future Work | Unimplemented design proposal | Refers to proof matrix runtime-recovery-design.md#10 (E-a..E-f, X01..X06) and future work; no code symbols |"
+      },
+      "afterUnit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Implementation And Design Status",
+        "anchor": "implementation-and-design-status",
+        "githubAnchor": "implementation-and-design-status",
+        "stableAnchor": "h-963e9db1f355",
+        "startLine": 25,
+        "endLine": 25,
+        "textDigest": "e9987e41f961ef6c8dc9e9e2b204eafc3ee98883460e98c0c18606ac0cc3a046",
+        "sample": "Implementation And Design Status",
+        "sectionPayloadDigest": "358e928cbbe6aa3f0790c2cb866fe0ea10acff0c53ee1d780903c8e6f6531d88",
+        "followingBlockDigest": "59d70c7fd04f6212e5c8909a4bf8bca340c7aeb0f372547419ca80fbc74dd78a",
+        "identityFingerprint": "275e80f633d4ea169fb1ab51a863af7332b8244e2ec85f9a4d7fd7d8b596bd0a",
+        "ancestry": [
+          "Executor Fallback And Effect Eligibility"
+        ],
+        "text": "## Implementation And Design Status",
+        "sectionText": "## Implementation And Design Status\n\nThe implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs. The retained recovery planner produces a recommendation, park or needs-input decision from snapshot and evidence. Evidence: `src/runner/dispatch/recovery-planner.mjs:243-266`. Applying a recommendation checks its action key, snapshot hash, control epoch, expiry and current legality again. Evidence: `src/runner/dispatch/recovery-planner.mjs:281-316`.\n\n| Section | Status | Evidence / limit |\n|---|---|---|\n| 1. Responsibility And Inputs | Unimplemented design proposal | FailureObservationV1/executor-failure-observation absent (git grep src/ packages/ apps/ core/ domains/ bin/ = 0); owners named in the stage table exist: src/runner/dispatch/liveness.mjs:211 evaluateLadder, src/runner/dispatch/plan.mjs:45 compileDispatchPlan, src/runner/dispatch/run-result.mjs:350 normalizeRunResult |\n| 2. Production Ladder Semantics | Current contract/invariant | src/runner/dispatch/liveness.mjs:211 evaluateLadder (truth>blocked>died>ceiling>stale), :63 DEFAULT_DEATH_THRESHOLD=3, :105 paneFateFor keeps paused-limit under closeAlways, :99 keep-always |\n| 3. Coarse Matrix Mapping | Mixed implementation and proposal; no blanket implementation claim | src/runner/dispatch/herdr-round.mjs:350-357 ERROR_CLASS_FOR_OUTCOME (died->worker-spawn-fail, others->worker-timeout); src/runner/recovery.mjs:106-115,133 resolveAction; src/runner/loop.mjs:515 resolveStaleDoing; blocked/paused-limit park is explicitly \"Proposed behavior change\" |\n| 4. One Attempt History, Explicit Caps | Mixed implementation and proposal; no blanket implementation claim | Not implemented: maxAttemptsPerAssignment/maxAttemptsPerExecutor = 0 hits in code; src/runner/dispatch/assignment-policy.mjs:380-388 fallbackExecutors \"reserved-not-executed\"; admission counting live at src/runner/dispatch/assignment-runner.mjs:672-783 (runId per attempt); src/runner/recovery.mjs:91 DEFAULT_MAX_RETRIES=2 |\n| 5. EffectGuaranteePort | Unimplemented design proposal | EffectGuaranteePort absent in code; related live subset: src/runner/dispatch/recovery.mjs:201 assess(plan, repeatMode, confinement, attestation) with ASSESS_OUTCOMES :56 and REPEAT_MODE never inferred from Assignment.mutation :202-206 |\n| 6. Resolver Output And Apply | Mixed implementation and proposal; no blanket implementation claim | src/runner/dispatch/recovery.mjs:93 resolveFallback (FALLBACK_STATUSES :53), src/runner/dispatch/assignment-policy.mjs:334-339 cliOverride.preferExecutor; FallbackDecisionV1/rejectedCandidates absent; apply re-check in src/runner/dispatch/recovery-planner.mjs:281 checkApply |\n| 7. Proof, Rollout And Future Work | Unimplemented design proposal | Refers to proof matrix runtime-recovery-design.md#10 (E-a..E-f, X01..X06) and future work; no code symbols |"
+      },
+      "beforeDigestAuthenticated": true,
+      "afterDigestAuthenticated": true,
+      "oldFileSHA256": "afcd8060ca4d3ef7a0b2e0640dd7a8be9bbd6fe6c285fd4fc36a0b348797f26e",
+      "newFileSHA256": "848999421de92c2840c86b3cbe459d3fb58fce4b8d0a718557547eacebbe7614",
+      "committedDiff": "diff --git a/docs/platform/agent-coordination/architecture/executor-health-and-fallback.md b/docs/platform/agent-coordination/architecture/executor-health-and-fallback.md\nindex 11262bc5d..7757efe1d 100644\n--- a/docs/platform/agent-coordination/architecture/executor-health-and-fallback.md\n+++ b/docs/platform/agent-coordination/architecture/executor-health-and-fallback.md\n@@ -24,7 +24,7 @@ Complete pre-rework input: [historical snapshot](../history/retired-engine/files\n \n ## Implementation And Design Status\n \n-The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs.\n+The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs. The retained recovery planner produces a recommendation, park or needs-input decision from snapshot and evidence. Evidence: `src/runner/dispatch/recovery-planner.mjs:243-266`. Applying a recommendation checks its action key, snapshot hash, control epoch, expiry and current legality again. Evidence: `src/runner/dispatch/recovery-planner.mjs:281-316`.\n \n | Section | Status | Evidence / limit |\n |---|---|---|\n",
+      "interpretation": "Native carry retains this exact identity and changes its digest. Old list tuple remains historical/pending; no approval carries."
+    },
+    {
+      "kind": "native-gap-plus-independent-new-ID",
+      "before": {
+        "sourcePath": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+        "unitDigest": "1a00d82edc7c6ea7214949d37aea4e0150f91057666c93f2ffb8a7e6a5175a53",
+        "identityFingerprint": "1a00d82edc7c6ea7214949d37aea4e0150f91057666c93f2ffb8a7e6a5175a53",
+        "claimId": "claim_35b6d8008541bef15edc061dade28c06",
+        "sourceAnchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
+        "claimKind": "architecture",
+        "status": "future"
+      },
+      "after": {
+        "sourcePath": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+        "unitDigest": "30148b4c0e53a517416cfc5fb1b22bc8dd7b6301c5f7f69ba51cb1a5cd4025ca",
+        "identityFingerprint": "30148b4c0e53a517416cfc5fb1b22bc8dd7b6301c5f7f69ba51cb1a5cd4025ca",
+        "claimId": "claim_87f236ae2e3356f5e23e70a7f7224242",
+        "sourceAnchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "59d70c7fd04f6212e5c8909a4bf8bca340c7aeb0f372547419ca80fbc74dd78a",
+        "claimKind": "architecture",
+        "status": "future",
+        "origin": "added-since-498048c1a6651556a0ae977a2871135b5ac7c945"
+      },
+      "oldNativeGap": {
+        "sourcePath": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+        "unitDigest": "1a00d82edc7c6ea7214949d37aea4e0150f91057666c93f2ffb8a7e6a5175a53",
+        "identityFingerprint": "1a00d82edc7c6ea7214949d37aea4e0150f91057666c93f2ffb8a7e6a5175a53",
+        "claimId": "claim_35b6d8008541bef15edc061dade28c06",
+        "sourceAnchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
+        "claimKind": "architecture",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-3 is not a stable heading anchor"
+      },
+      "beforeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 27,
+        "endLine": 27,
+        "textDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
+        "sample": "The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those inter",
+        "identityFingerprint": "1a00d82edc7c6ea7214949d37aea4e0150f91057666c93f2ffb8a7e6a5175a53",
+        "ancestry": [
+          "Executor Fallback And Effect Eligibility",
+          "Implementation And Design Status"
+        ],
+        "text": "The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs."
+      },
+      "afterUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 27,
+        "endLine": 27,
+        "textDigest": "59d70c7fd04f6212e5c8909a4bf8bca340c7aeb0f372547419ca80fbc74dd78a",
+        "sample": "The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those inter",
+        "identityFingerprint": "30148b4c0e53a517416cfc5fb1b22bc8dd7b6301c5f7f69ba51cb1a5cd4025ca",
+        "ancestry": [
+          "Executor Fallback And Effect Eligibility",
+          "Implementation And Design Status"
+        ],
+        "text": "The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs. The retained recovery planner produces a recommendation, park or needs-input decision from snapshot and evidence. Evidence: `src/runner/dispatch/recovery-planner.mjs:243-266`. Applying a recommendation checks its action key, snapshot hash, control epoch, expiry and current legality again. Evidence: `src/runner/dispatch/recovery-planner.mjs:281-316`."
+      },
+      "beforeDigestAuthenticated": true,
+      "afterDigestAuthenticated": true,
+      "oldFileSHA256": "afcd8060ca4d3ef7a0b2e0640dd7a8be9bbd6fe6c285fd4fc36a0b348797f26e",
+      "newFileSHA256": "848999421de92c2840c86b3cbe459d3fb58fce4b8d0a718557547eacebbe7614",
+      "committedDiff": "diff --git a/docs/platform/agent-coordination/architecture/executor-health-and-fallback.md b/docs/platform/agent-coordination/architecture/executor-health-and-fallback.md\nindex 11262bc5d..7757efe1d 100644\n--- a/docs/platform/agent-coordination/architecture/executor-health-and-fallback.md\n+++ b/docs/platform/agent-coordination/architecture/executor-health-and-fallback.md\n@@ -24,7 +24,7 @@ Complete pre-rework input: [historical snapshot](../history/retired-engine/files\n \n ## Implementation And Design Status\n \n-The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs.\n+The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs. The retained recovery planner produces a recommendation, park or needs-input decision from snapshot and evidence. Evidence: `src/runner/dispatch/recovery-planner.mjs:243-266`. Applying a recommendation checks its action key, snapshot hash, control epoch, expiry and current legality again. Evidence: `src/runner/dispatch/recovery-planner.mjs:281-316`.\n \n | Section | Status | Evidence / limit |\n |---|---|---|\n",
+      "interpretation": "The native old unit is a preserved gap and the current unit has a distinct new ID. Path+anchor match explains the edited slot only, never historical identity. No manual graft or approval carry."
+    },
+    {
+      "kind": "native-retained-ID-digest-change",
+      "before": {
+        "sourcePath": "docs/platform/agent-coordination/architecture/run-handle.md",
+        "unitDigest": "660240a3617d2444b6ad07151342f136439005270deae66460949db1bec8e81c",
+        "identityFingerprint": "07add88cb496d1b67c021019e81c72a8db58c725e146286f1d1233e783571ca4",
+        "claimId": "claim_f1c6ef52a41ee978ba72a88733520c60",
+        "sourceAnchor": "implementation-and-design-status",
+        "unitKind": "heading",
+        "sourceUnitDigest": "bef0ccaa8745300be2bf165c8d136047af133c064637af821eed0a95b23d04fe",
+        "claimKind": "architecture",
+        "status": "future"
+      },
+      "after": {
+        "sourcePath": "docs/platform/agent-coordination/architecture/run-handle.md",
+        "unitDigest": "e106f9b9cbcb845af99af61b913c9f36ef35269fc079700d6ae59bab75afe92d",
+        "identityFingerprint": "fe1cafe68efb9af38993d05e2171d902f7d9d7e0be304a2c7fdd20f862207645",
+        "claimId": "claim_f1c6ef52a41ee978ba72a88733520c60",
+        "sourceAnchor": "implementation-and-design-status",
+        "unitKind": "heading",
+        "sourceUnitDigest": "565cf67de33a96a867f31b05e3ef2330415d5c6385df5a355e92b6d4d5a38421",
+        "claimKind": "architecture",
+        "status": "future",
+        "reviewStatus": "needs-review",
+        "lineage": {
+          "fromCommit": "498048c1a6651556a0ae977a2871135b5ac7c945",
+          "fromUnitDigest": "660240a3617d2444b6ad07151342f136439005270deae66460949db1bec8e81c",
+          "toUnitDigest": "e106f9b9cbcb845af99af61b913c9f36ef35269fc079700d6ae59bab75afe92d",
+          "fromSourceUnitDigest": "bef0ccaa8745300be2bf165c8d136047af133c064637af821eed0a95b23d04fe",
+          "toSourceUnitDigest": "565cf67de33a96a867f31b05e3ef2330415d5c6385df5a355e92b6d4d5a38421"
+        }
+      },
+      "oldNativeGap": null,
+      "beforeUnit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Implementation And Design Status",
+        "anchor": "implementation-and-design-status",
+        "githubAnchor": "implementation-and-design-status",
+        "stableAnchor": "h-963e9db1f355",
+        "startLine": 25,
+        "endLine": 25,
+        "textDigest": "bef0ccaa8745300be2bf165c8d136047af133c064637af821eed0a95b23d04fe",
+        "sample": "Implementation And Design Status",
+        "sectionPayloadDigest": "ffabf17a2e027f608498133cbd93bc7c5a870edf4334fd49316eeb851ac5ea8e",
+        "followingBlockDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
+        "identityFingerprint": "07add88cb496d1b67c021019e81c72a8db58c725e146286f1d1233e783571ca4",
+        "ancestry": [
+          "RunHandle And Recovery Material"
+        ],
+        "text": "## Implementation And Design Status",
+        "sectionText": "## Implementation And Design Status\n\nThe implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs.\n\n| Section | Status | Evidence / limit |\n|---|---|---|\n| 1. Identity And Facts | Mixed implementation and proposal; no blanket implementation claim | RunHandleV1 / run-handle.json absent from code (0 hits); live pieces: ladder threading absentStreak/blindMs src/runner/dispatch/herdr-round.mjs:1103-1165, liveness.mjs:211; visibility binding src/runner/dispatch/visibility-session.mjs:106-330 |\n| 2. State Transitions | Unimplemented design proposal | No run-handle execution state machine in code (git grep RunHandle = 0); nearest: visibility-session.mjs:43 VISIBILITY_STATES, :59 RUN_STATUSES |\n| 3. Ports And Control Outcomes | Mixed implementation and proposal; no blanket implementation claim | src/runner/dispatch/run-lock.mjs:306 acquireRunControl, :423 releaseRunControl, :369 inspectRunControl (control-epoch/token fencing); assignment-runner.mjs:1872,2086 run-control-held; RunHandleRepository/RuntimeAdapterPort absent; herdr client herdr-agent.mjs:387 agentGet |\n| 4. Guard Sequence | Mixed implementation and proposal; no blanket implementation claim | Live: reconcile before relaunch src/runner/dispatch/herdr-reconcile.mjs:342 reconcileHerdrSpawnRun, deterministic run-scoped name src/runner/dispatch/confinement/authority.mjs:1593-1600, pending launch command :1620-1640, incarnation guard detached-run-supervisor.mjs:1098-1103, release-in-finally via run-lock.mjs:423; termination-coverage taxonomy (resource-only/worker-tree/write-access-revoked) = 0 hits |\n| 5. RecoveryMaterialV1 | Unimplemented design proposal | RecoveryMaterial/run-recovery-material/writerQuiescence/workspace-authority-unavailable = 0 hits in src/packages/apps/core/domains/bin |\n| 6. Persistence And Supported Profile | Mixed implementation and proposal; no blanket implementation claim | run-handle.json absent; visibility.json still the binding authority: src/runner/dispatch/herdr-round.mjs:386,1132,1630 and cli.mjs:126; launch command files under runDir/controller/commands authority.mjs:1596-1600; setup/doctor registration for these not implemented |\n| 7. Proof And Deferred Scope | Unimplemented design proposal | Points to runtime-recovery-design.md#10 proof matrix (F-a..F-g, X01..X05/X10); docs/platform/agent-coordination/verification/runtime-recovery/ holds shipped-cell traces |"
+      },
+      "afterUnit": {
+        "unitKind": "heading",
+        "level": 2,
+        "title": "Implementation And Design Status",
+        "anchor": "implementation-and-design-status",
+        "githubAnchor": "implementation-and-design-status",
+        "stableAnchor": "h-963e9db1f355",
+        "startLine": 25,
+        "endLine": 25,
+        "textDigest": "565cf67de33a96a867f31b05e3ef2330415d5c6385df5a355e92b6d4d5a38421",
+        "sample": "Implementation And Design Status",
+        "sectionPayloadDigest": "4c1539098f365985dc0cbb6ce035d16c318b83f32e5a69e458364459c1532944",
+        "followingBlockDigest": "1f25a51f75e78cb32b002b7ccb303a916191d96c495a81235ebf1b7a8608f694",
+        "identityFingerprint": "fe1cafe68efb9af38993d05e2171d902f7d9d7e0be304a2c7fdd20f862207645",
+        "ancestry": [
+          "RunHandle And Recovery Material"
+        ],
+        "text": "## Implementation And Design Status",
+        "sectionText": "## Implementation And Design Status\n\nThe implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs. Run-control acquisition checks the expected control epoch and refuses a settled generation. Evidence: `src/runner/dispatch/run-lock.mjs:306-320`. An expired heartbeat does not authorize stealing a live or unproven-dead holder; holder liveness must permit reclaim. Evidence: `src/runner/dispatch/run-lock.mjs:321-334`. Settlement verifies the exact epoch and token and publishes a settled generation. Evidence: `src/runner/dispatch/run-lock.mjs:390-412`.\n\n| Section | Status | Evidence / limit |\n|---|---|---|\n| 1. Identity And Facts | Mixed implementation and proposal; no blanket implementation claim | RunHandleV1 / run-handle.json absent from code (0 hits); live pieces: ladder threading absentStreak/blindMs src/runner/dispatch/herdr-round.mjs:1103-1165, liveness.mjs:211; visibility binding src/runner/dispatch/visibility-session.mjs:106-330 |\n| 2. State Transitions | Unimplemented design proposal | No run-handle execution state machine in code (git grep RunHandle = 0); nearest: visibility-session.mjs:43 VISIBILITY_STATES, :59 RUN_STATUSES |\n| 3. Ports And Control Outcomes | Mixed implementation and proposal; no blanket implementation claim | src/runner/dispatch/run-lock.mjs:306 acquireRunControl, :423 releaseRunControl, :369 inspectRunControl (control-epoch/token fencing); assignment-runner.mjs:1872,2086 run-control-held; RunHandleRepository/RuntimeAdapterPort absent; herdr client herdr-agent.mjs:387 agentGet |\n| 4. Guard Sequence | Mixed implementation and proposal; no blanket implementation claim | Live: reconcile before relaunch src/runner/dispatch/herdr-reconcile.mjs:342 reconcileHerdrSpawnRun, deterministic run-scoped name src/runner/dispatch/confinement/authority.mjs:1593-1600, pending launch command :1620-1640, incarnation guard detached-run-supervisor.mjs:1098-1103, release-in-finally via run-lock.mjs:423; termination-coverage taxonomy (resource-only/worker-tree/write-access-revoked) = 0 hits |\n| 5. RecoveryMaterialV1 | Unimplemented design proposal | RecoveryMaterial/run-recovery-material/writerQuiescence/workspace-authority-unavailable = 0 hits in src/packages/apps/core/domains/bin |\n| 6. Persistence And Supported Profile | Mixed implementation and proposal; no blanket implementation claim | run-handle.json absent; visibility.json still the binding authority: src/runner/dispatch/herdr-round.mjs:386,1132,1630 and cli.mjs:126; launch command files under runDir/controller/commands authority.mjs:1596-1600; setup/doctor registration for these not implemented |\n| 7. Proof And Deferred Scope | Unimplemented design proposal | Points to runtime-recovery-design.md#10 proof matrix (F-a..F-g, X01..X05/X10); docs/platform/agent-coordination/verification/runtime-recovery/ holds shipped-cell traces |"
+      },
+      "beforeDigestAuthenticated": true,
+      "afterDigestAuthenticated": true,
+      "oldFileSHA256": "31c3bfbb30b5e0b9fecec82895f313d71671306d9d274883324c7cff6d8d1112",
+      "newFileSHA256": "a5b3d04dbc725ba2248ed07fd24144cc2e3ffd4031ae2fc23d6088d12f50581b",
+      "committedDiff": "diff --git a/docs/platform/agent-coordination/architecture/run-handle.md b/docs/platform/agent-coordination/architecture/run-handle.md\nindex 82a4aa941..23ad4ad19 100644\n--- a/docs/platform/agent-coordination/architecture/run-handle.md\n+++ b/docs/platform/agent-coordination/architecture/run-handle.md\n@@ -24,7 +24,7 @@ Complete pre-rework input: [historical snapshot](../history/retired-engine/files\n \n ## Implementation And Design Status\n \n-The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs.\n+The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs. Run-control acquisition checks the expected control epoch and refuses a settled generation. Evidence: `src/runner/dispatch/run-lock.mjs:306-320`. An expired heartbeat does not authorize stealing a live or unproven-dead holder; holder liveness must permit reclaim. Evidence: `src/runner/dispatch/run-lock.mjs:321-334`. Settlement verifies the exact epoch and token and publishes a settled generation. Evidence: `src/runner/dispatch/run-lock.mjs:390-412`.\n \n | Section | Status | Evidence / limit |\n |---|---|---|\n",
+      "interpretation": "Native carry retains this exact identity and changes its digest. Old list tuple remains historical/pending; no approval carries."
+    },
+    {
+      "kind": "native-gap-plus-independent-new-ID",
+      "before": {
+        "sourcePath": "docs/platform/agent-coordination/architecture/run-handle.md",
+        "unitDigest": "1a00d82edc7c6ea7214949d37aea4e0150f91057666c93f2ffb8a7e6a5175a53",
+        "identityFingerprint": "1a00d82edc7c6ea7214949d37aea4e0150f91057666c93f2ffb8a7e6a5175a53",
+        "claimId": "claim_2e2938c719ad58a967857c76c72850f1",
+        "sourceAnchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
+        "claimKind": "architecture",
+        "status": "future"
+      },
+      "after": {
+        "sourcePath": "docs/platform/agent-coordination/architecture/run-handle.md",
+        "unitDigest": "fc59912d35eb78157c56d47b46235aa9955bf2e27ba7016f353a3a28de61ee1b",
+        "identityFingerprint": "fc59912d35eb78157c56d47b46235aa9955bf2e27ba7016f353a3a28de61ee1b",
+        "claimId": "claim_9d5d0b39286fb978c6de4bbc09e75adb",
+        "sourceAnchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "1f25a51f75e78cb32b002b7ccb303a916191d96c495a81235ebf1b7a8608f694",
+        "claimKind": "architecture",
+        "status": "future",
+        "origin": "added-since-498048c1a6651556a0ae977a2871135b5ac7c945"
+      },
+      "oldNativeGap": {
+        "sourcePath": "docs/platform/agent-coordination/architecture/run-handle.md",
+        "unitDigest": "1a00d82edc7c6ea7214949d37aea4e0150f91057666c93f2ffb8a7e6a5175a53",
+        "identityFingerprint": "1a00d82edc7c6ea7214949d37aea4e0150f91057666c93f2ffb8a7e6a5175a53",
+        "claimId": "claim_2e2938c719ad58a967857c76c72850f1",
+        "sourceAnchor": "unheaded-block-3",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
+        "claimKind": "architecture",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-3 is not a stable heading anchor"
+      },
+      "beforeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 27,
+        "endLine": 27,
+        "textDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
+        "sample": "The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those inter",
+        "identityFingerprint": "1a00d82edc7c6ea7214949d37aea4e0150f91057666c93f2ffb8a7e6a5175a53",
+        "ancestry": [
+          "RunHandle And Recovery Material",
+          "Implementation And Design Status"
+        ],
+        "text": "The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs."
+      },
+      "afterUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-3",
+        "githubAnchor": "unheaded-block-3",
+        "stableAnchor": "unheaded-block-3",
+        "title": "Unheaded block 3",
+        "startLine": 27,
+        "endLine": 27,
+        "textDigest": "1f25a51f75e78cb32b002b7ccb303a916191d96c495a81235ebf1b7a8608f694",
+        "sample": "The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those inter",
+        "identityFingerprint": "fc59912d35eb78157c56d47b46235aa9955bf2e27ba7016f353a3a28de61ee1b",
+        "ancestry": [
+          "RunHandle And Recovery Material",
+          "Implementation And Design Status"
+        ],
+        "text": "The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs. Run-control acquisition checks the expected control epoch and refuses a settled generation. Evidence: `src/runner/dispatch/run-lock.mjs:306-320`. An expired heartbeat does not authorize stealing a live or unproven-dead holder; holder liveness must permit reclaim. Evidence: `src/runner/dispatch/run-lock.mjs:321-334`. Settlement verifies the exact epoch and token and publishes a settled generation. Evidence: `src/runner/dispatch/run-lock.mjs:390-412`."
+      },
+      "beforeDigestAuthenticated": true,
+      "afterDigestAuthenticated": true,
+      "oldFileSHA256": "31c3bfbb30b5e0b9fecec82895f313d71671306d9d274883324c7cff6d8d1112",
+      "newFileSHA256": "a5b3d04dbc725ba2248ed07fd24144cc2e3ffd4031ae2fc23d6088d12f50581b",
+      "committedDiff": "diff --git a/docs/platform/agent-coordination/architecture/run-handle.md b/docs/platform/agent-coordination/architecture/run-handle.md\nindex 82a4aa941..23ad4ad19 100644\n--- a/docs/platform/agent-coordination/architecture/run-handle.md\n+++ b/docs/platform/agent-coordination/architecture/run-handle.md\n@@ -24,7 +24,7 @@ Complete pre-rework input: [historical snapshot](../history/retired-engine/files\n \n ## Implementation And Design Status\n \n-The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs.\n+The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs. Run-control acquisition checks the expected control epoch and refuses a settled generation. Evidence: `src/runner/dispatch/run-lock.mjs:306-320`. An expired heartbeat does not authorize stealing a live or unproven-dead holder; holder liveness must permit reclaim. Evidence: `src/runner/dispatch/run-lock.mjs:321-334`. Settlement verifies the exact epoch and token and publishes a settled generation. Evidence: `src/runner/dispatch/run-lock.mjs:390-412`.\n \n | Section | Status | Evidence / limit |\n |---|---|---|\n",
+      "interpretation": "The native old unit is a preserved gap and the current unit has a distinct new ID. Path+anchor match explains the edited slot only, never historical identity. No manual graft or approval carry."
+    },
+    {
+      "kind": "native-retained-ID-digest-change",
+      "before": {
+        "sourcePath": "docs/platform/session-identity/spec.md",
+        "unitDigest": "184ecd5327340d2f2bc4166b12cee436632d384caee990164f916c958d36e9d0",
+        "identityFingerprint": "c39c6eda757234b38208d4ef820070e8fb73c378c2cb4a4a01631c48488edaf0",
+        "claimId": "claim_47720e8dc7d54d433aeba2418c93098b",
+        "sourceAnchor": "session-identity-component-specification",
+        "unitKind": "heading",
+        "sourceUnitDigest": "edb2b14e9b84180246823708126e1dbc05f8f2ca57c9a8cce045685960224ce1",
+        "claimKind": "architecture",
+        "status": "future"
+      },
+      "after": {
+        "sourcePath": "docs/platform/session-identity/spec.md",
+        "unitDigest": "e33e44e581a9f4afe71330474cd4301751afa7fba17a75f8da172e55e51bef20",
+        "identityFingerprint": "0269907614ae65aa698d168a28464caee52b578165dcdc9953daec455614b6c4",
+        "claimId": "claim_47720e8dc7d54d433aeba2418c93098b",
+        "sourceAnchor": "session-identity-component-specification",
+        "unitKind": "heading",
+        "sourceUnitDigest": "94917454a42ee413d6555c49f5c86c513d9165ec0ff6ed0924e29634d72a8582",
+        "claimKind": "architecture",
+        "status": "future",
+        "reviewStatus": "needs-review",
+        "lineage": {
+          "fromCommit": "498048c1a6651556a0ae977a2871135b5ac7c945",
+          "fromUnitDigest": "184ecd5327340d2f2bc4166b12cee436632d384caee990164f916c958d36e9d0",
+          "toUnitDigest": "e33e44e581a9f4afe71330474cd4301751afa7fba17a75f8da172e55e51bef20",
+          "fromSourceUnitDigest": "edb2b14e9b84180246823708126e1dbc05f8f2ca57c9a8cce045685960224ce1",
+          "toSourceUnitDigest": "94917454a42ee413d6555c49f5c86c513d9165ec0ff6ed0924e29634d72a8582"
+        }
+      },
+      "oldNativeGap": null,
+      "beforeUnit": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "Session Identity Component Specification",
+        "anchor": "session-identity-component-specification",
+        "githubAnchor": "session-identity-component-specification",
+        "stableAnchor": "h-1694f157744b",
+        "startLine": 1,
+        "endLine": 1,
+        "textDigest": "edb2b14e9b84180246823708126e1dbc05f8f2ca57c9a8cce045685960224ce1",
+        "sample": "Session Identity Component Specification",
+        "sectionPayloadDigest": "54ffebc5e7a158a6d273670146c1002dd8c6c08fea92f13a9b66f1c6e3efbb54",
+        "followingBlockDigest": "54ffebc5e7a158a6d273670146c1002dd8c6c08fea92f13a9b66f1c6e3efbb54",
+        "identityFingerprint": "c39c6eda757234b38208d4ef820070e8fb73c378c2cb4a4a01631c48488edaf0",
+        "ancestry": [],
+        "text": "# Session Identity Component Specification",
+        "sectionText": "# Session Identity Component Specification\n\n```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the single authority for \"who is the writer of this process\"\nDesign status: Accepted\nImplementation status: Implemented (activation pending)\nCanonical: Yes\nOwner: Session Identity component\nSource: packages/session-identity/rust\nContracts: packages/session-identity/contracts/\nLast reviewed: 2026-10-15\nRelated:\n- docs/io-contract.md\n- docs/platform/component-boundary.md\n- docs/specs/observe.md\n- plans/261015-2102-identity-resolver-rust-crate/plan.md\n```"
+      },
+      "afterUnit": {
+        "unitKind": "heading",
+        "level": 1,
+        "title": "Session Identity Component Specification",
+        "anchor": "session-identity-component-specification",
+        "githubAnchor": "session-identity-component-specification",
+        "stableAnchor": "h-1694f157744b",
+        "startLine": 1,
+        "endLine": 1,
+        "textDigest": "94917454a42ee413d6555c49f5c86c513d9165ec0ff6ed0924e29634d72a8582",
+        "sample": "Session Identity Component Specification",
+        "sectionPayloadDigest": "0ec0241bb11b9491bf96749ef3f292f590f7c2e9bc51913dc5b45f972e3cd716",
+        "followingBlockDigest": "0ec0241bb11b9491bf96749ef3f292f590f7c2e9bc51913dc5b45f972e3cd716",
+        "identityFingerprint": "0269907614ae65aa698d168a28464caee52b578165dcdc9953daec455614b6c4",
+        "ancestry": [],
+        "text": "# Session Identity Component Specification",
+        "sectionText": "# Session Identity Component Specification\n\n```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the single authority for \"who is the writer of this process\"\nDesign status: Accepted\nImplementation: Implemented (activation pending)\nProvenance: packages/session-identity/rust; packages/session-identity/contracts/; introduced by 6a53e65b5\nWriter type: Agent draft writer (header completion pending independent review)\nCanonical: Yes\nCanonical for: Session Identity component writer attribution rule and native identity contract\nUse this when: Resolving or reviewing the writer identity of a calling process\nDo not use this for: Authentication, lock authority, worker id creation, process liveness or run supervision\nOwner: Session Identity component\nSource: packages/session-identity/rust\nContracts: packages/session-identity/contracts/\nLast reviewed: 2026-10-15\nRelated:\n- docs/io-contract.md\n- docs/platform/component-boundary.md\n- docs/specs/observe.md\n- plans/261015-2102-identity-resolver-rust-crate/plan.md\nSupersedes: None\nSuperseded by: None\n```"
+      },
+      "beforeDigestAuthenticated": true,
+      "afterDigestAuthenticated": true,
+      "oldFileSHA256": "d007573a8d4f659fa9e017214b312ac61e3f7ab7fc78226688118c3d1fa4bad9",
+      "newFileSHA256": "b3dfd588a2535949d4396a3c4afc20e15508c6af57f278be4154533e7cd2621a",
+      "committedDiff": "diff --git a/docs/platform/session-identity/spec.md b/docs/platform/session-identity/spec.md\nindex 290cc68e9..4b1b531d7 100644\n--- a/docs/platform/session-identity/spec.md\n+++ b/docs/platform/session-identity/spec.md\n@@ -5,8 +5,13 @@ Document type: BA-grade area specification\n Audience: Human reviewer, maintainer, implementation agent\n Purpose: Define the single authority for \"who is the writer of this process\"\n Design status: Accepted\n-Implementation status: Implemented (activation pending)\n+Implementation: Implemented (activation pending)\n+Provenance: packages/session-identity/rust; packages/session-identity/contracts/; introduced by 6a53e65b5\n+Writer type: Agent draft writer (header completion pending independent review)\n Canonical: Yes\n+Canonical for: Session Identity component writer attribution rule and native identity contract\n+Use this when: Resolving or reviewing the writer identity of a calling process\n+Do not use this for: Authentication, lock authority, worker id creation, process liveness or run supervision\n Owner: Session Identity component\n Source: packages/session-identity/rust\n Contracts: packages/session-identity/contracts/\n@@ -16,6 +21,8 @@ Related:\n - docs/platform/component-boundary.md\n - docs/specs/observe.md\n - plans/261015-2102-identity-resolver-rust-crate/plan.md\n+Supersedes: None\n+Superseded by: None\n ```\n \n ## 1. Purpose\n",
+      "interpretation": "Native carry retains this exact identity and changes its digest. Old list tuple remains historical/pending; no approval carries."
+    },
+    {
+      "kind": "native-gap-plus-independent-new-ID",
+      "before": {
+        "sourcePath": "docs/platform/session-identity/spec.md",
+        "unitDigest": "3aa919f7324a1fa38463a76afa88326c73ceb462f692f4dc09e13ee3d47544a7",
+        "identityFingerprint": "3aa919f7324a1fa38463a76afa88326c73ceb462f692f4dc09e13ee3d47544a7",
+        "claimId": "claim_dceb439735340f734bb484d23c887dad",
+        "sourceAnchor": "unheaded-block-1",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "54ffebc5e7a158a6d273670146c1002dd8c6c08fea92f13a9b66f1c6e3efbb54",
+        "claimKind": "specification",
+        "status": "future"
+      },
+      "after": {
+        "sourcePath": "docs/platform/session-identity/spec.md",
+        "unitDigest": "25baa5728093912506c0f8ea341b390b05b78bce671e213500c4fb899177ec0d",
+        "identityFingerprint": "25baa5728093912506c0f8ea341b390b05b78bce671e213500c4fb899177ec0d",
+        "claimId": "claim_3b20c21f7dd91fecef6382c16397c623",
+        "sourceAnchor": "unheaded-block-1",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "0ec0241bb11b9491bf96749ef3f292f590f7c2e9bc51913dc5b45f972e3cd716",
+        "claimKind": "specification",
+        "status": "future",
+        "origin": "added-since-498048c1a6651556a0ae977a2871135b5ac7c945"
+      },
+      "oldNativeGap": {
+        "sourcePath": "docs/platform/session-identity/spec.md",
+        "unitDigest": "3aa919f7324a1fa38463a76afa88326c73ceb462f692f4dc09e13ee3d47544a7",
+        "identityFingerprint": "3aa919f7324a1fa38463a76afa88326c73ceb462f692f4dc09e13ee3d47544a7",
+        "claimId": "claim_dceb439735340f734bb484d23c887dad",
+        "sourceAnchor": "unheaded-block-1",
+        "unitKind": "unheaded-block",
+        "sourceUnitDigest": "54ffebc5e7a158a6d273670146c1002dd8c6c08fea92f13a9b66f1c6e3efbb54",
+        "claimKind": "specification",
+        "status": "future",
+        "identityStatus": "identity-gap",
+        "gapReason": "edited unit whose anchor unheaded-block-1 is not a stable heading anchor"
+      },
+      "beforeUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded block 1",
+        "startLine": 3,
+        "endLine": 19,
+        "textDigest": "54ffebc5e7a158a6d273670146c1002dd8c6c08fea92f13a9b66f1c6e3efbb54",
+        "sample": "```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the single authority for \"who is the writer of this pro",
+        "identityFingerprint": "3aa919f7324a1fa38463a76afa88326c73ceb462f692f4dc09e13ee3d47544a7",
+        "ancestry": [
+          "Session Identity Component Specification"
+        ],
+        "text": "```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the single authority for \"who is the writer of this process\"\nDesign status: Accepted\nImplementation status: Implemented (activation pending)\nCanonical: Yes\nOwner: Session Identity component\nSource: packages/session-identity/rust\nContracts: packages/session-identity/contracts/\nLast reviewed: 2026-10-15\nRelated:\n- docs/io-contract.md\n- docs/platform/component-boundary.md\n- docs/specs/observe.md\n- plans/261015-2102-identity-resolver-rust-crate/plan.md\n```"
+      },
+      "afterUnit": {
+        "unitKind": "unheaded-block",
+        "anchor": "unheaded-block-1",
+        "githubAnchor": "unheaded-block-1",
+        "stableAnchor": "unheaded-block-1",
+        "title": "Unheaded block 1",
+        "startLine": 3,
+        "endLine": 26,
+        "textDigest": "0ec0241bb11b9491bf96749ef3f292f590f7c2e9bc51913dc5b45f972e3cd716",
+        "sample": "```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the single authority for \"who is the writer of this pro",
+        "identityFingerprint": "25baa5728093912506c0f8ea341b390b05b78bce671e213500c4fb899177ec0d",
+        "ancestry": [
+          "Session Identity Component Specification"
+        ],
+        "text": "```txt\nDocument type: BA-grade area specification\nAudience: Human reviewer, maintainer, implementation agent\nPurpose: Define the single authority for \"who is the writer of this process\"\nDesign status: Accepted\nImplementation: Implemented (activation pending)\nProvenance: packages/session-identity/rust; packages/session-identity/contracts/; introduced by 6a53e65b5\nWriter type: Agent draft writer (header completion pending independent review)\nCanonical: Yes\nCanonical for: Session Identity component writer attribution rule and native identity contract\nUse this when: Resolving or reviewing the writer identity of a calling process\nDo not use this for: Authentication, lock authority, worker id creation, process liveness or run supervision\nOwner: Session Identity component\nSource: packages/session-identity/rust\nContracts: packages/session-identity/contracts/\nLast reviewed: 2026-10-15\nRelated:\n- docs/io-contract.md\n- docs/platform/component-boundary.md\n- docs/specs/observe.md\n- plans/261015-2102-identity-resolver-rust-crate/plan.md\nSupersedes: None\nSuperseded by: None\n```"
+      },
+      "beforeDigestAuthenticated": true,
+      "afterDigestAuthenticated": true,
+      "oldFileSHA256": "d007573a8d4f659fa9e017214b312ac61e3f7ab7fc78226688118c3d1fa4bad9",
+      "newFileSHA256": "b3dfd588a2535949d4396a3c4afc20e15508c6af57f278be4154533e7cd2621a",
+      "committedDiff": "diff --git a/docs/platform/session-identity/spec.md b/docs/platform/session-identity/spec.md\nindex 290cc68e9..4b1b531d7 100644\n--- a/docs/platform/session-identity/spec.md\n+++ b/docs/platform/session-identity/spec.md\n@@ -5,8 +5,13 @@ Document type: BA-grade area specification\n Audience: Human reviewer, maintainer, implementation agent\n Purpose: Define the single authority for \"who is the writer of this process\"\n Design status: Accepted\n-Implementation status: Implemented (activation pending)\n+Implementation: Implemented (activation pending)\n+Provenance: packages/session-identity/rust; packages/session-identity/contracts/; introduced by 6a53e65b5\n+Writer type: Agent draft writer (header completion pending independent review)\n Canonical: Yes\n+Canonical for: Session Identity component writer attribution rule and native identity contract\n+Use this when: Resolving or reviewing the writer identity of a calling process\n+Do not use this for: Authentication, lock authority, worker id creation, process liveness or run supervision\n Owner: Session Identity component\n Source: packages/session-identity/rust\n Contracts: packages/session-identity/contracts/\n@@ -16,6 +21,8 @@ Related:\n - docs/platform/component-boundary.md\n - docs/specs/observe.md\n - plans/261015-2102-identity-resolver-rust-crate/plan.md\n+Supersedes: None\n+Superseded by: None\n ```\n \n ## 1. Purpose\n",
+      "interpretation": "The native old unit is a preserved gap and the current unit has a distinct new ID. Path+anchor match explains the edited slot only, never historical identity. No manual graft or approval carry."
+    }
+  ]
+}

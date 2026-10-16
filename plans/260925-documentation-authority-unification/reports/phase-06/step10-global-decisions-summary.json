@@ -149,7 +149,20 @@
     {
       "id": "L10-37",
       "summary": "Last wording-only rationale round; content loss still repaired; wording holds require explicit reason."
+    },
+    {
+      "id": "L10-38",
+      "summary": "Repair global ordinary-review content/binding defects; restore code-proven live paragraphs and rebind history/confinement carriers; every changed row pending."
+    },
+    {
+      "id": "L10-39",
+      "summary": "Reopen six reviewed work-state footer siblings and occurrence/context-match all seven footer gaps; no positional identity or approval carry."
+    },
+    {
+      "id": "L10-40",
+      "summary": "Keep the two A31 main-diff successors as supersede; apply matching committed ok verdicts normally."
     }
   ],
-  "A43": "Responsibility groups only; no required/planned Orchestrator/Launcher/Router/Driver/Dispatcher entity. Three rows pending ordinary independent review (one move, two supersede); holds=0. Phase 6 stops awaiting owner review after checkpoint."
+  "A43": "Responsibility groups only; no required/planned Orchestrator/Launcher/Router/Driver/Dispatcher entity. Three rows pending ordinary independent review (one move, two supersede); holds=0. Phase 6 stops awaiting owner review after checkpoint.",
+  "packageContentCommit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be"
 }

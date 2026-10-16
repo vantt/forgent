@@ -1,0 +1,922 @@
+{
+  "contentCommit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+  "producer": "codex-session:unit-run-1792169760182-e3acba42@2026-10-16",
+  "mode": "ordinary",
+  "entries": [
+    {
+      "entry": "c129",
+      "kind": "candidate-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-author-candidate-accounting.json",
+      "array": "candidateChanges",
+      "index": 129,
+      "proof": {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-runner.json",
+        "action": "rebind",
+        "oldTuple": [
+          "claim_61244b0a84842a2771f7cdb493ebb699",
+          "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+          "unheaded-block-2",
+          "ae0e268fad727f5deda17cf43d013aa1710f5cea2506fdd844809c3c8e98511f"
+        ],
+        "newTuple": [
+          "claim_83a11864c376f283107eeca5fe3ffca5",
+          "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+          "unheaded-block-2",
+          "c354e3357585a5cc6bce8dd57d833b0e85d3f19e58ba6e81e9d6f562aca53edc"
+        ],
+        "before": {
+          "claimId": "claim_61244b0a84842a2771f7cdb493ebb699",
+          "path": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+          "anchor": "unheaded-block-2",
+          "unitDigest": "ae0e268fad727f5deda17cf43d013aa1710f5cea2506fdd844809c3c8e98511f",
+          "fileStatus": "Candidate",
+          "shownText": "> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: A41 F2: replace deleted entropy pointer (packages/observe/rust/src/metrics_cli/entropy.rs:1-8; packages/observe/rust/src/metrics_cli/entropy.rs:107-127); A41 F1: replace deleted ranking pointer (bin/fgos.mjs:4640-4643; bin/fgos.mjs:4373-4380); R9-5: remove decisions-placement boilerplate from non-decision carrier.",
+          "shownTextDigest": "ae0e268fad727f5deda17cf43d013aa1710f5cea2506fdd844809c3c8e98511f",
+          "reviewStatus": "pending"
+        },
+        "after": {
+          "claimId": "claim_83a11864c376f283107eeca5fe3ffca5",
+          "path": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+          "anchor": "unheaded-block-2",
+          "unitDigest": "c354e3357585a5cc6bce8dd57d833b0e85d3f19e58ba6e81e9d6f562aca53edc",
+          "fileStatus": "Candidate",
+          "shownTextDigest": "ae0e268fad727f5deda17cf43d013aa1710f5cea2506fdd844809c3c8e98511f",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+          "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+          "currentStateAccounting": "step10-author-candidate-accounting.json"
+        },
+        "proof": {
+          "kind": "explicit-successor-decision-and-exact-native-target",
+          "decision": {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-systemic-native-predecessors.json",
+            "collection": "registryGaps",
+            "row": {
+              "claimId": "claim_61244b0a84842a2771f7cdb493ebb699",
+              "sourcePath": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+              "sourceUnitDigest": "ae0e268fad727f5deda17cf43d013aa1710f5cea2506fdd844809c3c8e98511f",
+              "claimKind": "specification",
+              "disposition": "supersede",
+              "targetOwner": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+              "targetAnchor": "unheaded-block-2",
+              "rationale": "Source: docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md:23-23#unheaded-block-2 (historical witness at 19ca8de23908e161c34c91626e41041b7813167c); unit SHA256 ae0e268fad727f5deda17cf43d013aa1710f5cea2506fdd844809c3c8e98511f.\nTarget: docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md:23-23#unheaded-block-2 (current lines); unit SHA256 c354e3357585a5cc6bce8dd57d833b0e85d3f19e58ba6e81e9d6f562aca53edc.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest c354e3357585a5cc6bce8dd57d833b0e85d3f19e58ba6e81e9d6f562aca53edc at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nL10-24/citation-scaffold: \"bin/fgos.mjs:4640-4643; bin/fgos.mjs:4373-4380\" → \"bin/fgos.mjs:4414-4417\"; evidence step10-round3-doc-edits.json; bin/fgos.mjs:4414-4417,4503 (evidence commit 5035fed52e60254ecbe034cc987553feb24616f4).\nDisposition supersede: Account for docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md#unheaded-block-2 under docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md#unheaded-block-2; source context \"Added in candidate: Runner Pointers (implementation)\", target context \"Added in candidate: Runner Pointers (implementation)\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+              "reviewStatus": "reviewed",
+              "authoredBy": "codex-session:unit-run-1792126341980-e0c35701@2026-10-16",
+              "reviewNote": "deep: supersede of unheaded-block-2 of runner/subcomponents/h-f34e0d170d89/spec.md; the character diff shows the only change is the pointer bin/fgos.mjs:4640-4643; bin/fgos.mjs:4373-4380 replaced by bin/fgos.mjs:4414-4417, matching the single labelled correction in the rationale (before text present in the 19ca8de23 source, after text in the target); last-reviewed digest c354e335 at 62751458b has an ok row and equals the current target digest.",
+              "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+              "reviewedAt": "2026-10-16",
+              "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+              "reviewMode": "ordinary",
+              "targetUnitDigest": "c354e3357585a5cc6bce8dd57d833b0e85d3f19e58ba6e81e9d6f562aca53edc",
+              "targetAncestry": [
+                "Added in candidate: Runner Pointers (implementation)"
+              ],
+              "reviewReportCommit": "203f4ef93867a60e6a37624b31ce14de426cafa8"
+            }
+          },
+          "native": {
+            "sourcePath": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+            "unitDigest": "e1fbde6f58cfdeb1279b92317107b574bff70a5805f3838dcdc8be070ff0a51d",
+            "identityFingerprint": "e1fbde6f58cfdeb1279b92317107b574bff70a5805f3838dcdc8be070ff0a51d",
+            "claimId": "claim_83a11864c376f283107eeca5fe3ffca5",
+            "sourceAnchor": "unheaded-block-2",
+            "unitKind": "unheaded-block",
+            "sourceUnitDigest": "c354e3357585a5cc6bce8dd57d833b0e85d3f19e58ba6e81e9d6f562aca53edc",
+            "claimKind": "specification",
+            "status": "future"
+          }
+        }
+      },
+      "reviewStatus": "pending",
+      "check": "Authenticate old tuple at f70ecf4ec, current membership/non-membership at content pin, and the exact native identity/content witness. Removal never asserts identity of a new ordinal occupant."
+    },
+    {
+      "entry": "c008",
+      "kind": "candidate-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-author-candidate-accounting.json",
+      "array": "candidateChanges",
+      "index": 8,
+      "proof": {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-agent-coordination.json",
+        "action": "rebind",
+        "oldTuple": [
+          "claim_9e9d711e331efe5a12c8b8bf50371dc6",
+          "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+          "unheaded-block-117",
+          "087d5cdd477bde5b2bf98882290f0d23d3e44a06f0c6f93b7f15e6bcfa391c63"
+        ],
+        "newTuple": [
+          "claim_cfdd80946e57e4ea360ed04c1413f4dd",
+          "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+          "unheaded-block-117",
+          "7486a9e911dc83dd8182817e3d51bccd7b2e95a87b245307e19b3dd1de9fbb34"
+        ],
+        "before": {
+          "claimId": "claim_9e9d711e331efe5a12c8b8bf50371dc6",
+          "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+          "anchor": "unheaded-block-117",
+          "unitDigest": "087d5cdd477bde5b2bf98882290f0d23d3e44a06f0c6f93b7f15e6bcfa391c63",
+          "fileStatus": {
+            "kind": "guide-runbook",
+            "kindCanonical": true,
+            "authorityStatus": "candidate",
+            "designStatus": "Candidate",
+            "canonical": false,
+            "eligibility": "non-promoted Candidate/Draft"
+          },
+          "status": "candidate-unverified"
+        },
+        "after": {
+          "claimId": "claim_cfdd80946e57e4ea360ed04c1413f4dd",
+          "path": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+          "anchor": "unheaded-block-117",
+          "unitDigest": "7486a9e911dc83dd8182817e3d51bccd7b2e95a87b245307e19b3dd1de9fbb34",
+          "fileStatus": {
+            "kind": "guide-runbook",
+            "kindCanonical": true,
+            "authorityStatus": "candidate",
+            "designStatus": "Candidate",
+            "canonical": false,
+            "eligibility": "non-promoted Candidate/Draft"
+          },
+          "status": "candidate-unverified",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+          "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+          "currentStateAccounting": "step10-author-candidate-accounting.json"
+        },
+        "proof": {
+          "kind": "explicit-successor-decision-and-exact-native-target",
+          "decision": {
+            "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-round4-native-predecessors.json",
+            "collection": "registryGaps",
+            "row": {
+              "claimId": "claim_9e9d711e331efe5a12c8b8bf50371dc6",
+              "sourcePath": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+              "sourceUnitDigest": "087d5cdd477bde5b2bf98882290f0d23d3e44a06f0c6f93b7f15e6bcfa391c63",
+              "claimKind": "specification",
+              "disposition": "supersede",
+              "targetOwner": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+              "targetAnchor": "unheaded-block-117",
+              "rationale": "Source: docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md:1470-1471#unheaded-block-117 (historical witness at 9b0526380); unit SHA256 087d5cdd477bde5b2bf98882290f0d23d3e44a06f0c6f93b7f15e6bcfa391c63.\nTarget: docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md:1470-1471#unheaded-block-117 (current lines); unit SHA256 7486a9e911dc83dd8182817e3d51bccd7b2e95a87b245307e19b3dd1de9fbb34.\nSource and target unit digests differ.\nTarget changed since last reviewed digest 087d5cdd477bde5b2bf98882290f0d23d3e44a06f0c6f93b7f15e6bcfa391c63 at 0f063d18fdab01cb6f2c915bb60ff528c5e0f238.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nL10-31/explicit-section-correction: \"Current packet dispositions require actual evidence when they turn on claims\" → \"Added in candidate — current-Workflow correction; the former driver-specific rules remain in the historical snapshot linked above. Current packet dispositions require actual evidence when they turn on claims\"; evidence step10-round4-doc-edits.json.\nDisposition supersede: Account for docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md#unheaded-block-117 under docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md#unheaded-block-117; source context \"Architecture Advisory Role Doctrine / Driver-Disposition Doctrine / Evidence And Conduct Boundaries\", target context \"Architecture Advisory Role Doctrine / Driver-Disposition Doctrine / Evidence And Conduct Boundaries\". The complete source direct section occurs verbatim inside the bound target section; native unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+              "reviewStatus": "reviewed",
+              "authoredBy": "codex-session:unit-run-1792122626822-ceb0cdd9@2026-10-16",
+              "reviewNote": "deep: supersede of architecture-advisory-role-doctrine.md unheaded-block-117 (lines 1470 to 1471): the source two lines occur verbatim inside the new block, which only gains the labelled current-Workflow prefix, so the rationale sentence that the complete source direct section occurs verbatim inside the target section is true; the correction fragment equals the committed line and the ancestry has three levels as stated.",
+              "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+              "reviewedAt": "2026-10-16",
+              "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-62751458b.md",
+              "reviewMode": "ordinary",
+              "targetUnitDigest": "7486a9e911dc83dd8182817e3d51bccd7b2e95a87b245307e19b3dd1de9fbb34",
+              "targetAncestry": [
+                "Architecture Advisory Role Doctrine",
+                "Driver-Disposition Doctrine",
+                "Evidence And Conduct Boundaries"
+              ],
+              "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
+            }
+          },
+          "native": {
+            "sourcePath": "docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+            "unitDigest": "0093aca093c7750ec5c3b0e2bb870a1fba3b1f888cc2292efd9a9d109c023faa",
+            "identityFingerprint": "0093aca093c7750ec5c3b0e2bb870a1fba3b1f888cc2292efd9a9d109c023faa",
+            "claimId": "claim_cfdd80946e57e4ea360ed04c1413f4dd",
+            "sourceAnchor": "unheaded-block-117",
+            "unitKind": "unheaded-block",
+            "sourceUnitDigest": "7486a9e911dc83dd8182817e3d51bccd7b2e95a87b245307e19b3dd1de9fbb34",
+            "claimKind": "procedure",
+            "status": "future"
+          }
+        }
+      },
+      "reviewStatus": "pending",
+      "check": "Authenticate old tuple at f70ecf4ec, current membership/non-membership at content pin, and the exact native identity/content witness. Removal never asserts identity of a new ordinal occupant."
+    },
+    {
+      "entry": "c058",
+      "kind": "candidate-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-author-candidate-accounting.json",
+      "array": "candidateChanges",
+      "index": 58,
+      "proof": {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-host-invocation-routing.json",
+        "action": "rebind",
+        "oldTuple": [
+          "claim_edb478ba5fec2586534ec7371a420b62",
+          "docs/platform/host-invocation-routing/contracts/README.md",
+          "host-invocation-contracts",
+          "c4e895ae4e4fe72cab71c1e87293255e0d235f787f009d44ba266136cae0109d"
+        ],
+        "newTuple": [
+          "claim_edb478ba5fec2586534ec7371a420b62",
+          "docs/platform/host-invocation-routing/contracts/README.md",
+          "host-invocation-contracts",
+          "2e2406ce66b5342c6bd4f1c59b4cd1075e6f78b12d105ed82a2c27ac9979d8f0"
+        ],
+        "before": {
+          "claimId": "claim_edb478ba5fec2586534ec7371a420b62",
+          "path": "docs/platform/host-invocation-routing/contracts/README.md",
+          "anchor": "host-invocation-contracts",
+          "unitDigest": "c4e895ae4e4fe72cab71c1e87293255e0d235f787f009d44ba266136cae0109d",
+          "fileStatus": {
+            "kind": "collection-index",
+            "kindCanonical": true,
+            "authorityStatus": "candidate",
+            "designStatus": "Draft",
+            "canonical": false,
+            "eligibility": "non-promoted Candidate/Draft"
+          },
+          "status": "candidate-unverified"
+        },
+        "after": {
+          "claimId": "claim_edb478ba5fec2586534ec7371a420b62",
+          "path": "docs/platform/host-invocation-routing/contracts/README.md",
+          "anchor": "host-invocation-contracts",
+          "unitDigest": "2e2406ce66b5342c6bd4f1c59b4cd1075e6f78b12d105ed82a2c27ac9979d8f0",
+          "fileStatus": {
+            "kind": "collection-index",
+            "kindCanonical": true,
+            "authorityStatus": "candidate",
+            "designStatus": "Draft",
+            "canonical": false,
+            "eligibility": "non-promoted Candidate/Draft"
+          },
+          "status": "candidate-unverified",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+          "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+          "currentStateAccounting": "step10-author-candidate-accounting.json"
+        },
+        "proof": {
+          "kind": "native-carried-claim-id",
+          "native": {
+            "sourcePath": "docs/platform/host-invocation-routing/contracts/README.md",
+            "unitDigest": "15f49e1a88674f20f152ab6b7fd8294317bc9a2613382585af7926c022553e16",
+            "identityFingerprint": "635205f3d6b20f1bf573b99f56daec6a9d9cfd1db5a08a79393ee559b7916ee9",
+            "claimId": "claim_edb478ba5fec2586534ec7371a420b62",
+            "sourceAnchor": "host-invocation-contracts",
+            "unitKind": "heading",
+            "sourceUnitDigest": "2e2406ce66b5342c6bd4f1c59b4cd1075e6f78b12d105ed82a2c27ac9979d8f0",
+            "claimKind": "contract",
+            "status": "future"
+          }
+        }
+      },
+      "reviewStatus": "pending",
+      "check": "Authenticate old tuple at f70ecf4ec, current membership/non-membership at content pin, and the exact native identity/content witness. Removal never asserts identity of a new ordinal occupant."
+    },
+    {
+      "entry": "c083",
+      "kind": "candidate-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-author-candidate-accounting.json",
+      "array": "candidateChanges",
+      "index": 83,
+      "proof": {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-proposals-redesigns.json",
+        "action": "rebind",
+        "oldTuple": [
+          "claim_3e77ba7d49e3be7af271cdc24bdc5b0b",
+          "docs/platform/agent-coordination/architecture/work-integration.md",
+          "work-driver-handoff-to-dispatch",
+          "f80fbd765eff3f472a6159d5574b7083988ec66c70e680dfcb51921873386fb0"
+        ],
+        "newTuple": [
+          "claim_3e77ba7d49e3be7af271cdc24bdc5b0b",
+          "docs/platform/agent-coordination/architecture/work-integration.md",
+          "work-driver-handoff-to-dispatch",
+          "ef0e26efeb3a17d765d289a523eaf0d5cbb2ca31b5fb14ea3f55f5e067fe53dc"
+        ],
+        "before": {
+          "claimId": "claim_3e77ba7d49e3be7af271cdc24bdc5b0b",
+          "path": "docs/platform/agent-coordination/architecture/work-integration.md",
+          "anchor": "work-driver-handoff-to-dispatch",
+          "unitDigest": "f80fbd765eff3f472a6159d5574b7083988ec66c70e680dfcb51921873386fb0",
+          "status": "candidate-unverified",
+          "reviewStatus": "reviewed",
+          "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
+          "fileStatus": {
+            "kind": "architecture",
+            "kindCanonical": true,
+            "designStatus": "Candidate",
+            "authorityStatus": "candidate"
+          },
+          "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+          "reviewNote": "mechanical: digest recomputed from git blob at the pin (section formula) equals shown digest; tuple byte-equal in the Agent list; file header Design status Candidate / kind architecture; not read in full",
+          "reviewedAt": "2026-10-15",
+          "reviewMode": "ordinary",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
+          "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+        },
+        "after": {
+          "claimId": "claim_3e77ba7d49e3be7af271cdc24bdc5b0b",
+          "path": "docs/platform/agent-coordination/architecture/work-integration.md",
+          "anchor": "work-driver-handoff-to-dispatch",
+          "unitDigest": "ef0e26efeb3a17d765d289a523eaf0d5cbb2ca31b5fb14ea3f55f5e067fe53dc",
+          "status": "candidate-unverified",
+          "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+          "fileStatus": {
+            "kind": "architecture",
+            "kindCanonical": true,
+            "designStatus": "Candidate",
+            "authorityStatus": "candidate"
+          },
+          "reviewStatus": "pending",
+          "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+          "currentStateAccounting": "step10-author-candidate-accounting.json"
+        },
+        "proof": {
+          "kind": "native-carried-claim-id",
+          "native": {
+            "sourcePath": "docs/platform/agent-coordination/architecture/work-integration.md",
+            "unitDigest": "b7909edbeff5635d11fb2b9ece67612a74800207d44e4e8ac5b022a6709957a2",
+            "identityFingerprint": "2d9bd530d3891893afdc1702cbc335f15fe097672f10896c9c394e8e0ddb47d6",
+            "claimId": "claim_3e77ba7d49e3be7af271cdc24bdc5b0b",
+            "sourceAnchor": "work-driver-handoff-to-dispatch",
+            "unitKind": "heading",
+            "sourceUnitDigest": "ef0e26efeb3a17d765d289a523eaf0d5cbb2ca31b5fb14ea3f55f5e067fe53dc",
+            "claimKind": "architecture",
+            "status": "future"
+          }
+        }
+      },
+      "reviewStatus": "pending",
+      "check": "Authenticate old tuple at f70ecf4ec, current membership/non-membership at content pin, and the exact native identity/content witness. Removal never asserts identity of a new ordinal occupant."
+    },
+    {
+      "entry": "c087",
+      "kind": "candidate-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-author-candidate-accounting.json",
+      "array": "candidateChanges",
+      "index": 87,
+      "proof": {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-proposals-redesigns.json",
+        "action": "rebind",
+        "oldTuple": [
+          "claim_eefd21e417ee3e32c356caf5759b8166",
+          "docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
+          "current-scope",
+          "12ebb60222c1092105508d1ea2faea45c7530716f9176fdf308cb9ec79d46189"
+        ],
+        "newTuple": [
+          "claim_eefd21e417ee3e32c356caf5759b8166",
+          "docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
+          "current-scope",
+          "83370882ceae06bff62a3f0b1debbf065c551c18181f316685b83db0455c54e7"
+        ],
+        "before": {
+          "claimId": "claim_eefd21e417ee3e32c356caf5759b8166",
+          "path": "docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
+          "anchor": "current-scope",
+          "unitDigest": "12ebb60222c1092105508d1ea2faea45c7530716f9176fdf308cb9ec79d46189",
+          "status": "candidate-unverified",
+          "reviewStatus": "reviewed",
+          "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
+          "fileStatus": {
+            "kind": "decision",
+            "kindCanonical": true,
+            "designStatus": "Candidate",
+            "authorityStatus": "candidate"
+          },
+          "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+          "reviewNote": "mechanical: digest recomputed from git blob at the pin (section formula) equals shown digest; tuple byte-equal in the Agent list; file header Design status Candidate / kind decision; not read in full",
+          "reviewedAt": "2026-10-15",
+          "reviewMode": "ordinary",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
+          "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+        },
+        "after": {
+          "claimId": "claim_eefd21e417ee3e32c356caf5759b8166",
+          "path": "docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
+          "anchor": "current-scope",
+          "unitDigest": "83370882ceae06bff62a3f0b1debbf065c551c18181f316685b83db0455c54e7",
+          "status": "candidate-unverified",
+          "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+          "fileStatus": {
+            "kind": "decision",
+            "kindCanonical": true,
+            "designStatus": "Candidate",
+            "authorityStatus": "candidate"
+          },
+          "reviewStatus": "pending",
+          "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
+          "currentStateAccounting": "step10-author-candidate-accounting.json"
+        },
+        "proof": {
+          "kind": "native-carried-claim-id",
+          "native": {
+            "sourcePath": "docs/platform/agent-coordination/decisions/ADR-005-herdr-visibility-only.md",
+            "unitDigest": "700f957b6b88a6130988c038ac9d322abd1aee5b600d192cfd10eee08abc36b8",
+            "identityFingerprint": "02cdd9494ce44b7a00c73e6952e91237fdae7ed6ee17fde2a3a29a637d7f044a",
+            "claimId": "claim_eefd21e417ee3e32c356caf5759b8166",
+            "sourceAnchor": "current-scope",
+            "unitKind": "heading",
+            "sourceUnitDigest": "83370882ceae06bff62a3f0b1debbf065c551c18181f316685b83db0455c54e7",
+            "claimKind": "decision",
+            "status": "future"
+          }
+        }
+      },
+      "reviewStatus": "pending",
+      "check": "Authenticate old tuple at f70ecf4ec, current membership/non-membership at content pin, and the exact native identity/content witness. Removal never asserts identity of a new ordinal occupant."
+    },
+    {
+      "entry": "c193",
+      "kind": "candidate-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-author-candidate-accounting.json",
+      "array": "candidateChanges",
+      "index": 193,
+      "proof": {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-runner.json",
+        "action": "add",
+        "oldTuple": null,
+        "newTuple": [
+          "claim_b171f08d544f21d7ba28f0f472e9a232",
+          "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "unheaded-block-2",
+          "79df87736370e5a1aa7700abf07e3f28c6138dd590897da79e166188c0f5997b"
+        ],
+        "after": {
+          "claimId": "claim_b171f08d544f21d7ba28f0f472e9a232",
+          "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "anchor": "unheaded-block-2",
+          "unitDigest": "79df87736370e5a1aa7700abf07e3f28c6138dd590897da79e166188c0f5997b",
+          "status": "candidate-unverified",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+          "unverifiedReason": "Current native reverse candidate in persisted global E; absent from every current-state list after authenticated rebindings. No source decision accounts for it; truth and promotion remain unverified.",
+          "currentStateAccounting": "step10-author-candidate-accounting.json"
+        },
+        "proof": {
+          "kind": "current-native-unit-and-global-reverse-membership",
+          "native": {
+            "sourcePath": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+            "unitDigest": "e5ee46c0bde6c05a5334fb9b644226f1cf53b28d69040b7db9776b690f990546",
+            "identityFingerprint": "e5ee46c0bde6c05a5334fb9b644226f1cf53b28d69040b7db9776b690f990546",
+            "claimId": "claim_b171f08d544f21d7ba28f0f472e9a232",
+            "sourceAnchor": "unheaded-block-2",
+            "unitKind": "unheaded-block",
+            "sourceUnitDigest": "79df87736370e5a1aa7700abf07e3f28c6138dd590897da79e166188c0f5997b",
+            "claimKind": "decision",
+            "status": "future"
+          },
+          "globalE": "step10-global-E.json#explicitOpenFindings.unreferencedCandidateRows"
+        }
+      },
+      "reviewStatus": "pending",
+      "check": "Authenticate old tuple at f70ecf4ec, current membership/non-membership at content pin, and the exact native identity/content witness. Removal never asserts identity of a new ordinal occupant."
+    },
+    {
+      "entry": "c220",
+      "kind": "candidate-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-author-candidate-accounting.json",
+      "array": "candidateChanges",
+      "index": 220,
+      "proof": {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-runner.json",
+        "action": "add",
+        "oldTuple": null,
+        "newTuple": [
+          "claim_ee99b0951090e8a9aeabd89bf2982f05",
+          "docs/platform/runner/spec.md",
+          "unheaded-block-10",
+          "28d0009fb157647913ed15eaaa21f78a13218cffb6610cda0f0b0d223a61fed6"
+        ],
+        "after": {
+          "claimId": "claim_ee99b0951090e8a9aeabd89bf2982f05",
+          "path": "docs/platform/runner/spec.md",
+          "anchor": "unheaded-block-10",
+          "unitDigest": "28d0009fb157647913ed15eaaa21f78a13218cffb6610cda0f0b0d223a61fed6",
+          "status": "candidate-unverified",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+          "unverifiedReason": "Current native reverse candidate in persisted global E; absent from every current-state list after authenticated rebindings. No source decision accounts for it; truth and promotion remain unverified.",
+          "currentStateAccounting": "step10-author-candidate-accounting.json"
+        },
+        "proof": {
+          "kind": "current-native-unit-and-global-reverse-membership",
+          "native": {
+            "sourcePath": "docs/platform/runner/spec.md",
+            "unitDigest": "3f04a25770175d51f86d82739e8ba1134f1395a17dd235a34e5a3c5517c8a757",
+            "identityFingerprint": "3f04a25770175d51f86d82739e8ba1134f1395a17dd235a34e5a3c5517c8a757",
+            "claimId": "claim_ee99b0951090e8a9aeabd89bf2982f05",
+            "sourceAnchor": "unheaded-block-10",
+            "unitKind": "unheaded-block",
+            "sourceUnitDigest": "28d0009fb157647913ed15eaaa21f78a13218cffb6610cda0f0b0d223a61fed6",
+            "claimKind": "specification",
+            "status": "future"
+          },
+          "globalE": "step10-global-E.json#explicitOpenFindings.unreferencedCandidateRows"
+        }
+      },
+      "reviewStatus": "pending",
+      "check": "Authenticate old tuple at f70ecf4ec, current membership/non-membership at content pin, and the exact native identity/content witness. Removal never asserts identity of a new ordinal occupant."
+    },
+    {
+      "entry": "c211",
+      "kind": "candidate-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-author-candidate-accounting.json",
+      "array": "candidateChanges",
+      "index": 211,
+      "proof": {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-agent-coordination.json",
+        "action": "add",
+        "oldTuple": null,
+        "newTuple": [
+          "claim_dee4109c508c8e3b6596636a59625edd",
+          "docs/platform/agent-coordination/vision.md",
+          "unheaded-block-57",
+          "afa6e1bfcf309ab69db544af5f4f249255e17db2973ea08b733ba5b9fd1f4f6b"
+        ],
+        "after": {
+          "claimId": "claim_dee4109c508c8e3b6596636a59625edd",
+          "path": "docs/platform/agent-coordination/vision.md",
+          "anchor": "unheaded-block-57",
+          "unitDigest": "afa6e1bfcf309ab69db544af5f4f249255e17db2973ea08b733ba5b9fd1f4f6b",
+          "status": "candidate-unverified",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+          "unverifiedReason": "Current native reverse candidate in persisted global E; absent from every current-state list after authenticated rebindings. No source decision accounts for it; truth and promotion remain unverified.",
+          "currentStateAccounting": "step10-author-candidate-accounting.json"
+        },
+        "proof": {
+          "kind": "current-native-unit-and-global-reverse-membership",
+          "native": {
+            "sourcePath": "docs/platform/agent-coordination/vision.md",
+            "unitDigest": "c383dc082a7556859785d2eea4a37dd214225aae54e00a4bc060b06875463eb1",
+            "identityFingerprint": "c383dc082a7556859785d2eea4a37dd214225aae54e00a4bc060b06875463eb1",
+            "claimId": "claim_dee4109c508c8e3b6596636a59625edd",
+            "sourceAnchor": "unheaded-block-57",
+            "unitKind": "unheaded-block",
+            "sourceUnitDigest": "afa6e1bfcf309ab69db544af5f4f249255e17db2973ea08b733ba5b9fd1f4f6b",
+            "claimKind": "vision",
+            "status": "future"
+          },
+          "globalE": "step10-global-E.json#explicitOpenFindings.unreferencedCandidateRows"
+        }
+      },
+      "reviewStatus": "pending",
+      "check": "Authenticate old tuple at f70ecf4ec, current membership/non-membership at content pin, and the exact native identity/content witness. Removal never asserts identity of a new ordinal occupant."
+    },
+    {
+      "entry": "c153",
+      "kind": "candidate-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-author-candidate-accounting.json",
+      "array": "candidateChanges",
+      "index": 153,
+      "proof": {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-runner.json",
+        "action": "add",
+        "oldTuple": null,
+        "newTuple": [
+          "claim_3390e7039e79eb400059e2949c945cf6",
+          "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "unheaded-block-189",
+          "55c5a95220c4486691bd2e55c4cae7af99f9475c621dd4f65d5dcdc9544fbd8d"
+        ],
+        "after": {
+          "claimId": "claim_3390e7039e79eb400059e2949c945cf6",
+          "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "anchor": "unheaded-block-189",
+          "unitDigest": "55c5a95220c4486691bd2e55c4cae7af99f9475c621dd4f65d5dcdc9544fbd8d",
+          "status": "candidate-unverified",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+          "unverifiedReason": "Current native reverse candidate in persisted global E; absent from every current-state list after authenticated rebindings. No source decision accounts for it; truth and promotion remain unverified.",
+          "currentStateAccounting": "step10-author-candidate-accounting.json"
+        },
+        "proof": {
+          "kind": "current-native-unit-and-global-reverse-membership",
+          "native": {
+            "sourcePath": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+            "unitDigest": "66902e93046acbb1892c0fa4f764dfcdcc79835c39a6e76ad46f7d5186ce0d31",
+            "identityFingerprint": "66902e93046acbb1892c0fa4f764dfcdcc79835c39a6e76ad46f7d5186ce0d31",
+            "claimId": "claim_3390e7039e79eb400059e2949c945cf6",
+            "sourceAnchor": "unheaded-block-189",
+            "unitKind": "unheaded-block",
+            "sourceUnitDigest": "55c5a95220c4486691bd2e55c4cae7af99f9475c621dd4f65d5dcdc9544fbd8d",
+            "claimKind": "decision",
+            "status": "future"
+          },
+          "globalE": "step10-global-E.json#explicitOpenFindings.unreferencedCandidateRows"
+        }
+      },
+      "reviewStatus": "pending",
+      "check": "Authenticate old tuple at f70ecf4ec, current membership/non-membership at content pin, and the exact native identity/content witness. Removal never asserts identity of a new ordinal occupant."
+    },
+    {
+      "entry": "c176",
+      "kind": "candidate-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-author-candidate-accounting.json",
+      "array": "candidateChanges",
+      "index": 176,
+      "proof": {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-agent-coordination.json",
+        "action": "add",
+        "oldTuple": null,
+        "newTuple": [
+          "claim_6e283f886ccd5efc279b44adf0f7b073",
+          "docs/platform/agent-coordination/spec.md",
+          "unheaded-block-13",
+          "1b6fb0095ed47cc396c91d6cb66502161eaac67504a78e9f99507f4dfcbfd871"
+        ],
+        "after": {
+          "claimId": "claim_6e283f886ccd5efc279b44adf0f7b073",
+          "path": "docs/platform/agent-coordination/spec.md",
+          "anchor": "unheaded-block-13",
+          "unitDigest": "1b6fb0095ed47cc396c91d6cb66502161eaac67504a78e9f99507f4dfcbfd871",
+          "status": "candidate-unverified",
+          "reviewStatus": "pending",
+          "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
+          "unverifiedReason": "Current native reverse candidate in persisted global E; absent from every current-state list after authenticated rebindings. No source decision accounts for it; truth and promotion remain unverified.",
+          "currentStateAccounting": "step10-author-candidate-accounting.json"
+        },
+        "proof": {
+          "kind": "current-native-unit-and-global-reverse-membership",
+          "native": {
+            "sourcePath": "docs/platform/agent-coordination/spec.md",
+            "unitDigest": "c2633a6183fdc2e8cd9de3656234f8b480ec246e36c6be8bb1313c2918d25942",
+            "identityFingerprint": "c2633a6183fdc2e8cd9de3656234f8b480ec246e36c6be8bb1313c2918d25942",
+            "claimId": "claim_6e283f886ccd5efc279b44adf0f7b073",
+            "sourceAnchor": "unheaded-block-13",
+            "unitKind": "unheaded-block",
+            "sourceUnitDigest": "1b6fb0095ed47cc396c91d6cb66502161eaac67504a78e9f99507f4dfcbfd871",
+            "claimKind": "specification",
+            "status": "future"
+          },
+          "globalE": "step10-global-E.json#explicitOpenFindings.unreferencedCandidateRows"
+        }
+      },
+      "reviewStatus": "pending",
+      "check": "Authenticate old tuple at f70ecf4ec, current membership/non-membership at content pin, and the exact native identity/content witness. Removal never asserts identity of a new ordinal occupant."
+    },
+    {
+      "entry": "c105",
+      "kind": "candidate-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-author-candidate-accounting.json",
+      "array": "candidateChanges",
+      "index": 105,
+      "proof": {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-proposals-redesigns.json",
+        "action": "remove",
+        "oldTuple": [
+          "claim_0b9fcf0a1a07c29e6ae48f02d7f5dc59",
+          "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+          "unheaded-block-13",
+          "a6662af528d7186106b7dc978680ed96bcc4b7500854e3f4bfb8ddd204e728eb"
+        ],
+        "newTuple": null,
+        "before": {
+          "claimId": "claim_0b9fcf0a1a07c29e6ae48f02d7f5dc59",
+          "path": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+          "anchor": "unheaded-block-13",
+          "unitDigest": "a6662af528d7186106b7dc978680ed96bcc4b7500854e3f4bfb8ddd204e728eb",
+          "status": "candidate-unverified",
+          "reviewStatus": "reviewed",
+          "authoredBy": "codex-session:unit-run-1792037090725-b6a675fa@2026-10-15",
+          "fileStatus": {
+            "kind": "vocabulary",
+            "kindCanonical": true,
+            "designStatus": "Candidate",
+            "authorityStatus": "candidate"
+          },
+          "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+          "reviewNote": "mechanical: digest recomputed from git blob at the pin (sha256 of raw block lines) equals shown digest; tuple byte-equal in the Agent list; file header Design status Candidate / kind vocabulary; not read in full",
+          "reviewedAt": "2026-10-15",
+          "reviewMode": "ordinary",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-1110-proposals-redesigns-candidates-0f063d18f.md",
+          "reviewReportCommit": "f5ca5d9e73b46d31bebf81e8e1cada96d022a09c"
+        },
+        "reason": "Historical native identity gap: no active unit with this claim id, no unique same-path content digest and no exact authored native successor. Historical membership is removed; any current occupant is independently admitted, never rebound by ordinal.",
+        "proof": {
+          "kind": "native-identity-gap",
+          "native": {
+            "sourcePath": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+            "unitDigest": "dfaa1d1ff9e96e3acd207cd169acef9f1fa12da6a91d8c349c4eb540d297a9a4",
+            "identityFingerprint": "dfaa1d1ff9e96e3acd207cd169acef9f1fa12da6a91d8c349c4eb540d297a9a4",
+            "claimId": "claim_0b9fcf0a1a07c29e6ae48f02d7f5dc59",
+            "sourceAnchor": "unheaded-block-13",
+            "unitKind": "unheaded-block",
+            "sourceUnitDigest": "a6662af528d7186106b7dc978680ed96bcc4b7500854e3f4bfb8ddd204e728eb",
+            "claimKind": "architecture",
+            "status": "future",
+            "identityStatus": "identity-gap",
+            "gapReason": "edited unit whose anchor unheaded-block-13 is not a stable heading anchor"
+          },
+          "existingDecisions": []
+        }
+      },
+      "reviewStatus": "pending",
+      "check": "Authenticate old tuple at f70ecf4ec, current membership/non-membership at content pin, and the exact native identity/content witness. Removal never asserts identity of a new ordinal occupant."
+    },
+    {
+      "entry": "c137",
+      "kind": "candidate-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-author-candidate-accounting.json",
+      "array": "candidateChanges",
+      "index": 137,
+      "proof": {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-whole-system-architecture.json",
+        "action": "remove",
+        "oldTuple": [
+          "claim_088901bb1c7d69b87da383ddce95fe18",
+          "docs/platform/component-boundary.md",
+          "unheaded-block-13",
+          "dd9bdd0cd63e539a2ae55a9d73c2ba85351ad2befc50c30551992df9f7efd894"
+        ],
+        "newTuple": null,
+        "before": {
+          "claimId": "claim_088901bb1c7d69b87da383ddce95fe18",
+          "path": "docs/platform/component-boundary.md",
+          "anchor": "unheaded-block-13",
+          "unitDigest": "dd9bdd0cd63e539a2ae55a9d73c2ba85351ad2befc50c30551992df9f7efd894",
+          "status": "candidate-unverified",
+          "reviewStatus": "reviewed",
+          "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+          "reviewedAt": "2026-10-15",
+          "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0710-whole-system-candidate-tuples.md",
+          "reviewReportCommit": "5f0403a0055a9cb50f9975cb74777fba3828eff4",
+          "reviewMode": "ordinary",
+          "reviewNote": "mechanical: text block unheaded-block-13 of component-boundary.md; unit re-extracted at the request commit, anchor found once, native tuple and shown digest dd9bdd0cd63e539a equal the request, sidecar and committed bytes; component-boundary.md declares Design status Draft (architecture), not promoted; before and current records identical. Unit digest hand-recomputed as sha256 of the block text, equal."
+        },
+        "reason": "Historical native identity gap: no active unit with this claim id, no unique same-path content digest and no exact authored native successor. Historical membership is removed; any current occupant is independently admitted, never rebound by ordinal.",
+        "proof": {
+          "kind": "native-identity-gap",
+          "native": {
+            "sourcePath": "docs/platform/component-boundary.md",
+            "unitDigest": "40c7c8b5cdd8b96a146005b37c78a53a4d1cccf9fe23403dd48ccbb5afb72b8d",
+            "identityFingerprint": "40c7c8b5cdd8b96a146005b37c78a53a4d1cccf9fe23403dd48ccbb5afb72b8d",
+            "claimId": "claim_088901bb1c7d69b87da383ddce95fe18",
+            "sourceAnchor": "unheaded-block-13",
+            "unitKind": "unheaded-block",
+            "sourceUnitDigest": "dd9bdd0cd63e539a2ae55a9d73c2ba85351ad2befc50c30551992df9f7efd894",
+            "claimKind": "contract",
+            "status": "future",
+            "identityStatus": "identity-gap",
+            "gapReason": "edited unit whose anchor unheaded-block-13 is not a stable heading anchor"
+          },
+          "existingDecisions": []
+        }
+      },
+      "reviewStatus": "pending",
+      "check": "Authenticate old tuple at f70ecf4ec, current membership/non-membership at content pin, and the exact native identity/content witness. Removal never asserts identity of a new ordinal occupant."
+    },
+    {
+      "entry": "c039",
+      "kind": "candidate-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-author-candidate-accounting.json",
+      "array": "candidateChanges",
+      "index": 39,
+      "proof": {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-host-invocation-routing.json",
+        "action": "remove",
+        "oldTuple": [
+          "claim_938bc277307728e0fe982e71e9fda2d9",
+          "docs/platform/host-invocation-routing/architecture/provider-routing.md",
+          "unheaded-block-7",
+          "05f96982ace4687583cc8dd90a8d2e3af67865001f0168fe1455ce0785a361de"
+        ],
+        "newTuple": null,
+        "before": {
+          "claimId": "claim_938bc277307728e0fe982e71e9fda2d9",
+          "path": "docs/platform/host-invocation-routing/architecture/provider-routing.md",
+          "anchor": "unheaded-block-7",
+          "unitDigest": "05f96982ace4687583cc8dd90a8d2e3af67865001f0168fe1455ce0785a361de",
+          "fileStatus": {
+            "kind": "architecture",
+            "kindCanonical": true,
+            "authorityStatus": "candidate",
+            "designStatus": "Draft",
+            "canonical": false,
+            "eligibility": "non-promoted Candidate/Draft"
+          },
+          "status": "candidate-unverified"
+        },
+        "reason": "Historical native identity gap: no active unit with this claim id, no unique same-path content digest and no exact authored native successor. Historical membership is removed; any current occupant is independently admitted, never rebound by ordinal.",
+        "proof": {
+          "kind": "native-identity-gap",
+          "native": {
+            "sourcePath": "docs/platform/host-invocation-routing/architecture/provider-routing.md",
+            "unitDigest": "327626e331c1c3a9599eb70bb70ce41b4d5f342ec790017f99e2f421745f3300",
+            "identityFingerprint": "327626e331c1c3a9599eb70bb70ce41b4d5f342ec790017f99e2f421745f3300",
+            "claimId": "claim_938bc277307728e0fe982e71e9fda2d9",
+            "sourceAnchor": "unheaded-block-7",
+            "unitKind": "unheaded-block",
+            "sourceUnitDigest": "05f96982ace4687583cc8dd90a8d2e3af67865001f0168fe1455ce0785a361de",
+            "claimKind": "architecture",
+            "status": "future",
+            "identityStatus": "identity-gap",
+            "gapReason": "edited unit whose anchor unheaded-block-7 is not a stable heading anchor"
+          },
+          "existingDecisions": []
+        }
+      },
+      "reviewStatus": "pending",
+      "check": "Authenticate old tuple at f70ecf4ec, current membership/non-membership at content pin, and the exact native identity/content witness. Removal never asserts identity of a new ordinal occupant."
+    },
+    {
+      "entry": "c110",
+      "kind": "candidate-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-author-candidate-accounting.json",
+      "array": "candidateChanges",
+      "index": 110,
+      "proof": {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-root-authorities.json",
+        "action": "remove",
+        "oldTuple": [
+          "claim_178bb22fcc32ae881dd170c17e2cb2ad",
+          "docs/platform/work-state/architecture/implementation-pointers.md",
+          "unheaded-block-1",
+          "d357d4a5224eaffb265d2bcf57b79347b4d4a7ef3ca5c998d31da3cc9f1d3d5b"
+        ],
+        "newTuple": null,
+        "before": {
+          "claimId": "claim_178bb22fcc32ae881dd170c17e2cb2ad",
+          "path": "docs/platform/work-state/architecture/implementation-pointers.md",
+          "anchor": "unheaded-block-1",
+          "unitDigest": "d357d4a5224eaffb265d2bcf57b79347b4d4a7ef3ca5c998d31da3cc9f1d3d5b",
+          "status": "candidate-unverified",
+          "fileStatus": {
+            "kind": "architecture",
+            "kindCanonical": true,
+            "designStatus": "Candidate",
+            "canonical": false,
+            "canonicalHeader": null,
+            "authorityStatus": "candidate"
+          }
+        },
+        "reason": "Historical native identity gap: no active unit with this claim id, no unique same-path content digest and no exact authored native successor. Historical membership is removed; any current occupant is independently admitted, never rebound by ordinal.",
+        "proof": {
+          "kind": "native-identity-gap",
+          "native": {
+            "sourcePath": "docs/platform/work-state/architecture/implementation-pointers.md",
+            "unitDigest": "e74cd274e1d0eaf6308c46fb75aefb305f703a6fd0e3bf88475a5bc9a9ac5f0f",
+            "identityFingerprint": "e74cd274e1d0eaf6308c46fb75aefb305f703a6fd0e3bf88475a5bc9a9ac5f0f",
+            "claimId": "claim_178bb22fcc32ae881dd170c17e2cb2ad",
+            "sourceAnchor": "unheaded-block-1",
+            "unitKind": "unheaded-block",
+            "sourceUnitDigest": "d357d4a5224eaffb265d2bcf57b79347b4d4a7ef3ca5c998d31da3cc9f1d3d5b",
+            "claimKind": "architecture",
+            "status": "future",
+            "identityStatus": "identity-gap",
+            "gapReason": "edited unit whose anchor unheaded-block-1 is not a stable heading anchor"
+          },
+          "existingDecisions": []
+        }
+      },
+      "reviewStatus": "pending",
+      "check": "Authenticate old tuple at f70ecf4ec, current membership/non-membership at content pin, and the exact native identity/content witness. Removal never asserts identity of a new ordinal occupant."
+    },
+    {
+      "entry": "c059",
+      "kind": "candidate-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-author-candidate-accounting.json",
+      "array": "candidateChanges",
+      "index": 59,
+      "proof": {
+        "file": "plans/260925-documentation-authority-unification/reports/phase-06/candidate-unverified-host-invocation-routing.json",
+        "action": "remove",
+        "oldTuple": [
+          "claim_5f905e257e65f6b7d73322ffc0fe640d",
+          "docs/platform/host-invocation-routing/contracts/README.md",
+          "unheaded-block-1",
+          "85a9c829d90c73055ad2dd4dee136f090ac288c5d8724a0d01bef64a7c664e34"
+        ],
+        "newTuple": null,
+        "before": {
+          "claimId": "claim_5f905e257e65f6b7d73322ffc0fe640d",
+          "path": "docs/platform/host-invocation-routing/contracts/README.md",
+          "anchor": "unheaded-block-1",
+          "unitDigest": "85a9c829d90c73055ad2dd4dee136f090ac288c5d8724a0d01bef64a7c664e34",
+          "fileStatus": {
+            "kind": "collection-index",
+            "kindCanonical": true,
+            "authorityStatus": "candidate",
+            "designStatus": "Draft",
+            "canonical": false,
+            "eligibility": "non-promoted Candidate/Draft"
+          },
+          "status": "candidate-unverified"
+        },
+        "reason": "Historical native identity gap: no active unit with this claim id, no unique same-path content digest and no exact authored native successor. Historical membership is removed; any current occupant is independently admitted, never rebound by ordinal.",
+        "proof": {
+          "kind": "native-identity-gap",
+          "native": {
+            "sourcePath": "docs/platform/host-invocation-routing/contracts/README.md",
+            "unitDigest": "0c45fd522351ac360b0d12cf6cab4d5e84824584aef9de7a76a1f931e9d8922a",
+            "identityFingerprint": "0c45fd522351ac360b0d12cf6cab4d5e84824584aef9de7a76a1f931e9d8922a",
+            "claimId": "claim_5f905e257e65f6b7d73322ffc0fe640d",
+            "sourceAnchor": "unheaded-block-1",
+            "unitKind": "unheaded-block",
+            "sourceUnitDigest": "85a9c829d90c73055ad2dd4dee136f090ac288c5d8724a0d01bef64a7c664e34",
+            "claimKind": "contract",
+            "status": "future",
+            "identityStatus": "identity-gap",
+            "gapReason": "edited unit whose anchor unheaded-block-1 is not a stable heading anchor"
+          },
+          "existingDecisions": []
+        }
+      },
+      "reviewStatus": "pending",
+      "check": "Authenticate old tuple at f70ecf4ec, current membership/non-membership at content pin, and the exact native identity/content witness. Removal never asserts identity of a new ordinal occupant."
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "freshOutputDirectory": "/tmp/fgos-work/package-portable-final",
+  "materializedFrom": "step10-package-reproduction.json",
+  "results": [
+    {
+      "name": "expected",
+      "exitCode": 0,
+      "stderr": null
+    },
+    {
+      "name": "decision",
+      "exitCode": 0,
+      "stderr": null
+    },
+    {
+      "name": "document",
+      "exitCode": 0,
+      "stderr": null
+    },
+    {
+      "name": "native",
+      "exitCode": 0,
+      "stderr": null
+    },
+    {
+      "name": "comparison",
+      "exitCode": 0,
+      "stderr": null
+    },
+    {
+      "name": "group",
+      "exitCode": 0,
+      "stderr": null
+    }
+  ]
+}

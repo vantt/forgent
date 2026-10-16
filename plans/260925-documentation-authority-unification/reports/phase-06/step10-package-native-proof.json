@@ -1,0 +1,108 @@
+{
+  "contentCommit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+  "syncSeconds": 665.599,
+  "items": 4486,
+  "claims": 91388,
+  "knownBefore": 99581,
+  "knownAfter": 99584,
+  "zeroKnownIDLoss": true,
+  "activeTupleEquality": true,
+  "persistenceCount": 1,
+  "compact": true,
+  "registryBytes": 62196419,
+  "registrySHA256": "6fcd58e6f7a2ea0f17df2b1c4024b2728dfa2d73dfc365278df3c3a1c964018c",
+  "carryForward": {
+    "fromCommit": "498048c1a6651556a0ae977a2871135b5ac7c945",
+    "toCommit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+    "oldUnits": 91388,
+    "newUnits": 91388,
+    "kept": 91008,
+    "paired": 374,
+    "moved": 0,
+    "editedKept": 3,
+    "added": 3,
+    "gaps": 3,
+    "retired": 0,
+    "retiredDocuments": 0
+  },
+  "newUnits": [
+    {
+      "sourcePath": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "unitDigest": "30148b4c0e53a517416cfc5fb1b22bc8dd7b6301c5f7f69ba51cb1a5cd4025ca",
+      "identityFingerprint": "30148b4c0e53a517416cfc5fb1b22bc8dd7b6301c5f7f69ba51cb1a5cd4025ca",
+      "claimId": "claim_87f236ae2e3356f5e23e70a7f7224242",
+      "sourceAnchor": "unheaded-block-3",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "59d70c7fd04f6212e5c8909a4bf8bca340c7aeb0f372547419ca80fbc74dd78a",
+      "claimKind": "architecture",
+      "status": "future",
+      "origin": "added-since-498048c1a6651556a0ae977a2871135b5ac7c945"
+    },
+    {
+      "sourcePath": "docs/platform/agent-coordination/architecture/run-handle.md",
+      "unitDigest": "fc59912d35eb78157c56d47b46235aa9955bf2e27ba7016f353a3a28de61ee1b",
+      "identityFingerprint": "fc59912d35eb78157c56d47b46235aa9955bf2e27ba7016f353a3a28de61ee1b",
+      "claimId": "claim_9d5d0b39286fb978c6de4bbc09e75adb",
+      "sourceAnchor": "unheaded-block-3",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "1f25a51f75e78cb32b002b7ccb303a916191d96c495a81235ebf1b7a8608f694",
+      "claimKind": "architecture",
+      "status": "future",
+      "origin": "added-since-498048c1a6651556a0ae977a2871135b5ac7c945"
+    },
+    {
+      "sourcePath": "docs/platform/session-identity/spec.md",
+      "unitDigest": "25baa5728093912506c0f8ea341b390b05b78bce671e213500c4fb899177ec0d",
+      "identityFingerprint": "25baa5728093912506c0f8ea341b390b05b78bce671e213500c4fb899177ec0d",
+      "claimId": "claim_3b20c21f7dd91fecef6382c16397c623",
+      "sourceAnchor": "unheaded-block-1",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "0ec0241bb11b9491bf96749ef3f292f590f7c2e9bc51913dc5b45f972e3cd716",
+      "claimKind": "specification",
+      "status": "future",
+      "origin": "added-since-498048c1a6651556a0ae977a2871135b5ac7c945"
+    }
+  ],
+  "newGaps": [
+    {
+      "sourcePath": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "unitDigest": "1a00d82edc7c6ea7214949d37aea4e0150f91057666c93f2ffb8a7e6a5175a53",
+      "identityFingerprint": "1a00d82edc7c6ea7214949d37aea4e0150f91057666c93f2ffb8a7e6a5175a53",
+      "claimId": "claim_35b6d8008541bef15edc061dade28c06",
+      "sourceAnchor": "unheaded-block-3",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
+      "claimKind": "architecture",
+      "status": "future",
+      "identityStatus": "identity-gap",
+      "gapReason": "edited unit whose anchor unheaded-block-3 is not a stable heading anchor"
+    },
+    {
+      "sourcePath": "docs/platform/agent-coordination/architecture/run-handle.md",
+      "unitDigest": "1a00d82edc7c6ea7214949d37aea4e0150f91057666c93f2ffb8a7e6a5175a53",
+      "identityFingerprint": "1a00d82edc7c6ea7214949d37aea4e0150f91057666c93f2ffb8a7e6a5175a53",
+      "claimId": "claim_2e2938c719ad58a967857c76c72850f1",
+      "sourceAnchor": "unheaded-block-3",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
+      "claimKind": "architecture",
+      "status": "future",
+      "identityStatus": "identity-gap",
+      "gapReason": "edited unit whose anchor unheaded-block-3 is not a stable heading anchor"
+    },
+    {
+      "sourcePath": "docs/platform/session-identity/spec.md",
+      "unitDigest": "3aa919f7324a1fa38463a76afa88326c73ceb462f692f4dc09e13ee3d47544a7",
+      "identityFingerprint": "3aa919f7324a1fa38463a76afa88326c73ceb462f692f4dc09e13ee3d47544a7",
+      "claimId": "claim_dceb439735340f734bb484d23c887dad",
+      "sourceAnchor": "unheaded-block-1",
+      "unitKind": "unheaded-block",
+      "sourceUnitDigest": "54ffebc5e7a158a6d273670146c1002dd8c6c08fea92f13a9b66f1c6e3efbb54",
+      "claimKind": "specification",
+      "status": "future",
+      "identityStatus": "identity-gap",
+      "gapReason": "edited unit whose anchor unheaded-block-1 is not a stable heading anchor"
+    }
+  ],
+  "newRetired": []
+}

@@ -1,0 +1,1711 @@
+{
+  "contentCommit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+  "producer": "codex-session:unit-run-1792169760182-e3acba42@2026-10-16",
+  "mode": "ordinary",
+  "entries": [
+    {
+      "entry": "n01",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 1,
+      "proof": {
+        "collection": "metadata",
+        "key": "_binding",
+        "kind": "changed",
+        "before": {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+          "bytes": 62185030,
+          "sha256": "1f5325ff1b1c2012c06aaf17b805c3f4fc2527923742271dff3d77e10707989e"
+        },
+        "after": {
+          "path": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+          "bytes": 62198395,
+          "sha256": "b7b7c94cca23f863ab3d5bb052d9ef0f66fd754bed9cd09de95b757b3b5116ac"
+        },
+        "changedFields": [
+          "bytes",
+          "sha256"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n02",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 2,
+      "proof": {
+        "collection": "metadata",
+        "key": "carriedFromCommit",
+        "kind": "changed",
+        "before": "ade5812a9f444f895185594aedc1f73cf8b2288a",
+        "after": "498048c1a6651556a0ae977a2871135b5ac7c945",
+        "changedFields": []
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n03",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 3,
+      "proof": {
+        "collection": "metadata",
+        "key": "carryForward",
+        "kind": "changed",
+        "before": {
+          "fromCommit": "ade5812a9f444f895185594aedc1f73cf8b2288a",
+          "toCommit": "498048c1a6651556a0ae977a2871135b5ac7c945",
+          "oldUnits": 91386,
+          "newUnits": 91388,
+          "kept": 90990,
+          "paired": 374,
+          "moved": 0,
+          "editedKept": 10,
+          "added": 14,
+          "gaps": 12,
+          "retired": 0,
+          "retiredDocuments": 0
+        },
+        "after": {
+          "fromCommit": "498048c1a6651556a0ae977a2871135b5ac7c945",
+          "toCommit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+          "oldUnits": 91388,
+          "newUnits": 91388,
+          "kept": 91008,
+          "paired": 374,
+          "moved": 0,
+          "editedKept": 3,
+          "added": 3,
+          "gaps": 3,
+          "retired": 0,
+          "retiredDocuments": 0
+        },
+        "changedFields": [
+          "added",
+          "editedKept",
+          "fromCommit",
+          "gaps",
+          "kept",
+          "oldUnits",
+          "toCommit"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n04",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 4,
+      "proof": {
+        "collection": "metadata",
+        "key": "commit",
+        "kind": "changed",
+        "before": "498048c1a6651556a0ae977a2871135b5ac7c945",
+        "after": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+        "changedFields": []
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n05",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 5,
+      "proof": {
+        "collection": "units",
+        "key": "claim_0fa55480c276f05a190ac7c866632f9e",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+          "unitDigest": "ab506b8d2df15cb275914e2f7c92d098a7043c781e5c1203bef95cda6de4d4d8",
+          "identityFingerprint": "ab506b8d2df15cb275914e2f7c92d098a7043c781e5c1203bef95cda6de4d4d8",
+          "claimId": "claim_0fa55480c276f05a190ac7c866632f9e",
+          "sourceAnchor": "unheaded-block-14",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "67f9f91fe484e41c014e151aaee4856f8aba43c473e42ffa3428d00e693db22c",
+          "claimKind": "unclassified",
+          "status": "future",
+          "origin": "added-since-ade5812a9f444f895185594aedc1f73cf8b2288a"
+        },
+        "after": {
+          "sourcePath": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+          "unitDigest": "ab506b8d2df15cb275914e2f7c92d098a7043c781e5c1203bef95cda6de4d4d8",
+          "identityFingerprint": "ab506b8d2df15cb275914e2f7c92d098a7043c781e5c1203bef95cda6de4d4d8",
+          "claimId": "claim_0fa55480c276f05a190ac7c866632f9e",
+          "sourceAnchor": "unheaded-block-14",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "67f9f91fe484e41c014e151aaee4856f8aba43c473e42ffa3428d00e693db22c",
+          "claimKind": "unclassified",
+          "status": "future"
+        },
+        "changedFields": [
+          "origin"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n06",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 6,
+      "proof": {
+        "collection": "units",
+        "key": "claim_18e6220e1e54f07c5754d1f5cc61187f",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/platform/runner/architecture/h-69197b459754.md",
+          "unitDigest": "07e8b7a8f8522eb37c2a8aea63ff636e995355fc9cfd93e500c9a17760998c00",
+          "identityFingerprint": "07e8b7a8f8522eb37c2a8aea63ff636e995355fc9cfd93e500c9a17760998c00",
+          "claimId": "claim_18e6220e1e54f07c5754d1f5cc61187f",
+          "sourceAnchor": "unheaded-block-5",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "75a73f547e8e94133e10c4e8a503a4be54ab173417f1b7fe4b8bf54555507a53",
+          "claimKind": "architecture",
+          "status": "future",
+          "origin": "added-since-ade5812a9f444f895185594aedc1f73cf8b2288a"
+        },
+        "after": {
+          "sourcePath": "docs/platform/runner/architecture/h-69197b459754.md",
+          "unitDigest": "07e8b7a8f8522eb37c2a8aea63ff636e995355fc9cfd93e500c9a17760998c00",
+          "identityFingerprint": "07e8b7a8f8522eb37c2a8aea63ff636e995355fc9cfd93e500c9a17760998c00",
+          "claimId": "claim_18e6220e1e54f07c5754d1f5cc61187f",
+          "sourceAnchor": "unheaded-block-5",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "75a73f547e8e94133e10c4e8a503a4be54ab173417f1b7fe4b8bf54555507a53",
+          "claimKind": "architecture",
+          "status": "future"
+        },
+        "changedFields": [
+          "origin"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n07",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 7,
+      "proof": {
+        "collection": "units",
+        "key": "claim_2e2938c719ad58a967857c76c72850f1",
+        "kind": "removed",
+        "before": {
+          "sourcePath": "docs/platform/agent-coordination/architecture/run-handle.md",
+          "unitDigest": "1a00d82edc7c6ea7214949d37aea4e0150f91057666c93f2ffb8a7e6a5175a53",
+          "identityFingerprint": "1a00d82edc7c6ea7214949d37aea4e0150f91057666c93f2ffb8a7e6a5175a53",
+          "claimId": "claim_2e2938c719ad58a967857c76c72850f1",
+          "sourceAnchor": "unheaded-block-3",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
+          "claimKind": "architecture",
+          "status": "future"
+        },
+        "after": null,
+        "changedFields": [
+          "claimId",
+          "claimKind",
+          "identityFingerprint",
+          "sourceAnchor",
+          "sourcePath",
+          "sourceUnitDigest",
+          "status",
+          "unitDigest",
+          "unitKind"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n08",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 8,
+      "proof": {
+        "collection": "units",
+        "key": "claim_35a5dbff0280f3ec835d94703f9f8151",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/architecture-manifest.json",
+          "unitDigest": "67c1b8cb95183cf31ddc23488a21df07dd360a01d5ccf95cd9c0d520e0e6e862",
+          "identityFingerprint": "67c1b8cb95183cf31ddc23488a21df07dd360a01d5ccf95cd9c0d520e0e6e862",
+          "claimId": "claim_35a5dbff0280f3ec835d94703f9f8151",
+          "sourceAnchor": "file-block",
+          "unitKind": "file-block",
+          "sourceUnitDigest": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
+          "claimKind": "contract",
+          "status": "future",
+          "origin": "added-since-ade5812a9f444f895185594aedc1f73cf8b2288a"
+        },
+        "after": {
+          "sourcePath": "docs/architecture-manifest.json",
+          "unitDigest": "67c1b8cb95183cf31ddc23488a21df07dd360a01d5ccf95cd9c0d520e0e6e862",
+          "identityFingerprint": "67c1b8cb95183cf31ddc23488a21df07dd360a01d5ccf95cd9c0d520e0e6e862",
+          "claimId": "claim_35a5dbff0280f3ec835d94703f9f8151",
+          "sourceAnchor": "file-block",
+          "unitKind": "file-block",
+          "sourceUnitDigest": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
+          "claimKind": "contract",
+          "status": "future"
+        },
+        "changedFields": [
+          "origin"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n09",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 9,
+      "proof": {
+        "collection": "units",
+        "key": "claim_35b6d8008541bef15edc061dade28c06",
+        "kind": "removed",
+        "before": {
+          "sourcePath": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+          "unitDigest": "1a00d82edc7c6ea7214949d37aea4e0150f91057666c93f2ffb8a7e6a5175a53",
+          "identityFingerprint": "1a00d82edc7c6ea7214949d37aea4e0150f91057666c93f2ffb8a7e6a5175a53",
+          "claimId": "claim_35b6d8008541bef15edc061dade28c06",
+          "sourceAnchor": "unheaded-block-3",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
+          "claimKind": "architecture",
+          "status": "future"
+        },
+        "after": null,
+        "changedFields": [
+          "claimId",
+          "claimKind",
+          "identityFingerprint",
+          "sourceAnchor",
+          "sourcePath",
+          "sourceUnitDigest",
+          "status",
+          "unitDigest",
+          "unitKind"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n10",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 10,
+      "proof": {
+        "collection": "units",
+        "key": "claim_383a6485c1aaed79a640a59463183fe8",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/specs/runner.md",
+          "unitDigest": "fcbec7af428f6773bab696a96bb017921473a6480fe262f0372464e590122fe6",
+          "identityFingerprint": "9994203f0129df5d90efa8caf5eb4382998caf92cb553ccb73a2b49824319bc8",
+          "claimId": "claim_383a6485c1aaed79a640a59463183fe8",
+          "sourceAnchor": "guard-reconciliation",
+          "unitKind": "heading",
+          "sourceUnitDigest": "42ab966efc78e26589453160b8a631996c393b84c94d6acd46e78e19029b63d6",
+          "claimKind": "specification",
+          "status": "current",
+          "reviewStatus": "needs-review",
+          "lineage": {
+            "fromCommit": "ade5812a9f444f895185594aedc1f73cf8b2288a",
+            "fromUnitDigest": "31b0465179a24758c4df8881812c1cb7aa10d3cb4d16c37bd6abb5065c458b2a",
+            "toUnitDigest": "fcbec7af428f6773bab696a96bb017921473a6480fe262f0372464e590122fe6",
+            "fromSourceUnitDigest": "16c2b3dace9daab9a6d90e29bd7f00fbad2c313cbedb0e28ed031664fa81b255",
+            "toSourceUnitDigest": "42ab966efc78e26589453160b8a631996c393b84c94d6acd46e78e19029b63d6"
+          }
+        },
+        "after": {
+          "sourcePath": "docs/specs/runner.md",
+          "unitDigest": "fcbec7af428f6773bab696a96bb017921473a6480fe262f0372464e590122fe6",
+          "identityFingerprint": "9994203f0129df5d90efa8caf5eb4382998caf92cb553ccb73a2b49824319bc8",
+          "claimId": "claim_383a6485c1aaed79a640a59463183fe8",
+          "sourceAnchor": "guard-reconciliation",
+          "unitKind": "heading",
+          "sourceUnitDigest": "42ab966efc78e26589453160b8a631996c393b84c94d6acd46e78e19029b63d6",
+          "claimKind": "specification",
+          "status": "current"
+        },
+        "changedFields": [
+          "lineage",
+          "reviewStatus"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n11",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 11,
+      "proof": {
+        "collection": "units",
+        "key": "claim_3883003faea82c5a23d576a5fd4d627c",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/specs/runner.md",
+          "unitDigest": "07e8b7a8f8522eb37c2a8aea63ff636e995355fc9cfd93e500c9a17760998c00",
+          "identityFingerprint": "07e8b7a8f8522eb37c2a8aea63ff636e995355fc9cfd93e500c9a17760998c00",
+          "claimId": "claim_3883003faea82c5a23d576a5fd4d627c",
+          "sourceAnchor": "unheaded-block-119",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "75a73f547e8e94133e10c4e8a503a4be54ab173417f1b7fe4b8bf54555507a53",
+          "claimKind": "specification",
+          "status": "current",
+          "origin": "added-since-ade5812a9f444f895185594aedc1f73cf8b2288a"
+        },
+        "after": {
+          "sourcePath": "docs/specs/runner.md",
+          "unitDigest": "07e8b7a8f8522eb37c2a8aea63ff636e995355fc9cfd93e500c9a17760998c00",
+          "identityFingerprint": "07e8b7a8f8522eb37c2a8aea63ff636e995355fc9cfd93e500c9a17760998c00",
+          "claimId": "claim_3883003faea82c5a23d576a5fd4d627c",
+          "sourceAnchor": "unheaded-block-119",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "75a73f547e8e94133e10c4e8a503a4be54ab173417f1b7fe4b8bf54555507a53",
+          "claimKind": "specification",
+          "status": "current"
+        },
+        "changedFields": [
+          "origin"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n12",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 12,
+      "proof": {
+        "collection": "units",
+        "key": "claim_39c66e391d621f2df14c19a014dfdbd6",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/platform/packaging-distribution/spec.md",
+          "unitDigest": "54303a6e71149df37bc1312e873a6afddc67fb267ff8697ed64d4e82bc5c909d",
+          "identityFingerprint": "24e17c40142c4e027dfb0e219cc540fd90c22d3a47fa07b3d13da486140dcba2",
+          "claimId": "claim_39c66e391d621f2df14c19a014dfdbd6",
+          "sourceAnchor": "lịch-sử-quyết-định",
+          "unitKind": "heading",
+          "sourceUnitDigest": "aa23ac1936263d65e45dba048c4949930715c52c31a30290b3eff845d39200fa",
+          "claimKind": "specification",
+          "status": "future",
+          "reviewStatus": "needs-review",
+          "lineage": {
+            "fromCommit": "ade5812a9f444f895185594aedc1f73cf8b2288a",
+            "fromUnitDigest": "e1a7ad73753ef71389387b0843a965d0ed6b33ac4fa56fbe98f6f3a4f4ee2678",
+            "toUnitDigest": "54303a6e71149df37bc1312e873a6afddc67fb267ff8697ed64d4e82bc5c909d",
+            "fromSourceUnitDigest": "75835bc044b19fbcddfbe17788fe06579ba39bf2c99d1b381aa810e6390a9726",
+            "toSourceUnitDigest": "aa23ac1936263d65e45dba048c4949930715c52c31a30290b3eff845d39200fa"
+          }
+        },
+        "after": {
+          "sourcePath": "docs/platform/packaging-distribution/spec.md",
+          "unitDigest": "54303a6e71149df37bc1312e873a6afddc67fb267ff8697ed64d4e82bc5c909d",
+          "identityFingerprint": "24e17c40142c4e027dfb0e219cc540fd90c22d3a47fa07b3d13da486140dcba2",
+          "claimId": "claim_39c66e391d621f2df14c19a014dfdbd6",
+          "sourceAnchor": "lịch-sử-quyết-định",
+          "unitKind": "heading",
+          "sourceUnitDigest": "aa23ac1936263d65e45dba048c4949930715c52c31a30290b3eff845d39200fa",
+          "claimKind": "specification",
+          "status": "future"
+        },
+        "changedFields": [
+          "lineage",
+          "reviewStatus"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n13",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 13,
+      "proof": {
+        "collection": "units",
+        "key": "claim_39e8bffc8c5b0e8befcf80a389804953",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/how-to/operate-dispatch-runtime-inspection-and-reconciliation.md",
+          "unitDigest": "a9a6ae8afaa6b069cbcf33cc8ac031dd168fc198758b0bcd4c41369faadc7b28",
+          "identityFingerprint": "32ab6e6060a8057d1776a321ab634f4600752e56214d69a0a991e2ef7c3a442f",
+          "claimId": "claim_39e8bffc8c5b0e8befcf80a389804953",
+          "sourceAnchor": "plan-reconciliation",
+          "unitKind": "heading",
+          "sourceUnitDigest": "8b2da672cd9f9955e40fe2663cba7f8b51c23ad981c3fea10af5d96dbf8d21b5",
+          "claimKind": "unclassified",
+          "status": "future",
+          "reviewStatus": "needs-review",
+          "lineage": {
+            "fromCommit": "ade5812a9f444f895185594aedc1f73cf8b2288a",
+            "fromUnitDigest": "23d4a2fd85251c1dea84d37bd6767919e9c1e3e916438ebb77af77f8a9dcf629",
+            "toUnitDigest": "a9a6ae8afaa6b069cbcf33cc8ac031dd168fc198758b0bcd4c41369faadc7b28",
+            "fromSourceUnitDigest": "d6f1f0dd3a8e56efd74a07eb446bd856fc83b0e5ee83e010c6c7898e8244e9b5",
+            "toSourceUnitDigest": "8b2da672cd9f9955e40fe2663cba7f8b51c23ad981c3fea10af5d96dbf8d21b5"
+          }
+        },
+        "after": {
+          "sourcePath": "docs/how-to/operate-dispatch-runtime-inspection-and-reconciliation.md",
+          "unitDigest": "a9a6ae8afaa6b069cbcf33cc8ac031dd168fc198758b0bcd4c41369faadc7b28",
+          "identityFingerprint": "32ab6e6060a8057d1776a321ab634f4600752e56214d69a0a991e2ef7c3a442f",
+          "claimId": "claim_39e8bffc8c5b0e8befcf80a389804953",
+          "sourceAnchor": "plan-reconciliation",
+          "unitKind": "heading",
+          "sourceUnitDigest": "8b2da672cd9f9955e40fe2663cba7f8b51c23ad981c3fea10af5d96dbf8d21b5",
+          "claimKind": "unclassified",
+          "status": "future"
+        },
+        "changedFields": [
+          "lineage",
+          "reviewStatus"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n14",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 14,
+      "proof": {
+        "collection": "units",
+        "key": "claim_3b20c21f7dd91fecef6382c16397c623",
+        "kind": "added",
+        "before": null,
+        "after": {
+          "sourcePath": "docs/platform/session-identity/spec.md",
+          "unitDigest": "25baa5728093912506c0f8ea341b390b05b78bce671e213500c4fb899177ec0d",
+          "identityFingerprint": "25baa5728093912506c0f8ea341b390b05b78bce671e213500c4fb899177ec0d",
+          "claimId": "claim_3b20c21f7dd91fecef6382c16397c623",
+          "sourceAnchor": "unheaded-block-1",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "0ec0241bb11b9491bf96749ef3f292f590f7c2e9bc51913dc5b45f972e3cd716",
+          "claimKind": "specification",
+          "status": "future",
+          "origin": "added-since-498048c1a6651556a0ae977a2871135b5ac7c945"
+        },
+        "changedFields": [
+          "claimId",
+          "claimKind",
+          "identityFingerprint",
+          "origin",
+          "sourceAnchor",
+          "sourcePath",
+          "sourceUnitDigest",
+          "status",
+          "unitDigest",
+          "unitKind"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n15",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 15,
+      "proof": {
+        "collection": "units",
+        "key": "claim_47720e8dc7d54d433aeba2418c93098b",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/platform/session-identity/spec.md",
+          "unitDigest": "184ecd5327340d2f2bc4166b12cee436632d384caee990164f916c958d36e9d0",
+          "identityFingerprint": "c39c6eda757234b38208d4ef820070e8fb73c378c2cb4a4a01631c48488edaf0",
+          "claimId": "claim_47720e8dc7d54d433aeba2418c93098b",
+          "sourceAnchor": "session-identity-component-specification",
+          "unitKind": "heading",
+          "sourceUnitDigest": "edb2b14e9b84180246823708126e1dbc05f8f2ca57c9a8cce045685960224ce1",
+          "claimKind": "architecture",
+          "status": "future"
+        },
+        "after": {
+          "sourcePath": "docs/platform/session-identity/spec.md",
+          "unitDigest": "e33e44e581a9f4afe71330474cd4301751afa7fba17a75f8da172e55e51bef20",
+          "identityFingerprint": "0269907614ae65aa698d168a28464caee52b578165dcdc9953daec455614b6c4",
+          "claimId": "claim_47720e8dc7d54d433aeba2418c93098b",
+          "sourceAnchor": "session-identity-component-specification",
+          "unitKind": "heading",
+          "sourceUnitDigest": "94917454a42ee413d6555c49f5c86c513d9165ec0ff6ed0924e29634d72a8582",
+          "claimKind": "architecture",
+          "status": "future",
+          "reviewStatus": "needs-review",
+          "lineage": {
+            "fromCommit": "498048c1a6651556a0ae977a2871135b5ac7c945",
+            "fromUnitDigest": "184ecd5327340d2f2bc4166b12cee436632d384caee990164f916c958d36e9d0",
+            "toUnitDigest": "e33e44e581a9f4afe71330474cd4301751afa7fba17a75f8da172e55e51bef20",
+            "fromSourceUnitDigest": "edb2b14e9b84180246823708126e1dbc05f8f2ca57c9a8cce045685960224ce1",
+            "toSourceUnitDigest": "94917454a42ee413d6555c49f5c86c513d9165ec0ff6ed0924e29634d72a8582"
+          }
+        },
+        "changedFields": [
+          "identityFingerprint",
+          "lineage",
+          "reviewStatus",
+          "sourceUnitDigest",
+          "unitDigest"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n16",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 16,
+      "proof": {
+        "collection": "units",
+        "key": "claim_4eeb2f406288458e61bad21531966ab1",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/specs/distribution.md",
+          "unitDigest": "3e5702120075fce2d14df8f06b46c6222d413a6571daca63be4b825e13ccdddf",
+          "identityFingerprint": "7ef557db4234046af14a1b492392cb69ace9f7ba74e0ecba0164438c21dabb10",
+          "claimId": "claim_4eeb2f406288458e61bad21531966ab1",
+          "sourceAnchor": "data-dictionary",
+          "unitKind": "heading",
+          "sourceUnitDigest": "fcbd92b190383feb2779a6eec9d86e6f67e881b30840fa490b7230c69c09e09d",
+          "claimKind": "specification",
+          "status": "current",
+          "reviewStatus": "needs-review",
+          "lineage": {
+            "fromCommit": "ade5812a9f444f895185594aedc1f73cf8b2288a",
+            "fromUnitDigest": "6f5ebbe0d4bf45bbe61a46b082fc8d84f95e120f7e62f8c01c8af86ff1d7e3fb",
+            "toUnitDigest": "3e5702120075fce2d14df8f06b46c6222d413a6571daca63be4b825e13ccdddf",
+            "fromSourceUnitDigest": "04f89e98512b5fd7af474ab2abbf362b9a0d30a25b5a911d011037539b3a9d3f",
+            "toSourceUnitDigest": "fcbd92b190383feb2779a6eec9d86e6f67e881b30840fa490b7230c69c09e09d"
+          }
+        },
+        "after": {
+          "sourcePath": "docs/specs/distribution.md",
+          "unitDigest": "3e5702120075fce2d14df8f06b46c6222d413a6571daca63be4b825e13ccdddf",
+          "identityFingerprint": "7ef557db4234046af14a1b492392cb69ace9f7ba74e0ecba0164438c21dabb10",
+          "claimId": "claim_4eeb2f406288458e61bad21531966ab1",
+          "sourceAnchor": "data-dictionary",
+          "unitKind": "heading",
+          "sourceUnitDigest": "fcbd92b190383feb2779a6eec9d86e6f67e881b30840fa490b7230c69c09e09d",
+          "claimKind": "specification",
+          "status": "current"
+        },
+        "changedFields": [
+          "lineage",
+          "reviewStatus"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n17",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 17,
+      "proof": {
+        "collection": "units",
+        "key": "claim_53e415a9b7534fe99249c5d0e0b6539c",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/platform/runner/architecture/h-69197b459754.md",
+          "unitDigest": "208ef82f369a7c09db460111fa79b9172be887f5bc515c61d407a25a39ffc910",
+          "identityFingerprint": "976c5fdbad0710eee6454392c4445f470b1f648a1f9dfa67b90fc15d6db276a6",
+          "claimId": "claim_53e415a9b7534fe99249c5d0e0b6539c",
+          "sourceAnchor": "dispatch-operability-implementation-slice-2026-09-16",
+          "unitKind": "heading",
+          "sourceUnitDigest": "c7040697a3027c20e21f5ded2fc574689980ee6b1f5016fdbfc7bbef87ea7db5",
+          "claimKind": "architecture",
+          "status": "future",
+          "reviewStatus": "needs-review",
+          "lineage": {
+            "fromCommit": "ade5812a9f444f895185594aedc1f73cf8b2288a",
+            "fromUnitDigest": "11bb9ba599ba3e301c87b27ec1aa7712ee470a3df5c0cf86de3da492743eee07",
+            "toUnitDigest": "208ef82f369a7c09db460111fa79b9172be887f5bc515c61d407a25a39ffc910",
+            "fromSourceUnitDigest": "4200a6cf61ccb7c1ffb502add937aa1762d55724f4d32f243a41c6bb9fefa871",
+            "toSourceUnitDigest": "c7040697a3027c20e21f5ded2fc574689980ee6b1f5016fdbfc7bbef87ea7db5"
+          }
+        },
+        "after": {
+          "sourcePath": "docs/platform/runner/architecture/h-69197b459754.md",
+          "unitDigest": "208ef82f369a7c09db460111fa79b9172be887f5bc515c61d407a25a39ffc910",
+          "identityFingerprint": "976c5fdbad0710eee6454392c4445f470b1f648a1f9dfa67b90fc15d6db276a6",
+          "claimId": "claim_53e415a9b7534fe99249c5d0e0b6539c",
+          "sourceAnchor": "dispatch-operability-implementation-slice-2026-09-16",
+          "unitKind": "heading",
+          "sourceUnitDigest": "c7040697a3027c20e21f5ded2fc574689980ee6b1f5016fdbfc7bbef87ea7db5",
+          "claimKind": "architecture",
+          "status": "future"
+        },
+        "changedFields": [
+          "lineage",
+          "reviewStatus"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n18",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 18,
+      "proof": {
+        "collection": "units",
+        "key": "claim_54d2ff6d9214b5612db7b830aa249b2e",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/platform/packaging-distribution/spec.md",
+          "unitDigest": "5fe6ec8118995d5bae6c9cf9d97c07c3f116a21d8520816aacf1828b68c6608e",
+          "identityFingerprint": "5fe6ec8118995d5bae6c9cf9d97c07c3f116a21d8520816aacf1828b68c6608e",
+          "claimId": "claim_54d2ff6d9214b5612db7b830aa249b2e",
+          "sourceAnchor": "unheaded-block-85",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "00a3412a5974cb6c7e2d4f51aadd36437162cdc3bf4a92e4dc781ec0f334ed1d",
+          "claimKind": "specification",
+          "status": "future",
+          "origin": "added-since-ade5812a9f444f895185594aedc1f73cf8b2288a"
+        },
+        "after": {
+          "sourcePath": "docs/platform/packaging-distribution/spec.md",
+          "unitDigest": "5fe6ec8118995d5bae6c9cf9d97c07c3f116a21d8520816aacf1828b68c6608e",
+          "identityFingerprint": "5fe6ec8118995d5bae6c9cf9d97c07c3f116a21d8520816aacf1828b68c6608e",
+          "claimId": "claim_54d2ff6d9214b5612db7b830aa249b2e",
+          "sourceAnchor": "unheaded-block-85",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "00a3412a5974cb6c7e2d4f51aadd36437162cdc3bf4a92e4dc781ec0f334ed1d",
+          "claimKind": "specification",
+          "status": "future"
+        },
+        "changedFields": [
+          "origin"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n19",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 19,
+      "proof": {
+        "collection": "units",
+        "key": "claim_55b85c1d204ea6a7b336fd6b066fc4f1",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/specs/runner.md",
+          "unitDigest": "3a0cc4520dfc05108e10b2f44afdefbe41af848d0bb0ff22d729db6767bdfcd4",
+          "identityFingerprint": "157436a8e4ad9ccc9f1ce147a74fd35b0651244abd6857a8ee12b47317f82414",
+          "claimId": "claim_55b85c1d204ea6a7b336fd6b066fc4f1",
+          "sourceAnchor": "dispatch-operability-implementation-slice-2026-09-16",
+          "unitKind": "heading",
+          "sourceUnitDigest": "020a15e1469e9d8f87b2295cc7ea3ca73da8fdda1dd62ff82b49a403fdb086f5",
+          "claimKind": "specification",
+          "status": "current",
+          "reviewStatus": "needs-review",
+          "lineage": {
+            "fromCommit": "ade5812a9f444f895185594aedc1f73cf8b2288a",
+            "fromUnitDigest": "0d0147733a63186a0883228eff2c5a5cd46e848958813fe1390c484607acc071",
+            "toUnitDigest": "3a0cc4520dfc05108e10b2f44afdefbe41af848d0bb0ff22d729db6767bdfcd4",
+            "fromSourceUnitDigest": "aaec88b66425149e842fe7c507cd3dd0beaee9d3e0ecde88fa805637967d2f10",
+            "toSourceUnitDigest": "020a15e1469e9d8f87b2295cc7ea3ca73da8fdda1dd62ff82b49a403fdb086f5"
+          }
+        },
+        "after": {
+          "sourcePath": "docs/specs/runner.md",
+          "unitDigest": "3a0cc4520dfc05108e10b2f44afdefbe41af848d0bb0ff22d729db6767bdfcd4",
+          "identityFingerprint": "157436a8e4ad9ccc9f1ce147a74fd35b0651244abd6857a8ee12b47317f82414",
+          "claimId": "claim_55b85c1d204ea6a7b336fd6b066fc4f1",
+          "sourceAnchor": "dispatch-operability-implementation-slice-2026-09-16",
+          "unitKind": "heading",
+          "sourceUnitDigest": "020a15e1469e9d8f87b2295cc7ea3ca73da8fdda1dd62ff82b49a403fdb086f5",
+          "claimKind": "specification",
+          "status": "current"
+        },
+        "changedFields": [
+          "lineage",
+          "reviewStatus"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n20",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 20,
+      "proof": {
+        "collection": "units",
+        "key": "claim_580793ae55c06a4891f1f902939145c4",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/specs/distribution.md",
+          "unitDigest": "83d0e6ae090d097618304293a869f795b5d52d3ea260ec6bc5426783f4b13381",
+          "identityFingerprint": "83d0e6ae090d097618304293a869f795b5d52d3ea260ec6bc5426783f4b13381",
+          "claimId": "claim_580793ae55c06a4891f1f902939145c4",
+          "sourceAnchor": "unheaded-block-15",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "87f98a72908fb6991a3cd9bdf8c1407373d72b039ad1b3e83a35a89a2a87d299",
+          "claimKind": "specification",
+          "status": "current",
+          "origin": "added-since-ade5812a9f444f895185594aedc1f73cf8b2288a"
+        },
+        "after": {
+          "sourcePath": "docs/specs/distribution.md",
+          "unitDigest": "83d0e6ae090d097618304293a869f795b5d52d3ea260ec6bc5426783f4b13381",
+          "identityFingerprint": "83d0e6ae090d097618304293a869f795b5d52d3ea260ec6bc5426783f4b13381",
+          "claimId": "claim_580793ae55c06a4891f1f902939145c4",
+          "sourceAnchor": "unheaded-block-15",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "87f98a72908fb6991a3cd9bdf8c1407373d72b039ad1b3e83a35a89a2a87d299",
+          "claimKind": "specification",
+          "status": "current"
+        },
+        "changedFields": [
+          "origin"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n21",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 21,
+      "proof": {
+        "collection": "units",
+        "key": "claim_5c7a41cb0091d5fa398c963b4f28b50d",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/platform/packaging-distribution/spec.md",
+          "unitDigest": "9ad0e34b7bf4554eab8c8bdd02fed7a689946c34cce67a2ca9839a5cd4256395",
+          "identityFingerprint": "ab460471d33c6c9d1250e39a1ad934276e8edcc20ad955cba582284bea178cf5",
+          "claimId": "claim_5c7a41cb0091d5fa398c963b4f28b50d",
+          "sourceAnchor": "data-dictionary",
+          "unitKind": "heading",
+          "sourceUnitDigest": "aa3ecf1c73f2625a3f371a732ad4a4468c9c5e5a3e74ac693e9af0d507454720",
+          "claimKind": "specification",
+          "status": "future",
+          "reviewStatus": "needs-review",
+          "lineage": {
+            "fromCommit": "ade5812a9f444f895185594aedc1f73cf8b2288a",
+            "fromUnitDigest": "76072d6308310a074a737f2b974014d8113b212829301afaa19088a2dd935001",
+            "toUnitDigest": "9ad0e34b7bf4554eab8c8bdd02fed7a689946c34cce67a2ca9839a5cd4256395",
+            "fromSourceUnitDigest": "3dd2d51fac193d78f712a83b2f0918c9f5f48a0e8eb65572afda4bb678b1de95",
+            "toSourceUnitDigest": "aa3ecf1c73f2625a3f371a732ad4a4468c9c5e5a3e74ac693e9af0d507454720"
+          }
+        },
+        "after": {
+          "sourcePath": "docs/platform/packaging-distribution/spec.md",
+          "unitDigest": "9ad0e34b7bf4554eab8c8bdd02fed7a689946c34cce67a2ca9839a5cd4256395",
+          "identityFingerprint": "ab460471d33c6c9d1250e39a1ad934276e8edcc20ad955cba582284bea178cf5",
+          "claimId": "claim_5c7a41cb0091d5fa398c963b4f28b50d",
+          "sourceAnchor": "data-dictionary",
+          "unitKind": "heading",
+          "sourceUnitDigest": "aa3ecf1c73f2625a3f371a732ad4a4468c9c5e5a3e74ac693e9af0d507454720",
+          "claimKind": "specification",
+          "status": "future"
+        },
+        "changedFields": [
+          "lineage",
+          "reviewStatus"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n22",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 22,
+      "proof": {
+        "collection": "units",
+        "key": "claim_7128e9202e4487a49758e98140b8c19a",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/how-to/operate-dispatch-runtime-inspection-and-reconciliation.md",
+          "unitDigest": "315dd41fb941e00fcbfe3d64e119541c365fdc553cab7e330d60e6e892936ff8",
+          "identityFingerprint": "315dd41fb941e00fcbfe3d64e119541c365fdc553cab7e330d60e6e892936ff8",
+          "claimId": "claim_7128e9202e4487a49758e98140b8c19a",
+          "sourceAnchor": "unheaded-block-9",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "18c3b2ef3b753051196c1aa174af453fb4c2cb14bbb6e71ad1659694f813e950",
+          "claimKind": "unclassified",
+          "status": "future",
+          "origin": "added-since-ade5812a9f444f895185594aedc1f73cf8b2288a"
+        },
+        "after": {
+          "sourcePath": "docs/how-to/operate-dispatch-runtime-inspection-and-reconciliation.md",
+          "unitDigest": "315dd41fb941e00fcbfe3d64e119541c365fdc553cab7e330d60e6e892936ff8",
+          "identityFingerprint": "315dd41fb941e00fcbfe3d64e119541c365fdc553cab7e330d60e6e892936ff8",
+          "claimId": "claim_7128e9202e4487a49758e98140b8c19a",
+          "sourceAnchor": "unheaded-block-9",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "18c3b2ef3b753051196c1aa174af453fb4c2cb14bbb6e71ad1659694f813e950",
+          "claimKind": "unclassified",
+          "status": "future"
+        },
+        "changedFields": [
+          "origin"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n23",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 23,
+      "proof": {
+        "collection": "units",
+        "key": "claim_7b8ebb8144ab632113046a7a6dbba680",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+          "unitDigest": "cd3da0a21cfd255db98547e16c87e33e2682f365d1c0d66e9dd9cc2eb7d0d8cf",
+          "identityFingerprint": "b67759f600fb731add46583ff0955d3d9e623fa8e140a67217f9a6fda2326b56",
+          "claimId": "claim_7b8ebb8144ab632113046a7a6dbba680",
+          "sourceAnchor": "coordination-rings",
+          "unitKind": "heading",
+          "sourceUnitDigest": "c1a3107f359fb34010a0f09ad1156aaa2be077954106517f738f6cbc073ad579",
+          "claimKind": "unclassified",
+          "status": "future",
+          "reviewStatus": "needs-review",
+          "lineage": {
+            "fromCommit": "ade5812a9f444f895185594aedc1f73cf8b2288a",
+            "fromUnitDigest": "093a41489968546b5cae4e588c2bbd318f2e69584e2c7c005c8549dc42669b66",
+            "toUnitDigest": "cd3da0a21cfd255db98547e16c87e33e2682f365d1c0d66e9dd9cc2eb7d0d8cf",
+            "fromSourceUnitDigest": "845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823",
+            "toSourceUnitDigest": "c1a3107f359fb34010a0f09ad1156aaa2be077954106517f738f6cbc073ad579"
+          }
+        },
+        "after": {
+          "sourcePath": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+          "unitDigest": "cd3da0a21cfd255db98547e16c87e33e2682f365d1c0d66e9dd9cc2eb7d0d8cf",
+          "identityFingerprint": "b67759f600fb731add46583ff0955d3d9e623fa8e140a67217f9a6fda2326b56",
+          "claimId": "claim_7b8ebb8144ab632113046a7a6dbba680",
+          "sourceAnchor": "coordination-rings",
+          "unitKind": "heading",
+          "sourceUnitDigest": "c1a3107f359fb34010a0f09ad1156aaa2be077954106517f738f6cbc073ad579",
+          "claimKind": "unclassified",
+          "status": "future"
+        },
+        "changedFields": [
+          "lineage",
+          "reviewStatus"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n24",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 24,
+      "proof": {
+        "collection": "units",
+        "key": "claim_87f236ae2e3356f5e23e70a7f7224242",
+        "kind": "added",
+        "before": null,
+        "after": {
+          "sourcePath": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+          "unitDigest": "30148b4c0e53a517416cfc5fb1b22bc8dd7b6301c5f7f69ba51cb1a5cd4025ca",
+          "identityFingerprint": "30148b4c0e53a517416cfc5fb1b22bc8dd7b6301c5f7f69ba51cb1a5cd4025ca",
+          "claimId": "claim_87f236ae2e3356f5e23e70a7f7224242",
+          "sourceAnchor": "unheaded-block-3",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "59d70c7fd04f6212e5c8909a4bf8bca340c7aeb0f372547419ca80fbc74dd78a",
+          "claimKind": "architecture",
+          "status": "future",
+          "origin": "added-since-498048c1a6651556a0ae977a2871135b5ac7c945"
+        },
+        "changedFields": [
+          "claimId",
+          "claimKind",
+          "identityFingerprint",
+          "origin",
+          "sourceAnchor",
+          "sourcePath",
+          "sourceUnitDigest",
+          "status",
+          "unitDigest",
+          "unitKind"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n25",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 25,
+      "proof": {
+        "collection": "units",
+        "key": "claim_8af62b949d9d3e77433b7fc8f72917cc",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/specs/runner.md",
+          "unitDigest": "fca642b22bfc06c8629351c01cb04c76ba850ece54d87ba0161b68869ea77b04",
+          "identityFingerprint": "fca642b22bfc06c8629351c01cb04c76ba850ece54d87ba0161b68869ea77b04",
+          "claimId": "claim_8af62b949d9d3e77433b7fc8f72917cc",
+          "sourceAnchor": "unheaded-block-3",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "bed7c5ea3ed1a7241f9271b44d6a8253d4ea89c082745eed076d3c5ab703d789",
+          "claimKind": "specification",
+          "status": "current",
+          "origin": "added-since-ade5812a9f444f895185594aedc1f73cf8b2288a"
+        },
+        "after": {
+          "sourcePath": "docs/specs/runner.md",
+          "unitDigest": "fca642b22bfc06c8629351c01cb04c76ba850ece54d87ba0161b68869ea77b04",
+          "identityFingerprint": "fca642b22bfc06c8629351c01cb04c76ba850ece54d87ba0161b68869ea77b04",
+          "claimId": "claim_8af62b949d9d3e77433b7fc8f72917cc",
+          "sourceAnchor": "unheaded-block-3",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "bed7c5ea3ed1a7241f9271b44d6a8253d4ea89c082745eed076d3c5ab703d789",
+          "claimKind": "specification",
+          "status": "current"
+        },
+        "changedFields": [
+          "origin"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n26",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 26,
+      "proof": {
+        "collection": "units",
+        "key": "claim_9b3b7fac64df06547dd06e05f4f026c5",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/backlog.md",
+          "unitDigest": "84458bb943e32f1355bac07b21217404e8d472ff91c1ec1dc486a7743dd8c9d6",
+          "identityFingerprint": "84458bb943e32f1355bac07b21217404e8d472ff91c1ec1dc486a7743dd8c9d6",
+          "claimId": "claim_9b3b7fac64df06547dd06e05f4f026c5",
+          "sourceAnchor": "unheaded-block-2",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "3430068fb5b1687e480e143bc34727fa7d6ada9f1342932c9fdd2f8b23c17da2",
+          "claimKind": "unclassified",
+          "status": "future",
+          "origin": "added-since-ade5812a9f444f895185594aedc1f73cf8b2288a"
+        },
+        "after": {
+          "sourcePath": "docs/backlog.md",
+          "unitDigest": "84458bb943e32f1355bac07b21217404e8d472ff91c1ec1dc486a7743dd8c9d6",
+          "identityFingerprint": "84458bb943e32f1355bac07b21217404e8d472ff91c1ec1dc486a7743dd8c9d6",
+          "claimId": "claim_9b3b7fac64df06547dd06e05f4f026c5",
+          "sourceAnchor": "unheaded-block-2",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "3430068fb5b1687e480e143bc34727fa7d6ada9f1342932c9fdd2f8b23c17da2",
+          "claimKind": "unclassified",
+          "status": "future"
+        },
+        "changedFields": [
+          "origin"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n27",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 27,
+      "proof": {
+        "collection": "units",
+        "key": "claim_9d5d0b39286fb978c6de4bbc09e75adb",
+        "kind": "added",
+        "before": null,
+        "after": {
+          "sourcePath": "docs/platform/agent-coordination/architecture/run-handle.md",
+          "unitDigest": "fc59912d35eb78157c56d47b46235aa9955bf2e27ba7016f353a3a28de61ee1b",
+          "identityFingerprint": "fc59912d35eb78157c56d47b46235aa9955bf2e27ba7016f353a3a28de61ee1b",
+          "claimId": "claim_9d5d0b39286fb978c6de4bbc09e75adb",
+          "sourceAnchor": "unheaded-block-3",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "1f25a51f75e78cb32b002b7ccb303a916191d96c495a81235ebf1b7a8608f694",
+          "claimKind": "architecture",
+          "status": "future",
+          "origin": "added-since-498048c1a6651556a0ae977a2871135b5ac7c945"
+        },
+        "changedFields": [
+          "claimId",
+          "claimKind",
+          "identityFingerprint",
+          "origin",
+          "sourceAnchor",
+          "sourcePath",
+          "sourceUnitDigest",
+          "status",
+          "unitDigest",
+          "unitKind"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n28",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 28,
+      "proof": {
+        "collection": "units",
+        "key": "claim_9d97a24e7d17ac4be484f2c75a5e116a",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/specs/distribution.md",
+          "unitDigest": "5fe6ec8118995d5bae6c9cf9d97c07c3f116a21d8520816aacf1828b68c6608e",
+          "identityFingerprint": "5fe6ec8118995d5bae6c9cf9d97c07c3f116a21d8520816aacf1828b68c6608e",
+          "claimId": "claim_9d97a24e7d17ac4be484f2c75a5e116a",
+          "sourceAnchor": "unheaded-block-5",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "00a3412a5974cb6c7e2d4f51aadd36437162cdc3bf4a92e4dc781ec0f334ed1d",
+          "claimKind": "specification",
+          "status": "current",
+          "origin": "added-since-ade5812a9f444f895185594aedc1f73cf8b2288a"
+        },
+        "after": {
+          "sourcePath": "docs/specs/distribution.md",
+          "unitDigest": "5fe6ec8118995d5bae6c9cf9d97c07c3f116a21d8520816aacf1828b68c6608e",
+          "identityFingerprint": "5fe6ec8118995d5bae6c9cf9d97c07c3f116a21d8520816aacf1828b68c6608e",
+          "claimId": "claim_9d97a24e7d17ac4be484f2c75a5e116a",
+          "sourceAnchor": "unheaded-block-5",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "00a3412a5974cb6c7e2d4f51aadd36437162cdc3bf4a92e4dc781ec0f334ed1d",
+          "claimKind": "specification",
+          "status": "current"
+        },
+        "changedFields": [
+          "origin"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n29",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 29,
+      "proof": {
+        "collection": "units",
+        "key": "claim_a1a323052194c5140b628b5f3861fa05",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/specs/distribution.md",
+          "unitDigest": "973bcba559e20f6846f6e1da5fb3c73b6a5e06cd813fbe4b63d37cb7b5b2b025",
+          "identityFingerprint": "61b8e5f02ab9df6eeaec7bf9eed5d26114af3cae683904d9a728903f7fce2702",
+          "claimId": "claim_a1a323052194c5140b628b5f3861fa05",
+          "sourceAnchor": "lịch-sử-quyết-định",
+          "unitKind": "heading",
+          "sourceUnitDigest": "bf462051b1d0486a12178695e54518b61a46423454a45f2d7a9ecd4e1e90d5bf",
+          "claimKind": "specification",
+          "status": "current",
+          "reviewStatus": "needs-review",
+          "lineage": {
+            "fromCommit": "ade5812a9f444f895185594aedc1f73cf8b2288a",
+            "fromUnitDigest": "68f42c7210f344bf686830af3362e44156667aaa23248d34d789d095f0106e7b",
+            "toUnitDigest": "973bcba559e20f6846f6e1da5fb3c73b6a5e06cd813fbe4b63d37cb7b5b2b025",
+            "fromSourceUnitDigest": "7d3b22dcbeba036ee788b91dd1409d06f722321a5b10851c97cd677654203743",
+            "toSourceUnitDigest": "bf462051b1d0486a12178695e54518b61a46423454a45f2d7a9ecd4e1e90d5bf"
+          }
+        },
+        "after": {
+          "sourcePath": "docs/specs/distribution.md",
+          "unitDigest": "973bcba559e20f6846f6e1da5fb3c73b6a5e06cd813fbe4b63d37cb7b5b2b025",
+          "identityFingerprint": "61b8e5f02ab9df6eeaec7bf9eed5d26114af3cae683904d9a728903f7fce2702",
+          "claimId": "claim_a1a323052194c5140b628b5f3861fa05",
+          "sourceAnchor": "lịch-sử-quyết-định",
+          "unitKind": "heading",
+          "sourceUnitDigest": "bf462051b1d0486a12178695e54518b61a46423454a45f2d7a9ecd4e1e90d5bf",
+          "claimKind": "specification",
+          "status": "current"
+        },
+        "changedFields": [
+          "lineage",
+          "reviewStatus"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n30",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 30,
+      "proof": {
+        "collection": "units",
+        "key": "claim_aceb6cd32c0737fd188a72b7582f4b04",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+          "unitDigest": "fbb81e86ae3da3650cd5af9c6a0312a831eca141f53fbe0be22f9dfad63be472",
+          "identityFingerprint": "fbb81e86ae3da3650cd5af9c6a0312a831eca141f53fbe0be22f9dfad63be472",
+          "claimId": "claim_aceb6cd32c0737fd188a72b7582f4b04",
+          "sourceAnchor": "unheaded-block-13",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "c83ac63a4a4e83300982f785d18cf976798bc12a439df80e994dc1e823790251",
+          "claimKind": "unclassified",
+          "status": "future",
+          "origin": "added-since-ade5812a9f444f895185594aedc1f73cf8b2288a"
+        },
+        "after": {
+          "sourcePath": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+          "unitDigest": "fbb81e86ae3da3650cd5af9c6a0312a831eca141f53fbe0be22f9dfad63be472",
+          "identityFingerprint": "fbb81e86ae3da3650cd5af9c6a0312a831eca141f53fbe0be22f9dfad63be472",
+          "claimId": "claim_aceb6cd32c0737fd188a72b7582f4b04",
+          "sourceAnchor": "unheaded-block-13",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "c83ac63a4a4e83300982f785d18cf976798bc12a439df80e994dc1e823790251",
+          "claimKind": "unclassified",
+          "status": "future"
+        },
+        "changedFields": [
+          "origin"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n31",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 31,
+      "proof": {
+        "collection": "units",
+        "key": "claim_b68d3dcef75b726c52655458154f4283",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/platform/contracts/architecture-manifest.json",
+          "unitDigest": "67c1b8cb95183cf31ddc23488a21df07dd360a01d5ccf95cd9c0d520e0e6e862",
+          "identityFingerprint": "67c1b8cb95183cf31ddc23488a21df07dd360a01d5ccf95cd9c0d520e0e6e862",
+          "claimId": "claim_b68d3dcef75b726c52655458154f4283",
+          "sourceAnchor": "file-block",
+          "unitKind": "file-block",
+          "sourceUnitDigest": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
+          "claimKind": "contract",
+          "status": "future",
+          "origin": "added-since-ade5812a9f444f895185594aedc1f73cf8b2288a"
+        },
+        "after": {
+          "sourcePath": "docs/platform/contracts/architecture-manifest.json",
+          "unitDigest": "67c1b8cb95183cf31ddc23488a21df07dd360a01d5ccf95cd9c0d520e0e6e862",
+          "identityFingerprint": "67c1b8cb95183cf31ddc23488a21df07dd360a01d5ccf95cd9c0d520e0e6e862",
+          "claimId": "claim_b68d3dcef75b726c52655458154f4283",
+          "sourceAnchor": "file-block",
+          "unitKind": "file-block",
+          "sourceUnitDigest": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
+          "claimKind": "contract",
+          "status": "future"
+        },
+        "changedFields": [
+          "origin"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n32",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 32,
+      "proof": {
+        "collection": "units",
+        "key": "claim_b6963c89796864ca59f82467d506f348",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+          "unitDigest": "2ef32787bed31abb089e8a71ad65e598717f83aef5f59c0f9f47736c5bc752df",
+          "identityFingerprint": "714e354d9336c412274465ea94730678e45384fc7541502d4d3e3defcbcdf024",
+          "claimId": "claim_b6963c89796864ca59f82467d506f348",
+          "sourceAnchor": "implementation-and-design-status",
+          "unitKind": "heading",
+          "sourceUnitDigest": "4fc22267739453739992bd7673b29eaa711de810b721bd915c28f58ec555cc0c",
+          "claimKind": "architecture",
+          "status": "future"
+        },
+        "after": {
+          "sourcePath": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+          "unitDigest": "64ad2fe38659742d6debea41fbdb62236e592ac2fd442f8c1737e423c1ef1d1a",
+          "identityFingerprint": "275e80f633d4ea169fb1ab51a863af7332b8244e2ec85f9a4d7fd7d8b596bd0a",
+          "claimId": "claim_b6963c89796864ca59f82467d506f348",
+          "sourceAnchor": "implementation-and-design-status",
+          "unitKind": "heading",
+          "sourceUnitDigest": "e9987e41f961ef6c8dc9e9e2b204eafc3ee98883460e98c0c18606ac0cc3a046",
+          "claimKind": "architecture",
+          "status": "future",
+          "reviewStatus": "needs-review",
+          "lineage": {
+            "fromCommit": "498048c1a6651556a0ae977a2871135b5ac7c945",
+            "fromUnitDigest": "2ef32787bed31abb089e8a71ad65e598717f83aef5f59c0f9f47736c5bc752df",
+            "toUnitDigest": "64ad2fe38659742d6debea41fbdb62236e592ac2fd442f8c1737e423c1ef1d1a",
+            "fromSourceUnitDigest": "4fc22267739453739992bd7673b29eaa711de810b721bd915c28f58ec555cc0c",
+            "toSourceUnitDigest": "e9987e41f961ef6c8dc9e9e2b204eafc3ee98883460e98c0c18606ac0cc3a046"
+          }
+        },
+        "changedFields": [
+          "identityFingerprint",
+          "lineage",
+          "reviewStatus",
+          "sourceUnitDigest",
+          "unitDigest"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n33",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 33,
+      "proof": {
+        "collection": "units",
+        "key": "claim_dceb439735340f734bb484d23c887dad",
+        "kind": "removed",
+        "before": {
+          "sourcePath": "docs/platform/session-identity/spec.md",
+          "unitDigest": "3aa919f7324a1fa38463a76afa88326c73ceb462f692f4dc09e13ee3d47544a7",
+          "identityFingerprint": "3aa919f7324a1fa38463a76afa88326c73ceb462f692f4dc09e13ee3d47544a7",
+          "claimId": "claim_dceb439735340f734bb484d23c887dad",
+          "sourceAnchor": "unheaded-block-1",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "54ffebc5e7a158a6d273670146c1002dd8c6c08fea92f13a9b66f1c6e3efbb54",
+          "claimKind": "specification",
+          "status": "future"
+        },
+        "after": null,
+        "changedFields": [
+          "claimId",
+          "claimKind",
+          "identityFingerprint",
+          "sourceAnchor",
+          "sourcePath",
+          "sourceUnitDigest",
+          "status",
+          "unitDigest",
+          "unitKind"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n34",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 34,
+      "proof": {
+        "collection": "units",
+        "key": "claim_e3b2beba04aeae4e77dafa055f10741e",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+          "unitDigest": "cc95d39564ac7e782e418995a6a62443b3264be45c1700f1ddce15e754fcaf7d",
+          "identityFingerprint": "cc95d39564ac7e782e418995a6a62443b3264be45c1700f1ddce15e754fcaf7d",
+          "claimId": "claim_e3b2beba04aeae4e77dafa055f10741e",
+          "sourceAnchor": "unheaded-block-15",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "98cfa680f2dcc1b0e3893292faa24314b142123fc9b30d00895f90aaac26662c",
+          "claimKind": "unclassified",
+          "status": "future",
+          "origin": "added-since-ade5812a9f444f895185594aedc1f73cf8b2288a"
+        },
+        "after": {
+          "sourcePath": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+          "unitDigest": "cc95d39564ac7e782e418995a6a62443b3264be45c1700f1ddce15e754fcaf7d",
+          "identityFingerprint": "cc95d39564ac7e782e418995a6a62443b3264be45c1700f1ddce15e754fcaf7d",
+          "claimId": "claim_e3b2beba04aeae4e77dafa055f10741e",
+          "sourceAnchor": "unheaded-block-15",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "98cfa680f2dcc1b0e3893292faa24314b142123fc9b30d00895f90aaac26662c",
+          "claimKind": "unclassified",
+          "status": "future"
+        },
+        "changedFields": [
+          "origin"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n35",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 35,
+      "proof": {
+        "collection": "units",
+        "key": "claim_e7dcb5fda0b4d46ecb9f4c10a3ef7f7e",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/platform/packaging-distribution/spec.md",
+          "unitDigest": "83d0e6ae090d097618304293a869f795b5d52d3ea260ec6bc5426783f4b13381",
+          "identityFingerprint": "83d0e6ae090d097618304293a869f795b5d52d3ea260ec6bc5426783f4b13381",
+          "claimId": "claim_e7dcb5fda0b4d46ecb9f4c10a3ef7f7e",
+          "sourceAnchor": "unheaded-block-92",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "87f98a72908fb6991a3cd9bdf8c1407373d72b039ad1b3e83a35a89a2a87d299",
+          "claimKind": "specification",
+          "status": "future",
+          "origin": "added-since-ade5812a9f444f895185594aedc1f73cf8b2288a"
+        },
+        "after": {
+          "sourcePath": "docs/platform/packaging-distribution/spec.md",
+          "unitDigest": "83d0e6ae090d097618304293a869f795b5d52d3ea260ec6bc5426783f4b13381",
+          "identityFingerprint": "83d0e6ae090d097618304293a869f795b5d52d3ea260ec6bc5426783f4b13381",
+          "claimId": "claim_e7dcb5fda0b4d46ecb9f4c10a3ef7f7e",
+          "sourceAnchor": "unheaded-block-92",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "87f98a72908fb6991a3cd9bdf8c1407373d72b039ad1b3e83a35a89a2a87d299",
+          "claimKind": "specification",
+          "status": "future"
+        },
+        "changedFields": [
+          "origin"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n36",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 36,
+      "proof": {
+        "collection": "units",
+        "key": "claim_f0b2a4079764d68b1102ddddb08776ce",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/backlog.md",
+          "unitDigest": "eb37a0f7bbe5c0d4c4ab5d4b3e9fd1259fc8152c286d9e05041ec7599fbcd69c",
+          "identityFingerprint": "cc648a60c0ee1838306fe1fc26a84e7ea554283def177d79a7632b5ed0dbee8e",
+          "claimId": "claim_f0b2a4079764d68b1102ddddb08776ce",
+          "sourceAnchor": "product-backlog",
+          "unitKind": "heading",
+          "sourceUnitDigest": "92be08bb7b0a9af07f2d36307db6a7891545c2ab4590dcbb77074d46c2c8dfbe",
+          "claimKind": "unclassified",
+          "status": "future",
+          "reviewStatus": "needs-review",
+          "lineage": {
+            "fromCommit": "ade5812a9f444f895185594aedc1f73cf8b2288a",
+            "fromUnitDigest": "efa09820ba5a42be5a4a06e55dae4be7e0507bd72effc9f8257dc849082654a4",
+            "toUnitDigest": "eb37a0f7bbe5c0d4c4ab5d4b3e9fd1259fc8152c286d9e05041ec7599fbcd69c",
+            "fromSourceUnitDigest": "800732106a25d1de145c1e71fdda4347cf26f60d8625771d1f42c540228cfc0a",
+            "toSourceUnitDigest": "92be08bb7b0a9af07f2d36307db6a7891545c2ab4590dcbb77074d46c2c8dfbe"
+          }
+        },
+        "after": {
+          "sourcePath": "docs/backlog.md",
+          "unitDigest": "eb37a0f7bbe5c0d4c4ab5d4b3e9fd1259fc8152c286d9e05041ec7599fbcd69c",
+          "identityFingerprint": "cc648a60c0ee1838306fe1fc26a84e7ea554283def177d79a7632b5ed0dbee8e",
+          "claimId": "claim_f0b2a4079764d68b1102ddddb08776ce",
+          "sourceAnchor": "product-backlog",
+          "unitKind": "heading",
+          "sourceUnitDigest": "92be08bb7b0a9af07f2d36307db6a7891545c2ab4590dcbb77074d46c2c8dfbe",
+          "claimKind": "unclassified",
+          "status": "future"
+        },
+        "changedFields": [
+          "lineage",
+          "reviewStatus"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n37",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 37,
+      "proof": {
+        "collection": "units",
+        "key": "claim_f1c6ef52a41ee978ba72a88733520c60",
+        "kind": "changed",
+        "before": {
+          "sourcePath": "docs/platform/agent-coordination/architecture/run-handle.md",
+          "unitDigest": "660240a3617d2444b6ad07151342f136439005270deae66460949db1bec8e81c",
+          "identityFingerprint": "07add88cb496d1b67c021019e81c72a8db58c725e146286f1d1233e783571ca4",
+          "claimId": "claim_f1c6ef52a41ee978ba72a88733520c60",
+          "sourceAnchor": "implementation-and-design-status",
+          "unitKind": "heading",
+          "sourceUnitDigest": "bef0ccaa8745300be2bf165c8d136047af133c064637af821eed0a95b23d04fe",
+          "claimKind": "architecture",
+          "status": "future"
+        },
+        "after": {
+          "sourcePath": "docs/platform/agent-coordination/architecture/run-handle.md",
+          "unitDigest": "e106f9b9cbcb845af99af61b913c9f36ef35269fc079700d6ae59bab75afe92d",
+          "identityFingerprint": "fe1cafe68efb9af38993d05e2171d902f7d9d7e0be304a2c7fdd20f862207645",
+          "claimId": "claim_f1c6ef52a41ee978ba72a88733520c60",
+          "sourceAnchor": "implementation-and-design-status",
+          "unitKind": "heading",
+          "sourceUnitDigest": "565cf67de33a96a867f31b05e3ef2330415d5c6385df5a355e92b6d4d5a38421",
+          "claimKind": "architecture",
+          "status": "future",
+          "reviewStatus": "needs-review",
+          "lineage": {
+            "fromCommit": "498048c1a6651556a0ae977a2871135b5ac7c945",
+            "fromUnitDigest": "660240a3617d2444b6ad07151342f136439005270deae66460949db1bec8e81c",
+            "toUnitDigest": "e106f9b9cbcb845af99af61b913c9f36ef35269fc079700d6ae59bab75afe92d",
+            "fromSourceUnitDigest": "bef0ccaa8745300be2bf165c8d136047af133c064637af821eed0a95b23d04fe",
+            "toSourceUnitDigest": "565cf67de33a96a867f31b05e3ef2330415d5c6385df5a355e92b6d4d5a38421"
+          }
+        },
+        "changedFields": [
+          "identityFingerprint",
+          "lineage",
+          "reviewStatus",
+          "sourceUnitDigest",
+          "unitDigest"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n38",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 38,
+      "proof": {
+        "collection": "identityGaps",
+        "key": "claim_2e2938c719ad58a967857c76c72850f1",
+        "kind": "added",
+        "before": null,
+        "after": {
+          "sourcePath": "docs/platform/agent-coordination/architecture/run-handle.md",
+          "unitDigest": "1a00d82edc7c6ea7214949d37aea4e0150f91057666c93f2ffb8a7e6a5175a53",
+          "identityFingerprint": "1a00d82edc7c6ea7214949d37aea4e0150f91057666c93f2ffb8a7e6a5175a53",
+          "claimId": "claim_2e2938c719ad58a967857c76c72850f1",
+          "sourceAnchor": "unheaded-block-3",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
+          "claimKind": "architecture",
+          "status": "future",
+          "identityStatus": "identity-gap",
+          "gapReason": "edited unit whose anchor unheaded-block-3 is not a stable heading anchor"
+        },
+        "changedFields": [
+          "claimId",
+          "claimKind",
+          "gapReason",
+          "identityFingerprint",
+          "identityStatus",
+          "sourceAnchor",
+          "sourcePath",
+          "sourceUnitDigest",
+          "status",
+          "unitDigest",
+          "unitKind"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n39",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 39,
+      "proof": {
+        "collection": "identityGaps",
+        "key": "claim_35b6d8008541bef15edc061dade28c06",
+        "kind": "added",
+        "before": null,
+        "after": {
+          "sourcePath": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+          "unitDigest": "1a00d82edc7c6ea7214949d37aea4e0150f91057666c93f2ffb8a7e6a5175a53",
+          "identityFingerprint": "1a00d82edc7c6ea7214949d37aea4e0150f91057666c93f2ffb8a7e6a5175a53",
+          "claimId": "claim_35b6d8008541bef15edc061dade28c06",
+          "sourceAnchor": "unheaded-block-3",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "d4d6dd64727d26d9281be53d026bb9158f9e3a28661cd019f7af6232ba23e57b",
+          "claimKind": "architecture",
+          "status": "future",
+          "identityStatus": "identity-gap",
+          "gapReason": "edited unit whose anchor unheaded-block-3 is not a stable heading anchor"
+        },
+        "changedFields": [
+          "claimId",
+          "claimKind",
+          "gapReason",
+          "identityFingerprint",
+          "identityStatus",
+          "sourceAnchor",
+          "sourcePath",
+          "sourceUnitDigest",
+          "status",
+          "unitDigest",
+          "unitKind"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n40",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 40,
+      "proof": {
+        "collection": "identityGaps",
+        "key": "claim_dceb439735340f734bb484d23c887dad",
+        "kind": "added",
+        "before": null,
+        "after": {
+          "sourcePath": "docs/platform/session-identity/spec.md",
+          "unitDigest": "3aa919f7324a1fa38463a76afa88326c73ceb462f692f4dc09e13ee3d47544a7",
+          "identityFingerprint": "3aa919f7324a1fa38463a76afa88326c73ceb462f692f4dc09e13ee3d47544a7",
+          "claimId": "claim_dceb439735340f734bb484d23c887dad",
+          "sourceAnchor": "unheaded-block-1",
+          "unitKind": "unheaded-block",
+          "sourceUnitDigest": "54ffebc5e7a158a6d273670146c1002dd8c6c08fea92f13a9b66f1c6e3efbb54",
+          "claimKind": "specification",
+          "status": "future",
+          "identityStatus": "identity-gap",
+          "gapReason": "edited unit whose anchor unheaded-block-1 is not a stable heading anchor"
+        },
+        "changedFields": [
+          "claimId",
+          "claimKind",
+          "gapReason",
+          "identityFingerprint",
+          "identityStatus",
+          "sourceAnchor",
+          "sourcePath",
+          "sourceUnitDigest",
+          "status",
+          "unitDigest",
+          "unitKind"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n41",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 41,
+      "proof": {
+        "collection": "documents",
+        "key": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+        "kind": "changed",
+        "before": {
+          "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+          "sourceId": "src_5b762b7d5b3b81ccadd17c0940559eef",
+          "sourceDigest": "afcd8060ca4d3ef7a0b2e0640dd7a8be9bbd6fe6c285fd4fc36a0b348797f26e",
+          "blobSha": "11262bc5d56ed4d6c17066c5642072ab69a688f7"
+        },
+        "after": {
+          "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+          "sourceId": "src_5b762b7d5b3b81ccadd17c0940559eef",
+          "sourceDigest": "848999421de92c2840c86b3cbe459d3fb58fce4b8d0a718557547eacebbe7614",
+          "blobSha": "7757efe1d24c419542249fb7f308dc5a23d390e6"
+        },
+        "changedFields": [
+          "blobSha",
+          "sourceDigest"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n42",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 42,
+      "proof": {
+        "collection": "documents",
+        "key": "docs/platform/agent-coordination/architecture/run-handle.md",
+        "kind": "changed",
+        "before": {
+          "path": "docs/platform/agent-coordination/architecture/run-handle.md",
+          "sourceId": "src_a6ca8dfe79cc52475eda05f97efea780",
+          "sourceDigest": "31c3bfbb30b5e0b9fecec82895f313d71671306d9d274883324c7cff6d8d1112",
+          "blobSha": "82a4aa941f2c24a71ca0de763b41db6a9665bf72"
+        },
+        "after": {
+          "path": "docs/platform/agent-coordination/architecture/run-handle.md",
+          "sourceId": "src_a6ca8dfe79cc52475eda05f97efea780",
+          "sourceDigest": "a5b3d04dbc725ba2248ed07fd24144cc2e3ffd4031ae2fc23d6088d12f50581b",
+          "blobSha": "23ad4ad1920383bb2949fd4d3a8f470acf6332be"
+        },
+        "changedFields": [
+          "blobSha",
+          "sourceDigest"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    },
+    {
+      "entry": "n43",
+      "kind": "native-accounting",
+      "accountingFile": "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-registry-accounting.json",
+      "index": 43,
+      "proof": {
+        "collection": "documents",
+        "key": "docs/platform/session-identity/spec.md",
+        "kind": "changed",
+        "before": {
+          "path": "docs/platform/session-identity/spec.md",
+          "sourceDigest": "d007573a8d4f659fa9e017214b312ac61e3f7ab7fc78226688118c3d1fa4bad9",
+          "blobSha": "290cc68e9cd8a8a1b762a144c9b1d2432f3e6454",
+          "sourceId": "src_e32a08b83d659db4ff5e3c2771b9b6cf"
+        },
+        "after": {
+          "path": "docs/platform/session-identity/spec.md",
+          "sourceDigest": "b3dfd588a2535949d4396a3c4afc20e15508c6af57f278be4154533e7cd2621a",
+          "blobSha": "4b1b531d7d1e6128e7992aab03c927032c488902",
+          "sourceId": "src_e32a08b83d659db4ff5e3c2771b9b6cf"
+        },
+        "changedFields": [
+          "blobSha",
+          "sourceDigest"
+        ]
+      },
+      "reviewStatus": "pending",
+      "check": "Compare exact before/after collections with committed c3614f4d2 registry and current sole persistence. Metadata/marker accounting is not conservation or truth approval."
+    }
+  ]
+}

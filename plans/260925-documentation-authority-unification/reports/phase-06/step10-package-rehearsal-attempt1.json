@@ -1,0 +1,11 @@
+{
+  "contentCommit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+  "exitCode": -9,
+  "stage": "Native regeneration in disposable clone; no E/retirement result produced",
+  "observed": "SIGKILL; /tmp is RAM-backed and held approximately4.8 GiB (2.2 GiB v8 plus2.4 GiB full-plan clone); swap was full. Memory pressure is inferred, not kernel-confirmed.",
+  "clone": "/tmp/fgos-work/step10-rehearsal-aIkfdt",
+  "cloneRemoved": true,
+  "removedAlreadyConsumedV8TransportBytes": 2280868991,
+  "nativePersistenceRepeated": false,
+  "recovery": "Remove consumed scratch v8, materialize docs/scripts plus actual decision-input directories only. Every committed source blob remains accessible through exact Git object-store alternate; inventory API still scans the full commit. No source, inventory field or evaluator is filtered."
+}

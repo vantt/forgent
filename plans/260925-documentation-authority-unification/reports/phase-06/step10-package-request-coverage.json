@@ -1,0 +1,134 @@
+{
+  "contentCommit": "c3614f4d223f0c787ee6dc7ce0a8c89433ddc7be",
+  "seed": "c3614f4d2-accounting-ordinary-sample-v1",
+  "sampleRule": "Smallest SHA256(seed+\":candidate:\"+decimal original index) per candidate action; analogous \":group:\" per group action. Producer-selected accounting sample explicitly requested; NOT checkpoint sample/sensitivity pack.",
+  "allPending": [
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "collection": "registryGaps",
+      "claimId": "claim_dd06c2555dc0e81c54c80376fee8ff91"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "collection": "registryGaps",
+      "claimId": "claim_16abc69cd658a382c456cdaf23f64d87"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "collection": "registryGaps",
+      "claimId": "claim_9c7e133ec44851189185dbb7b04a78a0"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "collection": "registryGaps",
+      "claimId": "claim_7a0776311f7105750a4f234681f513a3"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "collection": "registryGaps",
+      "claimId": "claim_35d0f259a0c0828577dcfd003821fb3a"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "collection": "registryGaps",
+      "claimId": "claim_aace4a1d3e3df2ac329d0930b81bd9f4"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "collection": "registryGaps",
+      "claimId": "claim_1d724afb521915455a45db2b1f3b34cd"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-reading-map-global-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_fdcd01e8f20dd83c584b1eb782bebf3a"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-reading-map-global-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_9c5cef506f44e46a8e66ba64f14499cb"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "collection": "rows",
+      "claimId": "claim_96c405c9cefaa4b7c63e40bdaac18330"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "collection": "rows",
+      "claimId": "claim_2d9ccc774d84c91978163a37739aaa26"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "collection": "rows",
+      "claimId": "claim_8be1f5a856f48c009b2a47816d982eb1"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "collection": "rows",
+      "claimId": "claim_ac8c8092219e244b8a9001337c1d8310"
+    }
+  ],
+  "parts": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-decisions.json",
+      "entries": 13,
+      "bytes": 53297,
+      "sha256": "96a8eed3867f44cc2562ad8b6e41063cb96bd5188267d1b7c6e3911d34f6896e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-documents.json",
+      "entries": 3,
+      "bytes": 6098,
+      "sha256": "ff9178c91395582949bc038d4bfd57eae5ec6234e66d253ee35f564f621708b7"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-candidate-sample.json",
+      "entries": 15,
+      "bytes": 55024,
+      "sha256": "61c6ef9e9b4d89ffffeb590d0eea5cdff65b4fc210be0a1c88e301d9b5cbead1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-accounting.json",
+      "entries": 17,
+      "bytes": 70100,
+      "sha256": "79a562b1ef148900690095f9dfd92c9dccb389d36de1e66b9848eab5ca3415db"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-package-native.json",
+      "entries": 43,
+      "bytes": 81717,
+      "sha256": "db225bac79e95f4b22876227e751e6ebd41009d23564bf07446c3c0494cf60d5"
+    }
+  ],
+  "candidateUniverse": 233,
+  "candidateStrata": {
+    "rebind": {
+      "population": 71,
+      "sample": 5
+    },
+    "add": {
+      "population": 95,
+      "sample": 5
+    },
+    "remove": {
+      "population": 67,
+      "sample": 5
+    }
+  },
+  "groupUniverse": 35,
+  "groupStrata": {
+    "add": {
+      "population": 25,
+      "sample": 5
+    },
+    "remove": {
+      "population": 10,
+      "sample": 5
+    }
+  },
+  "fullAccounting": "plans/260925-documentation-authority-unification/reports/phase-06/step10-author-candidate-accounting.json",
+  "all108AppliedRecords": "plans/260925-documentation-authority-unification/reports/phase-06/step10-global-review-application.json",
+  "reviewedByProducer": false,
+  "totalEntries": 91
+}
