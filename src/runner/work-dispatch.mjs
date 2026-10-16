@@ -11,7 +11,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { resolveTaskSpecPath, resolveContentRoot } from './paths.mjs';
-import { loadAgentDefs, readTaskSpecHeader } from './agent-roster.mjs';
+import { loadAgentRoster, readTaskSpecHeader } from './agent-roster.mjs';
 import { selectTemplate, hashTemplate } from './prompt-templates.mjs';
 import { RunnerConfigError } from './dispatch/config.mjs';
 import { resolveStrongerRigor, RIGOR_VALUES } from './rigor.mjs';
@@ -34,7 +34,7 @@ import { listWork } from '../state/store.mjs';
  * `bundleForStep` (the Workflow's step bundle, the same {skill,taskSpec} lookup
  * `spawnWorker` already uses for the skill half), reads its header via
  * `resolveTaskSpecPath` + `readTaskSpecHeader`, and matches it against the
- * real on-disk agent roster (`loadAgentDefs`) via `resolveAgentTypeForTaskSpec`
+ * real on-disk agent roster (`loadAgentRoster`) via `resolveAgentTypeForTaskSpec`
  * above.
  *
  * `currentAgentType` is always `null` here: nothing on a work item tracks
@@ -60,8 +60,11 @@ export function resolveAgentTypeForWork(work, cwd, stage) {
   const taskSpecPath = resolveTaskSpecPath(domainName, taskSpec, { cwd });
   const header = readTaskSpecHeader(taskSpecPath);
   if (Object.keys(header).length === 0) return null;
-  const agentDefs = loadAgentDefs(cwd);
-  return resolveAgentTypeForTaskSpec(header, agentDefs, null);
+  const { defs, problems } = loadAgentRoster(cwd);
+  // An agent file that cannot be parsed is left out of the roster; say so on stderr (once per file
+  // per lookup) rather than letting the agent vanish without a trace. `fgos doctor` names it too.
+  for (const problem of problems) process.stderr.write(`warning: agent roster: ${problem}\n`);
+  return resolveAgentTypeForTaskSpec(header, defs, null);
 }
 
 /**

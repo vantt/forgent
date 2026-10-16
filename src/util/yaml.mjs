@@ -26,3 +26,19 @@ export function parseYaml(text, { filename } = {}) {
   }
   return docs[0];
 }
+
+/**
+ * One-line reason for a failed parse: `<reason> (line L, column C)`, 1-based like an editor shows it.
+ * Works for a parser error (it carries a position) and for the single-document error (it has none).
+ *
+ * @param {unknown} error
+ * @returns {string}
+ */
+export function describeYamlError(error) {
+  const reason = String(error?.reason ?? error?.message ?? error).split('\n')[0];
+  const mark = error?.mark;
+  if (mark && Number.isInteger(mark.line) && Number.isInteger(mark.column)) {
+    return `${reason} (line ${mark.line + 1}, column ${mark.column + 1})`;
+  }
+  return reason;
+}

@@ -34,8 +34,9 @@ import { releaseBinaryPath } from '../util/release-binary-path.mjs';
 import { RELEASE_TARGETS, releaseTargetForHost } from '../util/release-targets.mjs';
 import { hashFile, listLegacyNodeSourceFiles } from '../../scripts/build-rust-distribution.mjs';
 import { mainCheckoutHookWired } from './git-hooks.mjs';
+import { describeYamlError, parseYaml } from '../util/yaml.mjs';
 import { loadRunnerConfigFromDir } from '../runner/dispatch/config.mjs';
-import { agentShapeProblem, findAgentDuplicates, scanAgentTiers } from '../runner/agent-definitions.mjs';
+import { agentShapeProblem, findAgentDuplicates, readAgentDefinition, scanAgentTiers } from '../runner/agent-definitions.mjs';
 import { agentRenderWarnings, listAgents } from '../runner/agent-listing.mjs';
 import { claudeCodeHookWired } from './claude-code-hooks.mjs';
 import {
@@ -880,44 +881,6 @@ function allTaskSpecs(cwd) {
   return specs;
 }
 
-// Extracts a `skills:` list's own item strings from raw yaml SOURCE TEXT,
-// without a yaml parser dependency. Doctor (`src/setup/registrations.mjs`)
-// must keep loading in a plain unpacked copy with no `node_modules/` yet
-// (test/setup/checks-setup-rc-line.test.mjs's own "setup from a copy of
-// fgos that is not in a git checkout" case proves this is a real,
-// exercised scenario) -- a static top-level `import ... from 'yaml'`
-// would break module load there even though 'yaml' is a real dependency
-// used elsewhere (scripts/project-agents.mjs, run only after `npm
-// install`, well after this constraint applies). Supports both block-list
-// (`skills:\n  - a\n  - b`) and inline flow (`skills: [a, b]`) styles,
-// enough for a diagnostic -- the real authority on whether a source yaml
-// is well-formed is project-agents.mjs's own full parse at projection
-// time, never this heuristic.
-function extractSkillsFromYamlText(text) {
-  const inlineMatch = text.match(/^skills:\s*\[([^\]]*)\]\s*$/m);
-  if (inlineMatch) {
-    return inlineMatch[1].split(',').map((s) => s.trim()).filter(Boolean);
-  }
-  const lines = text.split('\n');
-  const skills = [];
-  let inBlock = false;
-  for (const line of lines) {
-    if (/^skills:\s*$/.test(line)) {
-      inBlock = true;
-      continue;
-    }
-    if (!inBlock) continue;
-    const item = line.match(/^\s+-\s*(\S+)\s*$/);
-    if (item) {
-      skills.push(item[1]);
-      continue;
-    }
-    if (line.trim() === '') continue;
-    break;
-  }
-  return skills;
-}
-
 function parseTaskSpecHeaderFields(headerLine) {
   if (!headerLine) return {};
   const parts = headerLine.split('|').map((p) => p.trim());
@@ -992,23 +955,36 @@ function allAgentYamlFiles(cwd) {
   return files;
 }
 
+// Reads every agent file once and maps agent name to the skills it declares. A file that cannot be
+// read or is not valid YAML is left out of the map and named in `problems`, never skipped silently.
+function readAgentSkills(agentFiles) {
+  const agentSkillsMap = new Map();
+  const problems = [];
+  for (const file of agentFiles) {
+    const rel = `${file.source}/${file.fileName}`;
+    let text;
+    try {
+      text = fs.readFileSync(file.filePath, 'utf8');
+    } catch (error) {
+      problems.push(`${rel}: cannot be read (${error.message})`);
+      continue;
+    }
+    const { error, name: declared, skills } = readAgentDefinition(text, { filename: rel });
+    if (error) {
+      problems.push(`${rel}: ${error}`);
+      continue;
+    }
+    agentSkillsMap.set(declared ?? file.fileName.replace(/\.yaml$|\.yml$/, ''), new Set(skills));
+  }
+  return { agentSkillsMap, problems };
+}
+
 // tsk-397 D20: eligibility direction inverted -- task-spec declares agent/requires-skill,
 // agent-type declares skills. Check validates every requires-skill is provided by at least
 // one agent-type, and every pinned agent exists.
 function checkAgentClaimsResolve(cwd) {
   const agentFiles = allAgentYamlFiles(cwd);
-  const agentSkillsMap = new Map();
-  for (const file of agentFiles) {
-    try {
-      const text = fs.readFileSync(file.filePath, 'utf8');
-      const nameMatch = text.match(/^name:\s*(\S+)/m);
-      const name = nameMatch ? nameMatch[1] : file.fileName.replace(/\.yaml$|\.yml$/, '');
-      const skills = extractSkillsFromYamlText(text);
-      agentSkillsMap.set(name, new Set(skills));
-    } catch {
-      continue;
-    }
-  }
+  const { agentSkillsMap, problems: agentFileProblems } = readAgentSkills(agentFiles);
 
   const allProvidedSkills = new Set();
   for (const skillsSet of agentSkillsMap.values()) {
@@ -1016,7 +992,7 @@ function checkAgentClaimsResolve(cwd) {
   }
 
   const taskSpecs = allTaskSpecs(cwd);
-  const problems = [];
+  const problems = [...agentFileProblems];
 
   for (const spec of taskSpecs) {
     let text;
@@ -1064,18 +1040,8 @@ export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains 
   const problems = [];
 
   const agentFiles = allAgentYamlFiles(root);
-  const agentSkillsMap = new Map();
-  for (const file of agentFiles) {
-    try {
-      const text = fs.readFileSync(file.filePath, 'utf8');
-      const nameMatch = text.match(/^name:\s*(\S+)/m);
-      const name = nameMatch ? nameMatch[1] : file.fileName.replace(/\.yaml$|\.yml$/, '');
-      const skills = extractSkillsFromYamlText(text);
-      agentSkillsMap.set(name, new Set(skills));
-    } catch {
-      continue;
-    }
-  }
+  const { agentSkillsMap, problems: agentFileProblems } = readAgentSkills(agentFiles);
+  problems.push(...agentFileProblems);
   const allProvidedSkills = new Set();
   for (const skillsSet of agentSkillsMap.values()) {
     for (const s of skillsSet) allProvidedSkills.add(s);
@@ -2482,34 +2448,60 @@ registerCheck({
 // bind() resolves it (exact name, then the bare verb). One that does not has
 // no candidate pool, so that unit is refused at run time with no earlier signal.
 // A declared entry that carries no `prefer` pool (exact or bare verb) is reported too.
-// Read straight from the definition files with a line match instead of loading them
-// through the Workflow loader: `fgos setup` runs from copies of fgos that have no
-// installed dependencies, and the loader needs the YAML parser.
+// Each definition file is parsed (JSON.parse for .json, the YAML door otherwise) and every string
+// under a key named `capability`, at any depth, is a use. A file that cannot be parsed is reported by
+// name, never skipped.
 function workflowCapabilityUses(root) {
   const uses = new Map();
+  const problems = [];
   const dirs = [];
   const core = path.join(root, 'core', 'workflows');
-  if (fs.existsSync(core)) dirs.push([core, '']);
+  if (fs.existsSync(core)) dirs.push([core, '', 'core/workflows']);
   const domainsDir = path.join(root, 'domains');
   if (fs.existsSync(domainsDir)) {
     for (const d of fs.readdirSync(domainsDir, { withFileTypes: true })) {
       const dir = path.join(domainsDir, d.name, 'workflows');
-      if (d.isDirectory() && fs.existsSync(dir)) dirs.push([dir, `${d.name}/`]);
+      if (d.isDirectory() && fs.existsSync(dir)) dirs.push([dir, `${d.name}/`, `domains/${d.name}/workflows`]);
     }
   }
-  for (const [dir, prefix] of dirs) {
+  for (const [dir, prefix, relDir] of dirs) {
     for (const file of fs.readdirSync(dir).sort()) {
       if (!/\.(ya?ml|json)$/i.test(file)) continue;
       const id = `${prefix}${file.replace(/\.[^.]+$/, '')}`;
-      for (const line of fs.readFileSync(path.join(dir, file), 'utf8').split('\n')) {
-        const match = /^\s*"?capability"?\s*:\s*["']?([^\s"',#]+)/.exec(line);
-        if (!match) continue;
-        if (!uses.has(match[1])) uses.set(match[1], new Set());
-        uses.get(match[1]).add(id);
+      const rel = `${relDir}/${file}`;
+      let parsed;
+      try {
+        const text = fs.readFileSync(path.join(dir, file), 'utf8');
+        parsed = /\.json$/i.test(file) ? JSON.parse(text) : parseYaml(text, { filename: rel });
+      } catch (error) {
+        problems.push(`${rel}: cannot be parsed: ${/\.json$/i.test(file) ? error.message : describeYamlError(error)}`);
+        continue;
+      }
+      for (const capability of capabilityValues(parsed)) {
+        if (!uses.has(capability)) uses.set(capability, new Set());
+        uses.get(capability).add(id);
       }
     }
   }
-  return uses;
+  return { uses, problems };
+}
+
+// Every string stored under a key named `capability`, at any depth. Iterative with a visited set:
+// a YAML alias can make a document reference itself, and a recursive walk would never end.
+function capabilityValues(root) {
+  const found = [];
+  const visited = new Set();
+  const queue = [root];
+  for (let next = 0; next < queue.length; next += 1) {
+    const node = queue[next];
+    if (node === null || typeof node !== 'object' || visited.has(node)) continue;
+    visited.add(node);
+    for (const [key, value] of Array.isArray(node) ? node.entries() : Object.entries(node)) {
+      if (key === 'capability' && typeof value === 'string' && value.trim() !== '') found.push(value.trim());
+      else queue.push(value);
+    }
+  }
+  return found;
 }
 
 // Capabilities the runner loop's worker asks for that no Workflow unit names. A coding item's
@@ -2521,14 +2513,19 @@ function checkWorkflowCapabilitiesConfigured(cwd) {
   const capabilities = readSharedConfig(cwd)?.runner?.capabilities;
   const declared = capabilities && typeof capabilities === 'object' && !Array.isArray(capabilities) ? capabilities : {};
   const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-  const uses = workflowCapabilityUses(packageRoot);
+  const { uses, problems: unparsable } = workflowCapabilityUses(packageRoot);
   for (const [capability, id] of RUNNER_LOOP_CAPABILITY_USES) {
     uses.set(capability, new Set([...(uses.get(capability) ?? []), id]));
   }
   if (path.resolve(cwd) !== packageRoot) {
-    for (const [capability, ids] of workflowCapabilityUses(cwd)) {
+    const project = workflowCapabilityUses(cwd);
+    unparsable.push(...project.problems);
+    for (const [capability, ids] of project.uses) {
       uses.set(capability, new Set([...(uses.get(capability) ?? []), ...ids]));
     }
+  }
+  if (unparsable.length > 0) {
+    return { passed: false, message: `Workflow definitions that cannot be parsed, so their capabilities are not checked: ${unparsable.join('; ')}` };
   }
   const missing = [...uses].filter(
     ([capability]) => !declared[capability] && !(capability.includes(':') && declared[capability.split(':')[1]]),

@@ -4,58 +4,50 @@
 // project's own `domains/` or `core/agents/` folder hides, and the keys the persona renderer drops.
 //
 // The renderer (dispatch/assignment.mjs) reads only `description`, `persona.voice|style|archetype` and
-// `decision_boundary.can_decide|must_escalate`. Anything else, a multi-line value, or a block scalar is
+// `decision_boundary.can_decide|must_escalate` (see projectPersona). Any other key in those sections is
 // not rendered and not reported there, so the warnings below are the only place that says so.
 
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { INSTALL_ROOT, agentShapeProblem, findAgentDuplicates, scanAgentTiers } from './agent-definitions.mjs';
+import {
+  BOUNDARY_KEYS,
+  INSTALL_ROOT,
+  PERSONA_KEYS,
+  agentShapeProblem,
+  findAgentDuplicates,
+  readAgentDefinition,
+  scanAgentTiers,
+} from './agent-definitions.mjs';
 
-const PERSONA_KEYS = new Set(['voice', 'style', 'archetype']);
-const BOUNDARY_KEYS = new Set(['can_decide', 'must_escalate']);
-const BLOCK_SCALAR = /^[>|][+-]?\d*$/;
-
-const unquote = (value) => value.trim().replace(/^["'](.*)["']$/, '$1');
+const isPlainObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 
 /**
- * Keys in a definition that the renderer would silently drop, one sentence each.
+ * Keys in a definition that the renderer would silently drop, one sentence each. A file that is not
+ * valid YAML has none to report here; `agentShapeProblem` names the parse failure.
  *
  * @param {string} text the definition file's text
  * @returns {string[]}
  */
 export function agentRenderWarnings(text) {
+  const { data } = readAgentDefinition(text);
   const warnings = [];
-  let section = null;
-  for (const line of String(text).split('\n')) {
-    if (!line.trim() || line.trim().startsWith('#')) continue;
-    const top = /^([a-zA-Z0-9_-]+):[ \t]*(.*)$/.exec(line);
-    if (top && !/^[ \t]/.test(line)) {
-      const [, key, value] = top;
-      section = value.trim() === '' ? key : null;
-      if (key === 'description' && BLOCK_SCALAR.test(value.trim())) {
-        warnings.push('description is a multi-line block, so only its marker is rendered; write it on one line');
-      }
-      continue;
-    }
-    if (section === 'persona') {
-      const child = /^\s+([a-zA-Z0-9_-]+):[ \t]*(.*)$/.exec(line);
-      if (!child) continue;
-      if (!PERSONA_KEYS.has(child[1])) warnings.push(`persona.${child[1]} is not rendered (only voice, style, archetype are)`);
-      else if (BLOCK_SCALAR.test(child[2].trim())) warnings.push(`persona.${child[1]} is a multi-line block, so only its marker is rendered; write it on one line`);
-    } else if (section === 'decision_boundary') {
-      const sub = /^\s{2}([a-zA-Z0-9_-]+):[ \t]*$/.exec(line);
-      if (sub && !BOUNDARY_KEYS.has(sub[1])) warnings.push(`decision_boundary.${sub[1]} is not rendered (only can_decide, must_escalate are)`);
+  if (isPlainObject(data?.persona)) {
+    for (const key of Object.keys(data.persona)) {
+      if (!PERSONA_KEYS.includes(key)) warnings.push(`persona.${key} is not rendered (only ${PERSONA_KEYS.join(', ')} are)`);
     }
   }
-  return [...new Set(warnings)];
+  if (isPlainObject(data?.decision_boundary)) {
+    for (const key of Object.keys(data.decision_boundary)) {
+      if (!BOUNDARY_KEYS.includes(key)) warnings.push(`decision_boundary.${key} is not rendered (only ${BOUNDARY_KEYS.join(', ')} are)`);
+    }
+  }
+  return warnings;
 }
 
-/** The one-line `description:` of a definition, or '' when it has none on one line. */
+/** The `description:` of a definition on one line (whitespace runs collapsed), or '' when it has none. */
 export function agentDescription(text) {
-  const match = /^description:[ \t]*(\S.*)$/m.exec(String(text));
-  const value = match ? unquote(match[1]) : '';
-  return BLOCK_SCALAR.test(value) ? '' : value;
+  return readAgentDefinition(text).description.replace(/\s+/g, ' ');
 }
 
 function readQuietly(file) {

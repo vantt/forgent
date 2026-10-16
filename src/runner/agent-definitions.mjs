@@ -15,6 +15,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { describeYamlError, parseYaml } from '../util/yaml.mjs';
 import { RunnerConfigError } from './dispatch/config.mjs';
 
 export const AGENT_NAME_PATTERN = /^[a-z][a-z0-9-]{0,63}$/;
@@ -83,16 +84,74 @@ export function findAgentDuplicates(scan) {
   return duplicates;
 }
 
+const isPlainObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
+const isScalar = (value) => typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean';
+
+/**
+ * Reads a definition file's text once with the real YAML parser and derives the fields every reader
+ * needs. A file that is not valid YAML never throws: `error` carries `cannot be parsed: <reason>
+ * (line L, column C)` and `data` is null, so each caller decides how to report it.
+ *
+ * - `name`: the declared name coerced with `String()` (`name: 123` is "123"), or undefined when absent.
+ * - `skills`: the entries of `skills` that are strings; `[]` when absent or not a list.
+ * - `description`: the declared description as text, or '' when absent.
+ *
+ * @param {string} text
+ * @param {{ filename?: string }} [options] named in the parse error
+ * @returns {{ data: object|null, error: string|null, name: string|undefined, skills: string[], description: string }}
+ */
+export function readAgentDefinition(text, { filename } = {}) {
+  let parsed;
+  try {
+    parsed = parseYaml(String(text), { filename });
+  } catch (error) {
+    return { data: null, error: `cannot be parsed: ${describeYamlError(error)}`, name: undefined, skills: [], description: '' };
+  }
+  const data = isPlainObject(parsed) ? parsed : null;
+  const declared = data && isScalar(data.name) ? String(data.name).trim() : '';
+  return {
+    data,
+    error: null,
+    name: declared === '' ? undefined : declared,
+    skills: Array.isArray(data?.skills) ? data.skills.filter((skill) => typeof skill === 'string') : [],
+    description: data && isScalar(data.description) ? String(data.description).trim() : '',
+  };
+}
+
+/** The keys of a definition the persona renderer reads; anything else in those sections is not rendered. */
+export const PERSONA_KEYS = Object.freeze(['voice', 'style', 'archetype']);
+export const BOUNDARY_KEYS = Object.freeze(['can_decide', 'must_escalate']);
+
+const scalarText = (value) => (isScalar(value) ? String(value).trim() : '');
+const textList = (value) => (Array.isArray(value) ? value.filter(isScalar).map((item) => String(item).trim()).filter(Boolean) : []);
+
+/**
+ * What the persona renderer shows from a parsed definition: `description`, `persona.voice|style|archetype`
+ * (text) and `decision_boundary.can_decide|must_escalate` (lists of text). Scalars are rendered with
+ * `String()`; a missing or non-scalar value is ''/[] and renders nothing.
+ *
+ * @param {object|null} data a parsed definition (see readAgentDefinition)
+ */
+export function projectPersona(data) {
+  const persona = isPlainObject(data?.persona) ? data.persona : {};
+  const boundary = isPlainObject(data?.decision_boundary) ? data.decision_boundary : {};
+  return {
+    description: scalarText(data?.description),
+    persona: Object.fromEntries(PERSONA_KEYS.map((key) => [key, scalarText(persona[key])])),
+    decision_boundary: Object.fromEntries(BOUNDARY_KEYS.map((key) => [key, textList(boundary[key])])),
+  };
+}
+
 /**
  * The problem with a definition file's shape, or null. The renderer needs a file that names itself
- * after its basename and says what it is for; anything else would render as an empty persona. The
- * check reads the two top-level lines it needs without a YAML dependency, because `fgos setup` and
- * `fgos doctor` load this module from a copy that may not have its dependencies installed.
+ * after its basename and says what it is for; anything else would render as an empty persona. A file
+ * that is not valid YAML is reported with the parser's line and column.
  */
 export function agentShapeProblem(name, text) {
-  const declared = /^name:[ \t]*["']?([^\s"']+)["']?[ \t]*$/m.exec(text)?.[1];
+  const { error, name: declared, description } = readAgentDefinition(text);
+  if (error) return error;
   if (declared !== name) return `must declare name: ${name} (got ${JSON.stringify(declared ?? null)})`;
-  if (!/^description:[ \t]*\S/m.test(text)) return 'must declare a non-empty description';
+  if (description === '') return 'must declare a non-empty description';
   return null;
 }
 
