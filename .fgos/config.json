@@ -1560,6 +1560,7 @@
         "frontier": "z-ai/glm-5.3"
       },
       "xai": {
+        "nano": "grok-4.3",
         "standard": "grok-4.3",
         "advanced": "grok-4.5",
         "flagship": "grok-4.6",
