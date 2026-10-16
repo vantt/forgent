@@ -168,14 +168,14 @@ function makeHandle(prepared, scope, fd) {
 /** The result of a route answer that is not `acquired`, for a description
  * the caller has already closed: a value for held/timeout, a named error
  * for everything the caller must not retry blindly. */
-function settleNotAcquired(line, lock, wait) {
+function settleNotAcquired(line, lock, wait, killWaitMs = null) {
   switch (line.result) {
     case 'held':
       if (line.reason === 'predecessor-domain-not-empty') {
         throw new HolderLockError(
           'lock-predecessor-domain-not-empty',
           `${lock.name}: the previous holder's domain is still not empty after the kill wait (${JSON.stringify(line.domain)})`,
-          { lock: lock.name, path: lock.v3Path, domain: line.domain ?? null },
+          { lock: lock.name, path: lock.v3Path, domain: line.domain ?? null, killWaitMs },
         );
       }
       return { result: 'held', reason: line.reason ?? 'kernel-lock-held', ...(line.holders !== undefined ? { holders: line.holders } : {}) };
@@ -223,7 +223,7 @@ export function acquireSync(scope, name, params = {}, { waitMs } = {}) {
       continue;
     }
     closeQuietly(fd);
-    return settleNotAcquired(line, lock, wait);
+    return settleNotAcquired(line, lock, wait, killWaitMs);
   }
   throw new HolderLockError('lock-inode-unstable', `${lock.name}: ${lock.v3Path} was replaced ${INODE_RETRIES} times during acquire`, { lock: lock.name, path: lock.v3Path });
 }
@@ -277,7 +277,7 @@ export async function acquire(scope, name, params = {}, { waitMs, pollMs = DEFAU
       }
       return { result: 'timeout', waitedMs: now - startedAt };
     }
-    return settleNotAcquired(line, lock, wait);
+    return settleNotAcquired(line, lock, wait, killWaitMs);
   }
 }
 
@@ -477,7 +477,10 @@ export function checkBorrowedDescription(lockPath, { env = process.env, fgosDir 
   const name = match[1];
   const slot = Number(match[2]);
   const bin = hostBin({ fgosDir });
-  const line = runLockRouteSync({ bin, args: ['--borrowed-check', path.resolve(lockPath)], fd: slot, timeoutMs: ROUTE_CALL_TIMEOUT_MS });
+  // The route sees the inherited description at its own slot 3, so it is told
+  // that slot, whatever number the caller's process gave the descriptor.
+  const childEnv = routeEnv({ ...process.env, [LOCK_FD_ENV]: `${name}:${LOCK_FD_SLOT}` });
+  const line = runLockRouteSync({ bin, args: ['--borrowed-check', path.resolve(lockPath)], fd: slot, timeoutMs: ROUTE_CALL_TIMEOUT_MS, env: childEnv });
   if (line.result === 'borrower') return { result: 'borrower', name };
   if (line.result === 'not-borrower') return { result: 'not-borrower', reason: line.reason ?? 'lock-not-held-by-description', name };
   if (line.result === 'unavailable') {

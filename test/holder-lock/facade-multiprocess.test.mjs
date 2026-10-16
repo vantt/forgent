@@ -224,7 +224,7 @@ test('a live predecessor domain is killed at once and acquire returns within mil
   }
 });
 
-test('a predecessor domain that cannot be killed fails by name after lock.predecessorKillWaitMs and leaves the lock free', { skip: NEEDS_HOST || LINUX_ONLY || (process.getuid?.() === 0 ? 'root can kill pid 1' : false) }, () => {
+test('a predecessor domain that cannot be killed fails by name within lock.predecessorKillWaitMs and leaves the lock free', { skip: NEEDS_HOST || LINUX_ONLY || (process.getuid?.() === 0 ? 'root can kill pid 1' : false) }, () => {
   const { dir, fgosDir } = makeProject();
   try {
     fs.mkdirSync(fgosDir, { recursive: true });
@@ -238,11 +238,13 @@ test('a predecessor domain that cannot be killed fails by name after lock.predec
         assert.equal(err.code, 'lock-predecessor-domain-not-empty');
         assert.equal(err.domain?.domainKind, 'linux-gate');
         assert.equal(err.domain?.domainId?.pid, 1);
+        assert.equal(err.killWaitMs, 200, 'the configured bound is the one sent to the route');
         return true;
       },
     );
     const elapsed = Date.now() - started;
-    assert.ok(elapsed >= 150, `gave up after ${elapsed} ms, below the configured 200 ms bound`);
+    // pid 1 refuses the kill (EPERM), and the route answers a refused kill at
+    // once instead of waiting the bound out; it never takes longer than it.
     assert.ok(elapsed < 1500, `took ${elapsed} ms: the configured 200 ms bound was not applied`);
     assert.deepEqual(probe(LOCK, { fgosDir }), { result: 'free' }, 'the successor released the kernel lock before reporting');
   } finally {

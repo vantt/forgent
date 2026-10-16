@@ -164,7 +164,7 @@ test('runBorrowed prepends the gc guards to git only, refuses a released handle,
     const { handle } = acquireSync(scope, LOCK, { fgosDir });
     const seen = runBorrowed(handle, {
       command: process.execPath,
-      args: ['-e', 'process.stdout.write(JSON.stringify({ env: process.env.FGOS_LOCK_FD, argv: process.argv.slice(2) }))', 'a', 'b'],
+      args: ['-e', 'process.stdout.write(JSON.stringify({ env: process.env.FGOS_LOCK_FD, argv: process.argv.slice(1) }))', 'a', 'b'],
       env: { ...process.env },
     });
     assert.equal(seen.exit, 0, seen.stderr);
