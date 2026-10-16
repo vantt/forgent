@@ -353,3 +353,8 @@ Relayed in assignment `unit-run-1792130182385-eef9a749/producer/1`; reports comm
 6. Run all document-tool tests, all-shard independent audit, ownership, link replay, A/B/H/I, candidate-status and scoped FAST D/E. Author turn: no native sync or review pack. **Next = package** (one native sync, one small bounded re-review of only this turn's changed rows/tools/reproduction plus the four omitted marker claims and every actual native transition), then the existing global turn.
 
 Merge `203f4ef93` changes no docs source relative to its first parent: no A31 source re-carry is due. The runner commits; no fgOS CLI, Git writes, legacy/protected/baseline/runtime edits are authorized here. Review note about the runner spec's older provenance header remains a next-touch observation; its source bytes are not touched in this turn.
+
+
+## L10-37 — last rationale-wording review round (A42)
+
+Lead instruction in package assignment `unit-run-1792130920095-4c562e4f/producer/1`, content `ade5812a9`: this is the LAST review round for rationale wording. If the coming round finds only rationale-wording defects with no conservation loss, those rows become holds with explicit reason and go to the owner queue for the promotion truth check. Content defects are still fixed. This records the supplied decision; no producer verdict, hold or seed is chosen here. After this review is applied, proceed to the existing global turn.

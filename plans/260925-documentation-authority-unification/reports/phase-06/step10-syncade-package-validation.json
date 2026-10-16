@@ -1,0 +1,47 @@
+{
+  "contentCommit": "ade5812a9f444f895185594aedc1f73cf8b2288a",
+  "beforeCommit": "203f4ef93867a60e6a37624b31ce14de426cafa8",
+  "entries": 40,
+  "parts": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-01-ade5812a9.md",
+      "entries": 12,
+      "bytes": 154691
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-ade5812a9.md",
+      "entries": 12,
+      "bytes": 124096
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-ade5812a9.md",
+      "entries": 12,
+      "bytes": 27898
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-04-ade5812a9.md",
+      "entries": 4,
+      "bytes": 12297
+    }
+  ],
+  "counts": [
+    12,
+    12,
+    12,
+    4
+  ],
+  "maxBytes": 154691,
+  "allFiveBeforeAfterCommittedEquality": true,
+  "registryChangesSinceRequest": 16,
+  "outstandingMarkerDrops": 4,
+  "producerSeeds": false,
+  "producerVerdicts": false,
+  "entryKinds": {
+    "changed-rationale": 5,
+    "changed-tool-test-reproduction": 13,
+    "outstanding-registry-marker-drop": 4,
+    "package-portable-reproduction": 1,
+    "regenerated-check-A": 1,
+    "registry-change-since-request": 16
+  }
+}

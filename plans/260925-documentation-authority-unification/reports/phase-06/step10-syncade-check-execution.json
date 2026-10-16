@@ -1,0 +1,51 @@
+[
+  {
+    "label": "native-D",
+    "command": [
+      "node",
+      "--max-old-space-size=4096",
+      "--max-semi-space-size=16",
+      "/tmp/fgos-work/packageade/verify-current.mjs",
+      "--output-dir",
+      "/tmp/fgos-work/packageade"
+    ],
+    "exitCode": 0,
+    "seconds": 293.3541637779563,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-native-D.log"
+  },
+  {
+    "label": "portable-sync4d",
+    "command": [
+      "python3",
+      "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduce.py",
+      "--output-dir",
+      "/tmp/fgos-work/packageade/fresh-sync4d"
+    ],
+    "exitCode": 0,
+    "seconds": 25.318156470020767,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-portable-sync4d.log"
+  },
+  {
+    "label": "portable-round5",
+    "command": [
+      "python3",
+      "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduce.py",
+      "--output-dir",
+      "/tmp/fgos-work/packageade/fresh-round5"
+    ],
+    "exitCode": 0,
+    "seconds": 26.32859940797789,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-portable-round5.log"
+  },
+  {
+    "label": "tests",
+    "command": [
+      "zsh",
+      "-c",
+      "node --test test/scripts/doc-*.test.mjs test/scripts/check-doc-*.test.mjs test/scripts/generate-doc-inventory.test.mjs test/scripts/list-doc-anchors.test.mjs test/scripts/verify-phase-02.test.mjs test/scripts/next-doc-id.test.mjs"
+    ],
+    "exitCode": 0,
+    "seconds": 29.933555946976412,
+    "log": "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-tests.log"
+  }
+]

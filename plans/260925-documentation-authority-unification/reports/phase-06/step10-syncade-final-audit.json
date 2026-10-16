@@ -1,0 +1,430 @@
+{
+  "contentCommit": "ade5812a9f444f895185594aedc1f73cf8b2288a",
+  "authorSession": "codex-session:unit-run-1792130920095-4c562e4f@2026-10-16",
+  "scopeViolations": [],
+  "changedPaths": [
+    "plans/260925-documentation-authority-unification/reports/phase-06/owner-answers.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/progress.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-01-ade5812a9.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-ade5812a9.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-ade5812a9.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-04-ade5812a9.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-index-ade5812a9.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step-10-report.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-A36.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-D-both.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-D-identity.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-D-phase02.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-D-summary.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-bindings.log",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-check-execution.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-checks.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-checks.log",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-final-audit.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-independent-consistency.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-link-replay.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-native-D.log",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-native-proof.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-native.log",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-package-validation.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-portable-round5.log",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-portable-sync4d.log",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-rebindings.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-registry-accounting.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-reproduction.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-target-ownership.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-tests.log",
+    "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json"
+  ],
+  "workingDocsDelta": [],
+  "contentCommitDocsDelta": [],
+  "precedingMergeDocsDelta": [],
+  "native": {
+    "syncSeconds": 671.941,
+    "carryStartLogCount": 1,
+    "compactPersistenceLogCount": 1,
+    "registrySHA256": "1f5325ff1b1c2012c06aaf17b805c3f4fc2527923742271dff3d77e10707989e",
+    "proofRegistrySHA256": "1f5325ff1b1c2012c06aaf17b805c3f4fc2527923742271dff3d77e10707989e",
+    "knownBefore": 99567,
+    "knownAfter": 99567,
+    "lostKnownIDs": [],
+    "activeTupleEquality": true,
+    "files": 4486,
+    "units": 91386,
+    "newUnits": 0,
+    "newGaps": 0,
+    "newRetired": 0
+  },
+  "bindings": {
+    "checked": 9210,
+    "rebound": 0,
+    "unresolved": [],
+    "approvalCarried": false
+  },
+  "D": [
+    {
+      "label": "both",
+      "seconds": 89.89,
+      "fatalCount": 0
+    },
+    {
+      "label": "identity",
+      "seconds": 96.951,
+      "fatalCount": 0
+    },
+    {
+      "label": "phase02",
+      "seconds": 97.813,
+      "fatalCount": 0
+    }
+  ],
+  "independent": {
+    "ok": true,
+    "rowsScanned": 12895,
+    "shardsScanned": 92,
+    "structuredRows": 718,
+    "sectionClaims": 261,
+    "linkClaims": 719
+  },
+  "historicalSourceWitnessLimits": 70,
+  "ownership": {
+    "referenceGroups": 254,
+    "noNewDoubleOwnership": true,
+    "newActiveSourcePairs": 0,
+    "nativeDuplicates": 0,
+    "targetDigestDrift": 0
+  },
+  "links": {
+    "original": 366,
+    "later": 98,
+    "round3": 4,
+    "originalFindings": 0,
+    "laterFindings": 0,
+    "round3Findings": 0
+  },
+  "checks": {
+    "A": {
+      "historicalOffenders": [
+        "plans/260925-documentation-authority-unification/phase-06-transform-all-platform-areas-as-candidate-material.md",
+        "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md",
+        "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+        "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.json",
+        "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.md",
+        "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/open-questions.md",
+        "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-07-draft.md",
+        "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-08-draft.md"
+      ],
+      "historicalEqual": true,
+      "newWorkingViolations": [],
+      "accountedPairs": [
+        {
+          "commit": "bd217ecf12bc75929d63c2285a838254b1b825cd",
+          "path": "plans/260925-documentation-authority-unification/phase-06-transform-all-platform-areas-as-candidate-material.md",
+          "authority": "L10-35a"
+        },
+        {
+          "commit": "bd217ecf12bc75929d63c2285a838254b1b825cd",
+          "path": "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+          "authority": "L10-35a"
+        },
+        {
+          "commit": "db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd",
+          "path": "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md",
+          "authority": "A21"
+        },
+        {
+          "commit": "db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd",
+          "path": "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+          "authority": "A21"
+        },
+        {
+          "commit": "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.json",
+          "authority": "A3"
+        },
+        {
+          "commit": "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.md",
+          "authority": "A3"
+        },
+        {
+          "commit": "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/open-questions.md",
+          "authority": "A3"
+        },
+        {
+          "commit": "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-07-draft.md",
+          "authority": "A3"
+        },
+        {
+          "commit": "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-08-draft.md",
+          "authority": "A3"
+        }
+      ],
+      "unaccountedPairs": [],
+      "ok": true
+    },
+    "B": true,
+    "H": {
+      "files": 609,
+      "byStatus": {
+        "promoted": 3,
+        "candidate": 214,
+        "legacy-current": 0,
+        "non-authority": 1,
+        "unrouted": 391
+      },
+      "exemptUnrouted": 302,
+      "checked": 217,
+      "findings": 0,
+      "byType": {}
+    },
+    "I": {
+      "equal": false,
+      "equalToHEAD": true,
+      "frozenBaselineUnchanged": true
+    }
+  },
+  "tests": {
+    "tests": 507,
+    "pass": 507,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "portableReproduction": [
+    {
+      "outputDir": "/tmp/fgos-work/packageade/fresh-sync4d",
+      "commands": [
+        {
+          "command": [
+            "node",
+            "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-06/step10-independent-rationale-audit.mjs",
+            "--output",
+            "/tmp/fgos-work/packageade/fresh-sync4d/independent.json"
+          ],
+          "exitCode": 0,
+          "log": "/tmp/fgos-work/packageade/fresh-sync4d/step10-independent-rationale-audit.log"
+        },
+        {
+          "command": [
+            "node",
+            "/tmp/fgos-work/packageade/fresh-sync4d/checks.mjs",
+            "--output-dir",
+            "/tmp/fgos-work/packageade/fresh-sync4d"
+          ],
+          "exitCode": 0,
+          "log": "/tmp/fgos-work/packageade/fresh-sync4d/checks.log"
+        },
+        {
+          "command": [
+            "node",
+            "/tmp/fgos-work/packageade/fresh-sync4d/ownership.mjs",
+            "--output-dir",
+            "/tmp/fgos-work/packageade/fresh-sync4d"
+          ],
+          "exitCode": 0,
+          "log": "/tmp/fgos-work/packageade/fresh-sync4d/ownership.log"
+        },
+        {
+          "command": [
+            "node",
+            "/tmp/fgos-work/packageade/fresh-sync4d/audit-ownership.mjs",
+            "--output-dir",
+            "/tmp/fgos-work/packageade/fresh-sync4d"
+          ],
+          "exitCode": 0,
+          "log": "/tmp/fgos-work/packageade/fresh-sync4d/audit-ownership.log"
+        },
+        {
+          "command": [
+            "python3",
+            "/tmp/fgos-work/packageade/fresh-sync4d/replay.py",
+            "--output-dir",
+            "/tmp/fgos-work/packageade/fresh-sync4d"
+          ],
+          "exitCode": 0,
+          "log": "/tmp/fgos-work/packageade/fresh-sync4d/replay.log"
+        }
+      ],
+      "allPassed": true
+    },
+    {
+      "outputDir": "/tmp/fgos-work/packageade/fresh-round5",
+      "commands": [
+        {
+          "command": [
+            "node",
+            "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-06/step10-independent-rationale-audit.mjs",
+            "--output",
+            "/tmp/fgos-work/packageade/fresh-round5/independent.json"
+          ],
+          "exitCode": 0,
+          "log": "/tmp/fgos-work/packageade/fresh-round5/step10-independent-rationale-audit.log"
+        },
+        {
+          "command": [
+            "node",
+            "/tmp/fgos-work/packageade/fresh-round5/checks.mjs",
+            "--output-dir",
+            "/tmp/fgos-work/packageade/fresh-round5"
+          ],
+          "exitCode": 0,
+          "log": "/tmp/fgos-work/packageade/fresh-round5/checks.log"
+        },
+        {
+          "command": [
+            "node",
+            "/tmp/fgos-work/packageade/fresh-round5/fast.mjs",
+            "--output-dir",
+            "/tmp/fgos-work/packageade/fresh-round5"
+          ],
+          "exitCode": 0,
+          "log": "/tmp/fgos-work/packageade/fresh-round5/fast.log"
+        },
+        {
+          "command": [
+            "node",
+            "/tmp/fgos-work/packageade/fresh-round5/ownership.mjs",
+            "--output-dir",
+            "/tmp/fgos-work/packageade/fresh-round5"
+          ],
+          "exitCode": 0,
+          "log": "/tmp/fgos-work/packageade/fresh-round5/ownership.log"
+        },
+        {
+          "command": [
+            "node",
+            "/tmp/fgos-work/packageade/fresh-round5/audit-ownership.mjs",
+            "--output-dir",
+            "/tmp/fgos-work/packageade/fresh-round5"
+          ],
+          "exitCode": 0,
+          "log": "/tmp/fgos-work/packageade/fresh-round5/audit-ownership.log"
+        },
+        {
+          "command": [
+            "python3",
+            "/tmp/fgos-work/packageade/fresh-round5/replay.py",
+            "--output-dir",
+            "/tmp/fgos-work/packageade/fresh-round5"
+          ],
+          "exitCode": 0,
+          "log": "/tmp/fgos-work/packageade/fresh-round5/replay.log"
+        }
+      ],
+      "allPassed": true
+    }
+  ],
+  "execution": [
+    {
+      "label": "native-D",
+      "command": [
+        "node",
+        "--max-old-space-size=4096",
+        "--max-semi-space-size=16",
+        "/tmp/fgos-work/packageade/verify-current.mjs",
+        "--output-dir",
+        "/tmp/fgos-work/packageade"
+      ],
+      "exitCode": 0,
+      "seconds": 293.3541637779563,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-native-D.log"
+    },
+    {
+      "label": "portable-sync4d",
+      "command": [
+        "python3",
+        "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduce.py",
+        "--output-dir",
+        "/tmp/fgos-work/packageade/fresh-sync4d"
+      ],
+      "exitCode": 0,
+      "seconds": 25.318156470020767,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-portable-sync4d.log"
+    },
+    {
+      "label": "portable-round5",
+      "command": [
+        "python3",
+        "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduce.py",
+        "--output-dir",
+        "/tmp/fgos-work/packageade/fresh-round5"
+      ],
+      "exitCode": 0,
+      "seconds": 26.32859940797789,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-portable-round5.log"
+    },
+    {
+      "label": "tests",
+      "command": [
+        "zsh",
+        "-c",
+        "node --test test/scripts/doc-*.test.mjs test/scripts/check-doc-*.test.mjs test/scripts/generate-doc-inventory.test.mjs test/scripts/list-doc-anchors.test.mjs test/scripts/verify-phase-02.test.mjs test/scripts/next-doc-id.test.mjs"
+      ],
+      "exitCode": 0,
+      "seconds": 29.933555946976412,
+      "log": "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-tests.log"
+    }
+  ],
+  "package": {
+    "contentCommit": "ade5812a9f444f895185594aedc1f73cf8b2288a",
+    "beforeCommit": "203f4ef93867a60e6a37624b31ce14de426cafa8",
+    "entries": 40,
+    "parts": [
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-01-ade5812a9.md",
+        "entries": 12,
+        "bytes": 154691
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-ade5812a9.md",
+        "entries": 12,
+        "bytes": 124096
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-ade5812a9.md",
+        "entries": 12,
+        "bytes": 27898
+      },
+      {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-04-ade5812a9.md",
+        "entries": 4,
+        "bytes": 12297
+      }
+    ],
+    "counts": [
+      12,
+      12,
+      12,
+      4
+    ],
+    "maxBytes": 154691,
+    "allFiveBeforeAfterCommittedEquality": true,
+    "registryChangesSinceRequest": 16,
+    "outstandingMarkerDrops": 4,
+    "producerSeeds": false,
+    "producerVerdicts": false,
+    "entryKinds": {
+      "changed-rationale": 5,
+      "changed-tool-test-reproduction": 13,
+      "outstanding-registry-marker-drop": 4,
+      "package-portable-reproduction": 1,
+      "regenerated-check-A": 1,
+      "registry-change-since-request": 16
+    }
+  },
+  "L10-37": "Recorded under A42 in owner-answers.md: last rationale wording review round; wording-only defects without conservation loss become reasoned holds for owner promotion truth check; content defects remain repairable. No producer hold/verdict chosen.",
+  "blockers": [],
+  "next": "Independent ordinary review of this one bounded set; apply only matching committed verdicts and verbatim notes, then the existing global turn. Global E/A34/current-truth/consumer/cutover/checkpoint/scorecard remain open.",
+  "limits": [
+    "70 historical source-witness limits remain explicit; no unrestricted natural-language truth proof.",
+    "Frozen I diagnostic retains its historical delta while bytes are unchanged and current reader routes equal HEAD.",
+    "Lead-confirmed broad-suite environment/pre-existing failures remain disclosed in step10-sync4d-environment.json; no blanket npm-test-green claim.",
+    "No callable MDView tool; no external preview registration within this grant."
+  ],
+  "okScoped": true
+}

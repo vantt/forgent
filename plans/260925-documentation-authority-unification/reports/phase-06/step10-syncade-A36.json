@@ -1,0 +1,369 @@
+{
+  "contentCommit": "ade5812a9f444f895185594aedc1f73cf8b2288a",
+  "mechanicalEntries": 40,
+  "deepRequired": [
+    {
+      "entryId": "entry-001",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-01-ade5812a9.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_d5dd5fbdb3483914743a14791a5f02a8",
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-002",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-01-ade5812a9.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_9a5781f0086209a17330035ff0e58638",
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-003",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-01-ade5812a9.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_76dfcba31d147e73488ea3abeade7ef1",
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-004",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-01-ade5812a9.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_080c5cdacf820ed661ab372086ca7e41",
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-005",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-01-ade5812a9.md",
+      "kind": "changed-rationale",
+      "claimId": "claim_c072318ec582affe5e0e6936961fadc4",
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-006",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-01-ade5812a9.md",
+      "kind": "changed-tool-test-reproduction",
+      "claimId": null,
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-007",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-01-ade5812a9.md",
+      "kind": "changed-tool-test-reproduction",
+      "claimId": null,
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-008",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-01-ade5812a9.md",
+      "kind": "changed-tool-test-reproduction",
+      "claimId": null,
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-009",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-01-ade5812a9.md",
+      "kind": "changed-tool-test-reproduction",
+      "claimId": null,
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-010",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-01-ade5812a9.md",
+      "kind": "changed-tool-test-reproduction",
+      "claimId": null,
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-011",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-01-ade5812a9.md",
+      "kind": "changed-tool-test-reproduction",
+      "claimId": null,
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-012",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-01-ade5812a9.md",
+      "kind": "changed-tool-test-reproduction",
+      "claimId": null,
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-013",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-ade5812a9.md",
+      "kind": "changed-tool-test-reproduction",
+      "claimId": null,
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-014",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-ade5812a9.md",
+      "kind": "changed-tool-test-reproduction",
+      "claimId": null,
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-015",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-ade5812a9.md",
+      "kind": "changed-tool-test-reproduction",
+      "claimId": null,
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-016",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-ade5812a9.md",
+      "kind": "changed-tool-test-reproduction",
+      "claimId": null,
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-017",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-ade5812a9.md",
+      "kind": "changed-tool-test-reproduction",
+      "claimId": null,
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-018",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-ade5812a9.md",
+      "kind": "changed-tool-test-reproduction",
+      "claimId": null,
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-019",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-ade5812a9.md",
+      "kind": "outstanding-registry-marker-drop",
+      "claimId": "claim_133a4900a601db7cbf1182a96540ef56",
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-020",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-ade5812a9.md",
+      "kind": "outstanding-registry-marker-drop",
+      "claimId": "claim_4a2dfdbfa271d8f20b4e581757288988",
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-021",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-ade5812a9.md",
+      "kind": "outstanding-registry-marker-drop",
+      "claimId": "claim_c90c0415c20234da816351e16f9903b8",
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-022",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-ade5812a9.md",
+      "kind": "outstanding-registry-marker-drop",
+      "claimId": "claim_cfdd80946e57e4ea360ed04c1413f4dd",
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-023",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-ade5812a9.md",
+      "kind": "registry-change-since-request",
+      "claimId": null,
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-024",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-02-ade5812a9.md",
+      "kind": "registry-change-since-request",
+      "claimId": null,
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-025",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-ade5812a9.md",
+      "kind": "registry-change-since-request",
+      "claimId": null,
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-026",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-ade5812a9.md",
+      "kind": "registry-change-since-request",
+      "claimId": null,
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-027",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-ade5812a9.md",
+      "kind": "registry-change-since-request",
+      "claimId": null,
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-028",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-ade5812a9.md",
+      "kind": "registry-change-since-request",
+      "claimId": null,
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-029",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-ade5812a9.md",
+      "kind": "registry-change-since-request",
+      "claimId": null,
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-030",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-ade5812a9.md",
+      "kind": "registry-change-since-request",
+      "claimId": null,
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-031",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-ade5812a9.md",
+      "kind": "registry-change-since-request",
+      "claimId": null,
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-032",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-ade5812a9.md",
+      "kind": "registry-change-since-request",
+      "claimId": null,
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-033",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-ade5812a9.md",
+      "kind": "registry-change-since-request",
+      "claimId": null,
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-034",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-ade5812a9.md",
+      "kind": "registry-change-since-request",
+      "claimId": null,
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-035",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-ade5812a9.md",
+      "kind": "registry-change-since-request",
+      "claimId": null,
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-036",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-03-ade5812a9.md",
+      "kind": "registry-change-since-request",
+      "claimId": null,
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-037",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-04-ade5812a9.md",
+      "kind": "registry-change-since-request",
+      "claimId": null,
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-038",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-04-ade5812a9.md",
+      "kind": "registry-change-since-request",
+      "claimId": null,
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-039",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-04-ade5812a9.md",
+      "kind": "regenerated-check-A",
+      "claimId": null,
+      "A36": [
+        "deep-required"
+      ]
+    },
+    {
+      "entryId": "entry-040",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/review-request-step10-changed-04-ade5812a9.md",
+      "kind": "package-portable-reproduction",
+      "claimId": null,
+      "A36": [
+        "deep-required"
+      ]
+    }
+  ],
+  "producerSeed": false,
+  "producerVerdicts": false,
+  "reviewerObligation": "All entries deep and mechanical. Reviewer owns seeds, sample IDs and ordinary verdicts."
+}

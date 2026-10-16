@@ -1,3 +1,31 @@
+# Bounded package at ade5812a9 complete — independent review next
+
+Assignment `unit-run-1792130920095-4c562e4f/producer/1`. **One native sync 671.941s /one compact persistence**, known99,567 unchanged, zero loss; 4,486 files/91,386 units/exact active tuples. All9,210 bindings checked: zero drift/rebinds. **D zero fatal both priors together/each. Independent audit12,895 rows/92 shards/zero findings**,70 historical witness limits retained. Ownership254 groups/no new collision/native duplicate/drift;replay366+98+4 zero;**507/507 document tests**,both fresh-directory portable wrappers pass. A/B/H pass;A9 accounted pairs/zero unaccounted/working violations;I frozen bytes/current-to-HEAD preserved with historical delta explicit.
+
+**Registry: EVERY16 changes since fe98a6455 (12 origin-marker drops +4 metadata), plus four older outstanding marker drops included. ONE bounded set:[40 entries/four files](review-request-step10-index-ade5812a9.md),counts12,12,12,4,max154,691 bytes.** Five committed pending rationale before/after snapshots,all changed witness/accounting tools/tests/reproduction,check A and current portable manifest covered. Every header has Author sessions,portable commands/~3GiB heap note;A36 deep lists marked;no producer seeds/verdicts.
+
+**L10-37 (A42) recorded:**LAST rationale-wording round;wording-only findings without conservation loss become reasoned holds for owner promotion truth check;content defects still fixed. **NEXT=independent ordinary review,matching application,then the existing global turn.** Global E/A34/truth/consumer/cutover/checkpoint/scorecard remain open;Phase6 not closed. No new blocker;prior Lead-confirmed broad-suite environment/pre-existing limits remain,no blanket npm-test-green claim. [Report](step-10-report.md),[audit](step10-syncade-final-audit.json),[accounting](step10-syncade-registry-accounting.json),[reproduction](step10-syncade-reproduction.json). No docs/protected/workspace.fgos/CLI/Git writes;runner commits. MDView tool unavailable.
+
+---
+
+# Native sync at ade5812a9 complete — full D running
+
+One background native carry/persistence/genuine full inventory completed in671.941s,4,486 files/91,386 active units;known99,567→99,567,zero loss/exact active tuples,zero additions/gaps/retirements. One compact persistence,no recovery/resync. D both priors together/each is now running on the same complete2.1GiB v8 artifact;no fields omitted. Subsequent all-shard audit/two fresh-directory wrappers/document tests queued sequentially. Package40 entries/four files12,12,12,4;L10-37 recorded. Final structural/test claims await actual results.
+
+---
+
+# Package checkpoint at ade5812a9 — native inventory running
+
+One compact registry persistence completed; known99,567 unchanged, zero additions/gaps/retirements. All9,210 bindings checked: zero drift/rebinds. Complete accounting since fe98a6455:16 changes (12 origin marker drops +4 metadata);four older outstanding marker drops separately retained. Draft ONE bounded set40 entries/four parts12,12,12,4, max154,691 bytes. A/B/H pass;I frozen bytes/current routes preserved. Ownership254 groups/zero new active collision/native duplicate/digest drift;replay366+98+4 zero findings. Native full inventory/D and independent all-shard audit remain pending; no structural-green claim. L10-37 recorded;runner commits.
+
+---
+
+# Package at ade5812a9 in progress
+
+Assignment `unit-run-1792130920095-4c562e4f/producer/1`; Author session `codex-session:unit-run-1792130920095-4c562e4f@2026-10-16`. One native sync/compact persistence, D both priors, pending content-based drift repair, all-shard independent audit, replay/ownership and one bounded re-review set. L10-37 (A42): LAST rationale-wording round; wording-only defects without conservation loss become reasoned holds in the owner promotion-truth queue; content defects still get fixed. After matching review application, the global turn. Runner commits; plan-only writes and external outbox, no fgOS CLI or Git writes.
+
+---
+
 # Round-6 author corrections complete — package next
 
 Assignment `unit-run-1792130182385-eef9a749/producer/1`; input203f4ef93, reviews446b53d9d/content4d3634360/requestfe98a6455; L10-35/L10-36 accounted. All five Notes/Concerns read. Merge changes no docs source, no A31 re-carry due.

@@ -1,3 +1,39 @@
+# Bounded package at ade5812a9 complete — independent review next
+
+Assignment `unit-run-1792130920095-4c562e4f/producer/1`; Package Author session `codex-session:unit-run-1792130920095-4c562e4f@2026-10-16`. Content pin `ade5812a9f444f895185594aedc1f73cf8b2288a`; preceding main merge `203f4ef93` and content commit change no docs source. Original author session `codex-session:unit-run-1792130182385-eef9a749@2026-10-16`. Runner owns commits; package writes only in this plan and required external outbox.
+
+**L10-37 (A42), recorded in [owner answers](owner-answers.md): this is the LAST rationale-wording review round.** Wording-only defects without conservation loss become holds with explicit reason and go to the owner queue for the promotion truth check. Content defects are still fixed. This package chooses no seed, verdict or hold. After this review is applied, proceed to the existing global turn.
+
+**One background native carry-forward /one compact registry persistence /one complete inventory: 671.941s.** Known IDs **99,567 → 99,567**, zero loss; **4,486 files /91,386 active units**, exact active tuple equality. Zero added units, gaps or retirements. Registry SHA256 `1f5325ff1b1c2012c06aaf17b805c3f4fc2527923742271dff3d77e10707989e`; final hash equals the sole persistence proof. Full inventory uses lossless v8 bytes with16MiB chunk I/O; no omitted fields or substitute inventory. [Native proof](step10-syncade-native-proof.json), [own polled log](step10-syncade-native.log).
+
+**All9,210 live claim/gap bindings checked: zero drift, zero content rebinds, zero unresolved rows; no approval carried.** The existing content-based helper remains the path for actual drift and would reopen a changed row pending; none occurred. Historical collections are separately included in the all-shard audit. [Complete binding scan](step10-syncade-rebindings.json).
+
+**Native D: zero fatal against both priors together and each separately**, reusing that same complete native inventory and current compact registry. [Summary](step10-syncade-D-summary.json), [log](step10-syncade-native-D.log).
+
+| Priors | Seconds | Fatal |
+|---|---:|---:|
+| both | 89.890 | 0 |
+| identity | 96.951 | 0 |
+| phase02 | 97.813 | 0 |
+
+**Independent file-derived checker: all12,895 rows /92 shards /zero findings**; 718 structured source citations, 261 section assertions and 719 link assertions. **70 historical source-witness limits remain explicit.** No renderer agreement is substituted for independent content evidence; older hand prose is not given blanket truth approval. [Audit](step10-syncade-independent-consistency.json).
+
+**Ownership and replay pass:**254 historical/reference groups enumerated; zero new active-source collision, native duplicate or target digest drift. Exact link replay366+98+4 has zero findings. Both documented wrappers pass from fresh caller-supplied scratch directories, with every child exit code recorded; **507/507 document-tool tests pass**, zero fail/skip/cancel/todo, using `env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work`. Heavy steps run sequentially. [Ownership](step10-syncade-target-ownership.json), [replay](step10-syncade-link-replay.json), [execution/portable commands](step10-syncade-check-execution.json), [tests](step10-syncade-tests.log).
+
+**Complete registry accounting since request fe98a6455:16 changes**, all submitted:12 unit-record origin-marker drops and4 metadata keys (`_binding`, `carriedFromCommit`, `carryForward`, `commit`). **Four older outstanding marker-drop claims** are separately submitted with full authenticated f1f414b02→fe98a6455 before/after: `claim_c90c0415c20234da816351e16f9903b8`, `claim_133a4900a601db7cbf1182a96540ef56`, `claim_4a2dfdbfa271d8f20b4e581757288988`, `claim_cfdd80946e57e4ea360ed04c1413f4dd`. No known ID disappears and marker absence grants no review/truth approval. [Every change](step10-syncade-registry-accounting.json), [older four records](step10-round6-registry-accounting.json).
+
+**ONE small bounded set: [40 entries /4 request files](review-request-step10-index-ade5812a9.md)**; counts **12, 12, 12, 4**, max **154,691 bytes**. Covers five committed regenerated rationale snapshots; eight witness/accounting tool/test changes; four original portable-reproduction changes; tooling rationale; four omitted marker records; all16 current registry changes; regenerated check A; current portable native reproduction manifest. All five after snapshots equal the committed pending rows; their before snapshots come from203f4ef93. Package overlays bind exact registry/evidence to the runner package commit before ordinary verdicts. No unchanged reviewed population is resubmitted. [Coverage/validation](step10-syncade-package-validation.json).
+
+Every header names Author and Package Author sessions, portable commands, and the **approximately3GiB heap** note; optional full native inventory/D uses4GiB old-space/16MiB semi-space. Scratch belongs to the caller under `/tmp/fgos-work/`; historical mutation scripts are archival and never reproduce commands. **All40 entries are A36 mechanical/deep-required**, with [exact deep lists](step10-syncade-A36.json). Reviewer owns seeds, sample IDs and verdicts. [Portable manifest](step10-syncade-reproduction.json).
+
+**A/B/H pass:** check A has9 accounted commit/path pairs, zero unaccounted pairs/working violations; protected hashes unchanged; H609 files/217 checked/zero findings. Regenerated A is an explicit review entry. **I frozen bytes are unchanged; current reader routes equal HEAD; its historical baseline delta remains disclosed.** No allowlist, gate, checker, extractor, vocabulary or baseline change. Lead-confirmed broad-suite environment/pre-existing failures remain in step10-sync4d-environment.json; no blanket npm-test-green claim. [Checks](step10-syncade-checks.json), [final audit](step10-syncade-final-audit.json).
+
+**Next: independent ordinary review of this ONE set, then apply only matching committed verdicts with verbatim Notes. After that review is applied, run the existing global turn:** current main reconciliation; global D/E on the same applied in-memory overlay alone; T9/current-truth/promotion review; mutation and third refresh; full-corpus/reduced rehearsal; exact aliases and checkpoint sensitivity/red-team; consumer/cutover/A34/scorecard/effort obligations. Keep32 other groups for Phase7/8 and existing Rings holds/owner queues explicit. This package is complete; Phase6 remains open. No new content-source blocker or owner-direction question.
+
+No docs/source/code/test/protected/runtime bytes changed, fgOS CLI, Git write, workspace `.fgos` mutation, authority flip, source retirement, alias adoption, push or landing. MDView tool lookup found no callable view-file tool; no external registration was written and no preview URL is claimed.
+
+---
+
 # Round-6 author corrections complete — package next
 
 Assignment `unit-run-1792130182385-eef9a749/producer/1`; input `203f4ef93`, content `4d3634360`, request `fe98a6455`, reviews `446b53d9d`, Lead L10-35 `6600925b4`. All five Notes/Concerns read; L10-36 records the supplied Lead decisions under A42. Merge `203f4ef93` changes no docs source: no A31 re-carry due.
