@@ -10,6 +10,7 @@ import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { COMMAND_REGISTRY } from '../../src/cli/command-registry.mjs';
 import { invokeDispatchReconcileOperation } from '../../src/verbs/dispatch/reconcile.mjs';
+import { planReconciliation } from '../../src/runner/dispatch/reconciliation-planner.mjs';
 
 const repo = path.resolve(fileURLToPath(new URL('../..', import.meta.url)));
 
@@ -288,9 +289,13 @@ test('reconcile production routes refuse recovery semantics through CLI, operati
   assert.deepEqual(dispatchEntry.subcommands.reconcile.parameters.properties.action.description.match(/clear-cwd-lock|collect-result|clear-assignment-claim|repair-projection/g), [
     'clear-cwd-lock',
     'collect-result',
-    'clear-assignment-claim',
     'repair-projection',
   ]);
+  // Every advertised action must be one the planner recognizes.
+  for (const advertised of ['clear-cwd-lock', 'collect-result', 'repair-projection']) {
+    const plan = planReconciliation(root, { action: advertised, runId: 'r', now: '2026-09-15T00:00:00.000Z' });
+    assert.doesNotMatch(plan.reason ?? '', /unsupported reconciliation action/, `${advertised} is advertised`);
+  }
 
   assert.throws(
     () => invokeDispatchReconcileOperation({

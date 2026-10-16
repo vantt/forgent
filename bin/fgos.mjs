@@ -90,6 +90,7 @@ import { mergeList, mergeNext } from '../src/verbs/merge/merge.mjs';
 import { catchupUseCase } from '../src/verbs/merge/catchup.mjs';
 import { discoverUseCase, planUseCase } from '../src/verbs/state/step.mjs';
 import { editUseCase, parseEditFlags } from '../src/verbs/state/edit.mjs';
+import { unknownFlagMessage } from '../src/cli/flag-check.mjs';
 import { moveUseCase } from '../src/verbs/state/move.mjs';
 import { listUseCase, graphUseCase, workflowUseCase, gateCheckUseCase, staleUseCase } from '../src/verbs/state/read.mjs';
 import { showRunUseCase } from '../src/verbs/dispatch/show-run.mjs';
@@ -2662,17 +2663,11 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           // default (the CLI process's real process.cwd()) applies, same
           // ergonomics as running the command from inside the stuck cwd.
           const runParam = flags.run ?? flags['run-id'];
-          if ((runParam !== undefined || flags.assignment !== undefined) && (!flags.action || flags.action === 'clear-cwd-lock')) {
-            throw new StoreError(
-              'validation',
-              'dispatch reconcile plan with --run or --assignment requires --action (e.g. collect-result, clear-assignment-claim, or repair-projection)',
-            );
-          }
           const cwd = flags.cwd !== undefined ? path.resolve(process.cwd(), flags.cwd) : undefined;
           return invokeDispatchReconcileOperation({
             operationId: 'dispatch.runtime.reconcile', effect: 'write',
             ctx: reconcileCtx,
-            payload: { action: flags.action, runId: runParam, assignmentId: flags.assignment, cwd },
+            payload: { action: flags.action, runId: runParam, cwd },
           });
         }
         if (positional[1] === 'apply') {
@@ -4993,6 +4988,11 @@ async function main() {
     if ((rest.includes('--help') || rest.includes('-h')) && handleVerbHelp(verb, flags, positional)) {
       return;
     }
+
+    faultClass = 'unknown-flag';
+    const flagEntry = COMMAND_REGISTRY.find((e) => e.name === verb);
+    const unknownFlag = flagEntry && !flagEntry.nativeOnly ? unknownFlagMessage(flagEntry, flags, positional) : null;
+    if (unknownFlag) throw new StoreError('validation', unknownFlag);
 
     faultClass = 'dir-invalid';
     dir = dataDir(flags.dir);

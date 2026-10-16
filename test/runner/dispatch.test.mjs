@@ -5041,6 +5041,24 @@ test('resolveAgentTypeForWork returns null when no real agentDefs exist to resol
   assert.equal(resolved, null);
 });
 
+test('resolveAgentTypeForWork names an unparsable agent file on stderr once per process, not on every lookup', () => {
+  const cwd = mkTempDir();
+  writeTaskSpecFixture(cwd, 'domain: coding | stage: executing | role: implementer | requires-skill: fgos-coding-implement');
+  writeAgentFixture(cwd, 'general-worker', ['fgos-coding-implement']);
+  fs.writeFileSync(path.join(cwd, 'core', 'agents', 'broken.yaml'), 'name: broken\ndescription: a: b\n');
+  const written = [];
+  const realWrite = process.stderr.write;
+  process.stderr.write = (chunk) => { written.push(String(chunk)); return true; };
+  try {
+    for (let i = 0; i < 3; i += 1) assert.equal(resolveAgentTypeForWork({ domain: 'coding', stage: 'executing' }, cwd), 'general-worker');
+  } finally {
+    process.stderr.write = realWrite;
+  }
+  const rosterWarnings = written.filter((line) => line.startsWith('warning: agent roster:'));
+  assert.equal(rosterWarnings.length, 1);
+  assert.match(rosterWarnings[0], /broken\.yaml: cannot be parsed: .*line 2/);
+});
+
 test('resolveAgentTypeForWork returns null for a stage with no registered taskSpec (bundleForStage\'s own {skill:null,taskSpec:null} case) -- nothing to resolve from', () => {
   const cwd = mkTempDir();
   const resolved = resolveAgentTypeForWork({ domain: 'coding', stage: 'nonexistent-stage' }, cwd);

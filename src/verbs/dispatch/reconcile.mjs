@@ -1,4 +1,4 @@
-import { planReconciliation, applyReconciliation } from '../../runner/dispatch/reconciliation-planner.mjs';
+import { planReconciliation, applyReconciliation, RECONCILE_RUN_REQUIRES_ACTION } from '../../runner/dispatch/reconciliation-planner.mjs';
 import { loadGlobalConfig } from '../../config/global-config.mjs';
 import { clearProviderAccountQuarantine, quarantineProviderAccount, providerAccountInventory, ProviderCapacityConfigError } from '../../runner/dispatch/provider-capacity.mjs';
 export class DispatchReconcileError extends Error {
@@ -15,13 +15,11 @@ export class DispatchReconcileError extends Error {
 // applyReconciliation otherwise derive from the real wall clock and their
 // own expiresAt-vs-now bookkeeping.
 export function reconcilePlanUseCase(ctx, payload = {}) {
-  const { action, runId, assignmentId, cwd } = payload;
-  if ((runId !== undefined || assignmentId !== undefined) && (!action || action === 'clear-cwd-lock')) {
-    throw new DispatchReconcileError(
-      'dispatch reconcile plan with --run or --assignment requires --action (e.g. collect-result, clear-assignment-claim, or repair-projection)',
-    );
+  const { action, runId, cwd } = payload;
+  if (runId !== undefined && (!action || action === 'clear-cwd-lock')) {
+    throw new DispatchReconcileError(RECONCILE_RUN_REQUIRES_ACTION);
   }
-  return planReconciliation(ctx?.repoRoot ?? ctx?.cwd ?? process.cwd(), { action, runId, assignmentId, cwd });
+  return planReconciliation(ctx?.repoRoot ?? ctx?.cwd ?? process.cwd(), { action, runId, cwd });
 }
 export function reconcileApplyUseCase(ctx, payload = {}) { return applyReconciliation(ctx?.repoRoot ?? ctx?.cwd ?? process.cwd(), payload.plan); }
 export function reconcileProviderCapacityClearUseCase(ctx, payload = {}) {

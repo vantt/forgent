@@ -222,10 +222,12 @@ function holder(lock) {
   return { state: 'live', pid: lock.pid, incarnation: `pid:${lock.pid}:start:${recorded}` };
 }
 
-export function planReconciliation(root, { action = 'clear-cwd-lock', runId, assignmentId, cwd = process.cwd(), now = new Date().toISOString(), ttlMs = 300000, runsCache = null } = {}) {
+export const RECONCILE_RUN_REQUIRES_ACTION = 'dispatch reconcile plan with --run requires --action (e.g. collect-result or repair-projection)';
+
+export function planReconciliation(root, { action = 'clear-cwd-lock', runId, cwd = process.cwd(), now = new Date().toISOString(), ttlMs = 300000, runsCache = null } = {}) {
   return withRunsCache(runsCache, () => {
-    if ((runId !== undefined || assignmentId !== undefined) && (!action || action === 'clear-cwd-lock')) {
-      return { outcome: 'refused', reason: 'dispatch reconcile plan with --run or --assignment requires --action (e.g. collect-result or repair-projection)' };
+    if (runId !== undefined && (!action || action === 'clear-cwd-lock')) {
+      return { outcome: 'refused', reason: RECONCILE_RUN_REQUIRES_ACTION };
     }
     if (action === 'collect-result') return planCollectResult(root, { runId, now, ttlMs });
     if (action === 'repair-projection') return planRepairProjection(root, { runId, now, ttlMs });

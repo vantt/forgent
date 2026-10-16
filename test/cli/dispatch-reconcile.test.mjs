@@ -101,7 +101,7 @@ test('CLI apply refuses a same-byte outside-root target tampered into a plan', (
 // unsupported action, never as a half-working door.
 test('CLI refuses the retired clear-assignment-claim action as unsupported, never as a half-working door', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-reconcile-cli-')); fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
-  const planned = run(root, ['dispatch', 'reconcile', 'plan', '--action', 'clear-assignment-claim', '--assignment', 'a']);
+  const planned = run(root, ['dispatch', 'reconcile', 'plan', '--action', 'clear-assignment-claim']);
   assert.equal(planned.status, 0, planned.stderr);
   const outcome = JSON.parse(planned.stdout).data;
   assert.equal(outcome.outcome, 'refused');
