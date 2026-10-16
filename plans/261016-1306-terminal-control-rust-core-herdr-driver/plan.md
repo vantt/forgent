@@ -116,4 +116,4 @@ Thuần code + một thư mục state mới (`stateRoot/terminal/`) chỉ là ca
 
 ## Câu hỏi mở cho anh
 
-1. (Mặc định đã chọn, D2) 6.5 chuyển **mọi** lời gọi herdr của Node sang terminal-control, kể cả thao tác agent (`agent start/prompt/read`), thay vì chỉ vòng đời pane. Rộng hơn r6 §11/6.5 một chút nhưng đúng "một cửa"; nếu anh muốn hẹp (chỉ allocate/launch/release, agent ops để 6.3 cùng agent-protocol) thì P06 giảm ~5 h và `herdr-agent.mjs` giữ phần agent tới 6.3.
+1. **Đã chốt 2026-10-16: giữ mặc định, chuyển mọi lời gọi herdr** (nguyên tắc One Door và luật gom tùm lum). (D2) 6.5 chuyển **mọi** lời gọi herdr của Node sang terminal-control, kể cả thao tác agent (`agent start/prompt/read`), thay vì chỉ vòng đời pane. Rộng hơn r6 §11/6.5 một chút nhưng đúng "một cửa"; nếu anh muốn hẹp (chỉ allocate/launch/release, agent ops để 6.3 cùng agent-protocol) thì P06 giảm ~5 h và `herdr-agent.mjs` giữ phần agent tới 6.3.

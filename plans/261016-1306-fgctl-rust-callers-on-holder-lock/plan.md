@@ -101,4 +101,4 @@ Trước P05 bước đặt hàng rào: revert merge trên main, cài lại `fgc
 
 ## Câu hỏi mở cho anh
 
-1. (Xác nhận, mặc định đã chọn) D5: giữa 4.4a và 4.4b, `fgctl` trên Windows từ chối activate có tên thay vì lùi về lock v1. Đây là hệ quả trực tiếp của A2; nếu anh cần Windows chạy được trong khoảng đó thì 4.4b phải land cùng đợt.
+1. **Đã chốt 2026-10-16: giữ mặc định** (hệ quả trực tiếp của quyết định A2 của anh). D5: giữa 4.4a và 4.4b, `fgctl` trên Windows từ chối activate có tên thay vì lùi về lock v1. Đây là hệ quả trực tiếp của A2; nếu anh cần Windows chạy được trong khoảng đó thì 4.4b phải land cùng đợt.
