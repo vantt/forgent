@@ -1282,6 +1282,8 @@ fn identity_rejects_bad_options() {
             "args {args:?} must print no envelope"
         );
     }
+}
+
 /// Spawns fgos with a stdin pipe whose writer stays open (what a heredoc, an
 /// agent Bash tool, or `sleep 30 | fgos ...` hands the child). Returns the
 /// exit status if the child finishes within `limit`, otherwise kills it and
