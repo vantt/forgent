@@ -77,7 +77,52 @@ Sau khi báo cáo được viết, kiểm tra thêm cho thấy cùng 8 file lu�
 
 Chủ repo dùng Claude, pi, omp, codex và agy **cùng lúc**. Vì vậy đích cần đạt không phải "chọn một đích cho ak", mà là **mỗi CLI thấy mỗi luật đúng một lần**. Gỡ target `omp` như bản đầu báo cáo gợi ý sẽ làm codex, omp và pi mất bộ luật. Muốn thiết kế đúng cần một **bảng nạp (load matrix)** đo thật: CLI nào tự đọc file nào (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.omp/rules`, `.pi/rules`, file `@import`, AGENTS.md lồng theo thư mục). Hiện mới chắc chắn cho Claude (đọc trùng) và codex (chỉ đọc `AGENTS.md`); omp, pi và agy cần chạy thử từng CLI để xác minh. Mục backlog `p-7eb9e65b` giữ việc này.
 
+Kết quả đo thật cho 4 CLI nằm ở mục 2d; cột "CLI đọc" trên là giả định trước khi đo, mục 2d sửa lại nó.
+
 Cùng nguyên nhân gốc còn một lỗi thứ hai: `fgos doctor --fix` chạy toàn bộ 22 fix một lúc, gồm cả việc ghi vào cấu hình của tool khác; nó bỏ qua file JSON hỏng (`src/setup/agent-hooks.mjs:107-108`) nhưng ghi đè cả file lành bằng `JSON.stringify` (`agent-hooks.mjs:35-37`) và không backup. Hai bộ cài cùng coi một file là của mình, và mỗi bên viết lại toàn bộ file đó. Mục backlog `p-68be2ae3` giữ việc này.
+
+### 2d. Bảng nạp đo thật cho 4 CLI (2026-10-17)
+
+**Cách đo.** Mỗi CLI được bật qua `fgos run`, transport herdr, ghim tài khoản, cùng một prompt: không đọc file nào trong repo, chỉ trả lời từ những gì đã có trong context, liệt kê nguồn instruction và đếm số lần thân của 7 heading xuất hiện. Cả 4 lần chạy đều `pass`.
+
+| CLI | Invocation, tài khoản | Unit run |
+|---|---|---|
+| Claude Code (Sonnet 5.5) | `claude-herdr-bwrap` | `unit-run-1792172342967-f4a278a0` |
+| codex | `codex-herdr-fgovn`, openai `tetnu` | `unit-run-1792172342967-348699f2` |
+| omp | `omp-gemini-tetcu72`, gemini `tetcu72` | `unit-run-1792172342966-f4168380` |
+| pi | `pi-herdr-openrouter`, deepseek `openrouter` | `unit-run-1792172342967-9208ca5c` |
+
+Báo cáo gốc của từng CLI: `.fgos/assignments/<unit run>/producer/1/runs/01/outbox/report-1.md`.
+
+**Kết quả (số lần thân heading xuất hiện trong context):**
+
+| Heading | Claude | codex | omp | pi |
+|---|---|---|---|---|
+| `# forgent` | 1 | 1 | 1 | 1 |
+| `# Development Rules` | **2** | 1 | 1 | 1 |
+| `# Primary Workflow` | **2** | 1 | 1 | 1 |
+| `# Skill Domain Routing` | **2** | **0** | 1 | 1 |
+| `# GitNexus — Code Intelligence` | **2** | 1 | 1 | 1 |
+| `## Documentation Viewing (MDView)` | **2** | 1 | 1 | 1 |
+| `## fgOS Effective Instructions` | 1 | 1 | 1 | 1 |
+| Nguồn project tự khai | `CLAUDE.md`, `AGENTS.md` (qua `@AGENTS.md`), 8 file `.claude/rules` | chỉ `AGENTS.md` | chỉ `AGENTS.md` | `AGENTS.md` |
+
+**Phát hiện:**
+
+1. **Chỉ Claude đọc trùng.** Bộ luật AgentKit, GitNexus và MDView đều đến Claude hai lần: một lần từ `.claude/rules` hoặc `CLAUDE.md`, một lần từ `AGENTS.md` qua `@AGENTS.md`. Khớp với mục 2b và với số đo của script `instruction-audit` (47 nhóm đoạn trùng, khoảng 17 KB).
+2. **codex cắt cụt `AGENTS.md` mà không báo.** codex báo `# Skill Domain Routing` xuất hiện 0 lần dù nó nằm trong `AGENTS.md`. Vị trí byte giải thích chính xác: file dài 38.901 byte; mọi heading bắt đầu trước byte 32.768 (32 KiB, giới hạn `project_doc_max_bytes` mặc định của codex) đều được thấy, ví dụ `# Review, Audit, and Decision Rules` ở byte 31.714; mọi heading sau ngưỡng đều mất, ví dụ `# Skill Domain Routing` ở byte 33.144 và `# Skill Workflow Routing` ở byte 37.022. Đây là lỗi **nặng hơn đọc trùng**: bất cứ thứ gì được nối vào cuối `AGENTS.md` (khối AGENTKIT, các projection của fgOS) đều vô hình với codex.
+3. **omp không đọc `.omp/rules`.** omp chỉ nhận `AGENTS.md` và mọi heading xuất hiện đúng một lần, nên bản sao trong `.omp/rules` không được dùng (bản sao chết).
+4. **pi chưa kết luận chắc được.** pi đếm mọi heading đúng một lần và nói chúng nằm trong `AGENTS.md`, nhưng lại gọi tên các file `ak-engineer-*.md`, tên chỉ có trong `.pi/rules` (không có trong `AGENTS.md`), và mã extension trong `.pi/extensions` không cho thấy chỗ nạp thư mục đó. Cần đo lại bằng chuỗi đánh dấu (canary) cài vào từng file nguồn.
+5. **agy chưa đo** vì chưa cài trên máy này.
+
+**Giới hạn của phép đo.** Đây là số liệu CLI tự khai, có thể đếm sai; kết luận 2 có bằng chứng độc lập (vị trí byte), kết luận 1 khớp với script quét. Pane herdr chạy trong home cách ly, nhưng máy này không có file instruction cấp user nào (`~/.claude/CLAUDE.md`, `~/.codex*/AGENTS.md`, `~/.pi/agent/AGENTS.md`, profile omp đều không có), nên không làm lệch kết quả. Phép đo chắc chắn hơn là canary: cài một chuỗi duy nhất vào mỗi file nguồn rồi hỏi CLI thấy chuỗi nào; cách này cần sửa tạm các file instruction.
+
+**Hệ quả cho thiết kế (bổ sung P5).** `AGENTS.md` là kênh chung duy nhất mà codex, omp và pi thực sự đọc, và Claude cũng đọc nó qua import. Vì vậy:
+
+- Luật chung đặt một lần trong `AGENTS.md`, và **tổng `AGENTS.md` phải dưới 32 KiB**, hoặc ít nhất mọi luật quan trọng phải nằm trong 32 KiB đầu. Tăng `project_doc_max_bytes` trong `config.toml` của từng home codex chỉ là vá tạm, vì vẫn phải nhớ làm trên mọi máy và mọi tài khoản.
+- Với Claude, bỏ các bản sao mà `AGENTS.md` đã phủ: bộ luật AgentKit trong `.claude/rules`, khối GitNexus và MDView trong `CLAUDE.md`.
+- `.omp/rules` không mang lại gì cho omp; xác nhận bằng canary rồi bỏ khỏi đích cài của ak.
+- Script `instruction-audit` nên cảnh báo khi `AGENTS.md` vượt 32 KiB, kèm danh sách heading nằm sau ngưỡng.
 
 ## 3. Cơ chế tự động: cái đã có và chỗ hổng
 
@@ -176,7 +221,8 @@ Không cần agent nào ghi nhớ thêm điều gì: P1/P2 ép bằng máy, P3/P
 
 ## Câu hỏi chưa giải quyết
 
-- **Q1.** ~~Có phải lần chạy `ak` lúc 16/10 11:19 không, và nên giữ đích nào?~~ Đã trả lời: đúng là chủ repo vừa cài ak; nhưng vì 5 CLI được dùng cùng lúc nên không gỡ đích nào (mục 2c). Còn mở: bảng nạp của omp, pi và agy, cần đo bằng cách chạy thử từng CLI.
+- **Q1.** ~~Có phải lần chạy `ak` lúc 16/10 11:19 không, và nên giữ đích nào?~~ Đã trả lời: đúng là chủ repo vừa cài ak; nhưng vì 5 CLI được dùng cùng lúc nên không gỡ đích nào (mục 2c). Đã đo cho Claude, codex, omp và pi (mục 2d). Còn mở: agy (chưa cài), và xác nhận pi cùng `.omp/rules` bằng canary.
+- **Q5.** Xử lý giới hạn 32 KiB của codex thế nào: rút `AGENTS.md` xuống dưới 32 KiB (đề xuất), sắp lại để luật quan trọng nằm trong 32 KiB đầu, hay tăng `project_doc_max_bytes` trên mọi home codex?
 - **Q2.** Các worker ngoài tiến trình (pi, agy, Codex) có nạp AGENTS.md không? Nếu không, P3 bắt buộc phải nằm trong worker contract (báo cáo đã đề xuất như vậy).
 - **Q3.** Checker của P1 có đang nằm trong bộ test hoặc canary mà runner chạy trước khi commit mỗi Unit không? Nếu không, cần đưa vào để `--no-verify` và việc commit thẳng lên `main` không lách được.
 - **Q4.** 7 nguyên tắc nên chốt thành luật khoá mới (L11+, có decision ID) hay đưa vào spec dưới dạng guideline không khoá?
