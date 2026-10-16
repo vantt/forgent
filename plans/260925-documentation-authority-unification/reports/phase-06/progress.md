@@ -1,3 +1,21 @@
+# Round-7 author complete — package + global turn next
+
+Assignment `unit-run-1792150605063-4191f728/producer/1`; SYNC `a9a2b079f6a12d5992461312cd03b5d24c6495a2`. All40 request entries/25 table ok verdicts accounted with verbatim notes; five matching decision approvals applied, native/tool verdicts retained as accounting receipts. Exact entry-023 package registry SHA256 `1f5325ff1b1c2012c06aaf17b805c3f4fc2527923742271dff3d77e10707989e` /62,185,030 bytes bound to `b53dd05df`; registry unchanged.
+
+**A43: three Rings rows pending (one verbatim move, two supersede); holds=0.** Main five changed hunks carried verbatim to mapped runner/distribution candidates; byte-equal manifest and sidecar; generated backlog/end-user how-to mapping evidenced. All five paths accounted in existing ratchet structure; default roots unchanged, zero findings.49 rows reopened pending by content/citation dependency; nine provisional current-source drafts await native sync.117 frozen rationales unchanged.
+
+**Independent 12,895 rows/92 shards: zero findings,69 historical witness limits. Ownership/replay/A/B/H clean;I unchanged/current=HEAD;candidate-status clean. Final tool tests506/507;portable8/8.** Remaining liveness failure requires the native sync prohibited this author turn. Scoped FAST D9 `decision-claim-unknown` against both priors together/each: nine changed source predecessors awaiting native carry, all accounted pending, target drift0. E open15 partial/19 pending/one owner group/two gaps/313 reverse. No D/E-green or closure claim. [Report](step-10-report.md),[audit](step10-round7-final-audit.json),[commands](step10-round7-reproduction.json).
+
+**NEXT=package + global turn:** one native sync preserving every known ID, resolve all nine drafts and candidate changes, rebind all drift pending; rerun native both-prior D/liveness, bounded independent changed-content review, existing global E/A34/truth/consumer/cutover/checkpoint/scorecard. No new owner-direction blocker; native sync remains the known package dependency. Author turn had no native sync/review packs/CLI/Git/legacy/checker/extractor/vocabulary/baseline/workspace.fgos writes. Runner commits. Phase6 stays open; MDView unavailable.
+
+---
+
+# Round-7 author application and A43/main re-carry in progress
+
+Assignment `unit-run-1792150605063-4191f728/producer/1`. Applying all matching round-7 ok notes verbatim, exact entry-023 registry SHA256 binding, A43 responsibility-model redecisions, and A31 main re-carry at `a9a2b079f`. Author turn: no native sync or review packs. Next = package + global turn. Runner commits; scoped files only, no fgOS CLI/Git writes.
+
+---
+
 # Bounded package at ade5812a9 complete — independent review next
 
 Assignment `unit-run-1792130920095-4c562e4f/producer/1`. **One native sync 671.941s /one compact persistence**, known99,567 unchanged, zero loss; 4,486 files/91,386 units/exact active tuples. All9,210 bindings checked: zero drift/rebinds. **D zero fatal both priors together/each. Independent audit12,895 rows/92 shards/zero findings**,70 historical witness limits retained. Ownership254 groups/no new collision/native duplicate/drift;replay366+98+4 zero;**507/507 document tests**,both fresh-directory portable wrappers pass. A/B/H pass;A9 accounted pairs/zero unaccounted/working violations;I frozen bytes/current-to-HEAD preserved with historical delta explicit.

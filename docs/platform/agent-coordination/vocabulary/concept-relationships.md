@@ -100,6 +100,13 @@ Driver. Current concrete owners are the Workflow runner for sequencing,
 Execution Core binding and patterns for Unit execution, dispatch adapters for
 attempts, and Work verbs for delivery lifecycle.
 
-Whether to retain a future typed ring architecture remains open; this document
-does not assert it is implemented or revive the retired session engine.
+Added in candidate — A43: The owner adopts this responsibility model. No
+Orchestrator, Launcher, Router, Driver or Dispatcher class or entity is required
+or planned.
 
+The rings are responsibility boundaries, not necessarily one process or module
+per ring.
+
+Added in candidate — A43: Concrete responsibility owners remain
+`src/workflow/runner.mjs`, `src/runner/execution/patterns` and
+`src/runner/dispatch`; this does not revive the retired session engine.

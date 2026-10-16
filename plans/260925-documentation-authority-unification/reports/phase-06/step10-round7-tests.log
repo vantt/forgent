@@ -1,0 +1,2274 @@
+✔ status comes only from the switchboard (2.756269ms)
+✔ a Design status header never changes the computed status (9.007703ms)
+✔ a candidate missing candidateCore fields is reported; a complete one is clean (3.606933ms)
+✔ a headerless candidate is reported (1.320418ms)
+✔ a promoted document needs the governance baseline plus the promotion extras (1.990293ms)
+✔ unresolved relative links and Related paths are reported, resolved ones are not (2.208593ms)
+✔ link and Related extraction helpers (0.722027ms)
+✔ runCli is report-only by default and fatal under --strict (52.545039ms)
+✔ the real switchboard routes every promoted and candidate area entry point (20.472911ms)
+✔ a routed document that matches no placement pattern is reported, and an ambiguous switchboard route is surfaced (6.038819ms)
+✔ strict candidate status includes untracked Markdown but not ignored draft files (22.36303ms)
+generate-doc-inventory: identity registry (commit 702f857accc33241dc8cbb7ec8b278f1d008923f) is bound to cbb75ac5afde09c8fe7b9d2cf2d45227f5fdac6a; no carry-forward needed
+generate-doc-inventory: wrote plans/260925-documentation-authority-unification/reports/doc-inventory.json and plans/260925-documentation-authority-unification/reports/doc-inventory.md
+✔ row-set conservation rejects a previous claim id that is neither live, gap nor retired (4.689905ms)
+✔ two different target owners on one semantic claim are rejected, one shared owner is accepted (8.330465ms)
+✔ separate noncanonical evidence payload carriers do not compete for semantic ownership (1.742278ms)
+✔ evidence provenance cannot exempt canonical owners or other noncanonical kinds (1.756742ms)
+✔ a claim row without a disposition or with one outside the vocabulary is rejected (0.55212ms)
+✔ a disposition that requires a target owner is rejected without one, for every such disposition (1.618468ms)
+✔ legacy growth reported by the ratchet becomes a conservation finding (6.322876ms)
+✔ checkConservation separates fatal invariants from open data (1.774944ms)
+✔ a registry stays bound to later commits that change nothing in scope, and to none that do (138.207815ms)
+✔ generation and the gates accept a registry bound to an earlier commit with the same in-scope tree (193.746485ms)
+✔ refresh reuses a bound registry and carries identity forward when the in-scope tree changed (212.183679ms)
+✔ gates CLI: open conservation data is reported by default and fatal in strict mode; a lost claim id is always fatal (264.509894ms)
+✔ gates CLI combines repeated decision inputs and rejects a duplicate across inputs (264.171777ms)
+✔ gates CLI rejects each unreadable or empty decision input instead of ignoring later flags (125.018476ms)
+✔ gates CLI names the refresh command with the current commit when the shards are missing (31.571955ms)
+✔ a retired row without a vocabulary disposition is not a recorded removal (0.450175ms)
+✔ a partial-carry row is open data that blocks the cutover, scoped like the other open checks, and a decision for it names the remainder (2.035257ms)
+✔ identical source units that name different owners are reported as open data (0.478535ms)
+✔ the inventory must describe the current tree and the registry on disk (50.917585ms)
+✔ a targetAnchor is checked against the headings of the target document at the inventory commit (40.172195ms)
+✔ gates CLI strict mode refuses to run without its conservation inputs, and a stale inventory is always fatal (239.032925ms)
+✔ a reviewed decision on a registry gap resolves it while a pending decision does not (56.009043ms)
+✔ a registry gap decision overlays the gap row and reports an unknown, repeated or incomplete one (0.805237ms)
+✔ a reviewed decision is bound to its target unit and detects current digest drift (61.838229ms)
+✔ blocking pairs only with unknown-blocking, a file is decided once, and an unknown-blocking gap stays open (0.520044ms)
+✔ a scope that is an option or matches no inventory path is reported (0.205668ms)
+✔ a file decision replaces the proposed disposition, rationale and target owner of its item (0.949364ms)
+✔ each rule violated by a claim decision is reported with its own finding type (1.39027ms)
+✔ a claim decided twice, in one shard or across shards, is reported once as a duplicate (0.39824ms)
+✔ file decisions naming an unknown path or violating the vocabulary are reported (0.437631ms)
+✔ with decisions, a decided owner that is a promoted or candidate platform document counts as a valid target owner (0.47939ms)
+✔ loadDecisionShards reads one file or a directory in name order and rejects malformed input (1.814365ms)
+✔ a scope restricts every open conservation check to rows whose source path is in scope (0.761565ms)
+✔ a scope matches whole path segments and an empty scope changes nothing (0.30704ms)
+✔ checkConservation scopes the open data and leaves the invariants global (0.308599ms)
+✔ committed vocabulary and constitution are internally consistent (20.354169ms)
+✔ vocabulary: a duplicate id inside a section is reported (1.437175ms)
+✔ vocabulary: a disposition naming an undefined file class is reported (9.039169ms)
+✔ vocabulary: a disposition without allowed file classes is reported (0.992014ms)
+✔ vocabulary: a file class restricted to an unknown disposition is reported (1.232914ms)
+✔ vocabulary: a change entry without evidence is reported (1.140798ms)
+✔ vocabulary: claim kinds that disagree on the ledger field list are reported (1.246494ms)
+✔ constitution: an unknown claim kind reference is reported (5.860315ms)
+✔ constitution: a claim kind served by no document kind is reported (3.6731ms)
+✔ constitution: a vocabulary document type with no document kind is reported (2.459895ms)
+✔ constitution: duplicate document kind ids and duplicate placement patterns are reported (4.687185ms)
+✔ constitution: an undeclared placeholder and a bad cardinality are reported (2.490596ms)
+✔ constitution: a canonical placement under a legacy root is reported (1.576825ms)
+✔ constitution: an alias to a missing kind and an alias that is also unmapped are reported (1.512282ms)
+✔ constitution: a gate that names a missing script is reported (1.968549ms)
+✔ constitution: a planned gate without a deliverable is reported (5.584853ms)
+✔ constitution: a deferred item without a revisit trigger is reported (4.869857ms)
+✔ constitution: an outcome disposition outside the vocabulary and a class mismatch are reported (2.101988ms)
+✔ constitution: a corpus that has no placement is reported (1.741637ms)
+✔ row validator accepts a complete row and a row with typed relations (5.688095ms)
+✔ row validator accepts identity gap claim ids and assigned targets (0.55718ms)
+✔ row validator reports each defect with a stable reason code (2.508546ms)
+✔ row validator requires a target owner when the disposition needs one (0.705177ms)
+✔ ledger summary counts valid and invalid rows, duplicate ids, usage and gaps (2.024311ms)
+✔ ledger summary flags usage drift between the vocabulary and the rows (0.728865ms)
+✔ item summary reports values the vocabulary or constitution does not define (1.304446ms)
+✔ cli: committed files without a ledger exit 0 (5.431045ms)
+✔ cli: invalid ledger rows are reported but exit 0; strict mode exits 1 (15.952907ms)
+✔ cli: an undefined item value is reported, and fatal only in strict mode (8.910681ms)
+✔ cli: --json prints one machine-readable summary (3.957762ms)
+✔ cli: an unreadable inventory is fatal and prints how to regenerate it (9.342121ms)
+✔ cli: a structurally broken vocabulary is fatal (9.588172ms)
+✔ row validator requires a rationale where the disposition needs one (0.863989ms)
+✔ row validator checks the target owner against the placement rules (7.194555ms)
+✔ row validator rejects a reviewed row that is still blocking (4.12501ms)
+✔ placement: each path matches exactly one kind, most specific pattern first (0.840325ms)
+✔ placement: equally specific patterns of different kinds are reported as ambiguous (6.954435ms)
+✔ placement check lists leftovers and recorded exceptions (1.018894ms)
+✔ placement: every markdown file under docs/platform matches exactly one kind (108.053009ms)
+✔ constitution: a governance reference to a missing heading is reported (1.807285ms)
+✔ constitution: candidate marker, amendment rule and placement exceptions are required (1.767333ms)
+✔ constitution: a kind with neither placements nor a marker is reported (2.108872ms)
+✔ constitution: retirement gate records the conservation requirements (0.344487ms)
+✔ vocabulary: an amendment without evidence is reported (0.917359ms)
+✔ item summary reports a disposition that its file class does not allow (0.391058ms)
+✔ cli: strict mode fails on an item whose disposition its file class does not allow (8.687574ms)
+✔ cli: a row rationale may come from its inventory item (5.955712ms)
+✔ governance baseline fields are derived from doc-governance, not copied (0.351452ms)
+✔ constitution: candidate fields outside the governance baseline and bad promotion fields are reported (2.306633ms)
+✔ promotion report lists the fields each canonical document lacks (1.393496ms)
+✔ cli: the promotion report is informational and never fatal (89.020217ms)
+✔ constitution: the retirement gate requires an own reviewed rationale (0.246334ms)
+✔ evidence payloads are classified by location, not by missing header (0.375637ms)
+✔ placement check reports evidence whose verification index is missing (0.36167ms)
+✔ promotion report skips evidence payloads but lists other headerless canonical files (0.465437ms)
+✔ constitution: an evidence kind that is canonical or has no owner rule is reported (1.635582ms)
+✔ reports are history and the verification kind is a verification record (0.448712ms)
+✔ authority classes are a vocabulary section and every kind uses a defined one (1.431833ms)
+✔ the usage amendment rests on dispositions that the committed decision shards use (9.757154ms)
+✔ the reading map stays outside docs/platform for a recorded reason (0.264321ms)
+✔ cutover rows: a retained claim needs an owner, an anchor and a classified kind (0.830392ms)
+✔ cutover rows: unreviewed, blocking and rationale-less rows are counted per reason (0.485988ms)
+✔ cli: --cutover is fatal while any row is blocking or unreviewed, and a reviewed ledger reports no cutover rows (8.363266ms)
+✔ constitution CLI merges every decision input and rejects a stale source proof (1317.837142ms)
+✔ every check of both gates gets a result; clean inputs leave only the planned checks blocked and the review check owed (6.10495ms)
+✔ a defect in file-disposition blocks exactly that check (1.916915ms)
+✔ a defect in claims-closed blocks exactly that check (0.517503ms)
+✔ a defect in claims-closed blocks exactly that check (0.516023ms)
+✔ a defect in claims-reviewed blocks exactly that check (0.533141ms)
+✔ a defect in dropped-claims-resolved blocks exactly that check (0.526087ms)
+✔ a defect in aliases-cover-immutable-refs blocks exactly that check (0.653396ms)
+✔ a defect in consumers-rewritten blocks exactly that check (0.488342ms)
+✔ a defect in no-new-legacy-growth blocks exactly that check (0.589148ms)
+✔ a defect in row-set-conserved blocks exactly that check (0.890416ms)
+✔ a defect in row-set-conserved blocks exactly that check (0.431336ms)
+✔ a defect in one-owner-per-semantic-claim blocks exactly that check (0.502232ms)
+✔ a defect in cutover-mode blocks exactly that check (0.347756ms)
+✔ a defect in cutover-mode blocks exactly that check (0.353343ms)
+✔ a defect in reviewed-rationale blocks exactly that check (0.311916ms)
+✔ a defect in canonical-metadata-complete blocks exactly that check (0.339392ms)
+✔ a defect in metadata-and-structure blocks exactly that check (0.329745ms)
+✔ a defect in links-resolve blocks exactly that check (0.380295ms)
+✔ a defect in owner-per-claim blocks exactly that check (0.337325ms)
+✔ the evidence check stays blocked until a verifier exists, whatever the inputs say (0.538091ms)
+✔ a review check stays owed until a record names reviewer, date and evidence, and cutover mode counts it (4.75419ms)
+✔ a check dropped from the constitution is reported as blocked (0.964913ms)
+✔ an unresolved conflict group blocks the plan acceptance check (0.585262ms)
+✔ a check the constitution marks planned is blocked even when its computed measure is clean, and a check with no evaluator is blocked as unevaluated (0.991347ms)
+✔ legacy paths that history reads by path are covered only by a bare-path alias (0.648657ms)
+✔ duplicate groups made only of evidence mirrors resolve by deduplication and do not count as conflicts (0.5578ms)
+✔ consumer edges count only authority readers of legacy paths (0.533348ms)
+✔ the dry run fails only on a conservation invariant; cutover mode also fails while a check is blocked (0.355872ms)
+✔ cli: an unreadable inventory is fatal and names the regenerate command (10.600535ms)
+✔ recorded duplicate and semantic resolutions close only their named conflict groups (0.608445ms)
+✔ the retirement acceptance gate consumes conflict decisions without removing any remaining conflict (0.856876ms)
+✔ malformed and duplicate conflict decisions fail instead of granting closure (4.662695ms)
+✔ historical decisions remain recordable after a group disappears and never close another group (0.340885ms)
+✔ named retiring files participate in history alias coverage without swallowing neighboring paths or kept projections (2.846021ms)
+✔ root-file consumers are counted while both fixed legacy directories and retiring-file readers remain legacy (0.748774ms)
+✔ retiring-file data cannot redefine directory roots, retire instruction files, candidates or the kept decision projection (4.636686ms)
+✔ the committed table is empty and validates clean (3.813228ms)
+✔ a well-formed table validates clean, including a retirement with evidence (0.849568ms)
+✔ rejects a duplicate fromPath (0.528506ms)
+✔ rejects an owner outside docs/platform unless the alias is a retirement (0.515269ms)
+✔ rejects an alias chain and reports a loop as a cycle (0.737315ms)
+✔ rejects an anchor without an owner (0.323071ms)
+✔ rejects a bad kind and schema violations (0.533197ms)
+✔ checks owner existence against a repo root when given (0.888909ms)
+✔ resolves an exact path, a path with anchor, and reports an unknown ref (1.966357ms)
+✔ runCli validates, resolves and sets the exit code (22.228859ms)
+✔ a split alias must name the old anchor, and a chain through an anchored alias is found (0.604428ms)
+✔ toAnchor must be a heading of the owner document (7.580766ms)
+✔ a line reference maps through the old document to the section alias and says it is approximate (3.413344ms)
+✔ an unknown anchor is unresolved when the old document is readable, GitHub spelling and deeper anchors resolve (4.333216ms)
+✔ a relative link is normalized against the consumer and a missing consumer is explicit (0.536656ms)
+✔ fromPath anchors are checked against the old document when it exists (1.738431ms)
+✔ references outside the repository, inverted ranges and a fixed revision are handled explicitly (0.78858ms)
+✔ the CLI fails an approximate resolution under --exact and names the precision otherwise (7.202055ms)
+✔ inserted paragraphs move anchors without substituting neighbouring text (2.212865ms)
+✔ identical footers keep their occurrence within the prior content sequence (1.66055ms)
+✔ ambiguous or absent content fails closed instead of retaining old anchor (0.887297ms)
+✔ unchanged bindings never overwrite truthful rationale (0.484053ms)
+✔ ownership check reports two distinct claims at one target (0.492733ms)
+✔ position-exact link replay rejects swapped table cells despite string presence (2.63305ms)
+✔ stale prior anchor uses reviewed ancestry to distinguish repeated footer text (0.376204ms)
+✔ expanding digest prefixes or shifting an unchanged content anchor preserves rationale (0.335438ms)
+✔ repeated content with a stale anchor and no ancestry is rejected rather than taking occurrence one (2.095933ms)
+✔ candidate units not named by a source decision are open data rather than invariant corruption (11.37665ms)
+✔ legacy source scope checks the target area including unnamed sibling documents, not unrelated areas (1.517243ms)
+✔ candidate self references cannot conceal invented units and a parent anchor does not own unnamed children (1.29859ms)
+✔ previous shards do not acquire new reverse-review obligations implicitly (0.565522ms)
+✔ script-proven exact and mirror rows name only their expanded units, not an entire target area (1.566626ms)
+✔ a committed independently accepted candidate-native-navigation receipt closes only its bound unit (151.845591ms)
+✔ a committed independently accepted structural-frame receipt closes only its bound unit (122.655162ms)
+✔ a committed independently accepted bookkeeping receipt closes only its bound unit (97.139074ms)
+✔ reverse conservation leaves its unit open with an uncommitted receipt (64.134734ms)
+✔ reverse conservation leaves its unit open with an uncommitted review report (74.198313ms)
+✔ reverse conservation leaves its unit open with a non-accepted verdict (102.855184ms)
+✔ reverse conservation leaves its unit open with an unapproved reference (68.638143ms)
+✔ reverse conservation leaves its unit open with a class outside the fixed list (79.846966ms)
+✔ reverse conservation leaves its unit open with a reviewer who authored the receipt in the same session on another date (77.590509ms)
+✔ reverse conservation leaves its unit open with missing row authorship (70.121432ms)
+✔ reverse conservation leaves its unit open with missing receipt session authorship (74.963346ms)
+✔ reverse conservation leaves its unit open with missing shard authorship with the opt-in flag disabled (84.732849ms)
+✔ reverse conservation leaves its unit open with a script pretending to author a classification (74.436386ms)
+✔ reverse conservation leaves its unit open with a reviewer identity different from the report (85.249718ms)
+✔ reverse conservation leaves its unit open with a changed candidate unit (70.152895ms)
+✔ reverse conservation leaves its unit open with a moved unit path (75.658351ms)
+✔ reverse conservation leaves its unit open with a moved unit heading (76.805812ms)
+✔ reverse conservation leaves its unit open with a report for a different class (77.623421ms)
+✔ reverse conservation leaves its unit open with a report for a different shown-text digest (88.09809ms)
+✔ classification proofs read committed receipt bytes, not a later working-tree rewrite (76.626262ms)
+✔ classification report and receipt pins must be ancestors of the inventory commit (78.542434ms)
+✔ the shard loader rejects a non-array classification reference list (54.610987ms)
+✔ heading classification approval is invalidated when the shown section changes without changing its heading identity (96.574737ms)
+✔ a classification receipt does not close a unit with a forged receipt payload (62.692387ms)
+✔ a classification receipt does not close a unit with a stale receipt payload digest (63.309668ms)
+✔ a classification receipt does not close a unit with a stale reviewed payload digest (63.162333ms)
+✔ an ordinary classification receipt cannot replace checkpoint sensitivity review (53.031789ms)
+✔ substantive candidate content closes only after an independently accepted current-code check (80.653828ms)
+✔ substantive candidate content stays open with missing current evidence (63.731233ms)
+✔ substantive candidate content stays open with a stale assessment (67.83525ms)
+✔ substantive candidate content stays open with a false assessment (64.857729ms)
+✔ substantive candidate content stays open with a different reviewed evidence digest (73.629239ms)
+✔ substantive candidate content stays open with a rework verdict (69.235983ms)
+✔ substantive candidate content stays open with an author acting as reviewer (54.899521ms)
+✔ current-code evidence becomes stale when its cited implementation changes (102.245055ms)
+✔ an independently accepted observed command can prove candidate-native behaviour (133.347818ms)
+✔ a failed command is not a true-and-current behaviour proof (95.902433ms)
+✔ independently reviewed historical fenced content closes by provenance bytes rather than current truth (83.343678ms)
+✔ a complete historical paragraph can close when its bytes occur in the provenance blob (78.942843ms)
+✔ history snapshot remains open with canonical document kind (69.296192ms)
+✔ history snapshot remains open with missing provenance pin (67.664789ms)
+✔ history snapshot remains open with different provenance path (67.192194ms)
+✔ history snapshot remains open with different provenance commit (72.960023ms)
+✔ history snapshot remains open with different source blob digest (79.95872ms)
+✔ history snapshot remains open with only a fragment of the full fenced body proven (76.696752ms)
+✔ history snapshot remains open with extra content outside the provenance blob (78.082591ms)
+✔ history snapshot remains open with normalized rather than literal bytes (81.320245ms)
+✔ history snapshot remains open with snapshot metadata instead of historical payload (75.624418ms)
+✔ history snapshot remains open with different independently reviewed evidence digest (77.991215ms)
+✔ history snapshot remains open with uncommitted independent review (57.846657ms)
+✔ history snapshot remains open with non-accepted verdict (83.624784ms)
+✔ history snapshot remains open with pending receipt reference (59.373124ms)
+✔ history snapshot remains open with same author and reviewer session (62.820984ms)
+✔ a snapshot proof is invalidated by a committed provenance change even when payload bytes are unchanged (101.729188ms)
+✔ a later provenance line cannot replace an unpinned snapshot provenance (104.192397ms)
+✔ independently committed corpus rules classify every selected row and file without reviewing legacy authority (68.170362ms)
+✔ a corpus classification drift is rejected rather than silently giving authority rows a rule approval (51.460663ms)
+✔ unsupported corpora and dispositions cannot earn rule review (36.116547ms)
+✔ uncommitted, mismatched and self-session corpus review cannot approve rows (70.785825ms)
+✔ corpus-generated rows cannot be decided again in the same shard (41.353474ms)
+✔ loader rejects a malformed corpus-rule collection (33.364508ms)
+✔ pending corpus policy keeps rows blocking until its independent review is committed (34.076005ms)
+✔ corpus approval preserves generated projections while reviewing every generated claim (33.840416ms)
+✔ coverage honors explicit source paths and prefix maps but not target mentions or neighboring prefixes (5.716403ms)
+✔ rebind preserves review only for one digest match and otherwise returns rows to pending (1.00022ms)
+✔ snapshot uses merged decisions in the ledger schema shape and verifies both content and digest (7.202328ms)
+✔ identical text moved under another heading loses review while same-context anchor shifts retain it (0.370666ms)
+✔ coverage excludes canonical and non-authority items and a heading range covers only its rows (1.419172ms)
+✔ exact proposals carry only unique long units with equal ancestors and a sufficient document share (5.066926ms)
+✔ repeated digests, changed ancestors and low exact share cannot become script-reviewed (0.749706ms)
+✔ the gate re-proves exact entries and binds current anchors by digest rather than position (4.335503ms)
+✔ committed unit lookup retains full text and the ancestor chain for exact proof (50.649087ms)
+✔ summary lists multi-legacy duplicate groups and required reconciliation sources (2.04331ms)
+✔ exact proof cannot script-review canonical self-carries or non-legacy sources (1.745839ms)
+✔ two identical source occurrences cannot both be exact against one target occurrence (1.290315ms)
+✔ a byte-identical evidence mirror carries all source units to the verified copy and decides its file (11.063778ms)
+✔ mirror proof rejects changed blobs, unpinned blobs, non-evidence sources and missing targets (1.337273ms)
+✔ mirror and manual decisions cannot decide the same claim or file twice (1.401039ms)
+✔ mixed-file target anchors and digests are proven from the committed bytes, not the working tree (53.10042ms)
+✔ a canonical duplicate group with two source copies and two platform copies has one owner (9.152979ms)
+✔ review pack contains full source and target units and reverse unmatched candidate blocks (8.874274ms)
+✔ seeded review uses six real text mutations and scores missed defects and false flags (29.538324ms)
+✔ review application binds current digest and keeps rework and hold pending without inventing approval (15.607626ms)
+✔ valid source digest prefixes survive pack and review application with full seen-text bindings (6.491791ms)
+✔ verdict table names the reviewer and requires an explicit verdict and own note for each row (2.226597ms)
+✔ unknown dispositions remain blocking after a hold verdict and pass decision validation (6.981438ms)
+✔ unknown dispositions remain blocking after a rework verdict and pass decision validation (3.012298ms)
+✔ the same reviewer session on another date is still the author session (0.524797ms)
+✔ pre-reviewed hand rows without committed evidence are rejected instead of skipped (2.040857ms)
+✔ a public seeded pack does not expose its replay inputs or retain original mutated digests (5.360131ms)
+✔ review application requires a passing sensitivity result for the exact shown pack (4.71157ms)
+✔ approval cannot attach to target text or heading ancestry changed after the pack (7.274564ms)
+✔ approved rows retain the seen unit binding and their own report across review rounds (3.52112ms)
+✔ sensitivity controls must belong to the bound batch even when the sensitivity score passes (4.694726ms)
+✔ deduplicates overlapping candidate lists and accounts native strict red without claiming strict green (4.258786ms)
+✔ rejects same-size candidate substitutions and stale digest/anchor/path/identity (1.095371ms)
+✔ rejects unexpected fatal, unknown open category and summary-count mismatch (1.013521ms)
+✔ pending claims must equal holds by identity; unknown-blocking also counted (0.594944ms)
+✔ partial carries compare full native identity including registry predecessors (0.761363ms)
+✔ identical groups compare digest and exact owner sets rather than group counts (0.791516ms)
+✔ missing explicit rows, malformed data and duplicate native identities fail closed (0.680902ms)
+✔ native registry partial rows use source text digest rather than opaque unit identity digest (0.494732ms)
+✔ never repoints a source relationship or a link to its own file (8.603193ms)
+✔ source column header protects subsequent table rows (0.964774ms)
+✔ chooses a restored same-named candidate before a portal (1.026028ms)
+✔ chooses the unique per-anchor target when no same-named candidate exists (0.42239ms)
+✔ restores and classifies a portal alias with no specific target (0.462276ms)
+✔ wrapped labels are repointed and labels preserved (0.443061ms)
+✔ fences and historical referents are retained (0.529989ms)
+✔ anchored destinations preserve the explicit alias anchor (0.409487ms)
+✔ ambiguous specific targets fail closed (0.908842ms)
+✔ uses the source heading alias for a split document without guessing among sections (0.52179ms)
+✔ a canonical data cell does not protect unrelated following table rows (2.68304ms)
+✔ restored same-named document takes precedence over an archived heading alias (0.442302ms)
+✔ all source relationship row labels retain legacy destinations and verbatim labels (0.719799ms)
+✔ Source and Legacy source columns protect only their own cells (2.966615ms)
+✔ canonical in narrative text is not a source relationship label (0.752715ms)
+✔ a labelled source relationship inside any cell protects that cell alone (0.539633ms)
+✔ a source relationship link label inside any cell stays verbatim (0.231968ms)
+✔ a source-column link label does not turn preservation targets into source relationships (0.300191ms)
+✔ prose destinations and bare legacy names do not protect candidate links (0.319437ms)
+✔ relationship labels protect their own link, not other links in the same cell (0.299187ms)
+✔ frozen reviewed rationale survives regeneration until a binding changes (4.405641ms)
+✔ identical source occurrences require their own anchor or authenticated historical ordinal (1.453553ms)
+✔ heading comparison uses complete direct section and detects unlabelled payload loss (2.819602ms)
+✔ heading body equality and link rebases are explained independently of depth (1.365194ms)
+✔ correction before must occur in its own bound source or identify an intermediate witness (1.097383ms)
+✔ removed and added unrelated links are two changes and repeated changes are distinct pairs (0.972928ms)
+✔ whole-section audit cannot clear an unexplained delta with a generic reason (0.852134ms)
+✔ whole-section comparison reports reordered lines even with identical line multisets (0.919615ms)
+✔ whole-section normalization applies complete corrections before overlapping fragments (0.902483ms)
+✔ a repository directory trailing slash is a spelling change with the same destination (0.846249ms)
+✔ secondary section-accounting carriers do not masquerade as the primary source anchor (2.826303ms)
+✔ section witnesses reject same-side source loss and target additions (0.613397ms)
+✔ section witnesses require whole lines, never substring matches (1.513726ms)
+✔ label classifier matches only registered case-sensitive bounded ids (0.979743ms)
+✔ equal section movement never claims replacement even with an account label (2.888154ms)
+✔ independent facts reject a generator-consistent invented label and equal section claim (5.376011ms)
+✔ independent facts reject wrong removed and added line arrays (3.078329ms)
+✔ independent facts recompute link counts from the actual bound sections (0.636845ms)
+✔ independent facts accept actual delta and a real account label (2.104629ms)
+✔ independent equal-section facts reject replacement wording (0.693984ms)
+✔ independent facts verify a named live carrier by whole lines (1.64452ms)
+✔ independent reverse carrier audit rejects reviewer fence, brace, separator and link-placeholder witnesses (1.800021ms)
+✔ independent reverse carrier audit uses the raw link spelling inside substantive prose (0.691047ms)
+✔ reproduction rejects missing or repository output ["consistency"] (87.262237ms)
+✔ reproduction rejects missing or repository output ["consistency","--output","/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/unsafe.json"] (70.907955ms)
+✔ reproduction rejects missing or repository output ["consistency","--output","relative.json"] (72.594367ms)
+✔ direct audit rejects a symlink output before reading the corpus (62.843834ms)
+✔ direct audit rejects a dangling-symlink output before reading the corpus (71.667688ms)
+✔ direct audit rejects a hardlink output before reading the corpus (86.138672ms)
+✔ documented ownership commands work from a fresh reviewer output directory: step10-round5-reproduction.json (16255.295449ms)
+✔ documented ownership commands work from a fresh reviewer output directory: step10-sync4d-reproduction.json (15694.984788ms)
+✔ rationale is rebuilt from bound facts without appending false old text (7.589867ms)
+✔ full unit digest decides equality, including heading section payload (0.900782ms)
+✔ last review comparison accepts digest prefix expansion and reports changes (1.116781ms)
+✔ link count distinguishes actual destination changes from spelling rebases (0.787974ms)
+✔ consistency flags changed ranges, anchors, equality and reviewed digest assertions (3.439212ms)
+✔ historical witness and no-target retain do not invent current source ranges (0.550289ms)
+✔ missing or mismatched binding evidence fails rather than inventing facts (1.158361ms)
+✔ legacy consistency checks contextual ranges, anchors and equality without mistaking header citations for bound spans (7.613618ms)
+✔ legacy audit understands unicode anchors, same-file successors and explicitly quoted prior rationales (2.714544ms)
+✔ unavailable historical text remains an explicit witness limit without invented line numbers (1.125361ms)
+✔ link alignment counts inserted provenance separately from repointed links (1.135792ms)
+✔ bound related citations include their actual lines and exact text (1.078399ms)
+✔ review entry snapshots use the committed row for both after and currentDecision (1.954132ms)
+✔ legacy citation audit distinguishes described links from the unit binding itself (0.917586ms)
+✔ residual sibling references are checked as residual facts rather than the primary unit anchor (0.561724ms)
+✔ a historical target is never presented as a current target or as no mapped copy (1.593146ms)
+✔ declared historical target identity disambiguates same-file source and successor references (0.507024ms)
+✔ overlapping labelled corrections are composed to current bound text before selection (0.671388ms)
+✔ carrier witnesses require substantive removed raw lines, excluding reviewer fence, brace, separator and link-only examples (1.392671ms)
+✔ carrier witness raw removals honor exact corrections and repeated-line multiplicity (0.752132ms)
+✔ registry accounting includes marker-only edits, all collections, metadata and deleted keys (1.530095ms)
+✔ restored claims require owner anchor and the complete committed unit digest (62.880183ms)
+✔ working-tree text cannot supply an uncommitted restoration proof (37.718839ms)
+✔ deferred register entries must point to an existing committed stub anchor (31.841515ms)
+✔ a deferred decision cannot name a nonexistent stub or omit its fields (37.501064ms)
+✔ two legacy sources sharing a short unit retain a multiple-owner blocking finding (56.915589ms)
+✔ committed independent review permits a subsequent pack without passing unproven rows (81.909628ms)
+✔ the same session cannot review itself by changing identity prefix or date (54.375239ms)
+✔ reviewed manual rows require an author and cannot borrow a script identity (56.380241ms)
+✔ an uncommitted or mismatched verdict never approves a manual row (68.818428ms)
+✔ a later edit of a report cannot silently erase or replace an earlier pinned approval (100.029553ms)
+✔ review report pins from outside inventory ancestry cannot certify a row (47.31883ms)
+✔ authorship-required shards cannot omit their author session (53.583346ms)
+✔ escaped table pipes retain the exact reviewer note after parsing (74.039638ms)
+▶ new manual shards cannot disable required authorship or committed review evidence
+  ✔ authorSession remains required when the flag is undefined (5.56901ms)
+  ✔ authoredBy remains required when the flag is undefined (5.443667ms)
+  ✔ reviewReport remains required when the flag is undefined (0.309265ms)
+  ✔ authorSession remains required when the flag is false (4.286851ms)
+  ✔ authoredBy remains required when the flag is false (4.44818ms)
+  ✔ reviewReport remains required when the flag is false (0.206332ms)
+✔ new manual shards cannot disable required authorship or committed review evidence (65.629165ms)
+✔ reviewers receive full text and a unified diff in Markdown with safely nested fences (182.149176ms)
+✔ the public seeded Markdown can be scored without exposing the seed or private selection key (489.507464ms)
+✔ script-proven carries supply batch sensitivity controls without reopening accepted decisions (478.730571ms)
+✔ a new shard cannot claim legacy compatibility by deleting author fields (133.321159ms)
+✔ ordinary committed reviews approve seen text without a sensitivity pack and retain their report pin (339.223225ms)
+▶ ordinary reviews cannot approve a changed digest, an unauthored row or their own session
+  ✔ target-digest (122.791965ms)
+  ✔ source-digest (106.689868ms)
+  ✔ authoredBy (110.199791ms)
+  ✔ authorSession (107.73513ms)
+  ✔ same-session (117.04242ms)
+✔ ordinary reviews cannot approve a changed digest, an unauthored row or their own session (565.965416ms)
+▶ checkpoint reports cannot use the ordinary channel to omit sensitivity proof
+  ✔ checkpoint 3 (200.451575ms)
+  ✔ checkpoint 6 (193.788157ms)
+  ✔ checkpoint 10 (188.689078ms)
+✔ checkpoint reports cannot use the ordinary channel to omit sensitivity proof (583.54299ms)
+✔ the review lint accepts a well-formed ordinary report before application and writes nothing (98.149989ms)
+✔ the review lint uses the recorded target digest of an applied shard without an inventory (144.564886ms)
+▶ the review lint names the line and claim of each malformed verdict row
+  ✔ source-digest-not-64-hex (101.747438ms)
+  ✔ wrong-cell-count (91.451778ms)
+  ✔ non-bare-first-cell (89.058615ms)
+  ✔ target-digest-mismatch (102.334728ms)
+  ✔ source-digest-mismatch (92.6954ms)
+  ✔ bad-verdict (90.694433ms)
+✔ the review lint names the line and claim of each malformed verdict row (568.972475ms)
+✔ the review lint allows labelled non-claim rows but reports unknown claims and missing headers (311.848657ms)
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+... Skipped lines
+
+  [
+    [
+      '0005-runner-cô-lập-worker',
+      '8c6dec18f6bef92315f061a9bdcf6803f5c40f688265b36d608602036bf9778a'
+    ],
+...
+      'dispatch-operability-implementation-slice-2026-09-16',
++     '020a15e1469e9d8f87b2295cc7ea3ca73da8fdda1dd62ff82b49a403fdb086f5'
+-     'aaec88b66425149e842fe7c507cd3dd0beaee9d3e0ecde88fa805637967d2f10'
+    ],
+    [
+      'dispatch-runtime-inspection',
+      '5ed555b20633e3d02aab26557fd2c1a144c2cac1cc1da5e7048986c280cfa1e0'
+    ],
+...
+      'guard-reconciliation',
++     '42ab966efc78e26589453160b8a631996c393b84c94d6acd46e78e19029b63d6'
+-     '16c2b3dace9daab9a6d90e29bd7f00fbad2c313cbedb0e28ed031664fa81b255'
+    ],
+    [
+      'gặt-lại-lúc-khởi-động-reap-phục-hồi-sau-crash',
+      'f8968e79fcc258ed272fbdd6f442233110f238edac79ca5b2c8261adf32785b2'
+    ],
+...
+      'unheaded-block-119',
++     '75a73f547e8e94133e10c4e8a503a4be54ab173417f1b7fe4b8bf54555507a53'
+-     '1c77f2b68620610ff91f742d28ff88584c190c8af2ade3ac6818b67a6f054288'
+    ],
+    [
+      'unheaded-block-12',
+      '344985adb8cb7f6b7f62c1b4ef88be9a3d3f73e531130851c57fa9a9106d3c12'
+    ],
+...
+      'unheaded-block-3',
++     'bed7c5ea3ed1a7241f9271b44d6a8253d4ea89c082745eed076d3c5ab703d789'
+-     '026046f0b0c9dff4fa16ad675837105849db185678d8263e091270e599c0ba72'
+    ],
+    [
+      'unheaded-block-30',
+      '7a42c3eb3aa1bd08033ac943c4fec8ea15d8c5126735b4c690ab4cdf3175e300'
+    ],
+
+    at file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/[eval1]:16:8
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: [
+    [
+      '0005-runner-cô-lập-worker',
+      '8c6dec18f6bef92315f061a9bdcf6803f5c40f688265b36d608602036bf9778a'
+    ],
+    [
+      '0008-routing-theo-audience-của-từng-interface',
+      '4a89d0eee1476346d312e102a9990ae398d0c9a0a04621614c32bf60ac3586ff'
+    ],
+    [
+      '0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập',
+      '846ae5c87d5d064d453beeb1084d4670a19a4da867ab19c3c1cb6fbc5c62b088'
+    ],
+    [
+      '0021-wire-main-checkout-lock-hook-qua-fgos-doctorsetup-không-epoch-fence',
+      '959caa2c40413558eef7fc8ddf9b56e55624d8e1d2d1ca39bef105028e8bf7d4'
+    ],
+    [
+      '0022-khảo-sát-choke-point-fgos-quyết-định-lặplệch-xuyên-clirunnerskill',
+      '2666cf25c87f39bcaee829d110aae261bf5290761df53f486b3ac0466a855df2'
+    ],
+    [
+      '0023-thứ-tự-ưu-tiên-sản-phẩm-ship-faster-dod-result-docs-hoàn-thiện-sau-ngưỡng',
+      '71c4c7fc47a234ace33d1fab94af73c79c2f18a1ef050fa9f5fd9c04c768f2ea'
+    ],
+    [
+      '0025-thứ-tự-ưu-tiên-sản-phẩm-chi-tiết-hoá-0023-nạp-always-loaded-qua-agentsmd',
+      '8308c59db81e66797b42ab24e7bc3b432c96beb5abcbca95bcfe6a6bab4befa1'
+    ],
+    [
+      '0026-native-first-dispatch-doctrine-launcherroottaskcapacity',
+      'b5feb9dc39066908a13b2af9470dc682055b21f096f7c68e2f64169a72656e6f'
+    ],
+    [
+      '0028-đổi-tên-pinned-term-orchestrator-thành-launcher',
+      'd8f1249a2c419f0baf2d767776d91463f1efa81acbfb98ec917f75e46fd0841d'
+    ],
+    [
+      '0029-sửa-ba-mệnh-đề-từ-vựng-dispatch-của-0026-bỏ-roottasksubtask-capacity-là-năng-lực-có-tên-t1-hai-giá-trị',
+      'c93ff7accfa74d803887b10ccc4f1c83000d462985b7ca40b18b41104939ce8c'
+    ],
+    [
+      '0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm',
+      '37bc1d87f4949e20df85dca9c8cf5e71c743366dc424168490705486abc1948d'
+    ],
+    [
+      '0031-bỏ-guard-cấm-từ-orchestrator-sau-khi-0029-đã-gán-nghĩa-mới',
+      '0e40c4bec2d4c007a8ad19cda638c3a3bfc1c4866c8ca1c5ab81526c001a12dd'
+    ],
+    [
+      '0032-cổng-iron-law-chỉ-hỏi-ở-ranh-giới-trunk-thêm-mức-warn-agent-gõ-lệnh-thay-người',
+      '518b40214e39e32458b4abd8df5835a0d63076b09fe1e495606b103633fcfb69'
+    ],
+    [
+      '0033-capacity-cli-spawn-shaped-thắng-haslivetaskaccess-thu-hẹp-0026-rule-2',
+      '870f0cda11251eb1ee8a3e50538b008cffb4f7b6e3c406b5216a9f297085ab6a'
+    ],
+    [
+      '0034-đổi-tên-capacitycapacities-thành-executorexecutors-chốt-tách-capability',
+      '8e58276b0592e40372a37ac42f2a7f2d457d7751f65c5a612dfc3921d4b43f44'
+    ],
+    [
+      '0035-ranh-giới-tin-cậy-của-cổng-mutation-gate-caller-trong-tiến-trình-cùng-lớp-tin-cậy-với-user-không-phải-kẻ-tấn-công',
+      '6a9b6ff7d029a5a396af6faf728380f673e6388b6c65fb6746894d1fd11dc43d'
+    ],
+    [
+      '0043-vocabulary-bound-invocation-supervisor-vs-detached-run-supervisor',
+      '0c685ba69f0bc771bdafc5184a8e95fd810a9363471c286072076c9c4798ae37'
+    ],
+    [
+      '0046-gom-thang-tierrigor-2-thang-1-bảng-xoá-mọi-lớp-chồng',
+      '3e06e42c903776657538aeb0c3293d568aeaaed3c5ee38896d893cccd4c15e09'
+    ],
+    [
+      '0047-p1-lõi-thực-thi-unit-một-bind-một-cửa-chạy-fgos-run-3-pattern-cộng-tác-đóng-4-mối-authority-l5-1-đã-bị-thay-một-phần-bởi-0061',
+      '7a82fc342dbc99f94ab1d7f5cb7b99e4f1d2fb4e701626cfe52efea70c0169da'
+    ],
+    [
+      '0048-p2-plan-chạy-được-unit-cho-mọi-đường-vào-driver-mỏng-fgos-run-bỏ-demandfactsmatcher',
+      '8accf2e712bcb94cb1052b33924b384edab96c8628c5400f7d096efcf09cded1'
+    ],
+    [
+      '0049-p3b-work-không-còn-stage-work-chỉ-còn-bản-ghilifecycle-workflow-runner-là-sequencer-duy-nhất-đóng-a4',
+      'a79a3012b22c033bb7e482e94239462054434386e4f2c010c9346577130e1a8d'
+    ],
+    [
+      '0050-p6-nối-thật-herdr-là-transport-mặc-định-posture-một-đường-fallback-quota-qua-pane-mới',
+      'b5019011cdace996fa7f74d74340bbdc14ae0b3b5ae3f479975e336bccd9679f'
+    ],
+    [
+      '0051-cổng-ghi-file-đi-theo-chuỗi-fallback-quyền-git-của-invocation-giữ-lại-cho-work-loop',
+      '181cde40f90478c0541bbf0892a5eceae965f9c1e5d7f5e366e5a777b7241311'
+    ],
+    [
+      '0052-worker-không-bao-giờ-có-quyền-git-runner-commit-trên-mọi-đường-thay-mục-2-của-0051-đã-bị-thay-một-phần-bởi-0060',
+      '04f68eee53c6601115869e0dec85769498db8f63b00fd7cf5ba4cfb859a35c8f'
+    ],
+    [
+      '0053-một-cơ-chế-truyền-kết-quả-đường-dẫn-report-trong-contextrefs-phân-giải-một-lần',
+      '29f2185e7cf971134b645c8f61feebab3c998c90c66f8e6eee181adef6163279'
+    ],
+    [
+      '0055-panel-khác-họ-provider-giữa-các-ghế-là-ưu-tiên-mềm-bind-rải-ghế-theo-thứ-tự-prefer-reviewed-vẫn-cứng',
+      '75dc85e0ed4a197a26329a68c01c7d0414ca8e2399e893bceb75c4545d9319b3'
+    ],
+    [
+      '0056---seats-chuyên-biệt-hoá-ghế-panel-bằng-lens-khi-khởi-động-không-thêm-workflow-yaml-hay-registry',
+      '72ebb5b0a96c61934e736eae2046edd32750afbf69a82309e533f81a55b9da1c'
+    ],
+    [
+      '0057---seats-name-persona-có-tên-theo-ba-tầng-tra-cứu-ghim-nội-dung-lúc-start-gắn-đúng-một-ghế',
+      '03e970109c245bd491f286e8b54c799121e32c7300c0dab2e80dcaef1e21564a'
+    ],
+    [
+      '0058-provider-failure-fails-over-inside-execution-core-another-account-of-the-same-provider-first-then-the-next-candidate',
+      '403486a0de69580ccf79203888df2f75637b3acea53ce3624dbfc1944a63e1a0'
+    ],
+    [
+      '0059-a-domain-persona-pack-is-a-folder-what-a-seat-can-name-what-it-pinned-and-who-ran-it-are-each-stated-by-one-read',
+      'a4ba52db8acdfc49d4b74f87e9f88961d2fa1b824ffb0d42846dd19332527a08'
+    ],
+    [
+      '0060-runner-commit-theo-writes-của-unit-một-matcher-preflight-index-resume-chỉ-commit-brief-ghi-file-nói-rõ-phạm-vi-thay-mục-1-2-của-0052',
+      '3298c40f0899e93402ee63927a6dcf3ea4ad38d08c6fd9af88aefb11d2457db1'
+    ],
+    [
+      '0061-unit-ad-hoc-được-preferpersona-mềm-one-liner-fgos-run-workflow-start---units--effort-unit-ghi-nối-nhánh-thay-một-phần-mục-1-của-0047',
+      '648a519ae124396088ceac1e0c3a0784742df48f2ab04e2423ef576065cf5da4'
+    ],
+    [
+      '0062-xoá-cửa-thô-dispatch-là-tầng-thấp-fanout-về-tầng-work-thay-phần-purpose-door-của-rul68-2-tầng-dispatch-và-phần-mỗi-cửa-một-lane-posture-của-rul77-posture-belongs-to-the-capability',
+      '73fa71a8c6944bbf866662ca0a909000ae3e16d38770acaa3643ac86cb1052fc'
+    ],
+    [
+      '0063-work-chỉ-là-bên-dùng-dispatch-nhận-input-generic-thay-phần-đầu-vào-còn-lại-của-rul73-dispatch-does-not-know-work2',
+      '29d41a45489095b7ca89fd6570c786bc74bce025d8b3c4cb995cf315b3c653d9'
+    ],
+    [
+      '0064-hook-commit-để-lại-đèn-hoạt-động-riêng-không-ghi-main-checkoutlock-người-tranh-xét-record-theo-ttlms-của-chính-holder-checkpoint-dưới-merge-slot-giữ-main-mutex',
+      'dbd2125739c4bcd43eae0e2abb00500fb4b4f309a84d2ba6ef751cc5141b674e'
+    ],
+    [
+      '1-take-vs-pick-2-định-nghĩa-khác-nhau-cho-item-này-claim-được-không',
+      'e8eee63f828f4b5a6653239b4bf2c3e087acc21bae56fec77dd99514d5d129db'
+    ],
+    [
+      '2-kiểm-tra-working-tree-sạch-2-định-nghĩa-độc-lập-cho-return-và-approve',
+      '0ef1161a7277126cde540e2316d3d5205f0f9625e2f1153621fa6751da9f9f23'
+    ],
+    [
+      '3-createworktree-6-call-site-mỗi-nơi-tự-xử-lý-baserefcleanup-riêng',
+      'a78fe17050bf93323f164ddab36560dea3178d289cf4fe2faa2add23a0b28e02'
+    ],
+    [
+      'actors-access',
+      '3f682e32dc04d19e654abc927f8a3570f8ed866f17711e4ff18302e2840461e7'
+    ],
+    [
+      'agent-coordination-foundation-shared-capability-catalog-planning-awareness-cluster-docshistoryagent-coordination-foundationplanmd',
+      'f53f0f718c2ee9e2ec07a7c380f22072bdfe1e65e21fc0fa4b60b4031234ae70'
+    ],
+    [
+      'ai-ngã-ngũ-role-trên-settlement-phase-3-s3-closeout',
+      '8aaf79d96e8764fe3ddca86618ab2693738753c8e172dbe14fc86f3abe07df4e'
+    ],
+    [
+      'behaviors-operations',
+      '39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3'
+    ],
+    [
+      'business-rules',
+      'a0b653256ad485b037729003bab45b5f1bdfd1ccc0bfc100b5fc81b98e4bac64'
+    ],
+    [
+      'báo-việc-phát-hiện-từ-trợ-lý-workerrunner-discovery-report',
+      '59aa6f5d6d68c416a22eeea6fa6c4247fb7d7de59f69325d790f3bd7d7015581'
+    ],
+    [
+      'bảng-đối-chiếu-từ-vựng-dispatch',
+      '4d4c05e94bd4baf1756a0e253ce3a29ec9b73beaa546931acf49ac259e774f44'
+    ],
+    [
+      'bảo-vệ-approve-khỏi-lồng-phiên-session-nesting-guard-epic-2',
+      'c92d09f05317c34d30da8c4f5e7119acce83d4dfd5073ceb8c42c3483cfca7b7'
+    ],
+    [
+      'bằng-chứng-đã-kiểm',
+      'd57167acd4b6dac5fe237e41eba7b61e6dcda1ea2e8c99e7049040ab37795c9b'
+    ],
+    [
+      'bỏ-roottasksubtask-khỏi-từ-vựng-dispatch',
+      'a45acaeb1652116327762820c76424ed00d2f2de131d94c16cb179b6e8c57e0d'
+    ],
+    [
+      'bối-cảnh',
+      'c85972d73e0c1fc03329d33ae01a1fcf036d3d19c81c2e91389f04163992016e'
+    ],
+    [
+      'bối-cảnh-1',
+      'bb0b97a3dd60e838c00bfb454fb5731d1d570dcbae8d0c0dbe03171d04f5b62d'
+    ],
+    [
+      'bối-cảnh-10',
+      '77fee056c5b08ef7af1a1bd3f50d5e10fd9d4101b583320d9bab46f92be1f2b4'
+    ],
+    [
+      'bối-cảnh-11',
+      '357a2a344123089446a3a10e192e9d89e9b224d4ded3e0b8366bb07d00e9ef9e'
+    ],
+    [
+      'bối-cảnh-12',
+      'c59a3e00f3c7354ba734d5bcf7728b08b771cdc2b66131e43a37719b2491dd98'
+    ],
+    [
+      'bối-cảnh-13',
+      'c0bbf53368466ef1474fbff89514a960821b2902802db0104386c556b460a32c'
+    ],
+    [
+      'bối-cảnh-2',
+      '6fb8b852b1fc94c9a926ec161be7278c2b7e11bce46ac025cacbb612e9514698'
+    ],
+    [
+      'bối-cảnh-3',
+      'ad761744dda5fb4efe907ece8dd148f3e6441853b0b4f328bd323958720ff323'
+    ],
+    [
+      'bối-cảnh-4',
+      '2230d7de38bd1a697ef276c8eeded79ab4e02a9783ab94813ca816a268ea86e0'
+    ],
+    [
+      'bối-cảnh-5',
+      '075828bc1bd5b16a6aafd698e6df6b86fe652be3869fb73bad7375114adc3d59'
+    ],
+    [
+      'bối-cảnh-6',
+      '337ae164cf0ab9962947a018e618fb6050db1b0d5f66bdef1833bf5be32fa074'
+    ],
+    [
+      'bối-cảnh-7',
+      '23e631bc21b94f5af0a02cfab78693f61b33d25c52b30ce2e7aa4de386bf2466'
+    ],
+    [
+      'bối-cảnh-8',
+      'a2c04691faba0522f2ef90f8e0d4e0940e61682ea1c81b226f8fe75d6e33b523'
+    ],
+    [
+      'bối-cảnh-9',
+      '3c0b2783128372e5b83c4cf6a47c550f020d1f903c41e8896f17326cfc17d153'
+    ],
+    [
+      'candidates',
+      '8ddbd223d18aa054946e9087698849202a8fb1d634c58e09c58f7a3fbf21f56a'
+    ],
+    [
+      'capability-aware-dispatch-activation-tsk-46f',
+      '80ab9c4a9405eed4d1289cd8872637275cca4685a9bb0934ed9cb2d807fb8b4a'
+    ],
+    [
+      'capacity-một-năng-lực-có-tên-behavior-promise-functional-helper',
+      'bdb952cf50f1ad2350771dd66bf8d2457df5227ab87f184abce12a8a277f22fe'
+    ],
+    [
+      'chính-thức-hóa-việc-tách-capabilitycapacity-mà-0029-để-ngỏ',
+      'b6f027726edfbe603e799e5140a6545f768a1d496d716420bd7007dadb9af319'
+    ],
+    [
+      'chấm-trượt-lỗi-giữa-vòng',
+      'bb15a10898312c62d0812b80ea5a0afd1660bc44d3c3b690a48d0c121a031f47'
+    ],
+    [
+      'confinement-authority-một-cửa-kiểm-soát-giam-giữ-runtime-executethroughconfinement',
+      '1c0f8a82fce53e8ea0e4eb69a11ec8110ac6f111764803a6fcfadd3b51c3b33d'
+    ],
+    [
+      'coordinationsession-lịch-sử-đã-thu-hồi-per-p4-thay-bằng-collaborationpattern-workflow-runner',
+      'e3b9637386370205add50577674190f948eb94fefd4b56a1ffa35cff7f701478'
+    ],
+    [
+      'cây-nhánh-tích-hợp-con-nhập-vào-nhánh-của-gốc-chỉ-gốc-nhập-vào-cây-chính',
+      'b07c69bd296947367e0db70b6e6d4533d2ae58f471b3f6080198fae6c35f0f4a'
+    ],
+    [
+      'cơ-chế-phân-biệt-không-phải-heuristic-mới',
+      'd248d7c3ed3bab201338d35554aed966136f261e32da3c1e0fc366b38ec4532e'
+    ],
+    [
+      'cổng-duyệt-pr-nội-bộ-approval-gate-reviewapprovereject',
+      '82ff33c387aac2673e8aa51b5dfae092bc17fcfe90019aa50de38cdb2546ed97'
+    ],
+    [
+      'cổng-duyệt-qua-github-github-transport-tuỳ-chọn-reviewapprove---github',
+      '70f158b97d460c6cd790f466868963419ca1955f3543d63e9cc93154bcdb4c5f'
+    ],
+    [
+      'data-dictionary',
+      'b91663aeb373f3e9759bda7e8edf97edc512497d6d3adbf55ebdb6b8c7af5187'
+    ],
+    [
+      'dispatch-operability-implementation-slice-2026-09-16',
+      '020a15e1469e9d8f87b2295cc7ea3ca73da8fdda1dd62ff82b49a403fdb086f5'
+    ],
+    [
+      'dispatch-runtime-inspection',
+      '5ed555b20633e3d02aab26557fd2c1a144c2cac1cc1da5e7048986c280cfa1e0'
+    ],
+    [
+      'edge-cases-settled',
+      'c1c87e9a7f22cc4d3693c5d83d5ecac2fd90fa0386e03fb890638cf059c10de4'
+    ],
+    [
+      'entry-points-triggers',
+      '72526beea6ee0dab3fb182c1754440a8b37f4be2a7c4ffe734e7ef583c833b68'
+    ],
+    [
+      'executorprofile-invocation-target-vocabulary-phase-06-executor-policy-dispatch-seams-identitysupports-made-real-config-phase-c-executor-profile-schema-migration',
+      '0f54c4919dedb58d73fc7cf55e8d217fb054b04f36911b7990b6e9a78a361713'
+    ],
+    [
+      'gate-a-xếp-hạng-candidate-bắc-cầu-sang-việc-thật-evolve',
+      '52a283ef3e1356d53fc5ae6efb44c1c8c687858b70009ef970c11e151b896b6d'
+    ],
+    [
+      'ghi-chú-liên-quan-không-phải-finding-mới-của-item-này',
+      'd22438074db150b18a097bf95f2422820648903c6bb211b4fb534786fb80abe8'
+    ],
+    [
+      'ghi-lại-output-của-trợ-lý-sau-mỗi-lượt-dispatch-persist-log',
+      '833e1a2724e50109d3f7ab290cc9febae57b6ee66d9715aeda8a29d032804e13'
+    ],
+    [
+      'giao-việc-theo-mẻ-song-song-có-giới-hạn-giữ-quyền-sở-hữu-gốc',
+      '1eb8d70495713021803680d977e3d8788012c662e03b0b01aaff56cdc3fb53ff'
+    ],
+    [
+      'guard-reconciliation',
+      '42ab966efc78e26589453160b8a631996c393b84c94d6acd46e78e19029b63d6'
+    ],
+    [
+      'gặt-lại-lúc-khởi-động-reap-phục-hồi-sau-crash',
+      'f8968e79fcc258ed272fbdd6f442233110f238edac79ca5b2c8261adf32785b2'
+    ],
+    [
+      'hệ-quả',
+      'bd3abb8a9b8884d507aa39dad26a0a8669326d975f1cbbcddaa1a1d70d2b692f'
+    ],
+    [
+      'hệ-quả-1',
+      'c0d2ed8b1050279455c37226890b760cbd9991f77066c97d57813548c46c3810'
+    ],
+    [
+      'hệ-quả-10',
+      '93cb01610d213afd09e43ef535222c463834632e403ebf4cd74a394dfdf9dcb6'
+    ],
+    [
+      'hệ-quả-11',
+      'eede37c34599d00d26acf3126dcc0dd2f0ef3db8aaaf8b372af48043b41531b1'
+    ],
+    [
+      'hệ-quả-2',
+      '1a4eed607d10e73fe1cff749ffe1c5c17c6d79ec05d5928d3e014b24ccac6e39'
+    ],
+    [
+      'hệ-quả-3',
+      '7296dfaf2a21f7bff97e45c9dd7c77dc69ff49061dab1577395d67343b6aa8aa'
+    ],
+    [
+      'hệ-quả-4',
+      '6a6306aef856dae488426e2f9c17c5aa4238d67a541a93b4f82272e68bdc44c3'
+    ],
+    [
+      'hệ-quả-5',
+      'e2b8ec3df45f9427347649d739024782c07610b9db9527048e03239ac4144653'
+    ],
+    [
+      'hệ-quả-6',
+      '736119c4cc6845655cbf0c7bd974e6ca9aa47af56a18637967135727d7999319'
+    ],
+    [
+      'hệ-quả-7',
+      'c5c6ad2ea55987a32ed41732beb0582d0326128ed827cc655b29e2a14ae2d9bc'
+    ],
+    [
+      'hệ-quả-8',
+      '14e0aa722cef643382c26bad2388e9cc7bf76b7d52067c72502af1cb2804f9d6'
+    ],
+    [
+      'hệ-quả-9',
+      'f41ecefca1aa681c16ead99e85a938e4f0983c804ca956852f7eed8ff235e966'
+    ],
+    [
+      'hợp-đồng-rigor-tier-phase-2-2026-10-01',
+      'cfd79dea41e34baf7969fddba3e30ecc5666de6a7ee32a50dd97cf099bfd8448'
+    ],
+    [
+      'iron-law-phân-loại-rủi-ro-của-một-candidate-fix-self-improve-loop-str13-slice-23',
+      'b5bd1aff8cdb056c9d10c357f80729d5c1cefd632d344242fc46a5441a8f0e23'
+    ],
+    [
+      'khóa-hoạt-động-cây-chính-chặn-commit-trần-khi-phiên-khác-đang-hoạt-động-str65',
+      '1c46bbd825e116160efeadcef33dab9d2fa69c0ba9985af5de2d4e717cf7b577'
+    ],
+    ... 397 more items
+  ],
+  expected: [
+    [
+      '0005-runner-cô-lập-worker',
+      '8c6dec18f6bef92315f061a9bdcf6803f5c40f688265b36d608602036bf9778a'
+    ],
+    [
+      '0008-routing-theo-audience-của-từng-interface',
+      '4a89d0eee1476346d312e102a9990ae398d0c9a0a04621614c32bf60ac3586ff'
+    ],
+    [
+      '0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập',
+      '846ae5c87d5d064d453beeb1084d4670a19a4da867ab19c3c1cb6fbc5c62b088'
+    ],
+    [
+      '0021-wire-main-checkout-lock-hook-qua-fgos-doctorsetup-không-epoch-fence',
+      '959caa2c40413558eef7fc8ddf9b56e55624d8e1d2d1ca39bef105028e8bf7d4'
+    ],
+    [
+      '0022-khảo-sát-choke-point-fgos-quyết-định-lặplệch-xuyên-clirunnerskill',
+      '2666cf25c87f39bcaee829d110aae261bf5290761df53f486b3ac0466a855df2'
+    ],
+    [
+      '0023-thứ-tự-ưu-tiên-sản-phẩm-ship-faster-dod-result-docs-hoàn-thiện-sau-ngưỡng',
+      '71c4c7fc47a234ace33d1fab94af73c79c2f18a1ef050fa9f5fd9c04c768f2ea'
+    ],
+    [
+      '0025-thứ-tự-ưu-tiên-sản-phẩm-chi-tiết-hoá-0023-nạp-always-loaded-qua-agentsmd',
+      '8308c59db81e66797b42ab24e7bc3b432c96beb5abcbca95bcfe6a6bab4befa1'
+    ],
+    [
+      '0026-native-first-dispatch-doctrine-launcherroottaskcapacity',
+      'b5feb9dc39066908a13b2af9470dc682055b21f096f7c68e2f64169a72656e6f'
+    ],
+    [
+      '0028-đổi-tên-pinned-term-orchestrator-thành-launcher',
+      'd8f1249a2c419f0baf2d767776d91463f1efa81acbfb98ec917f75e46fd0841d'
+    ],
+    [
+      '0029-sửa-ba-mệnh-đề-từ-vựng-dispatch-của-0026-bỏ-roottasksubtask-capacity-là-năng-lực-có-tên-t1-hai-giá-trị',
+      'c93ff7accfa74d803887b10ccc4f1c83000d462985b7ca40b18b41104939ce8c'
+    ],
+    [
+      '0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm',
+      '37bc1d87f4949e20df85dca9c8cf5e71c743366dc424168490705486abc1948d'
+    ],
+    [
+      '0031-bỏ-guard-cấm-từ-orchestrator-sau-khi-0029-đã-gán-nghĩa-mới',
+      '0e40c4bec2d4c007a8ad19cda638c3a3bfc1c4866c8ca1c5ab81526c001a12dd'
+    ],
+    [
+      '0032-cổng-iron-law-chỉ-hỏi-ở-ranh-giới-trunk-thêm-mức-warn-agent-gõ-lệnh-thay-người',
+      '518b40214e39e32458b4abd8df5835a0d63076b09fe1e495606b103633fcfb69'
+    ],
+    [
+      '0033-capacity-cli-spawn-shaped-thắng-haslivetaskaccess-thu-hẹp-0026-rule-2',
+      '870f0cda11251eb1ee8a3e50538b008cffb4f7b6e3c406b5216a9f297085ab6a'
+    ],
+    [
+      '0034-đổi-tên-capacitycapacities-thành-executorexecutors-chốt-tách-capability',
+      '8e58276b0592e40372a37ac42f2a7f2d457d7751f65c5a612dfc3921d4b43f44'
+    ],
+    [
+      '0035-ranh-giới-tin-cậy-của-cổng-mutation-gate-caller-trong-tiến-trình-cùng-lớp-tin-cậy-với-user-không-phải-kẻ-tấn-công',
+      '6a9b6ff7d029a5a396af6faf728380f673e6388b6c65fb6746894d1fd11dc43d'
+    ],
+    [
+      '0043-vocabulary-bound-invocation-supervisor-vs-detached-run-supervisor',
+      '0c685ba69f0bc771bdafc5184a8e95fd810a9363471c286072076c9c4798ae37'
+    ],
+    [
+      '0046-gom-thang-tierrigor-2-thang-1-bảng-xoá-mọi-lớp-chồng',
+      '3e06e42c903776657538aeb0c3293d568aeaaed3c5ee38896d893cccd4c15e09'
+    ],
+    [
+      '0047-p1-lõi-thực-thi-unit-một-bind-một-cửa-chạy-fgos-run-3-pattern-cộng-tác-đóng-4-mối-authority-l5-1-đã-bị-thay-một-phần-bởi-0061',
+      '7a82fc342dbc99f94ab1d7f5cb7b99e4f1d2fb4e701626cfe52efea70c0169da'
+    ],
+    [
+      '0048-p2-plan-chạy-được-unit-cho-mọi-đường-vào-driver-mỏng-fgos-run-bỏ-demandfactsmatcher',
+      '8accf2e712bcb94cb1052b33924b384edab96c8628c5400f7d096efcf09cded1'
+    ],
+    [
+      '0049-p3b-work-không-còn-stage-work-chỉ-còn-bản-ghilifecycle-workflow-runner-là-sequencer-duy-nhất-đóng-a4',
+      'a79a3012b22c033bb7e482e94239462054434386e4f2c010c9346577130e1a8d'
+    ],
+    [
+      '0050-p6-nối-thật-herdr-là-transport-mặc-định-posture-một-đường-fallback-quota-qua-pane-mới',
+      'b5019011cdace996fa7f74d74340bbdc14ae0b3b5ae3f479975e336bccd9679f'
+    ],
+    [
+      '0051-cổng-ghi-file-đi-theo-chuỗi-fallback-quyền-git-của-invocation-giữ-lại-cho-work-loop',
+      '181cde40f90478c0541bbf0892a5eceae965f9c1e5d7f5e366e5a777b7241311'
+    ],
+    [
+      '0052-worker-không-bao-giờ-có-quyền-git-runner-commit-trên-mọi-đường-thay-mục-2-của-0051-đã-bị-thay-một-phần-bởi-0060',
+      '04f68eee53c6601115869e0dec85769498db8f63b00fd7cf5ba4cfb859a35c8f'
+    ],
+    [
+      '0053-một-cơ-chế-truyền-kết-quả-đường-dẫn-report-trong-contextrefs-phân-giải-một-lần',
+      '29f2185e7cf971134b645c8f61feebab3c998c90c66f8e6eee181adef6163279'
+    ],
+    [
+      '0055-panel-khác-họ-provider-giữa-các-ghế-là-ưu-tiên-mềm-bind-rải-ghế-theo-thứ-tự-prefer-reviewed-vẫn-cứng',
+      '75dc85e0ed4a197a26329a68c01c7d0414ca8e2399e893bceb75c4545d9319b3'
+    ],
+    [
+      '0056---seats-chuyên-biệt-hoá-ghế-panel-bằng-lens-khi-khởi-động-không-thêm-workflow-yaml-hay-registry',
+      '72ebb5b0a96c61934e736eae2046edd32750afbf69a82309e533f81a55b9da1c'
+    ],
+    [
+      '0057---seats-name-persona-có-tên-theo-ba-tầng-tra-cứu-ghim-nội-dung-lúc-start-gắn-đúng-một-ghế',
+      '03e970109c245bd491f286e8b54c799121e32c7300c0dab2e80dcaef1e21564a'
+    ],
+    [
+      '0058-provider-failure-fails-over-inside-execution-core-another-account-of-the-same-provider-first-then-the-next-candidate',
+      '403486a0de69580ccf79203888df2f75637b3acea53ce3624dbfc1944a63e1a0'
+    ],
+    [
+      '0059-a-domain-persona-pack-is-a-folder-what-a-seat-can-name-what-it-pinned-and-who-ran-it-are-each-stated-by-one-read',
+      'a4ba52db8acdfc49d4b74f87e9f88961d2fa1b824ffb0d42846dd19332527a08'
+    ],
+    [
+      '0060-runner-commit-theo-writes-của-unit-một-matcher-preflight-index-resume-chỉ-commit-brief-ghi-file-nói-rõ-phạm-vi-thay-mục-1-2-của-0052',
+      '3298c40f0899e93402ee63927a6dcf3ea4ad38d08c6fd9af88aefb11d2457db1'
+    ],
+    [
+      '0061-unit-ad-hoc-được-preferpersona-mềm-one-liner-fgos-run-workflow-start---units--effort-unit-ghi-nối-nhánh-thay-một-phần-mục-1-của-0047',
+      '648a519ae124396088ceac1e0c3a0784742df48f2ab04e2423ef576065cf5da4'
+    ],
+    [
+      '0062-xoá-cửa-thô-dispatch-là-tầng-thấp-fanout-về-tầng-work-thay-phần-purpose-door-của-rul68-2-tầng-dispatch-và-phần-mỗi-cửa-một-lane-posture-của-rul77-posture-belongs-to-the-capability',
+      '73fa71a8c6944bbf866662ca0a909000ae3e16d38770acaa3643ac86cb1052fc'
+    ],
+    [
+      '0063-work-chỉ-là-bên-dùng-dispatch-nhận-input-generic-thay-phần-đầu-vào-còn-lại-của-rul73-dispatch-does-not-know-work2',
+      '29d41a45489095b7ca89fd6570c786bc74bce025d8b3c4cb995cf315b3c653d9'
+    ],
+    [
+      '0064-hook-commit-để-lại-đèn-hoạt-động-riêng-không-ghi-main-checkoutlock-người-tranh-xét-record-theo-ttlms-của-chính-holder-checkpoint-dưới-merge-slot-giữ-main-mutex',
+      'dbd2125739c4bcd43eae0e2abb00500fb4b4f309a84d2ba6ef751cc5141b674e'
+    ],
+    [
+      '1-take-vs-pick-2-định-nghĩa-khác-nhau-cho-item-này-claim-được-không',
+      'e8eee63f828f4b5a6653239b4bf2c3e087acc21bae56fec77dd99514d5d129db'
+    ],
+    [
+      '2-kiểm-tra-working-tree-sạch-2-định-nghĩa-độc-lập-cho-return-và-approve',
+      '0ef1161a7277126cde540e2316d3d5205f0f9625e2f1153621fa6751da9f9f23'
+    ],
+    [
+      '3-createworktree-6-call-site-mỗi-nơi-tự-xử-lý-baserefcleanup-riêng',
+      'a78fe17050bf93323f164ddab36560dea3178d289cf4fe2faa2add23a0b28e02'
+    ],
+    [
+      'actors-access',
+      '3f682e32dc04d19e654abc927f8a3570f8ed866f17711e4ff18302e2840461e7'
+    ],
+    [
+      'agent-coordination-foundation-shared-capability-catalog-planning-awareness-cluster-docshistoryagent-coordination-foundationplanmd',
+      'f53f0f718c2ee9e2ec07a7c380f22072bdfe1e65e21fc0fa4b60b4031234ae70'
+    ],
+    [
+      'ai-ngã-ngũ-role-trên-settlement-phase-3-s3-closeout',
+      '8aaf79d96e8764fe3ddca86618ab2693738753c8e172dbe14fc86f3abe07df4e'
+    ],
+    [
+      'behaviors-operations',
+      '39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3'
+    ],
+    [
+      'business-rules',
+      'a0b653256ad485b037729003bab45b5f1bdfd1ccc0bfc100b5fc81b98e4bac64'
+    ],
+    [
+      'báo-việc-phát-hiện-từ-trợ-lý-workerrunner-discovery-report',
+      '59aa6f5d6d68c416a22eeea6fa6c4247fb7d7de59f69325d790f3bd7d7015581'
+    ],
+    [
+      'bảng-đối-chiếu-từ-vựng-dispatch',
+      '4d4c05e94bd4baf1756a0e253ce3a29ec9b73beaa546931acf49ac259e774f44'
+    ],
+    [
+      'bảo-vệ-approve-khỏi-lồng-phiên-session-nesting-guard-epic-2',
+      'c92d09f05317c34d30da8c4f5e7119acce83d4dfd5073ceb8c42c3483cfca7b7'
+    ],
+    [
+      'bằng-chứng-đã-kiểm',
+      'd57167acd4b6dac5fe237e41eba7b61e6dcda1ea2e8c99e7049040ab37795c9b'
+    ],
+    [
+      'bỏ-roottasksubtask-khỏi-từ-vựng-dispatch',
+      'a45acaeb1652116327762820c76424ed00d2f2de131d94c16cb179b6e8c57e0d'
+    ],
+    [
+      'bối-cảnh',
+      'c85972d73e0c1fc03329d33ae01a1fcf036d3d19c81c2e91389f04163992016e'
+    ],
+    [
+      'bối-cảnh-1',
+      'bb0b97a3dd60e838c00bfb454fb5731d1d570dcbae8d0c0dbe03171d04f5b62d'
+    ],
+    [
+      'bối-cảnh-10',
+      '77fee056c5b08ef7af1a1bd3f50d5e10fd9d4101b583320d9bab46f92be1f2b4'
+    ],
+    [
+      'bối-cảnh-11',
+      '357a2a344123089446a3a10e192e9d89e9b224d4ded3e0b8366bb07d00e9ef9e'
+    ],
+    [
+      'bối-cảnh-12',
+      'c59a3e00f3c7354ba734d5bcf7728b08b771cdc2b66131e43a37719b2491dd98'
+    ],
+    [
+      'bối-cảnh-13',
+      'c0bbf53368466ef1474fbff89514a960821b2902802db0104386c556b460a32c'
+    ],
+    [
+      'bối-cảnh-2',
+      '6fb8b852b1fc94c9a926ec161be7278c2b7e11bce46ac025cacbb612e9514698'
+    ],
+    [
+      'bối-cảnh-3',
+      'ad761744dda5fb4efe907ece8dd148f3e6441853b0b4f328bd323958720ff323'
+    ],
+    [
+      'bối-cảnh-4',
+      '2230d7de38bd1a697ef276c8eeded79ab4e02a9783ab94813ca816a268ea86e0'
+    ],
+    [
+      'bối-cảnh-5',
+      '075828bc1bd5b16a6aafd698e6df6b86fe652be3869fb73bad7375114adc3d59'
+    ],
+    [
+      'bối-cảnh-6',
+      '337ae164cf0ab9962947a018e618fb6050db1b0d5f66bdef1833bf5be32fa074'
+    ],
+    [
+      'bối-cảnh-7',
+      '23e631bc21b94f5af0a02cfab78693f61b33d25c52b30ce2e7aa4de386bf2466'
+    ],
+    [
+      'bối-cảnh-8',
+      'a2c04691faba0522f2ef90f8e0d4e0940e61682ea1c81b226f8fe75d6e33b523'
+    ],
+    [
+      'bối-cảnh-9',
+      '3c0b2783128372e5b83c4cf6a47c550f020d1f903c41e8896f17326cfc17d153'
+    ],
+    [
+      'candidates',
+      '8ddbd223d18aa054946e9087698849202a8fb1d634c58e09c58f7a3fbf21f56a'
+    ],
+    [
+      'capability-aware-dispatch-activation-tsk-46f',
+      '80ab9c4a9405eed4d1289cd8872637275cca4685a9bb0934ed9cb2d807fb8b4a'
+    ],
+    [
+      'capacity-một-năng-lực-có-tên-behavior-promise-functional-helper',
+      'bdb952cf50f1ad2350771dd66bf8d2457df5227ab87f184abce12a8a277f22fe'
+    ],
+    [
+      'chính-thức-hóa-việc-tách-capabilitycapacity-mà-0029-để-ngỏ',
+      'b6f027726edfbe603e799e5140a6545f768a1d496d716420bd7007dadb9af319'
+    ],
+    [
+      'chấm-trượt-lỗi-giữa-vòng',
+      'bb15a10898312c62d0812b80ea5a0afd1660bc44d3c3b690a48d0c121a031f47'
+    ],
+    [
+      'confinement-authority-một-cửa-kiểm-soát-giam-giữ-runtime-executethroughconfinement',
+      '1c0f8a82fce53e8ea0e4eb69a11ec8110ac6f111764803a6fcfadd3b51c3b33d'
+    ],
+    [
+      'coordinationsession-lịch-sử-đã-thu-hồi-per-p4-thay-bằng-collaborationpattern-workflow-runner',
+      'e3b9637386370205add50577674190f948eb94fefd4b56a1ffa35cff7f701478'
+    ],
+    [
+      'cây-nhánh-tích-hợp-con-nhập-vào-nhánh-của-gốc-chỉ-gốc-nhập-vào-cây-chính',
+      'b07c69bd296947367e0db70b6e6d4533d2ae58f471b3f6080198fae6c35f0f4a'
+    ],
+    [
+      'cơ-chế-phân-biệt-không-phải-heuristic-mới',
+      'd248d7c3ed3bab201338d35554aed966136f261e32da3c1e0fc366b38ec4532e'
+    ],
+    [
+      'cổng-duyệt-pr-nội-bộ-approval-gate-reviewapprovereject',
+      '82ff33c387aac2673e8aa51b5dfae092bc17fcfe90019aa50de38cdb2546ed97'
+    ],
+    [
+      'cổng-duyệt-qua-github-github-transport-tuỳ-chọn-reviewapprove---github',
+      '70f158b97d460c6cd790f466868963419ca1955f3543d63e9cc93154bcdb4c5f'
+    ],
+    [
+      'data-dictionary',
+      'b91663aeb373f3e9759bda7e8edf97edc512497d6d3adbf55ebdb6b8c7af5187'
+    ],
+    [
+      'dispatch-operability-implementation-slice-2026-09-16',
+      'aaec88b66425149e842fe7c507cd3dd0beaee9d3e0ecde88fa805637967d2f10'
+    ],
+    [
+      'dispatch-runtime-inspection',
+      '5ed555b20633e3d02aab26557fd2c1a144c2cac1cc1da5e7048986c280cfa1e0'
+    ],
+    [
+      'edge-cases-settled',
+      'c1c87e9a7f22cc4d3693c5d83d5ecac2fd90fa0386e03fb890638cf059c10de4'
+    ],
+    [
+      'entry-points-triggers',
+      '72526beea6ee0dab3fb182c1754440a8b37f4be2a7c4ffe734e7ef583c833b68'
+    ],
+    [
+      'executorprofile-invocation-target-vocabulary-phase-06-executor-policy-dispatch-seams-identitysupports-made-real-config-phase-c-executor-profile-schema-migration',
+      '0f54c4919dedb58d73fc7cf55e8d217fb054b04f36911b7990b6e9a78a361713'
+    ],
+    [
+      'gate-a-xếp-hạng-candidate-bắc-cầu-sang-việc-thật-evolve',
+      '52a283ef3e1356d53fc5ae6efb44c1c8c687858b70009ef970c11e151b896b6d'
+    ],
+    [
+      'ghi-chú-liên-quan-không-phải-finding-mới-của-item-này',
+      'd22438074db150b18a097bf95f2422820648903c6bb211b4fb534786fb80abe8'
+    ],
+    [
+      'ghi-lại-output-của-trợ-lý-sau-mỗi-lượt-dispatch-persist-log',
+      '833e1a2724e50109d3f7ab290cc9febae57b6ee66d9715aeda8a29d032804e13'
+    ],
+    [
+      'giao-việc-theo-mẻ-song-song-có-giới-hạn-giữ-quyền-sở-hữu-gốc',
+      '1eb8d70495713021803680d977e3d8788012c662e03b0b01aaff56cdc3fb53ff'
+    ],
+    [
+      'guard-reconciliation',
+      '16c2b3dace9daab9a6d90e29bd7f00fbad2c313cbedb0e28ed031664fa81b255'
+    ],
+    [
+      'gặt-lại-lúc-khởi-động-reap-phục-hồi-sau-crash',
+      'f8968e79fcc258ed272fbdd6f442233110f238edac79ca5b2c8261adf32785b2'
+    ],
+    [
+      'hệ-quả',
+      'bd3abb8a9b8884d507aa39dad26a0a8669326d975f1cbbcddaa1a1d70d2b692f'
+    ],
+    [
+      'hệ-quả-1',
+      'c0d2ed8b1050279455c37226890b760cbd9991f77066c97d57813548c46c3810'
+    ],
+    [
+      'hệ-quả-10',
+      '93cb01610d213afd09e43ef535222c463834632e403ebf4cd74a394dfdf9dcb6'
+    ],
+    [
+      'hệ-quả-11',
+      'eede37c34599d00d26acf3126dcc0dd2f0ef3db8aaaf8b372af48043b41531b1'
+    ],
+    [
+      'hệ-quả-2',
+      '1a4eed607d10e73fe1cff749ffe1c5c17c6d79ec05d5928d3e014b24ccac6e39'
+    ],
+    [
+      'hệ-quả-3',
+      '7296dfaf2a21f7bff97e45c9dd7c77dc69ff49061dab1577395d67343b6aa8aa'
+    ],
+    [
+      'hệ-quả-4',
+      '6a6306aef856dae488426e2f9c17c5aa4238d67a541a93b4f82272e68bdc44c3'
+    ],
+    [
+      'hệ-quả-5',
+      'e2b8ec3df45f9427347649d739024782c07610b9db9527048e03239ac4144653'
+    ],
+    [
+      'hệ-quả-6',
+      '736119c4cc6845655cbf0c7bd974e6ca9aa47af56a18637967135727d7999319'
+    ],
+    [
+      'hệ-quả-7',
+      'c5c6ad2ea55987a32ed41732beb0582d0326128ed827cc655b29e2a14ae2d9bc'
+    ],
+    [
+      'hệ-quả-8',
+      '14e0aa722cef643382c26bad2388e9cc7bf76b7d52067c72502af1cb2804f9d6'
+    ],
+    [
+      'hệ-quả-9',
+      'f41ecefca1aa681c16ead99e85a938e4f0983c804ca956852f7eed8ff235e966'
+    ],
+    [
+      'hợp-đồng-rigor-tier-phase-2-2026-10-01',
+      'cfd79dea41e34baf7969fddba3e30ecc5666de6a7ee32a50dd97cf099bfd8448'
+    ],
+    [
+      'iron-law-phân-loại-rủi-ro-của-một-candidate-fix-self-improve-loop-str13-slice-23',
+      'b5bd1aff8cdb056c9d10c357f80729d5c1cefd632d344242fc46a5441a8f0e23'
+    ],
+    [
+      'khóa-hoạt-động-cây-chính-chặn-commit-trần-khi-phiên-khác-đang-hoạt-động-str65',
+      '1c46bbd825e116160efeadcef33dab9d2fa69c0ba9985af5de2d4e717cf7b577'
+    ],
+    ... 397 more items
+  ],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.18.0
+✖ runner liveness retains current decision assertions with complete-record consumer evidence (1456.33175ms)
+✔ buildSwitchboardIndex + lookupSwitchboard: exact root document wins (6.672742ms)
+✔ lookupSwitchboard: exact area route (non-glob) matches precisely (0.413443ms)
+✔ lookupSwitchboard: glob route (/**) matches every file under the prefix (0.47509ms)
+✔ lookupSwitchboard: unmatched path returns null (0.372685ms)
+✔ deriveFileClassFromAuthority: role text mentioning generated/projection wins regardless of status (0.356269ms)
+✔ deriveFileClassFromAuthority: non-authority defaults to maintained-authority, not generated (0.205631ms)
+✔ deriveFileClassFromAuthority: historical/vision role text yields retained-source (0.213342ms)
+✔ classifyDocPath: AGENTS.md and CLAUDE.md are always-loaded instruction layer (0.388267ms)
+✔ classifyDocPath: promoted docs/platform/** file classifies as platform-authority, maintained-authority (0.452489ms)
+✔ classifyDocPath: docs/knowledge/** is switchboard-known but corpus is user-knowledge, not platform-authority (0.51082ms)
+✔ classifyDocPath: unmatched docs/architect path falls to the legacy directory heuristic as an explicit gap (0.691288ms)
+✔ classifyDocPath: completely unmapped path (outside docs/architect and docs/specs) is an explicit unclassified gap (0.302601ms)
+✔ classifyByDirectoryHeuristic: distillery is a consumer-project corpus, not platform authority (0.228265ms)
+✔ slugifyHeading: lowercases, strips punctuation, collapses whitespace to GitHub-compatible hyphens (1.229513ms)
+✔ normalizeDocTarget + extractLinks: resolves Markdown relative links against the source path (2.818902ms)
+✔ extractRefs: preserves full tsk ids, avoids ADR inside D-ADR duplicates, and ignores pure date-like hex (1.027947ms)
+✔ extractHeadings: ignores headings inside fenced code blocks and dedupes repeated anchors (3.489932ms)
+✔ extractMarkdownConservationUnits: only closes fences with matching marker and sufficient length (0.518355ms)
+✔ extractHeadings: strips a trailing ATX closing sequence (0.436984ms)
+✔ extractDocumentType: reads the conventional leading ```txt frontmatter block (3.246828ms)
+✔ extractDocumentType: returns null when no frontmatter block is present (0.317691ms)
+✔ deriveClaimKind: maps known document types, falls back to unclassified (0.229245ms)
+✔ proposeDisposition: gap always wins as unknown-blocking regardless of other fields (0.230357ms)
+✔ proposeDisposition: user-knowledge and consumer-project corpora reclassify out of platform scope (0.195505ms)
+✔ proposeDisposition: history-evidence retains as evidence; generated regenerates from source (0.164144ms)
+✔ proposeDisposition: already-promoted docs/platform/** canonical route proposes promote; legacy maintained files merge (0.213829ms)
+✔ proposeRationale: every disposition that requires one gets a non-empty string; others get null (0.226349ms)
+✔ buildInventoryRow: end-to-end row for a promoted portal file requires a target owner and needs no rationale (3.437766ms)
+✔ buildInventoryRow: end-to-end row for an unmapped gap requires a rationale and no target owner (1.894358ms)
+✔ buildInventoryRow: claim ledger rows carry every plan §6.2 field and enum status (1.114612ms)
+✔ buildInventoryRow: source and claim ids come from path-scoped registry entries, not content fallback (1.933275ms)
+✔ generateInventory: exact duplicate files share semantic claim ids with explicit occurrence coverage (109.000044ms)
+✔ buildInventoryRow: identical claim content inside one source never silently collides (0.738528ms)
+✔ extractMarkdownConservationUnits: emits headings and unheaded blocks for conservation (0.397979ms)
+✔ extractMarkdownConservationUnits: preserves short nonblank normative unheaded lines (0.680024ms)
+✔ extractMarkdownConservationUnits: conserves fenced payloads without treating headings inside them as headings (0.466137ms)
+✔ extractMixedFileConservationUnit: non-Markdown payloads get a file-block claim unit (0.371354ms)
+✔ classifyConsumerKind: covers dynamic, glob, fixture, executable proof, and literal consumers without treating Markdown bold as glob (0.288359ms)
+✔ collectConsumers: scans source extensions, resolves relative links, globs, exact AGENTS segments, and immutable refs (52.420442ms)
+✔ buildInventoryRow: current source route is not automatically its own target owner (0.682393ms)
+✔ buildInventoryRow: multi-claim-kind with only one concrete owner demotes instead of pretending split (1.070836ms)
+✔ parseLsTreeLong: parses `git ls-tree -r -l` output and ignores non-blob entries (0.377659ms)
+✔ validateStructure: accepts shared duplicate claim ids only with explicit coverage and rejects silent collisions (2.426825ms)
+✔ validateStructure: accepts explicit unresolvedRoot dynamic consumer gaps without broad target fan-out (0.423315ms)
+✔ validateStructure: rejects missing plan §6.2 fields and invalid claim status (0.427394ms)
+✔ validateCommitBlobIntegrity: verifies sourceDigest and blobSha against commit tree (40.611216ms)
+✔ sharded inventory artifact loader verifies hashes, sizes, order, and extra parts (6.151883ms)
+✔ identity registry reuses unaffected claim ids when unrelated text is inserted and headings reorder (1.791761ms)
+✔ missing or ambiguous identity registry entries become explicit blockers, never derived replacement ids (1.67926ms)
+✔ buildSwitchboardIndex: duplicate exact routes become blocking route-conflict gaps instead of last-write-wins (0.659871ms)
+✔ slugifyHeading: preserves underscores like GitHub anchors (0.208058ms)
+✔ collectConsumers: path.join dynamic prefixes create standalone unresolved dynamic edges (66.875789ms)
+✔ collectConsumers: dynamic parser skips comments, quotes, and Markdown prose but scans fenced code (49.840682ms)
+✔ collectConsumers: the generator ignores its own saved output artifacts and still counts ordinary inputs (47.976214ms)
+✔ listCommitEntries: omits only the generator output artifacts from the commit tree (39.107257ms)
+✔ isGeneratorOutputArtifact: output locations agree with the checker defaults and the sharded writer layout (1.142193ms)
+✔ validateSourceUnitCoverage: detects dropped, duplicate, and digest-mismatched immutable source-unit coverage (64.096967ms)
+✔ deriveValidTargetOwnersFromSwitchboard reads target topology independently of inventory rows (0.484533ms)
+✔ validateAgainstVocabulary: retained claim owner must be a real switchboard-backed target owner (1.142282ms)
+✔ identity registry unit lookup excludes claim kind, status, and classification changes (1.015148ms)
+✔ repeated heading identity follows semantic fingerprint instead of ordinal anchor (1.39882ms)
+✔ indistinguishable repeated carried-forward units become explicit identity gaps (1.063899ms)
+✔ collectConsumers: dynamic parser keeps nested, multiple, multiline calls as docs-rooted unresolved patterns (41.398688ms)
+✔ buildSwitchboardIndex marks tied equal-prefix routes as blocking conflicts (1.074462ms)
+✔ carryForwardIdentityRegistry moves one source without reminting claim ids or unrelated opaque ids (75.243457ms)
+✔ carryForwardIdentityRegistry refuses existing destination registry entries (54.570243ms)
+✔ carryForwardIdentityRegistry updates carried unit status from new classification (90.513424ms)
+✔ carryForwardIdentityRegistry refuses ambiguous duplicate and edited units without guessing positional ids (163.498914ms)
+✔ validateIdentityRegistry detects exact equality and stale units (0.866468ms)
+✔ repo-wide carry-forward keeps ids of unchanged units, binds to the new commit and gives added units fresh opaque ids (75.920862ms)
+✔ repo-wide carry-forward keeps ids of a unit that moved to another path when its digest is unique (79.702554ms)
+✔ repo-wide carry-forward keeps the id of an edited heading with a stable anchor, records lineage and marks it for review (78.674209ms)
+✔ repo-wide carry-forward never matches an edited positional unit: old id becomes a gap row, the new unit gets a fresh id (71.16472ms)
+✔ repo-wide carry-forward does not match a heading whose title slug is duplicated in the file (83.033512ms)
+✔ repo-wide carry-forward pairs identical duplicates 1:1 by anchor when the anchor sets match (70.350531ms)
+✔ repo-wide carry-forward turns duplicates whose anchor sets differ into explicit gap rows instead of guessing (72.627583ms)
+✔ repo-wide carry-forward keeps removed units as retired rows pending disposition, never dropping an old id (65.871557ms)
+✔ repo-wide carry-forward partitions every old unit exactly once and emits deterministic order (67.894037ms)
+✔ repo-wide carry-forward registry is accepted by inventory generation for the new commit (90.144994ms)
+✔ validateDroppedClaims accepts an entry whose claim id is in the ledger or in the registry (including retired rows) (0.67625ms)
+✔ validateDroppedClaims fails when the claim id is absent from registry and ledger or missing from the entry (0.318109ms)
+✔ validateDroppedClaims fails when an entry lacks status, restorationOwner or gate (0.336534ms)
+✔ validateRetiredDispositions reports retired rows without a vocabulary disposition as open rows, not fatal findings (0.36011ms)
+✔ repo-wide carry-forward does not let carry markers survive into a later carry (88.240737ms)
+✔ repo-wide carry-forward reports a fingerprint ambiguity as ambiguous even when the digest finds nothing (59.840081ms)
+✔ repo-wide carry-forward refuses an input registry that holds a claim id twice (52.981598ms)
+✔ validateIdentityRegistry reports a claim id repeated across units, retired rows and gap rows (0.275703ms)
+✔ validateDroppedClaims fails on a register whose entries are missing or not an array (0.153686ms)
+✔ loadDroppedClaimsRegister skips a missing default file with a notice but fails on a missing explicit file (0.502929ms)
+✔ isGeneratorOutputArtifact covers the committed artifact names and keeps the first generation names (0.161419ms)
+✔ gates CLI names the regenerate command when the default manifest has no shards (7.739127ms)
+✔ ledger resolves duplicate-digest units paired by anchor to their carried ids (87.387482ms)
+✔ ledger keeps unpaired duplicate-digest units as ambiguous registry gaps (77.190011ms)
+✔ extractMarkdownConservationUnits: a short block joins the previous block of its section, or the next one, and no non-blank line is left outside every unit (0.863546ms)
+✔ extractMarkdownConservationUnits: consecutive short blocks before the first long block of a section all join that block without overlapping the next one (0.192045ms)
+✔ extractMarkdownConservationUnits: a short label ending in a colon joins the block it introduces, not the fence before it (0.309398ms)
+✔ lists heading and block anchors with the numbering prefix kept (8.450414ms)
+✔ accepts GitHub spelling of a heading with punctuation (2.443144ms)
+✔ the CLI prints anchors and checks one citation (1.834624ms)
+✔ STR pattern against STR1..STR59-shaped tokens returns 60 (3.591926ms)
+✔ RUL pattern against RUL1..RUL45 returns 46 (0.558177ms)
+✔ ADR pattern against leading-zero ADR0001..ADR0015 returns 16, not corrupted by leading zeros (0.485019ms)
+✔ a string with zero matches returns 1 (0.469121ms)
+✔ CLI --file/--pattern invocation prints the next free id for a real fixture file (65.913537ms)
+✔ parseArgs requires explicit base and fixed-end (4.123448ms)
+✔ parseArgs binds immutable base/fixed-end and skip-full-suite flags (1.602297ms)
+✔ parseArgs rejects unknown flags instead of silently ignoring moving-worktree input (0.296834ms)
+✔ verifyForbiddenPhase02Diff allows exact Phase 02 footprint including shard directory (0.51132ms)
+✔ verifyForbiddenPhase02Diff rejects unrelated edits (0.371793ms)
+ℹ tests 507
+ℹ suites 0
+ℹ pass 506
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 32650.467454
+
+✖ failing tests:
+
+test at test/scripts/doc-runner-liveness.test.mjs:8:1
+✖ runner liveness retains current decision assertions with complete-record consumer evidence (1456.33175ms)
+  Error: Command failed: /home/vantt/.nvm/versions/node/v24.18.0/bin/node --input-type=module
+  node:internal/modules/run_main:107
+      triggerUncaughtException(
+      ^
+  
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  ... Skipped lines
+  
+    [
+      [
+        '0005-runner-cô-lập-worker',
+        '8c6dec18f6bef92315f061a9bdcf6803f5c40f688265b36d608602036bf9778a'
+      ],
+  ...
+        'dispatch-operability-implementation-slice-2026-09-16',
+  +     '020a15e1469e9d8f87b2295cc7ea3ca73da8fdda1dd62ff82b49a403fdb086f5'
+  -     'aaec88b66425149e842fe7c507cd3dd0beaee9d3e0ecde88fa805637967d2f10'
+      ],
+      [
+        'dispatch-runtime-inspection',
+        '5ed555b20633e3d02aab26557fd2c1a144c2cac1cc1da5e7048986c280cfa1e0'
+      ],
+  ...
+        'guard-reconciliation',
+  +     '42ab966efc78e26589453160b8a631996c393b84c94d6acd46e78e19029b63d6'
+  -     '16c2b3dace9daab9a6d90e29bd7f00fbad2c313cbedb0e28ed031664fa81b255'
+      ],
+      [
+        'gặt-lại-lúc-khởi-động-reap-phục-hồi-sau-crash',
+        'f8968e79fcc258ed272fbdd6f442233110f238edac79ca5b2c8261adf32785b2'
+      ],
+  ...
+        'unheaded-block-119',
+  +     '75a73f547e8e94133e10c4e8a503a4be54ab173417f1b7fe4b8bf54555507a53'
+  -     '1c77f2b68620610ff91f742d28ff88584c190c8af2ade3ac6818b67a6f054288'
+      ],
+      [
+        'unheaded-block-12',
+        '344985adb8cb7f6b7f62c1b4ef88be9a3d3f73e531130851c57fa9a9106d3c12'
+      ],
+  ...
+        'unheaded-block-3',
+  +     'bed7c5ea3ed1a7241f9271b44d6a8253d4ea89c082745eed076d3c5ab703d789'
+  -     '026046f0b0c9dff4fa16ad675837105849db185678d8263e091270e599c0ba72'
+      ],
+      [
+        'unheaded-block-30',
+        '7a42c3eb3aa1bd08033ac943c4fec8ea15d8c5126735b4c690ab4cdf3175e300'
+      ],
+  
+      at file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/[eval1]:16:8
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [
+      [
+        '0005-runner-cô-lập-worker',
+        '8c6dec18f6bef92315f061a9bdcf6803f5c40f688265b36d608602036bf9778a'
+      ],
+      [
+        '0008-routing-theo-audience-của-từng-interface',
+        '4a89d0eee1476346d312e102a9990ae398d0c9a0a04621614c32bf60ac3586ff'
+      ],
+      [
+        '0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập',
+        '846ae5c87d5d064d453beeb1084d4670a19a4da867ab19c3c1cb6fbc5c62b088'
+      ],
+      [
+        '0021-wire-main-checkout-lock-hook-qua-fgos-doctorsetup-không-epoch-fence',
+        '959caa2c40413558eef7fc8ddf9b56e55624d8e1d2d1ca39bef105028e8bf7d4'
+      ],
+      [
+        '0022-khảo-sát-choke-point-fgos-quyết-định-lặplệch-xuyên-clirunnerskill',
+        '2666cf25c87f39bcaee829d110aae261bf5290761df53f486b3ac0466a855df2'
+      ],
+      [
+        '0023-thứ-tự-ưu-tiên-sản-phẩm-ship-faster-dod-result-docs-hoàn-thiện-sau-ngưỡng',
+        '71c4c7fc47a234ace33d1fab94af73c79c2f18a1ef050fa9f5fd9c04c768f2ea'
+      ],
+      [
+        '0025-thứ-tự-ưu-tiên-sản-phẩm-chi-tiết-hoá-0023-nạp-always-loaded-qua-agentsmd',
+        '8308c59db81e66797b42ab24e7bc3b432c96beb5abcbca95bcfe6a6bab4befa1'
+      ],
+      [
+        '0026-native-first-dispatch-doctrine-launcherroottaskcapacity',
+        'b5feb9dc39066908a13b2af9470dc682055b21f096f7c68e2f64169a72656e6f'
+      ],
+      [
+        '0028-đổi-tên-pinned-term-orchestrator-thành-launcher',
+        'd8f1249a2c419f0baf2d767776d91463f1efa81acbfb98ec917f75e46fd0841d'
+      ],
+      [
+        '0029-sửa-ba-mệnh-đề-từ-vựng-dispatch-của-0026-bỏ-roottasksubtask-capacity-là-năng-lực-có-tên-t1-hai-giá-trị',
+        'c93ff7accfa74d803887b10ccc4f1c83000d462985b7ca40b18b41104939ce8c'
+      ],
+      [
+        '0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm',
+        '37bc1d87f4949e20df85dca9c8cf5e71c743366dc424168490705486abc1948d'
+      ],
+      [
+        '0031-bỏ-guard-cấm-từ-orchestrator-sau-khi-0029-đã-gán-nghĩa-mới',
+        '0e40c4bec2d4c007a8ad19cda638c3a3bfc1c4866c8ca1c5ab81526c001a12dd'
+      ],
+      [
+        '0032-cổng-iron-law-chỉ-hỏi-ở-ranh-giới-trunk-thêm-mức-warn-agent-gõ-lệnh-thay-người',
+        '518b40214e39e32458b4abd8df5835a0d63076b09fe1e495606b103633fcfb69'
+      ],
+      [
+        '0033-capacity-cli-spawn-shaped-thắng-haslivetaskaccess-thu-hẹp-0026-rule-2',
+        '870f0cda11251eb1ee8a3e50538b008cffb4f7b6e3c406b5216a9f297085ab6a'
+      ],
+      [
+        '0034-đổi-tên-capacitycapacities-thành-executorexecutors-chốt-tách-capability',
+        '8e58276b0592e40372a37ac42f2a7f2d457d7751f65c5a612dfc3921d4b43f44'
+      ],
+      [
+        '0035-ranh-giới-tin-cậy-của-cổng-mutation-gate-caller-trong-tiến-trình-cùng-lớp-tin-cậy-với-user-không-phải-kẻ-tấn-công',
+        '6a9b6ff7d029a5a396af6faf728380f673e6388b6c65fb6746894d1fd11dc43d'
+      ],
+      [
+        '0043-vocabulary-bound-invocation-supervisor-vs-detached-run-supervisor',
+        '0c685ba69f0bc771bdafc5184a8e95fd810a9363471c286072076c9c4798ae37'
+      ],
+      [
+        '0046-gom-thang-tierrigor-2-thang-1-bảng-xoá-mọi-lớp-chồng',
+        '3e06e42c903776657538aeb0c3293d568aeaaed3c5ee38896d893cccd4c15e09'
+      ],
+      [
+        '0047-p1-lõi-thực-thi-unit-một-bind-một-cửa-chạy-fgos-run-3-pattern-cộng-tác-đóng-4-mối-authority-l5-1-đã-bị-thay-một-phần-bởi-0061',
+        '7a82fc342dbc99f94ab1d7f5cb7b99e4f1d2fb4e701626cfe52efea70c0169da'
+      ],
+      [
+        '0048-p2-plan-chạy-được-unit-cho-mọi-đường-vào-driver-mỏng-fgos-run-bỏ-demandfactsmatcher',
+        '8accf2e712bcb94cb1052b33924b384edab96c8628c5400f7d096efcf09cded1'
+      ],
+      [
+        '0049-p3b-work-không-còn-stage-work-chỉ-còn-bản-ghilifecycle-workflow-runner-là-sequencer-duy-nhất-đóng-a4',
+        'a79a3012b22c033bb7e482e94239462054434386e4f2c010c9346577130e1a8d'
+      ],
+      [
+        '0050-p6-nối-thật-herdr-là-transport-mặc-định-posture-một-đường-fallback-quota-qua-pane-mới',
+        'b5019011cdace996fa7f74d74340bbdc14ae0b3b5ae3f479975e336bccd9679f'
+      ],
+      [
+        '0051-cổng-ghi-file-đi-theo-chuỗi-fallback-quyền-git-của-invocation-giữ-lại-cho-work-loop',
+        '181cde40f90478c0541bbf0892a5eceae965f9c1e5d7f5e366e5a777b7241311'
+      ],
+      [
+        '0052-worker-không-bao-giờ-có-quyền-git-runner-commit-trên-mọi-đường-thay-mục-2-của-0051-đã-bị-thay-một-phần-bởi-0060',
+        '04f68eee53c6601115869e0dec85769498db8f63b00fd7cf5ba4cfb859a35c8f'
+      ],
+      [
+        '0053-một-cơ-chế-truyền-kết-quả-đường-dẫn-report-trong-contextrefs-phân-giải-một-lần',
+        '29f2185e7cf971134b645c8f61feebab3c998c90c66f8e6eee181adef6163279'
+      ],
+      [
+        '0055-panel-khác-họ-provider-giữa-các-ghế-là-ưu-tiên-mềm-bind-rải-ghế-theo-thứ-tự-prefer-reviewed-vẫn-cứng',
+        '75dc85e0ed4a197a26329a68c01c7d0414ca8e2399e893bceb75c4545d9319b3'
+      ],
+      [
+        '0056---seats-chuyên-biệt-hoá-ghế-panel-bằng-lens-khi-khởi-động-không-thêm-workflow-yaml-hay-registry',
+        '72ebb5b0a96c61934e736eae2046edd32750afbf69a82309e533f81a55b9da1c'
+      ],
+      [
+        '0057---seats-name-persona-có-tên-theo-ba-tầng-tra-cứu-ghim-nội-dung-lúc-start-gắn-đúng-một-ghế',
+        '03e970109c245bd491f286e8b54c799121e32c7300c0dab2e80dcaef1e21564a'
+      ],
+      [
+        '0058-provider-failure-fails-over-inside-execution-core-another-account-of-the-same-provider-first-then-the-next-candidate',
+        '403486a0de69580ccf79203888df2f75637b3acea53ce3624dbfc1944a63e1a0'
+      ],
+      [
+        '0059-a-domain-persona-pack-is-a-folder-what-a-seat-can-name-what-it-pinned-and-who-ran-it-are-each-stated-by-one-read',
+        'a4ba52db8acdfc49d4b74f87e9f88961d2fa1b824ffb0d42846dd19332527a08'
+      ],
+      [
+        '0060-runner-commit-theo-writes-của-unit-một-matcher-preflight-index-resume-chỉ-commit-brief-ghi-file-nói-rõ-phạm-vi-thay-mục-1-2-của-0052',
+        '3298c40f0899e93402ee63927a6dcf3ea4ad38d08c6fd9af88aefb11d2457db1'
+      ],
+      [
+        '0061-unit-ad-hoc-được-preferpersona-mềm-one-liner-fgos-run-workflow-start---units--effort-unit-ghi-nối-nhánh-thay-một-phần-mục-1-của-0047',
+        '648a519ae124396088ceac1e0c3a0784742df48f2ab04e2423ef576065cf5da4'
+      ],
+      [
+        '0062-xoá-cửa-thô-dispatch-là-tầng-thấp-fanout-về-tầng-work-thay-phần-purpose-door-của-rul68-2-tầng-dispatch-và-phần-mỗi-cửa-một-lane-posture-của-rul77-posture-belongs-to-the-capability',
+        '73fa71a8c6944bbf866662ca0a909000ae3e16d38770acaa3643ac86cb1052fc'
+      ],
+      [
+        '0063-work-chỉ-là-bên-dùng-dispatch-nhận-input-generic-thay-phần-đầu-vào-còn-lại-của-rul73-dispatch-does-not-know-work2',
+        '29d41a45489095b7ca89fd6570c786bc74bce025d8b3c4cb995cf315b3c653d9'
+      ],
+      [
+        '0064-hook-commit-để-lại-đèn-hoạt-động-riêng-không-ghi-main-checkoutlock-người-tranh-xét-record-theo-ttlms-của-chính-holder-checkpoint-dưới-merge-slot-giữ-main-mutex',
+        'dbd2125739c4bcd43eae0e2abb00500fb4b4f309a84d2ba6ef751cc5141b674e'
+      ],
+      [
+        '1-take-vs-pick-2-định-nghĩa-khác-nhau-cho-item-này-claim-được-không',
+        'e8eee63f828f4b5a6653239b4bf2c3e087acc21bae56fec77dd99514d5d129db'
+      ],
+      [
+        '2-kiểm-tra-working-tree-sạch-2-định-nghĩa-độc-lập-cho-return-và-approve',
+        '0ef1161a7277126cde540e2316d3d5205f0f9625e2f1153621fa6751da9f9f23'
+      ],
+      [
+        '3-createworktree-6-call-site-mỗi-nơi-tự-xử-lý-baserefcleanup-riêng',
+        'a78fe17050bf93323f164ddab36560dea3178d289cf4fe2faa2add23a0b28e02'
+      ],
+      [
+        'actors-access',
+        '3f682e32dc04d19e654abc927f8a3570f8ed866f17711e4ff18302e2840461e7'
+      ],
+      [
+        'agent-coordination-foundation-shared-capability-catalog-planning-awareness-cluster-docshistoryagent-coordination-foundationplanmd',
+        'f53f0f718c2ee9e2ec07a7c380f22072bdfe1e65e21fc0fa4b60b4031234ae70'
+      ],
+      [
+        'ai-ngã-ngũ-role-trên-settlement-phase-3-s3-closeout',
+        '8aaf79d96e8764fe3ddca86618ab2693738753c8e172dbe14fc86f3abe07df4e'
+      ],
+      [
+        'behaviors-operations',
+        '39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3'
+      ],
+      [
+        'business-rules',
+        'a0b653256ad485b037729003bab45b5f1bdfd1ccc0bfc100b5fc81b98e4bac64'
+      ],
+      [
+        'báo-việc-phát-hiện-từ-trợ-lý-workerrunner-discovery-report',
+        '59aa6f5d6d68c416a22eeea6fa6c4247fb7d7de59f69325d790f3bd7d7015581'
+      ],
+      [
+        'bảng-đối-chiếu-từ-vựng-dispatch',
+        '4d4c05e94bd4baf1756a0e253ce3a29ec9b73beaa546931acf49ac259e774f44'
+      ],
+      [
+        'bảo-vệ-approve-khỏi-lồng-phiên-session-nesting-guard-epic-2',
+        'c92d09f05317c34d30da8c4f5e7119acce83d4dfd5073ceb8c42c3483cfca7b7'
+      ],
+      [
+        'bằng-chứng-đã-kiểm',
+        'd57167acd4b6dac5fe237e41eba7b61e6dcda1ea2e8c99e7049040ab37795c9b'
+      ],
+      [
+        'bỏ-roottasksubtask-khỏi-từ-vựng-dispatch',
+        'a45acaeb1652116327762820c76424ed00d2f2de131d94c16cb179b6e8c57e0d'
+      ],
+      [
+        'bối-cảnh',
+        'c85972d73e0c1fc03329d33ae01a1fcf036d3d19c81c2e91389f04163992016e'
+      ],
+      [
+        'bối-cảnh-1',
+        'bb0b97a3dd60e838c00bfb454fb5731d1d570dcbae8d0c0dbe03171d04f5b62d'
+      ],
+      [
+        'bối-cảnh-10',
+        '77fee056c5b08ef7af1a1bd3f50d5e10fd9d4101b583320d9bab46f92be1f2b4'
+      ],
+      [
+        'bối-cảnh-11',
+        '357a2a344123089446a3a10e192e9d89e9b224d4ded3e0b8366bb07d00e9ef9e'
+      ],
+      [
+        'bối-cảnh-12',
+        'c59a3e00f3c7354ba734d5bcf7728b08b771cdc2b66131e43a37719b2491dd98'
+      ],
+      [
+        'bối-cảnh-13',
+        'c0bbf53368466ef1474fbff89514a960821b2902802db0104386c556b460a32c'
+      ],
+      [
+        'bối-cảnh-2',
+        '6fb8b852b1fc94c9a926ec161be7278c2b7e11bce46ac025cacbb612e9514698'
+      ],
+      [
+        'bối-cảnh-3',
+        'ad761744dda5fb4efe907ece8dd148f3e6441853b0b4f328bd323958720ff323'
+      ],
+      [
+        'bối-cảnh-4',
+        '2230d7de38bd1a697ef276c8eeded79ab4e02a9783ab94813ca816a268ea86e0'
+      ],
+      [
+        'bối-cảnh-5',
+        '075828bc1bd5b16a6aafd698e6df6b86fe652be3869fb73bad7375114adc3d59'
+      ],
+      [
+        'bối-cảnh-6',
+        '337ae164cf0ab9962947a018e618fb6050db1b0d5f66bdef1833bf5be32fa074'
+      ],
+      [
+        'bối-cảnh-7',
+        '23e631bc21b94f5af0a02cfab78693f61b33d25c52b30ce2e7aa4de386bf2466'
+      ],
+      [
+        'bối-cảnh-8',
+        'a2c04691faba0522f2ef90f8e0d4e0940e61682ea1c81b226f8fe75d6e33b523'
+      ],
+      [
+        'bối-cảnh-9',
+        '3c0b2783128372e5b83c4cf6a47c550f020d1f903c41e8896f17326cfc17d153'
+      ],
+      [
+        'candidates',
+        '8ddbd223d18aa054946e9087698849202a8fb1d634c58e09c58f7a3fbf21f56a'
+      ],
+      [
+        'capability-aware-dispatch-activation-tsk-46f',
+        '80ab9c4a9405eed4d1289cd8872637275cca4685a9bb0934ed9cb2d807fb8b4a'
+      ],
+      [
+        'capacity-một-năng-lực-có-tên-behavior-promise-functional-helper',
+        'bdb952cf50f1ad2350771dd66bf8d2457df5227ab87f184abce12a8a277f22fe'
+      ],
+      [
+        'chính-thức-hóa-việc-tách-capabilitycapacity-mà-0029-để-ngỏ',
+        'b6f027726edfbe603e799e5140a6545f768a1d496d716420bd7007dadb9af319'
+      ],
+      [
+        'chấm-trượt-lỗi-giữa-vòng',
+        'bb15a10898312c62d0812b80ea5a0afd1660bc44d3c3b690a48d0c121a031f47'
+      ],
+      [
+        'confinement-authority-một-cửa-kiểm-soát-giam-giữ-runtime-executethroughconfinement',
+        '1c0f8a82fce53e8ea0e4eb69a11ec8110ac6f111764803a6fcfadd3b51c3b33d'
+      ],
+      [
+        'coordinationsession-lịch-sử-đã-thu-hồi-per-p4-thay-bằng-collaborationpattern-workflow-runner',
+        'e3b9637386370205add50577674190f948eb94fefd4b56a1ffa35cff7f701478'
+      ],
+      [
+        'cây-nhánh-tích-hợp-con-nhập-vào-nhánh-của-gốc-chỉ-gốc-nhập-vào-cây-chính',
+        'b07c69bd296947367e0db70b6e6d4533d2ae58f471b3f6080198fae6c35f0f4a'
+      ],
+      [
+        'cơ-chế-phân-biệt-không-phải-heuristic-mới',
+        'd248d7c3ed3bab201338d35554aed966136f261e32da3c1e0fc366b38ec4532e'
+      ],
+      [
+        'cổng-duyệt-pr-nội-bộ-approval-gate-reviewapprovereject',
+        '82ff33c387aac2673e8aa51b5dfae092bc17fcfe90019aa50de38cdb2546ed97'
+      ],
+      [
+        'cổng-duyệt-qua-github-github-transport-tuỳ-chọn-reviewapprove---github',
+        '70f158b97d460c6cd790f466868963419ca1955f3543d63e9cc93154bcdb4c5f'
+      ],
+      [
+        'data-dictionary',
+        'b91663aeb373f3e9759bda7e8edf97edc512497d6d3adbf55ebdb6b8c7af5187'
+      ],
+      [
+        'dispatch-operability-implementation-slice-2026-09-16',
+        '020a15e1469e9d8f87b2295cc7ea3ca73da8fdda1dd62ff82b49a403fdb086f5'
+      ],
+      [
+        'dispatch-runtime-inspection',
+        '5ed555b20633e3d02aab26557fd2c1a144c2cac1cc1da5e7048986c280cfa1e0'
+      ],
+      [
+        'edge-cases-settled',
+        'c1c87e9a7f22cc4d3693c5d83d5ecac2fd90fa0386e03fb890638cf059c10de4'
+      ],
+      [
+        'entry-points-triggers',
+        '72526beea6ee0dab3fb182c1754440a8b37f4be2a7c4ffe734e7ef583c833b68'
+      ],
+      [
+        'executorprofile-invocation-target-vocabulary-phase-06-executor-policy-dispatch-seams-identitysupports-made-real-config-phase-c-executor-profile-schema-migration',
+        '0f54c4919dedb58d73fc7cf55e8d217fb054b04f36911b7990b6e9a78a361713'
+      ],
+      [
+        'gate-a-xếp-hạng-candidate-bắc-cầu-sang-việc-thật-evolve',
+        '52a283ef3e1356d53fc5ae6efb44c1c8c687858b70009ef970c11e151b896b6d'
+      ],
+      [
+        'ghi-chú-liên-quan-không-phải-finding-mới-của-item-này',
+        'd22438074db150b18a097bf95f2422820648903c6bb211b4fb534786fb80abe8'
+      ],
+      [
+        'ghi-lại-output-của-trợ-lý-sau-mỗi-lượt-dispatch-persist-log',
+        '833e1a2724e50109d3f7ab290cc9febae57b6ee66d9715aeda8a29d032804e13'
+      ],
+      [
+        'giao-việc-theo-mẻ-song-song-có-giới-hạn-giữ-quyền-sở-hữu-gốc',
+        '1eb8d70495713021803680d977e3d8788012c662e03b0b01aaff56cdc3fb53ff'
+      ],
+      [
+        'guard-reconciliation',
+        '42ab966efc78e26589453160b8a631996c393b84c94d6acd46e78e19029b63d6'
+      ],
+      [
+        'gặt-lại-lúc-khởi-động-reap-phục-hồi-sau-crash',
+        'f8968e79fcc258ed272fbdd6f442233110f238edac79ca5b2c8261adf32785b2'
+      ],
+      [
+        'hệ-quả',
+        'bd3abb8a9b8884d507aa39dad26a0a8669326d975f1cbbcddaa1a1d70d2b692f'
+      ],
+      [
+        'hệ-quả-1',
+        'c0d2ed8b1050279455c37226890b760cbd9991f77066c97d57813548c46c3810'
+      ],
+      [
+        'hệ-quả-10',
+        '93cb01610d213afd09e43ef535222c463834632e403ebf4cd74a394dfdf9dcb6'
+      ],
+      [
+        'hệ-quả-11',
+        'eede37c34599d00d26acf3126dcc0dd2f0ef3db8aaaf8b372af48043b41531b1'
+      ],
+      [
+        'hệ-quả-2',
+        '1a4eed607d10e73fe1cff749ffe1c5c17c6d79ec05d5928d3e014b24ccac6e39'
+      ],
+      [
+        'hệ-quả-3',
+        '7296dfaf2a21f7bff97e45c9dd7c77dc69ff49061dab1577395d67343b6aa8aa'
+      ],
+      [
+        'hệ-quả-4',
+        '6a6306aef856dae488426e2f9c17c5aa4238d67a541a93b4f82272e68bdc44c3'
+      ],
+      [
+        'hệ-quả-5',
+        'e2b8ec3df45f9427347649d739024782c07610b9db9527048e03239ac4144653'
+      ],
+      [
+        'hệ-quả-6',
+        '736119c4cc6845655cbf0c7bd974e6ca9aa47af56a18637967135727d7999319'
+      ],
+      [
+        'hệ-quả-7',
+        'c5c6ad2ea55987a32ed41732beb0582d0326128ed827cc655b29e2a14ae2d9bc'
+      ],
+      [
+        'hệ-quả-8',
+        '14e0aa722cef643382c26bad2388e9cc7bf76b7d52067c72502af1cb2804f9d6'
+      ],
+      [
+        'hệ-quả-9',
+        'f41ecefca1aa681c16ead99e85a938e4f0983c804ca956852f7eed8ff235e966'
+      ],
+      [
+        'hợp-đồng-rigor-tier-phase-2-2026-10-01',
+        'cfd79dea41e34baf7969fddba3e30ecc5666de6a7ee32a50dd97cf099bfd8448'
+      ],
+      [
+        'iron-law-phân-loại-rủi-ro-của-một-candidate-fix-self-improve-loop-str13-slice-23',
+        'b5bd1aff8cdb056c9d10c357f80729d5c1cefd632d344242fc46a5441a8f0e23'
+      ],
+      [
+        'khóa-hoạt-động-cây-chính-chặn-commit-trần-khi-phiên-khác-đang-hoạt-động-str65',
+        '1c46bbd825e116160efeadcef33dab9d2fa69c0ba9985af5de2d4e717cf7b577'
+      ],
+      ... 397 more items
+    ],
+    expected: [
+      [
+        '0005-runner-cô-lập-worker',
+        '8c6dec18f6bef92315f061a9bdcf6803f5c40f688265b36d608602036bf9778a'
+      ],
+      [
+        '0008-routing-theo-audience-của-từng-interface',
+        '4a89d0eee1476346d312e102a9990ae398d0c9a0a04621614c32bf60ac3586ff'
+      ],
+      [
+        '0020-chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập',
+        '846ae5c87d5d064d453beeb1084d4670a19a4da867ab19c3c1cb6fbc5c62b088'
+      ],
+      [
+        '0021-wire-main-checkout-lock-hook-qua-fgos-doctorsetup-không-epoch-fence',
+        '959caa2c40413558eef7fc8ddf9b56e55624d8e1d2d1ca39bef105028e8bf7d4'
+      ],
+      [
+        '0022-khảo-sát-choke-point-fgos-quyết-định-lặplệch-xuyên-clirunnerskill',
+        '2666cf25c87f39bcaee829d110aae261bf5290761df53f486b3ac0466a855df2'
+      ],
+      [
+        '0023-thứ-tự-ưu-tiên-sản-phẩm-ship-faster-dod-result-docs-hoàn-thiện-sau-ngưỡng',
+        '71c4c7fc47a234ace33d1fab94af73c79c2f18a1ef050fa9f5fd9c04c768f2ea'
+      ],
+      [
+        '0025-thứ-tự-ưu-tiên-sản-phẩm-chi-tiết-hoá-0023-nạp-always-loaded-qua-agentsmd',
+        '8308c59db81e66797b42ab24e7bc3b432c96beb5abcbca95bcfe6a6bab4befa1'
+      ],
+      [
+        '0026-native-first-dispatch-doctrine-launcherroottaskcapacity',
+        'b5feb9dc39066908a13b2af9470dc682055b21f096f7c68e2f64169a72656e6f'
+      ],
+      [
+        '0028-đổi-tên-pinned-term-orchestrator-thành-launcher',
+        'd8f1249a2c419f0baf2d767776d91463f1efa81acbfb98ec917f75e46fd0841d'
+      ],
+      [
+        '0029-sửa-ba-mệnh-đề-từ-vựng-dispatch-của-0026-bỏ-roottasksubtask-capacity-là-năng-lực-có-tên-t1-hai-giá-trị',
+        'c93ff7accfa74d803887b10ccc4f1c83000d462985b7ca40b18b41104939ce8c'
+      ],
+      [
+        '0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm',
+        '37bc1d87f4949e20df85dca9c8cf5e71c743366dc424168490705486abc1948d'
+      ],
+      [
+        '0031-bỏ-guard-cấm-từ-orchestrator-sau-khi-0029-đã-gán-nghĩa-mới',
+        '0e40c4bec2d4c007a8ad19cda638c3a3bfc1c4866c8ca1c5ab81526c001a12dd'
+      ],
+      [
+        '0032-cổng-iron-law-chỉ-hỏi-ở-ranh-giới-trunk-thêm-mức-warn-agent-gõ-lệnh-thay-người',
+        '518b40214e39e32458b4abd8df5835a0d63076b09fe1e495606b103633fcfb69'
+      ],
+      [
+        '0033-capacity-cli-spawn-shaped-thắng-haslivetaskaccess-thu-hẹp-0026-rule-2',
+        '870f0cda11251eb1ee8a3e50538b008cffb4f7b6e3c406b5216a9f297085ab6a'
+      ],
+      [
+        '0034-đổi-tên-capacitycapacities-thành-executorexecutors-chốt-tách-capability',
+        '8e58276b0592e40372a37ac42f2a7f2d457d7751f65c5a612dfc3921d4b43f44'
+      ],
+      [
+        '0035-ranh-giới-tin-cậy-của-cổng-mutation-gate-caller-trong-tiến-trình-cùng-lớp-tin-cậy-với-user-không-phải-kẻ-tấn-công',
+        '6a9b6ff7d029a5a396af6faf728380f673e6388b6c65fb6746894d1fd11dc43d'
+      ],
+      [
+        '0043-vocabulary-bound-invocation-supervisor-vs-detached-run-supervisor',
+        '0c685ba69f0bc771bdafc5184a8e95fd810a9363471c286072076c9c4798ae37'
+      ],
+      [
+        '0046-gom-thang-tierrigor-2-thang-1-bảng-xoá-mọi-lớp-chồng',
+        '3e06e42c903776657538aeb0c3293d568aeaaed3c5ee38896d893cccd4c15e09'
+      ],
+      [
+        '0047-p1-lõi-thực-thi-unit-một-bind-một-cửa-chạy-fgos-run-3-pattern-cộng-tác-đóng-4-mối-authority-l5-1-đã-bị-thay-một-phần-bởi-0061',
+        '7a82fc342dbc99f94ab1d7f5cb7b99e4f1d2fb4e701626cfe52efea70c0169da'
+      ],
+      [
+        '0048-p2-plan-chạy-được-unit-cho-mọi-đường-vào-driver-mỏng-fgos-run-bỏ-demandfactsmatcher',
+        '8accf2e712bcb94cb1052b33924b384edab96c8628c5400f7d096efcf09cded1'
+      ],
+      [
+        '0049-p3b-work-không-còn-stage-work-chỉ-còn-bản-ghilifecycle-workflow-runner-là-sequencer-duy-nhất-đóng-a4',
+        'a79a3012b22c033bb7e482e94239462054434386e4f2c010c9346577130e1a8d'
+      ],
+      [
+        '0050-p6-nối-thật-herdr-là-transport-mặc-định-posture-một-đường-fallback-quota-qua-pane-mới',
+        'b5019011cdace996fa7f74d74340bbdc14ae0b3b5ae3f479975e336bccd9679f'
+      ],
+      [
+        '0051-cổng-ghi-file-đi-theo-chuỗi-fallback-quyền-git-của-invocation-giữ-lại-cho-work-loop',
+        '181cde40f90478c0541bbf0892a5eceae965f9c1e5d7f5e366e5a777b7241311'
+      ],
+      [
+        '0052-worker-không-bao-giờ-có-quyền-git-runner-commit-trên-mọi-đường-thay-mục-2-của-0051-đã-bị-thay-một-phần-bởi-0060',
+        '04f68eee53c6601115869e0dec85769498db8f63b00fd7cf5ba4cfb859a35c8f'
+      ],
+      [
+        '0053-một-cơ-chế-truyền-kết-quả-đường-dẫn-report-trong-contextrefs-phân-giải-một-lần',
+        '29f2185e7cf971134b645c8f61feebab3c998c90c66f8e6eee181adef6163279'
+      ],
+      [
+        '0055-panel-khác-họ-provider-giữa-các-ghế-là-ưu-tiên-mềm-bind-rải-ghế-theo-thứ-tự-prefer-reviewed-vẫn-cứng',
+        '75dc85e0ed4a197a26329a68c01c7d0414ca8e2399e893bceb75c4545d9319b3'
+      ],
+      [
+        '0056---seats-chuyên-biệt-hoá-ghế-panel-bằng-lens-khi-khởi-động-không-thêm-workflow-yaml-hay-registry',
+        '72ebb5b0a96c61934e736eae2046edd32750afbf69a82309e533f81a55b9da1c'
+      ],
+      [
+        '0057---seats-name-persona-có-tên-theo-ba-tầng-tra-cứu-ghim-nội-dung-lúc-start-gắn-đúng-một-ghế',
+        '03e970109c245bd491f286e8b54c799121e32c7300c0dab2e80dcaef1e21564a'
+      ],
+      [
+        '0058-provider-failure-fails-over-inside-execution-core-another-account-of-the-same-provider-first-then-the-next-candidate',
+        '403486a0de69580ccf79203888df2f75637b3acea53ce3624dbfc1944a63e1a0'
+      ],
+      [
+        '0059-a-domain-persona-pack-is-a-folder-what-a-seat-can-name-what-it-pinned-and-who-ran-it-are-each-stated-by-one-read',
+        'a4ba52db8acdfc49d4b74f87e9f88961d2fa1b824ffb0d42846dd19332527a08'
+      ],
+      [
+        '0060-runner-commit-theo-writes-của-unit-một-matcher-preflight-index-resume-chỉ-commit-brief-ghi-file-nói-rõ-phạm-vi-thay-mục-1-2-của-0052',
+        '3298c40f0899e93402ee63927a6dcf3ea4ad38d08c6fd9af88aefb11d2457db1'
+      ],
+      [
+        '0061-unit-ad-hoc-được-preferpersona-mềm-one-liner-fgos-run-workflow-start---units--effort-unit-ghi-nối-nhánh-thay-một-phần-mục-1-của-0047',
+        '648a519ae124396088ceac1e0c3a0784742df48f2ab04e2423ef576065cf5da4'
+      ],
+      [
+        '0062-xoá-cửa-thô-dispatch-là-tầng-thấp-fanout-về-tầng-work-thay-phần-purpose-door-của-rul68-2-tầng-dispatch-và-phần-mỗi-cửa-một-lane-posture-của-rul77-posture-belongs-to-the-capability',
+        '73fa71a8c6944bbf866662ca0a909000ae3e16d38770acaa3643ac86cb1052fc'
+      ],
+      [
+        '0063-work-chỉ-là-bên-dùng-dispatch-nhận-input-generic-thay-phần-đầu-vào-còn-lại-của-rul73-dispatch-does-not-know-work2',
+        '29d41a45489095b7ca89fd6570c786bc74bce025d8b3c4cb995cf315b3c653d9'
+      ],
+      [
+        '0064-hook-commit-để-lại-đèn-hoạt-động-riêng-không-ghi-main-checkoutlock-người-tranh-xét-record-theo-ttlms-của-chính-holder-checkpoint-dưới-merge-slot-giữ-main-mutex',
+        'dbd2125739c4bcd43eae0e2abb00500fb4b4f309a84d2ba6ef751cc5141b674e'
+      ],
+      [
+        '1-take-vs-pick-2-định-nghĩa-khác-nhau-cho-item-này-claim-được-không',
+        'e8eee63f828f4b5a6653239b4bf2c3e087acc21bae56fec77dd99514d5d129db'
+      ],
+      [
+        '2-kiểm-tra-working-tree-sạch-2-định-nghĩa-độc-lập-cho-return-và-approve',
+        '0ef1161a7277126cde540e2316d3d5205f0f9625e2f1153621fa6751da9f9f23'
+      ],
+      [
+        '3-createworktree-6-call-site-mỗi-nơi-tự-xử-lý-baserefcleanup-riêng',
+        'a78fe17050bf93323f164ddab36560dea3178d289cf4fe2faa2add23a0b28e02'
+      ],
+      [
+        'actors-access',
+        '3f682e32dc04d19e654abc927f8a3570f8ed866f17711e4ff18302e2840461e7'
+      ],
+      [
+        'agent-coordination-foundation-shared-capability-catalog-planning-awareness-cluster-docshistoryagent-coordination-foundationplanmd',
+        'f53f0f718c2ee9e2ec07a7c380f22072bdfe1e65e21fc0fa4b60b4031234ae70'
+      ],
+      [
+        'ai-ngã-ngũ-role-trên-settlement-phase-3-s3-closeout',
+        '8aaf79d96e8764fe3ddca86618ab2693738753c8e172dbe14fc86f3abe07df4e'
+      ],
+      [
+        'behaviors-operations',
+        '39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3'
+      ],
+      [
+        'business-rules',
+        'a0b653256ad485b037729003bab45b5f1bdfd1ccc0bfc100b5fc81b98e4bac64'
+      ],
+      [
+        'báo-việc-phát-hiện-từ-trợ-lý-workerrunner-discovery-report',
+        '59aa6f5d6d68c416a22eeea6fa6c4247fb7d7de59f69325d790f3bd7d7015581'
+      ],
+      [
+        'bảng-đối-chiếu-từ-vựng-dispatch',
+        '4d4c05e94bd4baf1756a0e253ce3a29ec9b73beaa546931acf49ac259e774f44'
+      ],
+      [
+        'bảo-vệ-approve-khỏi-lồng-phiên-session-nesting-guard-epic-2',
+        'c92d09f05317c34d30da8c4f5e7119acce83d4dfd5073ceb8c42c3483cfca7b7'
+      ],
+      [
+        'bằng-chứng-đã-kiểm',
+        'd57167acd4b6dac5fe237e41eba7b61e6dcda1ea2e8c99e7049040ab37795c9b'
+      ],
+      [
+        'bỏ-roottasksubtask-khỏi-từ-vựng-dispatch',
+        'a45acaeb1652116327762820c76424ed00d2f2de131d94c16cb179b6e8c57e0d'
+      ],
+      [
+        'bối-cảnh',
+        'c85972d73e0c1fc03329d33ae01a1fcf036d3d19c81c2e91389f04163992016e'
+      ],
+      [
+        'bối-cảnh-1',
+        'bb0b97a3dd60e838c00bfb454fb5731d1d570dcbae8d0c0dbe03171d04f5b62d'
+      ],
+      [
+        'bối-cảnh-10',
+        '77fee056c5b08ef7af1a1bd3f50d5e10fd9d4101b583320d9bab46f92be1f2b4'
+      ],
+      [
+        'bối-cảnh-11',
+        '357a2a344123089446a3a10e192e9d89e9b224d4ded3e0b8366bb07d00e9ef9e'
+      ],
+      [
+        'bối-cảnh-12',
+        'c59a3e00f3c7354ba734d5bcf7728b08b771cdc2b66131e43a37719b2491dd98'
+      ],
+      [
+        'bối-cảnh-13',
+        'c0bbf53368466ef1474fbff89514a960821b2902802db0104386c556b460a32c'
+      ],
+      [
+        'bối-cảnh-2',
+        '6fb8b852b1fc94c9a926ec161be7278c2b7e11bce46ac025cacbb612e9514698'
+      ],
+      [
+        'bối-cảnh-3',
+        'ad761744dda5fb4efe907ece8dd148f3e6441853b0b4f328bd323958720ff323'
+      ],
+      [
+        'bối-cảnh-4',
+        '2230d7de38bd1a697ef276c8eeded79ab4e02a9783ab94813ca816a268ea86e0'
+      ],
+      [
+        'bối-cảnh-5',
+        '075828bc1bd5b16a6aafd698e6df6b86fe652be3869fb73bad7375114adc3d59'
+      ],
+      [
+        'bối-cảnh-6',
+        '337ae164cf0ab9962947a018e618fb6050db1b0d5f66bdef1833bf5be32fa074'
+      ],
+      [
+        'bối-cảnh-7',
+        '23e631bc21b94f5af0a02cfab78693f61b33d25c52b30ce2e7aa4de386bf2466'
+      ],
+      [
+        'bối-cảnh-8',
+        'a2c04691faba0522f2ef90f8e0d4e0940e61682ea1c81b226f8fe75d6e33b523'
+      ],
+      [
+        'bối-cảnh-9',
+        '3c0b2783128372e5b83c4cf6a47c550f020d1f903c41e8896f17326cfc17d153'
+      ],
+      [
+        'candidates',
+        '8ddbd223d18aa054946e9087698849202a8fb1d634c58e09c58f7a3fbf21f56a'
+      ],
+      [
+        'capability-aware-dispatch-activation-tsk-46f',
+        '80ab9c4a9405eed4d1289cd8872637275cca4685a9bb0934ed9cb2d807fb8b4a'
+      ],
+      [
+        'capacity-một-năng-lực-có-tên-behavior-promise-functional-helper',
+        'bdb952cf50f1ad2350771dd66bf8d2457df5227ab87f184abce12a8a277f22fe'
+      ],
+      [
+        'chính-thức-hóa-việc-tách-capabilitycapacity-mà-0029-để-ngỏ',
+        'b6f027726edfbe603e799e5140a6545f768a1d496d716420bd7007dadb9af319'
+      ],
+      [
+        'chấm-trượt-lỗi-giữa-vòng',
+        'bb15a10898312c62d0812b80ea5a0afd1660bc44d3c3b690a48d0c121a031f47'
+      ],
+      [
+        'confinement-authority-một-cửa-kiểm-soát-giam-giữ-runtime-executethroughconfinement',
+        '1c0f8a82fce53e8ea0e4eb69a11ec8110ac6f111764803a6fcfadd3b51c3b33d'
+      ],
+      [
+        'coordinationsession-lịch-sử-đã-thu-hồi-per-p4-thay-bằng-collaborationpattern-workflow-runner',
+        'e3b9637386370205add50577674190f948eb94fefd4b56a1ffa35cff7f701478'
+      ],
+      [
+        'cây-nhánh-tích-hợp-con-nhập-vào-nhánh-của-gốc-chỉ-gốc-nhập-vào-cây-chính',
+        'b07c69bd296947367e0db70b6e6d4533d2ae58f471b3f6080198fae6c35f0f4a'
+      ],
+      [
+        'cơ-chế-phân-biệt-không-phải-heuristic-mới',
+        'd248d7c3ed3bab201338d35554aed966136f261e32da3c1e0fc366b38ec4532e'
+      ],
+      [
+        'cổng-duyệt-pr-nội-bộ-approval-gate-reviewapprovereject',
+        '82ff33c387aac2673e8aa51b5dfae092bc17fcfe90019aa50de38cdb2546ed97'
+      ],
+      [
+        'cổng-duyệt-qua-github-github-transport-tuỳ-chọn-reviewapprove---github',
+        '70f158b97d460c6cd790f466868963419ca1955f3543d63e9cc93154bcdb4c5f'
+      ],
+      [
+        'data-dictionary',
+        'b91663aeb373f3e9759bda7e8edf97edc512497d6d3adbf55ebdb6b8c7af5187'
+      ],
+      [
+        'dispatch-operability-implementation-slice-2026-09-16',
+        'aaec88b66425149e842fe7c507cd3dd0beaee9d3e0ecde88fa805637967d2f10'
+      ],
+      [
+        'dispatch-runtime-inspection',
+        '5ed555b20633e3d02aab26557fd2c1a144c2cac1cc1da5e7048986c280cfa1e0'
+      ],
+      [
+        'edge-cases-settled',
+        'c1c87e9a7f22cc4d3693c5d83d5ecac2fd90fa0386e03fb890638cf059c10de4'
+      ],
+      [
+        'entry-points-triggers',
+        '72526beea6ee0dab3fb182c1754440a8b37f4be2a7c4ffe734e7ef583c833b68'
+      ],
+      [
+        'executorprofile-invocation-target-vocabulary-phase-06-executor-policy-dispatch-seams-identitysupports-made-real-config-phase-c-executor-profile-schema-migration',
+        '0f54c4919dedb58d73fc7cf55e8d217fb054b04f36911b7990b6e9a78a361713'
+      ],
+      [
+        'gate-a-xếp-hạng-candidate-bắc-cầu-sang-việc-thật-evolve',
+        '52a283ef3e1356d53fc5ae6efb44c1c8c687858b70009ef970c11e151b896b6d'
+      ],
+      [
+        'ghi-chú-liên-quan-không-phải-finding-mới-của-item-này',
+        'd22438074db150b18a097bf95f2422820648903c6bb211b4fb534786fb80abe8'
+      ],
+      [
+        'ghi-lại-output-của-trợ-lý-sau-mỗi-lượt-dispatch-persist-log',
+        '833e1a2724e50109d3f7ab290cc9febae57b6ee66d9715aeda8a29d032804e13'
+      ],
+      [
+        'giao-việc-theo-mẻ-song-song-có-giới-hạn-giữ-quyền-sở-hữu-gốc',
+        '1eb8d70495713021803680d977e3d8788012c662e03b0b01aaff56cdc3fb53ff'
+      ],
+      [
+        'guard-reconciliation',
+        '16c2b3dace9daab9a6d90e29bd7f00fbad2c313cbedb0e28ed031664fa81b255'
+      ],
+      [
+        'gặt-lại-lúc-khởi-động-reap-phục-hồi-sau-crash',
+        'f8968e79fcc258ed272fbdd6f442233110f238edac79ca5b2c8261adf32785b2'
+      ],
+      [
+        'hệ-quả',
+        'bd3abb8a9b8884d507aa39dad26a0a8669326d975f1cbbcddaa1a1d70d2b692f'
+      ],
+      [
+        'hệ-quả-1',
+        'c0d2ed8b1050279455c37226890b760cbd9991f77066c97d57813548c46c3810'
+      ],
+      [
+        'hệ-quả-10',
+        '93cb01610d213afd09e43ef535222c463834632e403ebf4cd74a394dfdf9dcb6'
+      ],
+      [
+        'hệ-quả-11',
+        'eede37c34599d00d26acf3126dcc0dd2f0ef3db8aaaf8b372af48043b41531b1'
+      ],
+      [
+        'hệ-quả-2',
+        '1a4eed607d10e73fe1cff749ffe1c5c17c6d79ec05d5928d3e014b24ccac6e39'
+      ],
+      [
+        'hệ-quả-3',
+        '7296dfaf2a21f7bff97e45c9dd7c77dc69ff49061dab1577395d67343b6aa8aa'
+      ],
+      [
+        'hệ-quả-4',
+        '6a6306aef856dae488426e2f9c17c5aa4238d67a541a93b4f82272e68bdc44c3'
+      ],
+      [
+        'hệ-quả-5',
+        'e2b8ec3df45f9427347649d739024782c07610b9db9527048e03239ac4144653'
+      ],
+      [
+        'hệ-quả-6',
+        '736119c4cc6845655cbf0c7bd974e6ca9aa47af56a18637967135727d7999319'
+      ],
+      [
+        'hệ-quả-7',
+        'c5c6ad2ea55987a32ed41732beb0582d0326128ed827cc655b29e2a14ae2d9bc'
+      ],
+      [
+        'hệ-quả-8',
+        '14e0aa722cef643382c26bad2388e9cc7bf76b7d52067c72502af1cb2804f9d6'
+      ],
+      [
+        'hệ-quả-9',
+        'f41ecefca1aa681c16ead99e85a938e4f0983c804ca956852f7eed8ff235e966'
+      ],
+      [
+        'hợp-đồng-rigor-tier-phase-2-2026-10-01',
+        'cfd79dea41e34baf7969fddba3e30ecc5666de6a7ee32a50dd97cf099bfd8448'
+      ],
+      [
+        'iron-law-phân-loại-rủi-ro-của-một-candidate-fix-self-improve-loop-str13-slice-23',
+        'b5bd1aff8cdb056c9d10c357f80729d5c1cefd632d344242fc46a5441a8f0e23'
+      ],
+      [
+        'khóa-hoạt-động-cây-chính-chặn-commit-trần-khi-phiên-khác-đang-hoạt-động-str65',
+        '1c46bbd825e116160efeadcef33dab9d2fa69c0ba9985af5de2d4e717cf7b577'
+      ],
+      ... 397 more items
+    ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+  
+  Node.js v24.18.0
+  
+      at genericNodeError (node:internal/errors:985:15)
+      at wrappedFn (node:internal/errors:539:14)
+      at checkExecSyncError (node:child_process:925:11)
+      at execFileSync (node:child_process:961:15)
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-runner-liveness.test.mjs:19:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    status: 1,
+    signal: null,
+    output: [ null, <Buffer >, <Buffer 6e 6f 64 65 3a 69 6e 74 65 72 6e 61 6c 2f 6d 6f 64 75 6c 65 73 2f 72 75 6e 5f 6d 61 69 6e 3a 31 30 37 0a 20 20 20 20 74 72 69 67 67 65 72 55 6e 63 61 ... 33876 more bytes> ],
+    pid: 3106201,
+    stdout: <Buffer >,
+    stderr: <Buffer 6e 6f 64 65 3a 69 6e 74 65 72 6e 61 6c 2f 6d 6f 64 75 6c 65 73 2f 72 75 6e 5f 6d 61 69 6e 3a 31 30 37 0a 20 20 20 20 74 72 69 67 67 65 72 55 6e 63 61 ... 33876 more bytes>
+  }

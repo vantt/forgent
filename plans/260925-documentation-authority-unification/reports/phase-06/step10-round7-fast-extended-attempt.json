@@ -1,0 +1,507 @@
+{
+  "scope": [
+    "AGENTS.md",
+    "CLAUDE.md",
+    "docs/specs/reading-map.md",
+    "docs/specs/runner.md",
+    "docs/specs/confinement-authority.md",
+    "docs/architecture-manifest.json",
+    "docs/io-contract.md",
+    "docs/specs/distribution.md",
+    "docs/specs/observe.md",
+    "docs/reading-map.md",
+    "docs/architect/agent-coordination/vocabulary/concept-relationships.md"
+  ],
+  "method": "Scoped FAST unchanged native checker functions on a working-tree overlay; current source decisions and nine explicit provisional identity-gap drafts. No native sync, registry write, closure or native new-identity claim.",
+  "registryUnchanged": true,
+  "runs": [
+    {
+      "label": "both",
+      "D": {
+        "count": 21,
+        "fatalFindings": [
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s4-packaging-distribution-distribution.json: claim claim_4eeb2f406288458e61bad21531966ab1 is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s4-packaging-distribution-distribution.json: claim claim_a1a323052194c5140b628b5f3861fa05 is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s4-packaging-main-recarry.json: claim claim_d9185072d68925b4c020b13ba6c4d74f is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s5-root-boundary-sync.json: claim claim_f703aeda7755ab376e6e3eee88eb82c2 is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s5-root-main-recarry.json: claim claim_03ef50e87178220032a3eebe5c5d89d9 is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s9-runner-01.json: claim claim_383a6485c1aaed79a640a59463183fe8 is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s9-runner-01.json: claim claim_cdf8c5562fb083bbdccf7d8c03decb7a is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s9-runner-01.json: claim claim_55b85c1d204ea6a7b336fd6b066fc4f1 is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s9-runner-01.json: claim claim_d7fd3778a5cbb74cad9fb5e476708647 is not in the claim ledger"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_9832d0298e9320dc2ec4d4497b411db6 targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_50435fbd206ad719ebf3795165a87ccd targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_0ec50da09f379b79d8bf763660c21fb6 targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_f0a15a953f8fce5e049e2f69f17fdabf targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_4cb135b39de37e8710323614f9a5cbaa targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_825643f78fef3641b308e35c37ec83a1 targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_7db865966ccd250c2dcb57d95c6833dd targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_8abd3d67c764d265b622dcd57d38cb13 targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_5f0ea240f41c6a482d5785fee410158c targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_c350f90477676de34d5be1397785d8fe targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_ef46af833dcb1f76ff7ca72844c4aa74 targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_eaad287a417b0d1a585f4ca53534feb2 targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          }
+        ]
+      },
+      "E": {
+        "open": [
+          {
+            "type": "claims-partial-carry",
+            "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+            "count": 15,
+            "examples": [
+              "docs/io-contract.md#unheaded-block-5",
+              "docs/specs/observe.md#unheaded-block-3",
+              "docs/specs/runner.md#unheaded-block-102",
+              "docs/specs/runner.md#unheaded-block-118",
+              "docs/specs/runner.md#unheaded-block-127"
+            ]
+          },
+          {
+            "type": "claims-not-reviewed",
+            "message": "claim rows whose reviewStatus is not reviewed",
+            "count": 22,
+            "examples": [
+              "docs/specs/runner.md#guard-reconciliation",
+              "docs/specs/runner.md#unheaded-block-3",
+              "docs/specs/runner.md#data-dictionary",
+              "docs/specs/runner.md#unheaded-block-9",
+              "docs/specs/runner.md#gate-a-xếp-hạng-candidate-bắc-cầu-sang-việc-thật-evolve"
+            ]
+          },
+          {
+            "type": "identical-units-multiple-owners",
+            "message": "identical source units whose rows name different target owners",
+            "count": 1,
+            "examples": [
+              "39a803b85af8: docs/platform/packaging-distribution/spec.md, docs/platform/runner/operations/h-51f5cd7279fd.md"
+            ]
+          },
+          {
+            "type": "registry-gaps-without-disposition",
+            "message": "registry identity-gap rows with no vocabulary disposition",
+            "count": 2,
+            "examples": [
+              "docs/reading-map.md#unheaded-block-15",
+              "docs/reading-map.md#unheaded-block-16"
+            ]
+          },
+          {
+            "type": "candidate-blocks-unreferenced",
+            "message": "candidate conservation units not named by a source decision",
+            "count": 336,
+            "examples": [
+              "docs/platform/work-state/contracts/cli-io-contract.md#cli-io-contract",
+              "docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-1",
+              "docs/platform/work-state/contracts/cli-io-contract.md#single-write-door",
+              "docs/platform/work-state/contracts/cli-io-contract.md#writer-identity",
+              "docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-5"
+            ]
+          }
+        ],
+        "strictGreen": false
+      }
+    },
+    {
+      "label": "identity",
+      "D": {
+        "count": 21,
+        "fatalFindings": [
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s4-packaging-distribution-distribution.json: claim claim_4eeb2f406288458e61bad21531966ab1 is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s4-packaging-distribution-distribution.json: claim claim_a1a323052194c5140b628b5f3861fa05 is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s4-packaging-main-recarry.json: claim claim_d9185072d68925b4c020b13ba6c4d74f is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s5-root-boundary-sync.json: claim claim_f703aeda7755ab376e6e3eee88eb82c2 is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s5-root-main-recarry.json: claim claim_03ef50e87178220032a3eebe5c5d89d9 is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s9-runner-01.json: claim claim_383a6485c1aaed79a640a59463183fe8 is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s9-runner-01.json: claim claim_cdf8c5562fb083bbdccf7d8c03decb7a is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s9-runner-01.json: claim claim_55b85c1d204ea6a7b336fd6b066fc4f1 is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s9-runner-01.json: claim claim_d7fd3778a5cbb74cad9fb5e476708647 is not in the claim ledger"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_9832d0298e9320dc2ec4d4497b411db6 targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_50435fbd206ad719ebf3795165a87ccd targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_0ec50da09f379b79d8bf763660c21fb6 targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_f0a15a953f8fce5e049e2f69f17fdabf targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_4cb135b39de37e8710323614f9a5cbaa targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_825643f78fef3641b308e35c37ec83a1 targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_7db865966ccd250c2dcb57d95c6833dd targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_8abd3d67c764d265b622dcd57d38cb13 targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_5f0ea240f41c6a482d5785fee410158c targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_c350f90477676de34d5be1397785d8fe targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_ef46af833dcb1f76ff7ca72844c4aa74 targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_eaad287a417b0d1a585f4ca53534feb2 targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          }
+        ]
+      },
+      "E": {
+        "open": [
+          {
+            "type": "claims-partial-carry",
+            "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+            "count": 15,
+            "examples": [
+              "docs/io-contract.md#unheaded-block-5",
+              "docs/specs/observe.md#unheaded-block-3",
+              "docs/specs/runner.md#unheaded-block-102",
+              "docs/specs/runner.md#unheaded-block-118",
+              "docs/specs/runner.md#unheaded-block-127"
+            ]
+          },
+          {
+            "type": "claims-not-reviewed",
+            "message": "claim rows whose reviewStatus is not reviewed",
+            "count": 22,
+            "examples": [
+              "docs/specs/runner.md#guard-reconciliation",
+              "docs/specs/runner.md#unheaded-block-3",
+              "docs/specs/runner.md#data-dictionary",
+              "docs/specs/runner.md#unheaded-block-9",
+              "docs/specs/runner.md#gate-a-xếp-hạng-candidate-bắc-cầu-sang-việc-thật-evolve"
+            ]
+          },
+          {
+            "type": "identical-units-multiple-owners",
+            "message": "identical source units whose rows name different target owners",
+            "count": 1,
+            "examples": [
+              "39a803b85af8: docs/platform/packaging-distribution/spec.md, docs/platform/runner/operations/h-51f5cd7279fd.md"
+            ]
+          },
+          {
+            "type": "registry-gaps-without-disposition",
+            "message": "registry identity-gap rows with no vocabulary disposition",
+            "count": 2,
+            "examples": [
+              "docs/reading-map.md#unheaded-block-15",
+              "docs/reading-map.md#unheaded-block-16"
+            ]
+          },
+          {
+            "type": "candidate-blocks-unreferenced",
+            "message": "candidate conservation units not named by a source decision",
+            "count": 336,
+            "examples": [
+              "docs/platform/work-state/contracts/cli-io-contract.md#cli-io-contract",
+              "docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-1",
+              "docs/platform/work-state/contracts/cli-io-contract.md#single-write-door",
+              "docs/platform/work-state/contracts/cli-io-contract.md#writer-identity",
+              "docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-5"
+            ]
+          }
+        ],
+        "strictGreen": false
+      }
+    },
+    {
+      "label": "phase02",
+      "D": {
+        "count": 21,
+        "fatalFindings": [
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s4-packaging-distribution-distribution.json: claim claim_4eeb2f406288458e61bad21531966ab1 is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s4-packaging-distribution-distribution.json: claim claim_a1a323052194c5140b628b5f3861fa05 is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s4-packaging-main-recarry.json: claim claim_d9185072d68925b4c020b13ba6c4d74f is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s5-root-boundary-sync.json: claim claim_f703aeda7755ab376e6e3eee88eb82c2 is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s5-root-main-recarry.json: claim claim_03ef50e87178220032a3eebe5c5d89d9 is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s9-runner-01.json: claim claim_383a6485c1aaed79a640a59463183fe8 is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s9-runner-01.json: claim claim_cdf8c5562fb083bbdccf7d8c03decb7a is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s9-runner-01.json: claim claim_55b85c1d204ea6a7b336fd6b066fc4f1 is not in the claim ledger"
+          },
+          {
+            "type": "decision-claim-unknown",
+            "message": "shard s9-runner-01.json: claim claim_d7fd3778a5cbb74cad9fb5e476708647 is not in the claim ledger"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_9832d0298e9320dc2ec4d4497b411db6 targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_50435fbd206ad719ebf3795165a87ccd targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_0ec50da09f379b79d8bf763660c21fb6 targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_f0a15a953f8fce5e049e2f69f17fdabf targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_4cb135b39de37e8710323614f9a5cbaa targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_825643f78fef3641b308e35c37ec83a1 targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_7db865966ccd250c2dcb57d95c6833dd targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_8abd3d67c764d265b622dcd57d38cb13 targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_5f0ea240f41c6a482d5785fee410158c targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_c350f90477676de34d5be1397785d8fe targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_ef46af833dcb1f76ff7ca72844c4aa74 targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          },
+          {
+            "type": "retained-claim-owner-not-switchboard-backed",
+            "path": "docs/architect/agent-coordination/vocabulary/concept-relationships.md",
+            "message": "docs/architect/agent-coordination/vocabulary/concept-relationships.md: claim claim_eaad287a417b0d1a585f4ca53534feb2 targetOwner docs/platform/agent-coordination/history/retired-engine/files/vocabulary/concept-relationships.md is not a real switchboard-backed target owner"
+          }
+        ]
+      },
+      "E": {
+        "open": [
+          {
+            "type": "claims-partial-carry",
+            "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+            "count": 15,
+            "examples": [
+              "docs/io-contract.md#unheaded-block-5",
+              "docs/specs/observe.md#unheaded-block-3",
+              "docs/specs/runner.md#unheaded-block-102",
+              "docs/specs/runner.md#unheaded-block-118",
+              "docs/specs/runner.md#unheaded-block-127"
+            ]
+          },
+          {
+            "type": "claims-not-reviewed",
+            "message": "claim rows whose reviewStatus is not reviewed",
+            "count": 22,
+            "examples": [
+              "docs/specs/runner.md#guard-reconciliation",
+              "docs/specs/runner.md#unheaded-block-3",
+              "docs/specs/runner.md#data-dictionary",
+              "docs/specs/runner.md#unheaded-block-9",
+              "docs/specs/runner.md#gate-a-xếp-hạng-candidate-bắc-cầu-sang-việc-thật-evolve"
+            ]
+          },
+          {
+            "type": "identical-units-multiple-owners",
+            "message": "identical source units whose rows name different target owners",
+            "count": 1,
+            "examples": [
+              "39a803b85af8: docs/platform/packaging-distribution/spec.md, docs/platform/runner/operations/h-51f5cd7279fd.md"
+            ]
+          },
+          {
+            "type": "registry-gaps-without-disposition",
+            "message": "registry identity-gap rows with no vocabulary disposition",
+            "count": 2,
+            "examples": [
+              "docs/reading-map.md#unheaded-block-15",
+              "docs/reading-map.md#unheaded-block-16"
+            ]
+          },
+          {
+            "type": "candidate-blocks-unreferenced",
+            "message": "candidate conservation units not named by a source decision",
+            "count": 336,
+            "examples": [
+              "docs/platform/work-state/contracts/cli-io-contract.md#cli-io-contract",
+              "docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-1",
+              "docs/platform/work-state/contracts/cli-io-contract.md#single-write-door",
+              "docs/platform/work-state/contracts/cli-io-contract.md#writer-identity",
+              "docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-5"
+            ]
+          }
+        ],
+        "strictGreen": false
+      }
+    }
+  ],
+  "targetDriftQueue": [],
+  "newUnitDrafts": 9
+}

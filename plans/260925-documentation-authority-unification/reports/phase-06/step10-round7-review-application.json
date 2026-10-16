@@ -1,0 +1,911 @@
+{
+  "inputCommit": "a9a2b079f6a12d5992461312cd03b5d24c6495a2",
+  "method": "Unchanged applyReviewVerdicts ordinary committed reports; exact currentDecision match; L10-22 duplicates excluded.",
+  "counts": {
+    "applied": 5,
+    "non-decision-evidence": 16
+  },
+  "records": [
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-ade5812a9.md",
+      "claimId": "claim_d5dd5fbdb3483914743a14791a5f02a8",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: all 11 removed lines (rust enum fence, Built-In, External Process, External WebAssembly, Native Rust paragraphs) are verbatim at release-boundaries.md blocks 18-22 under restored-class-definitions; the 10 dropped witnesses held only fences or a brace; remaining heading witness restored-class-definitions qualifies by its section payload; remainder claim ids named"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-ade5812a9.md",
+      "claimId": "claim_9a5781f0086209a17330035ff0e58638",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: all 10 removed registry-linker lines are verbatim at compatibility-harness.md blocks 10, 11, 12 under restored-registry-linker-procedure; the 8 dropped witnesses carried no substantive removed line; the single added line links the restoration"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-ade5812a9.md",
+      "claimId": "claim_76dfcba31d147e73488ea3abeade7ef1",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: the 9 removed lines (state chain fence plus idempotency sentence) are in component-protocol.md blocks 15 and 11; the 20 dropped witnesses (upper spec.md, rejected options, harness) had no substantive removed line; its two added links point at the restoration sections that hold them"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-ade5812a9.md",
+      "claimId": "claim_080c5cdacf820ed661ab372086ca7e41",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: all 23 layout-tree lines are verbatim in release-boundaries.md block 10 under restored-physical-placement-layout-tree (21 substantive); the 16 dropped witnesses held only a fence line; the primary spec.md section keeps surrounding text and one link"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-ade5812a9.md",
+      "claimId": "claim_c072318ec582affe5e0e6936961fadc4",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: the 14 removed procedure lines, including the Component Boundary Advisory link line, are verbatim in component-protocol.md blocks 50 and 51; the two node-to-rust-migration.md witnesses matched only through the link placeholder and are rightly dropped; link-only lines can no longer witness"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-ade5812a9.md",
+      "claimId": "claim_133a4900a601db7cbf1182a96540ef56",
+      "status": "non-decision-evidence",
+      "verdict": "ok",
+      "note": "deep: registry row before and after equal git; unit evidence-and-conduct-boundaries digest matches the live heading plus following block; only change is the Added in candidate correction prefix on the first line of the payload, original text kept; dropped lineage and reviewStatus markers are by design; accounting only"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-ade5812a9.md",
+      "claimId": "claim_4a2dfdbfa271d8f20b4e581757288988",
+      "status": "non-decision-evidence",
+      "verdict": "ok",
+      "note": "deep: unheaded-block-44 digest matches the live block (lines 436-437); change is the Added in candidate prefix plus lower-cased first word; only the origin marker dropped, no other field moved"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-ade5812a9.md",
+      "claimId": "claim_c90c0415c20234da816351e16f9903b8",
+      "status": "non-decision-evidence",
+      "verdict": "ok",
+      "note": "deep: heading 7-constraint-findings digest matches the live heading plus its following block; the change is the same prefix on the first following line; lineage and reviewStatus drop only; anchor is the heading, not a position guess"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-ade5812a9.md",
+      "claimId": "claim_cfdd80946e57e4ea360ed04c1413f4dd",
+      "status": "non-decision-evidence",
+      "verdict": "ok",
+      "note": "deep: unheaded-block-117 digest matches the live block (lines 1470-1471); text equals the old block plus the Added in candidate current-Workflow correction clause whose snapshot link resolves; only origin dropped"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "claimId": "claim_0876da817dfa1682359c8d1823d92452",
+      "status": "non-decision-evidence",
+      "verdict": "ok",
+      "note": "deep: entry-027, unheaded-block-7 (unheaded block inside the appended historical-source carriers) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest recomputed by the extractor and by my plain-Python pass over all 19 units of the file. The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "claimId": "claim_4494775f2688c7b3ef05ffb458dd628a",
+      "status": "non-decision-evidence",
+      "verdict": "ok",
+      "note": "deep: entry-028, unheaded-block-9 (unheaded block inside the appended historical-source carriers) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest also hand-recomputed in plain Python (seed 20261018 sample). The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "claimId": "claim_6598b0201d76ee564e11e9fd1f6da0a2",
+      "status": "non-decision-evidence",
+      "verdict": "ok",
+      "note": "deep: entry-029, unheaded-block-6 (unheaded block inside the appended historical-source carriers) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest recomputed by the extractor and by my plain-Python pass over all 19 units of the file. The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "claimId": "claim_847f0e0c56a6695d4097fb1e537ea1bc",
+      "status": "non-decision-evidence",
+      "verdict": "ok",
+      "note": "deep: entry-030, historical-source-section-552ef3d6 (heading unit of an appended historical-source section) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest also hand-recomputed in plain Python (seed 20261018 sample). The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "claimId": "claim_90fb9245a91d2389ba25704be807be20",
+      "status": "non-decision-evidence",
+      "verdict": "ok",
+      "note": "deep: entry-031, unheaded-block-11 (unheaded block inside the appended historical-source carriers) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest recomputed by the extractor and by my plain-Python pass over all 19 units of the file. The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "claimId": "claim_982fa232e8267691441436f1d7d48b22",
+      "status": "non-decision-evidence",
+      "verdict": "ok",
+      "note": "deep: entry-032, historical-source-section-099eb566 (heading unit of an appended historical-source section) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest also hand-recomputed in plain Python (seed 20261018 sample). The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "claimId": "claim_9e9010f284010e4ee3fbc67deed8e8f1",
+      "status": "non-decision-evidence",
+      "verdict": "ok",
+      "note": "deep: entry-033, unheaded-block-8 (unheaded block inside the appended historical-source carriers) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest recomputed by the extractor and by my plain-Python pass over all 19 units of the file. The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "claimId": "claim_c321de74b624d639e56cb4dc77169655",
+      "status": "non-decision-evidence",
+      "verdict": "ok",
+      "note": "deep: entry-034, unheaded-block-12 (unheaded block inside the appended historical-source carriers) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest also hand-recomputed in plain Python (seed 20261018 sample). The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "claimId": "claim_d5e5139015078092355b369260cee249",
+      "status": "non-decision-evidence",
+      "verdict": "ok",
+      "note": "deep: entry-035, historical-source-section-0686418a (heading unit of an appended historical-source section) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest recomputed by the extractor and by my plain-Python pass over all 19 units of the file. The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "claimId": "claim_d8a2c7490367e214b55e86913275bd1b",
+      "status": "non-decision-evidence",
+      "verdict": "ok",
+      "note": "deep: entry-036, unheaded-block-13 (unheaded block inside the appended historical-source carriers) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest recomputed by the extractor and by my plain-Python pass over all 19 units of the file. The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-ade5812a9.md",
+      "claimId": "claim_ee99b0951090e8a9aeabd89bf2982f05",
+      "status": "non-decision-evidence",
+      "verdict": "ok",
+      "note": "deep: entry-037, unheaded-block-10 (unheaded block inside the appended historical-source carriers) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest recomputed by the extractor and by my plain-Python pass over all 19 units of the file. The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-ade5812a9.md",
+      "claimId": "claim_f97b02893c6b8f2554062dfea5f5df2c",
+      "status": "non-decision-evidence",
+      "verdict": "ok",
+      "note": "deep: entry-038, historical-source-section-4efee765 (heading unit of an appended historical-source section) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest recomputed by the extractor and by my plain-Python pass over all 19 units of the file. The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval."
+    }
+  ],
+  "allTableVerdicts": [
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-ade5812a9.md",
+      "claimOrEntry": "claim_d5dd5fbdb3483914743a14791a5f02a8",
+      "verdict": "ok",
+      "note": "deep: all 11 removed lines (rust enum fence, Built-In, External Process, External WebAssembly, Native Rust paragraphs) are verbatim at release-boundaries.md blocks 18-22 under restored-class-definitions; the 10 dropped witnesses held only fences or a brace; remaining heading witness restored-class-definitions qualifies by its section payload; remainder claim ids named",
+      "sourceDigest": "19bd3465163fc281e12f6ac88d531d651ce0e8329d0485fa4536c107516305fe",
+      "targetDigest": "e7a9211054b328f165f59f75bfc1633b8b3a60a383afeff778f1eb2312f6d8a0"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-ade5812a9.md",
+      "claimOrEntry": "claim_9a5781f0086209a17330035ff0e58638",
+      "verdict": "ok",
+      "note": "deep: all 10 removed registry-linker lines are verbatim at compatibility-harness.md blocks 10, 11, 12 under restored-registry-linker-procedure; the 8 dropped witnesses carried no substantive removed line; the single added line links the restoration",
+      "sourceDigest": "f26fe2980e00f599ee3395a67dd57972d0ef8371bf0219fde39bb7f44b353a4c",
+      "targetDigest": "cda1c088745776953a5144a0548869d897c54e9f69dcd512de6ad8359b99ed32"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-ade5812a9.md",
+      "claimOrEntry": "claim_76dfcba31d147e73488ea3abeade7ef1",
+      "verdict": "ok",
+      "note": "deep: the 9 removed lines (state chain fence plus idempotency sentence) are in component-protocol.md blocks 15 and 11; the 20 dropped witnesses (upper spec.md, rejected options, harness) had no substantive removed line; its two added links point at the restoration sections that hold them",
+      "sourceDigest": "7a639345a5670ebb3cd24fd27a72fb08467d57f4667517fbd47f51d35b9bb224",
+      "targetDigest": "a3fd2fb5bbb38608bae7071b5f0571cbcccb756e34449544f509d1d40fc8fdc6"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-ade5812a9.md",
+      "claimOrEntry": "claim_080c5cdacf820ed661ab372086ca7e41",
+      "verdict": "ok",
+      "note": "deep: all 23 layout-tree lines are verbatim in release-boundaries.md block 10 under restored-physical-placement-layout-tree (21 substantive); the 16 dropped witnesses held only a fence line; the primary spec.md section keeps surrounding text and one link",
+      "sourceDigest": "26dedcce46fdb8fba749ce8ecb56418bbc45624ad00c28a2a355647221c73a35",
+      "targetDigest": "e95f14771b2c72fc9eb48e5c9813b74f897175763fa9b44441fb2cb6a896c1cd"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-ade5812a9.md",
+      "claimOrEntry": "claim_c072318ec582affe5e0e6936961fadc4",
+      "verdict": "ok",
+      "note": "deep: the 14 removed procedure lines, including the Component Boundary Advisory link line, are verbatim in component-protocol.md blocks 50 and 51; the two node-to-rust-migration.md witnesses matched only through the link placeholder and are rightly dropped; link-only lines can no longer witness",
+      "sourceDigest": "d1c2fad49a5087903461482aaa9dbb0b96c53baa6db717e0546f8b185552307f",
+      "targetDigest": "ef6d9f08943bdc073dcf957c969015d6821b081aeb08b90898f0f1024dd2319e"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-ade5812a9.md",
+      "claimOrEntry": "claim_133a4900a601db7cbf1182a96540ef56",
+      "verdict": "ok",
+      "note": "deep: registry row before and after equal git; unit evidence-and-conduct-boundaries digest matches the live heading plus following block; only change is the Added in candidate correction prefix on the first line of the payload, original text kept; dropped lineage and reviewStatus markers are by design; accounting only",
+      "sourceDigest": "fd599aeb69ec450ccb654795c8db12e37932153fdf60f71c8eeaa7e463b32485",
+      "targetDigest": "none"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-ade5812a9.md",
+      "claimOrEntry": "claim_4a2dfdbfa271d8f20b4e581757288988",
+      "verdict": "ok",
+      "note": "deep: unheaded-block-44 digest matches the live block (lines 436-437); change is the Added in candidate prefix plus lower-cased first word; only the origin marker dropped, no other field moved",
+      "sourceDigest": "f03302423020c8beeac177192fbe0952433473b78efd7c17f5eb96b39d67dbca",
+      "targetDigest": "none"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-ade5812a9.md",
+      "claimOrEntry": "claim_c90c0415c20234da816351e16f9903b8",
+      "verdict": "ok",
+      "note": "deep: heading 7-constraint-findings digest matches the live heading plus its following block; the change is the same prefix on the first following line; lineage and reviewStatus drop only; anchor is the heading, not a position guess",
+      "sourceDigest": "e24524633ae56daa1d8e9a8c4b2956f92d4e08aac51d98f3fe5775b2f9ae3064",
+      "targetDigest": "none"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-ade5812a9.md",
+      "claimOrEntry": "claim_cfdd80946e57e4ea360ed04c1413f4dd",
+      "verdict": "ok",
+      "note": "deep: unheaded-block-117 digest matches the live block (lines 1470-1471); text equals the old block plus the Added in candidate current-Workflow correction clause whose snapshot link resolves; only origin dropped",
+      "sourceDigest": "7486a9e911dc83dd8182817e3d51bccd7b2e95a87b245307e19b3dd1de9fbb34",
+      "targetDigest": "none"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "claimOrEntry": "entry-025",
+      "verdict": "ok",
+      "note": "deep: registry metadata carryForward: before and after blocks equal the fe98a6455 and package-commit registries and the committed accounting JSON; arithmetic holds (oldUnits 91386 equals the previous newUnits, kept 91012 plus paired 374 equals newUnits 91386, added 0, moved 0, gaps 0, retired 0, fromCommit equals the previous toCommit, toCommit equals ade5812a9); the five listed changed fields are exactly the fields that differ; no registry document changed between 4d3634360 and ade5812a9 (git diff over the 128 changed paths touches none), so a no-edit carry is the right result.",
+      "sourceDigest": "none",
+      "targetDigest": "none"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "claimOrEntry": "entry-026",
+      "verdict": "ok",
+      "note": "deep: registry metadata commit moves from 4d3634360 to ade5812a9 and nothing else in that key; equals my own diff and the accounting JSON; consistent with carriedFromCommit (entry-024, other part) and carryForward.toCommit. Observation: the registry at the content commit ade5812a9 is byte-equal to fe98a6455 (sha256 3ead3b52); the updated registry (sha256 1f5325ff, 62185030 bytes, equal to step10-syncade-native-proof.json) exists only at the package commit b53dd05df, which is the binding the request asks for, and those are the bytes I reviewed.",
+      "sourceDigest": "none",
+      "targetDigest": "none"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "claimOrEntry": "claim_0876da817dfa1682359c8d1823d92452",
+      "verdict": "ok",
+      "note": "deep: entry-027, unheaded-block-7 (unheaded block inside the appended historical-source carriers) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest recomputed by the extractor and by my plain-Python pass over all 19 units of the file. The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval.",
+      "sourceDigest": "9216be2c3b07fb41d3f5f27307dd16239899a8f1a1207932bd4af7445a38bcdf",
+      "targetDigest": "none"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "claimOrEntry": "claim_4494775f2688c7b3ef05ffb458dd628a",
+      "verdict": "ok",
+      "note": "deep: entry-028, unheaded-block-9 (unheaded block inside the appended historical-source carriers) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest also hand-recomputed in plain Python (seed 20261018 sample). The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval.",
+      "sourceDigest": "30ad6c3c321a462677fbc037c612520d07495a445dd6a82810f85c1c30d591a9",
+      "targetDigest": "none"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "claimOrEntry": "claim_6598b0201d76ee564e11e9fd1f6da0a2",
+      "verdict": "ok",
+      "note": "deep: entry-029, unheaded-block-6 (unheaded block inside the appended historical-source carriers) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest recomputed by the extractor and by my plain-Python pass over all 19 units of the file. The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval.",
+      "sourceDigest": "a271942c1834e8f5b9f8a48c5efc501e69d2fa92ef572059f14b24a91f50ed30",
+      "targetDigest": "none"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "claimOrEntry": "claim_847f0e0c56a6695d4097fb1e537ea1bc",
+      "verdict": "ok",
+      "note": "deep: entry-030, historical-source-section-552ef3d6 (heading unit of an appended historical-source section) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest also hand-recomputed in plain Python (seed 20261018 sample). The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval.",
+      "sourceDigest": "d7474ce22b2aacd3fa972c85a7ab553f0712b9959468763ab90f1bbf91621899",
+      "targetDigest": "none"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "claimOrEntry": "claim_90fb9245a91d2389ba25704be807be20",
+      "verdict": "ok",
+      "note": "deep: entry-031, unheaded-block-11 (unheaded block inside the appended historical-source carriers) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest recomputed by the extractor and by my plain-Python pass over all 19 units of the file. The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval.",
+      "sourceDigest": "75c5c7028e9031320b63d89f672072416ee952498f10887da01e2bbef4848ed3",
+      "targetDigest": "none"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "claimOrEntry": "claim_982fa232e8267691441436f1d7d48b22",
+      "verdict": "ok",
+      "note": "deep: entry-032, historical-source-section-099eb566 (heading unit of an appended historical-source section) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest also hand-recomputed in plain Python (seed 20261018 sample). The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval.",
+      "sourceDigest": "399fd8b3a421c0c53fd57345fffd92928b0b66557e931ef4c495b185dd8a73e5",
+      "targetDigest": "none"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "claimOrEntry": "claim_9e9010f284010e4ee3fbc67deed8e8f1",
+      "verdict": "ok",
+      "note": "deep: entry-033, unheaded-block-8 (unheaded block inside the appended historical-source carriers) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest recomputed by the extractor and by my plain-Python pass over all 19 units of the file. The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval.",
+      "sourceDigest": "4747175709c4cc34d23b4b59027e00fe31f95728f8f7791d33696ae2cd660861",
+      "targetDigest": "none"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "claimOrEntry": "claim_c321de74b624d639e56cb4dc77169655",
+      "verdict": "ok",
+      "note": "deep: entry-034, unheaded-block-12 (unheaded block inside the appended historical-source carriers) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest also hand-recomputed in plain Python (seed 20261018 sample). The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval.",
+      "sourceDigest": "26cd8fbf0cce5fac3315235ebd00984cd4cc8a7ce80bac342e56f816848a7270",
+      "targetDigest": "none"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "claimOrEntry": "claim_d5e5139015078092355b369260cee249",
+      "verdict": "ok",
+      "note": "deep: entry-035, historical-source-section-0686418a (heading unit of an appended historical-source section) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest recomputed by the extractor and by my plain-Python pass over all 19 units of the file. The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval.",
+      "sourceDigest": "0232edaa58949708208a01bab57f0b92fa341bac85d0085530d5909fef47170a",
+      "targetDigest": "none"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "claimOrEntry": "claim_d8a2c7490367e214b55e86913275bd1b",
+      "verdict": "ok",
+      "note": "deep: entry-036, unheaded-block-13 (unheaded block inside the appended historical-source carriers) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest recomputed by the extractor and by my plain-Python pass over all 19 units of the file. The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval.",
+      "sourceDigest": "16efa16fda7dbea715e869140f384909207de259f0e88effa0b3ad2d106f2798",
+      "targetDigest": "none"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-ade5812a9.md",
+      "claimOrEntry": "claim_ee99b0951090e8a9aeabd89bf2982f05",
+      "verdict": "ok",
+      "note": "deep: entry-037, unheaded-block-10 (unheaded block inside the appended historical-source carriers) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest recomputed by the extractor and by my plain-Python pass over all 19 units of the file. The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval.",
+      "sourceDigest": "28d0009fb157647913ed15eaaa21f78a13218cffb6610cda0f0b0d223a61fed6",
+      "targetDigest": "none"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-ade5812a9.md",
+      "claimOrEntry": "claim_f97b02893c6b8f2554062dfea5f5df2c",
+      "verdict": "ok",
+      "note": "deep: entry-038, historical-source-section-4efee765 (heading unit of an appended historical-source section) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest recomputed by the extractor and by my plain-Python pass over all 19 units of the file. The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval.",
+      "sourceDigest": "feecc4809f456b2d4201f2527febcdd521ca9eccf64144629268071cea373d0d",
+      "targetDigest": "none"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-ade5812a9.md",
+      "claimOrEntry": "entry-039",
+      "verdict": "ok",
+      "note": "deep: check A at ade5812a9: I recomputed offenders by plain git (first-parent no-merges commits from start B0 dbe5c4328 to HEAD whose paths fall outside allowed-paths.json): exactly 9 commit/path pairs, equal to accountedPairs, and their unique paths equal the 8 historicalOffenders of step10-start-checks.json; authorities check out (A3 five pairs of 1cc92d7db, A21 the two non-plan.md pairs of db9fa7608, L10-35a two pairs of bd217ecf1, all in owner-answers.md); scripts/doc-rationale-facts.mjs is no longer an offender because the Lead commit 6600925b4 added it to allowed-paths.json (L10-35b), a one-line diff and no checker, baseline or start-checks edit; I reran checks.mjs from the manifest through a retargeted copy: ok true, unaccounted none, newWorkingViolations none, B and H clean, output equals the committed step10-syncade-checks.json except the HEAD field.",
+      "sourceDigest": "none",
+      "targetDigest": "none"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-ade5812a9.md",
+      "claimOrEntry": "entry-040",
+      "verdict": "ok",
+      "note": "deep: portable reproduction manifest step10-syncade-reproduction.json: its seven scripts equal the sync4d manifest byte for byte except inventory-readonly.mjs and verify-readonly.mjs, which differ only in the pinned commit (4d3634360 to ade5812a9); ownership.mjs now imports the lib from --output-dir and audit-ownership.mjs from its own directory, so the earlier hardcoded-import defect is gone; with retargeted output dirs (the wrappers insist on /tmp/fgos-work and I may only write to my scratch) I ran audit (12895 rows, 92 shards, 0 findings, byte-identical to step10-syncade-independent-consistency.json), checks, ownership (254 collisions, drift 0), audit-ownership (ok true) and replay (366 original and 98 later rows, 0 findings); target-ownership and link-replay outputs are byte-identical to the committed ones; registry accounting script rerun gives the same 16 changes as the committed JSON (only currentCommit differs because my HEAD is the package commit); the 26 doc test files give 507 of 507 pass. Optional native inventory and D at ade5812a9 (2 GiB inventory) was not rerun by me; I read the committed D summary and log only (fatal findings none), so native D is not independently reproduced here.",
+      "sourceDigest": "none",
+      "targetDigest": "none"
+    }
+  ],
+  "tableCounts": {
+    "ok": 25,
+    "rework": 0,
+    "hold": 0
+  },
+  "nonTableEntryVerdicts": [
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-ade5812a9.md",
+      "entry": "entry-006",
+      "verbatim": "- entry-006 `scripts/doc-binding-repair.mjs` ok: deep: `removedCarrierWitnesses` derives raw removals after exact corrections, keeps repeated-line multiplicity, drops fence, brace, separator, heading and link-only lines, rejects self carriers, and requires the exact raw line; `registryChangeAccounting` covers metadata plus all five collections including removals. My independent raw-line replay agrees with it on all five claims."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-ade5812a9.md",
+      "entry": "entry-007",
+      "verbatim": "- entry-007 `scripts/doc-rationale-facts.mjs` ok: deep: the reverse rule re-derives raw removals inside the checker (no generator import) and flags missing, self or unsupported anchors; the checker ran 0 findings over 12,895 rows. Minor non-defect: the heading-line normalization uses a non-global regex, so only the first heading-like line of a multi-line text is masked; irrelevant to these rows."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-ade5812a9.md",
+      "entry": "entry-008",
+      "verbatim": "- entry-008 `test/scripts/doc-rationale-facts.test.mjs` ok: deep: new cases cover fence, brace, separator, exact link-only, substring and missing witnesses, plus raw link spelling in prose; they pass."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-ade5812a9.md",
+      "entry": "entry-009",
+      "verbatim": "- entry-009 `test/scripts/doc-rationale-reproduction.test.mjs` ok: deep: fresh-directory tests materialize both manifests and run ownership, ownership audit and checks; they pass here."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-ade5812a9.md",
+      "entry": "entry-010",
+      "verbatim": "- entry-010 `test/scripts/doc-rationale.test.mjs` ok: deep: tests for the witness rule, corrections and multiplicity, and registry accounting; pass."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-ade5812a9.md",
+      "entry": "entry-011",
+      "verbatim": "- entry-011 `step10-round4-rationale-rebuild.mjs` ok: deep: it only filters the witness list through `removedCarrierWitnesses`; historical provenance script, not a replay command."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-ade5812a9.md",
+      "entry": "entry-012",
+      "verbatim": "- entry-012 `step10-round6-carriers.mjs` ok: deep: read-only without `--apply`, output confined to `/tmp/fgos-work`; run here: 17 sentences checked, 0 changes (stable)."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-ade5812a9.md",
+      "entry": "entry-013",
+      "verbatim": "- entry-013 `step10-registry-accounting.mjs` ok: deep: requires an explicit `--previous-request` and an external `/tmp/fgos-work` output, no ID filter, output equals my independent change count (16)."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-ade5812a9.md",
+      "entry": "entry-014",
+      "verbatim": "- entry-014 `step10-round5-reproduction.json` ok: deep: ownership imports its library from the caller `--output-dir`; checks.mjs gates check A on exact commit/path accounting (the nine pairs above) rather than on the frozen list equality; the only remaining `/tmp/fgos-work/` text is the required output root; the wrapper ran green end to end here."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-ade5812a9.md",
+      "entry": "entry-015",
+      "verbatim": "- entry-015 `step10-sync4d-reproduce.py` ok: deep: rejects outputs outside `/tmp/fgos-work`, inside the repo, symlinks and hard links; materializes only `readOnlyScripts`; ran green here. The optional native mode was not run (4 GiB)."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-ade5812a9.md",
+      "entry": "entry-016",
+      "verbatim": "- entry-016 `step10-sync4d-reproduction.json` ok: deep: same lib-from-output-dir fix and check A change; the old author scratch paths (`package4d`, `review4d`) are gone from the read-only scripts; the wrapper command and the optional native commands are consistent with the header."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-ade5812a9.md",
+      "entry": "entry-017",
+      "verbatim": "- entry-017 `step10-round6-reproduction.json` ok: deep: lists the documented commands and the four-marker obligation; historical author scripts are archival. Note: its first command names `step10-round5-reproduce.py` and works as written."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-ade5812a9.md",
+      "entry": "entry-018",
+      "verbatim": "- entry-018 `tooling.md` ok: deep: its claims check out against my runs (507 of 507 tests, 17 carrier sentences, nine accounted pairs, registry accounting counts); no stale statement found."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-ade5812a9.md",
+      "entry": "entry-023",
+      "verbatim": "- entry-023 `_binding` change ok: deep: before (562c2583..., 62180479 bytes) is the byte count and hash of the registry as read at f1f414b02 and after (3ead3b52..., 62185799) is that of fe98a6455, which is what `_binding` records (the input registry), so the change is genuine. The registry file at the request commit b53dd05df hashes to 1f5325ff1b1c2012c06aaf17b805c3f4fc2527923742271dff3d77e10707989e (62185030 bytes); the Lead must bind that exact hash to the package commit, as the entry itself says."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-ade5812a9.md",
+      "entry": "entry-024",
+      "verbatim": "- entry-024 `carriedFromCommit` change ok: deep: 62751458b to 4d363436, matches git at fe98a6455 and b53dd05df."
+    }
+  ],
+  "notesAndConcernsRead": [
+    "review-step10-changed-01-ade5812a9.md (all Notes and Unresolved sections)",
+    "review-step10-changed-02-ade5812a9.md (all Notes and Unresolved sections)",
+    "review-step10-changed-03-ade5812a9.md (all Notes and Unresolved sections)",
+    "review-step10-changed-04-ade5812a9.md (all Notes and Unresolved sections)"
+  ],
+  "nativeVerdictsAppliedAs": "Accounting receipts only; native identity registry unchanged. No native truth approval minted.",
+  "registryPackageBinding": {
+    "entry": "entry-023",
+    "packageCommit": "b53dd05dff3b7608ad9000eea82b4d6fc12c84f7",
+    "registryPath": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+    "SHA256": "1f5325ff1b1c2012c06aaf17b805c3f4fc2527923742271dff3d77e10707989e",
+    "bytes": 62185030,
+    "currentBytesEqualPackage": true,
+    "reviewStatus": "reviewed",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-ade5812a9.md",
+    "reviewNote": "- entry-023 `_binding` change ok: deep: before (562c2583..., 62180479 bytes) is the byte count and hash of the registry as read at f1f414b02 and after (3ead3b52..., 62185799) is that of fe98a6455, which is what `_binding` records (the input registry), so the change is genuine. The registry file at the request commit b53dd05df hashes to 1f5325ff1b1c2012c06aaf17b805c3f4fc2527923742271dff3d77e10707989e (62185030 bytes); the Lead must bind that exact hash to the package commit, as the entry itself says."
+  },
+  "allEntryAccounting": [
+    {
+      "entryId": "entry-001",
+      "kind": "changed-rationale",
+      "claimId": "claim_d5dd5fbdb3483914743a14791a5f02a8",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-ade5812a9.md",
+      "noteVerbatim": "deep: all 11 removed lines (rust enum fence, Built-In, External Process, External WebAssembly, Native Rust paragraphs) are verbatim at release-boundaries.md blocks 18-22 under restored-class-definitions; the 10 dropped witnesses held only fences or a brace; remaining heading witness restored-class-definitions qualifies by its section payload; remainder claim ids named",
+      "application": "matching currentDecision approved by unchanged ordinary-review applier",
+      "reviewScope": "Only substantive raw-line carrier membership changed; independently verify every surviving/removed carrier. L10-37 applies to wording-only findings without conservation loss."
+    },
+    {
+      "entryId": "entry-002",
+      "kind": "changed-rationale",
+      "claimId": "claim_9a5781f0086209a17330035ff0e58638",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-ade5812a9.md",
+      "noteVerbatim": "deep: all 10 removed registry-linker lines are verbatim at compatibility-harness.md blocks 10, 11, 12 under restored-registry-linker-procedure; the 8 dropped witnesses carried no substantive removed line; the single added line links the restoration",
+      "application": "matching currentDecision approved by unchanged ordinary-review applier",
+      "reviewScope": "Only substantive raw-line carrier membership changed; independently verify every surviving/removed carrier. L10-37 applies to wording-only findings without conservation loss."
+    },
+    {
+      "entryId": "entry-003",
+      "kind": "changed-rationale",
+      "claimId": "claim_76dfcba31d147e73488ea3abeade7ef1",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-ade5812a9.md",
+      "noteVerbatim": "deep: the 9 removed lines (state chain fence plus idempotency sentence) are in component-protocol.md blocks 15 and 11; the 20 dropped witnesses (upper spec.md, rejected options, harness) had no substantive removed line; its two added links point at the restoration sections that hold them",
+      "application": "matching currentDecision approved by unchanged ordinary-review applier",
+      "reviewScope": "Only substantive raw-line carrier membership changed; independently verify every surviving/removed carrier. L10-37 applies to wording-only findings without conservation loss."
+    },
+    {
+      "entryId": "entry-004",
+      "kind": "changed-rationale",
+      "claimId": "claim_080c5cdacf820ed661ab372086ca7e41",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-ade5812a9.md",
+      "noteVerbatim": "deep: all 23 layout-tree lines are verbatim in release-boundaries.md block 10 under restored-physical-placement-layout-tree (21 substantive); the 16 dropped witnesses held only a fence line; the primary spec.md section keeps surrounding text and one link",
+      "application": "matching currentDecision approved by unchanged ordinary-review applier",
+      "reviewScope": "Only substantive raw-line carrier membership changed; independently verify every surviving/removed carrier. L10-37 applies to wording-only findings without conservation loss."
+    },
+    {
+      "entryId": "entry-005",
+      "kind": "changed-rationale",
+      "claimId": "claim_c072318ec582affe5e0e6936961fadc4",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-ade5812a9.md",
+      "noteVerbatim": "deep: the 14 removed procedure lines, including the Component Boundary Advisory link line, are verbatim in component-protocol.md blocks 50 and 51; the two node-to-rust-migration.md witnesses matched only through the link placeholder and are rightly dropped; link-only lines can no longer witness",
+      "application": "matching currentDecision approved by unchanged ordinary-review applier",
+      "reviewScope": "Only substantive raw-line carrier membership changed; independently verify every surviving/removed carrier. L10-37 applies to wording-only findings without conservation loss."
+    },
+    {
+      "entryId": "entry-006",
+      "kind": "changed-tool-test-reproduction",
+      "claimId": null,
+      "file": "scripts/doc-binding-repair.mjs",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-ade5812a9.md",
+      "noteVerbatim": "- entry-006 `scripts/doc-binding-repair.mjs` ok: deep: `removedCarrierWitnesses` derives raw removals after exact corrections, keeps repeated-line multiplicity, drops fence, brace, separator, heading and link-only lines, rejects self carriers, and requires the exact raw line; `registryChangeAccounting` covers metadata plus all five collections including removals. My independent raw-line replay agrees with it on all five claims.",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "Review the committed delta and its tests; whole prior files are context. Independent audit has no generator import. Historical author scripts are provenance, never replay commands."
+    },
+    {
+      "entryId": "entry-007",
+      "kind": "changed-tool-test-reproduction",
+      "claimId": null,
+      "file": "scripts/doc-rationale-facts.mjs",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-ade5812a9.md",
+      "noteVerbatim": "- entry-007 `scripts/doc-rationale-facts.mjs` ok: deep: the reverse rule re-derives raw removals inside the checker (no generator import) and flags missing, self or unsupported anchors; the checker ran 0 findings over 12,895 rows. Minor non-defect: the heading-line normalization uses a non-global regex, so only the first heading-like line of a multi-line text is masked; irrelevant to these rows.",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "Review the committed delta and its tests; whole prior files are context. Independent audit has no generator import. Historical author scripts are provenance, never replay commands."
+    },
+    {
+      "entryId": "entry-008",
+      "kind": "changed-tool-test-reproduction",
+      "claimId": null,
+      "file": "test/scripts/doc-rationale-facts.test.mjs",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-ade5812a9.md",
+      "noteVerbatim": "- entry-008 `test/scripts/doc-rationale-facts.test.mjs` ok: deep: new cases cover fence, brace, separator, exact link-only, substring and missing witnesses, plus raw link spelling in prose; they pass.",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "Review the committed delta and its tests; whole prior files are context. Independent audit has no generator import. Historical author scripts are provenance, never replay commands."
+    },
+    {
+      "entryId": "entry-009",
+      "kind": "changed-tool-test-reproduction",
+      "claimId": null,
+      "file": "test/scripts/doc-rationale-reproduction.test.mjs",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-ade5812a9.md",
+      "noteVerbatim": "- entry-009 `test/scripts/doc-rationale-reproduction.test.mjs` ok: deep: fresh-directory tests materialize both manifests and run ownership, ownership audit and checks; they pass here.",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "Review the committed delta and its tests; whole prior files are context. Independent audit has no generator import. Historical author scripts are provenance, never replay commands."
+    },
+    {
+      "entryId": "entry-010",
+      "kind": "changed-tool-test-reproduction",
+      "claimId": null,
+      "file": "test/scripts/doc-rationale.test.mjs",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-ade5812a9.md",
+      "noteVerbatim": "- entry-010 `test/scripts/doc-rationale.test.mjs` ok: deep: tests for the witness rule, corrections and multiplicity, and registry accounting; pass.",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "Review the committed delta and its tests; whole prior files are context. Independent audit has no generator import. Historical author scripts are provenance, never replay commands."
+    },
+    {
+      "entryId": "entry-011",
+      "kind": "changed-tool-test-reproduction",
+      "claimId": null,
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-rebuild.mjs",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-ade5812a9.md",
+      "noteVerbatim": "- entry-011 `step10-round4-rationale-rebuild.mjs` ok: deep: it only filters the witness list through `removedCarrierWitnesses`; historical provenance script, not a replay command.",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "Review the committed delta and its tests; whole prior files are context. Independent audit has no generator import. Historical author scripts are provenance, never replay commands."
+    },
+    {
+      "entryId": "entry-012",
+      "kind": "changed-tool-test-reproduction",
+      "claimId": null,
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round6-carriers.mjs",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-ade5812a9.md",
+      "noteVerbatim": "- entry-012 `step10-round6-carriers.mjs` ok: deep: read-only without `--apply`, output confined to `/tmp/fgos-work`; run here: 17 sentences checked, 0 changes (stable).",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "Review the committed delta and its tests; whole prior files are context. Independent audit has no generator import. Historical author scripts are provenance, never replay commands."
+    },
+    {
+      "entryId": "entry-013",
+      "kind": "changed-tool-test-reproduction",
+      "claimId": null,
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-registry-accounting.mjs",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-ade5812a9.md",
+      "noteVerbatim": "- entry-013 `step10-registry-accounting.mjs` ok: deep: requires an explicit `--previous-request` and an external `/tmp/fgos-work` output, no ID filter, output equals my independent change count (16).",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "Review the committed delta and its tests; whole prior files are context. Independent audit has no generator import. Historical author scripts are provenance, never replay commands."
+    },
+    {
+      "entryId": "entry-014",
+      "kind": "changed-tool-test-reproduction",
+      "claimId": null,
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-ade5812a9.md",
+      "noteVerbatim": "- entry-014 `step10-round5-reproduction.json` ok: deep: ownership imports its library from the caller `--output-dir`; checks.mjs gates check A on exact commit/path accounting (the nine pairs above) rather than on the frozen list equality; the only remaining `/tmp/fgos-work/` text is the required output root; the wrapper ran green end to end here.",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "Review the committed delta and its tests; whole prior files are context. Independent audit has no generator import. Historical author scripts are provenance, never replay commands."
+    },
+    {
+      "entryId": "entry-015",
+      "kind": "changed-tool-test-reproduction",
+      "claimId": null,
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduce.py",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-ade5812a9.md",
+      "noteVerbatim": "- entry-015 `step10-sync4d-reproduce.py` ok: deep: rejects outputs outside `/tmp/fgos-work`, inside the repo, symlinks and hard links; materializes only `readOnlyScripts`; ran green here. The optional native mode was not run (4 GiB).",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "Review the committed delta and its tests; whole prior files are context. Independent audit has no generator import. Historical author scripts are provenance, never replay commands."
+    },
+    {
+      "entryId": "entry-016",
+      "kind": "changed-tool-test-reproduction",
+      "claimId": null,
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-ade5812a9.md",
+      "noteVerbatim": "- entry-016 `step10-sync4d-reproduction.json` ok: deep: same lib-from-output-dir fix and check A change; the old author scratch paths (`package4d`, `review4d`) are gone from the read-only scripts; the wrapper command and the optional native commands are consistent with the header.",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "Review the committed delta and its tests; whole prior files are context. Independent audit has no generator import. Historical author scripts are provenance, never replay commands."
+    },
+    {
+      "entryId": "entry-017",
+      "kind": "changed-tool-test-reproduction",
+      "claimId": null,
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round6-reproduction.json",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-ade5812a9.md",
+      "noteVerbatim": "- entry-017 `step10-round6-reproduction.json` ok: deep: lists the documented commands and the four-marker obligation; historical author scripts are archival. Note: its first command names `step10-round5-reproduce.py` and works as written.",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "Review the committed delta and its tests; whole prior files are context. Independent audit has no generator import. Historical author scripts are provenance, never replay commands."
+    },
+    {
+      "entryId": "entry-018",
+      "kind": "changed-tool-test-reproduction",
+      "claimId": null,
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/tooling.md",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-ade5812a9.md",
+      "noteVerbatim": "- entry-018 `tooling.md` ok: deep: its claims check out against my runs (507 of 507 tests, 17 carrier sentences, nine accounted pairs, registry accounting counts); no stale statement found.",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "Review the committed delta and its tests; whole prior files are context. Independent audit has no generator import. Historical author scripts are provenance, never replay commands."
+    },
+    {
+      "entryId": "entry-019",
+      "kind": "outstanding-registry-marker-drop",
+      "claimId": "claim_133a4900a601db7cbf1182a96540ef56",
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-ade5812a9.md",
+      "noteVerbatim": "deep: registry row before and after equal git; unit evidence-and-conduct-boundaries digest matches the live heading plus following block; only change is the Added in candidate correction prefix on the first line of the payload, original text kept; dropped lineage and reviewStatus markers are by design; accounting only",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "Previously omitted marker-drop accounting; full before/after retained. Metadata absence is not approval or current truth."
+    },
+    {
+      "entryId": "entry-020",
+      "kind": "outstanding-registry-marker-drop",
+      "claimId": "claim_4a2dfdbfa271d8f20b4e581757288988",
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-ade5812a9.md",
+      "noteVerbatim": "deep: unheaded-block-44 digest matches the live block (lines 436-437); change is the Added in candidate prefix plus lower-cased first word; only the origin marker dropped, no other field moved",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "Previously omitted marker-drop accounting; full before/after retained. Metadata absence is not approval or current truth."
+    },
+    {
+      "entryId": "entry-021",
+      "kind": "outstanding-registry-marker-drop",
+      "claimId": "claim_c90c0415c20234da816351e16f9903b8",
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-ade5812a9.md",
+      "noteVerbatim": "deep: heading 7-constraint-findings digest matches the live heading plus its following block; the change is the same prefix on the first following line; lineage and reviewStatus drop only; anchor is the heading, not a position guess",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "Previously omitted marker-drop accounting; full before/after retained. Metadata absence is not approval or current truth."
+    },
+    {
+      "entryId": "entry-022",
+      "kind": "outstanding-registry-marker-drop",
+      "claimId": "claim_cfdd80946e57e4ea360ed04c1413f4dd",
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-ade5812a9.md",
+      "noteVerbatim": "deep: unheaded-block-117 digest matches the live block (lines 1470-1471); text equals the old block plus the Added in candidate current-Workflow correction clause whose snapshot link resolves; only origin dropped",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "Previously omitted marker-drop accounting; full before/after retained. Metadata absence is not approval or current truth."
+    },
+    {
+      "entryId": "entry-023",
+      "kind": "registry-change-since-request",
+      "claimId": null,
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-ade5812a9.md",
+      "noteVerbatim": "- entry-023 `_binding` change ok: deep: before (562c2583..., 62180479 bytes) is the byte count and hash of the registry as read at f1f414b02 and after (3ead3b52..., 62185799) is that of fe98a6455, which is what `_binding` records (the input registry), so the change is genuine. The registry file at the request commit b53dd05df hashes to 1f5325ff1b1c2012c06aaf17b805c3f4fc2527923742271dff3d77e10707989e (62185030 bytes); the Lead must bind that exact hash to the package commit, as the entry itself says.",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "All changes since fe98a6455, including origin marker drops and top-level metadata; no identity filtering and no producer approval."
+    },
+    {
+      "entryId": "entry-024",
+      "kind": "registry-change-since-request",
+      "claimId": null,
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-ade5812a9.md",
+      "noteVerbatim": "- entry-024 `carriedFromCommit` change ok: deep: 62751458b to 4d363436, matches git at fe98a6455 and b53dd05df.",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "All changes since fe98a6455, including origin marker drops and top-level metadata; no identity filtering and no producer approval."
+    },
+    {
+      "entryId": "entry-025",
+      "kind": "registry-change-since-request",
+      "claimId": null,
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "noteVerbatim": "deep: registry metadata carryForward: before and after blocks equal the fe98a6455 and package-commit registries and the committed accounting JSON; arithmetic holds (oldUnits 91386 equals the previous newUnits, kept 91012 plus paired 374 equals newUnits 91386, added 0, moved 0, gaps 0, retired 0, fromCommit equals the previous toCommit, toCommit equals ade5812a9); the five listed changed fields are exactly the fields that differ; no registry document changed between 4d3634360 and ade5812a9 (git diff over the 128 changed paths touches none), so a no-edit carry is the right result.",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "All changes since fe98a6455, including origin marker drops and top-level metadata; no identity filtering and no producer approval."
+    },
+    {
+      "entryId": "entry-026",
+      "kind": "registry-change-since-request",
+      "claimId": null,
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "noteVerbatim": "deep: registry metadata commit moves from 4d3634360 to ade5812a9 and nothing else in that key; equals my own diff and the accounting JSON; consistent with carriedFromCommit (entry-024, other part) and carryForward.toCommit. Observation: the registry at the content commit ade5812a9 is byte-equal to fe98a6455 (sha256 3ead3b52); the updated registry (sha256 1f5325ff, 62185030 bytes, equal to step10-syncade-native-proof.json) exists only at the package commit b53dd05df, which is the binding the request asks for, and those are the bytes I reviewed.",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "All changes since fe98a6455, including origin marker drops and top-level metadata; no identity filtering and no producer approval."
+    },
+    {
+      "entryId": "entry-027",
+      "kind": "registry-change-since-request",
+      "claimId": null,
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "noteVerbatim": "deep: entry-027, unheaded-block-7 (unheaded block inside the appended historical-source carriers) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest recomputed by the extractor and by my plain-Python pass over all 19 units of the file. The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval.",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "All changes since fe98a6455, including origin marker drops and top-level metadata; no identity filtering and no producer approval."
+    },
+    {
+      "entryId": "entry-028",
+      "kind": "registry-change-since-request",
+      "claimId": null,
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "noteVerbatim": "deep: entry-028, unheaded-block-9 (unheaded block inside the appended historical-source carriers) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest also hand-recomputed in plain Python (seed 20261018 sample). The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval.",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "All changes since fe98a6455, including origin marker drops and top-level metadata; no identity filtering and no producer approval."
+    },
+    {
+      "entryId": "entry-029",
+      "kind": "registry-change-since-request",
+      "claimId": null,
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "noteVerbatim": "deep: entry-029, unheaded-block-6 (unheaded block inside the appended historical-source carriers) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest recomputed by the extractor and by my plain-Python pass over all 19 units of the file. The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval.",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "All changes since fe98a6455, including origin marker drops and top-level metadata; no identity filtering and no producer approval."
+    },
+    {
+      "entryId": "entry-030",
+      "kind": "registry-change-since-request",
+      "claimId": null,
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "noteVerbatim": "deep: entry-030, historical-source-section-552ef3d6 (heading unit of an appended historical-source section) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest also hand-recomputed in plain Python (seed 20261018 sample). The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval.",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "All changes since fe98a6455, including origin marker drops and top-level metadata; no identity filtering and no producer approval."
+    },
+    {
+      "entryId": "entry-031",
+      "kind": "registry-change-since-request",
+      "claimId": null,
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "noteVerbatim": "deep: entry-031, unheaded-block-11 (unheaded block inside the appended historical-source carriers) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest recomputed by the extractor and by my plain-Python pass over all 19 units of the file. The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval.",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "All changes since fe98a6455, including origin marker drops and top-level metadata; no identity filtering and no producer approval."
+    },
+    {
+      "entryId": "entry-032",
+      "kind": "registry-change-since-request",
+      "claimId": null,
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "noteVerbatim": "deep: entry-032, historical-source-section-099eb566 (heading unit of an appended historical-source section) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest also hand-recomputed in plain Python (seed 20261018 sample). The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval.",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "All changes since fe98a6455, including origin marker drops and top-level metadata; no identity filtering and no producer approval."
+    },
+    {
+      "entryId": "entry-033",
+      "kind": "registry-change-since-request",
+      "claimId": null,
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "noteVerbatim": "deep: entry-033, unheaded-block-8 (unheaded block inside the appended historical-source carriers) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest recomputed by the extractor and by my plain-Python pass over all 19 units of the file. The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval.",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "All changes since fe98a6455, including origin marker drops and top-level metadata; no identity filtering and no producer approval."
+    },
+    {
+      "entryId": "entry-034",
+      "kind": "registry-change-since-request",
+      "claimId": null,
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "noteVerbatim": "deep: entry-034, unheaded-block-12 (unheaded block inside the appended historical-source carriers) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest also hand-recomputed in plain Python (seed 20261018 sample). The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval.",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "All changes since fe98a6455, including origin marker drops and top-level metadata; no identity filtering and no producer approval."
+    },
+    {
+      "entryId": "entry-035",
+      "kind": "registry-change-since-request",
+      "claimId": null,
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "noteVerbatim": "deep: entry-035, historical-source-section-0686418a (heading unit of an appended historical-source section) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest recomputed by the extractor and by my plain-Python pass over all 19 units of the file. The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval.",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "All changes since fe98a6455, including origin marker drops and top-level metadata; no identity filtering and no producer approval."
+    },
+    {
+      "entryId": "entry-036",
+      "kind": "registry-change-since-request",
+      "claimId": null,
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-ade5812a9.md",
+      "noteVerbatim": "deep: entry-036, unheaded-block-13 (unheaded block inside the appended historical-source carriers) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest recomputed by the extractor and by my plain-Python pass over all 19 units of the file. The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval.",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "All changes since fe98a6455, including origin marker drops and top-level metadata; no identity filtering and no producer approval."
+    },
+    {
+      "entryId": "entry-037",
+      "kind": "registry-change-since-request",
+      "claimId": null,
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-ade5812a9.md",
+      "noteVerbatim": "deep: entry-037, unheaded-block-10 (unheaded block inside the appended historical-source carriers) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest recomputed by the extractor and by my plain-Python pass over all 19 units of the file. The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval.",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "All changes since fe98a6455, including origin marker drops and top-level metadata; no identity filtering and no producer approval."
+    },
+    {
+      "entryId": "entry-038",
+      "kind": "registry-change-since-request",
+      "claimId": null,
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-ade5812a9.md",
+      "noteVerbatim": "deep: entry-038, historical-source-section-4efee765 (heading unit of an appended historical-source section) in docs/platform/runner/spec.md: the only difference between the registry at fe98a6455 and at the package commit is removal of the origin marker added-since-62751458b; every other field (path, anchor, kind, unitDigest, identityFingerprint, sourceUnitDigest, claimKind, status) is unchanged; the request before and after blocks equal my own diff and the committed accounting JSON field for field, and anchor, kind, textDigest, unitDigest and fingerprint equal the live extractor output on the file at HEAD. Digest recomputed by the extractor and by my plain-Python pass over all 19 units of the file. The unit already had an ok identity verdict in the 4d3634360 round so no review state is lost; identity tuple only, not a truth approval.",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "All changes since fe98a6455, including origin marker drops and top-level metadata; no identity filtering and no producer approval."
+    },
+    {
+      "entryId": "entry-039",
+      "kind": "regenerated-check-A",
+      "claimId": null,
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-checks.json",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-ade5812a9.md",
+      "noteVerbatim": "deep: check A at ade5812a9: I recomputed offenders by plain git (first-parent no-merges commits from start B0 dbe5c4328 to HEAD whose paths fall outside allowed-paths.json): exactly 9 commit/path pairs, equal to accountedPairs, and their unique paths equal the 8 historicalOffenders of step10-start-checks.json; authorities check out (A3 five pairs of 1cc92d7db, A21 the two non-plan.md pairs of db9fa7608, L10-35a two pairs of bd217ecf1, all in owner-answers.md); scripts/doc-rationale-facts.mjs is no longer an offender because the Lead commit 6600925b4 added it to allowed-paths.json (L10-35b), a one-line diff and no checker, baseline or start-checks edit; I reran checks.mjs from the manifest through a retargeted copy: ok true, unaccounted none, newWorkingViolations none, B and H clean, output equals the committed step10-syncade-checks.json except the HEAD field.",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": null
+    },
+    {
+      "entryId": "entry-040",
+      "kind": "package-portable-reproduction",
+      "claimId": null,
+      "file": "plans/260925-documentation-authority-unification/reports/phase-06/step10-syncade-reproduction.json",
+      "verdict": "ok",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-ade5812a9.md",
+      "noteVerbatim": "deep: portable reproduction manifest step10-syncade-reproduction.json: its seven scripts equal the sync4d manifest byte for byte except inventory-readonly.mjs and verify-readonly.mjs, which differ only in the pinned commit (4d3634360 to ade5812a9); ownership.mjs now imports the lib from --output-dir and audit-ownership.mjs from its own directory, so the earlier hardcoded-import defect is gone; with retargeted output dirs (the wrappers insist on /tmp/fgos-work and I may only write to my scratch) I ran audit (12895 rows, 92 shards, 0 findings, byte-identical to step10-syncade-independent-consistency.json), checks, ownership (254 collisions, drift 0), audit-ownership (ok true) and replay (366 original and 98 later rows, 0 findings); target-ownership and link-replay outputs are byte-identical to the committed ones; registry accounting script rerun gives the same 16 changes as the committed JSON (only currentCommit differs because my HEAD is the package commit); the 26 doc test files give 507 of 507 pass. Optional native inventory and D at ade5812a9 (2 GiB inventory) was not rerun by me; I read the committed D summary and log only (fatal findings none), so native D is not independently reproduced here.",
+      "application": "accepted accounting/tool/reproduction receipt; registry and tools unchanged",
+      "reviewScope": "Read-only script materialization with explicit external scratch and current content pin; historical sync never replayed. Optional native D requires package registry binding."
+    }
+  ],
+  "entryAccountingCounts": {
+    "ok": 40,
+    "rework": 0,
+    "hold": 0
+  }
+}

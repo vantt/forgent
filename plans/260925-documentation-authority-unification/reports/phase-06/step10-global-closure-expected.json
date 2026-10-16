@@ -1,9 +1,5 @@
 {
-  "holds": [
-    "claim_bd4897029d5fdbab80b1b7ccee475e12",
-    "claim_d6db58a3090422d42154f240f54c9f5a",
-    "claim_f11410ffab23bcae1d89e8b6cbedf8bc"
-  ],
+  "holds": [],
   "identicalUnits": [
     {
       "digest": "017e993cbd763a70a04d7b9d879f9ebcbf287a76be67aca0ee869f5706f80213",

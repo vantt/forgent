@@ -1,0 +1,16 @@
+✔ reproduction rejects missing or repository output ["consistency"] (41.596067ms)
+✔ reproduction rejects missing or repository output ["consistency","--output","/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/unsafe.json"] (40.895721ms)
+✔ reproduction rejects missing or repository output ["consistency","--output","relative.json"] (41.261606ms)
+✔ direct audit rejects a symlink output before reading the corpus (44.075148ms)
+✔ direct audit rejects a dangling-symlink output before reading the corpus (44.034913ms)
+✔ direct audit rejects a hardlink output before reading the corpus (46.848329ms)
+✔ documented ownership commands work from a fresh reviewer output directory: step10-round5-reproduction.json (18194.586897ms)
+✔ documented ownership commands work from a fresh reviewer output directory: step10-sync4d-reproduction.json (19365.733755ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 37879.578358

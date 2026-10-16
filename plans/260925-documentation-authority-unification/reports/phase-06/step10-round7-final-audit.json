@@ -1,0 +1,370 @@
+{
+  "HEAD": "a9a2b079f6a12d5992461312cd03b5d24c6495a2",
+  "SYNC": "a9a2b079f6a12d5992461312cd03b5d24c6495a2",
+  "reviewApplications": {
+    "applied": 5,
+    "non-decision-evidence": 16
+  },
+  "reviewTableVerdicts": {
+    "ok": 25,
+    "rework": 0,
+    "hold": 0
+  },
+  "nonTableEntryVerdicts": 15,
+  "verbatimAppliedNotes": 5,
+  "registryPackageBinding": {
+    "entry": "entry-023",
+    "packageCommit": "b53dd05dff3b7608ad9000eea82b4d6fc12c84f7",
+    "registryPath": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+    "SHA256": "1f5325ff1b1c2012c06aaf17b805c3f4fc2527923742271dff3d77e10707989e",
+    "bytes": 62185030,
+    "currentBytesEqualPackage": true,
+    "reviewStatus": "reviewed",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-ade5812a9.md",
+    "reviewNote": "- entry-023 `_binding` change ok: deep: before (562c2583..., 62180479 bytes) is the byte count and hash of the registry as read at f1f414b02 and after (3ead3b52..., 62185799) is that of fe98a6455, which is what `_binding` records (the input registry), so the change is genuine. The registry file at the request commit b53dd05df hashes to 1f5325ff1b1c2012c06aaf17b805c3f4fc2527923742271dff3d77e10707989e (62185030 bytes); the Lead must bind that exact hash to the package commit, as the entry itself says."
+  },
+  "registryUnchanged": true,
+  "pendingRedecisions": 49,
+  "redecisionKinds": {
+    "A43-rings-redecision": 3,
+    "A31-source-predecessor-redecision": 8,
+    "historical-dependent-target-redecision": 16,
+    "A31-line-citation-redecision": 22
+  },
+  "rings": [
+    {
+      "claimId": "claim_d6db58a3090422d42154f240f54c9f5a",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "targetAnchor": "coordination-rings"
+    },
+    {
+      "claimId": "claim_f11410ffab23bcae1d89e8b6cbedf8bc",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "targetAnchor": "coordination-rings"
+    },
+    {
+      "claimId": "claim_bd4897029d5fdbab80b1b7ccee475e12",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "targetAnchor": "unheaded-block-14"
+    }
+  ],
+  "holds": 0,
+  "draftsAwaitingNativeResolution": 9,
+  "mainChangedHunks": 5,
+  "ratchet": {
+    "clean": true,
+    "findings": [],
+    "stats": {
+      "baselineFilesCount": 994,
+      "onDiskFilesCount": 995,
+      "accountedEditsCount": 26,
+      "accountedNewFilesCount": 1,
+      "findingsCount": 0
+    }
+  },
+  "manifestByteEqual": true,
+  "otherMappings": {
+    "docs/backlog.md": {
+      "decisionSourceShards": [
+        "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-generated-backlog.json",
+        "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-historical-gaps.json"
+      ],
+      "mapping": "generated/non-authority"
+    },
+    "docs/how-to/operate-dispatch-runtime-inspection-and-reconciliation.md": {
+      "decisionSourceShards": [
+        "plans/260925-documentation-authority-unification/ledger/decisions/s2-corpus-user-knowledge.json"
+      ],
+      "mapping": "end-user how-to outside Phase 6 source set"
+    }
+  },
+  "independent": {
+    "ok": true,
+    "rowsScanned": 12895,
+    "shardsScanned": 92,
+    "structuredRows": 728,
+    "sectionClaims": 263,
+    "linkClaims": 729
+  },
+  "sourceWitnessLimits": 69,
+  "ownership": {
+    "noNewDoubleOwnership": true,
+    "nativePlatformTargetIdentityDuplicates": 0,
+    "newActiveSourcePairCollisions": [],
+    "targetDigestDrift": []
+  },
+  "checks": {
+    "A": {
+      "historicalOffenders": [
+        "plans/260925-documentation-authority-unification/phase-06-transform-all-platform-areas-as-candidate-material.md",
+        "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md",
+        "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+        "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.json",
+        "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.md",
+        "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/open-questions.md",
+        "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-07-draft.md",
+        "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-08-draft.md"
+      ],
+      "historicalEqual": true,
+      "newWorkingViolations": [],
+      "accountedPairs": [
+        {
+          "commit": "bd217ecf12bc75929d63c2285a838254b1b825cd",
+          "path": "plans/260925-documentation-authority-unification/phase-06-transform-all-platform-areas-as-candidate-material.md",
+          "authority": "L10-35a"
+        },
+        {
+          "commit": "bd217ecf12bc75929d63c2285a838254b1b825cd",
+          "path": "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+          "authority": "L10-35a"
+        },
+        {
+          "commit": "db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd",
+          "path": "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md",
+          "authority": "A21"
+        },
+        {
+          "commit": "db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd",
+          "path": "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+          "authority": "A21"
+        },
+        {
+          "commit": "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.json",
+          "authority": "A3"
+        },
+        {
+          "commit": "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.md",
+          "authority": "A3"
+        },
+        {
+          "commit": "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/open-questions.md",
+          "authority": "A3"
+        },
+        {
+          "commit": "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-07-draft.md",
+          "authority": "A3"
+        },
+        {
+          "commit": "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+          "path": "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-08-draft.md",
+          "authority": "A3"
+        }
+      ],
+      "unaccountedPairs": [],
+      "ok": true
+    },
+    "B": {
+      "rows": [
+        {
+          "path": "scripts/generate-doc-inventory.mjs",
+          "expected": "a52981ff2862cc2c553dbb3181e4e822a26b146b",
+          "actual": "a52981ff2862cc2c553dbb3181e4e822a26b146b"
+        },
+        {
+          "path": "scripts/doc-inventory-artifact.mjs",
+          "expected": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64",
+          "actual": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64"
+        },
+        {
+          "path": "scripts/generate-shipped-path-inventory.mjs",
+          "expected": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
+          "actual": "0f1cd7e1cee308772c0b56c37f3190333039cfb3"
+        },
+        {
+          "path": "scripts/check-legacy-docs-ratchet.mjs",
+          "expected": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d",
+          "actual": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d"
+        },
+        {
+          "path": "scripts/lib/is-main-module.mjs",
+          "expected": "680570946fa1381474900c9192795514b5b88f48",
+          "actual": "680570946fa1381474900c9192795514b5b88f48"
+        }
+      ],
+      "ok": true
+    },
+    "H": {
+      "findings": [],
+      "counts": {
+        "files": 609,
+        "byStatus": {
+          "promoted": 3,
+          "candidate": 214,
+          "legacy-current": 0,
+          "non-authority": 1,
+          "unrouted": 391
+        },
+        "exemptUnrouted": 302,
+        "checked": 217,
+        "findings": 0,
+        "byType": {}
+      }
+    },
+    "I": {
+      "equal": false,
+      "equalToHEAD": true,
+      "frozenBaselineUnchanged": true
+    }
+  },
+  "tests": {
+    "tests": 507,
+    "pass": 506,
+    "fail": 1,
+    "remaining": "test/scripts/doc-runner-liveness.test.mjs asserts full runner source tuples equal the persisted native registry and HEAD source blob equals registry.commit. Main changed runner.md; native sync is expressly prohibited in this author turn. Recheck after next package single native sync; no test/checker/baseline bypass.",
+    "portableRerun": {
+      "tests": 8,
+      "pass": 8,
+      "fail": 0
+    },
+    "initialRun": {
+      "pass": 504,
+      "fail": 3,
+      "resolved": "Two ownership reproduction failures resolved by updating six legacy target dependencies and final A43 bindings; final full run passes both."
+    }
+  },
+  "D": [
+    {
+      "label": "both",
+      "fatalCount": 9,
+      "types": {
+        "decision-claim-unknown": 9
+      }
+    },
+    {
+      "label": "identity",
+      "fatalCount": 9,
+      "types": {
+        "decision-claim-unknown": 9
+      }
+    },
+    {
+      "label": "phase02",
+      "fatalCount": 9,
+      "types": {
+        "decision-claim-unknown": 9
+      }
+    }
+  ],
+  "E": {
+    "open": [
+      {
+        "type": "claims-partial-carry",
+        "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+        "count": 15,
+        "examples": [
+          "docs/io-contract.md#unheaded-block-5",
+          "docs/specs/observe.md#unheaded-block-3",
+          "docs/specs/runner.md#unheaded-block-102",
+          "docs/specs/runner.md#unheaded-block-118",
+          "docs/specs/runner.md#unheaded-block-127"
+        ]
+      },
+      {
+        "type": "claims-not-reviewed",
+        "message": "claim rows whose reviewStatus is not reviewed",
+        "count": 19,
+        "examples": [
+          "docs/specs/runner.md#guard-reconciliation",
+          "docs/specs/runner.md#unheaded-block-3",
+          "docs/specs/runner.md#data-dictionary",
+          "docs/specs/runner.md#unheaded-block-9",
+          "docs/specs/runner.md#gate-a-xếp-hạng-candidate-bắc-cầu-sang-việc-thật-evolve"
+        ]
+      },
+      {
+        "type": "identical-units-multiple-owners",
+        "message": "identical source units whose rows name different target owners",
+        "count": 1,
+        "examples": [
+          "39a803b85af8: docs/platform/packaging-distribution/spec.md, docs/platform/runner/operations/h-51f5cd7279fd.md"
+        ]
+      },
+      {
+        "type": "registry-gaps-without-disposition",
+        "message": "registry identity-gap rows with no vocabulary disposition",
+        "count": 2,
+        "examples": [
+          "docs/reading-map.md#unheaded-block-15",
+          "docs/reading-map.md#unheaded-block-16"
+        ]
+      },
+      {
+        "type": "candidate-blocks-unreferenced",
+        "message": "candidate conservation units not named by a source decision",
+        "count": 313,
+        "examples": [
+          "docs/platform/work-state/contracts/cli-io-contract.md#cli-io-contract",
+          "docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-1",
+          "docs/platform/work-state/contracts/cli-io-contract.md#single-write-door",
+          "docs/platform/work-state/contracts/cli-io-contract.md#writer-identity",
+          "docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-5"
+        ]
+      }
+    ],
+    "strictGreen": false
+  },
+  "DLimit": "All nine are accounted source-predecessor IDs absent from current source inventory before native carry. Nine provisional current-source drafts included. No D/E-green or closure claim. The earlier extended Rings scope also exposed 12 missing dependency-projection findings; retained as diagnostic, final FAST scope matches the prior ten-source author scope. Rings are covered by the all-shard audit and explicit three-row binding proof.",
+  "nativeSyncCount": 0,
+  "reviewPackCount": 0,
+  "frozenRationales": 117,
+  "frozenRationaleDrift": [],
+  "scopeViolations": [],
+  "changedPaths": [
+    "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
+    "docs/platform/contracts/architecture-manifest.json",
+    "docs/platform/packaging-distribution/spec.md",
+    "docs/platform/runner/architecture/h-69197b459754.md",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-source-completion.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/holds.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/progress.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step-10-report.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-global-closure-expected.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round7-candidate-status.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round7-checks.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round7-fast-check.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round7-fast-extended-attempt.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round7-final-audit.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round7-independent-consistency.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round7-link-replay.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round7-main-carry.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round7-manifest-sidecar.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round7-new-unit-drafts.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round7-portable-tests.log",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round7-ratchet.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round7-redecisions.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round7-reproduction.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round7-review-application.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round7-target-ownership.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round7-tests.log",
+    "scripts/check-legacy-docs-ratchet.exceptions.json"
+  ],
+  "next": "package + global turn",
+  "authorTasksComplete": true,
+  "packageDependencies": [
+    "One native sync to account nine changed legacy predecessor identities and all changed/new candidate identities; rebind all resulting drift pending, retaining all known IDs.",
+    "Rerun native D against both priors and each; rerun liveness test, independent audit and remaining global E/A34/truth/consumer/cutover/checkpoint/scorecard obligations.",
+    "Bounded independent ordinary review only of changed rows/carriers/native transitions as required by package."
+  ],
+  "newOwnerDecisionBlockers": [],
+  "requestEntriesAccounted": {
+    "ok": 40,
+    "rework": 0,
+    "hold": 0
+  }
+}

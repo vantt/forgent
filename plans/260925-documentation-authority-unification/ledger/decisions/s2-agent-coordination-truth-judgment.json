@@ -8721,9 +8721,12 @@
       "claimKind": "architecture",
       "disposition": "supersede",
       "reviewStatus": "pending",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The current successor at docs/platform/agent-coordination/vocabulary/concept-relationships.md#coordination-rings supersedes the stale current-state claim shown at docs/platform/agent-coordination/vocabulary/concept-relationships.md#coordination-rings before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval.",
-      "reviewNote": "hold. Coordination Rings hold kept. Target paragraph is true (no Orchestrator/Launcher/Router/Driver class or entity in src; named owners src/workflow/runner.mjs, src/runner/execution/patterns, src/runner/dispatch exist) but whether to retain a typed ring architecture is an owner decision, not clearable by a true paragraph. No reviewer stamp."
+      "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
+      "rationale": "Source: docs/architect/agent-coordination/vocabulary/concept-relationships.md:131-131#coordination-rings (current lines); unit SHA256 631c2b459e76ccb130e41afdc78c2fc296b342d641450632df8e33baeac22459.\nTarget: docs/platform/agent-coordination/vocabulary/concept-relationships.md:95-95#coordination-rings (current lines); unit SHA256 c1a3107f359fb34010a0f09ad1156aaa2be077954106517f738f6cbc073ad579.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 2; title \"Coordination Rings\" → \"Coordination Rings\".\nWhole direct section differs; depth 2 → 2; 0 distinct link changes; normalized line order differs; 6 removed and 11 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A43 supersedes the ring-to-entity architecture with the true responsibility model in this complete section: Workflow runner sequences, Execution Core binding and patterns execute Units, dispatch adapters own attempts. No Orchestrator/Launcher/Router/Driver/Dispatcher class or entity is required or planned. The responsibility-boundary sentence is retained verbatim in the sibling target block; source history retains the former typed mapping. Pending ordinary independent review.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "targetUnitDigest": "c1a3107f359fb34010a0f09ad1156aaa2be077954106517f738f6cbc073ad579",
+      "targetAncestry": [
+        "Agent Coordination Concept Relationships"
+      ]
     },
     {
       "claimId": "claim_cbedb41c7a00cb4db2b9e3840a028b36",
@@ -9272,42 +9275,31 @@
       "sourceUnitDigest": "1f83d2721e63ae946e300e062ec9ddba592ef25ef25ff196524cd6e492ef214e",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "rationale": "Source: docs/architect/agent-coordination/vocabulary/concept-relationships.md:133-138#unheaded-block-13 (current lines); unit SHA256 1f83d2721e63ae946e300e062ec9ddba592ef25ef25ff196524cd6e492ef214e.\nTarget: docs/platform/agent-coordination/vocabulary/concept-relationships.md:95-95#coordination-rings (current lines); unit SHA256 845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 13\" → \"Coordination Rings\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 6 removed and 8 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-13 under docs/platform/agent-coordination/vocabulary/concept-relationships.md#coordination-rings; source context \"Agent Coordination Concept Relationships / Coordination Rings\", target context \"Agent Coordination Concept Relationships\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "rationale": "Source: docs/architect/agent-coordination/vocabulary/concept-relationships.md:133-138#unheaded-block-13 (current lines); unit SHA256 1f83d2721e63ae946e300e062ec9ddba592ef25ef25ff196524cd6e492ef214e.\nTarget: docs/platform/agent-coordination/vocabulary/concept-relationships.md:95-95#coordination-rings (current lines); unit SHA256 c1a3107f359fb34010a0f09ad1156aaa2be077954106517f738f6cbc073ad579.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 13\" → \"Coordination Rings\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A43 supersedes the ring-to-entity architecture with the true responsibility model in this complete section: Workflow runner sequences, Execution Core binding and patterns execute Units, dispatch adapters own attempts. No Orchestrator/Launcher/Router/Driver/Dispatcher class or entity is required or planned. The responsibility-boundary sentence is retained verbatim in the sibling target block; source history retains the former typed mapping. Pending ordinary independent review.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetOwner": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
       "targetAnchor": "coordination-rings",
-      "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
-      "reviewStatus": "reviewed",
-      "reviewNote": "deep: supersede concept-relationships.md#unheaded-block-13 (unheaded-block, lines 133-138) to agent-coordination/vocabulary/concept-relationships.md#coordination-rings (heading, line 95); full digests, line spans, titles, depths and ancestry recomputed from the unit extractor and equal to the rationale; anchors ok; source block has 6 lines not verbatim in the successor section (first ```txt), so a rewrite under supersede with the count in the rationale matching a plain line diff plus the target heading line; links 0/0 equal",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-08-62751458b.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823",
+      "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
+      "reviewStatus": "pending",
+      "targetUnitDigest": "c1a3107f359fb34010a0f09ad1156aaa2be077954106517f738f6cbc073ad579",
       "targetAncestry": [
         "Agent Coordination Concept Relationships"
-      ],
-      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
+      ]
     },
     {
       "claimId": "claim_bd4897029d5fdbab80b1b7ccee475e12",
       "sourceUnitDigest": "67f9f91fe484e41c014e151aaee4856f8aba43c473e42ffa3428d00e693db22c",
       "claimKind": "architecture",
-      "disposition": "supersede",
-      "rationale": "Source: docs/architect/agent-coordination/vocabulary/concept-relationships.md:140-141#unheaded-block-14 (current lines); unit SHA256 67f9f91fe484e41c014e151aaee4856f8aba43c473e42ffa3428d00e693db22c.\nTarget: docs/platform/agent-coordination/vocabulary/concept-relationships.md:95-95#coordination-rings (current lines); unit SHA256 845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 14\" → \"Coordination Rings\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 2 removed and 8 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/vocabulary/concept-relationships.md#unheaded-block-14 under docs/platform/agent-coordination/vocabulary/concept-relationships.md#coordination-rings; source context \"Agent Coordination Concept Relationships / Coordination Rings\", target context \"Agent Coordination Concept Relationships\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "disposition": "move",
+      "rationale": "Source: docs/architect/agent-coordination/vocabulary/concept-relationships.md:140-141#unheaded-block-14 (current lines); unit SHA256 67f9f91fe484e41c014e151aaee4856f8aba43c473e42ffa3428d00e693db22c.\nTarget: docs/platform/agent-coordination/vocabulary/concept-relationships.md:107-108#unheaded-block-14 (current lines); unit SHA256 67f9f91fe484e41c014e151aaee4856f8aba43c473e42ffa3428d00e693db22c.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: A43 carries the complete responsibility-boundary sentence verbatim, with an equal source/target unit digest. Responsibility groups require no typed Orchestrator/Launcher/Router/Driver/Dispatcher entity. Pending ordinary independent review.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetOwner": "docs/platform/agent-coordination/vocabulary/concept-relationships.md",
-      "targetAnchor": "coordination-rings",
-      "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
-      "reviewStatus": "reviewed",
-      "reviewNote": "deep: supersede concept-relationships.md#unheaded-block-14 (unheaded-block, lines 140-141) to agent-coordination/vocabulary/concept-relationships.md#coordination-rings (heading, line 95); full digests, line spans, titles, depths and ancestry recomputed from the unit extractor and equal to the rationale; anchors ok; source block has 2 lines not verbatim in the successor section (first The rings are responsibility boundaries, not nec), so a rewrite under supersede with the count in the rationale matching a plain line diff plus the target heading line; links 0/0 equal",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-08-62751458b.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "845c5d7170057122eb08c567716737864626d6ea2baf0eb0706c42a9f9a23823",
+      "targetAnchor": "unheaded-block-14",
+      "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
+      "reviewStatus": "pending",
+      "targetUnitDigest": "67f9f91fe484e41c014e151aaee4856f8aba43c473e42ffa3428d00e693db22c",
       "targetAncestry": [
-        "Agent Coordination Concept Relationships"
-      ],
-      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
+        "Agent Coordination Concept Relationships",
+        "Coordination Rings"
+      ]
     },
     {
       "claimId": "claim_371515038b57bcd114632a79a36a922e",
