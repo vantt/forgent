@@ -1,0 +1,1 @@
+{"id":"cli:pane:process_info","result":{"process_info":{"foreground_process_group_id":2793310,"foreground_processes":[{"argv":["sleep","300"],"cmdline":"sleep 300","cwd":"/home/vantt/projects/forgentX","name":"sleep","pid":2793310}],"pane_id":"wS:p59Y","shell_pid":2785881},"type":"pane_process_info"}}
