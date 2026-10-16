@@ -552,6 +552,36 @@ test('persona text pinned by an earlier release that the parser rejects still re
   assert.doesNotMatch(prompt, /could not be parsed/);
 });
 
+const MAPPING_ITEM_TEXT = [
+  'name: critic',
+  'description: Blunt reviewer',
+  'persona:',
+  '  voice: calm',
+  'decision_boundary:',
+  '  must_escalate:',
+  '    - Escalate when: budget exceeded',
+  '    - plain item',
+  '',
+].join('\n');
+
+test('pinned persona text with a list item that reads as a mapping renders through the legacy projection', () => {
+  const prompt = personaPrompt(null, { pinned: MAPPING_ITEM_TEXT });
+  assert.match(prompt, /^Voice: calm$/m);
+  assert.match(prompt, /Must escalate:\n- Escalate when: budget exceeded\n- plain item/);
+});
+
+test('pinned persona text with a mapping under voice renders through the legacy projection, not as nothing', () => {
+  const prompt = personaPrompt(null, { pinned: 'name: critic\ndescription: Blunt reviewer\npersona:\n  voice:\n    tone: calm\n  style: short\n' });
+  assert.match(prompt, /^Description: Blunt reviewer$/m);
+  assert.match(prompt, /^Style: short$/m);
+});
+
+test('a persona file whose list item reads as a mapping renders one visible line, not a silent drop', () => {
+  const prompt = personaPrompt(MAPPING_ITEM_TEXT);
+  assert.match(prompt, /^Persona "critic" cannot be rendered: decision_boundary\.must_escalate\[0\] is a mapping/m);
+  assert.doesNotMatch(prompt, /Voice:|Must escalate:/);
+});
+
 test('pinned persona text that parses is read by the parser, and wins over the file', () => {
   const prompt = personaPrompt('name: critic\ndescription: from the file\n', { pinned: 'name: critic\ndescription: pinned one\npersona:\n  voice: calm\n' });
   assert.match(prompt, /^Description: pinned one$/m);

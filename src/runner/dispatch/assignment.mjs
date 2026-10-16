@@ -46,7 +46,7 @@ import { resolveTaskSpecPath } from '../paths.mjs';
 
 import { RunnerConfigError } from './config.mjs';
 import { describeYamlError, parseYaml } from '../../util/yaml.mjs';
-import { projectPersona } from '../agent-definitions.mjs';
+import { nonTextPersonaValues, projectPersona } from '../agent-definitions.mjs';
 import {
   NORMALIZER_VERSION,
   READ_ONLY_ROLES,
@@ -636,10 +636,14 @@ function buildInlineAssignment({ provenance, workId, createdBy, options = {} }) 
 }
 
 // The line-based reader that rendered personas before definitions were read with a real YAML parser.
-// It exists only for text pinned into a run record by a release that predates that change: such text
-// may hold lines the real parser rejects (`voice: direct: no hedging`), and a run resumed from it must
-// seat the same persona it was started with. Text read fresh from a file never uses it. Remove it,
-// with its fallback in renderPersonaSection, once no run pinned by those releases can still resume.
+// It exists only for text pinned into a run record by a release that predates that change. Pinned text
+// renders through the legacy projection in exactly two cases: the parser rejects it (`voice: direct: no
+// hedging`), or it parses but a rendered section holds a value that is not text (a list item such as
+// `- Escalate when: budget exceeded` reads as a mapping). The line reader shows what those releases showed,
+// so a run resumed from such text seats the persona it was started with. Pinned text that parses to text
+// renders through the parser, like a fresh file. A fresh file never uses the legacy reader: a definition
+// with those faults is refused where it is resolved. Remove this, with its fallback in
+// renderPersonaSection, once no run pinned by those releases can still resume.
 function legacyPersonaProjection(raw) {
   try {
     const result = { persona: {}, decision_boundary: { can_decide: [], must_escalate: [] } };
@@ -701,13 +705,17 @@ function renderPersonaSection(personaRef, options = {}) {
   const pinned = options.persona?.pinnedText;
   if (typeof pinned === 'string') {
     try {
-      content = projectPersona(parseYaml(pinned, { filename: `${personaRef}.yaml` }));
+      const parsed = parseYaml(pinned, { filename: `${personaRef}.yaml` });
+      content = nonTextPersonaValues(parsed).length > 0 ? legacyPersonaProjection(pinned) : projectPersona(parsed);
     } catch {
       content = legacyPersonaProjection(pinned);
     }
   } else if (fs.existsSync(personaFile)) {
     try {
-      content = projectPersona(parseYaml(fs.readFileSync(personaFile, 'utf8'), { filename: `${personaRef}.yaml` }));
+      const parsed = parseYaml(fs.readFileSync(personaFile, 'utf8'), { filename: `${personaRef}.yaml` });
+      const [nonText] = nonTextPersonaValues(parsed);
+      if (nonText) parseFailure = `Persona "${personaRef}" cannot be rendered: ${nonText}`;
+      else content = projectPersona(parsed);
     } catch (error) {
       parseFailure = `Persona "${personaRef}" could not be parsed: ${describeYamlError(error)}`;
     }

@@ -121,6 +121,33 @@ test('a definition with the wrong shape, invalid YAML or too large is refused wi
   assert.equal(agentShapeProblem('ok', definition('ok')), null);
 });
 
+test('a mapping or list where the renderer needs text is refused with its path, never dropped', (t) => {
+  const { root, write } = makeProject(t);
+  const cases = {
+    'item-map': ['decision_boundary:', '  must_escalate:', '    - Escalate when: budget exceeded'].join('\n'),
+    'second-item': ['decision_boundary:', '  can_decide:', '    - fine', '    - Decide when: sure'].join('\n'),
+    'voice-map': ['persona:', '  voice:', '    tone: calm'].join('\n'),
+    'style-list': ['persona:', '  style: [a, b]'].join('\n'),
+    'boundary-map': ['decision_boundary:', '  must_escalate:', '    when: budget'].join('\n'),
+    'boundary-text': ['decision_boundary:', '  must_escalate: budget'].join('\n'),
+  };
+  const expected = {
+    'item-map': /decision_boundary\.must_escalate\[0\] is a mapping; an unquoted ": "/,
+    'second-item': /decision_boundary\.can_decide\[1\] is a mapping/,
+    'voice-map': /persona\.voice is a mapping/,
+    'style-list': /persona\.style is a list/,
+    'boundary-map': /decision_boundary\.must_escalate is a mapping, not a list/,
+    'boundary-text': /decision_boundary\.must_escalate is text, not a list/,
+  };
+  for (const [name, body] of Object.entries(cases)) {
+    const text = `${definition(name)}${body}\n`;
+    write(`fgos/agents/${name}.yaml`, text);
+    assert.match(agentShapeProblem(name, text), expected[name], name);
+    assert.throws(() => resolveAgentDefinition(name, { projectRoot: root }), expected[name], name);
+  }
+  assert.equal(agentShapeProblem('quoted', `${definition('quoted')}decision_boundary:\n  must_escalate:\n    - "Escalate when: budget exceeded"\n`), null);
+});
+
 test('a definition is read as YAML: indentation, quoting and numbers are the parser\'s business', (t) => {
   const { root, write } = makeProject(t);
   write('fgos/agents/indented.yaml', '  name: indented\n  description: nested, still a mapping\n');

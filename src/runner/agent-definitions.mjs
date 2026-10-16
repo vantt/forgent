@@ -143,14 +143,51 @@ export function projectPersona(data) {
 }
 
 /**
+ * Values in the rendered sections that the renderer would silently drop because they are not text:
+ * a mapping where text belongs (typically an unquoted ": " inside a list item or a value) or a list
+ * where a single text belongs. One sentence per value, naming its path. This is the one detector;
+ * the shape check refuses the file with it and the pinned-text renderer falls back on it.
+ *
+ * @param {object|null} data a parsed definition (see readAgentDefinition)
+ * @returns {string[]}
+ */
+export function nonTextPersonaValues(data) {
+  const problems = [];
+  const kind = (value) => (Array.isArray(value) ? 'a list' : 'a mapping');
+  const hint = '; an unquoted ": " inside the text makes YAML read a mapping, quote it';
+  const single = (value, where) => {
+    if (value !== null && value !== undefined && !isScalar(value)) problems.push(`${where} is ${kind(value)}, not text${hint}`);
+  };
+  single(data?.description, 'description');
+  if (isPlainObject(data?.persona)) for (const key of PERSONA_KEYS) single(data.persona[key], `persona.${key}`);
+  if (isPlainObject(data?.decision_boundary)) {
+    for (const key of BOUNDARY_KEYS) {
+      const list = data.decision_boundary[key];
+      const where = `decision_boundary.${key}`;
+      if (list === null || list === undefined) continue;
+      if (!Array.isArray(list)) {
+        problems.push(`${where} is ${isPlainObject(list) ? 'a mapping' : 'text'}, not a list${isPlainObject(list) ? hint : ''}`);
+        continue;
+      }
+      list.forEach((item, index) => {
+        if (item !== null && !isScalar(item)) problems.push(`${where}[${index}] is ${kind(item)}${hint}`);
+      });
+    }
+  }
+  return problems;
+}
+
+/**
  * The problem with a definition file's shape, or null. The renderer needs a file that names itself
  * after its basename and says what it is for; anything else would render as an empty persona. A file
  * that is not valid YAML is reported with the parser's line and column.
  */
 export function agentShapeProblem(name, text) {
-  const { error, name: declared, description } = readAgentDefinition(text);
+  const { data, error, name: declared, description } = readAgentDefinition(text);
   if (error) return error;
   if (declared !== name) return `must declare name: ${name} (got ${JSON.stringify(declared ?? null)})`;
+  const [nonText] = nonTextPersonaValues(data);
+  if (nonText) return nonText;
   if (description === '') return 'must declare a non-empty description';
   return null;
 }
