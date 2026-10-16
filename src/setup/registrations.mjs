@@ -27,12 +27,14 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { isDeepStrictEqual } from 'node:util';
 
 import { detectRcFiles, hasSourceLine, deadSourceLines, probeShellIntegrationInvocation } from './shell-rc.mjs';
 import { mergeConfigDefaults } from './config-merge.mjs';
 import { releaseBinaryPath } from '../util/release-binary-path.mjs';
 import { RELEASE_TARGETS, releaseTargetForHost } from '../util/release-targets.mjs';
 import { hashFile, listLegacyNodeSourceFiles } from '../../scripts/build-rust-distribution.mjs';
+import { compileDomain } from '../../scripts/build-domain-registry.mjs';
 import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { describeYamlError, parseYaml } from '../util/yaml.mjs';
 import { loadRunnerConfigFromDir } from '../runner/dispatch/config.mjs';
@@ -1458,16 +1460,17 @@ registerCheck({
   check: (cwd) => checkAgentClaimsResolve(cwd),
 });
 
-// The Work lifecycle reads each domain's compiled.json (scripts/build-domain-registry.mjs) so it
-// loads with no YAML parser. A missing or unreadable file breaks every command that resolves a
-// domain; a stale one (YAML edited, not rebuilt) silently serves old steps. The freshness half
-// needs the `yaml` package, so it only runs where that package resolves (a checkout after install).
+// The Work lifecycle reads each domain's compiled.json (scripts/build-domain-registry.mjs) at
+// import time. A missing or unreadable file breaks every command that resolves a domain; a stale
+// one (YAML edited, not rebuilt) silently serves old steps; a YAML file that cannot be parsed
+// cannot be compiled at all. This check names each of those per domain, compiling from the YAML
+// with the same function the build uses.
 function checkDomainRegistryCompiled(cwd) {
   const domainsDir = path.join(cwd, 'domains');
   if (!fs.existsSync(domainsDir)) return { passed: true, message: 'no domains/ directory here — nothing to check' };
   const problems = [];
   let checked = 0;
-  for (const entry of fs.readdirSync(domainsDir, { withFileTypes: true })) {
+  for (const entry of fs.readdirSync(domainsDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
     if (!entry.isDirectory() || !fs.existsSync(path.join(domainsDir, entry.name, 'registry.yaml'))) continue;
     checked += 1;
     const compiled = path.join(domainsDir, entry.name, 'compiled.json');
@@ -1475,21 +1478,31 @@ function checkDomainRegistryCompiled(cwd) {
       problems.push(`domains/${entry.name}/compiled.json is missing`);
       continue;
     }
+    let onDisk;
     try {
-      JSON.parse(fs.readFileSync(compiled, 'utf8'));
+      onDisk = JSON.parse(fs.readFileSync(compiled, 'utf8'));
     } catch (err) {
       problems.push(`domains/${entry.name}/compiled.json is unreadable (${err.message})`);
+      continue;
     }
+    let fromYaml;
+    try {
+      fromYaml = JSON.parse(JSON.stringify(compileDomain(path.join(domainsDir, entry.name))));
+    } catch (err) {
+      problems.push(err.message);
+      continue;
+    }
+    if (!isDeepStrictEqual(onDisk, fromYaml)) problems.push(`domains/${entry.name}/compiled.json is stale — run npm run build:domains`);
   }
   if (problems.length > 0) {
-    return { passed: false, message: `${problems.join('; ')} — run npm run build:domains` };
+    return { passed: false, message: problems.join('; ') };
   }
-  return { passed: true, message: `${checked} domain registr${checked === 1 ? 'y' : 'ies'} compiled and readable` };
+  return { passed: true, message: `${checked} domain registr${checked === 1 ? 'y' : 'ies'} compiled, readable and in step with their YAML` };
 }
 
 registerCheck({
   id: 'domain-registry-compiled',
-  description: "every domain's compiled.json (the YAML-free form the Work lifecycle reads) exists and parses",
+  description: "every domain's compiled.json (the form the Work lifecycle reads) exists, parses and matches its registry and workflow YAML",
   check: (cwd) => checkDomainRegistryCompiled(cwd),
 });
 

@@ -4,13 +4,15 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
-import { compileAllDomains } from '../../scripts/build-domain-registry.mjs';
+import os from 'node:os';
+import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
+import { compileAllDomains, compileDomain } from '../../scripts/build-domain-registry.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
-// src/state/domain-registry.mjs reads domains/<d>/compiled.json (no YAML parser, so it loads in a
-// plain unpacked copy with no node_modules). The YAML is the source of truth: when it changes,
-// `npm run build:domains` regenerates the compiled file.
+// src/state/domain-registry.mjs reads domains/<d>/compiled.json at import time, so a YAML typo cannot
+// break every verb. The YAML is the source of truth: when it changes, `npm run build:domains`
+// regenerates the compiled file.
 test('every domain compiled.json matches its registry.yaml and workflows/*.yaml', () => {
   const compiled = compileAllDomains();
   assert.ok(Object.keys(compiled).length > 0, 'at least one domain must compile');
@@ -37,4 +39,66 @@ test('the domain registry loads with no yaml package resolvable', () => {
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }
+});
+
+// The doctor check compiles from the YAML with the build's own function, so a stale or unparsable
+// source is named per domain.
+const compiledCheck = DOCTOR_CHECKS.find((check) => check.id === 'domain-registry-compiled').check;
+
+function makeDomainProject(t) {
+  const project = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-domain-compiled-'));
+  t.after(() => fs.rmSync(project, { recursive: true, force: true }));
+  const write = (rel, text) => {
+    fs.mkdirSync(path.dirname(path.join(project, rel)), { recursive: true });
+    fs.writeFileSync(path.join(project, rel), text);
+  };
+  write('domains/demo/registry.yaml', 'defaultWorkflow: main\n');
+  write('domains/demo/workflows/main.yaml', 'id: demo/main\nsteps:\n  - id: first\n    phase: execute\n');
+  const compile = () => write('domains/demo/compiled.json', `${JSON.stringify(compileDomain(path.join(project, 'domains', 'demo')), null, 2)}\n`);
+  return { project, write, compile };
+}
+
+test('the doctor check passes for a domain whose compiled.json matches its YAML', async (t) => {
+  const { project, compile } = makeDomainProject(t);
+  compile();
+  const result = await compiledCheck(project);
+  assert.equal(result.passed, true, result.message);
+});
+
+test('the doctor check names a compiled.json that is stale against its YAML', async (t) => {
+  const { project, write, compile } = makeDomainProject(t);
+  compile();
+  write('domains/demo/workflows/main.yaml', 'id: demo/main\nsteps:\n  - id: first\n    phase: execute\n  - id: second\n    phase: verify\n');
+  const result = await compiledCheck(project);
+  assert.equal(result.passed, false);
+  assert.match(result.message, /domains\/demo\/compiled\.json is stale — run npm run build:domains/);
+});
+
+test('the doctor check names a domain workflow that cannot be parsed, with line and column', async (t) => {
+  const { project, write, compile } = makeDomainProject(t);
+  compile();
+  write('domains/demo/workflows/main.yaml', 'id: demo/main\nsteps:\n  - id: first\n   phase: [\n');
+  const result = await compiledCheck(project);
+  assert.equal(result.passed, false);
+  assert.match(result.message, /domains\/demo\/workflows\/main\.yaml: cannot be parsed: .* \(line \d+, column \d+\)/);
+});
+
+test('the doctor check still names a missing or unreadable compiled.json', async (t) => {
+  const { project, write, compile } = makeDomainProject(t);
+  const missing = await compiledCheck(project);
+  assert.match(missing.message, /domains\/demo\/compiled\.json is missing/);
+  compile();
+  write('domains/demo/compiled.json', '{not json');
+  assert.match((await compiledCheck(project)).message, /domains\/demo\/compiled\.json is unreadable/);
+});
+
+test('fgos doctor lists every check when a domain workflow cannot be parsed', (t) => {
+  const { project, write, compile } = makeDomainProject(t);
+  compile();
+  write('domains/demo/workflows/main.yaml', 'id: demo/main\nsteps: [\n');
+  const run = spawnSync(process.execPath, [path.join(root, 'bin', 'fgos.mjs'), 'doctor', '--json'], { cwd: project, encoding: 'utf8', env: { ...process.env, FGOS_DISABLE_OPPORTUNISTIC_CHECKS: '1' } });
+  assert.equal(run.status, 0, run.stderr);
+  const checks = JSON.parse(run.stdout).data.checks;
+  assert.deepEqual(checks.map((c) => c.id), DOCTOR_CHECKS.map((c) => c.id));
+  assert.match(checks.find((c) => c.id === 'domain-registry-compiled').message, /domains\/demo\/workflows\/main\.yaml: cannot be parsed/);
 });
