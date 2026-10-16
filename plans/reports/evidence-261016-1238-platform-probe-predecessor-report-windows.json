@@ -1,0 +1,808 @@
+{
+  "arch": "x86_64",
+  "durationMs": 171433.8,
+  "git": "git version 2.56.0.windows.2",
+  "os": "windows",
+  "osVersion": "Microsoft Windows [Version 10.0.26100.33438]",
+  "probe": "fgos-platform-probe",
+  "startedUnix": 1792128833,
+  "summary": {
+    "fail": 0,
+    "pass": 12,
+    "skip": 1
+  },
+  "tempDirFilesystem": "NTFS",
+  "tests": [
+    {
+      "data": {
+        "heldWhileHolderAlive": true,
+        "releaseMsAfterTerminate": 0.1
+      },
+      "durationMs": 8.2,
+      "expect": "LockFileEx lock is visible while held and is released when the holder is hard-terminated (TerminateProcess)",
+      "name": "lockfileex-released-on-terminate",
+      "note": "lock visible while held, released on TerminateProcess",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "heldWhileAlive": true,
+        "holderExitMsAfterParentTerminated": 2.8,
+        "lockFreeMsAfterParentTerminated": 2.9
+      },
+      "durationMs": 15.1,
+      "expect": "a holder that waits on its parent's handle exits when the parent is terminated, and its lock is then free",
+      "name": "holder-exits-when-parent-dies",
+      "note": "holder exited with its parent and released the lock",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "childAliveAfterParentTerminated": true,
+        "heldBeforeKill": true,
+        "lockFreeAfterChildKilled": true,
+        "lockFreeMsAfterParentDied": 0.1,
+        "lockStillHeldAfterParentDied": false,
+        "semantics": "lock is owned by the locking process; an inherited handle does not keep it"
+      },
+      "durationMs": 16.5,
+      "expect": "documents borrow semantics: design assumes a handle inherited by a child does NOT keep the lock after the locking process dies (so a job-scoped holder process is needed)",
+      "name": "lockfileex-inherited-handle-after-parent-death",
+      "note": "confirms: lock dies with the locking process even if a child holds an inherited handle",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "allAliveBeforeOwnerDeath": true,
+        "allDeadMsAfterOwnerDeath": 3.6,
+        "breakawayAttempt": "denied os_error=Some(5)",
+        "processesInJob": 5,
+        "survivors": []
+      },
+      "durationMs": 32.1,
+      "expect": "closing the job (owner dies) kills child, grandchild and a DETACHED_PROCESS child; CREATE_BREAKAWAY_FROM_JOB is denied",
+      "name": "job-kill-on-close-whole-tree",
+      "note": "job close killed child, grandchild and the detached child; breakaway denied",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "activeProcessesBefore": 5,
+        "activeZeroMsAfterTerminateJob": 2.1,
+        "breakawayAttempt": "denied os_error=Some(5)",
+        "expectedActive": 5
+      },
+      "durationMs": 328.0,
+      "expect": "QueryInformationJobObject ActiveProcesses equals the tree size and reaches 0 after the job is terminated",
+      "name": "job-active-process-count",
+      "note": "ActiveProcesses matched the tree and reached 0",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "ancestorChain": [
+          8216,
+          3176,
+          6196,
+          7996,
+          5388,
+          6328,
+          8404,
+          1064,
+          940,
+          4232,
+          5196,
+          2620,
+          984,
+          868,
+          756
+        ],
+        "leafPid": 7360,
+        "probePid": 6196,
+        "processesInSnapshot": 147,
+        "snapshotMs": 2.5
+      },
+      "durationMs": 21.6,
+      "expect": "a Toolhelp snapshot yields the parent chain from a grandchild up to the probe, fast enough for a per-call ancestry check",
+      "name": "toolhelp-ancestry",
+      "note": "ancestry chain from grandchild reaches the probe",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "allWatchedProcessesDeadMs": 0.2,
+        "autoGcObservedRunning": false,
+        "autoGcPid": null,
+        "firstLockFreeObservedMs": 0.2,
+        "gitPid": 8392,
+        "holderKillMs": 3.6,
+        "holderMechanism": "job-ok",
+        "holderPid": 8256,
+        "hookBackgroundPid": 6324,
+        "hookForegroundPid": 1264,
+        "lockFreeAfterObserve": true,
+        "lockFreeWhileGitOrChildAliveViolations": 0,
+        "lockHeldBeforeKill": true,
+        "lockReleasedMsAfterOrphansKilled": null,
+        "looseObjectsInDir17": 4,
+        "mode": "block",
+        "orphanPids": [],
+        "orphansSurvivedHolderDeath": false,
+        "samples": 1
+      },
+      "durationMs": 15082.2,
+      "expect": "kill the holder while git is blocked in a hook: lock is never observed free while git or its hook children are alive (windows: they all die with the job; unix: lock stays held through the inherited fd)",
+      "name": "git-borrow-blocking-hook",
+      "note": "lock never free while git or its children were alive",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "allWatchedProcessesDeadMs": 0.2,
+        "autoGcObservedRunning": false,
+        "autoGcPid": null,
+        "firstLockFreeObservedMs": 0.2,
+        "gitPid": 7300,
+        "holderKillMs": 1.4,
+        "holderMechanism": "job-ok",
+        "holderPid": 6552,
+        "hookBackgroundPid": 3360,
+        "hookForegroundPid": null,
+        "lockFreeAfterObserve": true,
+        "lockFreeWhileGitOrChildAliveViolations": 0,
+        "lockHeldBeforeKill": true,
+        "lockReleasedMsAfterOrphansKilled": null,
+        "looseObjectsInDir17": 4,
+        "mode": "noblock",
+        "orphanPids": [],
+        "orphansSurvivedHolderDeath": false,
+        "samples": 1
+      },
+      "durationMs": 13273.2,
+      "expect": "same invariant with gc.auto=1 and loose objects, killing the holder as soon as git returns while a detached gc and a background hook child may still run",
+      "name": "git-borrow-auto-gc",
+      "note": "lock never free while git or its children were alive",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "contenderTerminatedDomain": 50,
+        "domainKind": "job",
+        "domainStillOpenWhenChecked": 50,
+        "drainMs": 2000,
+        "extraWaitMs": {
+          "max": 2026.6,
+          "p50": 2006.8,
+          "p95": 2008.8
+        },
+        "heldReturned": 0,
+        "jobOwner": "supervisor (probe holds the handle)",
+        "lockWaitMsFromContenderStart": {
+          "max": 32.3,
+          "p50": 21.6,
+          "p95": 23.3
+        },
+        "repeats": 50,
+        "violationEvents": [],
+        "violationsProceededWithLiveProcesses": 0
+      },
+      "durationMs": 121784.1,
+      "expect": "50 repeats: a contender that applies the predecessor rule never proceeds while git or its hook children are alive (0 violations); extra wait is small",
+      "name": "git-borrow-blocking-hook-predecessor-check",
+      "note": "0 violations: contender proceeded only after the predecessor domain was empty",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "contenderTerminatedDomain": 0,
+        "domainKind": "job",
+        "domainStillOpenWhenChecked": 4,
+        "drainMs": 2000,
+        "extraWaitMs": {
+          "max": 6.1,
+          "p50": 2.2,
+          "p95": 5.5
+        },
+        "heldReturned": 0,
+        "jobOwner": "holder (its death closes the job)",
+        "lockWaitMsFromContenderStart": {
+          "max": 25.6,
+          "p50": 24.1,
+          "p95": 25.1
+        },
+        "repeats": 50,
+        "violationEvents": [
+          {
+            "contenderTerminated": false,
+            "domainOpenedWhenChecked": false,
+            "extraWaitMs": 2.7,
+            "lockWaitMs": 23.5,
+            "members": [
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 9104,
+                "role": "git"
+              },
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 4708,
+                "role": "hook-foreground"
+              },
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 5960,
+                "role": "hook-background"
+              }
+            ],
+            "msFromHolderKillToReturn": 6.0,
+            "repeat": 1,
+            "stateAtDecision": [
+              {
+                "aliveAtDecision": true,
+                "deadMsAfterDecision": 2.6,
+                "pid": 9104,
+                "stateAtDecision": "running (signaled=false, exitcode=0)"
+              },
+              {
+                "aliveAtDecision": true,
+                "deadMsAfterDecision": 0.0,
+                "pid": 4708,
+                "stateAtDecision": "unopenable (gone or reused)"
+              },
+              {
+                "aliveAtDecision": true,
+                "deadMsAfterDecision": 0.0,
+                "pid": 5960,
+                "stateAtDecision": "unopenable (gone or reused)"
+              }
+            ]
+          },
+          {
+            "contenderTerminated": false,
+            "domainOpenedWhenChecked": false,
+            "extraWaitMs": 2.2,
+            "lockWaitMs": 24.6,
+            "members": [
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 9108,
+                "role": "git"
+              },
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 4704,
+                "role": "hook-foreground"
+              },
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 2616,
+                "role": "hook-background"
+              }
+            ],
+            "msFromHolderKillToReturn": 6.5,
+            "repeat": 4,
+            "stateAtDecision": [
+              {
+                "aliveAtDecision": false,
+                "deadMsAfterDecision": null,
+                "pid": 9108,
+                "stateAtDecision": "unopenable (gone or reused)"
+              },
+              {
+                "aliveAtDecision": true,
+                "deadMsAfterDecision": 2.1,
+                "pid": 4704,
+                "stateAtDecision": "running (signaled=false, exitcode=0)"
+              },
+              {
+                "aliveAtDecision": false,
+                "deadMsAfterDecision": null,
+                "pid": 2616,
+                "stateAtDecision": "unopenable (gone or reused)"
+              }
+            ]
+          },
+          {
+            "contenderTerminated": false,
+            "domainOpenedWhenChecked": false,
+            "extraWaitMs": 5.2,
+            "lockWaitMs": 21.1,
+            "members": [
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 9132,
+                "role": "git"
+              },
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 7292,
+                "role": "hook-foreground"
+              },
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 9168,
+                "role": "hook-background"
+              }
+            ],
+            "msFromHolderKillToReturn": 5.9,
+            "repeat": 6,
+            "stateAtDecision": [
+              {
+                "aliveAtDecision": true,
+                "deadMsAfterDecision": 4.8,
+                "pid": 9132,
+                "stateAtDecision": "running (signaled=false, exitcode=0)"
+              },
+              {
+                "aliveAtDecision": true,
+                "deadMsAfterDecision": 0.0,
+                "pid": 7292,
+                "stateAtDecision": "unopenable (gone or reused)"
+              },
+              {
+                "aliveAtDecision": true,
+                "deadMsAfterDecision": 0.0,
+                "pid": 9168,
+                "stateAtDecision": "unopenable (gone or reused)"
+              }
+            ]
+          },
+          {
+            "contenderTerminated": false,
+            "domainOpenedWhenChecked": true,
+            "extraWaitMs": 5.4,
+            "lockWaitMs": 21.1,
+            "members": [
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 8820,
+                "role": "git"
+              },
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 2124,
+                "role": "hook-foreground"
+              },
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 5648,
+                "role": "hook-background"
+              }
+            ],
+            "msFromHolderKillToReturn": 6.3,
+            "repeat": 8,
+            "stateAtDecision": [
+              {
+                "aliveAtDecision": true,
+                "deadMsAfterDecision": 2.1,
+                "pid": 8820,
+                "stateAtDecision": "running (signaled=false, exitcode=0)"
+              },
+              {
+                "aliveAtDecision": false,
+                "deadMsAfterDecision": null,
+                "pid": 2124,
+                "stateAtDecision": "unopenable (gone or reused)"
+              },
+              {
+                "aliveAtDecision": false,
+                "deadMsAfterDecision": null,
+                "pid": 5648,
+                "stateAtDecision": "unopenable (gone or reused)"
+              }
+            ]
+          },
+          {
+            "contenderTerminated": false,
+            "domainOpenedWhenChecked": false,
+            "extraWaitMs": 2.2,
+            "lockWaitMs": 24.5,
+            "members": [
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 1632,
+                "role": "git"
+              },
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 2804,
+                "role": "hook-foreground"
+              },
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 6096,
+                "role": "hook-background"
+              }
+            ],
+            "msFromHolderKillToReturn": 6.4,
+            "repeat": 9,
+            "stateAtDecision": [
+              {
+                "aliveAtDecision": false,
+                "deadMsAfterDecision": null,
+                "pid": 1632,
+                "stateAtDecision": "unopenable (gone or reused)"
+              },
+              {
+                "aliveAtDecision": true,
+                "deadMsAfterDecision": 2.1,
+                "pid": 2804,
+                "stateAtDecision": "running (signaled=false, exitcode=0)"
+              },
+              {
+                "aliveAtDecision": true,
+                "deadMsAfterDecision": 0.0,
+                "pid": 6096,
+                "stateAtDecision": "unopenable (gone or reused)"
+              }
+            ]
+          },
+          {
+            "contenderTerminated": false,
+            "domainOpenedWhenChecked": false,
+            "extraWaitMs": 5.6,
+            "lockWaitMs": 21.0,
+            "members": [
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 8252,
+                "role": "git"
+              },
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 2500,
+                "role": "hook-foreground"
+              },
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 8352,
+                "role": "hook-background"
+              }
+            ],
+            "msFromHolderKillToReturn": 6.4,
+            "repeat": 11,
+            "stateAtDecision": [
+              {
+                "aliveAtDecision": true,
+                "deadMsAfterDecision": 5.1,
+                "pid": 8252,
+                "stateAtDecision": "running (signaled=false, exitcode=0)"
+              },
+              {
+                "aliveAtDecision": true,
+                "deadMsAfterDecision": 0.0,
+                "pid": 2500,
+                "stateAtDecision": "unopenable (gone or reused)"
+              },
+              {
+                "aliveAtDecision": true,
+                "deadMsAfterDecision": 0.0,
+                "pid": 8352,
+                "stateAtDecision": "unopenable (gone or reused)"
+              }
+            ]
+          },
+          {
+            "contenderTerminated": false,
+            "domainOpenedWhenChecked": false,
+            "extraWaitMs": 6.1,
+            "lockWaitMs": 20.7,
+            "members": [
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 4024,
+                "role": "git"
+              },
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 9104,
+                "role": "hook-foreground"
+              },
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 1736,
+                "role": "hook-background"
+              }
+            ],
+            "msFromHolderKillToReturn": 6.9,
+            "repeat": 12,
+            "stateAtDecision": [
+              {
+                "aliveAtDecision": true,
+                "deadMsAfterDecision": 3.0,
+                "pid": 4024,
+                "stateAtDecision": "running (signaled=false, exitcode=0)"
+              },
+              {
+                "aliveAtDecision": true,
+                "deadMsAfterDecision": 2.5,
+                "pid": 9104,
+                "stateAtDecision": "running (signaled=false, exitcode=0)"
+              },
+              {
+                "aliveAtDecision": true,
+                "deadMsAfterDecision": 0.0,
+                "pid": 1736,
+                "stateAtDecision": "unopenable (gone or reused)"
+              }
+            ]
+          },
+          {
+            "contenderTerminated": false,
+            "domainOpenedWhenChecked": false,
+            "extraWaitMs": 5.5,
+            "lockWaitMs": 21.1,
+            "members": [
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 2132,
+                "role": "git"
+              },
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 7116,
+                "role": "hook-foreground"
+              },
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 2236,
+                "role": "hook-background"
+              }
+            ],
+            "msFromHolderKillToReturn": 6.5,
+            "repeat": 14,
+            "stateAtDecision": [
+              {
+                "aliveAtDecision": true,
+                "deadMsAfterDecision": 5.4,
+                "pid": 2132,
+                "stateAtDecision": "running (signaled=false, exitcode=0)"
+              },
+              {
+                "aliveAtDecision": true,
+                "deadMsAfterDecision": 0.0,
+                "pid": 7116,
+                "stateAtDecision": "unopenable (gone or reused)"
+              },
+              {
+                "aliveAtDecision": true,
+                "deadMsAfterDecision": 0.0,
+                "pid": 2236,
+                "stateAtDecision": "unopenable (gone or reused)"
+              }
+            ]
+          },
+          {
+            "contenderTerminated": false,
+            "domainOpenedWhenChecked": false,
+            "extraWaitMs": 3.5,
+            "lockWaitMs": 21.1,
+            "members": [
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 8520,
+                "role": "git"
+              },
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 8676,
+                "role": "hook-foreground"
+              },
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 6872,
+                "role": "hook-background"
+              }
+            ],
+            "msFromHolderKillToReturn": 4.3,
+            "repeat": 15,
+            "stateAtDecision": [
+              {
+                "aliveAtDecision": true,
+                "deadMsAfterDecision": 3.1,
+                "pid": 8520,
+                "stateAtDecision": "running (signaled=false, exitcode=0)"
+              },
+              {
+                "aliveAtDecision": true,
+                "deadMsAfterDecision": 0.0,
+                "pid": 8676,
+                "stateAtDecision": "unopenable (gone or reused)"
+              },
+              {
+                "aliveAtDecision": true,
+                "deadMsAfterDecision": 0.0,
+                "pid": 6872,
+                "stateAtDecision": "unopenable (gone or reused)"
+              }
+            ]
+          },
+          {
+            "contenderTerminated": false,
+            "domainOpenedWhenChecked": false,
+            "extraWaitMs": 3.1,
+            "lockWaitMs": 21.2,
+            "members": [
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 9208,
+                "role": "git"
+              },
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 832,
+                "role": "hook-foreground"
+              },
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 2160,
+                "role": "hook-background"
+              }
+            ],
+            "msFromHolderKillToReturn": 3.9,
+            "repeat": 17,
+            "stateAtDecision": [
+              {
+                "aliveAtDecision": true,
+                "deadMsAfterDecision": 2.8,
+                "pid": 9208,
+                "stateAtDecision": "running (signaled=false, exitcode=0)"
+              },
+              {
+                "aliveAtDecision": true,
+                "deadMsAfterDecision": 0.0,
+                "pid": 832,
+                "stateAtDecision": "unopenable (gone or reused)"
+              },
+              {
+                "aliveAtDecision": true,
+                "deadMsAfterDecision": 0.0,
+                "pid": 2160,
+                "stateAtDecision": "unopenable (gone or reused)"
+              }
+            ]
+          },
+          {
+            "contenderTerminated": false,
+            "domainOpenedWhenChecked": false,
+            "extraWaitMs": 5.2,
+            "lockWaitMs": 21.2,
+            "members": [
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 6052,
+                "role": "git"
+              },
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 1440,
+                "role": "hook-foreground"
+              },
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 8,
+                "role": "hook-background"
+              }
+            ],
+            "msFromHolderKillToReturn": 6.2,
+            "repeat": 19,
+            "stateAtDecision": [
+              {
+                "aliveAtDecision": true,
+                "deadMsAfterDecision": 2.3,
+                "pid": 6052,
+                "stateAtDecision": "running (signaled=false, exitcode=0)"
+              },
+              {
+                "aliveAtDecision": true,
+                "deadMsAfterDecision": 2.6,
+                "pid": 1440,
+                "stateAtDecision": "running (signaled=false, exitcode=0)"
+              },
+              {
+                "aliveAtDecision": true,
+                "deadMsAfterDecision": 0.0,
+                "pid": 8,
+                "stateAtDecision": "unopenable (gone or reused)"
+              }
+            ]
+          },
+          {
+            "contenderTerminated": false,
+            "domainOpenedWhenChecked": false,
+            "extraWaitMs": 2.8,
+            "lockWaitMs": 24.5,
+            "members": [
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 1300,
+                "role": "git"
+              },
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 7196,
+                "role": "hook-foreground"
+              },
+              {
+                "inSupervisorJobBeforeKill": null,
+                "pid": 3448,
+                "role": "hook-background"
+              }
+            ],
+            "msFromHolderKillToReturn": 7.0,
+            "repeat": 20,
+            "stateAtDecision": [
+              {
+                "aliveAtDecision": false,
+                "deadMsAfterDecision": null,
+                "pid": 1300,
+                "stateAtDecision": "exited code=0"
+              },
+              {
+                "aliveAtDecision": true,
+                "deadMsAfterDecision": 2.6,
+                "pid": 7196,
+                "stateAtDecision": "running (signaled=false, exitcode=0)"
+              },
+              {
+                "aliveAtDecision": false,
+                "deadMsAfterDecision": null,
+                "pid": 3448,
+                "stateAtDecision": "unopenable (gone or reused)"
+              }
+            ]
+          }
+        ],
+        "violationsProceededWithLiveProcesses": 31
+      },
+      "durationMs": 20483.6,
+      "expect": "documents the hazard: when only the holder owns the job, its name can vanish (open fails = looks empty) while members are still terminating; informational, never fails",
+      "name": "git-borrow-blocking-hook-predecessor-check-holder-owned",
+      "note": "holder-owned job: 31/50 repeats proceeded while members were still dying (job name already gone in 46 of them)",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "domainKind": "job",
+        "extraWaitMs": {
+          "max": 0.1,
+          "p50": 0.1,
+          "p95": 0.1
+        },
+        "repeats": 20,
+        "unexpectedOutcomes": 0
+      },
+      "durationMs": 17.6,
+      "expect": "a record pointing to an already-destroyed domain lets the contender proceed immediately",
+      "name": "predecessor-record-stale",
+      "note": "stale record: contender proceeded immediately",
+      "status": "pass"
+    },
+    {
+      "data": {
+        "aliveAtProceed": [],
+        "contenderTerminatedDomain": true,
+        "domainKind": "job",
+        "drainMs": 300,
+        "extraWaitMs": 302.4,
+        "heldReason": null,
+        "membersDeadAfterwards": true,
+        "proceeded": true
+      },
+      "durationMs": 305.4,
+      "expect": "members that do not die within the drain window are terminated by the contender, which then proceeds with nothing alive (or returns held); it never proceeds with live members",
+      "name": "predecessor-drain-timeout",
+      "note": "drain expired, contender terminated the members and proceeded with nothing alive",
+      "status": "pass"
+    },
+    {
+      "data": null,
+      "durationMs": 12.2,
+      "expect": "informational: whether the terminal-pane transport can exist on this OS",
+      "name": "herdr-on-path",
+      "note": "herdr is not on PATH",
+      "status": "skip"
+    }
+  ],
+  "version": "0.1.0"
+}
