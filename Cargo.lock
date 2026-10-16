@@ -97,6 +97,7 @@ version = "0.2.0"
 dependencies = [
  "fgos-convention",
  "fgos-distribution",
+ "fgos-holder-lock",
  "fgos-host-runtime",
  "fgos-observe",
  "fgos-run-result",
@@ -124,6 +125,7 @@ dependencies = [
 name = "fgos-distribution"
 version = "0.2.0"
 dependencies = [
+ "fgos-holder-lock",
  "fgos-host-runtime",
  "flate2",
  "serde",
@@ -138,6 +140,11 @@ dependencies = [
 [[package]]
 name = "fgos-holder-lock"
 version = "0.2.0"
+dependencies = [
+ "fgos-process",
+ "libc",
+ "serde_json",
+]
 
 [[package]]
 name = "fgos-host-runtime"

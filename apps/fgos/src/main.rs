@@ -108,6 +108,16 @@ fn resolve_target_root(cli_args: &[std::ffi::OsString]) -> std::path::PathBuf {
 
 fn main() {
     let args: Vec<std::ffi::OsString> = std::env::args_os().collect();
+
+    // `fgos internal ...`: host routes for the Node payload (lock-fd,
+    // state-root, quiesce-scan, lock-borrow-vectors). Dispatched before the
+    // route table, composition and any spawn, so no child of this process
+    // can inherit a descriptor handed to a route; not listed in
+    // command-routes.json or help.
+    if args.get(1).is_some_and(|a| a == "internal") {
+        std::process::exit(fgos_holder_lock::route::main(&args[2..]));
+    }
+
     let cli_args = if args.len() > 1 { &args[1..] } else { &[] };
 
     // R1: No host-global options are recognized in R1 -- the first positional

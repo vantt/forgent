@@ -179,23 +179,23 @@ fn proc_pids() -> Vec<ProcId> {
 /// on btrfs subvolumes and overlay mounts).
 fn holds_lock_on(pid: ProcId, dev: u64, ino: u64) -> io::Result<bool> {
     use std::os::unix::fs::MetadataExt;
-    let fdinfo_dir = PathBuf::from(format!("/proc/{}/fdinfo", pid.0));
-    for entry in fs::read_dir(&fdinfo_dir)? {
+    // One stat per descriptor finds the ones open on the file; only those
+    // have their fdinfo read for a lock line (a full read of every fdinfo
+    // costs several times more on a busy host).
+    let proc_dir = Path::new("/proc").join(pid.0.to_string());
+    for entry in fs::read_dir(proc_dir.join("fd"))? {
         let entry = entry?;
-        let fd_name = entry.file_name();
-        let info = match fs::read_to_string(entry.path()) {
+        match fs::metadata(entry.path()) {
+            Ok(meta) if meta.dev() == dev && meta.ino() == ino => {}
+            _ => continue,
+        }
+        let info = match fs::read_to_string(proc_dir.join("fdinfo").join(entry.file_name())) {
             Ok(info) => info,
             Err(err) if err.kind() == io::ErrorKind::NotFound => continue,
             Err(err) => return Err(err),
         };
-        if !fdinfo_lock_inodes(&info).any(|locked| locked == ino) {
-            continue;
-        }
-        let target = Path::new("/proc").join(pid.0.to_string()).join("fd").join(&fd_name);
-        if let Ok(meta) = fs::metadata(&target) {
-            if meta.dev() == dev && meta.ino() == ino {
-                return Ok(true);
-            }
+        if fdinfo_lock_inodes(&info).any(|locked| locked == ino) {
+            return Ok(true);
         }
     }
     Ok(false)
