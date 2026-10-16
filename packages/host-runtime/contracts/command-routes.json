@@ -126,7 +126,41 @@
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
     ],
-    "subcommands": true
+    "subcommands": true,
+    "subcommand_flags": {
+      "check": [
+        "all",
+        "dir",
+        "help",
+        "json",
+        "paths"
+      ],
+      "classify": [
+        "dir",
+        "help",
+        "json",
+        "path"
+      ],
+      "name": [
+        "at",
+        "dir",
+        "help",
+        "json",
+        "kind",
+        "slug",
+        "type"
+      ],
+      "path": [
+        "at",
+        "dir",
+        "help",
+        "json",
+        "kind",
+        "plan",
+        "slug",
+        "type"
+      ]
+    }
   },
   "decision": {
     "selector": "decision",
@@ -226,7 +260,61 @@
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
     ],
-    "subcommands": true
+    "subcommands": true,
+    "subcommand_flags": {
+      "list": [
+        "dir",
+        "help",
+        "json",
+        "kind",
+        "layer",
+        "since"
+      ],
+      "migrate": [
+        "dir",
+        "help",
+        "json"
+      ],
+      "ping": [
+        "dir",
+        "help",
+        "json"
+      ],
+      "rank": [
+        "dir",
+        "help",
+        "json",
+        "limit"
+      ],
+      "record": [
+        "attempts",
+        "detail",
+        "detail-stdin",
+        "dir",
+        "disposition",
+        "doc-type",
+        "error-class",
+        "help",
+        "json",
+        "layer",
+        "producer",
+        "subject"
+      ],
+      "resolve": [
+        "by",
+        "dir",
+        "help",
+        "json",
+        "reason",
+        "subject"
+      ],
+      "show": [
+        "dir",
+        "help",
+        "json",
+        "subject"
+      ]
+    }
   },
   "gate-approve": {
     "selector": "gate-approve",
@@ -244,6 +332,11 @@
     "owner_path": "packages/work-state/rust",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
+    ],
+    "accepted_flags": [
+      "dir",
+      "help",
+      "json"
     ]
   },
   "gate-check": {
@@ -316,6 +409,13 @@
     "owner_path": "packages/session-identity/rust",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
+    ],
+    "accepted_flags": [
+      "dir",
+      "fgos-dir",
+      "help",
+      "json",
+      "pid"
     ]
   },
   "init": {
@@ -380,7 +480,91 @@
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
     ],
-    "subcommands": true
+    "subcommands": true,
+    "subcommand_flags": {
+      "case": [
+        "action",
+        "dir",
+        "harness",
+        "help",
+        "interventions",
+        "items",
+        "json",
+        "name",
+        "note",
+        "open",
+        "sessions",
+        "task",
+        "verdict"
+      ],
+      "coverage": [
+        "dir",
+        "help",
+        "json"
+      ],
+      "discussions": [
+        "by",
+        "dir",
+        "help",
+        "json",
+        "since",
+        "until"
+      ],
+      "entropy": [
+        "dir",
+        "help",
+        "json"
+      ],
+      "eval": [
+        "action",
+        "dir",
+        "harness",
+        "help",
+        "json",
+        "question"
+      ],
+      "faults": [
+        "class",
+        "dir",
+        "help",
+        "json",
+        "limit",
+        "since",
+        "until"
+      ],
+      "harness": [
+        "case",
+        "dir",
+        "help",
+        "json",
+        "since",
+        "until"
+      ],
+      "outcomes": [
+        "dir",
+        "help",
+        "json"
+      ],
+      "ping": [
+        "dir",
+        "help",
+        "json"
+      ],
+      "runs": [
+        "by",
+        "case",
+        "dir",
+        "help",
+        "json",
+        "since",
+        "until"
+      ],
+      "snapshot": [
+        "dir",
+        "help",
+        "json"
+      ]
+    }
   },
   "move": {
     "selector": "move",
@@ -695,6 +879,12 @@
     "owner_path": "packages/distribution/rust",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
+    ],
+    "accepted_flags": [
+      "dir",
+      "help",
+      "json",
+      "runtime-json"
     ]
   },
   "workflow": {
