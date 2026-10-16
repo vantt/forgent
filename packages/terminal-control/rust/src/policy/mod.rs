@@ -2,6 +2,8 @@
 //! deterministic function from measured geometry to a placement decision.
 //! It never changes ownership or lifecycle and never closes a pane.
 
+pub mod measured_split;
+
 use crate::driver::{Direction, Rect, TabGeometry};
 use serde::{Deserialize, Serialize};
 
@@ -46,6 +48,7 @@ pub struct PlaceInput {
 #[serde(rename_all = "camelCase")]
 pub enum Placement {
     Split {
+        #[serde(rename = "anchorKey")]
         anchor_key: String,
         direction: Direction,
         ratio: f64,
@@ -60,4 +63,40 @@ pub enum Placement {
 pub trait PlacementPolicy {
     fn name(&self) -> &'static str;
     fn place(&self, input: &PlaceInput) -> Placement;
+}
+
+/// Policy used when `terminal.layout.policy` is not set.
+pub const DEFAULT_POLICY: &str = "measured-split";
+
+/// Every policy name the registry resolves.
+pub const POLICY_NAMES: [&str; 1] = [measured_split::NAME];
+
+/// A configuration error: `terminal.layout.policy` names no known policy.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum PolicyError {
+    Unknown { name: String },
+}
+
+impl std::fmt::Display for PolicyError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            PolicyError::Unknown { name } => write!(
+                f,
+                "unknown terminal.layout.policy `{name}`; known: {}",
+                POLICY_NAMES.join(", ")
+            ),
+        }
+    }
+}
+
+impl std::error::Error for PolicyError {}
+
+/// Resolve a configured policy name; `None` selects the default.
+pub fn policy_by_name(name: Option<&str>) -> Result<Box<dyn PlacementPolicy>, PolicyError> {
+    match name.unwrap_or(DEFAULT_POLICY) {
+        measured_split::NAME => Ok(Box::new(measured_split::MeasuredSplit)),
+        other => Err(PolicyError::Unknown {
+            name: other.to_string(),
+        }),
+    }
 }

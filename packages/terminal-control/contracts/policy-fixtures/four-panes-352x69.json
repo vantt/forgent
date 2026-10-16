@@ -1,0 +1,27 @@
+{
+  "name": "four-panes-352x69",
+  "input": {
+    "groupKey": "g",
+    "tabs": [
+      {
+        "tabId": "t1",
+        "area": { "x": 0, "y": 0, "width": 352, "height": 69 },
+        "panes": [
+          { "paneId": "p1", "rect": { "x": 0, "y": 0, "width": 176, "height": 35 } },
+          { "paneId": "p3", "rect": { "x": 0, "y": 35, "width": 176, "height": 34 } },
+          { "paneId": "p2", "rect": { "x": 176, "y": 0, "width": 176, "height": 35 } },
+          { "paneId": "p4", "rect": { "x": 176, "y": 35, "width": 176, "height": 34 } }
+        ]
+      }
+    ],
+    "groupPanes": [
+      { "key": "k1", "tabId": "t1", "paneId": "p1", "rect": { "x": 0, "y": 0, "width": 176, "height": 35 } },
+      { "key": "k2", "tabId": "t1", "paneId": "p2", "rect": { "x": 176, "y": 0, "width": 176, "height": 35 } },
+      { "key": "k3", "tabId": "t1", "paneId": "p3", "rect": { "x": 0, "y": 35, "width": 176, "height": 34 } },
+      { "key": "k4", "tabId": "t1", "paneId": "p4", "rect": { "x": 176, "y": 35, "width": 176, "height": 34 } }
+    ],
+    "request": { "label": "w" },
+    "limits": { "minCols": 80, "minRows": 20, "maxPanesPerTab": 8 }
+  },
+  "expected": { "split": { "anchorKey": "k1", "direction": "right", "ratio": 0.5 } }
+}

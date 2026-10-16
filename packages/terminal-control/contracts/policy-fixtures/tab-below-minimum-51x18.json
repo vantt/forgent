@@ -1,0 +1,17 @@
+{
+  "name": "tab-below-minimum-51x18",
+  "input": {
+    "groupKey": "g",
+    "tabs": [
+      {
+        "tabId": "t1",
+        "area": { "x": 0, "y": 0, "width": 51, "height": 18 },
+        "panes": [{ "paneId": "p1", "rect": { "x": 0, "y": 0, "width": 51, "height": 18 } }]
+      }
+    ],
+    "groupPanes": [{ "key": "k1", "tabId": "t1", "paneId": "p1", "rect": { "x": 0, "y": 0, "width": 51, "height": 18 } }],
+    "request": { "label": "w" },
+    "limits": { "minCols": 80, "minRows": 20, "maxPanesPerTab": 8 }
+  },
+  "expected": { "newTab": {} }
+}
