@@ -1,0 +1,29 @@
+✔ rationale is rebuilt from bound facts without appending false old text (1.98324ms)
+✔ full unit digest decides equality, including heading section payload (0.242805ms)
+✔ last review comparison accepts digest prefix expansion and reports changes (0.348192ms)
+✔ link count distinguishes actual destination changes from spelling rebases (0.228587ms)
+✔ consistency flags changed ranges, anchors, equality and reviewed digest assertions (0.811854ms)
+✔ historical witness and no-target retain do not invent current source ranges (0.138882ms)
+✔ missing or mismatched binding evidence fails rather than inventing facts (0.298303ms)
+✔ legacy consistency checks contextual ranges, anchors and equality without mistaking header citations for bound spans (1.871919ms)
+✔ legacy audit understands unicode anchors, same-file successors and explicitly quoted prior rationales (0.280329ms)
+✔ unavailable historical text remains an explicit witness limit without invented line numbers (0.19848ms)
+✔ link alignment counts inserted provenance separately from repointed links (0.252913ms)
+✔ bound related citations include their actual lines and exact text (0.209299ms)
+✔ review entry snapshots use the committed row for both after and currentDecision (0.338106ms)
+✔ legacy citation audit distinguishes described links from the unit binding itself (0.154193ms)
+✔ residual sibling references are checked as residual facts rather than the primary unit anchor (0.122944ms)
+✔ a historical target is never presented as a current target or as no mapped copy (0.194188ms)
+✔ declared historical target identity disambiguates same-file source and successor references (0.139363ms)
+✔ overlapping labelled corrections are composed to current bound text before selection (0.194608ms)
+✔ carrier witnesses require substantive removed raw lines, excluding reviewer fence, brace, separator and link-only examples (0.406242ms)
+✔ carrier witness raw removals honor exact corrections and repeated-line multiplicity (0.128949ms)
+✔ registry accounting includes marker-only edits, all collections, metadata and deleted keys (0.328286ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 51.540589

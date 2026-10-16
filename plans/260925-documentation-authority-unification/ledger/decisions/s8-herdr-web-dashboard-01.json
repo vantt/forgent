@@ -812,13 +812,19 @@
       "targetAnchor": "edge-cases-settled",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792126341980-e0c35701@2026-10-16",
       "rationale": "Source: docs/specs/herdr-web-dashboard.md:246-246#edge-cases-settled (current lines); unit SHA256 e57fadfa3c6367e1098e0565fa3a61fe011bb34b4994eb241557beaa2c2ff879.\nTarget: docs/platform/herdr-web-dashboard/spec.md:267-267#edge-cases-settled (current lines); unit SHA256 e57fadfa3c6367e1098e0565fa3a61fe011bb34b4994eb241557beaa2c2ff879.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest e57fadfa3c6367e1098e0565fa3a61fe011bb34b4994eb241557beaa2c2ff879 at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 2; title \"Edge Cases Settled\" → \"Edge Cases Settled\".\nWhole direct section equal; depth 2 → 2; 0 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (equal-section): Complete direct source and target sections are byte-equal; no removed or added lines.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/herdr-web-dashboard.md#edge-cases-settled under docs/platform/herdr-web-dashboard/spec.md#edge-cases-settled; source context \"Spec: herdr Web Dashboard (browser surface for fgOS work)\", target context \"Spec: herdr Web Dashboard (browser surface for fgOS work)\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "mechanical: extractor digests recomputed (equal both sides), cited lines and anchor match the real spans, direct sections byte-equal (cmp), link count 0 and 0, depth and title and ancestry contexts equal the rationale, target digest unchanged since 62751458b (git show), anchor passes list-doc-anchors; I did not re-read the text beyond the rationale.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e57fadfa3c6367e1098e0565fa3a61fe011bb34b4994eb241557beaa2c2ff879",
       "targetAncestry": [
         "Spec: herdr Web Dashboard (browser surface for fgOS work)"
-      ]
+      ],
+      "reviewReportCommit": "203f4ef93867a60e6a37624b31ce14de426cafa8"
     },
     {
       "claimId": "claim_878e9f5faa08a2977408f49e04af0a7a",

@@ -1,0 +1,44 @@
+✔ independent facts reject a generator-consistent invented label and equal section claim (1.787118ms)
+✔ independent facts reject wrong removed and added line arrays (0.915975ms)
+✔ independent facts recompute link counts from the actual bound sections (0.215877ms)
+✔ independent facts accept actual delta and a real account label (0.74189ms)
+✔ independent equal-section facts reject replacement wording (0.243226ms)
+✔ independent facts verify a named live carrier by whole lines (0.613651ms)
+✔ independent reverse carrier audit rejects reviewer fence, brace, separator and link-placeholder witnesses (0.464245ms)
+✔ independent reverse carrier audit uses the raw link spelling inside substantive prose (0.248241ms)
+✔ reproduction rejects missing or repository output ["consistency"] (33.260986ms)
+✔ reproduction rejects missing or repository output ["consistency","--output","/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/unsafe.json"] (29.129776ms)
+✔ reproduction rejects missing or repository output ["consistency","--output","relative.json"] (23.907074ms)
+✔ direct audit rejects a symlink output before reading the corpus (28.192053ms)
+✔ direct audit rejects a dangling-symlink output before reading the corpus (27.47651ms)
+✔ direct audit rejects a hardlink output before reading the corpus (26.811382ms)
+✔ documented ownership commands work from a fresh reviewer output directory: step10-round5-reproduction.json (13940.101207ms)
+✔ documented ownership commands work from a fresh reviewer output directory: step10-sync4d-reproduction.json (13700.584386ms)
+✔ rationale is rebuilt from bound facts without appending false old text (2.418231ms)
+✔ full unit digest decides equality, including heading section payload (0.314344ms)
+✔ last review comparison accepts digest prefix expansion and reports changes (0.387058ms)
+✔ link count distinguishes actual destination changes from spelling rebases (0.288541ms)
+✔ consistency flags changed ranges, anchors, equality and reviewed digest assertions (0.936249ms)
+✔ historical witness and no-target retain do not invent current source ranges (0.18923ms)
+✔ missing or mismatched binding evidence fails rather than inventing facts (0.391137ms)
+✔ legacy consistency checks contextual ranges, anchors and equality without mistaking header citations for bound spans (2.412692ms)
+✔ legacy audit understands unicode anchors, same-file successors and explicitly quoted prior rationales (0.302025ms)
+✔ unavailable historical text remains an explicit witness limit without invented line numbers (0.274501ms)
+✔ link alignment counts inserted provenance separately from repointed links (0.407473ms)
+✔ bound related citations include their actual lines and exact text (0.242685ms)
+✔ review entry snapshots use the committed row for both after and currentDecision (0.43907ms)
+✔ legacy citation audit distinguishes described links from the unit binding itself (0.21708ms)
+✔ residual sibling references are checked as residual facts rather than the primary unit anchor (0.191675ms)
+✔ a historical target is never presented as a current target or as no mapped copy (0.256464ms)
+✔ declared historical target identity disambiguates same-file source and successor references (0.184429ms)
+✔ overlapping labelled corrections are composed to current bound text before selection (0.284443ms)
+✔ carrier witnesses require substantive removed raw lines, excluding reviewer fence, brace, separator and link-only examples (0.539059ms)
+✔ carrier witness raw removals honor exact corrections and repeated-line multiplicity (0.174113ms)
+ℹ tests 36
+ℹ suites 0
+ℹ pass 36
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 27868.449688

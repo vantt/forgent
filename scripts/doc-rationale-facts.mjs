@@ -30,7 +30,22 @@ export function auditRationaleFacts(rationale,{source,target,registeredLabels=[]
  const accounting=rationale.split('\n').filter(l=>l.startsWith('Section accounting (')).join('\n');
  const carriers=/Removed direct-section lines have distinct live carrier witnesses (.+?)\. (?:Added| Exact|Exact|$)/.exec(accounting);
  if(carriers){
-  const witnesses=[...carriers[1].matchAll(/(docs\/platform\/[^\s,#]+\.md)#([^\s,.]+)/g)].map(m=>carrierOf(m[1],m[2])).filter(Boolean);
+  const listed=[...carriers[1].matchAll(/(docs\/platform\/[^\s,#]+\.md)#([^\s,.]+)/g)].map(m=>({path:m[1],anchor:m[2],unit:carrierOf(m[1],m[2])}));
+  const witnesses=listed.map(w=>w.unit).filter(Boolean);
+  // Reverse rule: independently recover raw removed lines. Matching only the
+  // normalized <link>, a fence, separator or brace never authenticates a carrier.
+  const remaining=normalize(b).split('\n').filter(l=>l.trim());
+  const rawRemoved=revised.split('\n').filter(raw=>{
+   const key=normalize(raw),i=remaining.indexOf(key);
+   if(i>=0){remaining.splice(i,1);return false;}
+   const p=key.trim();
+   if(!p||p==='<heading>'||/^(?:`{3,}|~{3,})/.test(p)||/^[{}\[\]();,]+$/.test(p)||/^\|?[\s|:-]+\|?$/.test(p)||/^(?:[-*+]\s+)?<link>$/.test(p))return false;
+   return true;
+  });
+  for(const w of listed){
+   const unit=w.unit,distinct=unit&&![source,target].some(bound=>unit.path===bound.path&&unit.anchor===bound.anchor&&(unit.commit||null)===(bound.commit||null));
+   if(!distinct||!rawRemoved.some(line=>(payload(unit)||'').split('\n').includes(line)))findings.push({type:'carrier-without-substantive-removed-line',path:w.path,anchor:w.anchor});
+  }
   for(const line of removed)if(!witnesses.some(w=>!(w.path===source.path&&w.anchor===source.anchor&&(w.commit||null)===(source.commit||null))&&normalize(payload(w)).split('\n').includes(line)))findings.push({type:'removed-line-not-carried',line});
  }
 

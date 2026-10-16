@@ -259,3 +259,43 @@ export function classifySectionAccounting(delta, {labels=[],account='',kind='hea
   if(labels.length)return {kind:'existing-labelled-successor-correction',description:'Existing correction labels '+labels.join(', ')+' at immutable account '+account+'; '+description+exact};
   return {kind,description:description+exact};
 }
+
+// Witness membership uses raw source lines, independently of the normalized
+// delta printed for section comparison. Markup alone cannot name a carrier.
+export function removedCarrierWitnesses(source,target,corrections,candidates) {
+  const payload=u=>u?.level?u.sectionText:u?.text;
+  const normalize=t=>t.replace(/^(#{1,6}) .*$/m,'<heading>').replace(/\[([^\]]+)\]\(([^\s)]+)\)/g,'<link>');
+  let revised=payload(source);
+  for(const c of [...corrections].sort((a,b)=>b.before.length-a.before.length))if(c.before&&revised.includes(c.before))revised=revised.split(c.before).join(c.after);
+  const rest=normalize(payload(target)).split('\n').filter(l=>l.trim());
+  const removed=revised.split('\n').filter(line=>{
+    const key=normalize(line),i=rest.indexOf(key);
+    if(i>=0){rest.splice(i,1);return false;}
+    const plain=key.trim();
+    return plain&&!/^(?:`{3,}|~{3,})/.test(plain)&&!/^<heading>$/.test(plain)&&! /^[{}\[\]();,]+$/.test(plain)&&!/^\|?[\s|:-]+\|?$/.test(plain)&&! /^(?:[-*+]\s+)?<link>$/.test(plain);
+  });
+  return candidates.filter(w=>{
+    const self=[source,target].some(bound=>w.path===bound.path&&w.anchor===bound.anchor&&(w.commit||null)===(bound.commit||null));
+    const raw=payload(w)?.split('\n')||[];
+    return !self&&removed.some(line=>raw.includes(line));
+  });
+}
+
+// Complete author accounting for a package boundary, including marker-only
+// drops, document rows and registry metadata. This neither carries nor writes IDs.
+export function registryChangeAccounting(before,after) {
+  const collections=['units','identityGaps','retiredUnits','documents','retiredDocuments'];
+  const changes=[],equal=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+  const record=(collection,key,a,b)=>{
+    if(equal(a,b))return;
+    changes.push({collection,key,kind:a===undefined?'added':b===undefined?'removed':'changed',before:a??null,after:b??null,
+      changedFields:[...new Set([...Object.keys(a&&typeof a==='object'?a:{}),...Object.keys(b&&typeof b==='object'?b:{})])].filter(k=>!equal(a?.[k],b?.[k])).sort()});
+  };
+  for(const key of [...new Set([...Object.keys(before),...Object.keys(after)])].filter(k=>!collections.includes(k)).sort())record('metadata',key,before[key],after[key]);
+  for(const collection of collections){
+    const index=rows=>new Map((rows||[]).map(row=>[row.claimId||row.path,row]));
+    const left=index(before[collection]),right=index(after[collection]);
+    for(const key of [...new Set([...left.keys(),...right.keys()])].sort())record(collection,key,left.get(key),right.get(key));
+  }
+  return changes;
+}

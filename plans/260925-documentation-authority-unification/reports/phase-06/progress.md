@@ -1,3 +1,19 @@
+# Round-6 author corrections complete — package next
+
+Assignment `unit-run-1792130182385-eef9a749/producer/1`; input203f4ef93, reviews446b53d9d/content4d3634360/requestfe98a6455; L10-35/L10-36 accounted. All five Notes/Concerns read. Merge changes no docs source, no A31 re-carry due.
+
+**49 matching ok rows applied, notes verbatim. Five rationale witness lists regenerated,17 lists checked; zero binding changes; changed rows pending; second run stable.** Tests first for raw substantive witnesses and independent reverse rule. Both ownership manifests portable; documented wrappers pass from fresh supplied output dirs. **507/507 tool tests;12,895 rows/92 shards independent audit zero findings,70 historical witness limits.** Ownership/replay/candidate-status clean;A/B/H pass;A only9 accounted pairs/zero unaccounted;I bytes preserved/current links equal HEAD. Scoped FAST D zero fatal both priors together/each;E still open16 partial/one owner group/two gaps/313 reverse;five pending corrected rows separately enumerated outside fast source scope. [Report](step-10-report.md),[audit](step10-round6-final-audit.json),[commands](step10-round6-reproduction.json).
+
+**Complete registry accounting:**21 changes since f1f414b02, including the four omitted approved-unit marker drops;zero since latest requestfe98a6455. Registry unchanged this turn. **NEXT=PACKAGE:** one native sync; enumerate EVERY registry change since fe98a6455, plus those four outstanding accounting entries; one small bounded re-review of only this turn's changed rows/tools/reproduction and actual native transitions, then the existing global turn. No review packs/native sync this author turn;no new blocker;Phase6 open. Prior broad-suite environment/pre-existing limits remain disclosed;no blanket npm-test-green claim. Runner commits;no CLI/git/legacy/protected/baseline/runtime/workspace.fgos writes. MDView MCP unavailable.
+
+---
+
+# Round-6 author corrections in progress — package next
+
+Assignment unit-run-1792130182385-eef9a749/producer/1. Reading all five round-6 reviews and applying matching ok notes verbatim; L10-36 tests first for non-trivial carrier witnesses, portable reproduction and complete registry accounting. No native sync or review packs this author turn. Runner commits; no CLI, git writes, legacy/protected/runtime edits.
+
+---
+
 # Changed-only package at 4d3634360 complete — independent review next
 
 Assignment unit-run-1792127410542-c10a1e4e/producer/1. **One native sync 1355.558s /one compact persistence; known99,555→99,567, zero loss;4,486 files/91,386 units, active tuple equality;12 additions, zero gaps/retirements.** Inventory-only recovery 642.011s after2GiB I/O-limit failure; one carry/persistence, no re-sync. **9,210 bindings, zero drift/rebinds. D zero fatal both priors together/each. Independent checker12,895 rows/92 shards zero findings;70 historical witness limits explicit. Ownership/replay clean;500/500 tests pass.**

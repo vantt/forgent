@@ -28,3 +28,21 @@ test('independent facts verify a named live carrier by whole lines',()=>{
  assert.ok(audit(r,{carrierOf:()=>({...source,text:'lost body extra',sectionText:'## S\nlost body extra'})}).some(f=>f.type==='removed-line-not-carried'));
  assert.deepEqual(audit(r,{carrierOf:()=>({...source,path:'docs/platform/history.md',anchor:'retained'})}),[]);
 });
+
+test('independent reverse carrier audit rejects reviewer fence, brace, separator and link-placeholder witnesses',()=>{
+ const s={path:'docs/source.md',anchor:'s',text:'```js\nconst substance = true;\n}\n```\n|---|---|\n[Boundary](boundary.md)'},t={path:'docs/platform/spec.md',anchor:'t',text:'new body'};
+ const carriers={real:'```js\nconst substance = true;\n}\n```\n|---|---|\n[Boundary](boundary.md)',fences:'```js\n}\n```\n|---|---|',link:'[Other](other.md)',exactlink:'[Boundary](boundary.md)',substring:'prefix const substance = true; suffix'};
+ const rationale='Section accounting (split): Removed direct-section lines have distinct live carrier witnesses '+Object.keys(carriers).map(k=>'docs/platform/history.md#'+k).join(', ')+'. Added lines are explicit candidate declarations.';
+ const f=auditRationaleFacts(rationale,{source:s,target:t,carrierOf:(path,anchor)=>({path,anchor,text:carriers[anchor]})});
+ assert.deepEqual(f.filter(f=>f.type==='carrier-without-substantive-removed-line').map(f=>f.anchor),['fences','link','exactlink','substring']);
+ assert.equal(f.filter(f=>f.type==='removed-line-not-carried').length,0);
+ const missing=auditRationaleFacts('Section accounting (split): Removed direct-section lines have distinct live carrier witnesses docs/platform/history.md#missing. Added lines.',{source:s,target:t,carrierOf:()=>null});
+ assert.ok(missing.some(f=>f.type==='carrier-without-substantive-removed-line'&&f.anchor==='missing'));
+});
+test('independent reverse carrier audit uses the raw link spelling inside substantive prose',()=>{
+ const source={path:'docs/source.md',anchor:'s',text:'Read [Boundary](boundary.md) here.'},target={path:'docs/platform/spec.md',anchor:'t',text:'new body'};
+ const rationale='Section accounting (split): Removed direct-section lines have distinct live carrier witnesses docs/platform/history.md#link. Added lines.';
+ const result=spell=>auditRationaleFacts(rationale,{source,target,carrierOf:(path,anchor)=>({path,anchor,text:spell})});
+ assert.ok(result('Read [Other](other.md) here.').some(f=>f.type==='carrier-without-substantive-removed-line'));
+ assert.deepEqual(result(source.text),[]);
+});

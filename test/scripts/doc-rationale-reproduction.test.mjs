@@ -19,3 +19,18 @@ for(const kind of ['symlink','dangling-symlink','hardlink'])test('direct audit r
  assert.notEqual(r.status,0);assert.match(r.stderr,/external scratch|unsafe output/i);
  if(kind==='hardlink')assert.equal(fs.readFileSync(path.join(dir,'original'),'utf8'),'unchanged');
 });
+
+for(const [manifest,key] of [['step10-round5-reproduction.json','scripts'],['step10-sync4d-reproduction.json','readOnlyScripts']])test('documented ownership commands work from a fresh reviewer output directory: '+manifest,t=>{
+ const dir=fs.mkdtempSync('/tmp/fgos-work/reviewer-fresh-');t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));
+ const base='plans/260925-documentation-authority-unification/reports/phase-06/';
+ const scripts=JSON.parse(fs.readFileSync(base+manifest,'utf8'))[key];
+ for(const [name,source] of Object.entries(scripts))fs.writeFileSync(path.join(dir,name),source);
+ for(const name of ['ownership.mjs','audit-ownership.mjs','checks.mjs']){
+  const r=spawnSync('node',[path.join(dir,name),'--output-dir',dir],{encoding:'utf8',env:{...process.env,CLAUDE_CODE_SESSION_ID:undefined},timeout:120000,maxBuffer:5e6});
+  assert.equal(r.status,0,name+'\n'+r.stdout+'\n'+r.stderr);
+ }
+ const check=JSON.parse(fs.readFileSync(path.join(dir,manifest.replace('-reproduction.json','-checks.json')),'utf8'));
+ assert.equal(check.A.unaccountedPairs.length,0);
+ assert.ok(check.A.accountedPairs.some(r=>r.commit.startsWith('bd217ecf1')&&r.authority==='L10-35a'));
+ assert.equal(check.A.accountedPairs.filter(r=>r.commit.startsWith('bd217ecf1')).length,2);
+});

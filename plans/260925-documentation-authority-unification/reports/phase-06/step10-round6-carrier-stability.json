@@ -1,0 +1,256 @@
+{
+  "method": "L10-36: regenerate only carrier-list membership from authenticated raw source removals; retain all other rationale text verbatim; changed rows pending.",
+  "apply": false,
+  "checked": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_fb92651ea85a64c0b6e806926e51a4b2",
+      "beforeWitnesses": [
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md#literal-snapshot",
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md#unheaded-block-3"
+      ],
+      "afterWitnesses": [
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md#literal-snapshot",
+        "docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md#unheaded-block-3"
+      ]
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_af6831310fe9fcdaa7c8e69902e3c767",
+      "beforeWitnesses": [
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions",
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-14",
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-15",
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-16",
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-17"
+      ],
+      "afterWitnesses": [
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions",
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-14",
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-15",
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-16",
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-17"
+      ]
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_d5dd5fbdb3483914743a14791a5f02a8",
+      "beforeWitnesses": [
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions",
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-18",
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-19",
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-20",
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-21",
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-22"
+      ],
+      "afterWitnesses": [
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-class-definitions",
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-18",
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-19",
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-20",
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-21",
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-22"
+      ]
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_8066684d5e7c7159d6f58caeef26d8cc",
+      "beforeWitnesses": [
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-semantic-contract-stays-transport-neutral",
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#unheaded-block-26"
+      ],
+      "afterWitnesses": [
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-semantic-contract-stays-transport-neutral",
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#unheaded-block-26"
+      ]
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_9a5781f0086209a17330035ff0e58638",
+      "beforeWitnesses": [
+        "docs/platform/host-invocation-routing/verification/compatibility-harness.md#restored-registry-linker-procedure-and-its-input-output-formula",
+        "docs/platform/host-invocation-routing/verification/compatibility-harness.md#unheaded-block-10",
+        "docs/platform/host-invocation-routing/verification/compatibility-harness.md#unheaded-block-11",
+        "docs/platform/host-invocation-routing/verification/compatibility-harness.md#unheaded-block-12"
+      ],
+      "afterWitnesses": [
+        "docs/platform/host-invocation-routing/verification/compatibility-harness.md#restored-registry-linker-procedure-and-its-input-output-formula",
+        "docs/platform/host-invocation-routing/verification/compatibility-harness.md#unheaded-block-10",
+        "docs/platform/host-invocation-routing/verification/compatibility-harness.md#unheaded-block-11",
+        "docs/platform/host-invocation-routing/verification/compatibility-harness.md#unheaded-block-12"
+      ]
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_80fe1621540d25e5e4f6968bea7e0a0b",
+      "beforeWitnesses": [
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-contract-versioning",
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#unheaded-block-10"
+      ],
+      "afterWitnesses": [
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-contract-versioning",
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#unheaded-block-10"
+      ]
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_76dfcba31d147e73488ea3abeade7ef1",
+      "beforeWitnesses": [
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-contract-versioning",
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#unheaded-block-11",
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-lifecycle-state-chain-received-admitted-refused-selected-refused-granted-refused-dispatched-te",
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#unheaded-block-15"
+      ],
+      "afterWitnesses": [
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-contract-versioning",
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#unheaded-block-11",
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-lifecycle-state-chain-received-admitted-refused-selected-refused-granted-refused-dispatched-te",
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#unheaded-block-15"
+      ]
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_080c5cdacf820ed661ab372086ca7e41",
+      "beforeWitnesses": [
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-physical-placement-layout-tree",
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-10"
+      ],
+      "afterWitnesses": [
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-physical-placement-layout-tree",
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-10"
+      ]
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_7b3c9cdf89fe70d17f3f526bbdffa385",
+      "beforeWitnesses": [
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-both-adapters-delegate-a-complete-use-case",
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#unheaded-block-30"
+      ],
+      "afterWitnesses": [
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-both-adapters-delegate-a-complete-use-case",
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#unheaded-block-30"
+      ]
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_04f0605dc840e350f63e53d0e1e96843",
+      "beforeWitnesses": [
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-26"
+      ],
+      "afterWitnesses": [
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md#restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea",
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md#unheaded-block-26"
+      ]
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_c072318ec582affe5e0e6936961fadc4",
+      "beforeWitnesses": [
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-per-component-repeat-procedure",
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#unheaded-block-50",
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#unheaded-block-51"
+      ],
+      "afterWitnesses": [
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-per-component-repeat-procedure",
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#unheaded-block-50",
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#unheaded-block-51"
+      ]
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_e960a05c0b656d0dae2cffd3daee5a0d",
+      "beforeWitnesses": [
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-per-component-repeat-procedure",
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#unheaded-block-52",
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#unheaded-block-53"
+      ],
+      "afterWitnesses": [
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-per-component-repeat-procedure",
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#unheaded-block-52",
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#unheaded-block-53"
+      ]
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_ac2177776d1a367f2d8e81699b04fc63",
+      "beforeWitnesses": [
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rollback-bullets",
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#unheaded-block-57"
+      ],
+      "afterWitnesses": [
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#restored-rollback-bullets",
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md#unheaded-block-57"
+      ]
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "collection": "claims",
+      "claimId": "claim_552ef3d6e22bac10c24cc31e48463d50",
+      "beforeWitnesses": [
+        "docs/platform/runner/spec.md#historical-source-section-552ef3d6",
+        "docs/platform/runner/spec.md#unheaded-block-7"
+      ],
+      "afterWitnesses": [
+        "docs/platform/runner/spec.md#historical-source-section-552ef3d6",
+        "docs/platform/runner/spec.md#unheaded-block-7"
+      ]
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "collection": "claims",
+      "claimId": "claim_0686418ae7571d82eade8059c698709d",
+      "beforeWitnesses": [
+        "docs/platform/runner/spec.md#historical-source-section-0686418a",
+        "docs/platform/runner/spec.md#unheaded-block-9"
+      ],
+      "afterWitnesses": [
+        "docs/platform/runner/spec.md#historical-source-section-0686418a",
+        "docs/platform/runner/spec.md#unheaded-block-9"
+      ]
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "collection": "claims",
+      "claimId": "claim_099eb566c825967cf35f9397f2d7b947",
+      "beforeWitnesses": [
+        "docs/platform/runner/spec.md#historical-source-section-099eb566",
+        "docs/platform/runner/spec.md#unheaded-block-11"
+      ],
+      "afterWitnesses": [
+        "docs/platform/runner/spec.md#historical-source-section-099eb566",
+        "docs/platform/runner/spec.md#unheaded-block-11"
+      ]
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "collection": "claims",
+      "claimId": "claim_4efee765e5a47fc42f4d9cccc7a53191",
+      "beforeWitnesses": [
+        "docs/platform/runner/spec.md#historical-source-section-4efee765",
+        "docs/platform/runner/spec.md#unheaded-block-13"
+      ],
+      "afterWitnesses": [
+        "docs/platform/runner/spec.md#historical-source-section-4efee765",
+        "docs/platform/runner/spec.md#unheaded-block-13"
+      ]
+    }
+  ],
+  "changes": [],
+  "unresolved": [],
+  "ok": true
+}

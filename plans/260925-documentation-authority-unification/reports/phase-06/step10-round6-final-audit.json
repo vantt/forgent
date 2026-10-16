@@ -1,0 +1,590 @@
+{
+  "HEAD": "203f4ef93867a60e6a37624b31ce14de426cafa8",
+  "scopeViolations": [],
+  "protectedDrift": [],
+  "nativeRegistryUnchanged": true,
+  "mergeDocsDelta": [],
+  "reviewApplications": {
+    "applied": 49,
+    "rework-or-hold": 5,
+    "non-decision-evidence": 12
+  },
+  "allVerdictCounts": {
+    "ok": 75,
+    "rework": 6
+  },
+  "entryAccounting": {
+    "applied-note-verbatim": 49,
+    "changed-pending-rereview": 10,
+    "retained-evidence-ok": 10,
+    "retained-identity-only-ok": 12
+  },
+  "verbatimApplicationMismatches": [],
+  "rowsRegenerated": 5,
+  "carrierSentencesChecked": 17,
+  "carrierRegenerationStable": true,
+  "nativeBindingFieldDrift": [],
+  "changedDecisionRows": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-systemic-native-predecessors.json",
+      "claimId": "claim_08f9b4c140ce931a064c131c2bd4e014",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-systemic-native-predecessors.json",
+      "claimId": "claim_61244b0a84842a2771f7cdb493ebb699",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "claimId": "claim_bb161d438c5c39236401c04ce56ef08d",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "claimId": "claim_fb92651ea85a64c0b6e806926e51a4b2",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "claimId": "claim_ccfcc4bcb24e4f5a31aa634b44e95c7f",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "claimId": "claim_0261291ac389be7c598690a1c40ef56a",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "claimId": "claim_af6831310fe9fcdaa7c8e69902e3c767",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "claimId": "claim_d5dd5fbdb3483914743a14791a5f02a8",
+      "rationaleChanged": true,
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "claimId": "claim_8066684d5e7c7159d6f58caeef26d8cc",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "claimId": "claim_9a5781f0086209a17330035ff0e58638",
+      "rationaleChanged": true,
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "claimId": "claim_80fe1621540d25e5e4f6968bea7e0a0b",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "claimId": "claim_76dfcba31d147e73488ea3abeade7ef1",
+      "rationaleChanged": true,
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "claimId": "claim_080c5cdacf820ed661ab372086ca7e41",
+      "rationaleChanged": true,
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "claimId": "claim_7b3c9cdf89fe70d17f3f526bbdffa385",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "claimId": "claim_04f0605dc840e350f63e53d0e1e96843",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "claimId": "claim_b1e44493c254c54dc18efa2088b0018a",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "claimId": "claim_c072318ec582affe5e0e6936961fadc4",
+      "rationaleChanged": true,
+      "reviewStatus": "pending"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "claimId": "claim_e960a05c0b656d0dae2cffd3daee5a0d",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "claimId": "claim_ac2177776d1a367f2d8e81699b04fc63",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "claimId": "claim_5766225be2d76d6239e116a664aec7cf",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "claimId": "claim_088af18a5796ed72fe6d33ff2cc5d05c",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "claimId": "claim_163988c8973416bdd64781cc7c667f65",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "claimId": "claim_4eeb2f406288458e61bad21531966ab1",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-governance.json",
+      "claimId": "claim_66f7be3b79ca1fe458ce0416ba1adf89",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-mapped-conservation.json",
+      "claimId": "claim_53ebf4b541ff8f6a2c40e3b95304d6b7",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-mapped-conservation.json",
+      "claimId": "claim_2ae0cd4fc1cf487f7caa4d77d46e9682",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "claimId": "claim_239931ca8e26fd3b19bf970e30e2ae4b",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-08-component-authority-boundary-map.json",
+      "claimId": "claim_c1741ef08c45e88d276f75b668de7452",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "claimId": "claim_cd345b6c8a7da2451c2acf04ba8c5292",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "claimId": "claim_9a1cd05f74418890fbca8955aa76b378",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "claimId": "claim_2c080a72c195a28a1ca8efb0e1187f11",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "claimId": "claim_3770d5a0b897fbd8c1393a38c48c3333",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "claimId": "claim_96b54d15ac01f69e7df991151c2268be",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "claimId": "claim_1ef2bc00c79bc7a40787b62a4943f0df",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "claimId": "claim_7aacf43ab14386fce6c4a5a8a0519402",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "claimId": "claim_9168d8af609c58932a87918d4a49b8aa",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "claimId": "claim_78563a2491b11f7a0b412c5b900a7414",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "claimId": "claim_dc8b5bc2507201dd705fcd64deba8224",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "claimId": "claim_b532b9a9eb7f76d041c343e2d45bf859",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "claimId": "claim_e793bd095f4a872b0bc08757c827359f",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "claimId": "claim_7aede254166851de375089f4b0160ca6",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "claimId": "claim_39c40cef341e227d936ea768b12ba435",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "claimId": "claim_bed90dbb7de2a5782fafcdb4a3d6e0da",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "claimId": "claim_3f1a1bbd362edb4ff925ff6de3cbd823",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "claimId": "claim_06e68651628b7a731b974ec5c34c9743",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "claimId": "claim_1d1eb2ce98dcf1855678b2cf86c2ee67",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-decision-citation-drift-01.json",
+      "claimId": "claim_fefb1bf47fc375b9e83089dc6059326c",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json",
+      "claimId": "claim_7e17ce226062d06a53b940f64b9d5cdb",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+      "claimId": "claim_b2a51d5d39832d330879947bdbbcb227",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "claimId": "claim_552ef3d6e22bac10c24cc31e48463d50",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "claimId": "claim_224b5f54d28b453f1e3feaced0468399",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "claimId": "claim_0686418ae7571d82eade8059c698709d",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "claimId": "claim_099eb566c825967cf35f9397f2d7b947",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "claimId": "claim_4efee765e5a47fc42f4d9cccc7a53191",
+      "rationaleChanged": false,
+      "reviewStatus": "reviewed"
+    }
+  ],
+  "frozenRationales": 117,
+  "frozenRationaleDrift": [],
+  "independent": {
+    "ok": true,
+    "rowsScanned": 12895,
+    "shardsScanned": 92,
+    "structuredRows": 718,
+    "sectionClaims": 261,
+    "linkClaims": 719
+  },
+  "sourceWitnessLimits": 70,
+  "docTests": {
+    "tests": 507,
+    "pass": 507,
+    "fail": 0,
+    "skip": 0,
+    "cancel": 0,
+    "todo": 0
+  },
+  "portableReproduction": [
+    {
+      "outputDir": "/tmp/fgos-work/round6-fresh-round5",
+      "allPassed": true
+    },
+    {
+      "outputDir": "/tmp/fgos-work/round6-final-sync4d",
+      "allPassed": true
+    }
+  ],
+  "A": {
+    "historicalOffenders": [
+      "plans/260925-documentation-authority-unification/phase-06-transform-all-platform-areas-as-candidate-material.md",
+      "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md",
+      "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+      "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.json",
+      "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.md",
+      "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/open-questions.md",
+      "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-07-draft.md",
+      "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-08-draft.md"
+    ],
+    "historicalEqual": true,
+    "newWorkingViolations": [],
+    "accountedPairs": [
+      {
+        "commit": "bd217ecf12bc75929d63c2285a838254b1b825cd",
+        "path": "plans/260925-documentation-authority-unification/phase-06-transform-all-platform-areas-as-candidate-material.md",
+        "authority": "L10-35a"
+      },
+      {
+        "commit": "bd217ecf12bc75929d63c2285a838254b1b825cd",
+        "path": "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+        "authority": "L10-35a"
+      },
+      {
+        "commit": "db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd",
+        "path": "plans/260925-documentation-authority-unification/phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md",
+        "authority": "A21"
+      },
+      {
+        "commit": "db9fa7608ce5faeaadaea3d7ba0bbb98c1a8fedd",
+        "path": "plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md",
+        "authority": "A21"
+      },
+      {
+        "commit": "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+        "path": "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.json",
+        "authority": "A3"
+      },
+      {
+        "commit": "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+        "path": "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/consumer-survey.md",
+        "authority": "A3"
+      },
+      {
+        "commit": "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+        "path": "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/open-questions.md",
+        "authority": "A3"
+      },
+      {
+        "commit": "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+        "path": "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-07-draft.md",
+        "authority": "A3"
+      },
+      {
+        "commit": "1cc92d7db383b78dafebebf6a057c3d87163afa0",
+        "path": "plans/260925-documentation-authority-unification/reports/phase-07-08-prep/phase-08-draft.md",
+        "authority": "A3"
+      }
+    ],
+    "unaccountedPairs": [],
+    "ok": true
+  },
+  "B": true,
+  "H": {
+    "files": 609,
+    "byStatus": {
+      "promoted": 3,
+      "candidate": 214,
+      "legacy-current": 0,
+      "non-authority": 1,
+      "unrouted": 391
+    },
+    "exemptUnrouted": 302,
+    "checked": 217,
+    "findings": 0,
+    "byType": {}
+  },
+  "I": {
+    "equal": false,
+    "equalToHEAD": true,
+    "frozenBaselineUnchanged": true
+  },
+  "D": [
+    {
+      "label": "both",
+      "fatalCount": 0
+    },
+    {
+      "label": "identity",
+      "fatalCount": 0
+    },
+    {
+      "label": "phase02",
+      "fatalCount": 0
+    }
+  ],
+  "E": {
+    "open": [
+      {
+        "type": "claims-partial-carry",
+        "message": "claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)",
+        "count": 16,
+        "examples": [
+          "docs/io-contract.md#unheaded-block-5",
+          "docs/specs/distribution.md#unheaded-block-5",
+          "docs/specs/observe.md#unheaded-block-3",
+          "docs/specs/runner.md#unheaded-block-102",
+          "docs/specs/runner.md#unheaded-block-118"
+        ]
+      },
+      {
+        "type": "identical-units-multiple-owners",
+        "message": "identical source units whose rows name different target owners",
+        "count": 1,
+        "examples": [
+          "39a803b85af8: docs/platform/packaging-distribution/spec.md, docs/platform/runner/operations/h-51f5cd7279fd.md"
+        ]
+      },
+      {
+        "type": "registry-gaps-without-disposition",
+        "message": "registry identity-gap rows with no vocabulary disposition",
+        "count": 2,
+        "examples": [
+          "docs/reading-map.md#unheaded-block-15",
+          "docs/reading-map.md#unheaded-block-16"
+        ]
+      },
+      {
+        "type": "candidate-blocks-unreferenced",
+        "message": "candidate conservation units not named by a source decision",
+        "count": 313,
+        "examples": [
+          "docs/platform/work-state/contracts/cli-io-contract.md#cli-io-contract",
+          "docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-1",
+          "docs/platform/work-state/contracts/cli-io-contract.md#single-write-door",
+          "docs/platform/work-state/contracts/cli-io-contract.md#writer-identity",
+          "docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-5"
+        ]
+      }
+    ],
+    "strictGreen": false
+  },
+  "fivePendingRowsOutsideFastScope": [
+    "claim_d5dd5fbdb3483914743a14791a5f02a8",
+    "claim_9a5781f0086209a17330035ff0e58638",
+    "claim_76dfcba31d147e73488ea3abeade7ef1",
+    "claim_080c5cdacf820ed661ab372086ca7e41",
+    "claim_c072318ec582affe5e0e6936961fadc4"
+  ],
+  "nativeSyncCount": 0,
+  "reviewPackCount": 0,
+  "changedPaths": [
+    "plans/260925-documentation-authority-unification/ledger/decisions/s10-systemic-native-predecessors.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-governance.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-mapped-conservation.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-08-component-authority-boundary-map.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s8-decision-citation-drift-01.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+    "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/owner-answers.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/progress.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step-10-report.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-registry-accounting.mjs",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-rebuild.mjs",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round6-candidate-status.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round6-carrier-stability.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round6-carriers.mjs",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round6-checks.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round6-fast-check.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round6-final-audit.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round6-gitnexus-changes.txt",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round6-impact-explanation.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round6-impact-facts.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round6-independent-consistency.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round6-link-replay.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round6-portable-reproduction.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round6-rationale-edits.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round6-registry-accounting.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round6-registry-green.log",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round6-registry-red.log",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round6-registry-since-latest-request.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round6-reproduction.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round6-review-application.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round6-target-ownership.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round6-tool-tests.log",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round6-tools-initial-green.log",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-round6-tools-red.log",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduce.py",
+    "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync4d-reproduction.json",
+    "plans/260925-documentation-authority-unification/reports/phase-06/tooling.md",
+    "scripts/doc-binding-repair.mjs",
+    "scripts/doc-rationale-facts.mjs",
+    "test/scripts/doc-rationale-facts.test.mjs",
+    "test/scripts/doc-rationale-reproduction.test.mjs",
+    "test/scripts/doc-rationale.test.mjs"
+  ],
+  "next": "PACKAGE: one native sync; enumerate every registry change since fe98a6455 plus the four outstanding f1f414b02 marker records; one small bounded changed-only re-review; then the existing global turn.",
+  "noNewBlocker": true,
+  "okScoped": true
+}

@@ -4980,13 +4980,19 @@
       "targetAnchor": "1-read-first",
       "claimKind": "navigation",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792126341980-e0c35701@2026-10-16",
       "rationale": "Source: docs/README.md:23-23#1-read-first (current lines); unit SHA256 2aff5e7721a256efce78953c498af0839f56f0bb5b9918290a36bbc072659eb1.\nTarget: docs/platform/documentation/operations/portals/docs-portal.md:24-24#1-read-first (current lines); unit SHA256 16929d439319f41461ebf8f9278446e233b23a3b2450a9b9bd4295b12e1052db.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 16929d439319f41461ebf8f9278446e233b23a3b2450a9b9bd4295b12e1052db at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 8, target 8; 8 changed spellings/labels, 1 destination changes; 0 added, 0 removed.\nLink 1: \"doc-governance.md\" (doc-governance.md) → \"doc-governance.md\" (../../../governance.md); resolved docs/doc-governance.md → docs/platform/governance.md.\nLink 2: \"reading-map.md\" (reading-map.md) → \"reading-map.md\" (../../../../reading-map.md); resolved docs/reading-map.md → docs/reading-map.md.\nLink 3: \"platform/README.md\" (platform/README.md) → \"platform/README.md\" (../../../README.md); resolved docs/platform/README.md → docs/platform/README.md.\nLink 4: \"specs/reading-map.md\" (specs/reading-map.md) → \"specs/reading-map.md\" (../../../../specs/reading-map.md); resolved docs/specs/reading-map.md → docs/specs/reading-map.md.\nLink 5: \"user/\" (user/) → \"user/\" (../../../../user); resolved docs/user → docs/user.\nLink 6: \"how-to/\" (how-to/) → \"how-to/\" (../../../../how-to); resolved docs/how-to → docs/how-to.\nLink 7: \"reference/\" (reference/) → \"reference/\" (../../../../reference); resolved docs/reference → docs/reference.\nLink 8: \"explanation/\" (explanation/) → \"explanation/\" (../../../../explanation); resolved docs/explanation → docs/explanation.\nHeading depth: 2 → 2; title \"1. Read First\" → \"1. Read First\".\nWhole direct section differs; depth 2 → 2; 8 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (heading-and-links): Complete direct sections differ only in heading, link spellings/labels or authenticated exact corrections. Exact normalized nonblank line delta: removed []; added [].\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/README.md#1-read-first under docs/platform/documentation/operations/portals/docs-portal.md#1-read-first; source context \"fgOS Documentation\", target context \"fgOS Documentation\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "deep: supersede of 1. Read First with 8 links (labels unchanged, 1 destination change) and the section delta [] and []; every Link line quotes a link actually present on the stated side and the resolved paths exist; unchanged-since 16929d43 at 62751458b matches the ok row in review-step10-rationales-12-62751458b.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "16929d439319f41461ebf8f9278446e233b23a3b2450a9b9bd4295b12e1052db",
       "targetAncestry": [
         "fgOS Documentation"
-      ]
+      ],
+      "reviewReportCommit": "203f4ef93867a60e6a37624b31ce14de426cafa8"
     },
     {
       "claimId": "claim_53d2f5742d24e980328f8cee963fb73b",
@@ -5103,13 +5109,19 @@
       "targetAnchor": "4-related-files",
       "claimKind": "navigation",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792126341980-e0c35701@2026-10-16",
       "rationale": "Source: docs/README.md:50-50#4-related-files (current lines); unit SHA256 93e63d0c77140732f2db5dcff67c39869f924d501e3556dfb36a9d48cc73ed8d.\nTarget: docs/platform/documentation/operations/portals/docs-portal.md:51-51#4-related-files (current lines); unit SHA256 6dcde68b9663bbcefb3354897ee57514583ac7767a09df3f74a615011844a828.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 6dcde68b9663bbcefb3354897ee57514583ac7767a09df3f74a615011844a828 at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 4, target 4; 4 changed spellings/labels, 1 destination changes; 0 added, 0 removed.\nLink 1: \"doc-governance.md\" (doc-governance.md) → \"doc-governance.md\" (../../../governance.md); resolved docs/doc-governance.md → docs/platform/governance.md.\nLink 2: \"reading-map.md\" (reading-map.md) → \"reading-map.md\" (../../../../reading-map.md); resolved docs/reading-map.md → docs/reading-map.md.\nLink 3: \"platform/README.md\" (platform/README.md) → \"platform/README.md\" (../../../README.md); resolved docs/platform/README.md → docs/platform/README.md.\nLink 4: \"specs/reading-map.md\" (specs/reading-map.md) → \"specs/reading-map.md\" (../../../../specs/reading-map.md); resolved docs/specs/reading-map.md → docs/specs/reading-map.md.\nHeading depth: 2 → 2; title \"4. Related Files\" → \"4. Related Files\".\nWhole direct section differs; depth 2 → 2; 4 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (heading-and-links): Complete direct sections differ only in heading, link spellings/labels or authenticated exact corrections. Exact normalized nonblank line delta: removed []; added [].\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/README.md#4-related-files under docs/platform/documentation/operations/portals/docs-portal.md#4-related-files; source context \"fgOS Documentation\", target context \"fgOS Documentation\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "deep: supersede of 4. Related Files with 4 links (labels unchanged, 1 destination change), delta [] and []; the Link lines and resolved paths are right; unchanged-since 6dcde68b at 62751458b matches the ok row in review-step10-rationales-12-62751458b.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "6dcde68b9663bbcefb3354897ee57514583ac7767a09df3f74a615011844a828",
       "targetAncestry": [
         "fgOS Documentation"
-      ]
+      ],
+      "reviewReportCommit": "203f4ef93867a60e6a37624b31ce14de426cafa8"
     },
     {
       "claimId": "claim_0f63a4c33bd9ab4d707e6ea459868a91",

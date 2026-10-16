@@ -18,7 +18,7 @@ fs.mkdirSync(path.dirname(output),{recursive:true});
 const root=process.cwd(),P='plans/260925-documentation-authority-unification/',R=P+'reports/phase-06/';
 const read=p=>JSON.parse(fs.readFileSync(p,'utf8')),sha=b=>crypto.createHash('sha256').update(b).digest('hex');
 const {extractMarkdownConservationUnits}=await import(root+'/scripts/generate-doc-inventory.mjs');
-const {generateBindingRationale,checkBindingRationale,checkLegacyRationale,describeBindingLinks,bindingCorrections,frozenRationale,resolveSourceOccurrence,auditSourceOccurrences,describeSectionChange,checkSectionExplanation,sectionAccountLabels,classifySectionAccounting}=await import(root+'/scripts/doc-binding-repair.mjs');
+const {generateBindingRationale,checkBindingRationale,checkLegacyRationale,describeBindingLinks,bindingCorrections,frozenRationale,resolveSourceOccurrence,auditSourceOccurrences,describeSectionChange,checkSectionExplanation,sectionAccountLabels,classifySectionAccounting,removedCarrierWitnesses}=await import(root+'/scripts/doc-binding-repair.mjs');
 const reg=read(R+'working-identity-registry.json'),known=new Map(['units','identityGaps','retiredUnits'].flatMap(k=>reg[k].map(u=>[u.claimId,u])));
 const cache=new Map();
 function units(p,commit=null){const key=JSON.stringify([p,commit]);if(cache.has(key))return cache.get(key);let text;
@@ -162,7 +162,7 @@ function sectionExplanationOf(rec,source,target,applicable){
  const priorAccount=establishedRow(rec)?.rationale||'';
  const registeredIds=[...new Set(fs.readFileSync(R+'owner-answers.md','utf8').match(/\b(?:A\d+|L\d+-\d+[a-z]?)\b/g)||[])];
  const labels=sectionAccountLabels(priorAccount,registeredIds);
- const removedWitnesses=[],addedWitnesses=[];
+ let removedWitnesses=[];const addedWitnesses=[];
  const normalize=t=>t.replace(/^(#{1,6}) .*$/m,'<heading>').replace(/\[([^\]]+)\]\(([^\s)]+)\)/g,'<link>');
  const hasLine=(text,line)=>normalize(text).split('\n').includes(normalize(line));
  // Whole-line physical witnesses from other target sections and named histories.
@@ -184,6 +184,7 @@ function sectionExplanationOf(rec,source,target,applicable){
  for(const line of d.unexplainedAdded){const u=contributions(target.path).get(line.replace(/\[([^\]]+)\]\(([^\s)]+)\)/g,'<link>'));
   if(u)addedWitnesses.push({path:u.path,anchor:u.anchor,commit:u.commit||null,text:scope(u),textDigest:u.textDigest});
  }
+ removedWitnesses=removedCarrierWitnesses(source,target,applicable,removedWitnesses);
  const explainedRemoved=checkSectionExplanation({...d,unexplainedAdded:[]},{removedWitnesses});
  const contributionFindings=checkSectionExplanation({...d,unexplainedRemoved:[]},{addedWitnesses});
  // Additive candidate declarations are additions, not conserved source lines.

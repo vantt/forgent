@@ -1,0 +1,2077 @@
+{
+  "inputCommit": "203f4ef93867a60e6a37624b31ce14de426cafa8",
+  "method": "Unchanged applyReviewVerdicts ordinary committed reports; exact currentDecision match; L10-22 duplicates excluded.",
+  "counts": {
+    "applied": 49,
+    "rework-or-hold": 5,
+    "non-decision-evidence": 12
+  },
+  "records": [
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "claimId": "claim_08f9b4c140ce931a064c131c2bd4e014",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-systemic-native-predecessors.json",
+      "collection": "registryGaps",
+      "status": "applied",
+      "note": "deep: supersede of unheaded-block-26 (lines 456-467) of runner/operations/h-51f5cd7279fd.md from the 19ca8de23 witness to the same anchor now; a character diff shows the only change is the citation bin/fgos.mjs:4373,4461 to 4415,4503, which is exactly the one labelled correction the rationale names (before text is in the source witness, after text in the target); the cited lines 4414-4417 and 4503 at 5035fed52 are the unknown-verb default and the refuseHelp call; the last-reviewed sentence matches the ok row of review-step10-accounting-06-62751458b for 0f61fde6 which equals the current target digest."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "claimId": "claim_61244b0a84842a2771f7cdb493ebb699",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-systemic-native-predecessors.json",
+      "collection": "registryGaps",
+      "status": "applied",
+      "note": "deep: supersede of unheaded-block-2 of runner/subcomponents/h-f34e0d170d89/spec.md; the character diff shows the only change is the pointer bin/fgos.mjs:4640-4643; bin/fgos.mjs:4373-4380 replaced by bin/fgos.mjs:4414-4417, matching the single labelled correction in the rationale (before text present in the 19ca8de23 source, after text in the target); last-reviewed digest c354e335 at 62751458b has an ok row and equals the current target digest."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "claimId": "claim_bb161d438c5c39236401c04ce56ef08d",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: heading-only supersede (title No-Build Path mandatory sub-shape to cognitive quality sub-shape, depth 3 to 3); the section payload digest is identical on both sides and my line delta is removed [] and added [] so the heading-and-links accounting is right, the title change is disclosed in the heading line and no correction label is claimed or needed; the unchanged-since sentence matches the ok row 9e3c56fd at 62751458b in review-step10-rationales-01-62751458b."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "claimId": "claim_fb92651ea85a64c0b6e806926e51a4b2",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: supersede of the driver-disposition heading; my independent line delta is 18 removed and 14 added lines, equal to the exact arrays in the rationale, every one of the 18 removed lines occurs as a full line in both named carriers (history literal-snapshot and its unheaded-block-3, 18 of 18 each), the 14 added lines open with the labelled Added in candidate current-Workflow correction, and the L10-31 before and after fragments equal the entry in step10-round4-doc-edits.json (evidence commit 9b0526380) so no invented label remains; last-reviewed fd599aeb at 62751458b is an ok row."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "claimId": "claim_ccfcc4bcb24e4f5a31aa634b44e95c7f",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: supersede of section 7 whose title loses the proposals/constraint-advocate.md Phase 6 wording (disclosed in the heading line); the section is additive: removed [] and added two lines that I recomputed, the first starting Added in candidate with the registered counterparts sentence, the second its continuation; the L10-31 before and after fragments match step10-round4-doc-edits.json; last-reviewed e2452463 at 62751458b is an ok row equal to the current digest."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "claimId": "claim_0261291ac389be7c598690a1c40ef56a",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: heading-only supersede (10. Coding-Domain Stage Protocols to Workflow Step Operations, depth 2 to 2) with byte-equal payload and delta [] and []; the unchanged-since sentence names 287a22d33 which is the latest ok row for ce8fd21d (the 62751458b row is a rework of the old rationale at the same target digest, not of the target), so the sentence is true."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "claimId": "claim_af6831310fe9fcdaa7c8e69902e3c767",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: partial-carry of 1. Component Classes; the 8 removed lines (two definitions, the 5-line table, the closing paragraph) occur as full lines in release-boundaries.md#restored-class-definitions (8 of 8) and in its blocks 14 to 17, so the carrier list is genuine; the one added line is the labelled pointer; the four named remainder blocks (unheaded-block-7, 8, 10, 11) exist in the source with matching claim ids, digests and prefixes; link 0 to 1 added is right; labels and summary line equal the recomputed facts."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "claimId": "claim_d5dd5fbdb3483914743a14791a5f02a8",
+      "status": "rework-or-hold",
+      "note": "deep: the content is conserved (the 11 removed lines are carried verbatim at release-boundaries.md#restored-class-definitions, 11 of 11, and unheaded-block-18) but the rationale states that the removed lines have distinct live carrier witnesses and lists 16 anchors, 10 of which carry no removed text except code-fence markers or a closing brace (external-provider-protocol.md architecture heading, unheaded-block-1, 1-component-classes, unheaded-block-11, 3-component-protocol, unheaded-block-27 and release-boundaries.md architecture heading, unheaded-block-1, restored-physical-placement-layout-tree, unheaded-block-10); restrict the witnesses to anchors that contain at least one non-trivial removed line."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "claimId": "claim_8066684d5e7c7159d6f58caeef26d8cc",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: partial-carry of 3. Component Protocol; the single removed line (semantic contract stays transport-neutral) occurs as a full line in component-protocol.md#restored-semantic-contract-stays-transport-neutral and unheaded-block-26, both named as witnesses and both real; the one added line is the labelled pointer; the named source remainder block exists with matching claim id and digest; link 0 to 1 is right."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "claimId": "claim_9a5781f0086209a17330035ff0e58638",
+      "status": "rework-or-hold",
+      "note": "deep: content conserved (the 10 removed lines are carried at compatibility-harness.md#restored-registry-linker-procedure-and-its-input-output-formula, 10 of 10, plus its blocks 10, 11 and 12) but 8 of the 12 listed carrier witnesses hold only the code-fence lines (external-provider-protocol.md architecture heading, unheaded-block-1, 1-component-classes, unheaded-block-11, 3-component-protocol, unheaded-block-27 and compatibility-harness.md verification heading and unheaded-block-1), so the carrier sentence overstates the evidence; list only anchors that carry a non-trivial removed line."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "claimId": "claim_80fe1621540d25e5e4f6968bea7e0a0b",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: partial-carry of 5. Core Contracts; the one removed paragraph (Contract versioning) occurs as a full line in component-protocol.md#restored-contract-versioning and its unheaded-block-10, both listed and real; the added line is the labelled pointer; the two retargeted links and the one added link match the Link lines (3 changed, 2 destination changes, 1 added) and every resolved path and anchor exists."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "claimId": "claim_76dfcba31d147e73488ea3abeade7ef1",
+      "status": "rework-or-hold",
+      "note": "deep: content conserved (9 removed lines are carried at component-protocol.md#restored-lifecycle-state-chain-received-admitted-refused-selected-re, 8 lines, and the restored-contract-versioning anchor, 1 line) but the rationale lists 24 carrier witnesses of which 20 contain only the fence lines (the whole upper half of spec.md including the primary target's own anchors, and further component-protocol anchors such as unheaded-block-39, 41, 62, 67); the sentence that removed lines have these live carriers is therefore misleading; restrict to anchors that carry non-trivial removed lines."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "claimId": "claim_080c5cdacf820ed661ab372086ca7e41",
+      "status": "rework-or-hold",
+      "note": "deep: content conserved (the 23-line layout tree is carried at release-boundaries.md#restored-physical-placement-layout-tree and unheaded-block-10, 23 of 23 each) but 16 of the 18 listed carrier witnesses hold only a code-fence line (the primary target spec.md anchors, release-boundaries.md architecture heading, unheaded-block-1, restored-class-definitions and unheaded-block-18); the carrier list must be limited to anchors with a non-trivial removed line."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "claimId": "claim_7b3c9cdf89fe70d17f3f526bbdffa385",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: partial-carry of 1. Two Distinct Adapters; the one removed line (both adapters delegate a complete use case) occurs as a full line in component-protocol.md#restored-both-adapters-delegate-a-complete-use-case and unheaded-block-30, both real; one labelled added pointer; remainder block and claim id exist with the stated digest; link 0 to 1 right."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "claimId": "claim_04f0605dc840e350f63e53d0e1e96843",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: partial-carry of 2. Legacy Payload Identity; the removed package.json bin.fgos line is carried verbatim at release-boundaries.md#restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea and unheaded-block-26 (both real); the two added lines are the labelled checked-resolver-status note and the labelled pointer; links 2 to 3 (two repointed with unchanged resolved destination, one added) match the Link lines."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "claimId": "claim_b1e44493c254c54dc18efa2088b0018a",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: move of the Related Documents list from the 3-link source to the target (depth 2 to 4); labels are unchanged on all three links, two resolved destinations change (host-invocation-routing spec and architecture/external-provider-protocol.md, both exist) and one keeps its destination with a longer relative path, which equals the 3 changed and 2 destination changes stated; my line delta is [] and [] so heading-and-links is the right accounting."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "claimId": "claim_c072318ec582affe5e0e6936961fadc4",
+      "status": "rework-or-hold",
+      "note": "deep: content is carried (the 14 removed lines are in component-protocol.md#restored-per-component-repeat-procedure and its blocks 50 and 51, including the Component Boundary Advisory link line) but the rationale lists node-to-rust-migration.md#5-release-r1-distributable-rust-cli-host and #unheaded-block-32 as live carrier witnesses although neither contains any removed line; they match only because the removed link-only line was normalised to the placeholder <link> and the R1 list has a link-only line; drop those two anchors and fix the placeholder matching so a link-only line cannot witness another link."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "claimId": "claim_e960a05c0b656d0dae2cffd3daee5a0d",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: partial-carry of 10. Migrate Read Models Before Writers; the 8 removed lines (sequence list) are carried at component-protocol.md#restored-per-component-repeat-procedure (8 of 8) and blocks 52 and 53 (1 and 7), all listed and real; one labelled added pointer; remainder blocks recomputed; link 0 to 1 right."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "claimId": "claim_ac2177776d1a367f2d8e81699b04fc63",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: partial-carry of 13. Rollback Rules; the 7 removed bullet lines occur as full lines in component-protocol.md#restored-rollback-bullets and unheaded-block-57 (7 of 7 each), no spurious carrier is listed; the labelled pointer is the one added line; link counts 1 to 2 (one repointed, one added) match the Link lines."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "claimId": "claim_5766225be2d76d6239e116a664aec7cf",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: move of 2. Historical Supersession Table (depth 2 to 4); four links with identical labels and spelling changed only in relative path (resolved destinations unchanged, so 4 changed and 0 destination changes is right), my line delta is [] and [], payload equal after link normalisation; heading-and-links is the correct accounting."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "claimId": "claim_088af18a5796ed72fe6d33ff2cc5d05c",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: move of 5. ReleaseManifest (depth 2 to 4); one link with unchanged label and resolved destination, delta [] and []; heading-and-links accounting is right and the unchanged-since sentence matches the ok row dab66237 at 345f15d95."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "claimId": "claim_163988c8973416bdd64781cc7c667f65",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: move of the whole Workspace Runtime Model file (H1 to depth 3 inside spec.md) with 3 links; the Link lines match the source and target links, one resolved destination changes (workspace-topology to system-architecture/architecture/workspace-topology.md, which exists), delta [] and []; the file base name used as source context is the extractor convention for a first-line H1; the unchanged-since sentence names the ok row d53ab4e2 at 62751458b."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "claimId": "claim_4eeb2f406288458e61bad21531966ab1",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: supersede of Data Dictionary (depth 2 to 4, same title); the payload is byte-equal so the unit digests differ only by depth, and the disposition sentence that the complete source section occurs verbatim inside the target section is true; 0 links; unchanged-since digest 3dd2d51f at 287a22d33 is the latest ok row."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "claimId": "claim_66f7be3b79ca1fe458ce0416ba1adf89",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-governance.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: supersede of 14. Related Files with 6 links whose labels are unchanged and 2 resolved destinations changed, delta [] and []; the sentence that the target changed since the last reviewed digest 1b5703ab at 2300d6557 is true (current target digest is 12cc1851 and later rows for it are reworks), so no unchanged claim is made for a changed target."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "claimId": "claim_53ebf4b541ff8f6a2c40e3b95304d6b7",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-mapped-conservation.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: supersede of 1. Read First with 8 links (labels unchanged, 1 destination change) and the section delta [] and []; every Link line quotes a link actually present on the stated side and the resolved paths exist; unchanged-since 16929d43 at 62751458b matches the ok row in review-step10-rationales-12-62751458b."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "claimId": "claim_2ae0cd4fc1cf487f7caa4d77d46e9682",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-mapped-conservation.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: supersede of 4. Related Files with 4 links (labels unchanged, 1 destination change), delta [] and []; the Link lines and resolved paths are right; unchanged-since 6dcde68b at 62751458b matches the ok row in review-step10-rationales-12-62751458b."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "claimId": "claim_239931ca8e26fd3b19bf970e30e2ae4b",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: move of 7. Contract Authority Matrix (depth 2 to 4) with 11 links of which 9 are repointed (9 changed, 9 destination changes, the two unchanged ones are rightly not listed); labels unchanged, delta [] and []; several repointed destinations are history files under retired-engine, which exist and are named in the Link lines; unchanged-since 17884089 at 62751458b is an ok row."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "claimId": "claim_c1741ef08c45e88d276f75b668de7452",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-08-component-authority-boundary-map.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: supersede of the H1 section of the boundary map proposal; removed [] and 20 added lines that I recomputed, namely the candidate metadata fence, the labelled Added in candidate paragraph and the Source relationship line, so the additive-candidate-section accounting is right; the 9 source links are all repointed (one to the history carrier for the intent ledger) plus one added original source link, matching 10 changed, 1 destination change, 1 added; the four related-binding evidence lines exist at the cited lines of component-boundary.md."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "claimId": "claim_cd345b6c8a7da2451c2acf04ba8c5292",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: move of 8.7 Bảng tình huống chuẩn from docs/specs/confinement-authority.md to agent-confinement/spec.md; unit digests are equal and the heading and payload are byte-equal in both files (checked by diff, depth and title identical), so the equal-section statement is true and the former labelled-successor sentence is correctly gone; 0 links; unchanged-since digest at 62751458b matches the ok row in review-step10-rationales-10-62751458b."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "claimId": "claim_9a1cd05f74418890fbca8955aa76b378",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: move of 9. Default implementation đầu tiên from docs/specs/confinement-authority.md to agent-confinement/spec.md; unit digests are equal and the heading and payload are byte-equal in both files (checked by diff, depth and title identical), so the equal-section statement is true and the former labelled-successor sentence is correctly gone; 0 links; unchanged-since digest at 62751458b matches the ok row in review-step10-rationales-10-62751458b."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "claimId": "claim_2c080a72c195a28a1ca8efb0e1187f11",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: move of 9.1 Support matrix của default from docs/specs/confinement-authority.md to agent-confinement/spec.md; unit digests are equal and the heading and payload are byte-equal in both files (checked by diff, depth and title identical), so the equal-section statement is true and the former labelled-successor sentence is correctly gone; 0 links; unchanged-since digest at 62751458b matches the ok row in review-step10-rationales-10-62751458b."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "claimId": "claim_3770d5a0b897fbd8c1393a38c48c3333",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: move of 9.2 hostRead blind from docs/specs/confinement-authority.md to agent-confinement/spec.md; unit digests are equal and the heading and payload are byte-equal in both files (checked by diff, depth and title identical), so the equal-section statement is true and the former labelled-successor sentence is correctly gone; 0 links; unchanged-since digest at 62751458b matches the ok row in review-step10-rationales-10-62751458b."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "claimId": "claim_96b54d15ac01f69e7df991151c2268be",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: move of 10. Lộ trình rollout từ docs/specs/confinement-authority.md into agent-confinement/history/rollout-and-settled-facts.md; the target heading is a real heading (not inside a fence, line 24) and the section text is byte-equal to the source with equal unit digests, so the new equal-section accounting is true (the earlier wrapper caveat no longer applies to this bound unit); 0 links; unchanged-since d190224e at 62751458b is an ok row."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "claimId": "claim_1ef2bc00c79bc7a40787b62a4943f0df",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: move of 11. Proof và Definition of Done from docs/specs/confinement-authority.md to agent-confinement/spec.md; unit digests are equal and the heading and payload are byte-equal in both files (checked by diff, depth and title identical), so the equal-section statement is true and the former labelled-successor sentence is correctly gone; 0 links; unchanged-since digest at 62751458b matches the ok row in review-step10-rationales-10-62751458b."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "claimId": "claim_7aacf43ab14386fce6c4a5a8a0519402",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "mechanical: extractor digests recomputed (equal both sides), cited lines and anchor match the real spans, direct sections byte-equal (cmp), link count 0 and 0, depth and title and ancestry contexts equal the rationale, target digest unchanged since 62751458b (git show), anchor passes list-doc-anchors; I did not re-read the text beyond the rationale."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "claimId": "claim_9168d8af609c58932a87918d4a49b8aa",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "mechanical: extractor digests recomputed (equal both sides), cited lines and anchor match the real spans, direct sections byte-equal (cmp), link count 0 and 0, depth and title and ancestry contexts equal the rationale, target digest unchanged since 62751458b (git show), anchor passes list-doc-anchors; I did not re-read the text beyond the rationale."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "claimId": "claim_78563a2491b11f7a0b412c5b900a7414",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: 11.3 Behavior probes read in both files (probe bullets and closing paragraph), byte-identical, no links, both under Proof and Definition of Done; equal-section and move wording is true and the old invented label sentence is gone; last-reviewed digest unchanged at 62751458b."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "claimId": "claim_dc8b5bc2507201dd705fcd64deba8224",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: 11.4 Observability five bullets read in both files, byte-identical, same depth and ancestry; the equal-section sentence replaces the earlier false replacement wording and every other fact line matches my recomputation."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "claimId": "claim_b532b9a9eb7f76d041c343e2d45bf859",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: 11.5 Doctor/setup paragraph read in both files, byte-identical, no links; cited spans, digests, contexts and the equal-section sentence all match my recomputation; no labelled correction applies and none is claimed."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "claimId": "claim_e793bd095f4a872b0bc08757c827359f",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "mechanical: extractor digests recomputed (equal both sides), cited lines and anchor match the real spans, direct sections byte-equal (cmp), link count 0 and 0, depth and title and ancestry contexts equal the rationale, target digest unchanged since 62751458b (git show), anchor passes list-doc-anchors (target context is the Added in candidate decisions carrier, as named); I did not re-read the text beyond the rationale."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "claimId": "claim_7aede254166851de375089f4b0160ca6",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: heading 13 direct section (intro plus seven numbered settled risks) read in the legacy spec and in history/rollout-and-settled-facts.md, byte-identical; target context correctly named as the Added in candidate rollout carrier; subsections 13.1 to 13.3 and the open items are separate rows."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "claimId": "claim_39c40cef341e227d936ea768b12ba435",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "mechanical: extractor digests recomputed (equal both sides), cited lines and anchor match the real spans, direct sections byte-equal (cmp), link count 0 and 0, depth and title and ancestry contexts equal the rationale, target digest unchanged since 62751458b (git show), anchor passes list-doc-anchors (target context is the Added in candidate rollout carrier plus the 13 heading, as named); I did not re-read the text beyond the rationale."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "claimId": "claim_bed90dbb7de2a5782fafcdb4a3d6e0da",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: 13.2 login-renewal section read in both files, byte-identical; target ancestry is the labelled Added in candidate current-settled-facts heading and the rationale names exactly that context; move and equal-section wording true."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "claimId": "claim_3f1a1bbd362edb4ff925ff6de3cbd823",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "mechanical: extractor digests recomputed (equal both sides), cited lines and anchor match the real spans, direct sections byte-equal (cmp), link count 0 and 0, depth and title and ancestry contexts equal the rationale, target digest unchanged since 62751458b (git show), anchor passes list-doc-anchors (target is the decisions carrier, context Added in candidate plus 12 Quyet dinh cua proposal, as named); I did not re-read the text beyond the rationale."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "claimId": "claim_06e68651628b7a731b974ec5c34c9743",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: Open Deferred Items section (P04 M-3, P03 NEW-1b/c and P06 M2, P03 R4, strict-mode default) read in both files, byte-identical; target ancestry is the labelled current-settled-facts heading as the rationale says."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "claimId": "claim_1d1eb2ce98dcf1855678b2cf86c2ee67",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: 14 Pointers hien tai (eight pointer bullets) read in both files, byte-identical, same ancestry; equal-section sentence is true and no carrier or correction is claimed."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "claimId": "claim_fefb1bf47fc375b9e83089dc6059326c",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-decision-citation-drift-01.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: decision-citation-drift Pointers (implementation) section including the retired supersession-check paragraph read in both files, byte-identical; link count 0 and 0 and equal-section wording true."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "claimId": "claim_7e17ce226062d06a53b940f64b9d5cdb",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "mechanical: extractor digests recomputed (equal both sides), cited lines and anchor match the real spans, direct sections byte-equal (cmp), link count 0 and 0, depth and title and ancestry contexts equal the rationale, target digest unchanged since 62751458b (git show), anchor passes list-doc-anchors; I did not re-read the text beyond the rationale."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "claimId": "claim_b2a51d5d39832d330879947bdbbcb227",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: Observe Owns section: the A40 correction (friction list gains ping and migrate) has its before-text once in the legacy section and its after-text in the target, evidence friction_cli.rs:7-9 at 2107c4761 lists record resolve list show rank ping migrate; the single link ../platform/session-identity/spec.md becomes ../session-identity/spec.md and both resolve to docs/platform/session-identity/spec.md; after correction and link normalization 0 removed and 0 added, so heading-and-links is true."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "claimId": "claim_552ef3d6e22bac10c24cc31e48463d50",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: Data Dictionary table, five modified rows: rows 1b, 3 and 8 are exactly the four listed A41 corrections (each before-text occurs once in the legacy section, each after-text is in the target); the two residual lines are rows 9 and 10 and the rationale removed and added arrays equal my multiset diff verbatim; both removed rows occur verbatim in the new runner/spec.md carrier (heading section historical-source-section-552ef3d6 and fence unheaded-block-7) and both added rows carry an Added in candidate label; the A41 label token is present in the pinned account (independent audit found no label finding)."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "claimId": "claim_224b5f54d28b453f1e3feaced0468399",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: Gate A section (87 vs 79 lines): applying the three source-anchored A41 corrections to the legacy section reproduces the target exactly (0 removed, 0 added, same order); the fourth correction is an intermediate state and the claim is true (bin/fgos.mjs:4373,4461 is in the target at 19ca8de23, 4415,4503 at 62751458b and HEAD); heading-and-links is the right class and no carrier is needed because the replaced wording is the A41-corrected false current-state text."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "claimId": "claim_0686418ae7571d82eade8059c698709d",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: Actors and Access table: one row changes (the Gate A evolve operator row, a check mark becomes Historical operator role with an Added in candidate door-removed note); removed and added arrays equal my diff, the removed row is verbatim in the new runner/spec.md carrier (fence unheaded-block-9 and heading historical-source-section-0686418a), the added line self-labels, and Applicable labelled corrections none is accurate (no manifest correction after-text is in this section)."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "claimId": "claim_099eb566c825967cf35f9397f2d7b947",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: Edge Cases Settled: exactly one bullet changes, an Added in candidate sentence (historical e2e scenario of the removed evolve door, no current coverage claim) is prefixed to the otherwise unchanged bullet; arrays equal my diff, the removed bullet is verbatim in the new carrier (fence unheaded-block-11 and heading historical-source-section-099eb566), corrections none is accurate; both digests also hand-recomputed in Python."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "claimId": "claim_4efee765e5a47fc42f4d9cccc7a53191",
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "collection": "claims",
+      "status": "applied",
+      "note": "deep: Pointers (implementation): both listed A41 corrections (entropy.mjs pointer to the Rust entropy.rs handler, candidates.mjs pointer to a removal statement) have before-text in the legacy section and after-text in the target; the one residual bullet (evolve verb) is replaced by a labelled historical description, arrays equal my diff, the removed bullet is verbatim in the new carrier (fence unheaded-block-13 and heading historical-source-section-4efee765); existing label A41 is a whole token in the pinned account; both digests hand-recomputed in Python."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "claimId": "claim_d5e5139015078092355b369260cee249",
+      "status": "non-decision-evidence",
+      "verdict": "ok",
+      "note": "deep: new heading unit historical-source-section-0686418a in docs/platform/runner/spec.md: after tuple equals the HEAD working-identity-registry record field for field, unitDigest (sha256 of heading plus textDigest) and identityFingerprint reproduced by the extractor, claim absent from the f1f414b02 registry (before null); the registry holds 19 units for this file and all 19 equal the extractor output, and the document record sourceDigest and blobSha equal the committed file; this approves the identity tuple only, not truth."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "claimId": "claim_982fa232e8267691441436f1d7d48b22",
+      "status": "non-decision-evidence",
+      "verdict": "ok",
+      "note": "deep: new heading unit historical-source-section-099eb566 in docs/platform/runner/spec.md: after tuple equals the HEAD working-identity-registry record field for field, unitDigest (sha256 of heading plus textDigest) and identityFingerprint reproduced by the extractor, claim absent from the f1f414b02 registry (before null); the registry holds 19 units for this file and all 19 equal the extractor output, and the document record sourceDigest and blobSha equal the committed file; this approves the identity tuple only, not truth."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "claimId": "claim_f97b02893c6b8f2554062dfea5f5df2c",
+      "status": "non-decision-evidence",
+      "verdict": "ok",
+      "note": "deep: new heading unit historical-source-section-4efee765 in docs/platform/runner/spec.md: after tuple equals the HEAD working-identity-registry record field for field, unitDigest (sha256 of heading plus textDigest) and identityFingerprint reproduced by the extractor, claim absent from the f1f414b02 registry (before null); the registry holds 19 units for this file and all 19 equal the extractor output, and the document record sourceDigest and blobSha equal the committed file; this approves the identity tuple only, not truth."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-05-4d3634360.md",
+      "claimId": "claim_847f0e0c56a6695d4097fb1e537ea1bc",
+      "status": "non-decision-evidence",
+      "verdict": "ok",
+      "note": "deep: runner/spec.md#historical-source-section-552ef3d6 (new heading, units, origin added-since-62751458b). Heading unit lines 54 to 54 with its section payload covering labelled paragraph 56 and the fenced carrier 58 to 76; textDigest d7474ce2 reproduced by the extractor and by an independent plain sha256 over heading level, title, payload digest and following-block digest, unitDigest 77848f33 equals sha256 of kind plus textDigest, fingerprint 1f7cd60e matches. Registry row equals the pack field for field; claim id absent from the 62751458b registry."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-05-4d3634360.md",
+      "claimId": "claim_ee99b0951090e8a9aeabd89bf2982f05",
+      "status": "non-decision-evidence",
+      "verdict": "ok",
+      "note": "deep: runner/spec.md#unheaded-block-10, the Added in candidate label paragraph of the edge-cases-settled carrier (line 99). Digest 28d0009f is sha256 of the line text and equals the extractor textDigest, fingerprint and unitDigest equal 3f04a257, registry row equal, claim kind specification as pack. The label says historical source text, no current-truth approval, and names the corrected successor anchor, which passes list-doc-anchors."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-05-4d3634360.md",
+      "claimId": "claim_90fb9245a91d2389ba25704be807be20",
+      "status": "non-decision-evidence",
+      "verdict": "ok",
+      "note": "deep: runner/spec.md#unheaded-block-11, fenced carrier lines 101 to 153 of docs/specs/runner.md#edge-cases-settled. The fence body equals the complete direct section of the legacy blob 122d1a51 (the registry source blob) byte for byte, 13595 characters, heading line included, so nothing is lost and nothing is added inside the fence. Digest 75c5c702 reproduced, claimKind contract follows the extractor text heuristic since the section text contains the word contract."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-05-4d3634360.md",
+      "claimId": "claim_c321de74b624d639e56cb4dc77169655",
+      "status": "non-decision-evidence",
+      "verdict": "ok",
+      "note": "deep: runner/spec.md#unheaded-block-12, label paragraph of the pointers-implementation carrier (line 158). Digest 26cd8fbf reproduced, fingerprint and unitDigest 06dd4d58 equal, registry row equal. Observation: the file header still names blob ddfa78cc as provenance while this carrier carries the newer 122d1a51 section (two changed pointer lines already present in the h-f34e0d170d89 corrected carrier); the carrier itself is true to the registry source blob, only the header lags."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-05-4d3634360.md",
+      "claimId": "claim_d8a2c7490367e214b55e86913275bd1b",
+      "status": "non-decision-evidence",
+      "verdict": "ok",
+      "note": "deep: runner/spec.md#unheaded-block-13, fenced carrier lines 160 to 214 of docs/specs/runner.md#pointers-implementation. Fence body equals the complete direct section of blob 122d1a51 exactly (it differs from the older ddfa78cc blob in two lines, so the carrier took the current source). Digest 16efa16f reproduced, fingerprint and unitDigest 1094f998 equal, registry row equal. The unit is not yet a target of any decision row, which is the known candidate-blocks-unreferenced open data."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-05-4d3634360.md",
+      "claimId": "claim_6598b0201d76ee564e11e9fd1f6da0a2",
+      "status": "non-decision-evidence",
+      "verdict": "ok",
+      "note": "deep: runner/spec.md#unheaded-block-6, label paragraph of the data-dictionary carrier (line 56). Digest a271942c reproduced by the extractor and plain sha256, unitDigest and fingerprint 92199296 equal, registry row equal; the label states Added in candidate, historical source text and the anchor of the corrected successor, which exists."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-05-4d3634360.md",
+      "claimId": "claim_0876da817dfa1682359c8d1823d92452",
+      "status": "non-decision-evidence",
+      "verdict": "ok",
+      "note": "deep: runner/spec.md#unheaded-block-7, fenced carrier lines 58 to 76 of docs/specs/runner.md#data-dictionary. Fence body equals the complete direct section of the registry source blob 122d1a51 byte for byte (8806 characters) and also of the ddfa78cc blob, but not the 473a0096 map blob, so the carrier follows the synced source. Digest 9216be2c reproduced, fingerprint 0281188e equal, registry row equal."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-05-4d3634360.md",
+      "claimId": "claim_9e9010f284010e4ee3fbc67deed8e8f1",
+      "status": "non-decision-evidence",
+      "verdict": "ok",
+      "note": "deep: runner/spec.md#unheaded-block-8, label paragraph of the actors-access carrier (line 81). Digest 47471757 reproduced, fingerprint and unitDigest 3b6fd344 equal, registry row equal, successor anchor h-6df5686d0d54 actors-access passes the anchor check."
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-05-4d3634360.md",
+      "claimId": "claim_4494775f2688c7b3ef05ffb458dd628a",
+      "status": "non-decision-evidence",
+      "verdict": "ok",
+      "note": "deep: runner/spec.md#unheaded-block-9, fenced carrier lines 83 to 94 of docs/specs/runner.md#actors-access. Fence body equals the complete direct section of blob 122d1a51 and of the older blobs (552 characters). Digest 30ad6c3c reproduced, fingerprint and unitDigest a012b5f2 equal, registry row equal."
+    }
+  ],
+  "allTableVerdicts": [
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "entry": "claim_08f9b4c140ce931a064c131c2bd4e014",
+      "verdict": "ok",
+      "note": "deep: supersede of unheaded-block-26 (lines 456-467) of runner/operations/h-51f5cd7279fd.md from the 19ca8de23 witness to the same anchor now; a character diff shows the only change is the citation bin/fgos.mjs:4373,4461 to 4415,4503, which is exactly the one labelled correction the rationale names (before text is in the source witness, after text in the target); the cited lines 4414-4417 and 4503 at 5035fed52 are the unknown-verb default and the refuseHelp call; the last-reviewed sentence matches the ok row of review-step10-accounting-06-62751458b for 0f61fde6 which equals the current target digest.",
+      "sourceDigest": "30bbabf9219560dd2744a98e42e43b53e9fbaf15c4282e68860a8682f2b63059",
+      "targetDigest": "0f61fde6bc880cb19623ecde63a6a137571884e4b6ae2f8b24b8a585b25d600a"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "entry": "claim_61244b0a84842a2771f7cdb493ebb699",
+      "verdict": "ok",
+      "note": "deep: supersede of unheaded-block-2 of runner/subcomponents/h-f34e0d170d89/spec.md; the character diff shows the only change is the pointer bin/fgos.mjs:4640-4643; bin/fgos.mjs:4373-4380 replaced by bin/fgos.mjs:4414-4417, matching the single labelled correction in the rationale (before text present in the 19ca8de23 source, after text in the target); last-reviewed digest c354e335 at 62751458b has an ok row and equals the current target digest.",
+      "sourceDigest": "ae0e268fad727f5deda17cf43d013aa1710f5cea2506fdd844809c3c8e98511f",
+      "targetDigest": "c354e3357585a5cc6bce8dd57d833b0e85d3f19e58ba6e81e9d6f562aca53edc"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "entry": "claim_bb161d438c5c39236401c04ce56ef08d",
+      "verdict": "ok",
+      "note": "deep: heading-only supersede (title No-Build Path mandatory sub-shape to cognitive quality sub-shape, depth 3 to 3); the section payload digest is identical on both sides and my line delta is removed [] and added [] so the heading-and-links accounting is right, the title change is disclosed in the heading line and no correction label is claimed or needed; the unchanged-since sentence matches the ok row 9e3c56fd at 62751458b in review-step10-rationales-01-62751458b.",
+      "sourceDigest": "b543e1371ff29576a6dd17d6b3fde9de919bd53a0460cc92714f27f1312946f7",
+      "targetDigest": "9e3c56fd314283351db7002a5bbed73f7e1507570f8448e7d70b2129dbf2f542"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "entry": "claim_fb92651ea85a64c0b6e806926e51a4b2",
+      "verdict": "ok",
+      "note": "deep: supersede of the driver-disposition heading; my independent line delta is 18 removed and 14 added lines, equal to the exact arrays in the rationale, every one of the 18 removed lines occurs as a full line in both named carriers (history literal-snapshot and its unheaded-block-3, 18 of 18 each), the 14 added lines open with the labelled Added in candidate current-Workflow correction, and the L10-31 before and after fragments equal the entry in step10-round4-doc-edits.json (evidence commit 9b0526380) so no invented label remains; last-reviewed fd599aeb at 62751458b is an ok row.",
+      "sourceDigest": "ee8907a2f12410887101fab337f085440903f2ece580174b69146302968cec4d",
+      "targetDigest": "fd599aeb69ec450ccb654795c8db12e37932153fdf60f71c8eeaa7e463b32485"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "entry": "claim_ccfcc4bcb24e4f5a31aa634b44e95c7f",
+      "verdict": "ok",
+      "note": "deep: supersede of section 7 whose title loses the proposals/constraint-advocate.md Phase 6 wording (disclosed in the heading line); the section is additive: removed [] and added two lines that I recomputed, the first starting Added in candidate with the registered counterparts sentence, the second its continuation; the L10-31 before and after fragments match step10-round4-doc-edits.json; last-reviewed e2452463 at 62751458b is an ok row equal to the current digest.",
+      "sourceDigest": "925fd21f6972ad4060e318d3d32bfc3feae3fa6aebd95910d5a6ff90837c5885",
+      "targetDigest": "e24524633ae56daa1d8e9a8c4b2956f92d4e08aac51d98f3fe5775b2f9ae3064"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "entry": "claim_0261291ac389be7c598690a1c40ef56a",
+      "verdict": "ok",
+      "note": "deep: heading-only supersede (10. Coding-Domain Stage Protocols to Workflow Step Operations, depth 2 to 2) with byte-equal payload and delta [] and []; the unchanged-since sentence names 287a22d33 which is the latest ok row for ce8fd21d (the 62751458b row is a rework of the old rationale at the same target digest, not of the target), so the sentence is true.",
+      "sourceDigest": "8051e328585855662bb82c42e463bbaeee0fda38e5910ef661b1a6f49e5d9c0b",
+      "targetDigest": "ce8fd21d766fc1023f3662cde1da980d774512faa2cee1f15727b2d916d958a5"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "entry": "claim_af6831310fe9fcdaa7c8e69902e3c767",
+      "verdict": "ok",
+      "note": "deep: partial-carry of 1. Component Classes; the 8 removed lines (two definitions, the 5-line table, the closing paragraph) occur as full lines in release-boundaries.md#restored-class-definitions (8 of 8) and in its blocks 14 to 17, so the carrier list is genuine; the one added line is the labelled pointer; the four named remainder blocks (unheaded-block-7, 8, 10, 11) exist in the source with matching claim ids, digests and prefixes; link 0 to 1 added is right; labels and summary line equal the recomputed facts.",
+      "sourceDigest": "a180ac1d80159115a4f336ae648d311a92f7b2a09de392544c38273cf1ffa34f",
+      "targetDigest": "fd51d86a3880f7da70c7e5791d50dfb1af4cd414023a70d924a3606a319e252f"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "entry": "claim_d5dd5fbdb3483914743a14791a5f02a8",
+      "verdict": "rework",
+      "note": "deep: the content is conserved (the 11 removed lines are carried verbatim at release-boundaries.md#restored-class-definitions, 11 of 11, and unheaded-block-18) but the rationale states that the removed lines have distinct live carrier witnesses and lists 16 anchors, 10 of which carry no removed text except code-fence markers or a closing brace (external-provider-protocol.md architecture heading, unheaded-block-1, 1-component-classes, unheaded-block-11, 3-component-protocol, unheaded-block-27 and release-boundaries.md architecture heading, unheaded-block-1, restored-physical-placement-layout-tree, unheaded-block-10); restrict the witnesses to anchors that contain at least one non-trivial removed line.",
+      "sourceDigest": "19bd3465163fc281e12f6ac88d531d651ce0e8329d0485fa4536c107516305fe",
+      "targetDigest": "e7a9211054b328f165f59f75bfc1633b8b3a60a383afeff778f1eb2312f6d8a0"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "entry": "claim_8066684d5e7c7159d6f58caeef26d8cc",
+      "verdict": "ok",
+      "note": "deep: partial-carry of 3. Component Protocol; the single removed line (semantic contract stays transport-neutral) occurs as a full line in component-protocol.md#restored-semantic-contract-stays-transport-neutral and unheaded-block-26, both named as witnesses and both real; the one added line is the labelled pointer; the named source remainder block exists with matching claim id and digest; link 0 to 1 is right.",
+      "sourceDigest": "4788de97424c5b1035cf2384d427ef5a7694dfbae3af9c94f73cf5dcf4420ea6",
+      "targetDigest": "7cf43dd0dccf83e356b760c88da2576ecb1eb4cf9219caaf09a95ff12d2fd5a8"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "entry": "claim_9a5781f0086209a17330035ff0e58638",
+      "verdict": "rework",
+      "note": "deep: content conserved (the 10 removed lines are carried at compatibility-harness.md#restored-registry-linker-procedure-and-its-input-output-formula, 10 of 10, plus its blocks 10, 11 and 12) but 8 of the 12 listed carrier witnesses hold only the code-fence lines (external-provider-protocol.md architecture heading, unheaded-block-1, 1-component-classes, unheaded-block-11, 3-component-protocol, unheaded-block-27 and compatibility-harness.md verification heading and unheaded-block-1), so the carrier sentence overstates the evidence; list only anchors that carry a non-trivial removed line.",
+      "sourceDigest": "f26fe2980e00f599ee3395a67dd57972d0ef8371bf0219fde39bb7f44b353a4c",
+      "targetDigest": "cda1c088745776953a5144a0548869d897c54e9f69dcd512de6ad8359b99ed32"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "entry": "claim_80fe1621540d25e5e4f6968bea7e0a0b",
+      "verdict": "ok",
+      "note": "deep: partial-carry of 5. Core Contracts; the one removed paragraph (Contract versioning) occurs as a full line in component-protocol.md#restored-contract-versioning and its unheaded-block-10, both listed and real; the added line is the labelled pointer; the two retargeted links and the one added link match the Link lines (3 changed, 2 destination changes, 1 added) and every resolved path and anchor exists.",
+      "sourceDigest": "5e7c2c60dfed54dc9ebb433881669fc2e31db27fbf1cf90aef988969b14fd6e3",
+      "targetDigest": "9274b7dd1e623096538871b0934d940c5311b7dac7f87b98e8f3bbe9cbdf0e79"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "entry": "claim_76dfcba31d147e73488ea3abeade7ef1",
+      "verdict": "rework",
+      "note": "deep: content conserved (9 removed lines are carried at component-protocol.md#restored-lifecycle-state-chain-received-admitted-refused-selected-re, 8 lines, and the restored-contract-versioning anchor, 1 line) but the rationale lists 24 carrier witnesses of which 20 contain only the fence lines (the whole upper half of spec.md including the primary target's own anchors, and further component-protocol anchors such as unheaded-block-39, 41, 62, 67); the sentence that removed lines have these live carriers is therefore misleading; restrict to anchors that carry non-trivial removed lines.",
+      "sourceDigest": "7a639345a5670ebb3cd24fd27a72fb08467d57f4667517fbd47f51d35b9bb224",
+      "targetDigest": "a3fd2fb5bbb38608bae7071b5f0571cbcccb756e34449544f509d1d40fc8fdc6"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "entry": "claim_080c5cdacf820ed661ab372086ca7e41",
+      "verdict": "rework",
+      "note": "deep: content conserved (the 23-line layout tree is carried at release-boundaries.md#restored-physical-placement-layout-tree and unheaded-block-10, 23 of 23 each) but 16 of the 18 listed carrier witnesses hold only a code-fence line (the primary target spec.md anchors, release-boundaries.md architecture heading, unheaded-block-1, restored-class-definitions and unheaded-block-18); the carrier list must be limited to anchors with a non-trivial removed line.",
+      "sourceDigest": "26dedcce46fdb8fba749ce8ecb56418bbc45624ad00c28a2a355647221c73a35",
+      "targetDigest": "e95f14771b2c72fc9eb48e5c9813b74f897175763fa9b44441fb2cb6a896c1cd"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "entry": "claim_7b3c9cdf89fe70d17f3f526bbdffa385",
+      "verdict": "ok",
+      "note": "deep: partial-carry of 1. Two Distinct Adapters; the one removed line (both adapters delegate a complete use case) occurs as a full line in component-protocol.md#restored-both-adapters-delegate-a-complete-use-case and unheaded-block-30, both real; one labelled added pointer; remainder block and claim id exist with the stated digest; link 0 to 1 right.",
+      "sourceDigest": "fee7e29c8f6886025098180b705008f43d5a3198943485c0256f5645b9cdc0fd",
+      "targetDigest": "49afb148ce5b49502adacce9e063c07b40e58fb0981db00e6b2d9048a726d90d"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "entry": "claim_04f0605dc840e350f63e53d0e1e96843",
+      "verdict": "ok",
+      "note": "deep: partial-carry of 2. Legacy Payload Identity; the removed package.json bin.fgos line is carried verbatim at release-boundaries.md#restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea and unheaded-block-26 (both real); the two added lines are the labelled checked-resolver-status note and the labelled pointer; links 2 to 3 (two repointed with unchanged resolved destination, one added) match the Link lines.",
+      "sourceDigest": "e9f472117d68d8c826f9f9b15946883a24addeedf3c298765032fc081f37cb2d",
+      "targetDigest": "bcaecc76a91e2cd04d8a432c31285c9d795a274e2ae8dcba92ccfd94780daddf"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "entry": "claim_b1e44493c254c54dc18efa2088b0018a",
+      "verdict": "ok",
+      "note": "deep: move of the Related Documents list from the 3-link source to the target (depth 2 to 4); labels are unchanged on all three links, two resolved destinations change (host-invocation-routing spec and architecture/external-provider-protocol.md, both exist) and one keeps its destination with a longer relative path, which equals the 3 changed and 2 destination changes stated; my line delta is [] and [] so heading-and-links is the right accounting.",
+      "sourceDigest": "ded8adca384e6ae2de3bd7fe2c03692191f0bf14248ca807ff434b43e2efeeab",
+      "targetDigest": "954b3dcc8c61cac86072dbe20d9c6aa044d2ddc3387979c743c81bfd69ae9337"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "entry": "claim_c072318ec582affe5e0e6936961fadc4",
+      "verdict": "rework",
+      "note": "deep: content is carried (the 14 removed lines are in component-protocol.md#restored-per-component-repeat-procedure and its blocks 50 and 51, including the Component Boundary Advisory link line) but the rationale lists node-to-rust-migration.md#5-release-r1-distributable-rust-cli-host and #unheaded-block-32 as live carrier witnesses although neither contains any removed line; they match only because the removed link-only line was normalised to the placeholder <link> and the R1 list has a link-only line; drop those two anchors and fix the placeholder matching so a link-only line cannot witness another link.",
+      "sourceDigest": "d1c2fad49a5087903461482aaa9dbb0b96c53baa6db717e0546f8b185552307f",
+      "targetDigest": "ef6d9f08943bdc073dcf957c969015d6821b081aeb08b90898f0f1024dd2319e"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "entry": "claim_e960a05c0b656d0dae2cffd3daee5a0d",
+      "verdict": "ok",
+      "note": "deep: partial-carry of 10. Migrate Read Models Before Writers; the 8 removed lines (sequence list) are carried at component-protocol.md#restored-per-component-repeat-procedure (8 of 8) and blocks 52 and 53 (1 and 7), all listed and real; one labelled added pointer; remainder blocks recomputed; link 0 to 1 right.",
+      "sourceDigest": "225088240c21859fc36ee71b02c32151f4f19e37a2a17e8539b159561d58f15c",
+      "targetDigest": "5ae126eab3838fb0b18c1226734b38c22b3674d2b370d9c47193602a09990c6d"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "entry": "claim_ac2177776d1a367f2d8e81699b04fc63",
+      "verdict": "ok",
+      "note": "deep: partial-carry of 13. Rollback Rules; the 7 removed bullet lines occur as full lines in component-protocol.md#restored-rollback-bullets and unheaded-block-57 (7 of 7 each), no spurious carrier is listed; the labelled pointer is the one added line; link counts 1 to 2 (one repointed, one added) match the Link lines.",
+      "sourceDigest": "30245265d7fc653884caff4a90018addd38af26a0e29f35223b0f4fcd4ecdd20",
+      "targetDigest": "8d879f9c47c2ff7d5802b8a53b77ac6b4367b511681b018b81644f370b5abae6"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "entry": "claim_5766225be2d76d6239e116a664aec7cf",
+      "verdict": "ok",
+      "note": "deep: move of 2. Historical Supersession Table (depth 2 to 4); four links with identical labels and spelling changed only in relative path (resolved destinations unchanged, so 4 changed and 0 destination changes is right), my line delta is [] and [], payload equal after link normalisation; heading-and-links is the correct accounting.",
+      "sourceDigest": "70847eb505d007a2f2d5667bd66ecb218b1714f49112e48163ab449ad74f5dc8",
+      "targetDigest": "7a121f1faaa77b183e3e2d5b187d1ae7a2d65980bfa7a3a4ead0088e25ef938e"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "entry": "claim_088af18a5796ed72fe6d33ff2cc5d05c",
+      "verdict": "ok",
+      "note": "deep: move of 5. ReleaseManifest (depth 2 to 4); one link with unchanged label and resolved destination, delta [] and []; heading-and-links accounting is right and the unchanged-since sentence matches the ok row dab66237 at 345f15d95.",
+      "sourceDigest": "b801deec612f9c048de490e35353b38f99031f2bac692e2955b64c7b1411587b",
+      "targetDigest": "dab662376a62121a0cdec73438f62b6955fe94aa868d54deceb124c3aceaefee"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "entry": "claim_163988c8973416bdd64781cc7c667f65",
+      "verdict": "ok",
+      "note": "deep: move of the whole Workspace Runtime Model file (H1 to depth 3 inside spec.md) with 3 links; the Link lines match the source and target links, one resolved destination changes (workspace-topology to system-architecture/architecture/workspace-topology.md, which exists), delta [] and []; the file base name used as source context is the extractor convention for a first-line H1; the unchanged-since sentence names the ok row d53ab4e2 at 62751458b.",
+      "sourceDigest": "b40b26ddf0efce28d42470472e5c0ff0ec8976b3a7c2e8793bfd9bfef47c06b0",
+      "targetDigest": "d53ab4e2ea878a02f665cfaa616e61dbd2a988f027669faff34b62bd1834ad2e"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "entry": "claim_4eeb2f406288458e61bad21531966ab1",
+      "verdict": "ok",
+      "note": "deep: supersede of Data Dictionary (depth 2 to 4, same title); the payload is byte-equal so the unit digests differ only by depth, and the disposition sentence that the complete source section occurs verbatim inside the target section is true; 0 links; unchanged-since digest 3dd2d51f at 287a22d33 is the latest ok row.",
+      "sourceDigest": "04f89e98512b5fd7af474ab2abbf362b9a0d30a25b5a911d011037539b3a9d3f",
+      "targetDigest": "3dd2d51fac193d78f712a83b2f0918c9f5f48a0e8eb65572afda4bb678b1de95"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "entry": "claim_66f7be3b79ca1fe458ce0416ba1adf89",
+      "verdict": "ok",
+      "note": "deep: supersede of 14. Related Files with 6 links whose labels are unchanged and 2 resolved destinations changed, delta [] and []; the sentence that the target changed since the last reviewed digest 1b5703ab at 2300d6557 is true (current target digest is 12cc1851 and later rows for it are reworks), so no unchanged claim is made for a changed target.",
+      "sourceDigest": "b94c5cec93998f88a549a7613a90fbb1c4f111181aacf0faffc469528603bf9f",
+      "targetDigest": "12cc18517f23da3cdd1de3e0a0090371e92f19fce30063363466eb6fdea56cb6"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "entry": "claim_53ebf4b541ff8f6a2c40e3b95304d6b7",
+      "verdict": "ok",
+      "note": "deep: supersede of 1. Read First with 8 links (labels unchanged, 1 destination change) and the section delta [] and []; every Link line quotes a link actually present on the stated side and the resolved paths exist; unchanged-since 16929d43 at 62751458b matches the ok row in review-step10-rationales-12-62751458b.",
+      "sourceDigest": "2aff5e7721a256efce78953c498af0839f56f0bb5b9918290a36bbc072659eb1",
+      "targetDigest": "16929d439319f41461ebf8f9278446e233b23a3b2450a9b9bd4295b12e1052db"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "entry": "claim_2ae0cd4fc1cf487f7caa4d77d46e9682",
+      "verdict": "ok",
+      "note": "deep: supersede of 4. Related Files with 4 links (labels unchanged, 1 destination change), delta [] and []; the Link lines and resolved paths are right; unchanged-since 6dcde68b at 62751458b matches the ok row in review-step10-rationales-12-62751458b.",
+      "sourceDigest": "93e63d0c77140732f2db5dcff67c39869f924d501e3556dfb36a9d48cc73ed8d",
+      "targetDigest": "6dcde68b9663bbcefb3354897ee57514583ac7767a09df3f74a615011844a828"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "entry": "claim_239931ca8e26fd3b19bf970e30e2ae4b",
+      "verdict": "ok",
+      "note": "deep: move of 7. Contract Authority Matrix (depth 2 to 4) with 11 links of which 9 are repointed (9 changed, 9 destination changes, the two unchanged ones are rightly not listed); labels unchanged, delta [] and []; several repointed destinations are history files under retired-engine, which exist and are named in the Link lines; unchanged-since 17884089 at 62751458b is an ok row.",
+      "sourceDigest": "4d28b9272b26427ed2d52f257a57be32113f564fe2a49e164ba95262b990fe73",
+      "targetDigest": "1788408993b6607a28c59c3925c30846ec8eaaf79c32672b36ca78c29969d35c"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "entry": "claim_c1741ef08c45e88d276f75b668de7452",
+      "verdict": "ok",
+      "note": "deep: supersede of the H1 section of the boundary map proposal; removed [] and 20 added lines that I recomputed, namely the candidate metadata fence, the labelled Added in candidate paragraph and the Source relationship line, so the additive-candidate-section accounting is right; the 9 source links are all repointed (one to the history carrier for the intent ledger) plus one added original source link, matching 10 changed, 1 destination change, 1 added; the four related-binding evidence lines exist at the cited lines of component-boundary.md.",
+      "sourceDigest": "2e1bf1c32aef1b208e6145a9016e75a6c3cdc39dbc2f7124cb23ec012a4f2872",
+      "targetDigest": "a037734758fe338df958d787c389a2ceeeedeb87a6402677a3803484a3fefe5e"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "entry": "claim_cd345b6c8a7da2451c2acf04ba8c5292",
+      "verdict": "ok",
+      "note": "deep: move of 8.7 Bảng tình huống chuẩn from docs/specs/confinement-authority.md to agent-confinement/spec.md; unit digests are equal and the heading and payload are byte-equal in both files (checked by diff, depth and title identical), so the equal-section statement is true and the former labelled-successor sentence is correctly gone; 0 links; unchanged-since digest at 62751458b matches the ok row in review-step10-rationales-10-62751458b.",
+      "sourceDigest": "951028a48688bf9bf121f61795876c4aa5bbe52d0dd58383dbb76608271980f9",
+      "targetDigest": "951028a48688bf9bf121f61795876c4aa5bbe52d0dd58383dbb76608271980f9"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "entry": "claim_9a1cd05f74418890fbca8955aa76b378",
+      "verdict": "ok",
+      "note": "deep: move of 9. Default implementation đầu tiên from docs/specs/confinement-authority.md to agent-confinement/spec.md; unit digests are equal and the heading and payload are byte-equal in both files (checked by diff, depth and title identical), so the equal-section statement is true and the former labelled-successor sentence is correctly gone; 0 links; unchanged-since digest at 62751458b matches the ok row in review-step10-rationales-10-62751458b.",
+      "sourceDigest": "e78c37d28fb7fbf09e1c978624d56d78b442c8082d44b3b19c61e9be95642831",
+      "targetDigest": "e78c37d28fb7fbf09e1c978624d56d78b442c8082d44b3b19c61e9be95642831"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "entry": "claim_2c080a72c195a28a1ca8efb0e1187f11",
+      "verdict": "ok",
+      "note": "deep: move of 9.1 Support matrix của default from docs/specs/confinement-authority.md to agent-confinement/spec.md; unit digests are equal and the heading and payload are byte-equal in both files (checked by diff, depth and title identical), so the equal-section statement is true and the former labelled-successor sentence is correctly gone; 0 links; unchanged-since digest at 62751458b matches the ok row in review-step10-rationales-10-62751458b.",
+      "sourceDigest": "6547070a649080a9b46e64e56a74695a0a27993e07e7d917978fd4b56697af4d",
+      "targetDigest": "6547070a649080a9b46e64e56a74695a0a27993e07e7d917978fd4b56697af4d"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "entry": "claim_3770d5a0b897fbd8c1393a38c48c3333",
+      "verdict": "ok",
+      "note": "deep: move of 9.2 hostRead blind from docs/specs/confinement-authority.md to agent-confinement/spec.md; unit digests are equal and the heading and payload are byte-equal in both files (checked by diff, depth and title identical), so the equal-section statement is true and the former labelled-successor sentence is correctly gone; 0 links; unchanged-since digest at 62751458b matches the ok row in review-step10-rationales-10-62751458b.",
+      "sourceDigest": "28ef20e16a5b5c8d4fe7db58cfb81fa2915a15bd591ddfbdac9094abd5cdd4bc",
+      "targetDigest": "28ef20e16a5b5c8d4fe7db58cfb81fa2915a15bd591ddfbdac9094abd5cdd4bc"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "entry": "claim_96b54d15ac01f69e7df991151c2268be",
+      "verdict": "ok",
+      "note": "deep: move of 10. Lộ trình rollout từ docs/specs/confinement-authority.md into agent-confinement/history/rollout-and-settled-facts.md; the target heading is a real heading (not inside a fence, line 24) and the section text is byte-equal to the source with equal unit digests, so the new equal-section accounting is true (the earlier wrapper caveat no longer applies to this bound unit); 0 links; unchanged-since d190224e at 62751458b is an ok row.",
+      "sourceDigest": "d190224e5d950146033421700ed7ddb13820841f2cebcdb371223943ceacd82d",
+      "targetDigest": "d190224e5d950146033421700ed7ddb13820841f2cebcdb371223943ceacd82d"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "entry": "claim_1ef2bc00c79bc7a40787b62a4943f0df",
+      "verdict": "ok",
+      "note": "deep: move of 11. Proof và Definition of Done from docs/specs/confinement-authority.md to agent-confinement/spec.md; unit digests are equal and the heading and payload are byte-equal in both files (checked by diff, depth and title identical), so the equal-section statement is true and the former labelled-successor sentence is correctly gone; 0 links; unchanged-since digest at 62751458b matches the ok row in review-step10-rationales-10-62751458b.",
+      "sourceDigest": "57cf348eee6c014023677b375f253194430c8b05e051987ccbb1ad56e611e828",
+      "targetDigest": "57cf348eee6c014023677b375f253194430c8b05e051987ccbb1ad56e611e828"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "entry": "claim_7aacf43ab14386fce6c4a5a8a0519402",
+      "verdict": "ok",
+      "note": "mechanical: extractor digests recomputed (equal both sides), cited lines and anchor match the real spans, direct sections byte-equal (cmp), link count 0 and 0, depth and title and ancestry contexts equal the rationale, target digest unchanged since 62751458b (git show), anchor passes list-doc-anchors; I did not re-read the text beyond the rationale.",
+      "sourceDigest": "6d170846be1146514c997c484be5a940415a4a695507cfad1750510d531bd0d9",
+      "targetDigest": "6d170846be1146514c997c484be5a940415a4a695507cfad1750510d531bd0d9"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "entry": "claim_9168d8af609c58932a87918d4a49b8aa",
+      "verdict": "ok",
+      "note": "mechanical: extractor digests recomputed (equal both sides), cited lines and anchor match the real spans, direct sections byte-equal (cmp), link count 0 and 0, depth and title and ancestry contexts equal the rationale, target digest unchanged since 62751458b (git show), anchor passes list-doc-anchors; I did not re-read the text beyond the rationale.",
+      "sourceDigest": "82ad2c5e239e041eee2e98c16e8b463b09fb944eade7c446627ee3509bf79fc8",
+      "targetDigest": "82ad2c5e239e041eee2e98c16e8b463b09fb944eade7c446627ee3509bf79fc8"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "entry": "claim_78563a2491b11f7a0b412c5b900a7414",
+      "verdict": "ok",
+      "note": "deep: 11.3 Behavior probes read in both files (probe bullets and closing paragraph), byte-identical, no links, both under Proof and Definition of Done; equal-section and move wording is true and the old invented label sentence is gone; last-reviewed digest unchanged at 62751458b.",
+      "sourceDigest": "a7a202fee6a85efd0c8a379637bd43e9f5391a9cda96a3d428077837f92f3311",
+      "targetDigest": "a7a202fee6a85efd0c8a379637bd43e9f5391a9cda96a3d428077837f92f3311"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "entry": "claim_dc8b5bc2507201dd705fcd64deba8224",
+      "verdict": "ok",
+      "note": "deep: 11.4 Observability five bullets read in both files, byte-identical, same depth and ancestry; the equal-section sentence replaces the earlier false replacement wording and every other fact line matches my recomputation.",
+      "sourceDigest": "3ab503ef0253b33caddd6ae3e969b0ca08877af01ef959ca2fcbce54b548419e",
+      "targetDigest": "3ab503ef0253b33caddd6ae3e969b0ca08877af01ef959ca2fcbce54b548419e"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "entry": "claim_b532b9a9eb7f76d041c343e2d45bf859",
+      "verdict": "ok",
+      "note": "deep: 11.5 Doctor/setup paragraph read in both files, byte-identical, no links; cited spans, digests, contexts and the equal-section sentence all match my recomputation; no labelled correction applies and none is claimed.",
+      "sourceDigest": "2bcf45ee10d616e860737c38258d6a819c63e4a5f86ef7668e37abf3d6b9a3fe",
+      "targetDigest": "2bcf45ee10d616e860737c38258d6a819c63e4a5f86ef7668e37abf3d6b9a3fe"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "entry": "claim_e793bd095f4a872b0bc08757c827359f",
+      "verdict": "ok",
+      "note": "mechanical: extractor digests recomputed (equal both sides), cited lines and anchor match the real spans, direct sections byte-equal (cmp), link count 0 and 0, depth and title and ancestry contexts equal the rationale, target digest unchanged since 62751458b (git show), anchor passes list-doc-anchors (target context is the Added in candidate decisions carrier, as named); I did not re-read the text beyond the rationale.",
+      "sourceDigest": "52a57335bb3e35e9a18d3af5acbb56331567d845bd468629f7c4ea3ee5a4935f",
+      "targetDigest": "52a57335bb3e35e9a18d3af5acbb56331567d845bd468629f7c4ea3ee5a4935f"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "entry": "claim_7aede254166851de375089f4b0160ca6",
+      "verdict": "ok",
+      "note": "deep: heading 13 direct section (intro plus seven numbered settled risks) read in the legacy spec and in history/rollout-and-settled-facts.md, byte-identical; target context correctly named as the Added in candidate rollout carrier; subsections 13.1 to 13.3 and the open items are separate rows.",
+      "sourceDigest": "5b4b826dee4bf97e40378670f520aa3dc9c667d40de9d6e2b10447578371d38f",
+      "targetDigest": "5b4b826dee4bf97e40378670f520aa3dc9c667d40de9d6e2b10447578371d38f"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "entry": "claim_39c40cef341e227d936ea768b12ba435",
+      "verdict": "ok",
+      "note": "mechanical: extractor digests recomputed (equal both sides), cited lines and anchor match the real spans, direct sections byte-equal (cmp), link count 0 and 0, depth and title and ancestry contexts equal the rationale, target digest unchanged since 62751458b (git show), anchor passes list-doc-anchors (target context is the Added in candidate rollout carrier plus the 13 heading, as named); I did not re-read the text beyond the rationale.",
+      "sourceDigest": "ea51c76dca7a1c31cbc4288b0970c5b108a4ebf755e9b0d5790638262cf0580b",
+      "targetDigest": "ea51c76dca7a1c31cbc4288b0970c5b108a4ebf755e9b0d5790638262cf0580b"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "entry": "claim_bed90dbb7de2a5782fafcdb4a3d6e0da",
+      "verdict": "ok",
+      "note": "deep: 13.2 login-renewal section read in both files, byte-identical; target ancestry is the labelled Added in candidate current-settled-facts heading and the rationale names exactly that context; move and equal-section wording true.",
+      "sourceDigest": "21f2bf3ad52967fc6e5414fed7ade9b084a6c1a76adf93fbcb39447ca3f5da84",
+      "targetDigest": "21f2bf3ad52967fc6e5414fed7ade9b084a6c1a76adf93fbcb39447ca3f5da84"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "entry": "claim_3f1a1bbd362edb4ff925ff6de3cbd823",
+      "verdict": "ok",
+      "note": "mechanical: extractor digests recomputed (equal both sides), cited lines and anchor match the real spans, direct sections byte-equal (cmp), link count 0 and 0, depth and title and ancestry contexts equal the rationale, target digest unchanged since 62751458b (git show), anchor passes list-doc-anchors (target is the decisions carrier, context Added in candidate plus 12 Quyet dinh cua proposal, as named); I did not re-read the text beyond the rationale.",
+      "sourceDigest": "49cfcc85f0287a57313ea8cce45d4a511fad6cb36fefbdfc7c532acaf1ffe1ad",
+      "targetDigest": "49cfcc85f0287a57313ea8cce45d4a511fad6cb36fefbdfc7c532acaf1ffe1ad"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "entry": "claim_06e68651628b7a731b974ec5c34c9743",
+      "verdict": "ok",
+      "note": "deep: Open Deferred Items section (P04 M-3, P03 NEW-1b/c and P06 M2, P03 R4, strict-mode default) read in both files, byte-identical; target ancestry is the labelled current-settled-facts heading as the rationale says.",
+      "sourceDigest": "9f3428ddbdb9c7e79116cfd005571f29b2bf61f2f64344dedf46a0628b04b35f",
+      "targetDigest": "9f3428ddbdb9c7e79116cfd005571f29b2bf61f2f64344dedf46a0628b04b35f"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "entry": "claim_1d1eb2ce98dcf1855678b2cf86c2ee67",
+      "verdict": "ok",
+      "note": "deep: 14 Pointers hien tai (eight pointer bullets) read in both files, byte-identical, same ancestry; equal-section sentence is true and no carrier or correction is claimed.",
+      "sourceDigest": "68ee70ad03e7863859d56156353b04a9e61b3188841abf5c84e482b110afd3a2",
+      "targetDigest": "68ee70ad03e7863859d56156353b04a9e61b3188841abf5c84e482b110afd3a2"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "entry": "claim_fefb1bf47fc375b9e83089dc6059326c",
+      "verdict": "ok",
+      "note": "deep: decision-citation-drift Pointers (implementation) section including the retired supersession-check paragraph read in both files, byte-identical; link count 0 and 0 and equal-section wording true.",
+      "sourceDigest": "95e71b5dfa80858cdc6300b28de97966fb7de22d77bdba919c47ad7c9b81d32f",
+      "targetDigest": "95e71b5dfa80858cdc6300b28de97966fb7de22d77bdba919c47ad7c9b81d32f"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "entry": "claim_7e17ce226062d06a53b940f64b9d5cdb",
+      "verdict": "ok",
+      "note": "mechanical: extractor digests recomputed (equal both sides), cited lines and anchor match the real spans, direct sections byte-equal (cmp), link count 0 and 0, depth and title and ancestry contexts equal the rationale, target digest unchanged since 62751458b (git show), anchor passes list-doc-anchors; I did not re-read the text beyond the rationale.",
+      "sourceDigest": "e57fadfa3c6367e1098e0565fa3a61fe011bb34b4994eb241557beaa2c2ff879",
+      "targetDigest": "e57fadfa3c6367e1098e0565fa3a61fe011bb34b4994eb241557beaa2c2ff879"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "entry": "claim_b2a51d5d39832d330879947bdbbcb227",
+      "verdict": "ok",
+      "note": "deep: Observe Owns section: the A40 correction (friction list gains ping and migrate) has its before-text once in the legacy section and its after-text in the target, evidence friction_cli.rs:7-9 at 2107c4761 lists record resolve list show rank ping migrate; the single link ../platform/session-identity/spec.md becomes ../session-identity/spec.md and both resolve to docs/platform/session-identity/spec.md; after correction and link normalization 0 removed and 0 added, so heading-and-links is true.",
+      "sourceDigest": "ca2fd76b4ca2fe575e858e1f9ae76cf0ddf0f7300593c6a58b11ac2249b4d1b2",
+      "targetDigest": "a03c9cf9107371c2ec305cd2efea93cc9ca0f549ec485158bdb5e9ecc05c63aa"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "entry": "claim_552ef3d6e22bac10c24cc31e48463d50",
+      "verdict": "ok",
+      "note": "deep: Data Dictionary table, five modified rows: rows 1b, 3 and 8 are exactly the four listed A41 corrections (each before-text occurs once in the legacy section, each after-text is in the target); the two residual lines are rows 9 and 10 and the rationale removed and added arrays equal my multiset diff verbatim; both removed rows occur verbatim in the new runner/spec.md carrier (heading section historical-source-section-552ef3d6 and fence unheaded-block-7) and both added rows carry an Added in candidate label; the A41 label token is present in the pinned account (independent audit found no label finding).",
+      "sourceDigest": "b91663aeb373f3e9759bda7e8edf97edc512497d6d3adbf55ebdb6b8c7af5187",
+      "targetDigest": "3ffc347bf68707fd1a1b4d6d8673db7d38467fae324107ddf64e6151d03a3c41"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "entry": "claim_224b5f54d28b453f1e3feaced0468399",
+      "verdict": "ok",
+      "note": "deep: Gate A section (87 vs 79 lines): applying the three source-anchored A41 corrections to the legacy section reproduces the target exactly (0 removed, 0 added, same order); the fourth correction is an intermediate state and the claim is true (bin/fgos.mjs:4373,4461 is in the target at 19ca8de23, 4415,4503 at 62751458b and HEAD); heading-and-links is the right class and no carrier is needed because the replaced wording is the A41-corrected false current-state text.",
+      "sourceDigest": "52a283ef3e1356d53fc5ae6efb44c1c8c687858b70009ef970c11e151b896b6d",
+      "targetDigest": "445c152056e209d17110ce712ff081e8adc824b2abba8197069b59ad8fcc37ab"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "entry": "claim_0686418ae7571d82eade8059c698709d",
+      "verdict": "ok",
+      "note": "deep: Actors and Access table: one row changes (the Gate A evolve operator row, a check mark becomes Historical operator role with an Added in candidate door-removed note); removed and added arrays equal my diff, the removed row is verbatim in the new runner/spec.md carrier (fence unheaded-block-9 and heading historical-source-section-0686418a), the added line self-labels, and Applicable labelled corrections none is accurate (no manifest correction after-text is in this section).",
+      "sourceDigest": "3f682e32dc04d19e654abc927f8a3570f8ed866f17711e4ff18302e2840461e7",
+      "targetDigest": "704500af02588d8c934f08e738fc13445896cc4feba37d83c162b866d7d59e42"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "entry": "claim_099eb566c825967cf35f9397f2d7b947",
+      "verdict": "ok",
+      "note": "deep: Edge Cases Settled: exactly one bullet changes, an Added in candidate sentence (historical e2e scenario of the removed evolve door, no current coverage claim) is prefixed to the otherwise unchanged bullet; arrays equal my diff, the removed bullet is verbatim in the new carrier (fence unheaded-block-11 and heading historical-source-section-099eb566), corrections none is accurate; both digests also hand-recomputed in Python.",
+      "sourceDigest": "c1c87e9a7f22cc4d3693c5d83d5ecac2fd90fa0386e03fb890638cf059c10de4",
+      "targetDigest": "8fbc6ed74d8d0c274acc53ef231e5bdb2172c02bd6c16f6aadf861a096623f9e"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "entry": "claim_4efee765e5a47fc42f4d9cccc7a53191",
+      "verdict": "ok",
+      "note": "deep: Pointers (implementation): both listed A41 corrections (entropy.mjs pointer to the Rust entropy.rs handler, candidates.mjs pointer to a removal statement) have before-text in the legacy section and after-text in the target; the one residual bullet (evolve verb) is replaced by a labelled historical description, arrays equal my diff, the removed bullet is verbatim in the new carrier (fence unheaded-block-13 and heading historical-source-section-4efee765); existing label A41 is a whole token in the pinned account; both digests hand-recomputed in Python.",
+      "sourceDigest": "4bed9c69a1de3312aca4a42931d4d848718ce35f6e8ee2c964b4395748e3cf10",
+      "targetDigest": "850878a688f3b9c613114ddcb166a7fd1038b2865e113b41b99251817f40721e"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "entry": "carrier-552ef3d6",
+      "verdict": "ok",
+      "note": "deep: appended H2 Historical source section 552ef3d6 in docs/platform/runner/spec.md: the ~~~~text fence equals the legacy docs/specs/runner.md Data Dictionary direct section byte for byte (sha256 recomputed, source anchor unique, no tilde fence inside the source), the preamble is labelled Added in candidate, says historical and points to the existing successor h-02842f76ffd2/spec.md#data-dictionary; the file diff 1d92a7229..4d3634360 is 163 pure insertions at end of file so no existing anchor renumbers.",
+      "sourceDigest": "66b8d6214e0ee226ba4e2281b69b31149136d529985f4ad47947d9b812a9c6ff",
+      "targetDigest": "66b8d6214e0ee226ba4e2281b69b31149136d529985f4ad47947d9b812a9c6ff"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "entry": "carrier-0686418a",
+      "verdict": "ok",
+      "note": "deep: appended H2 Historical source section 0686418a in docs/platform/runner/spec.md: the ~~~~text fence equals the legacy docs/specs/runner.md Actors and Access direct section byte for byte (sha256 recomputed, source anchor unique, no tilde fence inside the source), the preamble is labelled Added in candidate, says historical and points to the existing successor h-6df5686d0d54/spec.md#actors-access; the file diff 1d92a7229..4d3634360 is 163 pure insertions at end of file so no existing anchor renumbers.",
+      "sourceDigest": "dc4aa74f90f5d31ad01b168b95def5e58294caf629f7e3547e79a6f6e7c283d8",
+      "targetDigest": "dc4aa74f90f5d31ad01b168b95def5e58294caf629f7e3547e79a6f6e7c283d8"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "entry": "carrier-099eb566",
+      "verdict": "ok",
+      "note": "deep: appended H2 Historical source section 099eb566 in docs/platform/runner/spec.md: the ~~~~text fence equals the legacy docs/specs/runner.md Edge Cases Settled direct section byte for byte (sha256 recomputed, source anchor unique, no tilde fence inside the source), the preamble is labelled Added in candidate, says historical and points to the existing successor h-37aced3896a8/spec.md#edge-cases-settled; the file diff 1d92a7229..4d3634360 is 163 pure insertions at end of file so no existing anchor renumbers.",
+      "sourceDigest": "d79fe195afbe5a4dc3a512da0701f3755e8b75033f4c0b7cbc3b2f19c036a6ac",
+      "targetDigest": "d79fe195afbe5a4dc3a512da0701f3755e8b75033f4c0b7cbc3b2f19c036a6ac"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "entry": "carrier-4efee765",
+      "verdict": "ok",
+      "note": "deep: appended H2 Historical source section 4efee765 in docs/platform/runner/spec.md: the ~~~~text fence equals the legacy docs/specs/runner.md Pointers (implementation) direct section byte for byte (sha256 recomputed, source anchor unique, no tilde fence inside the source), the preamble is labelled Added in candidate, says historical and points to the existing successor h-f34e0d170d89/spec.md#pointers-implementation; the file diff 1d92a7229..4d3634360 is 163 pure insertions at end of file so no existing anchor renumbers.",
+      "sourceDigest": "72979b2afcaaf5abc5490bc6e660241e85b7ca77c871f83633f5107c814c33a0",
+      "targetDigest": "72979b2afcaaf5abc5490bc6e660241e85b7ca77c871f83633f5107c814c33a0"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "entry": "tool-01",
+      "verdict": "ok",
+      "note": "deep: 21-line diff read against the earlier rework causes: checkSectionExplanation now ignores a witness equal to the same-side bound unit by path, anchor and commit and needs a whole-line match instead of substring; sectionAccountLabels is a bounded case-sensitive regex over registered ids; classifySectionAccounting returns equal-section first and has no fallback label; my scratch probes agree (SHA256-only text gives no label, substring carrier gives removed-line-not-carried); limit: a witness at the same path and anchor but another commit still counts, by design and by test.",
+      "sourceDigest": "dbca8a08886896423b17c8a8173b8d1a997fd9c400625e49f904f561ecbef6c2",
+      "targetDigest": "8533786523af2edba038b3afe4fbcdee1bb3152ea2bec3eda845cabc5b0ca351"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "entry": "tool-02",
+      "verdict": "ok",
+      "note": "deep: new independent checker (66 lines) read in full; imports only node:path, recomputes correction presence, section equality, line multisets and order, line arrays, whole-line carriers, account labels as whole tokens in the pinned account, and link counts by its own LCS pairing; my probes (invented label with SHA256-only account, substring carrier, absent correction before-text, fallback label) are each caught; limits: it never tests that added lines are labelled candidate declarations, intermediate-state corrections skip the before-text test, and rows without a resolvable source are skipped.",
+      "sourceDigest": "none",
+      "targetDigest": "1dd6942a005116b7f695a0b2092f5a563fc633695707388aec1e6a21ea8685f5"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "entry": "tool-03",
+      "verdict": "ok",
+      "note": "deep: audit driver (61 lines) read in full; run through a copy with the output guard and imports retargeted to my scratch dir: 12895 rows, 92 shards, 718 structured, 261 section claims, 719 link claims, 0 findings, and the result is byte-identical to the committed step10-sync4d-independent-consistency.json; limit: 70 rows have no resolvable source and are only listed as sourceWitnessLimits.",
+      "sourceDigest": "none",
+      "targetDigest": "22994c18e1529705f0018c6f563ccfe1d0366a39bd9fec51fa13fec3e16e0af9"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "entry": "tool-04",
+      "verdict": "ok",
+      "note": "deep: 51 added and 123 removed lines read in full: the classifier branches that produced the invented label are gone, labels come from sectionAccountLabels, equal sections classify equal-section, removed lines need whole-line live carriers or generation fails, and the 54 regenerated rows are those with Section accounting plus two named claims; my scan of all 13083 shard rationales: 52 carry Section accounting (20 equal, 15 split-or-corrected, 13 heading-and-links, 2 additive, 2 existing-labelled) and none has the old fallback label; observation: the sentence Added lines are explicit candidate declarations is chosen when any Added in candidate text exists anywhere in the target section, not per added line (true for all six rows of this request, but for claim_fb92651e 12 of 14 added lines sit under one labelled lead sentence), and no checker verifies it.",
+      "sourceDigest": "b2b5ca5bc485e46c4c02fe17ffae6ef191464ed3d89ad30a599171a8124c988e",
+      "targetDigest": "84e3968247a2f7a9216274d550b14a260e26cdd17f3a4e532ccdbb8528835154"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "entry": "tool-05",
+      "verdict": "ok",
+      "note": "deep: four new tests read (self-witness and target-addition rejection with prior-commit acceptance, whole-line-only witnesses, bounded case-sensitive label ids with SHA256 and a25 negatives, equal section never says replacement); all pass in my 500-test run and their assertions match the tool-01 behavior.",
+      "sourceDigest": "c03df31b8a77608095740d61968037b3d557ce1363b9620952bb1735140c08f0",
+      "targetDigest": "467e40ea65e2f591f6facb70f2dd421db4e6a5a1e464383573bbd3884604b753"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "entry": "tool-06",
+      "verdict": "ok",
+      "note": "deep: new test file (30 lines) read: invented label with SHA256-only account, wrong equal-section claim, wrong line arrays, link-count recompute, accept path with a real label, replacement wording on an equal section, substring versus whole-line carrier; all pass; limit: no test for the finding types correction-before-absent, correction-after-absent, invented-fallback-label, unregistered-account-label or section-link-count (I probed the first and the third in scratch and both fire).",
+      "sourceDigest": "none",
+      "targetDigest": "0101ce334ad09c3c43d9359f9157400030dbbea10559956b9141c9371b0091dc"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "entry": "tool-07",
+      "verdict": "ok",
+      "note": "deep: consistency.py is byte-identical to step10-sync287-reproduce.py (sha256 fd497120); it now launches only the independent audit (the generator --check is gone from this door), needs an absolute external output under /tmp/fgos-work, refuses symlink and hardlink; I could not run the wrapper as written because the output must be under /tmp/fgos-work, so I ran the audit it launches through a retargeted copy (result byte-identical to the committed one); two copies under two names are redundant.",
+      "sourceDigest": "beb8ef23f7b23767b9a9c0be364220228685ea8e663f81123f8948033830c197",
+      "targetDigest": "fd4971206235f91252501b715bbf7b0a6ae244ee5bebbbff9285dc3c9541c4f0"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "entry": "tool-08",
+      "verdict": "ok",
+      "note": "deep: step10-sync287-reproduce.py is byte-identical to consistency.py (sha256 fd497120), so the tool-07 reading applies unchanged: independent audit only, absolute external output, no symlink or hardlink, NODE_OPTIONS default 3072; audit result reproduced byte-identical through a retargeted copy.",
+      "sourceDigest": "beb8ef23f7b23767b9a9c0be364220228685ea8e663f81123f8948033830c197",
+      "targetDigest": "fd4971206235f91252501b715bbf7b0a6ae244ee5bebbbff9285dc3c9541c4f0"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "entry": "tool-09",
+      "verdict": "ok",
+      "note": "deep: new wrapper (28 lines) read: requires an absolute output dir under /tmp/fgos-work outside the repo and not a symlink, rejects symlink and hardlink entries, materializes manifest scripts, runs the audit and five scripts and exits non-zero if any fail; the wrapper logic is sound, but run end to end through a retargeted copy it exits 1 on ownership and audit-ownership because of the manifest content (see tool-10), and checks exits 1 on the disclosed check A offender list, so the package as committed cannot pass; no rework asked on the wrapper itself.",
+      "sourceDigest": "none",
+      "targetDigest": "c878ccc2b9a580ab6433fa36e0652e9d366cff4b0168cb2414ed539ddd4aa867"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "entry": "tool-10",
+      "verdict": "rework",
+      "note": "deep: new manifest read; its ownership.mjs imports the lib from the hardcoded /tmp/fgos-work/round5/step10-sync287-lib.mjs instead of from --output-dir, so the committed command with --output-dir /tmp/fgos-work/REVIEWER fails with ERR_MODULE_NOT_FOUND and audit-ownership then fails with ENOENT on step10-round5-target-ownership.json (reproduced with a retargeted copy of the wrapper: audit, fast and replay exit 0, ownership and audit-ownership exit 1); fix: import the lib relative to the output dir as the 627 manifest now does and rerun the wrapper end to end; the same hardcoded import is in step10-sync4d-reproduction.json (ownership.mjs imports /tmp/fgos-work/package4d/lib.mjs), which breaks step 3 of this request header.",
+      "sourceDigest": "none",
+      "targetDigest": "fb38b7f77714004301f54066fa37409bd80d6c8a8f1452ae26c5dd6039677301"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "entry": "tool-11",
+      "verdict": "ok",
+      "note": "deep: diff read: six materialized scripts now take --output-dir with a startsWith /tmp/fgos-work/ guard and import the lib from that dir; I ran ownership-readonly, audit-ownership-readonly and replay-readonly.py from the manifest with the guard retargeted: 254 collisions and ok true, link replay 366 original and 98 later rows with 0 findings, outputs identical to the committed ones; observations: the guard is a bare prefix test (a path with .. would pass) and the notes still say all outputs go to /tmp/fgos-work/review627.",
+      "sourceDigest": "60070cb2b3ab0c6daff10f0afba523928897a26f4ecb1bd02ba0c0d964d891a9",
+      "targetDigest": "58b91f7070dd5eaefba13e2a41c4bbb8cc985c43bb8334f3d2bf066d60abfdc3"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "entry": "claim_d5e5139015078092355b369260cee249",
+      "verdict": "ok",
+      "note": "deep: new heading unit historical-source-section-0686418a in docs/platform/runner/spec.md: after tuple equals the HEAD working-identity-registry record field for field, unitDigest (sha256 of heading plus textDigest) and identityFingerprint reproduced by the extractor, claim absent from the f1f414b02 registry (before null); the registry holds 19 units for this file and all 19 equal the extractor output, and the document record sourceDigest and blobSha equal the committed file; this approves the identity tuple only, not truth.",
+      "sourceDigest": "0232edaa58949708208a01bab57f0b92fa341bac85d0085530d5909fef47170a",
+      "targetDigest": "none"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "entry": "claim_982fa232e8267691441436f1d7d48b22",
+      "verdict": "ok",
+      "note": "deep: new heading unit historical-source-section-099eb566 in docs/platform/runner/spec.md: after tuple equals the HEAD working-identity-registry record field for field, unitDigest (sha256 of heading plus textDigest) and identityFingerprint reproduced by the extractor, claim absent from the f1f414b02 registry (before null); the registry holds 19 units for this file and all 19 equal the extractor output, and the document record sourceDigest and blobSha equal the committed file; this approves the identity tuple only, not truth.",
+      "sourceDigest": "399fd8b3a421c0c53fd57345fffd92928b0b66557e931ef4c495b185dd8a73e5",
+      "targetDigest": "none"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "entry": "claim_f97b02893c6b8f2554062dfea5f5df2c",
+      "verdict": "ok",
+      "note": "deep: new heading unit historical-source-section-4efee765 in docs/platform/runner/spec.md: after tuple equals the HEAD working-identity-registry record field for field, unitDigest (sha256 of heading plus textDigest) and identityFingerprint reproduced by the extractor, claim absent from the f1f414b02 registry (before null); the registry holds 19 units for this file and all 19 equal the extractor output, and the document record sourceDigest and blobSha equal the committed file; this approves the identity tuple only, not truth.",
+      "sourceDigest": "feecc4809f456b2d4201f2527febcdd521ca9eccf64144629268071cea373d0d",
+      "targetDigest": "none"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-05-4d3634360.md",
+      "entry": "claim_847f0e0c56a6695d4097fb1e537ea1bc",
+      "verdict": "ok",
+      "note": "deep: runner/spec.md#historical-source-section-552ef3d6 (new heading, units, origin added-since-62751458b). Heading unit lines 54 to 54 with its section payload covering labelled paragraph 56 and the fenced carrier 58 to 76; textDigest d7474ce2 reproduced by the extractor and by an independent plain sha256 over heading level, title, payload digest and following-block digest, unitDigest 77848f33 equals sha256 of kind plus textDigest, fingerprint 1f7cd60e matches. Registry row equals the pack field for field; claim id absent from the 62751458b registry.",
+      "sourceDigest": "d7474ce22b2aacd3fa972c85a7ab553f0712b9959468763ab90f1bbf91621899",
+      "targetDigest": "none"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-05-4d3634360.md",
+      "entry": "claim_ee99b0951090e8a9aeabd89bf2982f05",
+      "verdict": "ok",
+      "note": "deep: runner/spec.md#unheaded-block-10, the Added in candidate label paragraph of the edge-cases-settled carrier (line 99). Digest 28d0009f is sha256 of the line text and equals the extractor textDigest, fingerprint and unitDigest equal 3f04a257, registry row equal, claim kind specification as pack. The label says historical source text, no current-truth approval, and names the corrected successor anchor, which passes list-doc-anchors.",
+      "sourceDigest": "28d0009fb157647913ed15eaaa21f78a13218cffb6610cda0f0b0d223a61fed6",
+      "targetDigest": "none"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-05-4d3634360.md",
+      "entry": "claim_90fb9245a91d2389ba25704be807be20",
+      "verdict": "ok",
+      "note": "deep: runner/spec.md#unheaded-block-11, fenced carrier lines 101 to 153 of docs/specs/runner.md#edge-cases-settled. The fence body equals the complete direct section of the legacy blob 122d1a51 (the registry source blob) byte for byte, 13595 characters, heading line included, so nothing is lost and nothing is added inside the fence. Digest 75c5c702 reproduced, claimKind contract follows the extractor text heuristic since the section text contains the word contract.",
+      "sourceDigest": "75c5c7028e9031320b63d89f672072416ee952498f10887da01e2bbef4848ed3",
+      "targetDigest": "none"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-05-4d3634360.md",
+      "entry": "claim_c321de74b624d639e56cb4dc77169655",
+      "verdict": "ok",
+      "note": "deep: runner/spec.md#unheaded-block-12, label paragraph of the pointers-implementation carrier (line 158). Digest 26cd8fbf reproduced, fingerprint and unitDigest 06dd4d58 equal, registry row equal. Observation: the file header still names blob ddfa78cc as provenance while this carrier carries the newer 122d1a51 section (two changed pointer lines already present in the h-f34e0d170d89 corrected carrier); the carrier itself is true to the registry source blob, only the header lags.",
+      "sourceDigest": "26cd8fbf0cce5fac3315235ebd00984cd4cc8a7ce80bac342e56f816848a7270",
+      "targetDigest": "none"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-05-4d3634360.md",
+      "entry": "claim_d8a2c7490367e214b55e86913275bd1b",
+      "verdict": "ok",
+      "note": "deep: runner/spec.md#unheaded-block-13, fenced carrier lines 160 to 214 of docs/specs/runner.md#pointers-implementation. Fence body equals the complete direct section of blob 122d1a51 exactly (it differs from the older ddfa78cc blob in two lines, so the carrier took the current source). Digest 16efa16f reproduced, fingerprint and unitDigest 1094f998 equal, registry row equal. The unit is not yet a target of any decision row, which is the known candidate-blocks-unreferenced open data.",
+      "sourceDigest": "16efa16fda7dbea715e869140f384909207de259f0e88effa0b3ad2d106f2798",
+      "targetDigest": "none"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-05-4d3634360.md",
+      "entry": "claim_6598b0201d76ee564e11e9fd1f6da0a2",
+      "verdict": "ok",
+      "note": "deep: runner/spec.md#unheaded-block-6, label paragraph of the data-dictionary carrier (line 56). Digest a271942c reproduced by the extractor and plain sha256, unitDigest and fingerprint 92199296 equal, registry row equal; the label states Added in candidate, historical source text and the anchor of the corrected successor, which exists.",
+      "sourceDigest": "a271942c1834e8f5b9f8a48c5efc501e69d2fa92ef572059f14b24a91f50ed30",
+      "targetDigest": "none"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-05-4d3634360.md",
+      "entry": "claim_0876da817dfa1682359c8d1823d92452",
+      "verdict": "ok",
+      "note": "deep: runner/spec.md#unheaded-block-7, fenced carrier lines 58 to 76 of docs/specs/runner.md#data-dictionary. Fence body equals the complete direct section of the registry source blob 122d1a51 byte for byte (8806 characters) and also of the ddfa78cc blob, but not the 473a0096 map blob, so the carrier follows the synced source. Digest 9216be2c reproduced, fingerprint 0281188e equal, registry row equal.",
+      "sourceDigest": "9216be2c3b07fb41d3f5f27307dd16239899a8f1a1207932bd4af7445a38bcdf",
+      "targetDigest": "none"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-05-4d3634360.md",
+      "entry": "claim_9e9010f284010e4ee3fbc67deed8e8f1",
+      "verdict": "ok",
+      "note": "deep: runner/spec.md#unheaded-block-8, label paragraph of the actors-access carrier (line 81). Digest 47471757 reproduced, fingerprint and unitDigest 3b6fd344 equal, registry row equal, successor anchor h-6df5686d0d54 actors-access passes the anchor check.",
+      "sourceDigest": "4747175709c4cc34d23b4b59027e00fe31f95728f8f7791d33696ae2cd660861",
+      "targetDigest": "none"
+    },
+    {
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-05-4d3634360.md",
+      "entry": "claim_4494775f2688c7b3ef05ffb458dd628a",
+      "verdict": "ok",
+      "note": "deep: runner/spec.md#unheaded-block-9, fenced carrier lines 83 to 94 of docs/specs/runner.md#actors-access. Fence body equals the complete direct section of blob 122d1a51 and of the older blobs (552 characters). Digest 30ad6c3c reproduced, fingerprint and unitDigest a012b5f2 equal, registry row equal.",
+      "sourceDigest": "30ad6c3c321a462677fbc037c612520d07495a445dd6a82810f85c1c30d591a9",
+      "targetDigest": "none"
+    }
+  ],
+  "tableCounts": {
+    "ok": 75,
+    "rework": 6
+  },
+  "notesAndConcernsRead": [
+    "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+    "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-05-4d3634360.md"
+  ],
+  "allEntryAccounting": [
+    {
+      "entryId": "rationale-01",
+      "kind": "changed-rationale",
+      "claimId": "claim_08f9b4c140ce931a064c131c2bd4e014",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s10-systemic-native-predecessors.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: supersede of unheaded-block-26 (lines 456-467) of runner/operations/h-51f5cd7279fd.md from the 19ca8de23 witness to the same anchor now; a character diff shows the only change is the citation bin/fgos.mjs:4373,4461 to 4415,4503, which is exactly the one labelled correction the rationale names (before text is in the source witness, after text in the target); the cited lines 4414-4417 and 4503 at 5035fed52 are the unknown-verb default and the refuseHelp call; the last-reviewed sentence matches the ok row of review-step10-accounting-06-62751458b for 0f61fde6 which equals the current target digest."
+    },
+    {
+      "entryId": "rationale-02",
+      "kind": "changed-rationale",
+      "claimId": "claim_61244b0a84842a2771f7cdb493ebb699",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s10-systemic-native-predecessors.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: supersede of unheaded-block-2 of runner/subcomponents/h-f34e0d170d89/spec.md; the character diff shows the only change is the pointer bin/fgos.mjs:4640-4643; bin/fgos.mjs:4373-4380 replaced by bin/fgos.mjs:4414-4417, matching the single labelled correction in the rationale (before text present in the 19ca8de23 source, after text in the target); last-reviewed digest c354e335 at 62751458b has an ok row and equals the current target digest."
+    },
+    {
+      "entryId": "rationale-03",
+      "kind": "changed-rationale",
+      "claimId": "claim_bb161d438c5c39236401c04ce56ef08d",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: heading-only supersede (title No-Build Path mandatory sub-shape to cognitive quality sub-shape, depth 3 to 3); the section payload digest is identical on both sides and my line delta is removed [] and added [] so the heading-and-links accounting is right, the title change is disclosed in the heading line and no correction label is claimed or needed; the unchanged-since sentence matches the ok row 9e3c56fd at 62751458b in review-step10-rationales-01-62751458b."
+    },
+    {
+      "entryId": "rationale-04",
+      "kind": "changed-rationale",
+      "claimId": "claim_fb92651ea85a64c0b6e806926e51a4b2",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: supersede of the driver-disposition heading; my independent line delta is 18 removed and 14 added lines, equal to the exact arrays in the rationale, every one of the 18 removed lines occurs as a full line in both named carriers (history literal-snapshot and its unheaded-block-3, 18 of 18 each), the 14 added lines open with the labelled Added in candidate current-Workflow correction, and the L10-31 before and after fragments equal the entry in step10-round4-doc-edits.json (evidence commit 9b0526380) so no invented label remains; last-reviewed fd599aeb at 62751458b is an ok row."
+    },
+    {
+      "entryId": "rationale-05",
+      "kind": "changed-rationale",
+      "claimId": "claim_ccfcc4bcb24e4f5a31aa634b44e95c7f",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: supersede of section 7 whose title loses the proposals/constraint-advocate.md Phase 6 wording (disclosed in the heading line); the section is additive: removed [] and added two lines that I recomputed, the first starting Added in candidate with the registered counterparts sentence, the second its continuation; the L10-31 before and after fragments match step10-round4-doc-edits.json; last-reviewed e2452463 at 62751458b is an ok row equal to the current digest."
+    },
+    {
+      "entryId": "rationale-06",
+      "kind": "changed-rationale",
+      "claimId": "claim_0261291ac389be7c598690a1c40ef56a",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: heading-only supersede (10. Coding-Domain Stage Protocols to Workflow Step Operations, depth 2 to 2) with byte-equal payload and delta [] and []; the unchanged-since sentence names 287a22d33 which is the latest ok row for ce8fd21d (the 62751458b row is a rework of the old rationale at the same target digest, not of the target), so the sentence is true."
+    },
+    {
+      "entryId": "rationale-07",
+      "kind": "changed-rationale",
+      "claimId": "claim_af6831310fe9fcdaa7c8e69902e3c767",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: partial-carry of 1. Component Classes; the 8 removed lines (two definitions, the 5-line table, the closing paragraph) occur as full lines in release-boundaries.md#restored-class-definitions (8 of 8) and in its blocks 14 to 17, so the carrier list is genuine; the one added line is the labelled pointer; the four named remainder blocks (unheaded-block-7, 8, 10, 11) exist in the source with matching claim ids, digests and prefixes; link 0 to 1 added is right; labels and summary line equal the recomputed facts."
+    },
+    {
+      "entryId": "rationale-08",
+      "kind": "changed-rationale",
+      "claimId": "claim_d5dd5fbdb3483914743a14791a5f02a8",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "verdict": "rework",
+      "bindingMatches": false,
+      "status": "changed-pending-rereview",
+      "note": "deep: the content is conserved (the 11 removed lines are carried verbatim at release-boundaries.md#restored-class-definitions, 11 of 11, and unheaded-block-18) but the rationale states that the removed lines have distinct live carrier witnesses and lists 16 anchors, 10 of which carry no removed text except code-fence markers or a closing brace (external-provider-protocol.md architecture heading, unheaded-block-1, 1-component-classes, unheaded-block-11, 3-component-protocol, unheaded-block-27 and release-boundaries.md architecture heading, unheaded-block-1, restored-physical-placement-layout-tree, unheaded-block-10); restrict the witnesses to anchors that contain at least one non-trivial removed line."
+    },
+    {
+      "entryId": "rationale-09",
+      "kind": "changed-rationale",
+      "claimId": "claim_8066684d5e7c7159d6f58caeef26d8cc",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: partial-carry of 3. Component Protocol; the single removed line (semantic contract stays transport-neutral) occurs as a full line in component-protocol.md#restored-semantic-contract-stays-transport-neutral and unheaded-block-26, both named as witnesses and both real; the one added line is the labelled pointer; the named source remainder block exists with matching claim id and digest; link 0 to 1 is right."
+    },
+    {
+      "entryId": "rationale-10",
+      "kind": "changed-rationale",
+      "claimId": "claim_9a5781f0086209a17330035ff0e58638",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "verdict": "rework",
+      "bindingMatches": false,
+      "status": "changed-pending-rereview",
+      "note": "deep: content conserved (the 10 removed lines are carried at compatibility-harness.md#restored-registry-linker-procedure-and-its-input-output-formula, 10 of 10, plus its blocks 10, 11 and 12) but 8 of the 12 listed carrier witnesses hold only the code-fence lines (external-provider-protocol.md architecture heading, unheaded-block-1, 1-component-classes, unheaded-block-11, 3-component-protocol, unheaded-block-27 and compatibility-harness.md verification heading and unheaded-block-1), so the carrier sentence overstates the evidence; list only anchors that carry a non-trivial removed line."
+    },
+    {
+      "entryId": "rationale-11",
+      "kind": "changed-rationale",
+      "claimId": "claim_80fe1621540d25e5e4f6968bea7e0a0b",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: partial-carry of 5. Core Contracts; the one removed paragraph (Contract versioning) occurs as a full line in component-protocol.md#restored-contract-versioning and its unheaded-block-10, both listed and real; the added line is the labelled pointer; the two retargeted links and the one added link match the Link lines (3 changed, 2 destination changes, 1 added) and every resolved path and anchor exists."
+    },
+    {
+      "entryId": "rationale-12",
+      "kind": "changed-rationale",
+      "claimId": "claim_76dfcba31d147e73488ea3abeade7ef1",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "verdict": "rework",
+      "bindingMatches": false,
+      "status": "changed-pending-rereview",
+      "note": "deep: content conserved (9 removed lines are carried at component-protocol.md#restored-lifecycle-state-chain-received-admitted-refused-selected-re, 8 lines, and the restored-contract-versioning anchor, 1 line) but the rationale lists 24 carrier witnesses of which 20 contain only the fence lines (the whole upper half of spec.md including the primary target's own anchors, and further component-protocol anchors such as unheaded-block-39, 41, 62, 67); the sentence that removed lines have these live carriers is therefore misleading; restrict to anchors that carry non-trivial removed lines."
+    },
+    {
+      "entryId": "rationale-13",
+      "kind": "changed-rationale",
+      "claimId": "claim_080c5cdacf820ed661ab372086ca7e41",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "verdict": "rework",
+      "bindingMatches": false,
+      "status": "changed-pending-rereview",
+      "note": "deep: content conserved (the 23-line layout tree is carried at release-boundaries.md#restored-physical-placement-layout-tree and unheaded-block-10, 23 of 23 each) but 16 of the 18 listed carrier witnesses hold only a code-fence line (the primary target spec.md anchors, release-boundaries.md architecture heading, unheaded-block-1, restored-class-definitions and unheaded-block-18); the carrier list must be limited to anchors with a non-trivial removed line."
+    },
+    {
+      "entryId": "rationale-14",
+      "kind": "changed-rationale",
+      "claimId": "claim_7b3c9cdf89fe70d17f3f526bbdffa385",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: partial-carry of 1. Two Distinct Adapters; the one removed line (both adapters delegate a complete use case) occurs as a full line in component-protocol.md#restored-both-adapters-delegate-a-complete-use-case and unheaded-block-30, both real; one labelled added pointer; remainder block and claim id exist with the stated digest; link 0 to 1 right."
+    },
+    {
+      "entryId": "rationale-15",
+      "kind": "changed-rationale",
+      "claimId": "claim_04f0605dc840e350f63e53d0e1e96843",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: partial-carry of 2. Legacy Payload Identity; the removed package.json bin.fgos line is carried verbatim at release-boundaries.md#restored-package-json-bin-fgos-removed-pointed-at-workspace-shim-at-default-flip-bin-fgos-runner-stays-ownership-hea and unheaded-block-26 (both real); the two added lines are the labelled checked-resolver-status note and the labelled pointer; links 2 to 3 (two repointed with unchanged resolved destination, one added) match the Link lines."
+    },
+    {
+      "entryId": "rationale-16",
+      "kind": "changed-rationale",
+      "claimId": "claim_b1e44493c254c54dc18efa2088b0018a",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: move of the Related Documents list from the 3-link source to the target (depth 2 to 4); labels are unchanged on all three links, two resolved destinations change (host-invocation-routing spec and architecture/external-provider-protocol.md, both exist) and one keeps its destination with a longer relative path, which equals the 3 changed and 2 destination changes stated; my line delta is [] and [] so heading-and-links is the right accounting."
+    },
+    {
+      "entryId": "rationale-17",
+      "kind": "changed-rationale",
+      "claimId": "claim_c072318ec582affe5e0e6936961fadc4",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "verdict": "rework",
+      "bindingMatches": false,
+      "status": "changed-pending-rereview",
+      "note": "deep: content is carried (the 14 removed lines are in component-protocol.md#restored-per-component-repeat-procedure and its blocks 50 and 51, including the Component Boundary Advisory link line) but the rationale lists node-to-rust-migration.md#5-release-r1-distributable-rust-cli-host and #unheaded-block-32 as live carrier witnesses although neither contains any removed line; they match only because the removed link-only line was normalised to the placeholder <link> and the R1 list has a link-only line; drop those two anchors and fix the placeholder matching so a link-only line cannot witness another link."
+    },
+    {
+      "entryId": "rationale-18",
+      "kind": "changed-rationale",
+      "claimId": "claim_e960a05c0b656d0dae2cffd3daee5a0d",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: partial-carry of 10. Migrate Read Models Before Writers; the 8 removed lines (sequence list) are carried at component-protocol.md#restored-per-component-repeat-procedure (8 of 8) and blocks 52 and 53 (1 and 7), all listed and real; one labelled added pointer; remainder blocks recomputed; link 0 to 1 right."
+    },
+    {
+      "entryId": "rationale-19",
+      "kind": "changed-rationale",
+      "claimId": "claim_ac2177776d1a367f2d8e81699b04fc63",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: partial-carry of 13. Rollback Rules; the 7 removed bullet lines occur as full lines in component-protocol.md#restored-rollback-bullets and unheaded-block-57 (7 of 7 each), no spurious carrier is listed; the labelled pointer is the one added line; link counts 1 to 2 (one repointed, one added) match the Link lines."
+    },
+    {
+      "entryId": "rationale-20",
+      "kind": "changed-rationale",
+      "claimId": "claim_5766225be2d76d6239e116a664aec7cf",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: move of 2. Historical Supersession Table (depth 2 to 4); four links with identical labels and spelling changed only in relative path (resolved destinations unchanged, so 4 changed and 0 destination changes is right), my line delta is [] and [], payload equal after link normalisation; heading-and-links is the correct accounting."
+    },
+    {
+      "entryId": "rationale-21",
+      "kind": "changed-rationale",
+      "claimId": "claim_088af18a5796ed72fe6d33ff2cc5d05c",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: move of 5. ReleaseManifest (depth 2 to 4); one link with unchanged label and resolved destination, delta [] and []; heading-and-links accounting is right and the unchanged-since sentence matches the ok row dab66237 at 345f15d95."
+    },
+    {
+      "entryId": "rationale-22",
+      "kind": "changed-rationale",
+      "claimId": "claim_163988c8973416bdd64781cc7c667f65",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: move of the whole Workspace Runtime Model file (H1 to depth 3 inside spec.md) with 3 links; the Link lines match the source and target links, one resolved destination changes (workspace-topology to system-architecture/architecture/workspace-topology.md, which exists), delta [] and []; the file base name used as source context is the extractor convention for a first-line H1; the unchanged-since sentence names the ok row d53ab4e2 at 62751458b."
+    },
+    {
+      "entryId": "rationale-23",
+      "kind": "changed-rationale",
+      "claimId": "claim_4eeb2f406288458e61bad21531966ab1",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: supersede of Data Dictionary (depth 2 to 4, same title); the payload is byte-equal so the unit digests differ only by depth, and the disposition sentence that the complete source section occurs verbatim inside the target section is true; 0 links; unchanged-since digest 3dd2d51f at 287a22d33 is the latest ok row."
+    },
+    {
+      "entryId": "rationale-24",
+      "kind": "changed-rationale",
+      "claimId": "claim_66f7be3b79ca1fe458ce0416ba1adf89",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-governance.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: supersede of 14. Related Files with 6 links whose labels are unchanged and 2 resolved destinations changed, delta [] and []; the sentence that the target changed since the last reviewed digest 1b5703ab at 2300d6557 is true (current target digest is 12cc1851 and later rows for it are reworks), so no unchanged claim is made for a changed target."
+    },
+    {
+      "entryId": "rationale-25",
+      "kind": "changed-rationale",
+      "claimId": "claim_53ebf4b541ff8f6a2c40e3b95304d6b7",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-mapped-conservation.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: supersede of 1. Read First with 8 links (labels unchanged, 1 destination change) and the section delta [] and []; every Link line quotes a link actually present on the stated side and the resolved paths exist; unchanged-since 16929d43 at 62751458b matches the ok row in review-step10-rationales-12-62751458b."
+    },
+    {
+      "entryId": "rationale-26",
+      "kind": "changed-rationale",
+      "claimId": "claim_2ae0cd4fc1cf487f7caa4d77d46e9682",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-mapped-conservation.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: supersede of 4. Related Files with 4 links (labels unchanged, 1 destination change), delta [] and []; the Link lines and resolved paths are right; unchanged-since 6dcde68b at 62751458b matches the ok row in review-step10-rationales-12-62751458b."
+    },
+    {
+      "entryId": "rationale-27",
+      "kind": "changed-rationale",
+      "claimId": "claim_239931ca8e26fd3b19bf970e30e2ae4b",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: move of 7. Contract Authority Matrix (depth 2 to 4) with 11 links of which 9 are repointed (9 changed, 9 destination changes, the two unchanged ones are rightly not listed); labels unchanged, delta [] and []; several repointed destinations are history files under retired-engine, which exist and are named in the Link lines; unchanged-since 17884089 at 62751458b is an ok row."
+    },
+    {
+      "entryId": "rationale-28",
+      "kind": "changed-rationale",
+      "claimId": "claim_c1741ef08c45e88d276f75b668de7452",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-08-component-authority-boundary-map.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: supersede of the H1 section of the boundary map proposal; removed [] and 20 added lines that I recomputed, namely the candidate metadata fence, the labelled Added in candidate paragraph and the Source relationship line, so the additive-candidate-section accounting is right; the 9 source links are all repointed (one to the history carrier for the intent ledger) plus one added original source link, matching 10 changed, 1 destination change, 1 added; the four related-binding evidence lines exist at the cited lines of component-boundary.md."
+    },
+    {
+      "entryId": "rationale-29",
+      "kind": "changed-rationale",
+      "claimId": "claim_cd345b6c8a7da2451c2acf04ba8c5292",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: move of 8.7 Bảng tình huống chuẩn from docs/specs/confinement-authority.md to agent-confinement/spec.md; unit digests are equal and the heading and payload are byte-equal in both files (checked by diff, depth and title identical), so the equal-section statement is true and the former labelled-successor sentence is correctly gone; 0 links; unchanged-since digest at 62751458b matches the ok row in review-step10-rationales-10-62751458b."
+    },
+    {
+      "entryId": "rationale-30",
+      "kind": "changed-rationale",
+      "claimId": "claim_9a1cd05f74418890fbca8955aa76b378",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: move of 9. Default implementation đầu tiên from docs/specs/confinement-authority.md to agent-confinement/spec.md; unit digests are equal and the heading and payload are byte-equal in both files (checked by diff, depth and title identical), so the equal-section statement is true and the former labelled-successor sentence is correctly gone; 0 links; unchanged-since digest at 62751458b matches the ok row in review-step10-rationales-10-62751458b."
+    },
+    {
+      "entryId": "rationale-31",
+      "kind": "changed-rationale",
+      "claimId": "claim_2c080a72c195a28a1ca8efb0e1187f11",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: move of 9.1 Support matrix của default from docs/specs/confinement-authority.md to agent-confinement/spec.md; unit digests are equal and the heading and payload are byte-equal in both files (checked by diff, depth and title identical), so the equal-section statement is true and the former labelled-successor sentence is correctly gone; 0 links; unchanged-since digest at 62751458b matches the ok row in review-step10-rationales-10-62751458b."
+    },
+    {
+      "entryId": "rationale-32",
+      "kind": "changed-rationale",
+      "claimId": "claim_3770d5a0b897fbd8c1393a38c48c3333",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: move of 9.2 hostRead blind from docs/specs/confinement-authority.md to agent-confinement/spec.md; unit digests are equal and the heading and payload are byte-equal in both files (checked by diff, depth and title identical), so the equal-section statement is true and the former labelled-successor sentence is correctly gone; 0 links; unchanged-since digest at 62751458b matches the ok row in review-step10-rationales-10-62751458b."
+    },
+    {
+      "entryId": "rationale-33",
+      "kind": "changed-rationale",
+      "claimId": "claim_96b54d15ac01f69e7df991151c2268be",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: move of 10. Lộ trình rollout từ docs/specs/confinement-authority.md into agent-confinement/history/rollout-and-settled-facts.md; the target heading is a real heading (not inside a fence, line 24) and the section text is byte-equal to the source with equal unit digests, so the new equal-section accounting is true (the earlier wrapper caveat no longer applies to this bound unit); 0 links; unchanged-since d190224e at 62751458b is an ok row."
+    },
+    {
+      "entryId": "rationale-34",
+      "kind": "changed-rationale",
+      "claimId": "claim_1ef2bc00c79bc7a40787b62a4943f0df",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: move of 11. Proof và Definition of Done from docs/specs/confinement-authority.md to agent-confinement/spec.md; unit digests are equal and the heading and payload are byte-equal in both files (checked by diff, depth and title identical), so the equal-section statement is true and the former labelled-successor sentence is correctly gone; 0 links; unchanged-since digest at 62751458b matches the ok row in review-step10-rationales-10-62751458b."
+    },
+    {
+      "entryId": "rationale-35",
+      "kind": "changed-rationale",
+      "claimId": "claim_7aacf43ab14386fce6c4a5a8a0519402",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "mechanical: extractor digests recomputed (equal both sides), cited lines and anchor match the real spans, direct sections byte-equal (cmp), link count 0 and 0, depth and title and ancestry contexts equal the rationale, target digest unchanged since 62751458b (git show), anchor passes list-doc-anchors; I did not re-read the text beyond the rationale."
+    },
+    {
+      "entryId": "rationale-36",
+      "kind": "changed-rationale",
+      "claimId": "claim_9168d8af609c58932a87918d4a49b8aa",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "mechanical: extractor digests recomputed (equal both sides), cited lines and anchor match the real spans, direct sections byte-equal (cmp), link count 0 and 0, depth and title and ancestry contexts equal the rationale, target digest unchanged since 62751458b (git show), anchor passes list-doc-anchors; I did not re-read the text beyond the rationale."
+    },
+    {
+      "entryId": "rationale-37",
+      "kind": "changed-rationale",
+      "claimId": "claim_78563a2491b11f7a0b412c5b900a7414",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: 11.3 Behavior probes read in both files (probe bullets and closing paragraph), byte-identical, no links, both under Proof and Definition of Done; equal-section and move wording is true and the old invented label sentence is gone; last-reviewed digest unchanged at 62751458b."
+    },
+    {
+      "entryId": "rationale-38",
+      "kind": "changed-rationale",
+      "claimId": "claim_dc8b5bc2507201dd705fcd64deba8224",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: 11.4 Observability five bullets read in both files, byte-identical, same depth and ancestry; the equal-section sentence replaces the earlier false replacement wording and every other fact line matches my recomputation."
+    },
+    {
+      "entryId": "rationale-39",
+      "kind": "changed-rationale",
+      "claimId": "claim_b532b9a9eb7f76d041c343e2d45bf859",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: 11.5 Doctor/setup paragraph read in both files, byte-identical, no links; cited spans, digests, contexts and the equal-section sentence all match my recomputation; no labelled correction applies and none is claimed."
+    },
+    {
+      "entryId": "rationale-40",
+      "kind": "changed-rationale",
+      "claimId": "claim_e793bd095f4a872b0bc08757c827359f",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "mechanical: extractor digests recomputed (equal both sides), cited lines and anchor match the real spans, direct sections byte-equal (cmp), link count 0 and 0, depth and title and ancestry contexts equal the rationale, target digest unchanged since 62751458b (git show), anchor passes list-doc-anchors (target context is the Added in candidate decisions carrier, as named); I did not re-read the text beyond the rationale."
+    },
+    {
+      "entryId": "rationale-41",
+      "kind": "changed-rationale",
+      "claimId": "claim_7aede254166851de375089f4b0160ca6",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: heading 13 direct section (intro plus seven numbered settled risks) read in the legacy spec and in history/rollout-and-settled-facts.md, byte-identical; target context correctly named as the Added in candidate rollout carrier; subsections 13.1 to 13.3 and the open items are separate rows."
+    },
+    {
+      "entryId": "rationale-42",
+      "kind": "changed-rationale",
+      "claimId": "claim_39c40cef341e227d936ea768b12ba435",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "mechanical: extractor digests recomputed (equal both sides), cited lines and anchor match the real spans, direct sections byte-equal (cmp), link count 0 and 0, depth and title and ancestry contexts equal the rationale, target digest unchanged since 62751458b (git show), anchor passes list-doc-anchors (target context is the Added in candidate rollout carrier plus the 13 heading, as named); I did not re-read the text beyond the rationale."
+    },
+    {
+      "entryId": "rationale-43",
+      "kind": "changed-rationale",
+      "claimId": "claim_bed90dbb7de2a5782fafcdb4a3d6e0da",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: 13.2 login-renewal section read in both files, byte-identical; target ancestry is the labelled Added in candidate current-settled-facts heading and the rationale names exactly that context; move and equal-section wording true."
+    },
+    {
+      "entryId": "rationale-44",
+      "kind": "changed-rationale",
+      "claimId": "claim_3f1a1bbd362edb4ff925ff6de3cbd823",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "mechanical: extractor digests recomputed (equal both sides), cited lines and anchor match the real spans, direct sections byte-equal (cmp), link count 0 and 0, depth and title and ancestry contexts equal the rationale, target digest unchanged since 62751458b (git show), anchor passes list-doc-anchors (target is the decisions carrier, context Added in candidate plus 12 Quyet dinh cua proposal, as named); I did not re-read the text beyond the rationale."
+    },
+    {
+      "entryId": "rationale-45",
+      "kind": "changed-rationale",
+      "claimId": "claim_06e68651628b7a731b974ec5c34c9743",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: Open Deferred Items section (P04 M-3, P03 NEW-1b/c and P06 M2, P03 R4, strict-mode default) read in both files, byte-identical; target ancestry is the labelled current-settled-facts heading as the rationale says."
+    },
+    {
+      "entryId": "rationale-46",
+      "kind": "changed-rationale",
+      "claimId": "claim_1d1eb2ce98dcf1855678b2cf86c2ee67",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: 14 Pointers hien tai (eight pointer bullets) read in both files, byte-identical, same ancestry; equal-section sentence is true and no carrier or correction is claimed."
+    },
+    {
+      "entryId": "rationale-47",
+      "kind": "changed-rationale",
+      "claimId": "claim_fefb1bf47fc375b9e83089dc6059326c",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-decision-citation-drift-01.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: decision-citation-drift Pointers (implementation) section including the retired supersession-check paragraph read in both files, byte-identical; link count 0 and 0 and equal-section wording true."
+    },
+    {
+      "entryId": "rationale-48",
+      "kind": "changed-rationale",
+      "claimId": "claim_7e17ce226062d06a53b940f64b9d5cdb",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "mechanical: extractor digests recomputed (equal both sides), cited lines and anchor match the real spans, direct sections byte-equal (cmp), link count 0 and 0, depth and title and ancestry contexts equal the rationale, target digest unchanged since 62751458b (git show), anchor passes list-doc-anchors; I did not re-read the text beyond the rationale."
+    },
+    {
+      "entryId": "rationale-49",
+      "kind": "changed-rationale",
+      "claimId": "claim_b2a51d5d39832d330879947bdbbcb227",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: Observe Owns section: the A40 correction (friction list gains ping and migrate) has its before-text once in the legacy section and its after-text in the target, evidence friction_cli.rs:7-9 at 2107c4761 lists record resolve list show rank ping migrate; the single link ../platform/session-identity/spec.md becomes ../session-identity/spec.md and both resolve to docs/platform/session-identity/spec.md; after correction and link normalization 0 removed and 0 added, so heading-and-links is true."
+    },
+    {
+      "entryId": "rationale-50",
+      "kind": "changed-rationale",
+      "claimId": "claim_552ef3d6e22bac10c24cc31e48463d50",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: Data Dictionary table, five modified rows: rows 1b, 3 and 8 are exactly the four listed A41 corrections (each before-text occurs once in the legacy section, each after-text is in the target); the two residual lines are rows 9 and 10 and the rationale removed and added arrays equal my multiset diff verbatim; both removed rows occur verbatim in the new runner/spec.md carrier (heading section historical-source-section-552ef3d6 and fence unheaded-block-7) and both added rows carry an Added in candidate label; the A41 label token is present in the pinned account (independent audit found no label finding)."
+    },
+    {
+      "entryId": "rationale-51",
+      "kind": "changed-rationale",
+      "claimId": "claim_224b5f54d28b453f1e3feaced0468399",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: Gate A section (87 vs 79 lines): applying the three source-anchored A41 corrections to the legacy section reproduces the target exactly (0 removed, 0 added, same order); the fourth correction is an intermediate state and the claim is true (bin/fgos.mjs:4373,4461 is in the target at 19ca8de23, 4415,4503 at 62751458b and HEAD); heading-and-links is the right class and no carrier is needed because the replaced wording is the A41-corrected false current-state text."
+    },
+    {
+      "entryId": "rationale-52",
+      "kind": "changed-rationale",
+      "claimId": "claim_0686418ae7571d82eade8059c698709d",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: Actors and Access table: one row changes (the Gate A evolve operator row, a check mark becomes Historical operator role with an Added in candidate door-removed note); removed and added arrays equal my diff, the removed row is verbatim in the new runner/spec.md carrier (fence unheaded-block-9 and heading historical-source-section-0686418a), the added line self-labels, and Applicable labelled corrections none is accurate (no manifest correction after-text is in this section)."
+    },
+    {
+      "entryId": "rationale-53",
+      "kind": "changed-rationale",
+      "claimId": "claim_099eb566c825967cf35f9397f2d7b947",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: Edge Cases Settled: exactly one bullet changes, an Added in candidate sentence (historical e2e scenario of the removed evolve door, no current coverage claim) is prefixed to the otherwise unchanged bullet; arrays equal my diff, the removed bullet is verbatim in the new carrier (fence unheaded-block-11 and heading historical-source-section-099eb566), corrections none is accurate; both digests also hand-recomputed in Python."
+    },
+    {
+      "entryId": "rationale-54",
+      "kind": "changed-rationale",
+      "claimId": "claim_4efee765e5a47fc42f4d9cccc7a53191",
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "applied-note-verbatim",
+      "note": "deep: Pointers (implementation): both listed A41 corrections (entropy.mjs pointer to the Rust entropy.rs handler, candidates.mjs pointer to a removal statement) have before-text in the legacy section and after-text in the target; the one residual bullet (evolve verb) is replaced by a labelled historical description, arrays equal my diff, the removed bullet is verbatim in the new carrier (fence unheaded-block-13 and heading historical-source-section-4efee765); existing label A41 is a whole token in the pinned account; both digests hand-recomputed in Python."
+    },
+    {
+      "entryId": "carrier-552ef3d6",
+      "kind": "historical-section-preservation",
+      "claimId": "claim_552ef3d6e22bac10c24cc31e48463d50",
+      "path": "docs/platform/runner/spec.md",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "retained-evidence-ok",
+      "note": "deep: appended H2 Historical source section 552ef3d6 in docs/platform/runner/spec.md: the ~~~~text fence equals the legacy docs/specs/runner.md Data Dictionary direct section byte for byte (sha256 recomputed, source anchor unique, no tilde fence inside the source), the preamble is labelled Added in candidate, says historical and points to the existing successor h-02842f76ffd2/spec.md#data-dictionary; the file diff 1d92a7229..4d3634360 is 163 pure insertions at end of file so no existing anchor renumbers."
+    },
+    {
+      "entryId": "carrier-0686418a",
+      "kind": "historical-section-preservation",
+      "claimId": "claim_0686418ae7571d82eade8059c698709d",
+      "path": "docs/platform/runner/spec.md",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "retained-evidence-ok",
+      "note": "deep: appended H2 Historical source section 0686418a in docs/platform/runner/spec.md: the ~~~~text fence equals the legacy docs/specs/runner.md Actors and Access direct section byte for byte (sha256 recomputed, source anchor unique, no tilde fence inside the source), the preamble is labelled Added in candidate, says historical and points to the existing successor h-6df5686d0d54/spec.md#actors-access; the file diff 1d92a7229..4d3634360 is 163 pure insertions at end of file so no existing anchor renumbers."
+    },
+    {
+      "entryId": "carrier-099eb566",
+      "kind": "historical-section-preservation",
+      "claimId": "claim_099eb566c825967cf35f9397f2d7b947",
+      "path": "docs/platform/runner/spec.md",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "retained-evidence-ok",
+      "note": "deep: appended H2 Historical source section 099eb566 in docs/platform/runner/spec.md: the ~~~~text fence equals the legacy docs/specs/runner.md Edge Cases Settled direct section byte for byte (sha256 recomputed, source anchor unique, no tilde fence inside the source), the preamble is labelled Added in candidate, says historical and points to the existing successor h-37aced3896a8/spec.md#edge-cases-settled; the file diff 1d92a7229..4d3634360 is 163 pure insertions at end of file so no existing anchor renumbers."
+    },
+    {
+      "entryId": "carrier-4efee765",
+      "kind": "historical-section-preservation",
+      "claimId": "claim_4efee765e5a47fc42f4d9cccc7a53191",
+      "path": "docs/platform/runner/spec.md",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "retained-evidence-ok",
+      "note": "deep: appended H2 Historical source section 4efee765 in docs/platform/runner/spec.md: the ~~~~text fence equals the legacy docs/specs/runner.md Pointers (implementation) direct section byte for byte (sha256 recomputed, source anchor unique, no tilde fence inside the source), the preamble is labelled Added in candidate, says historical and points to the existing successor h-f34e0d170d89/spec.md#pointers-implementation; the file diff 1d92a7229..4d3634360 is 163 pure insertions at end of file so no existing anchor renumbers."
+    },
+    {
+      "entryId": "tool-01",
+      "kind": "tool-test-change",
+      "claimId": null,
+      "path": "scripts/doc-binding-repair.mjs",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": false,
+      "status": "changed-pending-rereview",
+      "note": "deep: 21-line diff read against the earlier rework causes: checkSectionExplanation now ignores a witness equal to the same-side bound unit by path, anchor and commit and needs a whole-line match instead of substring; sectionAccountLabels is a bounded case-sensitive regex over registered ids; classifySectionAccounting returns equal-section first and has no fallback label; my scratch probes agree (SHA256-only text gives no label, substring carrier gives removed-line-not-carried); limit: a witness at the same path and anchor but another commit still counts, by design and by test."
+    },
+    {
+      "entryId": "tool-02",
+      "kind": "tool-test-change",
+      "claimId": null,
+      "path": "scripts/doc-rationale-facts.mjs",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": false,
+      "status": "changed-pending-rereview",
+      "note": "deep: new independent checker (66 lines) read in full; imports only node:path, recomputes correction presence, section equality, line multisets and order, line arrays, whole-line carriers, account labels as whole tokens in the pinned account, and link counts by its own LCS pairing; my probes (invented label with SHA256-only account, substring carrier, absent correction before-text, fallback label) are each caught; limits: it never tests that added lines are labelled candidate declarations, intermediate-state corrections skip the before-text test, and rows without a resolvable source are skipped."
+    },
+    {
+      "entryId": "tool-03",
+      "kind": "tool-test-change",
+      "claimId": null,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-independent-rationale-audit.mjs",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "retained-evidence-ok",
+      "note": "deep: audit driver (61 lines) read in full; run through a copy with the output guard and imports retargeted to my scratch dir: 12895 rows, 92 shards, 718 structured, 261 section claims, 719 link claims, 0 findings, and the result is byte-identical to the committed step10-sync4d-independent-consistency.json; limit: 70 rows have no resolvable source and are only listed as sourceWitnessLimits."
+    },
+    {
+      "entryId": "tool-04",
+      "kind": "tool-test-change",
+      "claimId": null,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round4-rationale-rebuild.mjs",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": false,
+      "status": "changed-pending-rereview",
+      "note": "deep: 51 added and 123 removed lines read in full: the classifier branches that produced the invented label are gone, labels come from sectionAccountLabels, equal sections classify equal-section, removed lines need whole-line live carriers or generation fails, and the 54 regenerated rows are those with Section accounting plus two named claims; my scan of all 13083 shard rationales: 52 carry Section accounting (20 equal, 15 split-or-corrected, 13 heading-and-links, 2 additive, 2 existing-labelled) and none has the old fallback label; observation: the sentence Added lines are explicit candidate declarations is chosen when any Added in candidate text exists anywhere in the target section, not per added line (true for all six rows of this request, but for claim_fb92651e 12 of 14 added lines sit under one labelled lead sentence), and no checker verifies it."
+    },
+    {
+      "entryId": "tool-05",
+      "kind": "tool-test-change",
+      "claimId": null,
+      "path": "test/scripts/doc-rationale-author.test.mjs",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "retained-evidence-ok",
+      "note": "deep: four new tests read (self-witness and target-addition rejection with prior-commit acceptance, whole-line-only witnesses, bounded case-sensitive label ids with SHA256 and a25 negatives, equal section never says replacement); all pass in my 500-test run and their assertions match the tool-01 behavior."
+    },
+    {
+      "entryId": "tool-06",
+      "kind": "tool-test-change",
+      "claimId": null,
+      "path": "test/scripts/doc-rationale-facts.test.mjs",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": false,
+      "status": "changed-pending-rereview",
+      "note": "deep: new test file (30 lines) read: invented label with SHA256-only account, wrong equal-section claim, wrong line arrays, link-count recompute, accept path with a real label, replacement wording on an equal section, substring versus whole-line carrier; all pass; limit: no test for the finding types correction-before-absent, correction-after-absent, invented-fallback-label, unregistered-account-label or section-link-count (I probed the first and the third in scratch and both fire)."
+    },
+    {
+      "entryId": "tool-07",
+      "kind": "reproduction-command-change",
+      "claimId": null,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/consistency.py",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "retained-evidence-ok",
+      "note": "deep: consistency.py is byte-identical to step10-sync287-reproduce.py (sha256 fd497120); it now launches only the independent audit (the generator --check is gone from this door), needs an absolute external output under /tmp/fgos-work, refuses symlink and hardlink; I could not run the wrapper as written because the output must be under /tmp/fgos-work, so I ran the audit it launches through a retargeted copy (result byte-identical to the committed one); two copies under two names are redundant."
+    },
+    {
+      "entryId": "tool-08",
+      "kind": "reproduction-command-change",
+      "claimId": null,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync287-reproduce.py",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "retained-evidence-ok",
+      "note": "deep: step10-sync287-reproduce.py is byte-identical to consistency.py (sha256 fd497120), so the tool-07 reading applies unchanged: independent audit only, absolute external output, no symlink or hardlink, NODE_OPTIONS default 3072; audit result reproduced byte-identical through a retargeted copy."
+    },
+    {
+      "entryId": "tool-09",
+      "kind": "reproduction-command-change",
+      "claimId": null,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduce.py",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "retained-evidence-ok",
+      "note": "deep: new wrapper (28 lines) read: requires an absolute output dir under /tmp/fgos-work outside the repo and not a symlink, rejects symlink and hardlink entries, materializes manifest scripts, runs the audit and five scripts and exits non-zero if any fail; the wrapper logic is sound, but run end to end through a retargeted copy it exits 1 on ownership and audit-ownership because of the manifest content (see tool-10), and checks exits 1 on the disclosed check A offender list, so the package as committed cannot pass; no rework asked on the wrapper itself."
+    },
+    {
+      "entryId": "tool-10",
+      "kind": "reproduction-command-change",
+      "claimId": null,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round5-reproduction.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "verdict": "rework",
+      "bindingMatches": false,
+      "status": "changed-pending-rereview",
+      "note": "deep: new manifest read; its ownership.mjs imports the lib from the hardcoded /tmp/fgos-work/round5/step10-sync287-lib.mjs instead of from --output-dir, so the committed command with --output-dir /tmp/fgos-work/REVIEWER fails with ERR_MODULE_NOT_FOUND and audit-ownership then fails with ENOENT on step10-round5-target-ownership.json (reproduced with a retargeted copy of the wrapper: audit, fast and replay exit 0, ownership and audit-ownership exit 1); fix: import the lib relative to the output dir as the 627 manifest now does and rerun the wrapper end to end; the same hardcoded import is in step10-sync4d-reproduction.json (ownership.mjs imports /tmp/fgos-work/package4d/lib.mjs), which breaks step 3 of this request header."
+    },
+    {
+      "entryId": "tool-11",
+      "kind": "reproduction-command-change",
+      "claimId": null,
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync627-reproduction.json",
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "retained-evidence-ok",
+      "note": "deep: diff read: six materialized scripts now take --output-dir with a startsWith /tmp/fgos-work/ guard and import the lib from that dir; I ran ownership-readonly, audit-ownership-readonly and replay-readonly.py from the manifest with the guard retargeted: 254 collisions and ok true, link replay 366 original and 98 later rows with 0 findings, outputs identical to the committed ones; observations: the guard is a bare prefix test (a path with .. would pass) and the notes still say all outputs go to /tmp/fgos-work/review627."
+    },
+    {
+      "entryId": "native-001",
+      "kind": "native-transition",
+      "claimId": "claim_d5e5139015078092355b369260cee249",
+      "path": null,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "retained-identity-only-ok",
+      "note": "deep: new heading unit historical-source-section-0686418a in docs/platform/runner/spec.md: after tuple equals the HEAD working-identity-registry record field for field, unitDigest (sha256 of heading plus textDigest) and identityFingerprint reproduced by the extractor, claim absent from the f1f414b02 registry (before null); the registry holds 19 units for this file and all 19 equal the extractor output, and the document record sourceDigest and blobSha equal the committed file; this approves the identity tuple only, not truth."
+    },
+    {
+      "entryId": "native-002",
+      "kind": "native-transition",
+      "claimId": "claim_982fa232e8267691441436f1d7d48b22",
+      "path": null,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "retained-identity-only-ok",
+      "note": "deep: new heading unit historical-source-section-099eb566 in docs/platform/runner/spec.md: after tuple equals the HEAD working-identity-registry record field for field, unitDigest (sha256 of heading plus textDigest) and identityFingerprint reproduced by the extractor, claim absent from the f1f414b02 registry (before null); the registry holds 19 units for this file and all 19 equal the extractor output, and the document record sourceDigest and blobSha equal the committed file; this approves the identity tuple only, not truth."
+    },
+    {
+      "entryId": "native-003",
+      "kind": "native-transition",
+      "claimId": "claim_f97b02893c6b8f2554062dfea5f5df2c",
+      "path": null,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-04-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "retained-identity-only-ok",
+      "note": "deep: new heading unit historical-source-section-4efee765 in docs/platform/runner/spec.md: after tuple equals the HEAD working-identity-registry record field for field, unitDigest (sha256 of heading plus textDigest) and identityFingerprint reproduced by the extractor, claim absent from the f1f414b02 registry (before null); the registry holds 19 units for this file and all 19 equal the extractor output, and the document record sourceDigest and blobSha equal the committed file; this approves the identity tuple only, not truth."
+    },
+    {
+      "entryId": "native-004",
+      "kind": "native-transition",
+      "claimId": "claim_847f0e0c56a6695d4097fb1e537ea1bc",
+      "path": null,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-05-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "retained-identity-only-ok",
+      "note": "deep: runner/spec.md#historical-source-section-552ef3d6 (new heading, units, origin added-since-62751458b). Heading unit lines 54 to 54 with its section payload covering labelled paragraph 56 and the fenced carrier 58 to 76; textDigest d7474ce2 reproduced by the extractor and by an independent plain sha256 over heading level, title, payload digest and following-block digest, unitDigest 77848f33 equals sha256 of kind plus textDigest, fingerprint 1f7cd60e matches. Registry row equals the pack field for field; claim id absent from the 62751458b registry."
+    },
+    {
+      "entryId": "native-005",
+      "kind": "native-transition",
+      "claimId": "claim_ee99b0951090e8a9aeabd89bf2982f05",
+      "path": null,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-05-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "retained-identity-only-ok",
+      "note": "deep: runner/spec.md#unheaded-block-10, the Added in candidate label paragraph of the edge-cases-settled carrier (line 99). Digest 28d0009f is sha256 of the line text and equals the extractor textDigest, fingerprint and unitDigest equal 3f04a257, registry row equal, claim kind specification as pack. The label says historical source text, no current-truth approval, and names the corrected successor anchor, which passes list-doc-anchors."
+    },
+    {
+      "entryId": "native-006",
+      "kind": "native-transition",
+      "claimId": "claim_90fb9245a91d2389ba25704be807be20",
+      "path": null,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-05-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "retained-identity-only-ok",
+      "note": "deep: runner/spec.md#unheaded-block-11, fenced carrier lines 101 to 153 of docs/specs/runner.md#edge-cases-settled. The fence body equals the complete direct section of the legacy blob 122d1a51 (the registry source blob) byte for byte, 13595 characters, heading line included, so nothing is lost and nothing is added inside the fence. Digest 75c5c702 reproduced, claimKind contract follows the extractor text heuristic since the section text contains the word contract."
+    },
+    {
+      "entryId": "native-007",
+      "kind": "native-transition",
+      "claimId": "claim_c321de74b624d639e56cb4dc77169655",
+      "path": null,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-05-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "retained-identity-only-ok",
+      "note": "deep: runner/spec.md#unheaded-block-12, label paragraph of the pointers-implementation carrier (line 158). Digest 26cd8fbf reproduced, fingerprint and unitDigest 06dd4d58 equal, registry row equal. Observation: the file header still names blob ddfa78cc as provenance while this carrier carries the newer 122d1a51 section (two changed pointer lines already present in the h-f34e0d170d89 corrected carrier); the carrier itself is true to the registry source blob, only the header lags."
+    },
+    {
+      "entryId": "native-008",
+      "kind": "native-transition",
+      "claimId": "claim_d8a2c7490367e214b55e86913275bd1b",
+      "path": null,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-05-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "retained-identity-only-ok",
+      "note": "deep: runner/spec.md#unheaded-block-13, fenced carrier lines 160 to 214 of docs/specs/runner.md#pointers-implementation. Fence body equals the complete direct section of blob 122d1a51 exactly (it differs from the older ddfa78cc blob in two lines, so the carrier took the current source). Digest 16efa16f reproduced, fingerprint and unitDigest 1094f998 equal, registry row equal. The unit is not yet a target of any decision row, which is the known candidate-blocks-unreferenced open data."
+    },
+    {
+      "entryId": "native-009",
+      "kind": "native-transition",
+      "claimId": "claim_6598b0201d76ee564e11e9fd1f6da0a2",
+      "path": null,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-05-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "retained-identity-only-ok",
+      "note": "deep: runner/spec.md#unheaded-block-6, label paragraph of the data-dictionary carrier (line 56). Digest a271942c reproduced by the extractor and plain sha256, unitDigest and fingerprint 92199296 equal, registry row equal; the label states Added in candidate, historical source text and the anchor of the corrected successor, which exists."
+    },
+    {
+      "entryId": "native-010",
+      "kind": "native-transition",
+      "claimId": "claim_0876da817dfa1682359c8d1823d92452",
+      "path": null,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-05-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "retained-identity-only-ok",
+      "note": "deep: runner/spec.md#unheaded-block-7, fenced carrier lines 58 to 76 of docs/specs/runner.md#data-dictionary. Fence body equals the complete direct section of the registry source blob 122d1a51 byte for byte (8806 characters) and also of the ddfa78cc blob, but not the 473a0096 map blob, so the carrier follows the synced source. Digest 9216be2c reproduced, fingerprint 0281188e equal, registry row equal."
+    },
+    {
+      "entryId": "native-011",
+      "kind": "native-transition",
+      "claimId": "claim_9e9010f284010e4ee3fbc67deed8e8f1",
+      "path": null,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-05-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "retained-identity-only-ok",
+      "note": "deep: runner/spec.md#unheaded-block-8, label paragraph of the actors-access carrier (line 81). Digest 47471757 reproduced, fingerprint and unitDigest 3b6fd344 equal, registry row equal, successor anchor h-6df5686d0d54 actors-access passes the anchor check."
+    },
+    {
+      "entryId": "native-012",
+      "kind": "native-transition",
+      "claimId": "claim_4494775f2688c7b3ef05ffb458dd628a",
+      "path": null,
+      "report": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-05-4d3634360.md",
+      "verdict": "ok",
+      "bindingMatches": true,
+      "status": "retained-identity-only-ok",
+      "note": "deep: runner/spec.md#unheaded-block-9, fenced carrier lines 83 to 94 of docs/specs/runner.md#actors-access. Fence body equals the complete direct section of blob 122d1a51 and of the older blobs (552 characters). Digest 30ad6c3c reproduced, fingerprint and unitDigest a012b5f2 equal, registry row equal."
+    }
+  ],
+  "entryAccountingCounts": {
+    "applied-note-verbatim": 49,
+    "changed-pending-rereview": 10,
+    "retained-evidence-ok": 10,
+    "retained-identity-only-ok": 12
+  }
+}

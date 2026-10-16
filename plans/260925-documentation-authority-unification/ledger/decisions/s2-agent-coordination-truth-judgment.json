@@ -796,14 +796,20 @@
       "targetAnchor": "no-build-path-cognitive-quality-sub-shape",
       "claimKind": "procedure",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792126341980-e0c35701@2026-10-16",
       "rationale": "Source: docs/architect/agent-coordination/playbooks/architecture-advisory-artifact-templates.md:316-316#no-build-path-mandatory-sub-shape (current lines); unit SHA256 b543e1371ff29576a6dd17d6b3fde9de919bd53a0460cc92714f27f1312946f7.\nTarget: docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md:368-368#no-build-path-cognitive-quality-sub-shape (current lines); unit SHA256 9e3c56fd314283351db7002a5bbed73f7e1507570f8448e7d70b2129dbf2f542.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 9e3c56fd314283351db7002a5bbed73f7e1507570f8448e7d70b2129dbf2f542 at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 3 → 3; title \"No-Build Path — mandatory sub-shape\" → \"No-Build Path — cognitive quality sub-shape\".\nWhole direct section differs; depth 3 → 3; 0 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (heading-and-links): Complete direct sections differ only in heading, link spellings/labels or authenticated exact corrections. Exact normalized nonblank line delta: removed []; added [].\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/playbooks/architecture-advisory-artifact-templates.md#no-build-path-mandatory-sub-shape under docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md#no-build-path-cognitive-quality-sub-shape; source context \"Architecture Advisory Artifact Templates / 5. Candidate Architecture Proposal — `proposals/<role>.md`\", target context \"Architecture Advisory Artifact Templates / 5. Candidate Architecture Proposal — `proposals/<role>.md`\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "deep: heading-only supersede (title No-Build Path mandatory sub-shape to cognitive quality sub-shape, depth 3 to 3); the section payload digest is identical on both sides and my line delta is removed [] and added [] so the heading-and-links accounting is right, the title change is disclosed in the heading line and no correction label is claimed or needed; the unchanged-since sentence matches the ok row 9e3c56fd at 62751458b in review-step10-rationales-01-62751458b.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "9e3c56fd314283351db7002a5bbed73f7e1507570f8448e7d70b2129dbf2f542",
       "targetAncestry": [
         "Architecture Advisory Artifact Templates",
         "5. Candidate Architecture Proposal — `proposals/<role>.md`"
-      ]
+      ],
+      "reviewReportCommit": "203f4ef93867a60e6a37624b31ce14de426cafa8"
     },
     {
       "claimId": "claim_41632b96682db6e59b026e5bb24d81ac",
@@ -5792,14 +5798,20 @@
       "targetAnchor": "evidence-and-conduct-boundaries",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792126341980-e0c35701@2026-10-16",
       "rationale": "Source: docs/architect/agent-coordination/playbooks/architecture-advisory-role-doctrine.md:1460-1460#when-the-driver-must-not-disposition-alone (current lines); unit SHA256 ee8907a2f12410887101fab337f085440903f2ece580174b69146302968cec4d.\nTarget: docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md:1468-1468#evidence-and-conduct-boundaries (current lines); unit SHA256 fd599aeb69ec450ccb654795c8db12e37932153fdf60f71c8eeaa7e463b32485.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest fd599aeb69ec450ccb654795c8db12e37932153fdf60f71c8eeaa7e463b32485 at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 3 → 3; title \"When The Driver Must Not Disposition Alone\" → \"Evidence And Conduct Boundaries\".\nWhole direct section differs; depth 3 → 3; 0 distinct link changes; normalized line order differs; 18 removed and 14 added nonblank lines after heading/link/correction normalization.\nSection accounting (split-or-corrected-section): Removed direct-section lines have distinct live carrier witnesses docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md#literal-snapshot, docs/platform/agent-coordination/history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md#unheaded-block-3. Added lines are explicit candidate declarations or labelled corrections in the bound target; these are additions, not source-carriage evidence.  Exact normalized nonblank line delta: removed [\"The driver must obtain another advisor's evidence before dispositioning whenever\",\"the disposition turns on a claim about PROJECT_ROOT or about the panel's own\",\"artifacts. Concretely:\",\"- **`invalidated-by-evidence` always requires an advisor's observation.** The\",\"  driver asserting a fact about the code it has not been shown is opining inside\",\"  an authority role, which is the exact failure the role separation exists to\",\"  prevent — and it is invisible in the final packet unless a red-team catches it.\",\"- **`answered` requires a citation to an existing artifact.** If the driver\",\"  cannot point at the file and section, it has not been answered.\",\"- **`mitigated` requires the mitigation to be authored by an advisor.** The\",\"  driver may authorize a mitigation; it may not design one. Designing one is\",\"  advisory work performed by the authority that will later judge it.\",\"- **A disposition of a finding about the driver's own conduct** — an authority\",\"  violation, an isolation breach, a fabricated turn — must not be self-\",\"  dispositioned as `answered` or `invalidated-by-evidence`. Escalate it to the\",\"  person or to an independent role. Self-clearing is never legitimate here.\",\"The driver may always disposition alone on scope (`deferred`), and on accepting a\",\"finding (`accepted`) — accepting costs nothing that needs guarding.\"]; added [\"Added in candidate — current-Workflow correction; the former driver-specific rules remain in the historical snapshot linked above. Current packet dispositions require actual evidence when they turn on claims\",\"about PROJECT_ROOT or the panel's artifacts (`SKILL.md:124-128`):\",\"- **Invalidation:** cite a real observation, not the producer's unsupported\",\"  explanation for why dissent would be inconvenient.\",\"- **Answer:** cite the artifact that answers the concern.\",\"- **Mitigation:** identify the concrete mitigation and remaining risk; do not\",\"  invent advisor evidence or imply a mitigation was run merely because it is\",\"  written down.\",\"- **Conduct/isolation:** do not self-clear a breach as answered or invalidated.\",\"  Preserve it for an independent authority or the owner.\",\"Accepted and deferred findings retain their consequence, scope and trigger.\",\"Neither disposition automatically approves implementation or replaces the\",\"declared Workflow human gate. Manual-driver examples below illustrate these\",\"invariants, not a current runtime actor.\"].\nApplicable labelled corrections:\nL10-31/explicit-section-correction [intermediate state; witness 9b0526380]: \"Current packet dispositions require actual evidence when they turn on claims\" → \"Added in candidate — current-Workflow correction; the former driver-specific rules remain in the historical snapshot linked above. Current packet dispositions require actual evidence when they turn on claims\"; evidence step10-round4-doc-edits.json.\nDisposition supersede: Account for docs/architect/agent-coordination/playbooks/architecture-advisory-role-doctrine.md#when-the-driver-must-not-disposition-alone under docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md#evidence-and-conduct-boundaries; source context \"Architecture Advisory Role Doctrine / Driver-Disposition Doctrine\", target context \"Architecture Advisory Role Doctrine / Driver-Disposition Doctrine\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "deep: supersede of the driver-disposition heading; my independent line delta is 18 removed and 14 added lines, equal to the exact arrays in the rationale, every one of the 18 removed lines occurs as a full line in both named carriers (history literal-snapshot and its unheaded-block-3, 18 of 18 each), the 14 added lines open with the labelled Added in candidate current-Workflow correction, and the L10-31 before and after fragments equal the entry in step10-round4-doc-edits.json (evidence commit 9b0526380) so no invented label remains; last-reviewed fd599aeb at 62751458b is an ok row.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "fd599aeb69ec450ccb654795c8db12e37932153fdf60f71c8eeaa7e463b32485",
       "targetAncestry": [
         "Architecture Advisory Role Doctrine",
         "Driver-Disposition Doctrine"
-      ]
+      ],
+      "reviewReportCommit": "203f4ef93867a60e6a37624b31ce14de426cafa8"
     },
     {
       "claimId": "claim_7759181bd522af266855f849ecf8143a",
@@ -6174,13 +6186,19 @@
       "targetAnchor": "7-constraint-findings-optional-manual-constraintcritique-shape",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792126341980-e0c35701@2026-10-16",
       "rationale": "Source: docs/architect/agent-coordination/playbooks/architecture-advisory-artifact-templates.md:379-379#7-constraint-findings-proposalsconstraint-advocatemd-phase-6-section (current lines); unit SHA256 925fd21f6972ad4060e318d3d32bfc3feae3fa6aebd95910d5a6ff90837c5885.\nTarget: docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md:434-434#7-constraint-findings-optional-manual-constraintcritique-shape (current lines); unit SHA256 e24524633ae56daa1d8e9a8c4b2956f92d4e08aac51d98f3fe5775b2f9ae3064.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest e24524633ae56daa1d8e9a8c4b2956f92d4e08aac51d98f3fe5775b2f9ae3064 at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 2; title \"7. Constraint Findings — `proposals/constraint-advocate.md` (Phase 6 section)\" → \"7. Constraint Findings — optional manual constraint/critique shape\".\nWhole direct section differs; depth 2 → 2; 0 distinct link changes; normalized line order differs; 0 removed and 2 added nonblank lines after heading/link/correction normalization.\nSection accounting (additive-candidate-section): Added lines are explicit candidate declarations or labelled corrections in the bound target; these are additions, not source-carriage evidence.  Exact normalized nonblank line delta: removed []; added [\"Added in candidate — registered counterparts: constraint-lens shaping and reviewed critique reports,\",\"not a separate numbered runtime phase or mandatory file.\"].\nApplicable labelled corrections:\nL10-31/explicit-section-correction [intermediate state; witness 9b0526380]: \"Registered counterparts: constraint-lens shaping and reviewed critique reports,\" → \"Added in candidate — registered counterparts: constraint-lens shaping and reviewed critique reports,\"; evidence step10-round4-doc-edits.json.\nDisposition supersede: Account for docs/architect/agent-coordination/playbooks/architecture-advisory-artifact-templates.md#7-constraint-findings-proposalsconstraint-advocatemd-phase-6-section under docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md#7-constraint-findings-optional-manual-constraintcritique-shape; source context \"Architecture Advisory Artifact Templates\", target context \"Architecture Advisory Artifact Templates\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "deep: supersede of section 7 whose title loses the proposals/constraint-advocate.md Phase 6 wording (disclosed in the heading line); the section is additive: removed [] and added two lines that I recomputed, the first starting Added in candidate with the registered counterparts sentence, the second its continuation; the L10-31 before and after fragments match step10-round4-doc-edits.json; last-reviewed e2452463 at 62751458b is an ok row equal to the current digest.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "e24524633ae56daa1d8e9a8c4b2956f92d4e08aac51d98f3fe5775b2f9ae3064",
       "targetAncestry": [
         "Architecture Advisory Artifact Templates"
-      ]
+      ],
+      "reviewReportCommit": "203f4ef93867a60e6a37624b31ce14de426cafa8"
     },
     {
       "claimId": "claim_b6dde833e1e94658019aecb31294a7e6",
@@ -8291,13 +8309,19 @@
       "targetAnchor": "10-coding-domain-workflow-step-operations",
       "claimKind": "architecture",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792126341980-e0c35701@2026-10-16",
       "rationale": "Source: docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md:230-230#10-coding-domain-stage-protocols (current lines); unit SHA256 8051e328585855662bb82c42e463bbaeee0fda38e5910ef661b1a6f49e5d9c0b.\nTarget: docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md:255-255#10-coding-domain-workflow-step-operations (current lines); unit SHA256 ce8fd21d766fc1023f3662cde1da980d774512faa2cee1f15727b2d916d958a5.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest ce8fd21d766fc1023f3662cde1da980d774512faa2cee1f15727b2d916d958a5 at 287a22d33a0eaf2d9e47549a1142daf62361bb8c.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 2; title \"10. Coding-Domain Stage Protocols\" → \"10. Coding-Domain Workflow Step Operations\".\nWhole direct section differs; depth 2 → 2; 0 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (heading-and-links): Complete direct sections differ only in heading, link spellings/labels or authenticated exact corrections. Exact normalized nonblank line delta: removed []; added [].\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/proposals/team-communication-protocol-v1.md#10-coding-domain-stage-protocols under docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md#10-coding-domain-workflow-step-operations; source context \"Team Communication Protocol V1\", target context \"Team Communication Protocol V1\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "deep: heading-only supersede (10. Coding-Domain Stage Protocols to Workflow Step Operations, depth 2 to 2) with byte-equal payload and delta [] and []; the unchanged-since sentence names 287a22d33 which is the latest ok row for ce8fd21d (the 62751458b row is a rework of the old rationale at the same target digest, not of the target), so the sentence is true.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "ce8fd21d766fc1023f3662cde1da980d774512faa2cee1f15727b2d916d958a5",
       "targetAncestry": [
         "Team Communication Protocol V1"
-      ]
+      ],
+      "reviewReportCommit": "203f4ef93867a60e6a37624b31ce14de426cafa8"
     },
     {
       "claimId": "claim_a3ced60be2e244d272f2e7db26acf24f",

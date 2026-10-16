@@ -150,17 +150,23 @@
       "sourceUnitDigest": "04f89e98512b5fd7af474ab2abbf362b9a0d30a25b5a911d011037539b3a9d3f",
       "claimKind": "specification",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792126341980-e0c35701@2026-10-16",
       "rationale": "Source: docs/specs/distribution.md:55-55#data-dictionary (current lines); unit SHA256 04f89e98512b5fd7af474ab2abbf362b9a0d30a25b5a911d011037539b3a9d3f.\nTarget: docs/platform/packaging-distribution/spec.md:515-515#data-dictionary (current lines); unit SHA256 3dd2d51fac193d78f712a83b2f0918c9f5f48a0e8eb65572afda4bb678b1de95.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 3dd2d51fac193d78f712a83b2f0918c9f5f48a0e8eb65572afda4bb678b1de95 at 287a22d33a0eaf2d9e47549a1142daf62361bb8c.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 4; title \"Data Dictionary\" → \"Data Dictionary\".\nWhole direct section differs; depth 2 → 4; 0 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (heading-and-links): Complete direct sections differ only in heading, link spellings/labels or authenticated exact corrections. Exact normalized nonblank line delta: removed []; added [].\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/distribution.md#data-dictionary under docs/platform/packaging-distribution/spec.md#data-dictionary; source context \"Spec: Distribution\", target context \"Spec: Packaging-Distribution / Retained Distribution Source Detail / Spec: Distribution\". The complete source direct section occurs verbatim inside the bound target section; native unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
       "targetAnchor": "data-dictionary",
+      "reviewNote": "deep: supersede of Data Dictionary (depth 2 to 4, same title); the payload is byte-equal so the unit digests differ only by depth, and the disposition sentence that the complete source section occurs verbatim inside the target section is true; 0 links; unchanged-since digest 3dd2d51f at 287a22d33 is the latest ok row.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "3dd2d51fac193d78f712a83b2f0918c9f5f48a0e8eb65572afda4bb678b1de95",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "Retained Distribution Source Detail",
         "Spec: Distribution"
-      ]
+      ],
+      "reviewReportCommit": "203f4ef93867a60e6a37624b31ce14de426cafa8"
     },
     {
       "claimId": "claim_35e55882f79d7ab6b9435f03982beba3",

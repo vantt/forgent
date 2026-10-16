@@ -112,3 +112,28 @@ test('overlapping labelled corrections are composed to current bound text before
  assert.equal(corrections[0].after,target.text);assert.deepEqual(corrections[0].composedWith,['U8 flags']);
  assert.equal(bindingCorrections({...target,text:'unrelated'},records).length,0);
 });
+
+test('carrier witnesses require substantive removed raw lines, excluding reviewer fence, brace, separator and link-only examples', async()=>{
+ const {removedCarrierWitnesses}=await import('../../scripts/doc-binding-repair.mjs');
+ const source={path:'docs/source.md',anchor:'s',level:2,sectionText:'## Source\n```js\nconst kept = true;\n}\n```\n|---|---|\n[Boundary](boundary.md)\n  exact raw line'};
+ const target={path:'docs/platform/spec.md',anchor:'t',level:2,sectionText:'## Target\nnew body'};
+ const witness=(anchor,text)=>({path:target.path,anchor,text});
+ const candidates=[witness('fences','```js\n}\n```\n|---|---|'),witness('unrelated-link','[Other](other.md)'),witness('same-link','[Boundary](boundary.md)'),witness('substring','prefix const kept = true; suffix'),witness('wrong-indent','exact raw line'),witness('real','const kept = true;\n  exact raw line'),{...source,text:source.sectionText}];
+ assert.deepEqual(removedCarrierWitnesses(source,target,[],candidates).map(w=>w.anchor),['real']);
+});
+test('carrier witness raw removals honor exact corrections and repeated-line multiplicity',async()=>{
+ const {removedCarrierWitnesses}=await import('../../scripts/doc-binding-repair.mjs');
+ const source={path:'docs/source.md',anchor:'s',text:'old\nrepeat\nrepeat'},target={path:'docs/platform/spec.md',anchor:'t',text:'new\nrepeat'};
+ const candidates=[{path:target.path,anchor:'old',text:'old'},{path:target.path,anchor:'real',text:'repeat'}];
+ assert.deepEqual(removedCarrierWitnesses(source,target,[{before:'old',after:'new'}],candidates).map(w=>w.anchor),['real']);
+});
+
+test('registry accounting includes marker-only edits, all collections, metadata and deleted keys',async()=>{
+ const {registryChangeAccounting}=await import('../../scripts/doc-binding-repair.mjs');
+ const before={commit:'before',units:[{claimId:'a',origin:'old',reviewStatus:'needs-review'},{claimId:'b',lineage:{fromCommit:'old'}}],identityGaps:[{claimId:'c'}],documents:[{path:'docs/a.md',blobSha:'old'}],retiredDocuments:[{path:'gone.md'}],obsolete:true};
+ const after={commit:'after',units:[{claimId:'a'},{claimId:'b'},{claimId:'new'}],identityGaps:[],documents:[{path:'docs/a.md',blobSha:'new'}],retiredDocuments:[]};
+ const rows=registryChangeAccounting(before,after);
+ assert.deepEqual(rows.map(r=>[r.collection,r.key,r.kind]),[['metadata','commit','changed'],['metadata','obsolete','removed'],['units','a','changed'],['units','b','changed'],['units','new','added'],['identityGaps','c','removed'],['documents','docs/a.md','changed'],['retiredDocuments','gone.md','removed']]);
+ assert.deepEqual(rows.find(r=>r.key==='a').changedFields,['origin','reviewStatus']);
+ assert.deepEqual(rows.find(r=>r.key==='b').before,before.units[1]);
+});

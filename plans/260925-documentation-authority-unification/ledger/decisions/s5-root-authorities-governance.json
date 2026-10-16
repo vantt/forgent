@@ -1604,13 +1604,19 @@
       "targetAnchor": "14-related-files",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792126341980-e0c35701@2026-10-16",
       "rationale": "Source: docs/doc-governance.md:466-466#14-related-files (current lines); unit SHA256 b94c5cec93998f88a549a7613a90fbb1c4f111181aacf0faffc469528603bf9f.\nTarget: docs/platform/governance.md:467-467#14-related-files (current lines); unit SHA256 12cc18517f23da3cdd1de3e0a0090371e92f19fce30063363466eb6fdea56cb6.\nSource and target unit digests differ.\nTarget changed since last reviewed digest 1b5703ab9905bb5b86c289e9b6474f95cb2313ac563451919595515af5f1000c at 2300d65571968bb3bcb80123a273272586e3f1db.\nLinks: source 6, target 6; 6 changed spellings/labels, 2 destination changes; 0 added, 0 removed.\nLink 1: \"README.md\" (README.md) → \"README.md\" (documentation/operations/portals/docs-portal.md); resolved docs/README.md → docs/platform/documentation/operations/portals/docs-portal.md.\nLink 2: \"reading-map.md\" (reading-map.md) → \"reading-map.md\" (../reading-map.md); resolved docs/reading-map.md → docs/reading-map.md.\nLink 3: \"transitional-switchboard.md\" (transitional-switchboard.md) → \"transitional-switchboard.md\" (documentation/switchboard.md); resolved docs/transitional-switchboard.md → docs/platform/documentation/switchboard.md.\nLink 4: \"platform/migration-authoring-rules.md\" (platform/migration-authoring-rules.md) → \"platform/migration-authoring-rules.md\" (migration-authoring-rules.md); resolved docs/platform/migration-authoring-rules.md → docs/platform/migration-authoring-rules.md.\nLink 5: \"platform/README.md\" (platform/README.md) → \"platform/README.md\" (README.md); resolved docs/platform/README.md → docs/platform/README.md.\nLink 6: \"architect/documentation-system-design.md\" (architect/documentation-system-design.md) → \"architect/documentation-system-design.md\" (../architect/documentation-system-design.md); resolved docs/architect/documentation-system-design.md → docs/architect/documentation-system-design.md.\nHeading depth: 2 → 2; title \"14. Related Files\" → \"14. Related Files\".\nWhole direct section differs; depth 2 → 2; 6 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (heading-and-links): Complete direct sections differ only in heading, link spellings/labels or authenticated exact corrections. Exact normalized nonblank line delta: removed []; added [].\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/doc-governance.md#14-related-files under docs/platform/governance.md#14-related-files; source context \"Documentation Governance\", target context \"Documentation Governance\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "reviewNote": "deep: supersede of 14. Related Files with 6 links whose labels are unchanged and 2 resolved destinations changed, delta [] and []; the sentence that the target changed since the last reviewed digest 1b5703ab at 2300d6557 is true (current target digest is 12cc1851 and later rows for it are reworks), so no unchanged claim is made for a changed target.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "12cc18517f23da3cdd1de3e0a0090371e92f19fce30063363466eb6fdea56cb6",
       "targetAncestry": [
         "Documentation Governance"
-      ]
+      ],
+      "reviewReportCommit": "203f4ef93867a60e6a37624b31ce14de426cafa8"
     },
     {
       "claimId": "claim_5f99956630d0cb78499c2a3542d2e5e3",

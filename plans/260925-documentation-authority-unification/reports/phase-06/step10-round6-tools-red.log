@@ -1,0 +1,195 @@
+✔ independent facts reject a generator-consistent invented label and equal section claim (1.584727ms)
+✔ independent facts reject wrong removed and added line arrays (0.313708ms)
+✔ independent facts recompute link counts from the actual bound sections (0.193553ms)
+✔ independent facts accept actual delta and a real account label (0.658661ms)
+✔ independent equal-section facts reject replacement wording (0.21324ms)
+✔ independent facts verify a named live carrier by whole lines (0.339744ms)
+✖ independent reverse carrier audit rejects reviewer fence, brace, separator and link-placeholder witnesses (0.937751ms)
+✖ independent reverse carrier audit uses the raw link spelling inside substantive prose (3.299199ms)
+✔ reproduction rejects missing or repository output ["consistency"] (25.338245ms)
+✔ reproduction rejects missing or repository output ["consistency","--output","/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/unsafe.json"] (21.682058ms)
+✔ reproduction rejects missing or repository output ["consistency","--output","relative.json"] (23.931231ms)
+✔ direct audit rejects a symlink output before reading the corpus (26.909575ms)
+✔ direct audit rejects a dangling-symlink output before reading the corpus (27.833314ms)
+✔ direct audit rejects a hardlink output before reading the corpus (25.211497ms)
+✖ documented ownership commands work from a fresh reviewer output directory: step10-round5-reproduction.json (22.861427ms)
+✖ documented ownership commands work from a fresh reviewer output directory: step10-sync4d-reproduction.json (22.110878ms)
+✔ rationale is rebuilt from bound facts without appending false old text (2.164216ms)
+✔ full unit digest decides equality, including heading section payload (0.280106ms)
+✔ last review comparison accepts digest prefix expansion and reports changes (0.341263ms)
+✔ link count distinguishes actual destination changes from spelling rebases (0.22207ms)
+✔ consistency flags changed ranges, anchors, equality and reviewed digest assertions (0.888444ms)
+✔ historical witness and no-target retain do not invent current source ranges (0.16479ms)
+✔ missing or mismatched binding evidence fails rather than inventing facts (0.353004ms)
+✔ legacy consistency checks contextual ranges, anchors and equality without mistaking header citations for bound spans (2.096387ms)
+✔ legacy audit understands unicode anchors, same-file successors and explicitly quoted prior rationales (0.234758ms)
+✔ unavailable historical text remains an explicit witness limit without invented line numbers (0.232558ms)
+✔ link alignment counts inserted provenance separately from repointed links (0.305356ms)
+✔ bound related citations include their actual lines and exact text (0.221554ms)
+✔ review entry snapshots use the committed row for both after and currentDecision (0.389924ms)
+✔ legacy citation audit distinguishes described links from the unit binding itself (0.157765ms)
+✔ residual sibling references are checked as residual facts rather than the primary unit anchor (0.143001ms)
+✔ a historical target is never presented as a current target or as no mapped copy (0.221668ms)
+✔ declared historical target identity disambiguates same-file source and successor references (0.174752ms)
+✔ overlapping labelled corrections are composed to current bound text before selection (0.199223ms)
+✖ carrier witnesses require substantive removed raw lines, excluding reviewer fence, brace, separator and link-only examples (0.239441ms)
+✖ carrier witness raw removals honor exact corrections and repeated-line multiplicity (0.145022ms)
+ℹ tests 36
+ℹ suites 0
+ℹ pass 30
+ℹ fail 6
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 240.056253
+
+✖ failing tests:
+
+test at test/scripts/doc-rationale-facts.test.mjs:32:1
+✖ independent reverse carrier audit rejects reviewer fence, brace, separator and link-placeholder witnesses (0.937751ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + []
+  - [
+  -   'fences',
+  -   'link',
+  -   'exactlink',
+  -   'substring'
+  - ]
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale-facts.test.mjs:37:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [],
+    expected: [ 'fences', 'link', 'exactlink', 'substring' ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at test/scripts/doc-rationale-facts.test.mjs:42:1
+✖ independent reverse carrier audit uses the raw link spelling inside substantive prose (3.299199ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(result('Read [Other](other.md) here.').some(f=>f.type==='carrier-without-substantive-removed-line'))
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale-facts.test.mjs:46:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at test/scripts/doc-rationale-reproduction.test.mjs:23:131
+✖ documented ownership commands work from a fresh reviewer output directory: step10-round5-reproduction.json (22.861427ms)
+  AssertionError [ERR_ASSERTION]: ownership.mjs
+  
+  node:internal/modules/esm/resolve:271
+      throw new ERR_MODULE_NOT_FOUND(
+            ^
+  
+  Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/tmp/fgos-work/round5/step10-sync287-lib.mjs' imported from /tmp/fgos-work/reviewer-fresh-k5FIIB/ownership.mjs
+      at finalizeResolution (node:internal/modules/esm/resolve:271:11)
+      at moduleResolve (node:internal/modules/esm/resolve:865:10)
+      at defaultResolve (node:internal/modules/esm/resolve:992:11)
+      at #cachedDefaultResolve (node:internal/modules/esm/loader:701:20)
+      at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:721:38)
+      at ModuleLoader.resolveSync (node:internal/modules/esm/loader:759:56)
+      at #resolve (node:internal/modules/esm/loader:683:17)
+      at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:603:35)
+      at node:internal/modules/esm/loader:632:32
+      at TracingChannel.tracePromise (node:diagnostics_channel:362:14) {
+    code: 'ERR_MODULE_NOT_FOUND',
+    url: 'file:///tmp/fgos-work/round5/step10-sync287-lib.mjs'
+  }
+  
+  Node.js v24.18.0
+  
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale-reproduction.test.mjs:30:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/scripts/doc-rationale-reproduction.test.mjs:23:131
+✖ documented ownership commands work from a fresh reviewer output directory: step10-sync4d-reproduction.json (22.110878ms)
+  AssertionError [ERR_ASSERTION]: ownership.mjs
+  
+  node:internal/modules/esm/resolve:271
+      throw new ERR_MODULE_NOT_FOUND(
+            ^
+  
+  Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/tmp/fgos-work/package4d/lib.mjs' imported from /tmp/fgos-work/reviewer-fresh-aMUw7o/ownership.mjs
+      at finalizeResolution (node:internal/modules/esm/resolve:271:11)
+      at moduleResolve (node:internal/modules/esm/resolve:865:10)
+      at defaultResolve (node:internal/modules/esm/resolve:992:11)
+      at #cachedDefaultResolve (node:internal/modules/esm/loader:701:20)
+      at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:721:38)
+      at ModuleLoader.resolveSync (node:internal/modules/esm/loader:759:56)
+      at #resolve (node:internal/modules/esm/loader:683:17)
+      at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:603:35)
+      at node:internal/modules/esm/loader:632:32
+      at TracingChannel.tracePromise (node:diagnostics_channel:362:14) {
+    code: 'ERR_MODULE_NOT_FOUND',
+    url: 'file:///tmp/fgos-work/package4d/lib.mjs'
+  }
+  
+  Node.js v24.18.0
+  
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale-reproduction.test.mjs:30:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/scripts/doc-rationale.test.mjs:116:1
+✖ carrier witnesses require substantive removed raw lines, excluding reviewer fence, brace, separator and link-only examples (0.239441ms)
+  TypeError: removedCarrierWitnesses is not a function
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale.test.mjs:122:19)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7)
+
+test at test/scripts/doc-rationale.test.mjs:124:1
+✖ carrier witness raw removals honor exact corrections and repeated-line multiplicity (0.145022ms)
+  TypeError: removedCarrierWitnesses is not a function
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/test/scripts/doc-rationale.test.mjs:128:19)
+      at async Test.run (node:internal/test_runner/test:1332:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7)

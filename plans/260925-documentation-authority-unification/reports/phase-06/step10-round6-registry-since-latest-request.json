@@ -1,0 +1,8 @@
+{
+  "previousRequestCommit": "fe98a6455464da90de8e371c530560bf8d14751f",
+  "currentCommit": "203f4ef93867a60e6a37624b31ce14de426cafa8",
+  "registry": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+  "method": "All top-level keys and all identity/document collections, including removals and marker-only changes. No selected-ID filter.",
+  "changes": [],
+  "counts": {}
+}

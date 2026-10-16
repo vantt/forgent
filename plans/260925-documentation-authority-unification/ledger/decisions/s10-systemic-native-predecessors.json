@@ -92,14 +92,20 @@
       "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
       "targetAnchor": "unheaded-block-26",
       "rationale": "Source: docs/platform/runner/operations/h-51f5cd7279fd.md:456-467#unheaded-block-26 (historical witness at 19ca8de23908e161c34c91626e41041b7813167c); unit SHA256 30bbabf9219560dd2744a98e42e43b53e9fbaf15c4282e68860a8682f2b63059.\nTarget: docs/platform/runner/operations/h-51f5cd7279fd.md:456-467#unheaded-block-26 (current lines); unit SHA256 0f61fde6bc880cb19623ecde63a6a137571884e4b6ae2f8b24b8a585b25d600a.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 0f61fde6bc880cb19623ecde63a6a137571884e4b6ae2f8b24b8a585b25d600a at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nL10-24/citation-refuseHelp: \"bin/fgos.mjs:4373,4461\" → \"bin/fgos.mjs:4415,4503\"; evidence step10-round3-doc-edits.json; bin/fgos.mjs:4414-4417,4503 (evidence commit 5035fed52e60254ecbe034cc987553feb24616f4).\nDisposition supersede: Account for docs/platform/runner/operations/h-51f5cd7279fd.md#unheaded-block-26 under docs/platform/runner/operations/h-51f5cd7279fd.md#unheaded-block-26; source context \"Added in candidate: Runner Behaviors & Operations / Behaviors & Operations / Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\", target context \"Added in candidate: Runner Behaviors & Operations / Behaviors & Operations / Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792126341980-e0c35701@2026-10-16",
+      "reviewNote": "deep: supersede of unheaded-block-26 (lines 456-467) of runner/operations/h-51f5cd7279fd.md from the 19ca8de23 witness to the same anchor now; a character diff shows the only change is the citation bin/fgos.mjs:4373,4461 to 4415,4503, which is exactly the one labelled correction the rationale names (before text is in the source witness, after text in the target); the cited lines 4414-4417 and 4503 at 5035fed52 are the unknown-verb default and the refuseHelp call; the last-reviewed sentence matches the ok row of review-step10-accounting-06-62751458b for 0f61fde6 which equals the current target digest.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "0f61fde6bc880cb19623ecde63a6a137571884e4b6ae2f8b24b8a585b25d600a",
       "targetAncestry": [
         "Added in candidate: Runner Behaviors & Operations",
         "Behaviors & Operations",
         "Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)"
-      ]
+      ],
+      "reviewReportCommit": "203f4ef93867a60e6a37624b31ce14de426cafa8"
     },
     {
       "claimId": "claim_e0fc704182450d959f8452cc09da5f20",
@@ -201,12 +207,18 @@
       "targetOwner": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
       "targetAnchor": "unheaded-block-2",
       "rationale": "Source: docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md:23-23#unheaded-block-2 (historical witness at 19ca8de23908e161c34c91626e41041b7813167c); unit SHA256 ae0e268fad727f5deda17cf43d013aa1710f5cea2506fdd844809c3c8e98511f.\nTarget: docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md:23-23#unheaded-block-2 (current lines); unit SHA256 c354e3357585a5cc6bce8dd57d833b0e85d3f19e58ba6e81e9d6f562aca53edc.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest c354e3357585a5cc6bce8dd57d833b0e85d3f19e58ba6e81e9d6f562aca53edc at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nL10-24/citation-scaffold: \"bin/fgos.mjs:4640-4643; bin/fgos.mjs:4373-4380\" → \"bin/fgos.mjs:4414-4417\"; evidence step10-round3-doc-edits.json; bin/fgos.mjs:4414-4417,4503 (evidence commit 5035fed52e60254ecbe034cc987553feb24616f4).\nDisposition supersede: Account for docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md#unheaded-block-2 under docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md#unheaded-block-2; source context \"Added in candidate: Runner Pointers (implementation)\", target context \"Added in candidate: Runner Pointers (implementation)\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "reviewStatus": "pending",
+      "reviewStatus": "reviewed",
       "authoredBy": "codex-session:unit-run-1792126341980-e0c35701@2026-10-16",
+      "reviewNote": "deep: supersede of unheaded-block-2 of runner/subcomponents/h-f34e0d170d89/spec.md; the character diff shows the only change is the pointer bin/fgos.mjs:4640-4643; bin/fgos.mjs:4373-4380 replaced by bin/fgos.mjs:4414-4417, matching the single labelled correction in the rationale (before text present in the 19ca8de23 source, after text in the target); last-reviewed digest c354e335 at 62751458b has an ok row and equals the current target digest.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
+      "reviewMode": "ordinary",
       "targetUnitDigest": "c354e3357585a5cc6bce8dd57d833b0e85d3f19e58ba6e81e9d6f562aca53edc",
       "targetAncestry": [
         "Added in candidate: Runner Pointers (implementation)"
-      ]
+      ],
+      "reviewReportCommit": "203f4ef93867a60e6a37624b31ce14de426cafa8"
     },
     {
       "claimId": "claim_09ce5c9968f21e0b39b0f23170433a9b",

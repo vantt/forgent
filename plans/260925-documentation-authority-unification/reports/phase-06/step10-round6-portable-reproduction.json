@@ -1,0 +1,124 @@
+[
+  {
+    "outputDir": "/tmp/fgos-work/round6-fresh-round5",
+    "allPassed": true,
+    "results": [
+      {
+        "command": [
+          "node",
+          "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-06/step10-independent-rationale-audit.mjs",
+          "--output",
+          "/tmp/fgos-work/round6-fresh-round5/independent.json"
+        ],
+        "exitCode": 0,
+        "log": "/tmp/fgos-work/round6-fresh-round5/step10-independent-rationale-audit.log"
+      },
+      {
+        "command": [
+          "node",
+          "/tmp/fgos-work/round6-fresh-round5/checks.mjs",
+          "--output-dir",
+          "/tmp/fgos-work/round6-fresh-round5"
+        ],
+        "exitCode": 0,
+        "log": "/tmp/fgos-work/round6-fresh-round5/checks.log"
+      },
+      {
+        "command": [
+          "node",
+          "/tmp/fgos-work/round6-fresh-round5/fast.mjs",
+          "--output-dir",
+          "/tmp/fgos-work/round6-fresh-round5"
+        ],
+        "exitCode": 0,
+        "log": "/tmp/fgos-work/round6-fresh-round5/fast.log"
+      },
+      {
+        "command": [
+          "node",
+          "/tmp/fgos-work/round6-fresh-round5/ownership.mjs",
+          "--output-dir",
+          "/tmp/fgos-work/round6-fresh-round5"
+        ],
+        "exitCode": 0,
+        "log": "/tmp/fgos-work/round6-fresh-round5/ownership.log"
+      },
+      {
+        "command": [
+          "node",
+          "/tmp/fgos-work/round6-fresh-round5/audit-ownership.mjs",
+          "--output-dir",
+          "/tmp/fgos-work/round6-fresh-round5"
+        ],
+        "exitCode": 0,
+        "log": "/tmp/fgos-work/round6-fresh-round5/audit-ownership.log"
+      },
+      {
+        "command": [
+          "python3",
+          "/tmp/fgos-work/round6-fresh-round5/replay.py",
+          "--output-dir",
+          "/tmp/fgos-work/round6-fresh-round5"
+        ],
+        "exitCode": 0,
+        "log": "/tmp/fgos-work/round6-fresh-round5/replay.log"
+      }
+    ]
+  },
+  {
+    "outputDir": "/tmp/fgos-work/round6-final-sync4d",
+    "allPassed": true,
+    "results": [
+      {
+        "command": [
+          "node",
+          "/home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-06/step10-independent-rationale-audit.mjs",
+          "--output",
+          "/tmp/fgos-work/round6-final-sync4d/independent.json"
+        ],
+        "exitCode": 0,
+        "log": "/tmp/fgos-work/round6-final-sync4d/step10-independent-rationale-audit.log"
+      },
+      {
+        "command": [
+          "node",
+          "/tmp/fgos-work/round6-final-sync4d/checks.mjs",
+          "--output-dir",
+          "/tmp/fgos-work/round6-final-sync4d"
+        ],
+        "exitCode": 0,
+        "log": "/tmp/fgos-work/round6-final-sync4d/checks.log"
+      },
+      {
+        "command": [
+          "node",
+          "/tmp/fgos-work/round6-final-sync4d/ownership.mjs",
+          "--output-dir",
+          "/tmp/fgos-work/round6-final-sync4d"
+        ],
+        "exitCode": 0,
+        "log": "/tmp/fgos-work/round6-final-sync4d/ownership.log"
+      },
+      {
+        "command": [
+          "node",
+          "/tmp/fgos-work/round6-final-sync4d/audit-ownership.mjs",
+          "--output-dir",
+          "/tmp/fgos-work/round6-final-sync4d"
+        ],
+        "exitCode": 0,
+        "log": "/tmp/fgos-work/round6-final-sync4d/audit-ownership.log"
+      },
+      {
+        "command": [
+          "python3",
+          "/tmp/fgos-work/round6-final-sync4d/replay.py",
+          "--output-dir",
+          "/tmp/fgos-work/round6-final-sync4d"
+        ],
+        "exitCode": 0,
+        "log": "/tmp/fgos-work/round6-final-sync4d/replay.log"
+      }
+    ]
+  }
+]
