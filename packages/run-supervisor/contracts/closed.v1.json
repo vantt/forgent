@@ -1,0 +1,11 @@
+{
+  "contract": { "id": "run-supervisor-closed", "version": 1 },
+  "description": "<attemptDir>/closed.json. Published once when every step of the envelope has a step receipt. A scan skips closed attempts.",
+  "fields": {
+    "v": { "const": 1 },
+    "attemptId": "string",
+    "closedBy": { "enum": ["supervisor", "adopt"] },
+    "steps": "string[], the stepIds that had receipts",
+    "at": "string, ISO-8601 UTC"
+  }
+}

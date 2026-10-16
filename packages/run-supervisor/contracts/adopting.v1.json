@@ -1,0 +1,10 @@
+{
+  "contract": { "id": "run-supervisor-adopting", "version": 1 },
+  "description": "<attemptDir>/adopting.json. Written by an adopter right after it took the attempt lock EX (lock free and domain empty). Its presence while the lock is held makes a probe report being-adopted instead of running. Rewritten (temp + rename, not link) by each later adopter, since it only describes the current holder.",
+  "fields": {
+    "v": { "const": 1 },
+    "attemptId": "string",
+    "adopter": "processTuple of the adopter",
+    "at": "string, ISO-8601 UTC"
+  }
+}

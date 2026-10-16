@@ -1,0 +1,22 @@
+{
+  "contract": { "id": "run-supervisor-gate-go", "version": 1 },
+  "description": "Frames on the GO channel between supervisor and gate. direct: an inherited AF_UNIX SOCK_STREAM socketpair end at the fd named by --go-fd (no peer check needed: only the supervisor holds the other end). terminal: an AF_UNIX socket under the runtime socket dir; the gate checks the peer uid with SO_PEERCRED and never compares pids (the peer pid is 0 across pid namespaces).",
+  "framing": {
+    "frame": "4-byte unsigned big-endian length N, then N bytes of UTF-8 JSON (one object)",
+    "maxFrameBytes": 65536,
+    "oversizeOrInvalid": "protocol error: the receiver closes the channel; the gate treats it like EOF"
+  },
+  "frames": {
+    "HELLO": { "direction": "gate -> supervisor", "fields": { "type": "HELLO", "attemptId": "string, from the gate's own envelope" }, "when": "first frame after the gate starts" },
+    "GO": { "direction": "supervisor -> gate", "fields": { "type": "GO", "attemptId": "string", "envelopeDigest": "string" }, "gateCheck": "attemptId and envelopeDigest must equal the gate's own envelope; mismatch is a refusal (gate exits without running the agent, gate-exit not published, exit code 65)" },
+    "AGENT": { "direction": "gate -> supervisor", "fields": { "type": "AGENT", "tuple": "processTuple of the agent as seen from the host when knowable, else as seen in the namespace with pidNs of the namespace" }, "when": "right after the agent was spawned" },
+    "BRIEF_DELIVERED": { "direction": "supervisor -> gate", "fields": { "type": "BRIEF_DELIVERED" }, "mode": "terminal only (6.3); a direct gate ignores it" },
+    "STOP": { "direction": "supervisor -> gate", "fields": { "type": "STOP", "cause": { "enum": ["soft-deadline", "idle", "cancel"] } }, "meaning": "advisory duplicate of stop-requested.json; the gate still reads the file when it receives SIGTERM" }
+  },
+  "gateEnvelope": "the gate reads the envelope named by its own --envelope <path> argv (internal-route.run-supervisor.v1.json), verifies its digest, and compares GO against it",
+  "rules": [
+    "EOF or a refused connection before GO: the gate exits without running the agent (exit code 64, no gate-exit.json)",
+    "after GO the gate never needs the channel: supervisor death (EOF after GO) does not stop the agent in direct mode",
+    "terminal mode only: EOF after GO but before BRIEF_DELIVERED ends the domain (abandoned-before-brief); EOF after BRIEF_DELIVERED makes the gate watch the outbox (orphan branch)"
+  ]
+}

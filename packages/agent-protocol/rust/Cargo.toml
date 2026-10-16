@@ -1,0 +1,6 @@
+[package]
+name = "fgos-agent-protocol"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]

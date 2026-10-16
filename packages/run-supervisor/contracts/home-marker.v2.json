@@ -1,0 +1,16 @@
+{
+  "contract": { "id": "confinement-home-marker", "version": 2 },
+  "description": "Ownership marker `.fgos-confinement-owner.json` (OWNERSHIP_MARKER_FILE, src/runner/dispatch/confinement/cleanup.mjs) of a confinement home created for an attempt. Version 2 carries no pid and no pane: the attempt lock decides whether the home may be removed, and only the adopt door (finalize-home) removes it. Version 1 markers (contract `confinement-resource-ownership.v1`) keep the old reaper rules until they are gone; the old reader accepts only the v1 contract string, so it ignores version 2.",
+  "fields": {
+    "contract": { "const": "confinement-resource-ownership.v2" },
+    "creator": { "const": "fgos-confinement" },
+    "attemptId": "string",
+    "runDir": "absolute attemptDir (the attempt lock is <runDir>/attempt.lock)",
+    "dispatchId": "string, the per-dispatch parent directory name, as in version 1",
+    "resource": "string, the confined resource name, as in version 1",
+    "createdAt": "string, ISO-8601 UTC"
+  },
+  "extension": "extendOwnershipMarker may add facts known after the home is filled (e.g. the account login it was copied from); it never adds pid, pane or binder fields",
+  "forbiddenFields": ["pid", "timeoutMs", "paneId", "launchedAt", "binder"],
+  "removalRule": "remove only through finalize-home run by the supervisor or by adopt while it holds the attempt lock and containment.is_empty(domain) == empty"
+}

@@ -110,6 +110,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "fgos-agent-protocol"
+version = "0.2.0"
+
+[[package]]
 name = "fgos-convention"
 version = "0.2.0"
 dependencies = [
@@ -182,6 +186,14 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror",
+]
+
+[[package]]
+name = "fgos-run-supervisor"
+version = "0.2.0"
+dependencies = [
+ "serde_json",
+ "sha2",
 ]
 
 [[package]]

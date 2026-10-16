@@ -1,0 +1,10 @@
+{
+  "contract": { "id": "run-supervisor-stop-requested", "version": 1 },
+  "description": "<attemptDir>/stop-requested.json. Published once by the supervisor BEFORE it sends SIGTERM to the gate, so the gate can name why it was stopped.",
+  "fields": {
+    "v": { "const": 1 },
+    "attemptId": "string",
+    "cause": { "enum": ["soft-deadline", "idle", "cancel"] },
+    "at": "string, ISO-8601 UTC"
+  }
+}

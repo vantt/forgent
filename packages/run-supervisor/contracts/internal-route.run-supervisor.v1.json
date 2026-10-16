@@ -1,0 +1,92 @@
+{
+  "contract": { "id": "internal-route-run-supervisor", "version": 1 },
+  "description": "Internal routes of the fgos host for the run supervisor. Not in help, not user verbs. Only the payload of the same release calls them; a protocol mismatch fails closed with host-version-mismatch (same exit code as the holder-lock internal routes).",
+  "common": {
+    "protocol": "--protocol 1 is required on every route; absent or != 1 -> exit 3, stdout {\"v\":1,\"protocol\":1,\"result\":\"error\",\"code\":\"host-version-mismatch\"}",
+    "unknownFlag": "usage error, exit 2",
+    "stdout": "machine output only, one JSON object per line, each with v:1 and protocol:1; stderr is free text, never parsed",
+    "flagSyntax": "--name value (never --name=value)",
+    "exitCodes": {
+      "0": "route finished its job",
+      "2": "usage",
+      "3": "host-version-mismatch",
+      "65": "envelope-invalid (missing, v != 3, digest mismatch, GO mismatch)",
+      "70": "internal or io error"
+    }
+  },
+  "routes": {
+    "supervise": {
+      "argv": "fgos internal supervise --envelope <path> --protocol 1",
+      "fds": {
+        "3": "attempt lock description (inherited, held EX by the controller's scope); set FD_CLOEXEC first",
+        "4": "dispatch-cwd lease description, present only when envelope.mutation == mutating; set FD_CLOEXEC first",
+        "stdio": "stdin /dev/null; stdout and stderr appended to <attemptDir>/supervisor.log by the controller"
+      },
+      "process": "the controller spawns it with setsid, detached, no IPC channel; it outlives the controller",
+      "sequence": [
+        "CLOEXEC fd 3 (and 4)",
+        "containment.create(attemptId) -> domain",
+        "declare_domain on the attempt lock (predecessor.v1.json record) before the domain has a process",
+        "socketpair for GO; spawn_in(domain, gate spec) with fd map {3: attempt, 4: cwd (if any), 5: GO end}",
+        "publish supervisor-binding.json; send GO after HELLO",
+        "watch: soft deadline, idle (agent-protocol activity), cancel-requested.json, gate exit",
+        "on stop: publish stop-requested.json then SIGTERM the gate; kill_all(domain, gateKillGraceMs) if the gate outlives the grace",
+        "gate exited: close fd 4 at once; publish receipt.json; run the steps (step-receipt.v1.json); publish closed.json; exit 0"
+      ],
+      "stdout": { "result": { "enum": ["closed", "open"] }, "outcome": "receipt outcome", "pendingStep": "stepId or absent" }
+    },
+    "gate": {
+      "argv": "fgos internal gate --protocol 1 --envelope <path> (--go-fd N | --go-socket <path>)",
+      "fds": {
+        "3": "attempt lock description (inherited); set FD_CLOEXEC first",
+        "4": "dispatch-cwd lease description when mutating; set FD_CLOEXEC first",
+        "N": "GO channel end (direct); set FD_CLOEXEC first"
+      },
+      "linux-gate": "runs as pid 1 of a fresh pid namespace: bwrap <bwrapPrefix> --unshare-pid --as-pid-1 --proc /proc ... -- <hostBin> internal gate ...; no --die-with-parent in direct mode; installs SIGTERM and SIGINT handlers; reaps with waitpid(-1) continuously",
+      "sequence": [
+        "CLOEXEC lock fds and the GO fd",
+        "read and verify the envelope; send HELLO; wait for GO (EOF before GO -> exit 64 without running the agent)",
+        "open capture files (dup2 to 1, 2) and stdin per launch.stdinPolicy",
+        "spawn the agent (setsid inside the namespace) with env = launch.env + sideFile.env; send AGENT",
+        "wait: agent exit, SIGTERM/SIGINT (forward SIGTERM to the agent group, SIGKILL after gateKillGraceMs), hard ceiling on CLOCK_BOOTTIME (same SIGTERM -> grace -> SIGKILL)",
+        "agent gone: kill(-1, SIGKILL), reap until ECHILD, publish gate-exit.json, exit 0"
+      ],
+      "exitCodes": { "0": "gate-exit.json published", "64": "no GO: the agent was never started", "65": "envelope or GO mismatch" }
+    },
+    "adopt": {
+      "argv": "fgos internal adopt --protocol 1 (--run-dir <attemptDir> | --scan) [--probe-only]",
+      "scan": "stdin: one absolute attemptDir per line; stdout: one JSON line per attemptDir in input order",
+      "probeOnly": "report state only, write nothing, take no lock (LOCK_SH|LOCK_NB probe)",
+      "stdout": {
+        "attemptDir": "string",
+        "state": { "enum": ["running", "being-adopted", "needs-adopt", "adopted", "closed", "legacy-run", "open"] },
+        "outcome": "receipt outcome when known",
+        "pendingStep": "stepId the adopter could not finish (state open)",
+        "reason": "string or absent"
+      },
+      "stateMeaning": {
+        "running": "the attempt lock is held and no adopting.json names the holder",
+        "being-adopted": "the attempt lock is held by an adopter (adopting.json present)",
+        "needs-adopt": "probe-only: lock free and domain empty, not closed",
+        "adopted": "this call took the lock and drove the attempt to closed",
+        "open": "this call took the lock but a step returned retry or failed; the attempt stays for a later adopt",
+        "closed": "closed.json present (skipped without probing the lock)",
+        "legacy-run": "no attempt.lock or no envelope v3: not this door's run (left to 6.4)"
+      },
+      "rule": "lock free is not enough: adopt proceeds only when containment.is_empty(binding.domain) == empty (unknown counts as not empty)"
+    },
+    "attempt-step": {
+      "argv": "fgos internal attempt-step <stepId> --protocol 1 --run-dir <attemptDir>",
+      "execution": "the host execs the Node payload of envelope.payloadRoot (resolved like apps/fgos/src/legacy_exec.rs, never PATH) with entry src/run-supervisor/attempt-step.mjs, passing stepId and the attemptDir",
+      "stdout": "step-receipt.v1.json stepProcess.stdout",
+      "exitCodes": { "0": "done", "10": "retry", "65": "envelope-invalid", "66": "payload-missing", "70": "error" }
+    },
+    "lock-scan": {
+      "argv": "fgos internal lock-scan --protocol 1",
+      "stdin": "one absolute lock file path per line",
+      "stdout": "one JSON line per path in input order: {path, state: free|held|missing}",
+      "method": "open O_RDWR, flock(LOCK_SH|LOCK_NB), close; never LOCK_EX so two scans never block each other",
+      "budget": "< 50 ms for 2000 paths"
+    }
+  }
+}

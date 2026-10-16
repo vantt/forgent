@@ -1,0 +1,10 @@
+{
+  "contract": { "id": "run-supervisor-cancel-requested", "version": 1 },
+  "description": "<attemptDir>/cancel-requested.json. Published once by anyone allowed to cancel the attempt (Ctrl-C in the controller, 6.4). The supervisor polls for it, then publishes stop-requested {cause: cancel} and SIGTERMs the gate.",
+  "fields": {
+    "v": { "const": 1 },
+    "attemptId": "string",
+    "requestedBy": "string, free text (e.g. controller pid tuple or user)",
+    "at": "string, ISO-8601 UTC"
+  }
+}

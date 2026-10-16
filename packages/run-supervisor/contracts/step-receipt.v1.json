@@ -1,0 +1,23 @@
+{
+  "contract": { "id": "run-supervisor-step-receipt", "version": 1 },
+  "description": "<attemptDir>/steps/<stepId>.json. Published once by the step runner (supervisor or adopt) only after the step process exited 0 and printed a done result. A missing receipt means the step must run (again); every step is idempotent.",
+  "fields": {
+    "v": { "const": 1 },
+    "attemptId": "string",
+    "stepId": { "enum": ["settle-attempt", "finalize-home", "release-slot"] },
+    "status": { "const": "done" },
+    "detail": "object or absent; the step's own stdout result minus anything secret",
+    "at": "string, ISO-8601 UTC"
+  },
+  "stepProcess": {
+    "argv": "<step.hostBin> <step.argv...>, cwd step.cwd, env exactly step.env (no inheritance from the runner)",
+    "fds": "stdin /dev/null; stdout one JSON line; stderr appended to supervisor.log; no other fd: the step never receives a lock description",
+    "stdout": {
+      "done": { "result": "done", "detail": "object" },
+      "retry": { "result": "retry", "reason": "string, e.g. credential-home-kept; no receipt, adopt retries later" },
+      "error": { "result": "error", "code": { "enum": ["host-version-mismatch", "envelope-invalid", "payload-missing", "io", "internal"] }, "message": "string" }
+    },
+    "timeout": "the runner kills the step's process group after stepTimeoutMs; no receipt"
+  },
+  "order": "steps run in envelope order; a step without a receipt stops the chain for this runner (the attempt stays open for adopt)"
+}

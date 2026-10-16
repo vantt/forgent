@@ -1,0 +1,36 @@
+{
+  "contract": { "id": "run-supervisor-binding", "version": 1 },
+  "description": "<attemptDir>/supervisor-binding.json. Published once by the supervisor after the gate is running inside the containment domain and before GO is sent. Its presence means the attempt was handed over: the controller closes its lock fds when it sees it.",
+  "processTuple": {
+    "fields": {
+      "host": "string, hostname",
+      "bootId": "string, /proc/sys/kernel/random/boot_id on Linux; platform boot identifier elsewhere",
+      "pidNs": "string, pid namespace inode as seen from the host (Linux), empty string elsewhere",
+      "pid": "integer, pid as seen from the host",
+      "startTime": "string, process start time in the platform's native units"
+    },
+    "judge": "packages/process/contracts/process-facts.judge.v1.json"
+  },
+  "fields": {
+    "v": { "const": 1 },
+    "attemptId": "string, equal to the envelope's attemptId",
+    "envelopeDigest": "string, equal to the envelope's digest",
+    "supervisor": "processTuple of the supervisor",
+    "gate": "processTuple of the gate as seen from the host (linux-gate: the child pid bwrap reports on --info-fd, i.e. pid 1 of the attempt namespace)",
+    "agent": "processTuple or absent; published later only by the gate's AGENT frame through the supervisor log, never by rewriting this file",
+    "domain": {
+      "kind": { "enum": ["linux-gate", "linux-pgroup", "windows-job", "macos-tree"] },
+      "id": "domain id exactly as containment.create returned it and as the supervisor declared it into <attemptDir>/attempt.lock.predecessor.json (predecessor.v1.json domainId)"
+    },
+    "guarantee": {
+      "containment": { "enum": ["kernel", "best-effort"] },
+      "lock": { "enum": ["kernel", "job-scoped"] }
+    },
+    "boundAt": "string, ISO-8601 UTC"
+  },
+  "invariants": [
+    "published after declare_domain and spawn_in succeeded, before GO",
+    "never rewritten; a second supervisor for the same attempt cannot exist because it would need the attempt lock description",
+    "absent binding after the controller's wait is launch-unknown, never not-started"
+  ]
+}

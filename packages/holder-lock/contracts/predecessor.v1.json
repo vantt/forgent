@@ -9,7 +9,7 @@
   },
   "record": {
     "v": 1,
-    "domainKind": { "enum": ["linux-gate", "windows-job", "macos-tree"] },
+    "domainKind": { "enum": ["linux-gate", "linux-pgroup", "windows-job", "macos-tree"] },
     "domainId": {
       "linux-gate": {
         "host": "string",
@@ -18,6 +18,14 @@
         "pid": "integer",
         "startTime": "string",
         "meaning": "process tuple of the gate; the domain is empty iff judge(tuple) == dead"
+      },
+      "linux-pgroup": {
+        "host": "string",
+        "bootId": "string",
+        "pidNs": "string",
+        "pid": "integer",
+        "startTime": "string",
+        "meaning": "process tuple of the group leader (Linux without user namespaces, best-effort); the domain is empty when judge(tuple) == dead and no process is left in its process group"
       },
       "windows-job": {
         "type": "string",
@@ -60,6 +68,7 @@
   },
   "driverSupport": {
     "linux-gate": "implemented: judge(gate) == dead; kill_all = SIGKILL by identity",
+    "linux-pgroup": "written by the run supervisor (containment.port.v1.json); until its driver lands a holder-lock driver answers unknown, which is never treated as empty",
     "windows-job": "contract only; driver written after the Windows probes are green on a real machine",
     "macos-tree": "contract only until a consumer declares a tree domain; best-effort"
   },

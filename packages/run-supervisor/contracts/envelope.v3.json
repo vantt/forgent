@@ -1,0 +1,110 @@
+{
+  "contract": { "id": "run-supervisor-envelope", "version": 3 },
+  "description": "Immutable launch envelope of one attempt. The controller writes it once, under the attempt lock, before it spawns the supervisor; the supervisor, the gate, every post-receipt step and every adopter read it and never rewrite it. Secrets and the run-control token are not in it: they live in the 0600 side file.",
+  "layout": {
+    "attemptDir": "<assignmentDir>/runs/<NN> (NN = attempt number, two digits); the envelope field runDir names this directory",
+    "lockFile": "<attemptDir>/attempt.lock (lock-registry.v1.json row `attempt`, rank 15, kind lease)",
+    "envelope": "<attemptDir>/envelope.json",
+    "sideFile": "<attemptDir>/protected/attempt-secrets.json, mode 0600, directory 0700",
+    "binding": "<attemptDir>/supervisor-binding.json",
+    "gateExit": "<attemptDir>/gate-exit.json",
+    "receipt": "<attemptDir>/receipt.json",
+    "stepReceipts": "<attemptDir>/steps/<stepId>.json",
+    "stopRequested": "<attemptDir>/stop-requested.json",
+    "cancelRequested": "<attemptDir>/cancel-requested.json",
+    "adopting": "<attemptDir>/adopting.json",
+    "closed": "<attemptDir>/closed.json",
+    "supervisorLog": "<attemptDir>/supervisor.log (supervisor stdout and stderr; free text, never parsed)"
+  },
+  "publish": {
+    "rule": "every file in the layout except supervisor.log is written to a temp file in the same directory, fsynced, then hard-linked to its final name with link(2); EEXIST means another writer already published it: read that one, never overwrite. The temp file is removed afterwards.",
+    "envelope": "written once by the controller before the supervisor exists; nobody republishes it"
+  },
+  "digest": {
+    "field": "digest",
+    "value": "\"sha256:\" + lowercase hex sha256 of the canonical JSON of the envelope object with the `digest` key removed",
+    "canonicalJson": [
+      "objects: keys sorted by UTF-16 code unit order (JavaScript Array.prototype.sort default); keys whose value is undefined are dropped; serialized as {\"k\":v,...} with no whitespace",
+      "arrays: elements in order, [a,b] with no whitespace",
+      "strings: JSON.stringify escaping (\\\" \\\\ \\b \\f \\n \\r \\t, other control characters as \\u00XX lowercase hex, everything else literal UTF-8)",
+      "numbers: only integers in the safe range (|n| <= 2^53-1) are allowed; serialized in decimal without exponent; floats are a contract violation",
+      "booleans and null: true, false, null"
+    ],
+    "implementations": {
+      "node": "canonicalJson / computeSha256Digest in src/runner/dispatch/proof-helpers.mjs",
+      "rust": "fgos_run_supervisor::envelope::digest"
+    },
+    "vector": "packages/run-supervisor/contracts/vectors/envelope-digest.v1.json; both implementations must reproduce every vector byte for byte",
+    "keyRestriction": "all keys written by fgOS are ASCII, so UTF-16 order and byte order agree; a non-ASCII key is a contract violation"
+  },
+  "fields": {
+    "v": { "const": 3 },
+    "digest": "string, see digest",
+    "attemptId": "string, globally unique attempt id minted by the controller (also the slot key in terminal mode)",
+    "unitRunId": "string, the unit run this attempt belongs to",
+    "runDir": "absolute path of attemptDir",
+    "mode": { "enum": ["direct", "terminal"] },
+    "protocolId": { "const": 1, "meaning": "internal-route protocol the supervisor, gate and steps must speak (internal-route.run-supervisor.v1.json)" },
+    "hostBin": "absolute path of the fgos host binary of the release that wrote the envelope; resolved once by the controller, never through PATH or a shim",
+    "payloadRoot": "absolute path of the legacy-node payload root of the same release (components.legacyNode.root of the activated manifest); resolved like apps/fgos/src/legacy_exec.rs",
+    "cwd": "absolute working directory of the agent",
+    "mutation": { "enum": ["mutating", "read-only"], "meaning": "mutating attempts also hold the dispatch-cwd lease (rank 30) handed to the supervisor at fd 4" },
+    "launch": {
+      "command": "string, absolute executable path of the agent CLI (resolved by resolveExecutorCommand in src/runner/dispatch/transport.mjs)",
+      "args": "string[]",
+      "env": "object string -> string; the non-secret environment of the agent. Secret values are absent here and present in sideFile.env; the gate merges sideFile.env over this map",
+      "stdinPolicy": { "enum": ["brief-file", "null"], "meaning": "brief-file: the gate opens briefPath read-only as stdin; null: stdin is /dev/null (NUL on Windows)" },
+      "briefPath": "absolute path of the brief file, or null when the brief travels in argv",
+      "outboxDir": "absolute path where the agent writes result-<N>.json",
+      "capture": {
+        "stdout": "absolute path; the gate opens it O_WRONLY|O_CREAT|O_APPEND and dup2s it to fd 1",
+        "stderr": "absolute path; the gate opens it the same way and dup2s it to fd 2"
+      }
+    },
+    "containment": {
+      "preferred": { "enum": ["linux-gate", "linux-pgroup", "windows-job", "macos-tree"] },
+      "bwrapPrefix": "string[] or absent; linux-gate only: the full bwrap argv prefix produced by the confinement driver (ends with `--`); never contains --die-with-parent in direct mode; the supervisor inserts its own --info-fd and appends `<hostBin> internal gate --protocol 1 --envelope <attemptDir>/envelope.json --go-fd 5`"
+    },
+    "deadlines": {
+      "softAt": { "bootId": "string", "boottimeNs": "integer, absolute CLOCK_BOOTTIME nanoseconds; null when no soft deadline" },
+      "idleMs": "integer >= 1 or null; the supervisor stops the agent after this long without activity (agent-protocol activity source)",
+      "hardCeiling": { "bootId": "string", "boottimeNs": "integer, absolute CLOCK_BOOTTIME nanoseconds" },
+      "gateKillGraceMs": "integer >= 0, SIGTERM -> SIGKILL grace used by the gate and by kill_all; source config dispatch.gateKillGraceMs (default 10000)",
+      "rule": "deadlines are absolute; a later start, an adopt or a resume never extends them. A bootId that differs from the current boot means every process of the attempt is already dead"
+    },
+    "agentProtocol": {
+      "cli": { "enum": ["claude", "codex", "agy", "pi", "omp"] },
+      "mode": { "enum": ["direct", "terminal"], "meaning": "always equal to the top-level mode" }
+    },
+    "slot": "object {key} or absent; terminal mode only (terminal-control key, equal to attemptId)",
+    "steps": {
+      "type": "array, run in order after the receipt; see step-receipt.v1.json",
+      "item": {
+        "stepId": { "enum": ["settle-attempt", "finalize-home", "release-slot"] },
+        "hostBin": "absolute path, normally equal to the top-level hostBin",
+        "payloadRoot": "absolute path, normally equal to the top-level payloadRoot",
+        "argv": "string[] after hostBin, normally [\"internal\", \"attempt-step\", <stepId>, \"--protocol\", \"1\", \"--run-dir\", <runDir>]",
+        "cwd": "absolute path",
+        "env": "object string -> string; carries FGOS_STATE_ROOT and the project root; no secrets",
+        "stepTimeoutMs": "integer >= 1; the runner kills the step process group after this long and leaves the step without a receipt"
+      }
+    },
+    "sideFile": "absolute path of the side file (equal to layout.sideFile)"
+  },
+  "sideFile": {
+    "mode": "0600",
+    "fields": {
+      "v": { "const": 1 },
+      "attemptId": "string, equal to the envelope's attemptId",
+      "env": "object string -> string, secret environment of the agent",
+      "controlEpoch": "integer, run-control epoch acquired by the controller for this attempt",
+      "controlToken": "string, run-control token of the attempt; settle uses it through commitRunSettlement and never acquires a new epoch while it exists"
+    },
+    "readers": "supervisor (gate env), settle-attempt step, adopt. Never copied into any other file, log or receipt."
+  },
+  "invariants": [
+    "the envelope is written after the attempt lock (and the cwd lease when mutating) is held and before any agent process exists",
+    "nothing in the envelope is a secret",
+    "a reader that finds v != 3 or a digest that does not match treats the run as legacy-run (adopt) or refuses with envelope-invalid (supervise, gate, attempt-step)"
+  ]
+}

@@ -9,6 +9,7 @@
 //! Every OS-specific call lives behind [`ProcessPlatform`]; the public types
 //! carry no raw descriptor or `pid_t`, only [`ProcId`] and [`FdSlot`].
 
+pub mod containment;
 pub mod control;
 pub mod facts;
 pub mod platform;

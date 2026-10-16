@@ -1,0 +1,24 @@
+{
+  "contract": { "id": "run-supervisor-receipt", "version": 1 },
+  "description": "<attemptDir>/receipt.json. The physical result of the attempt, published once by the supervisor (or by adopt when the supervisor is gone). It is not the work result: the settle-attempt step judges the work.",
+  "fields": {
+    "v": { "const": 1 },
+    "attemptId": "string",
+    "outcome": { "enum": ["exited", "timeout", "cancelled", "gate-lost", "carrier-lost", "abandoned-not-started"] },
+    "gateExit": "the gate-exit.v1 object, or absent when no gate-exit.json exists",
+    "captureDigests": { "stdout": "\"sha256:<hex>\" of the capture file bytes or null when absent", "stderr": "same" },
+    "outboxPresent": "boolean, an outbox result-<N>.json exists in launch.outboxDir",
+    "synthesizedBy": { "enum": ["supervisor", "adopt"] },
+    "publishedAt": "string, ISO-8601 UTC"
+  },
+  "outcomeRule": [
+    "exited: gate-exit.stoppedBy == agent",
+    "timeout: gate-exit.stoppedBy in {soft-deadline, idle, hard-ceiling}",
+    "cancelled: gate-exit.stoppedBy == cancel",
+    "gate-lost: a binding exists but the gate died without gate-exit.json (the domain is empty because the lock is free)",
+    "carrier-lost: terminal mode; the terminal carrier died (6.3)",
+    "abandoned-not-started: no binding; adopt found the lock free",
+    "orphan maps to exited when an outbox result exists, else to gate-lost"
+  ],
+  "outboxWins": "an outbox result is settled whatever the outcome; the Run Result Evaluator still judges it"
+}

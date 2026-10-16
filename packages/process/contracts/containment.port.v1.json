@@ -1,0 +1,62 @@
+{
+  "contract": { "id": "process-containment-port", "version": 1 },
+  "description": "OS-neutral containment port (L0, crate fgos-process, module `containment`). The run supervisor never calls bwrap, Job Objects or process groups directly: it calls this port. One driver per platform. The port knows nothing about attempts, envelopes or locks beyond the attempt id used to name a domain.",
+  "domain": {
+    "kind": { "enum": ["linux-gate", "linux-pgroup", "windows-job", "macos-tree"] },
+    "id": "per kind, identical to predecessor.v1.json domainId so the supervisor can declare it on the attempt lock as is"
+  },
+  "operations": {
+    "create": {
+      "input": { "attemptId": "string" },
+      "output": "a domain without processes yet; linux-gate/linux-pgroup/macos-tree: the id is completed by spawn_in (it is the root process tuple); windows-job: a named Job Object (name carries attemptId and a unique token), KILL_ON_JOB_CLOSE, no breakaway",
+      "errors": { "enum": ["unsupported-platform", "driver-unavailable", "io"] }
+    },
+    "spawn_in": {
+      "input": {
+        "domain": "domain",
+        "spec": {
+          "argv": "string[] (linux-gate: the full bwrap argv including --unshare-pid --as-pid-1, ending with the gate command)",
+          "fdMap": "map child fd -> parent fd; every other fd >= 3 is closed in the child (spawn_with_fds of fgos-process)",
+          "env": "object string -> string, exact environment (no inheritance)",
+          "cwd": "absolute path",
+          "stdio": "{stdin, stdout, stderr}: each a parent fd or null (/dev/null)"
+        }
+      },
+      "output": "hostTuple of the root process (linux-gate: the gate as pid 1 of the new namespace, read from bwrap --info-fd child-pid); the domain id is now complete",
+      "errors": { "enum": ["spawn-failed", "namespace-unavailable", "io"] }
+    },
+    "is_empty": {
+      "input": { "domain": "domain" },
+      "output": { "enum": ["empty", "not-empty", "unknown"] },
+      "drivers": {
+        "linux-gate": "judge(gate hostTuple) == dead -> empty (the kernel kills and reaps every task of the namespace before init becomes a zombie); alive -> not-empty; unknown -> unknown. No ns/pid inode scan (doctor only)",
+        "linux-pgroup": "no process left in the process group of the root (kill(-pgid, 0) == ESRCH) and judge(root) == dead -> empty; best-effort: a setsid descendant escapes",
+        "windows-job": "OpenJobObject by name fails (job destroyed) or ActiveProcesses == 0 -> empty",
+        "macos-tree": "no process in the pgid and none in the scanned descendant tree (proc_listchildpids) -> empty; best-effort: a double-forked setsid process reparented to launchd escapes"
+      },
+      "rule": "unknown is never treated as empty by a caller"
+    },
+    "kill_all": {
+      "input": { "domain": "domain", "graceMs": "integer >= 0" },
+      "output": { "enum": ["ok", "refused"] },
+      "meaning": "SIGTERM (or job terminate) then SIGKILL after graceMs; returns ok when is_empty == empty afterwards or the deadline passed with every process signaled; refused when the driver cannot act (identity mismatch, unsupported)",
+      "drivers": {
+        "linux-gate": "signal the gate by identity (pidfd); the gate is pid 1 so SIGKILL of the gate kills the namespace",
+        "linux-pgroup": "killpg(pgid) by identity of the root, then scan /proc for descendants of the root and signal them",
+        "windows-job": "TerminateJobObject; closing the last handle also kills (KILL_ON_JOB_CLOSE); asynchronous, so the predecessor rule 6.0.1 applies",
+        "macos-tree": "killpg plus tree scan"
+      }
+    },
+    "guarantee": {
+      "output": { "driver": "string", "level": { "enum": ["kernel", "best-effort", "unsupported"] }, "escapes": "string[], named escape routes reported by doctor" },
+      "drivers": {
+        "linux-gate": { "level": "kernel", "escapes": ["processes created by a daemon outside the namespace on the agent's request (herdr, systemd, docker)"] },
+        "linux-pgroup": { "level": "best-effort", "escapes": ["setsid descendants leave the process group", "daemons outside the domain"] },
+        "windows-job": { "level": "kernel", "escapes": ["processes created by a service or COM server outside the job"] },
+        "macos-tree": { "level": "best-effort", "escapes": ["setsid + double fork reparented to launchd (measured: survives killpg)", "launchd/XPC services"] }
+      }
+    }
+  },
+  "driverSelection": "linux: linux-gate when bwrap with user and pid namespaces works (probed once per process), else linux-pgroup; windows: windows-job; macos: macos-tree; anything else: unsupported-platform",
+  "measurements": "design r6 §12.7 (pid namespace), §12.10-12.12 (Windows job, macOS tree; GitHub Actions runs 38855067175, 38856358204, 38857403785)"
+}
