@@ -1282,4 +1282,98 @@ fn identity_rejects_bad_options() {
             "args {args:?} must print no envelope"
         );
     }
+/// Spawns fgos with a stdin pipe whose writer stays open (what a heredoc, an
+/// agent Bash tool, or `sleep 30 | fgos ...` hands the child). Returns the
+/// exit status if the child finishes within `limit`, otherwise kills it and
+/// returns None.
+fn run_with_open_stdin(
+    args: &[&str],
+    cwd: &std::path::Path,
+    limit: std::time::Duration,
+) -> Option<std::process::ExitStatus> {
+    use std::process::Stdio;
+    let mut child = Command::new(fgos_bin())
+        .args(args)
+        .current_dir(cwd)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()
+        .expect("failed to spawn fgos");
+    let _writer = child.stdin.take(); // held open until the end of this function
+    let deadline = std::time::Instant::now() + limit;
+    loop {
+        if let Some(status) = child.try_wait().unwrap() {
+            return Some(status);
+        }
+        if std::time::Instant::now() >= deadline {
+            let _ = child.kill();
+            let _ = child.wait();
+            return None;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(50));
+    }
+}
+
+#[test]
+fn test_native_verb_without_stdin_payload_ignores_open_inherited_stdin() {
+    let temp_dir =
+        std::env::temp_dir().join(format!("fgos_test_open_stdin_{}", std::process::id()));
+    let _ = fs::remove_dir_all(&temp_dir);
+    fs::create_dir_all(&temp_dir).unwrap();
+
+    let status = run_with_open_stdin(
+        &[
+            "convention",
+            "path",
+            "--kind",
+            "report",
+            "--type",
+            "x",
+            "--slug",
+            "y",
+            "--json",
+        ],
+        &temp_dir,
+        std::time::Duration::from_secs(20),
+    );
+    let _ = fs::remove_dir_all(&temp_dir);
+    assert!(
+        status.is_some(),
+        "native verb that takes no stdin blocked on an open inherited stdin"
+    );
+}
+
+#[test]
+fn test_native_verb_with_stdin_payload_still_reads_it() {
+    use std::io::Write;
+    use std::process::Stdio;
+    let temp_dir =
+        std::env::temp_dir().join(format!("fgos_test_stdin_payload_{}", std::process::id()));
+    let _ = fs::remove_dir_all(&temp_dir);
+    fs::create_dir_all(&temp_dir).unwrap();
+
+    let mut child = Command::new(fgos_bin())
+        .args(["metrics", "ping", "--dir"])
+        .arg(&temp_dir)
+        .current_dir(&temp_dir)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .expect("failed to spawn fgos");
+    child
+        .stdin
+        .take()
+        .unwrap()
+        .write_all(b"hello-payload")
+        .unwrap();
+    let output = child.wait_with_output().unwrap();
+    let _ = fs::remove_dir_all(&temp_dir);
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(
+        stdout.contains("hello-payload"),
+        "stdin payload must still reach the provider, stdout={stdout} stderr={}",
+        String::from_utf8_lossy(&output.stderr)
+    );
 }
