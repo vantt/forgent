@@ -136,6 +136,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "fgos-holder-lock"
+version = "0.2.0"
+
+[[package]]
 name = "fgos-host-runtime"
 version = "0.2.0"
 dependencies = [
@@ -160,6 +164,10 @@ dependencies = [
  "thiserror",
  "tokio",
 ]
+
+[[package]]
+name = "fgos-process"
+version = "0.2.0"
 
 [[package]]
 name = "fgos-run-result"

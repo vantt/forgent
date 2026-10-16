@@ -1,0 +1,6 @@
+[package]
+name = "fgos-holder-lock"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]

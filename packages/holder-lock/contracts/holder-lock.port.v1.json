@@ -1,0 +1,116 @@
+{
+  "contract": { "id": "holder-lock-port", "version": 1 },
+  "description": "OS-neutral lock port. Callers (Node facade, Rust crate, hook) see only these operations; the fd or job handling lives in the driver.",
+  "resource": {
+    "fields": {
+      "name": "registry lock name (packages/holder-lock/contracts/lock-registry.v1.json)",
+      "path": "absolute path of the lock file, created once and never removed while the resource lives"
+    },
+    "fileRules": [
+      "opened O_RDWR (NFSv4 and BSD refuse an exclusive lock on a read-only fd)",
+      "the description is always FD_CLOEXEC except inside exactly one spawn that borrows it, through an explicit fd mapping",
+      "after acquire, fstat(fd).ino must equal stat(path).ino; otherwise close and retry",
+      "release and borrower close only; nobody calls LOCK_UN on any copy of a description"
+    ]
+  },
+  "operations": {
+    "acquire": {
+      "input": {
+        "resource": "resource",
+        "mode": { "enum": ["EX", "SH"] },
+        "wait": {
+          "oneOf": [
+            { "kind": "try" },
+            { "kind": "ms", "ms": "integer >= 1" }
+          ]
+        },
+        "killWaitMs": {
+          "default": 2000,
+          "config": "lock.predecessorKillWaitMs",
+          "meaning": "upper bound on waiting for a predecessor domain that was already killed to be signaled; never a wait-for-drain"
+        }
+      },
+      "rule": "returns acquired only when BOTH hold: the kernel lock is held AND the predecessor domain recorded next to the lock file is empty (predecessor.v1.json). A free kernel lock alone is not proof.",
+      "output": "acquire-result"
+    },
+    "release": {
+      "input": { "handle": "handle returned by acquire" },
+      "rule": "the holder releases only after its own domain is empty (run_borrowed already waited for the child, killed leftovers and waited for empty). Release closes every copy of the description it owns.",
+      "output": { "released": true }
+    },
+    "run_borrowed": {
+      "input": {
+        "handle": "handle returned by acquire (EX)",
+        "spec": { "argv": "string[]", "cwd": "string", "env": "string map" }
+      },
+      "rule": "the only way a child command passes with the holder's authority. Hands the description to exactly one child through an explicit fd mapping (default slot 3, env FGOS_LOCK_FD=<name>:3). When argv[0] is git, the call prepends -c gc.auto=0 -c maintenance.auto=false. After the child exits: kill what is left in the domain, wait for the domain to be empty, only then return.",
+      "output": { "exit": "integer|null", "signal": "string|null", "leftoversKilled": "integer >= 0" }
+    },
+    "probe": {
+      "input": { "resource": "resource" },
+      "rule": "non-blocking LOCK_SH attempt that never obstructs another holder; the shared lock is dropped at once.",
+      "output": { "result": { "enum": ["free", "held"] } }
+    },
+    "holders": {
+      "input": { "resource": "resource" },
+      "output": {
+        "oneOf": [
+          { "kind": "list", "holders": [{ "pid": "integer", "startTime": "string|null", "cmdline": "string|null" }] },
+          { "kind": "unlistable", "reason": "string" }
+        ]
+      },
+      "notes": "Linux scans /proc/*/fdinfo/* for a lock: line on the inode of the lock file. macOS and Windows-without-helper report unlistable."
+    },
+    "guarantee": {
+      "input": { "path": "directory the lock files live in" },
+      "output": "guarantee"
+    }
+  },
+  "results": {
+    "acquire-result": {
+      "acquired": { "result": "acquired", "handle": "opaque; owns the description" },
+      "held": {
+        "result": "held",
+        "reason": { "enum": ["kernel-lock-held", "predecessor-domain-not-empty"] },
+        "domain": "present only for predecessor-domain-not-empty: the predecessor domain record (predecessor.v1.json)",
+        "holders": "optional holders() output when listable"
+      },
+      "timeout": { "result": "timeout", "waitedMs": "integer >= 0" },
+      "unavailable": {
+        "result": "unavailable",
+        "reason": { "enum": ["unsupported-platform", "unsupported-filesystem", "host-version-mismatch", "io-error"] },
+        "detail": "string"
+      },
+      "invariants": [
+        "timeout and held never leave a description open: the lock is released before the result is returned",
+        "predecessor-domain-not-empty is returned after the lock was released again",
+        "no result of any operation is ever derived from a pid, a TTL or an mtime"
+      ]
+    }
+  },
+  "guarantee": {
+    "shape": {
+      "driver": "string",
+      "exclusion": "level",
+      "borrow": "level",
+      "holders": "level",
+      "platform": "string",
+      "notes": "string[]"
+    },
+    "level": ["kernel", "kernel-unmeasured", "job-scoped", "unsupported", "none"],
+    "levelMeaning": {
+      "kernel": "enforced by the kernel and measured on a real machine",
+      "kernel-unmeasured": "kernel semantics expected, no measurement yet",
+      "job-scoped": "enforced through a job/helper process plus the predecessor rule (Windows driver)",
+      "unsupported": "the driver does not provide it; the caller must not rely on it",
+      "none": "no guarantee (network filesystem); the driver refuses the lock with a named error"
+    },
+    "drivers": {
+      "linux-flock": { "exclusion": "kernel", "borrow": "kernel", "holders": "kernel" },
+      "macos-flock": { "exclusion": "kernel", "borrow": "kernel", "holders": "unsupported" },
+      "windows": { "exclusion": "unsupported", "borrow": "unsupported", "holders": "unsupported" },
+      "network-fs": { "exclusion": "none", "borrow": "none", "holders": "none" }
+    },
+    "containment": "macOS holder-lock containment is best-effort and is reported in notes, not in a level"
+  }
+}

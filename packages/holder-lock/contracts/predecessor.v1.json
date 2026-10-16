@@ -1,0 +1,67 @@
+{
+  "contract": { "id": "holder-lock-predecessor", "version": 1 },
+  "description": "Record `<lockFile>.predecessor.json` next to a lock file: the process domain the last holder created while it held the lock. The next holder must find that domain empty before it may proceed.",
+  "file": {
+    "path": "<lockFile>.predecessor.json",
+    "writer": "the holder, right after acquire and BEFORE it creates the domain, while it still holds the lock (nobody reads it mid-write)",
+    "writeMode": "write a temp file next to it, then rename over the record",
+    "absentMeaning": "the previous holder created no domain: nothing to wait for"
+  },
+  "record": {
+    "v": 1,
+    "domainKind": { "enum": ["linux-gate", "windows-job", "macos-tree"] },
+    "domainId": {
+      "linux-gate": {
+        "host": "string",
+        "bootId": "string",
+        "pidNs": "string",
+        "pid": "integer",
+        "startTime": "string",
+        "meaning": "process tuple of the gate; the domain is empty iff judge(tuple) == dead"
+      },
+      "windows-job": {
+        "type": "string",
+        "meaning": "named Job Object; the name carries the attempt id and a unique token"
+      },
+      "macos-tree": {
+        "host": "string",
+        "bootId": "string",
+        "pid": "integer",
+        "startTime": "string",
+        "meaning": "tuple of the tree root; the domain is empty when no process is left in its process group nor in the scanned descendant tree (best-effort)"
+      }
+    },
+    "unknownVersion": "a record with v != 1 or an unreadable record is never deleted or ignored: acquire returns held (predecessor-domain-not-empty) with the raw record"
+  },
+  "releaseRule": {
+    "step": 0,
+    "text": "A holder releases only when its own domain is empty: wait for the child, kill what is left in the domain, wait for empty, then release. A non-empty predecessor domain after the next holder took the lock therefore means the previous holder died abnormally."
+  },
+  "acquireAlgorithm": [
+    "take the kernel lock first",
+    "read the predecessor record; absent -> proceed",
+    "ask the driver whether the domain is empty; empty or unopenable-but-proven-empty -> proceed",
+    "not empty -> kill the whole domain at once (never wait for it to drain)",
+    "wait up to killWaitMs for the killed processes to be signaled",
+    "domain empty -> proceed; deadline passed -> release the kernel lock and return held (predecessor-domain-not-empty) naming the domain",
+    "after proceeding, a holder that will create a domain itself overwrites the record before creating it"
+  ],
+  "parameters": {
+    "killWaitMs": {
+      "default": 2000,
+      "config": "lock.predecessorKillWaitMs",
+      "meaning": "only bounds the wait for processes that were already terminated to be signaled"
+    }
+  },
+  "heldResult": {
+    "result": "held",
+    "reason": "predecessor-domain-not-empty",
+    "domain": { "domainKind": "as in the record", "domainId": "as in the record" }
+  },
+  "driverSupport": {
+    "linux-gate": "implemented: judge(gate) == dead; kill_all = SIGKILL by identity",
+    "windows-job": "contract only; driver written after the Windows probes are green on a real machine",
+    "macos-tree": "contract only until a consumer declares a tree domain; best-effort"
+  },
+  "runBorrowedWithoutDomain": "On Linux run_borrowed declares no domain; the leftovers it kills are the other processes that still hold the lock description (holders()). On macOS the leftovers are the child's process group."
+}

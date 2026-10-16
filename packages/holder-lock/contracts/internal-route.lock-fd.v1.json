@@ -1,0 +1,62 @@
+{
+  "contract": { "id": "internal-route-lock-fd", "version": 1 },
+  "command": "fgos internal lock-fd",
+  "description": "Cold-path helper for Node, which cannot call flock. Node opens the lock file (O_RDWR) and hands that fd in slot 3; the helper locks the inherited description and exits. The lock stays with the description Node owns. The helper is never the owner.",
+  "argv": {
+    "required": ["--protocol 1"],
+    "mode": {
+      "exactlyOne": [
+        { "flag": "--try", "meaning": "one non-blocking LOCK_EX attempt on fd 3" },
+        { "flag": "--wait-ms N", "meaning": "LOCK_EX attempts until N milliseconds elapsed (N integer >= 1); the caller still kills the helper on its own deadline" },
+        { "flag": "--shared-try", "meaning": "one non-blocking LOCK_SH attempt on fd 3; result free or held; the caller closes fd 3 afterwards" },
+        { "flag": "--borrowed-check <path>", "meaning": "borrower test for hooks: fd 3 must have the same dev:ino as <path> and a non-blocking LOCK_EX on it must succeed (a description that already holds the lock succeeds; a sibling that opened the file itself fails)" },
+        { "flag": "--guarantee <path>", "meaning": "no fd needed; print the guarantee of the directory <path> lives in" }
+      ]
+    },
+    "optional": [
+      { "flag": "--kill-wait-ms N", "applies": ["--try", "--wait-ms"], "default": 2000, "meaning": "predecessor kill wait; source lock.predecessorKillWaitMs" },
+      { "flag": "--predecessor <path>", "applies": ["--try", "--wait-ms"], "meaning": "predecessor record path; default <lock file>.predecessor.json derived from fd 3" }
+    ],
+    "unknownFlag": "usage error, exit 2"
+  },
+  "fds": {
+    "in": "fd 3 = the lock file description (inherited, O_RDWR). The helper sets FD_CLOEXEC on it before any other syscall.",
+    "out": "stdout = one JSON line then newline; stderr = free text for humans, never parsed",
+    "stdin": "unused, may be closed"
+  },
+  "stdout": {
+    "common": { "v": 1, "protocol": 1 },
+    "results": {
+      "acquired": { "result": "acquired" },
+      "held": { "result": "held", "reason": { "enum": ["kernel-lock-held", "predecessor-domain-not-empty"] }, "domain": "predecessor domain record, only for predecessor-domain-not-empty" },
+      "timeout": { "result": "timeout", "waitedMs": "integer" },
+      "unavailable": { "result": "unavailable", "reason": { "enum": ["unsupported-platform", "unsupported-filesystem", "io-error"] }, "detail": "string" },
+      "free": { "result": "free" },
+      "borrower": { "result": "borrower" },
+      "not-borrower": { "result": "not-borrower", "reason": { "enum": ["fd-missing", "inode-mismatch", "lock-not-held-by-description", "not-a-lock-file"] } },
+      "guarantee": { "result": "guarantee", "guarantee": "guarantee object of holder-lock.port.v1.json" },
+      "error": { "result": "error", "code": { "enum": ["host-version-mismatch", "usage", "io", "internal"] }, "message": "string" }
+    }
+  },
+  "exitCodes": {
+    "0": "acquired | free | borrower | guarantee",
+    "2": "usage error (result error, code usage)",
+    "3": "protocol mismatch (result error, code host-version-mismatch; --protocol absent or != 1)",
+    "10": "held | not-borrower",
+    "11": "timeout",
+    "12": "unavailable",
+    "70": "internal or io error (result error)"
+  },
+  "invariants": [
+    "after --try/--wait-ms with result acquired, the lock lives on the caller's description; helper exit must not release it",
+    "on held, timeout and unavailable no lock is left on the description",
+    "the helper never calls LOCK_UN",
+    "the helper never leaves fd 3 open in a child it spawns (it spawns none)"
+  ],
+  "callerRules": {
+    "timeout": "wait with spawnSync and killSignal SIGKILL; when it returns the helper is dead and reaped; close the fd; the result is not-acquired unless the stdout line says acquired",
+    "afterAcquire": "check fstat(fd).ino == stat(path).ino; otherwise close and retry",
+    "release": "close(fd)",
+    "resolution": "exec the binary named by FGOS_HOST_BIN or the activation, resolved once per process; never through a shim; never inside a hot lock"
+  }
+}
