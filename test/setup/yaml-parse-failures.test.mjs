@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 
 import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
 import { checkBlindStepsUseProvenPools } from '../../src/setup/blind-steps-proven-pools.mjs';
-import { checkWorkflowPoolsSatisfyIndependence } from '../../src/setup/workflow-pool-independence.mjs';
+import { checkWorkflowPoolsSatisfyIndependence, readWorkflowDefinitionFiles } from '../../src/setup/workflow-pool-independence.mjs';
 
 const FGOS = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'bin', 'fgos.mjs');
 const PARSE_PROBLEM = /cannot be parsed: .* \(line \d+, column \d+\)/;
@@ -47,7 +47,7 @@ test('a malformed workspace agent is named by the agent-names check with line an
   write('fgos/agents/broken.yaml', 'name: broken\ndescription: a: b\n');
   const result = await checkById('agent-type-names-unique')(root);
   assert.equal(result.passed, false);
-  assert.match(result.message, /fgos\/agents\/broken\.yaml cannot be parsed: .* \(line 2, column \d+\)/);
+  assert.match(result.message, /fgos\/agents\/broken\.yaml: cannot be parsed: .* \(line 2, column \d+\)/);
 });
 
 test('a malformed project workflow is a named problem in each check that reads workflows', async (t) => {
@@ -65,11 +65,69 @@ test('a malformed project workflow is a named problem in each check that reads w
   }
 });
 
-test('a self-referencing workflow document does not hang the capability walk', async (t) => {
+const REVIEWED_WORKFLOW = [
+  'id: reviewed-fixture',
+  'steps:',
+  '  - id: build',
+  '    units:',
+  '      - id: draft',
+  '        template: { capability: fixture:draft, pattern: reviewed, objective: Draft }',
+  '',
+].join('\n');
+// One family only: a reviewed unit cannot get an independent checker from it.
+const ONE_FAMILY_CONFIG = () => ({
+  executors: { alpha: { agentType: 'alpha', providerModel: 'claude' } },
+  capabilities: { 'fixture:draft': { prefer: [{ executor: 'alpha' }] } },
+});
+
+test('one unparsable workflow does not stop the others from being evaluated, and fails the check', async (t) => {
+  const { root, write } = makeProject(t);
+  write('core/workflows/reviewed.yaml', REVIEWED_WORKFLOW);
+  write('core/workflows/broken.yaml', MALFORMED_WORKFLOW);
+  const options = { packageRoot: path.join(root, 'elsewhere'), loadRunnerConfig: ONE_FAMILY_CONFIG };
+
+  const pools = await checkWorkflowPoolsSatisfyIndependence(root, options);
+  assert.equal(pools.passed, false);
+  assert.match(pools.message, /reviewed-fixture\/build\/draft/, 'the parsable workflow was evaluated');
+  assert.match(pools.message, new RegExp(`core/workflows/broken\\.yaml: ${PARSE_PROBLEM.source}`));
+
+  const blind = await checkBlindStepsUseProvenPools(root, options);
+  assert.equal(blind.passed, false);
+  assert.match(blind.message, /not applicable: no Workflow unit is blind/, 'the normal verdict is kept');
+  assert.match(blind.message, new RegExp(`core/workflows/broken\\.yaml: ${PARSE_PROBLEM.source}`));
+
+  write('core/workflows/uses-capability.yaml', 'id: uses\nsteps:\n  - id: a\n    units:\n      - id: u\n        template: { capability: nowhere:declared }\n');
+  const capabilities = await checkById('workflow-capabilities-configured')(root);
+  assert.equal(capabilities.passed, false);
+  assert.match(capabilities.message, /no entry for Workflow capabilities: .*nowhere:declared/, 'the parsable workflow was evaluated');
+  assert.match(capabilities.message, new RegExp(`core/workflows/broken\\.yaml: ${PARSE_PROBLEM.source}`));
+});
+
+test('the workflow reader tells a file that cannot be read from one that cannot be parsed, and names the root', (t) => {
+  const pkg = makeProject(t);
+  const project = makeProject(t);
+  pkg.write('core/workflows/ok.yaml', 'id: ok\nsteps: []\n');
+  pkg.write('core/workflows/bad.json', '{"id": ');
+  fs.mkdirSync(path.join(project.root, 'core', 'workflows', 'dir.yaml'), { recursive: true });
+  project.write('core/workflows/broken.yaml', MALFORMED_WORKFLOW);
+  const roots = [{ root: pkg.root, label: 'package' }, { root: project.root, label: 'project' }];
+  const { files, unreadable } = readWorkflowDefinitionFiles(roots);
+  assert.deepEqual(files.map((f) => f.fileId), ['ok']);
+  assert.equal(unreadable.length, 3);
+  assert.match(unreadable[0], /^package: core\/workflows\/bad\.json: cannot be parsed: /);
+  assert.match(unreadable[1], /^project: core\/workflows\/broken\.yaml: cannot be parsed: .* \(line \d+, column \d+\)$/);
+  assert.match(unreadable[2], /^project: core\/workflows\/dir\.yaml: cannot be read: /);
+
+  const single = readWorkflowDefinitionFiles([roots[1]]);
+  assert.match(single.unreadable[0], /^core\/workflows\/broken\.yaml: /, 'a single root needs no prefix');
+});
+
+test('a self-referencing workflow document is a named problem and does not hang the capability walk', async (t) => {
   const { root, write } = makeProject(t);
   write('core/workflows/loop.yaml', 'id: loop\nsteps: &s\n  - id: a\n    capability: demo:loop\n    again: *s\n');
   const result = await checkById('workflow-capabilities-configured')(root);
-  assert.match(result.message, /demo:loop \(loop\)/, 'the capability inside the cycle is still found, once');
+  assert.equal(result.passed, false);
+  assert.match(result.message, /core\/workflows\/loop\.yaml: cannot be parsed: .*aliases expand to more than/);
 });
 
 test('fgos doctor still runs and lists every check when agent and workflow files are malformed', (t) => {

@@ -33,49 +33,89 @@ const NO_POOL_REASONS = new Set(['headless-no-executor', 'no-candidate']);
 function workflowDefinitionFiles(root) {
   const dirs = [];
   const core = path.join(root, 'core', 'workflows');
-  if (fs.existsSync(core)) dirs.push([core, '']);
+  if (fs.existsSync(core)) dirs.push({ dir: core, prefix: '', relDir: 'core/workflows' });
   const domainsDir = path.join(root, 'domains');
   if (fs.existsSync(domainsDir)) {
     for (const d of fs.readdirSync(domainsDir, { withFileTypes: true })) {
       const dir = path.join(domainsDir, d.name, 'workflows');
-      if (d.isDirectory() && fs.existsSync(dir)) dirs.push([dir, `${d.name}/`]);
+      if (d.isDirectory() && fs.existsSync(dir)) dirs.push({ dir, prefix: `${d.name}/`, relDir: `domains/${d.name}/workflows` });
     }
   }
   const files = [];
-  for (const [dir, prefix] of dirs) {
+  for (const { dir, prefix, relDir } of dirs) {
     for (const file of fs.readdirSync(dir).sort()) {
-      if (/\.(ya?ml|json)$/i.test(file)) files.push({ file: path.join(dir, file), fallbackId: `${prefix}${file.replace(/\.[^.]+$/, '')}` });
+      if (/\.(ya?ml|json)$/i.test(file)) {
+        files.push({ file: path.join(dir, file), rel: `${relDir}/${file}`, fileId: `${prefix}${file.replace(/\.[^.]+$/, '')}` });
+      }
     }
   }
   return files;
 }
 
 /**
- * Workflow definitions under `roots` (package root, then the project), each as { id, steps }. A file
- * that cannot be read or parsed is left out and named in `unreadable` as
- * `<file>: cannot be parsed: <reason> (line L, column C)`.
+ * The one reader of Workflow definition files. Every `core/workflows` and `domains/*\/workflows` file
+ * `.yaml`, `.yml` or `.json` under each root is read and parsed (JSON.parse for `.json`, the YAML door
+ * otherwise). A file that cannot be read or parsed is left out of `files` and named in `unreadable` as
+ * `<file>: cannot be read: <reason>` or `<file>: cannot be parsed: <reason>`; the file is prefixed with its
+ * root's label (`package: ...`, `project: ...`) when more than one root is scanned.
+ *
+ * @param {Array<{ root: string, label: string }>} roots
+ * @returns {{ files: Array<{ fileId: string, rel: string, root: string, raw: unknown }>, unreadable: string[] }}
  */
-export function loadWorkflowDefinitions(roots) {
-  const workflows = new Map();
+export function readWorkflowDefinitionFiles(roots) {
+  const files = [];
   const unreadable = [];
-  for (const root of roots) {
-    for (const { file, fallbackId } of workflowDefinitionFiles(root)) {
+  for (const { root, label } of roots) {
+    for (const { file, rel, fileId } of workflowDefinitionFiles(root)) {
+      const named = roots.length > 1 ? `${label}: ${rel}` : rel;
+      let body;
       try {
-        const body = fs.readFileSync(file, 'utf8');
-        const raw = file.endsWith('.json') ? JSON.parse(body) : parseYaml(body, { filename: path.relative(root, file) });
-        const id = typeof raw?.id === 'string' && raw.id ? raw.id : fallbackId;
-        if (!workflows.has(id)) workflows.set(id, { id, steps: Array.isArray(raw?.steps) ? raw.steps : [] });
+        body = fs.readFileSync(file, 'utf8');
       } catch (err) {
-        unreadable.push(`${path.relative(root, file)}: cannot be parsed: ${file.endsWith('.json') ? err.message : describeYamlError(err)}`);
+        unreadable.push(`${named}: cannot be read: ${err.message}`);
+        continue;
+      }
+      try {
+        files.push({ fileId, rel, root, raw: file.endsWith('.json') ? JSON.parse(body) : parseYaml(body, { filename: rel }) });
+      } catch (err) {
+        unreadable.push(`${named}: cannot be parsed: ${file.endsWith('.json') ? err.message : describeYamlError(err)}`);
       }
     }
+  }
+  return { files, unreadable };
+}
+
+/** The roots a doctor check reads Workflow definitions from: the package, then the project when it is another folder. */
+export function workflowRoots(cwd, packageRoot) {
+  const roots = [{ root: packageRoot, label: 'package' }];
+  if (path.resolve(cwd) !== path.resolve(packageRoot)) roots.push({ root: cwd, label: 'project' });
+  return roots;
+}
+
+/**
+ * Workflow definitions under `roots`, each as { id, steps }; the first definition of an id wins. Files
+ * that cannot be read or parsed are named in `unreadable` (see readWorkflowDefinitionFiles).
+ */
+export function loadWorkflowDefinitions(roots) {
+  const { files, unreadable } = readWorkflowDefinitionFiles(roots);
+  const workflows = new Map();
+  for (const { fileId, raw } of files) {
+    const id = typeof raw?.id === 'string' && raw.id ? raw.id : fileId;
+    if (!workflows.has(id)) workflows.set(id, { id, steps: Array.isArray(raw?.steps) ? raw.steps : [] });
   }
   return { workflows, unreadable };
 }
 
-/** The failing doctor result for Workflow definitions that could not be parsed, so no pool was evaluated. */
-export function unparsableDefinitionsResult(unreadable) {
-  return { passed: false, message: `Workflow definitions that cannot be parsed, so their pools are not evaluated: ${unreadable.join('; ')}` };
+/**
+ * A check's verdict with the Workflow files it could not evaluate added: the normal message stands, the
+ * named problems are appended, and any unreadable file fails the check.
+ */
+export function withUnreadableDefinitions(result, unreadable) {
+  if (unreadable.length === 0) return result;
+  return {
+    passed: false,
+    message: `${result.message}; Workflow definitions that cannot be read or parsed, so they are not evaluated: ${unreadable.join('; ')}`,
+  };
 }
 
 /**
@@ -92,15 +132,16 @@ export async function checkWorkflowPoolsSatisfyIndependence(cwd, { packageRoot, 
   } catch (err) {
     return { passed: true, message: `runner config not loadable here, Workflow pools not evaluated: ${err.message}` };
   }
-  const roots = path.resolve(cwd) === path.resolve(packageRoot) ? [packageRoot] : [packageRoot, cwd];
-  const loaded = loadWorkflowDefinitions(roots);
-  if (loaded.unreadable.length > 0) return unparsableDefinitionsResult(loaded.unreadable);
+  const loaded = loadWorkflowDefinitions(workflowRoots(cwd, packageRoot));
+  return withUnreadableDefinitions(await evaluatePools(loaded.workflows, runnerConfig), loaded.unreadable);
+}
 
+async function evaluatePools(workflows, runnerConfig) {
   const session = { headless: true, herdrPresent: detectHerdrPresent() };
   const problems = [];
   const sharing = [];
   let evaluated = 0;
-  for (const wf of loaded.workflows.values()) {
+  for (const wf of workflows.values()) {
     for (const step of wf.steps) {
       for (const u of step?.units ?? []) {
         const template = u?.template ?? {};

@@ -36,7 +36,6 @@ import { RELEASE_TARGETS, releaseTargetForHost } from '../util/release-targets.m
 import { hashFile, listLegacyNodeSourceFiles } from '../../scripts/build-rust-distribution.mjs';
 import { compileDomain } from '../../scripts/build-domain-registry.mjs';
 import { mainCheckoutHookWired } from './git-hooks.mjs';
-import { describeYamlError, parseYaml } from '../util/yaml.mjs';
 import { loadRunnerConfigFromDir } from '../runner/dispatch/config.mjs';
 import { agentShapeProblem, findAgentDuplicates, readAgentDefinition, scanAgentTiers } from '../runner/agent-definitions.mjs';
 import { agentRenderWarnings, listAgents } from '../runner/agent-listing.mjs';
@@ -55,7 +54,12 @@ import {
 } from './agent-hooks.mjs';
 import { checkExecutorProfileWarnings } from './executor-profile-warnings.mjs';
 import { checkAgentCliProjectTrusted } from './agent-cli-trust.mjs';
-import { checkWorkflowPoolsSatisfyIndependence } from './workflow-pool-independence.mjs';
+import {
+  checkWorkflowPoolsSatisfyIndependence,
+  readWorkflowDefinitionFiles,
+  withUnreadableDefinitions,
+  workflowRoots,
+} from './workflow-pool-independence.mjs';
 import { checkBlindStepsUseProvenPools } from './blind-steps-proven-pools.mjs';
 import { checkExecutorPostureCoverage } from './executor-posture-coverage.mjs';
 import { checkAgyPermissionsConfigured, checkAgySubHomesConfigured, fixAgyPermissionsConfigured } from './agy-permissions.mjs';
@@ -1250,11 +1254,11 @@ function checkAgentTypeNamesUnique(cwd) {
     try {
       text = fs.readFileSync(entry.file, 'utf8');
     } catch (error) {
-      problems.push(`${entry.rel} cannot be read (${error.message})`);
+      problems.push(`${entry.rel}: cannot be read (${error.message})`);
       continue;
     }
     const problem = agentShapeProblem(entry.name, text);
-    if (problem) problems.push(`${entry.rel} ${problem}`);
+    if (problem) problems.push(`${entry.rel}: ${problem}`);
     // Keys the renderer drops are not an error (the file still seats); they are said here because
     // nothing else says it, and a persona that silently loses its voice or boundary is a failure.
     for (const warning of agentRenderWarnings(text)) notes.push(`${entry.rel}: ${warning}`);
@@ -2461,42 +2465,18 @@ registerCheck({
 // bind() resolves it (exact name, then the bare verb). One that does not has
 // no candidate pool, so that unit is refused at run time with no earlier signal.
 // A declared entry that carries no `prefer` pool (exact or bare verb) is reported too.
-// Each definition file is parsed (JSON.parse for .json, the YAML door otherwise) and every string
-// under a key named `capability`, at any depth, is a use. A file that cannot be parsed is reported by
-// name, never skipped.
-function workflowCapabilityUses(root) {
+// Definition files come from the one Workflow reader (readWorkflowDefinitionFiles) and every string
+// under a key named `capability`, at any depth, is a use. A file that cannot be read or parsed is
+// reported by name, never skipped.
+function workflowCapabilityUses(files) {
   const uses = new Map();
-  const problems = [];
-  const dirs = [];
-  const core = path.join(root, 'core', 'workflows');
-  if (fs.existsSync(core)) dirs.push([core, '', 'core/workflows']);
-  const domainsDir = path.join(root, 'domains');
-  if (fs.existsSync(domainsDir)) {
-    for (const d of fs.readdirSync(domainsDir, { withFileTypes: true })) {
-      const dir = path.join(domainsDir, d.name, 'workflows');
-      if (d.isDirectory() && fs.existsSync(dir)) dirs.push([dir, `${d.name}/`, `domains/${d.name}/workflows`]);
+  for (const { fileId, raw } of files) {
+    for (const capability of capabilityValues(raw)) {
+      if (!uses.has(capability)) uses.set(capability, new Set());
+      uses.get(capability).add(fileId);
     }
   }
-  for (const [dir, prefix, relDir] of dirs) {
-    for (const file of fs.readdirSync(dir).sort()) {
-      if (!/\.(ya?ml|json)$/i.test(file)) continue;
-      const id = `${prefix}${file.replace(/\.[^.]+$/, '')}`;
-      const rel = `${relDir}/${file}`;
-      let parsed;
-      try {
-        const text = fs.readFileSync(path.join(dir, file), 'utf8');
-        parsed = /\.json$/i.test(file) ? JSON.parse(text) : parseYaml(text, { filename: rel });
-      } catch (error) {
-        problems.push(`${rel}: cannot be parsed: ${/\.json$/i.test(file) ? error.message : describeYamlError(error)}`);
-        continue;
-      }
-      for (const capability of capabilityValues(parsed)) {
-        if (!uses.has(capability)) uses.set(capability, new Set());
-        uses.get(capability).add(id);
-      }
-    }
-  }
-  return { uses, problems };
+  return uses;
 }
 
 // Every string stored under a key named `capability`, at any depth. Iterative with a visited set:
@@ -2523,23 +2503,18 @@ function capabilityValues(root) {
 const RUNNER_LOOP_CAPABILITY_USES = Object.freeze([['code:implement', 'runner loop: coding executing step']]);
 
 function checkWorkflowCapabilitiesConfigured(cwd) {
-  const capabilities = readSharedConfig(cwd)?.runner?.capabilities;
-  const declared = capabilities && typeof capabilities === 'object' && !Array.isArray(capabilities) ? capabilities : {};
   const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-  const { uses, problems: unparsable } = workflowCapabilityUses(packageRoot);
+  const { files, unreadable } = readWorkflowDefinitionFiles(workflowRoots(cwd, packageRoot));
+  const uses = workflowCapabilityUses(files);
   for (const [capability, id] of RUNNER_LOOP_CAPABILITY_USES) {
     uses.set(capability, new Set([...(uses.get(capability) ?? []), id]));
   }
-  if (path.resolve(cwd) !== packageRoot) {
-    const project = workflowCapabilityUses(cwd);
-    unparsable.push(...project.problems);
-    for (const [capability, ids] of project.uses) {
-      uses.set(capability, new Set([...(uses.get(capability) ?? []), ...ids]));
-    }
-  }
-  if (unparsable.length > 0) {
-    return { passed: false, message: `Workflow definitions that cannot be parsed, so their capabilities are not checked: ${unparsable.join('; ')}` };
-  }
+  return withUnreadableDefinitions(evaluateWorkflowCapabilities(cwd, uses), unreadable);
+}
+
+function evaluateWorkflowCapabilities(cwd, uses) {
+  const capabilities = readSharedConfig(cwd)?.runner?.capabilities;
+  const declared = capabilities && typeof capabilities === 'object' && !Array.isArray(capabilities) ? capabilities : {};
   const missing = [...uses].filter(
     ([capability]) => !declared[capability] && !(capability.includes(':') && declared[capability.split(':')[1]]),
   );
