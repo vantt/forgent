@@ -17,6 +17,8 @@ use windows_sys::Win32::System::JobObjects::*;
 use windows_sys::Win32::System::Threading::*;
 use windows_sys::Win32::System::IO::OVERLAPPED;
 
+const JOB_OBJECT_TERMINATE: u32 = 0x0008;
+const JOB_OBJECT_QUERY: u32 = 0x0004;
 const DETACHED_PROCESS: u32 = 0x0000_0008;
 const CREATE_BREAKAWAY_FROM_JOB: u32 = 0x0100_0000;
 
@@ -98,8 +100,9 @@ pub fn lock_free(path: &Path) -> bool {
     }
 }
 
-unsafe fn make_kill_job() -> Result<HANDLE, String> {
-    let job = CreateJobObjectW(std::ptr::null(), std::ptr::null());
+unsafe fn make_kill_job(name: Option<&str>) -> Result<HANDLE, String> {
+    let w: Option<Vec<u16>> = name.map(|n| n.encode_utf16().chain(std::iter::once(0)).collect());
+    let job = CreateJobObjectW(std::ptr::null(), w.as_ref().map_or(std::ptr::null(), |v| v.as_ptr()));
     if job.is_null() {
         return Err(format!("CreateJobObjectW failed: {}", GetLastError()));
     }
@@ -180,6 +183,106 @@ pub fn fs_type(p: &Path) -> String {
     String::from_utf16_lossy(&name[..n])
 }
 
+// ---------- predecessor-domain primitives (used by predecessor.rs) ----------
+
+/// A held kernel lock; released on drop.
+pub struct Guard(HANDLE);
+impl Drop for Guard {
+    fn drop(&mut self) {
+        unsafe {
+            let mut ov: OVERLAPPED = std::mem::zeroed();
+            UnlockFileEx(self.0, 0, 1, 0, &mut ov);
+            CloseHandle(self.0);
+        }
+    }
+}
+
+pub fn try_acquire(path: &Path) -> Option<Guard> {
+    unsafe {
+        let h = open_lock(path, false);
+        if h == INVALID_HANDLE_VALUE {
+            return None;
+        }
+        if try_lock(h) {
+            Some(Guard(h))
+        } else {
+            CloseHandle(h);
+            None
+        }
+    }
+}
+
+/// An opened handle to the previous holder's process domain (a named job).
+pub struct Dom(HANDLE);
+impl Drop for Dom {
+    fn drop(&mut self) {
+        unsafe {
+            CloseHandle(self.0);
+        }
+    }
+}
+
+/// None when the domain no longer exists (open fails): that means empty.
+pub fn domain_open(id: &str) -> Option<Dom> {
+    let w: Vec<u16> = id.encode_utf16().chain(std::iter::once(0)).collect();
+    let h = unsafe { OpenJobObjectW(JOB_OBJECT_QUERY | JOB_OBJECT_TERMINATE | SYNCHRONIZE, 0, w.as_ptr()) };
+    if h.is_null() { None } else { Some(Dom(h)) }
+}
+
+pub fn domain_active(d: &Dom) -> Option<u32> {
+    unsafe { job_active(d.0) }
+}
+
+pub fn domain_kill(d: &Dom) {
+    unsafe {
+        TerminateJobObject(d.0, 1);
+    }
+}
+
+pub fn domain_kind() -> &'static str {
+    "job"
+}
+
+fn unique_job_name() -> String {
+    let nanos = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_nanos()).unwrap_or(0);
+    format!("Local\\fgos-probe-{}-{}", std::process::id(), nanos)
+}
+
+/// A domain id whose job was already destroyed (the only handle was closed with no members).
+pub fn make_stale_domain(_ctx: &Ctx) -> Result<String, String> {
+    unsafe {
+        let name = unique_job_name();
+        let job = make_kill_job(Some(&name))?;
+        CloseHandle(job);
+        Ok(name)
+    }
+}
+
+/// Keeps a handle open so the job (and kill-on-close) outlives the test's contender.
+pub struct Keep(HANDLE);
+impl Drop for Keep {
+    fn drop(&mut self) {
+        unsafe {
+            CloseHandle(self.0);
+        }
+    }
+}
+
+/// A job with a live member whose handle stays open: its process does not die by itself.
+pub fn make_stubborn_domain(ctx: &Ctx) -> Result<(String, Vec<u32>, Keep), String> {
+    let child = spawn(&mut ctx.role("sleeper", &[&ctx.s("stub.pid")]))?;
+    unsafe {
+        let name = unique_job_name();
+        let job = make_kill_job(Some(&name))?;
+        if AssignProcessToJobObject(job, child.as_raw_handle() as HANDLE) == 0 {
+            let e = GetLastError();
+            CloseHandle(job);
+            return Err(format!("AssignProcessToJobObject failed: {e}"));
+        }
+        Ok((name, vec![child.id()], Keep(job)))
+    }
+}
+
 fn park() -> ! {
     loop {
         std::thread::sleep(Duration::from_secs(3600));
@@ -245,7 +348,7 @@ pub fn role(name: &str, a: &[String]) -> bool {
             let dir = &a[0];
             let status;
             unsafe {
-                let job = match make_kill_job() {
+                let job = match make_kill_job(None) {
                     Ok(j) => j,
                     Err(e) => {
                         write_atomic(&Path::new(dir).join("owner.ready"), &format!("error {e}"));
@@ -294,7 +397,14 @@ pub fn role(name: &str, a: &[String]) -> bool {
         "githolder" => {
             let mut note = "job-ok".to_string();
             unsafe {
-                match make_kill_job() {
+                let h = open_lock(Path::new(&a[0]), false);
+                if h == INVALID_HANDLE_VALUE || !try_lock(h) {
+                    std::process::exit(3);
+                }
+                // The record is written while the lock is held, before the domain is created.
+                let name = unique_job_name();
+                write_predecessor_record(Path::new(&a[0]), "job", &name);
+                match make_kill_job(Some(&name)) {
                     Ok(job) => {
                         if AssignProcessToJobObject(job, GetCurrentProcess()) == 0 {
                             note = format!("job-assign-error-{}", GetLastError());
@@ -302,10 +412,6 @@ pub fn role(name: &str, a: &[String]) -> bool {
                         // the raw handle is never closed: the job lives as long as this process
                     }
                     Err(e) => note = format!("job-error-{}", e.replace(' ', "_")),
-                }
-                let h = open_lock(Path::new(&a[0]), false);
-                if h == INVALID_HANDLE_VALUE || !try_lock(h) {
-                    std::process::exit(3);
                 }
             }
             let mut c = Command::new("git");
@@ -488,7 +594,7 @@ fn job_kill_on_close(ctx: &Ctx) -> TestResult {
 fn job_active_count(ctx: &Ctx) -> TestResult {
     let dir = ctx.dir.to_string_lossy().into_owned();
     unsafe {
-        let job = make_kill_job()?;
+        let job = make_kill_job(None)?;
         let mut tree = spawn(&mut ctx.role("tree", &[&dir]))?;
         if AssignProcessToJobObject(job, tree.as_raw_handle() as HANDLE) == 0 {
             let e = GetLastError();

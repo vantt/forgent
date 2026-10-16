@@ -6,6 +6,7 @@
 //! Internal: fgos-platform-probe --role <name> <args...> (helper processes the probe re-invokes itself as).
 
 mod git;
+mod predecessor;
 mod util;
 #[cfg(unix)]
 #[path = "unix.rs"]
@@ -88,6 +89,7 @@ fn herdr_test(_ctx: &Ctx) -> TestResult {
 fn all_tests() -> Vec<Def> {
     let mut v = plat::tests();
     v.extend(git::tests());
+    v.extend(predecessor::tests());
     v.push(Def {
         name: "herdr-on-path",
         expect: "informational: whether the terminal-pane transport can exist on this OS",

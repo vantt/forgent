@@ -38,7 +38,7 @@ fn loose_in_17(repo: &Path) -> usize {
     std::fs::read_dir(repo.join(".git").join("objects").join("17")).map(|r| r.count()).unwrap_or(0)
 }
 
-fn setup_repo(ctx: &Ctx, block: bool) -> Result<std::path::PathBuf, String> {
+pub fn setup_repo(ctx: &Ctx, block: bool) -> Result<std::path::PathBuf, String> {
     let repo = ctx.p("repo");
     let mut c = Command::new("git");
     c.arg("init").arg("-q").arg(&repo);

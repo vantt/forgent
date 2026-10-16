@@ -24,6 +24,13 @@ pub fn pid_alive(pid: u32) -> bool {
             return std::io::Error::last_os_error().raw_os_error() == Some(libc::EPERM);
         }
     }
+    // Reap the pid if it is our own exited child (macOS has no /proc to spot zombies).
+    unsafe {
+        let mut st = 0;
+        if libc::waitpid(pid as i32, &mut st, libc::WNOHANG) == pid as i32 {
+            return false;
+        }
+    }
     // A zombie still answers kill(0); treat it as dead (Linux exposes the state).
     if let Ok(s) = std::fs::read_to_string(format!("/proc/{pid}/stat")) {
         if let Some(i) = s.rfind(')') {
@@ -56,6 +63,53 @@ pub fn lock_free(path: &Path) -> bool {
         Ok(f) => unsafe { libc::flock(f.as_raw_fd(), libc::LOCK_EX | libc::LOCK_NB) == 0 },
         Err(_) => false,
     }
+}
+
+// ---------- predecessor-domain primitives (used by predecessor.rs) ----------
+// Unix control: the domain is the previous holder's process (the gate); empty means that process is dead.
+
+/// A held kernel lock; released on drop.
+pub struct Guard(#[allow(dead_code)] std::fs::File);
+
+pub fn try_acquire(path: &Path) -> Option<Guard> {
+    let f = open_lock_file(path).ok()?;
+    if unsafe { libc::flock(f.as_raw_fd(), libc::LOCK_EX | libc::LOCK_NB) } == 0 { Some(Guard(f)) } else { None }
+}
+
+pub struct Dom(u32);
+
+/// None when the domain no longer exists, which means empty.
+pub fn domain_open(id: &str) -> Option<Dom> {
+    let pid: u32 = id.parse().ok()?;
+    if pid_alive(pid) { Some(Dom(pid)) } else { None }
+}
+
+pub fn domain_active(d: &Dom) -> Option<u32> {
+    Some(u32::from(pid_alive(d.0)))
+}
+
+pub fn domain_kill(d: &Dom) {
+    kill_pid(d.0);
+}
+
+pub fn domain_kind() -> &'static str {
+    "process"
+}
+
+pub fn make_stale_domain(ctx: &Ctx) -> Result<String, String> {
+    let mut c = spawn(&mut ctx.role("sleeper", &[&ctx.s("stale.pid")]))?;
+    let pid = c.id();
+    c.kill().map_err(|e| e.to_string())?;
+    let _ = c.wait();
+    Ok(pid.to_string())
+}
+
+pub struct Keep;
+
+/// A live process that does not exit by itself.
+pub fn make_stubborn_domain(ctx: &Ctx) -> Result<(String, Vec<u32>, Keep), String> {
+    let child = spawn(&mut ctx.role("sleeper", &[&ctx.s("stub.pid")]))?;
+    Ok((child.id().to_string(), vec![child.id()], Keep))
 }
 
 fn clear_cloexec(fd: i32) {
@@ -179,6 +233,7 @@ pub fn role(name: &str, a: &[String]) -> bool {
                 std::process::exit(3);
             }
             clear_cloexec(f.as_raw_fd());
+            write_predecessor_record(Path::new(&a[0]), "process", &std::process::id().to_string());
             let mut c = Command::new("git");
             c.args(["-C", &a[2], "-c", "gc.auto=1", "commit", "--allow-empty", "-q", "-m", "probe"]);
             c.stdin(std::process::Stdio::null()).stdout(std::process::Stdio::null()).stderr(std::process::Stdio::null());
