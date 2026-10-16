@@ -1,0 +1,2288 @@
+# Bounded re-review: rationales 10
+
+Author session: `codex-session:unit-run-1792114313040-56132651@2026-10-16`
+Packaged by: `codex-session:unit-run-1792116045118-73cfbb42@2026-10-16`
+Content commit: `287a22d33a0eaf2d9e47549a1142daf62361bb8c` (author changes at `0d8c602e2`)
+Comparison base: `5035fed52e60254ecbe034cc987553feb24616f4`
+Entries: **60**; each request at most60 entries and400000 bytes.
+
+[Single request index](review-request-step10-index-287a22d33.md). Before values are historical; currentDecision and after for content rows come from `git show <content commit>:<shard>` through unchanged `reviewEntryFromCommittedRow`. New package-native predecessor rows are explicitly labelled overlay and require the runner package commit. No seed, sample IDs or verdict chosen by producer.
+
+Reproduce all-shard consistency and every714 generated rationale (unchanged checker, no --apply):
+
+```sh
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work python3 plans/260925-documentation-authority-unification/reports/phase-06/step10-sync287-reproduce.py consistency
+```
+
+Reproduce tests yourself (473 expected):
+
+```sh
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/scripts/doc-*.test.mjs test/scripts/check-doc-*.test.mjs test/scripts/generate-doc-inventory.test.mjs test/scripts/list-doc-anchors.test.mjs test/scripts/verify-phase-02.test.mjs test/scripts/next-doc-id.test.mjs
+```
+
+Run at the runner package checkout from repository root. The consistency reproduction materializes scratch only under `/tmp/fgos-work/`, checks all90 pinned shards with the original checker, verifies their current-row equality, then audits all4 package-native rows with unchanged `checkLegacyRationale`:12893 rows/91 nonempty shards in total. The original checker directly on the new shard errors because its historical oldRow lookup assumes every shard existed at5035fed52; that observed limitation is preserved in `step10-sync287-rationale-consistency.log`. No checker code was altered or bypassed for a pass.
+
+Review every submitted current claim with an ordinary verdict and full digest/anchor/shard equality. Rationales are grouped for mechanical regeneration plus an independent seeded deep sample of at least108/714. A36 additionally requires reviewer-seeded at least162/1079 conservative Weak-exact/Judgment population, every unequal source/target digest and partial/historical row deep. One independently selected draw may satisfy both populations if both coverage thresholds are met; otherwise add draws. All exact doc corrections, tool changes and marked native predecessor transitions are deep. >3% deep rework escalates to the entire pack. Report seed/sample IDs and each claim's deep/mechanical note. Independent checkpoint/truth/red-team obligations remain. Confirmations retain existing committed approvals; metadata/evidence/native entries do not approve claims.
+
+## Entry rationale-541
+
+```json
+{
+  "entryId": "rationale-541",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+  "collection": "claims",
+  "claimId": "claim_446d721d407f7da7777d6d7598181d1d",
+  "before": "Move the complete direct unheaded-block unit \"Built-in and process providers are distinguishable through one router; all negative cases fail closed; no production component moved. `legacy-cli` selectors never reach t\" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-51 to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#unheaded-block-110. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+  "after": "Source: docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md:527-529#unheaded-block-51 (current lines); unit SHA256 eb23d168a9c7939187af1ad15c61125c5c9fbee07c3d654db6e747396613e2af.\nTarget: docs/platform/host-invocation-routing/roadmap.md:844-846#unheaded-block-112 (current lines); unit SHA256 eb23d168a9c7939187af1ad15c61125c5c9fbee07c3d654db6e747396613e2af.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest eb23d168a9c7939187af1ad15c61125c5c9fbee07c3d654db6e747396613e2af at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-51 under docs/platform/host-invocation-routing/roadmap.md#unheaded-block-112; source context \"Rust Host And Proof Providers Implementation Plan / 12. P7 — External Process Provider Preview / Exit gate and verify\", target context \"Host Invocation Routing Roadmap / Retained selected source material / Rust Host And Proof Providers Implementation Plan / 12. P7 — External Process Provider Preview / Exit gate and verify\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 540,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_446d721d407f7da7777d6d7598181d1d",
+    "sourceUnitDigest": "eb23d168a9c7939187af1ad15c61125c5c9fbee07c3d654db6e747396613e2af",
+    "claimKind": "architecture",
+    "kind": "roadmap",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+    "targetAnchor": "unheaded-block-112",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md:527-529#unheaded-block-51 (current lines); unit SHA256 eb23d168a9c7939187af1ad15c61125c5c9fbee07c3d654db6e747396613e2af.\nTarget: docs/platform/host-invocation-routing/roadmap.md:844-846#unheaded-block-112 (current lines); unit SHA256 eb23d168a9c7939187af1ad15c61125c5c9fbee07c3d654db6e747396613e2af.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest eb23d168a9c7939187af1ad15c61125c5c9fbee07c3d654db6e747396613e2af at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-51 under docs/platform/host-invocation-routing/roadmap.md#unheaded-block-112; source context \"Rust Host And Proof Providers Implementation Plan / 12. P7 — External Process Provider Preview / Exit gate and verify\", target context \"Host Invocation Routing Roadmap / Retained selected source material / Rust Host And Proof Providers Implementation Plan / 12. P7 — External Process Provider Preview / Exit gate and verify\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "eb23d168a9c7939187af1ad15c61125c5c9fbee07c3d654db6e747396613e2af"
+  }
+}
+```
+
+## Entry rationale-542
+
+```json
+{
+  "entryId": "rationale-542",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+  "collection": "claims",
+  "claimId": "claim_57d3b9749e5c2300873b408d8bd4bff3",
+  "before": "Move the complete direct unheaded-block unit \"```sh cargo test --workspace external_process node --test test/rust-host/external-provider.test.mjs ```\" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-52 to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#unheaded-block-111. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+  "after": "Source: docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md:531-534#unheaded-block-52 (current lines); unit SHA256 e6d6eb8789e7a7707eefcf9fa132b605dd22cad6164e0622ffdf09c5def52fda.\nTarget: docs/platform/host-invocation-routing/roadmap.md:848-851#unheaded-block-113 (current lines); unit SHA256 e6d6eb8789e7a7707eefcf9fa132b605dd22cad6164e0622ffdf09c5def52fda.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest e6d6eb8789e7a7707eefcf9fa132b605dd22cad6164e0622ffdf09c5def52fda at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-52 under docs/platform/host-invocation-routing/roadmap.md#unheaded-block-113; source context \"Rust Host And Proof Providers Implementation Plan / 12. P7 — External Process Provider Preview / Exit gate and verify\", target context \"Host Invocation Routing Roadmap / Retained selected source material / Rust Host And Proof Providers Implementation Plan / 12. P7 — External Process Provider Preview / Exit gate and verify\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 541,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_57d3b9749e5c2300873b408d8bd4bff3",
+    "sourceUnitDigest": "e6d6eb8789e7a7707eefcf9fa132b605dd22cad6164e0622ffdf09c5def52fda",
+    "claimKind": "architecture",
+    "kind": "roadmap",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+    "targetAnchor": "unheaded-block-113",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md:531-534#unheaded-block-52 (current lines); unit SHA256 e6d6eb8789e7a7707eefcf9fa132b605dd22cad6164e0622ffdf09c5def52fda.\nTarget: docs/platform/host-invocation-routing/roadmap.md:848-851#unheaded-block-113 (current lines); unit SHA256 e6d6eb8789e7a7707eefcf9fa132b605dd22cad6164e0622ffdf09c5def52fda.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest e6d6eb8789e7a7707eefcf9fa132b605dd22cad6164e0622ffdf09c5def52fda at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-52 under docs/platform/host-invocation-routing/roadmap.md#unheaded-block-113; source context \"Rust Host And Proof Providers Implementation Plan / 12. P7 — External Process Provider Preview / Exit gate and verify\", target context \"Host Invocation Routing Roadmap / Retained selected source material / Rust Host And Proof Providers Implementation Plan / 12. P7 — External Process Provider Preview / Exit gate and verify\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "e6d6eb8789e7a7707eefcf9fa132b605dd22cad6164e0622ffdf09c5def52fda"
+  }
+}
+```
+
+## Entry rationale-543
+
+```json
+{
+  "entryId": "rationale-543",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+  "collection": "claims",
+  "claimId": "claim_a8936ca958a19b57756c7f1451c3d4ae",
+  "before": "Move the complete direct unheaded-block unit \"Use `distribution.build.show` first unless another already-native read has more product value. Do not choose a Node-only route merely to justify a bridge.\" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-53 to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#unheaded-block-112. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+  "after": "Source: docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md:538-539#unheaded-block-53 (current lines); unit SHA256 da5b1e0d0c62ae65f0aac3198aae18d044269411e2f7ed63b5243e84b0e81c08.\nTarget: docs/platform/host-invocation-routing/roadmap.md:855-856#unheaded-block-114 (current lines); unit SHA256 da5b1e0d0c62ae65f0aac3198aae18d044269411e2f7ed63b5243e84b0e81c08.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest da5b1e0d0c62ae65f0aac3198aae18d044269411e2f7ed63b5243e84b0e81c08 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-53 under docs/platform/host-invocation-routing/roadmap.md#unheaded-block-114; source context \"Rust Host And Proof Providers Implementation Plan / 13. P8 — Production Remote Native Route\", target context \"Host Invocation Routing Roadmap / Retained selected source material / Rust Host And Proof Providers Implementation Plan / 13. P8 — Production Remote Native Route\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 542,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_a8936ca958a19b57756c7f1451c3d4ae",
+    "sourceUnitDigest": "da5b1e0d0c62ae65f0aac3198aae18d044269411e2f7ed63b5243e84b0e81c08",
+    "claimKind": "architecture",
+    "kind": "roadmap",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+    "targetAnchor": "unheaded-block-114",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md:538-539#unheaded-block-53 (current lines); unit SHA256 da5b1e0d0c62ae65f0aac3198aae18d044269411e2f7ed63b5243e84b0e81c08.\nTarget: docs/platform/host-invocation-routing/roadmap.md:855-856#unheaded-block-114 (current lines); unit SHA256 da5b1e0d0c62ae65f0aac3198aae18d044269411e2f7ed63b5243e84b0e81c08.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest da5b1e0d0c62ae65f0aac3198aae18d044269411e2f7ed63b5243e84b0e81c08 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-53 under docs/platform/host-invocation-routing/roadmap.md#unheaded-block-114; source context \"Rust Host And Proof Providers Implementation Plan / 13. P8 — Production Remote Native Route\", target context \"Host Invocation Routing Roadmap / Retained selected source material / Rust Host And Proof Providers Implementation Plan / 13. P8 — Production Remote Native Route\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "da5b1e0d0c62ae65f0aac3198aae18d044269411e2f7ed63b5243e84b0e81c08"
+  }
+}
+```
+
+## Entry rationale-544
+
+```json
+{
+  "entryId": "rationale-544",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+  "collection": "claims",
+  "claimId": "claim_f3a7761da9b79fcd907b36c8b2c83df1",
+  "before": "Move the complete direct unheaded-block unit \"1. Compose the production remote projector/presenter around the shared service. 2. Replace only the selected route's `VerbGateway` call. 3. Preserve gateway auth, request\" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-54 to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#unheaded-block-113. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+  "after": "Source: docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md:543-552#unheaded-block-54 (current lines); unit SHA256 283c93b439b405ac40e1d7fb649d0d2df74368b4cb39c36b82d8df26eee09594.\nTarget: docs/platform/host-invocation-routing/roadmap.md:860-869#unheaded-block-115 (current lines); unit SHA256 283c93b439b405ac40e1d7fb649d0d2df74368b4cb39c36b82d8df26eee09594.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 283c93b439b405ac40e1d7fb649d0d2df74368b4cb39c36b82d8df26eee09594 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-54 under docs/platform/host-invocation-routing/roadmap.md#unheaded-block-115; source context \"Rust Host And Proof Providers Implementation Plan / 13. P8 — Production Remote Native Route / Steps\", target context \"Host Invocation Routing Roadmap / Retained selected source material / Rust Host And Proof Providers Implementation Plan / 13. P8 — Production Remote Native Route / Steps\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 543,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_f3a7761da9b79fcd907b36c8b2c83df1",
+    "sourceUnitDigest": "283c93b439b405ac40e1d7fb649d0d2df74368b4cb39c36b82d8df26eee09594",
+    "claimKind": "architecture",
+    "kind": "roadmap",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+    "targetAnchor": "unheaded-block-115",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md:543-552#unheaded-block-54 (current lines); unit SHA256 283c93b439b405ac40e1d7fb649d0d2df74368b4cb39c36b82d8df26eee09594.\nTarget: docs/platform/host-invocation-routing/roadmap.md:860-869#unheaded-block-115 (current lines); unit SHA256 283c93b439b405ac40e1d7fb649d0d2df74368b4cb39c36b82d8df26eee09594.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 283c93b439b405ac40e1d7fb649d0d2df74368b4cb39c36b82d8df26eee09594 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-54 under docs/platform/host-invocation-routing/roadmap.md#unheaded-block-115; source context \"Rust Host And Proof Providers Implementation Plan / 13. P8 — Production Remote Native Route / Steps\", target context \"Host Invocation Routing Roadmap / Retained selected source material / Rust Host And Proof Providers Implementation Plan / 13. P8 — Production Remote Native Route / Steps\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "283c93b439b405ac40e1d7fb649d0d2df74368b4cb39c36b82d8df26eee09594"
+  }
+}
+```
+
+## Entry rationale-545
+
+```json
+{
+  "entryId": "rationale-545",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+  "collection": "claims",
+  "claimId": "claim_9457144f140ce0f5c9c64f3063e3776f",
+  "before": "Move the complete direct unheaded-block unit \"One production route is a true peer invocation. Remaining old routes are visible and no migrated route can fall back to envelope parsing.\" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-55 to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#unheaded-block-114. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+  "after": "Source: docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md:556-557#unheaded-block-55 (current lines); unit SHA256 3fe745ace291d6583944781985110b615af2e7520c04b04975cc134c522a1e51.\nTarget: docs/platform/host-invocation-routing/roadmap.md:873-874#unheaded-block-116 (current lines); unit SHA256 3fe745ace291d6583944781985110b615af2e7520c04b04975cc134c522a1e51.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 3fe745ace291d6583944781985110b615af2e7520c04b04975cc134c522a1e51 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-55 under docs/platform/host-invocation-routing/roadmap.md#unheaded-block-116; source context \"Rust Host And Proof Providers Implementation Plan / 13. P8 — Production Remote Native Route / Exit gate and verify\", target context \"Host Invocation Routing Roadmap / Retained selected source material / Rust Host And Proof Providers Implementation Plan / 13. P8 — Production Remote Native Route / Exit gate and verify\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 544,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_9457144f140ce0f5c9c64f3063e3776f",
+    "sourceUnitDigest": "3fe745ace291d6583944781985110b615af2e7520c04b04975cc134c522a1e51",
+    "claimKind": "architecture",
+    "kind": "roadmap",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+    "targetAnchor": "unheaded-block-116",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md:556-557#unheaded-block-55 (current lines); unit SHA256 3fe745ace291d6583944781985110b615af2e7520c04b04975cc134c522a1e51.\nTarget: docs/platform/host-invocation-routing/roadmap.md:873-874#unheaded-block-116 (current lines); unit SHA256 3fe745ace291d6583944781985110b615af2e7520c04b04975cc134c522a1e51.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 3fe745ace291d6583944781985110b615af2e7520c04b04975cc134c522a1e51 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-55 under docs/platform/host-invocation-routing/roadmap.md#unheaded-block-116; source context \"Rust Host And Proof Providers Implementation Plan / 13. P8 — Production Remote Native Route / Exit gate and verify\", target context \"Host Invocation Routing Roadmap / Retained selected source material / Rust Host And Proof Providers Implementation Plan / 13. P8 — Production Remote Native Route / Exit gate and verify\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "3fe745ace291d6583944781985110b615af2e7520c04b04975cc134c522a1e51"
+  }
+}
+```
+
+## Entry rationale-546
+
+```json
+{
+  "entryId": "rationale-546",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+  "collection": "claims",
+  "claimId": "claim_c6fb2d851a8aed27c31af82f9056a862",
+  "before": "Move the complete direct unheaded-block unit \"```sh cargo test --manifest-path herdr-plugin/Cargo.toml npm test ```\" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-56 to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#unheaded-block-115. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+  "after": "Source: docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md:559-562#unheaded-block-56 (current lines); unit SHA256 779f96f96e05bf79c02301979bf8375584fbcd29266dd60ffe6c6039b5320640.\nTarget: docs/platform/host-invocation-routing/roadmap.md:876-879#unheaded-block-117 (current lines); unit SHA256 779f96f96e05bf79c02301979bf8375584fbcd29266dd60ffe6c6039b5320640.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 779f96f96e05bf79c02301979bf8375584fbcd29266dd60ffe6c6039b5320640 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-56 under docs/platform/host-invocation-routing/roadmap.md#unheaded-block-117; source context \"Rust Host And Proof Providers Implementation Plan / 13. P8 — Production Remote Native Route / Exit gate and verify\", target context \"Host Invocation Routing Roadmap / Retained selected source material / Rust Host And Proof Providers Implementation Plan / 13. P8 — Production Remote Native Route / Exit gate and verify\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 545,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_c6fb2d851a8aed27c31af82f9056a862",
+    "sourceUnitDigest": "779f96f96e05bf79c02301979bf8375584fbcd29266dd60ffe6c6039b5320640",
+    "claimKind": "architecture",
+    "kind": "roadmap",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+    "targetAnchor": "unheaded-block-117",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md:559-562#unheaded-block-56 (current lines); unit SHA256 779f96f96e05bf79c02301979bf8375584fbcd29266dd60ffe6c6039b5320640.\nTarget: docs/platform/host-invocation-routing/roadmap.md:876-879#unheaded-block-117 (current lines); unit SHA256 779f96f96e05bf79c02301979bf8375584fbcd29266dd60ffe6c6039b5320640.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 779f96f96e05bf79c02301979bf8375584fbcd29266dd60ffe6c6039b5320640 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-56 under docs/platform/host-invocation-routing/roadmap.md#unheaded-block-117; source context \"Rust Host And Proof Providers Implementation Plan / 13. P8 — Production Remote Native Route / Exit gate and verify\", target context \"Host Invocation Routing Roadmap / Retained selected source material / Rust Host And Proof Providers Implementation Plan / 13. P8 — Production Remote Native Route / Exit gate and verify\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "779f96f96e05bf79c02301979bf8375584fbcd29266dd60ffe6c6039b5320640"
+  }
+}
+```
+
+## Entry rationale-547
+
+```json
+{
+  "entryId": "rationale-547",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+  "collection": "claims",
+  "claimId": "claim_2bc13328f1e7a4d1ac848c004a8a0952",
+  "before": "Move the complete direct unheaded-block unit \"`gate-bypass` is a candidate, not a pre-created component. Confirm authority and placement first. If selected: freeze precedence/malformed fixtures; port only the read; c\" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-57 to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#unheaded-block-116. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+  "after": "Source: docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md:566-570#unheaded-block-57 (current lines); unit SHA256 fe1cd3e68c4ddee018f5eda3345a1819ed8d9adf9bb3cea05dee81f865824b5b.\nTarget: docs/platform/host-invocation-routing/roadmap.md:883-887#unheaded-block-118 (current lines); unit SHA256 fe1cd3e68c4ddee018f5eda3345a1819ed8d9adf9bb3cea05dee81f865824b5b.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest fe1cd3e68c4ddee018f5eda3345a1819ed8d9adf9bb3cea05dee81f865824b5b at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-57 under docs/platform/host-invocation-routing/roadmap.md#unheaded-block-118; source context \"Rust Host And Proof Providers Implementation Plan / 14. P9 — Next Native Read\", target context \"Host Invocation Routing Roadmap / Retained selected source material / Rust Host And Proof Providers Implementation Plan / 14. P9 — Next Native Read\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 546,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_2bc13328f1e7a4d1ac848c004a8a0952",
+    "sourceUnitDigest": "fe1cd3e68c4ddee018f5eda3345a1819ed8d9adf9bb3cea05dee81f865824b5b",
+    "claimKind": "architecture",
+    "kind": "roadmap",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+    "targetAnchor": "unheaded-block-118",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md:566-570#unheaded-block-57 (current lines); unit SHA256 fe1cd3e68c4ddee018f5eda3345a1819ed8d9adf9bb3cea05dee81f865824b5b.\nTarget: docs/platform/host-invocation-routing/roadmap.md:883-887#unheaded-block-118 (current lines); unit SHA256 fe1cd3e68c4ddee018f5eda3345a1819ed8d9adf9bb3cea05dee81f865824b5b.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest fe1cd3e68c4ddee018f5eda3345a1819ed8d9adf9bb3cea05dee81f865824b5b at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-57 under docs/platform/host-invocation-routing/roadmap.md#unheaded-block-118; source context \"Rust Host And Proof Providers Implementation Plan / 14. P9 — Next Native Read\", target context \"Host Invocation Routing Roadmap / Retained selected source material / Rust Host And Proof Providers Implementation Plan / 14. P9 — Next Native Read\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "fe1cd3e68c4ddee018f5eda3345a1819ed8d9adf9bb3cea05dee81f865824b5b"
+  }
+}
+```
+
+## Entry rationale-548
+
+```json
+{
+  "entryId": "rationale-548",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+  "collection": "claims",
+  "claimId": "claim_61d6d1de22e22af7eb3be3da75284378",
+  "before": "Move the complete direct unheaded-block unit \"The provider never blocks on human input; a `parked` outcome is the only allowed response when human input is needed (matches `ask`/awaiting-human; \"Release con người\" la\" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-58 to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#unheaded-block-117. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+  "after": "Source: docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md:572-575#unheaded-block-58 (current lines); unit SHA256 4cbffbcd3dd2a051fa5d67979d3d02a84231e593082b80f07226b77685244b32.\nTarget: docs/platform/host-invocation-routing/roadmap.md:889-892#unheaded-block-119 (current lines); unit SHA256 4cbffbcd3dd2a051fa5d67979d3d02a84231e593082b80f07226b77685244b32.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 4cbffbcd3dd2a051fa5d67979d3d02a84231e593082b80f07226b77685244b32 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-58 under docs/platform/host-invocation-routing/roadmap.md#unheaded-block-119; source context \"Rust Host And Proof Providers Implementation Plan / 14. P9 — Next Native Read\", target context \"Host Invocation Routing Roadmap / Retained selected source material / Rust Host And Proof Providers Implementation Plan / 14. P9 — Next Native Read\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 547,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_61d6d1de22e22af7eb3be3da75284378",
+    "sourceUnitDigest": "4cbffbcd3dd2a051fa5d67979d3d02a84231e593082b80f07226b77685244b32",
+    "claimKind": "architecture",
+    "kind": "roadmap",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+    "targetAnchor": "unheaded-block-119",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md:572-575#unheaded-block-58 (current lines); unit SHA256 4cbffbcd3dd2a051fa5d67979d3d02a84231e593082b80f07226b77685244b32.\nTarget: docs/platform/host-invocation-routing/roadmap.md:889-892#unheaded-block-119 (current lines); unit SHA256 4cbffbcd3dd2a051fa5d67979d3d02a84231e593082b80f07226b77685244b32.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 4cbffbcd3dd2a051fa5d67979d3d02a84231e593082b80f07226b77685244b32 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-58 under docs/platform/host-invocation-routing/roadmap.md#unheaded-block-119; source context \"Rust Host And Proof Providers Implementation Plan / 14. P9 — Next Native Read\", target context \"Host Invocation Routing Roadmap / Retained selected source material / Rust Host And Proof Providers Implementation Plan / 14. P9 — Next Native Read\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "4cbffbcd3dd2a051fa5d67979d3d02a84231e593082b80f07226b77685244b32"
+  }
+}
+```
+
+## Entry rationale-549
+
+```json
+{
+  "entryId": "rationale-549",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+  "collection": "claims",
+  "claimId": "claim_137e7e29c20b6ff1f4855d7f465055ea",
+  "before": "Move the complete direct unheaded-block unit \"```sh node --test test/rust-host/gate-bypass-parity.test.mjs cargo test --workspace ```\" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-59 to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#unheaded-block-118. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+  "after": "Source: docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md:577-580#unheaded-block-59 (current lines); unit SHA256 88c6fc55695ee809a3c72ff8e236ff78e2c0af08f2ded47b56d2343bc300d783.\nTarget: docs/platform/host-invocation-routing/roadmap.md:894-897#unheaded-block-120 (current lines); unit SHA256 88c6fc55695ee809a3c72ff8e236ff78e2c0af08f2ded47b56d2343bc300d783.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 88c6fc55695ee809a3c72ff8e236ff78e2c0af08f2ded47b56d2343bc300d783 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-59 under docs/platform/host-invocation-routing/roadmap.md#unheaded-block-120; source context \"Rust Host And Proof Providers Implementation Plan / 14. P9 — Next Native Read\", target context \"Host Invocation Routing Roadmap / Retained selected source material / Rust Host And Proof Providers Implementation Plan / 14. P9 — Next Native Read\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 548,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_137e7e29c20b6ff1f4855d7f465055ea",
+    "sourceUnitDigest": "88c6fc55695ee809a3c72ff8e236ff78e2c0af08f2ded47b56d2343bc300d783",
+    "claimKind": "architecture",
+    "kind": "roadmap",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+    "targetAnchor": "unheaded-block-120",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md:577-580#unheaded-block-59 (current lines); unit SHA256 88c6fc55695ee809a3c72ff8e236ff78e2c0af08f2ded47b56d2343bc300d783.\nTarget: docs/platform/host-invocation-routing/roadmap.md:894-897#unheaded-block-120 (current lines); unit SHA256 88c6fc55695ee809a3c72ff8e236ff78e2c0af08f2ded47b56d2343bc300d783.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 88c6fc55695ee809a3c72ff8e236ff78e2c0af08f2ded47b56d2343bc300d783 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-59 under docs/platform/host-invocation-routing/roadmap.md#unheaded-block-120; source context \"Rust Host And Proof Providers Implementation Plan / 14. P9 — Next Native Read\", target context \"Host Invocation Routing Roadmap / Retained selected source material / Rust Host And Proof Providers Implementation Plan / 14. P9 — Next Native Read\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "88c6fc55695ee809a3c72ff8e236ff78e2c0af08f2ded47b56d2343bc300d783"
+  }
+}
+```
+
+## Entry rationale-550
+
+```json
+{
+  "entryId": "rationale-550",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+  "collection": "claims",
+  "claimId": "claim_88d182e8f7f1827e07da42ec9d992e49",
+  "before": "Move the complete direct unheaded-block unit \"Independently revertible slices:\" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-62 to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#unheaded-block-121. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; source unit shorter than 40 characters; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+  "after": "Source: docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md:601-601#unheaded-block-62 (current lines); unit SHA256 9fd2971f5a68d5559fcb1e5913246ca7e0f0264bf31845c8577fe86f80fd59d8.\nTarget: docs/platform/host-invocation-routing/roadmap.md:910-910#unheaded-block-123 (current lines); unit SHA256 9fd2971f5a68d5559fcb1e5913246ca7e0f0264bf31845c8577fe86f80fd59d8.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 9fd2971f5a68d5559fcb1e5913246ca7e0f0264bf31845c8577fe86f80fd59d8 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-62 under docs/platform/host-invocation-routing/roadmap.md#unheaded-block-123; source context \"Rust Host And Proof Providers Implementation Plan / 16. Commit And Rollback Slices\", target context \"Host Invocation Routing Roadmap / Retained selected source material / Rust Host And Proof Providers Implementation Plan / 16. Commit And Rollback Slices\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 549,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_88d182e8f7f1827e07da42ec9d992e49",
+    "sourceUnitDigest": "9fd2971f5a68d5559fcb1e5913246ca7e0f0264bf31845c8577fe86f80fd59d8",
+    "claimKind": "architecture",
+    "kind": "roadmap",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+    "targetAnchor": "unheaded-block-123",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md:601-601#unheaded-block-62 (current lines); unit SHA256 9fd2971f5a68d5559fcb1e5913246ca7e0f0264bf31845c8577fe86f80fd59d8.\nTarget: docs/platform/host-invocation-routing/roadmap.md:910-910#unheaded-block-123 (current lines); unit SHA256 9fd2971f5a68d5559fcb1e5913246ca7e0f0264bf31845c8577fe86f80fd59d8.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 9fd2971f5a68d5559fcb1e5913246ca7e0f0264bf31845c8577fe86f80fd59d8 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-62 under docs/platform/host-invocation-routing/roadmap.md#unheaded-block-123; source context \"Rust Host And Proof Providers Implementation Plan / 16. Commit And Rollback Slices\", target context \"Host Invocation Routing Roadmap / Retained selected source material / Rust Host And Proof Providers Implementation Plan / 16. Commit And Rollback Slices\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "9fd2971f5a68d5559fcb1e5913246ca7e0f0264bf31845c8577fe86f80fd59d8"
+  }
+}
+```
+
+## Entry rationale-551
+
+```json
+{
+  "entryId": "rationale-551",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+  "collection": "claims",
+  "claimId": "claim_b9014c66550a776442837dad43e46a3b",
+  "before": "Move the complete direct unheaded-block unit \"1. harness and generated selector artifact; 2. workspace skeleton; 3. invocation kernel/in-memory providers; 4. Node compatibility; 5. native `version` binding; 6. artifa\" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-63 to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#unheaded-block-122. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+  "after": "Source: docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md:603-614#unheaded-block-63 (current lines); unit SHA256 1332a50a9227ba20a7cca597f93f22ddb570a90a8fb7e7528de781bb9eb142f9.\nTarget: docs/platform/host-invocation-routing/roadmap.md:912-923#unheaded-block-124 (current lines); unit SHA256 1332a50a9227ba20a7cca597f93f22ddb570a90a8fb7e7528de781bb9eb142f9.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 1332a50a9227ba20a7cca597f93f22ddb570a90a8fb7e7528de781bb9eb142f9 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-63 under docs/platform/host-invocation-routing/roadmap.md#unheaded-block-124; source context \"Rust Host And Proof Providers Implementation Plan / 16. Commit And Rollback Slices\", target context \"Host Invocation Routing Roadmap / Retained selected source material / Rust Host And Proof Providers Implementation Plan / 16. Commit And Rollback Slices\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 550,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_b9014c66550a776442837dad43e46a3b",
+    "sourceUnitDigest": "1332a50a9227ba20a7cca597f93f22ddb570a90a8fb7e7528de781bb9eb142f9",
+    "claimKind": "architecture",
+    "kind": "roadmap",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+    "targetAnchor": "unheaded-block-124",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md:603-614#unheaded-block-63 (current lines); unit SHA256 1332a50a9227ba20a7cca597f93f22ddb570a90a8fb7e7528de781bb9eb142f9.\nTarget: docs/platform/host-invocation-routing/roadmap.md:912-923#unheaded-block-124 (current lines); unit SHA256 1332a50a9227ba20a7cca597f93f22ddb570a90a8fb7e7528de781bb9eb142f9.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 1332a50a9227ba20a7cca597f93f22ddb570a90a8fb7e7528de781bb9eb142f9 at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-63 under docs/platform/host-invocation-routing/roadmap.md#unheaded-block-124; source context \"Rust Host And Proof Providers Implementation Plan / 16. Commit And Rollback Slices\", target context \"Host Invocation Routing Roadmap / Retained selected source material / Rust Host And Proof Providers Implementation Plan / 16. Commit And Rollback Slices\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "1332a50a9227ba20a7cca597f93f22ddb570a90a8fb7e7528de781bb9eb142f9"
+  }
+}
+```
+
+## Entry rationale-552
+
+```json
+{
+  "entryId": "rationale-552",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+  "collection": "claims",
+  "claimId": "claim_add5109449e2f6aefc7489ff836f0734",
+  "before": "Move the complete direct unheaded-block unit \"Before P6, discard the candidate binary. After P6, roll back via `fgctl` release rollback (restores the previous complete release via `ActivationRecord.previousArtifactDi\" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-64 to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#unheaded-block-123. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+  "after": "Source: docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md:616-624#unheaded-block-64 (current lines); unit SHA256 191ee8f2ec30c1850ebab8c745894d52ac8f0d65d7aa622a978e73294e21fa6f.\nTarget: docs/platform/host-invocation-routing/roadmap.md:925-933#unheaded-block-125 (current lines); unit SHA256 191ee8f2ec30c1850ebab8c745894d52ac8f0d65d7aa622a978e73294e21fa6f.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 191ee8f2ec30c1850ebab8c745894d52ac8f0d65d7aa622a978e73294e21fa6f at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-64 under docs/platform/host-invocation-routing/roadmap.md#unheaded-block-125; source context \"Rust Host And Proof Providers Implementation Plan / 16. Commit And Rollback Slices\", target context \"Host Invocation Routing Roadmap / Retained selected source material / Rust Host And Proof Providers Implementation Plan / 16. Commit And Rollback Slices\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 551,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_add5109449e2f6aefc7489ff836f0734",
+    "sourceUnitDigest": "191ee8f2ec30c1850ebab8c745894d52ac8f0d65d7aa622a978e73294e21fa6f",
+    "claimKind": "architecture",
+    "kind": "roadmap",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+    "targetAnchor": "unheaded-block-125",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md:616-624#unheaded-block-64 (current lines); unit SHA256 191ee8f2ec30c1850ebab8c745894d52ac8f0d65d7aa622a978e73294e21fa6f.\nTarget: docs/platform/host-invocation-routing/roadmap.md:925-933#unheaded-block-125 (current lines); unit SHA256 191ee8f2ec30c1850ebab8c745894d52ac8f0d65d7aa622a978e73294e21fa6f.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 191ee8f2ec30c1850ebab8c745894d52ac8f0d65d7aa622a978e73294e21fa6f at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-64 under docs/platform/host-invocation-routing/roadmap.md#unheaded-block-125; source context \"Rust Host And Proof Providers Implementation Plan / 16. Commit And Rollback Slices\", target context \"Host Invocation Routing Roadmap / Retained selected source material / Rust Host And Proof Providers Implementation Plan / 16. Commit And Rollback Slices\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "191ee8f2ec30c1850ebab8c745894d52ac8f0d65d7aa622a978e73294e21fa6f"
+  }
+}
+```
+
+## Entry rationale-553
+
+```json
+{
+  "entryId": "rationale-553",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+  "collection": "claims",
+  "claimId": "claim_ab8c5d3c7ef7884ec870084364b54da4",
+  "before": "Move the complete direct unheaded-block unit \"1. R1 installs Rust on every approved target while every unmigrated selector preserves Node behavior. 2. `version` is typed, native, compatible, and proven not to spawn N\" from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-66 to its frozen mapped owner docs/platform/host-invocation-routing/roadmap.md#unheaded-block-125. The selected source material retains all direct-unit wording; only source heading depth and resolved link destinations are structural rewrites. The separate dated-scope note does not assert every source proposal or old route count is current code. Native counterpart class Weak-exact: ancestor headings differ; document exact share below one half; independent full-text judgment remains required, not a script-proven approval.",
+  "after": "Source: docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md:648-662#unheaded-block-66 (current lines); unit SHA256 d23a0b885629b56566368f82f5dbbe4510c96a9ffb153df11a95a6a4d70b22dc.\nTarget: docs/platform/host-invocation-routing/roadmap.md:942-956#unheaded-block-127 (current lines); unit SHA256 d23a0b885629b56566368f82f5dbbe4510c96a9ffb153df11a95a6a4d70b22dc.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest d23a0b885629b56566368f82f5dbbe4510c96a9ffb153df11a95a6a4d70b22dc at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-66 under docs/platform/host-invocation-routing/roadmap.md#unheaded-block-127; source context \"Rust Host And Proof Providers Implementation Plan / 18. Definition Of Done\", target context \"Host Invocation Routing Roadmap / Retained selected source material / Rust Host And Proof Providers Implementation Plan / 18. Definition Of Done\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 552,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_ab8c5d3c7ef7884ec870084364b54da4",
+    "sourceUnitDigest": "d23a0b885629b56566368f82f5dbbe4510c96a9ffb153df11a95a6a4d70b22dc",
+    "claimKind": "architecture",
+    "kind": "roadmap",
+    "disposition": "move",
+    "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+    "targetAnchor": "unheaded-block-127",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md:648-662#unheaded-block-66 (current lines); unit SHA256 d23a0b885629b56566368f82f5dbbe4510c96a9ffb153df11a95a6a4d70b22dc.\nTarget: docs/platform/host-invocation-routing/roadmap.md:942-956#unheaded-block-127 (current lines); unit SHA256 d23a0b885629b56566368f82f5dbbe4510c96a9ffb153df11a95a6a4d70b22dc.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest d23a0b885629b56566368f82f5dbbe4510c96a9ffb153df11a95a6a4d70b22dc at 13322f8a6712df4bb3dd69e7df208e237f32c216.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#unheaded-block-66 under docs/platform/host-invocation-routing/roadmap.md#unheaded-block-127; source context \"Rust Host And Proof Providers Implementation Plan / 18. Definition Of Done\", target context \"Host Invocation Routing Roadmap / Retained selected source material / Rust Host And Proof Providers Implementation Plan / 18. Definition Of Done\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "d23a0b885629b56566368f82f5dbbe4510c96a9ffb153df11a95a6a4d70b22dc"
+  }
+}
+```
+
+## Entry rationale-554
+
+```json
+{
+  "entryId": "rationale-554",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+  "collection": "rows",
+  "claimId": "claim_b12ca1fdc3534fa31f9d7459c1be9ef7",
+  "before": "L10-16 / L10-3: claim_b12ca1fdc3534fa31f9d7459c1be9ef7 records the historical native instruction identity AGENTS.md#dispatch-routing-work-to-a-executor (digest 6f82f0a34b9d52aeb929fa62c63a49e558f0cf94e6552b59bca278097f14ea6d). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
+  "after": "Source: AGENTS.md:99-99#dispatch-routing-work-to-a-executor (historical witness at 120af6b3de826faec4e98cf72a92d8bcf1a21dff); unit SHA256 6f82f0a34b9d52aeb929fa62c63a49e558f0cf94e6552b59bca278097f14ea6d.\nTarget: none; retained identity has no mapped platform copy.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → not a heading; title \"Dispatch — routing work to a executor\" → \"none\".\nApplicable labelled corrections: none in this bound unit.\nDisposition reclassify-out-of-platform-scope: Keep AGENTS.md#dispatch-routing-work-to-a-executor in its existing source ownership outside platform documentation authority.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 553,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_b12ca1fdc3534fa31f9d7459c1be9ef7",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "dispatch-routing-work-to-a-executor",
+    "sourceUnitDigest": "6f82f0a34b9d52aeb929fa62c63a49e558f0cf94e6552b59bca278097f14ea6d",
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "Source: AGENTS.md:99-99#dispatch-routing-work-to-a-executor (historical witness at 120af6b3de826faec4e98cf72a92d8bcf1a21dff); unit SHA256 6f82f0a34b9d52aeb929fa62c63a49e558f0cf94e6552b59bca278097f14ea6d.\nTarget: none; retained identity has no mapped platform copy.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → not a heading; title \"Dispatch — routing work to a executor\" → \"none\".\nApplicable labelled corrections: none in this bound unit.\nDisposition reclassify-out-of-platform-scope: Keep AGENTS.md#dispatch-routing-work-to-a-executor in its existing source ownership outside platform documentation authority.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16"
+  }
+}
+```
+
+## Entry rationale-555
+
+```json
+{
+  "entryId": "rationale-555",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+  "collection": "rows",
+  "claimId": "claim_21f66ad1c973daaf6c31abf50b6c8cc3",
+  "before": "L10-16 / L10-3: claim_21f66ad1c973daaf6c31abf50b6c8cc3 records the historical native instruction identity AGENTS.md#starting-the-herdr-gateway-one-door-never-a-raw-process (digest 43d98a2d84170eee45f9c337cd6700c7af2e32965c415e3fb26cf3c3ebe14bd7). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
+  "after": "Source: AGENTS.md#starting-the-herdr-gateway-one-door-never-a-raw-process; historical text/line witness unavailable; bound unit SHA256 43d98a2d84170eee45f9c337cd6700c7af2e32965c415e3fb26cf3c3ebe14bd7.\nTarget: none; retained identity has no mapped platform copy.\nLinks: source unavailable, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition reclassify-out-of-platform-scope: Keep AGENTS.md#starting-the-herdr-gateway-one-door-never-a-raw-process in its existing source ownership outside platform documentation authority.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 554,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_21f66ad1c973daaf6c31abf50b6c8cc3",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "starting-the-herdr-gateway-one-door-never-a-raw-process",
+    "sourceUnitDigest": "43d98a2d84170eee45f9c337cd6700c7af2e32965c415e3fb26cf3c3ebe14bd7",
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "Source: AGENTS.md#starting-the-herdr-gateway-one-door-never-a-raw-process; historical text/line witness unavailable; bound unit SHA256 43d98a2d84170eee45f9c337cd6700c7af2e32965c415e3fb26cf3c3ebe14bd7.\nTarget: none; retained identity has no mapped platform copy.\nLinks: source unavailable, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition reclassify-out-of-platform-scope: Keep AGENTS.md#starting-the-herdr-gateway-one-door-never-a-raw-process in its existing source ownership outside platform documentation authority.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16"
+  }
+}
+```
+
+## Entry rationale-556
+
+```json
+{
+  "entryId": "rationale-556",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+  "collection": "rows",
+  "claimId": "claim_806342ec2a1c5fd1d0b6d82ebd54d4e0",
+  "before": "L10-16 / L10-3: claim_806342ec2a1c5fd1d0b6d82ebd54d4e0 records the historical native instruction identity AGENTS.md#unheaded-block-18 (digest 818ed72de3118b43bbb9682e5b2231a74894d6001771d6375d08fcb626cd99b1). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
+  "after": "Source: AGENTS.md:101-101#unheaded-block-18 (historical witness at 120af6b3de826faec4e98cf72a92d8bcf1a21dff); unit SHA256 818ed72de3118b43bbb9682e5b2231a74894d6001771d6375d08fcb626cd99b1.\nTarget: none; retained identity has no mapped platform copy.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition reclassify-out-of-platform-scope: Keep AGENTS.md#unheaded-block-18 in its existing source ownership outside platform documentation authority.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 555,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_806342ec2a1c5fd1d0b6d82ebd54d4e0",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-18",
+    "sourceUnitDigest": "818ed72de3118b43bbb9682e5b2231a74894d6001771d6375d08fcb626cd99b1",
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "Source: AGENTS.md:101-101#unheaded-block-18 (historical witness at 120af6b3de826faec4e98cf72a92d8bcf1a21dff); unit SHA256 818ed72de3118b43bbb9682e5b2231a74894d6001771d6375d08fcb626cd99b1.\nTarget: none; retained identity has no mapped platform copy.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition reclassify-out-of-platform-scope: Keep AGENTS.md#unheaded-block-18 in its existing source ownership outside platform documentation authority.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16"
+  }
+}
+```
+
+## Entry rationale-557
+
+```json
+{
+  "entryId": "rationale-557",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+  "collection": "rows",
+  "claimId": "claim_7a4fef4aa802940385df7cd8fc1bf6f0",
+  "before": "L10-16 / L10-3: claim_7a4fef4aa802940385df7cd8fc1bf6f0 records the historical native instruction identity AGENTS.md#unheaded-block-23 (digest 367c95ab6574855f85ab31608ca9438bddb2bef0839cfc45ff4bf2640c6ea2f4). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
+  "after": "Source: AGENTS.md:114-116#unheaded-block-23 (historical witness at 120af6b3de826faec4e98cf72a92d8bcf1a21dff); unit SHA256 367c95ab6574855f85ab31608ca9438bddb2bef0839cfc45ff4bf2640c6ea2f4.\nTarget: none; retained identity has no mapped platform copy.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition reclassify-out-of-platform-scope: Keep AGENTS.md#unheaded-block-23 in its existing source ownership outside platform documentation authority.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 556,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_7a4fef4aa802940385df7cd8fc1bf6f0",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-23",
+    "sourceUnitDigest": "367c95ab6574855f85ab31608ca9438bddb2bef0839cfc45ff4bf2640c6ea2f4",
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "Source: AGENTS.md:114-116#unheaded-block-23 (historical witness at 120af6b3de826faec4e98cf72a92d8bcf1a21dff); unit SHA256 367c95ab6574855f85ab31608ca9438bddb2bef0839cfc45ff4bf2640c6ea2f4.\nTarget: none; retained identity has no mapped platform copy.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition reclassify-out-of-platform-scope: Keep AGENTS.md#unheaded-block-23 in its existing source ownership outside platform documentation authority.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16"
+  }
+}
+```
+
+## Entry rationale-558
+
+```json
+{
+  "entryId": "rationale-558",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+  "collection": "rows",
+  "claimId": "claim_7b209ce1498d7ab5ddafe25d203e5852",
+  "before": "L10-16 / L10-3: claim_7b209ce1498d7ab5ddafe25d203e5852 records the historical native instruction identity AGENTS.md#unheaded-block-24 (digest bd95c2c1daeda69523d203dcefc33f2d50d81a401087e921c058a7d004f5a02a). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
+  "after": "Source: AGENTS.md:118-118#unheaded-block-24 (historical witness at 120af6b3de826faec4e98cf72a92d8bcf1a21dff); unit SHA256 bd95c2c1daeda69523d203dcefc33f2d50d81a401087e921c058a7d004f5a02a.\nTarget: none; retained identity has no mapped platform copy.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition reclassify-out-of-platform-scope: Keep AGENTS.md#unheaded-block-24 in its existing source ownership outside platform documentation authority.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 557,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_7b209ce1498d7ab5ddafe25d203e5852",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-24",
+    "sourceUnitDigest": "bd95c2c1daeda69523d203dcefc33f2d50d81a401087e921c058a7d004f5a02a",
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "Source: AGENTS.md:118-118#unheaded-block-24 (historical witness at 120af6b3de826faec4e98cf72a92d8bcf1a21dff); unit SHA256 bd95c2c1daeda69523d203dcefc33f2d50d81a401087e921c058a7d004f5a02a.\nTarget: none; retained identity has no mapped platform copy.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition reclassify-out-of-platform-scope: Keep AGENTS.md#unheaded-block-24 in its existing source ownership outside platform documentation authority.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16"
+  }
+}
+```
+
+## Entry rationale-559
+
+```json
+{
+  "entryId": "rationale-559",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+  "collection": "rows",
+  "claimId": "claim_30f4d7e2306cb4ecdad78086848d139f",
+  "before": "L10-16 / L10-3: claim_30f4d7e2306cb4ecdad78086848d139f records the historical native instruction identity AGENTS.md#unheaded-block-26 (digest 52b2e04e2be1548ef98b8c68b27ee09c3cef2b516ce1cdd6925362d81dd2a306). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried.",
+  "after": "Source: AGENTS.md:129-130#unheaded-block-26 (historical witness at 5df843bdb90527b326974a71cc9d288fac4393bc); unit SHA256 52b2e04e2be1548ef98b8c68b27ee09c3cef2b516ce1cdd6925362d81dd2a306.\nTarget: none; retained identity has no mapped platform copy.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition reclassify-out-of-platform-scope: Keep AGENTS.md#unheaded-block-26 in its existing source ownership outside platform documentation authority.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 558,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_30f4d7e2306cb4ecdad78086848d139f",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-26",
+    "sourceUnitDigest": "52b2e04e2be1548ef98b8c68b27ee09c3cef2b516ce1cdd6925362d81dd2a306",
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "Source: AGENTS.md:129-130#unheaded-block-26 (historical witness at 5df843bdb90527b326974a71cc9d288fac4393bc); unit SHA256 52b2e04e2be1548ef98b8c68b27ee09c3cef2b516ce1cdd6925362d81dd2a306.\nTarget: none; retained identity has no mapped platform copy.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition reclassify-out-of-platform-scope: Keep AGENTS.md#unheaded-block-26 in its existing source ownership outside platform documentation authority.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16"
+  }
+}
+```
+
+## Entry rationale-560
+
+```json
+{
+  "entryId": "rationale-560",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+  "collection": "rows",
+  "claimId": "claim_dea64a2d50bdbadf3b2ebeceec84fa5d",
+  "before": "L10-16 / L10-3: claim_dea64a2d50bdbadf3b2ebeceec84fa5d records the historical native instruction identity AGENTS.md#unheaded-block-34 (digest ba8b02c21fe45af0ba20b280ef182065e87c3410dae024d6ede3983845990c9c). The root instruction file remains the always-loaded owner outside platform documentation authority. The historical anchor names this predecessor, not a claim that its old text is the current unit at the same numbered anchor. Retain native predecessor/successor identities without creating a platform copy, target owner or truth certificate. Reclassify-out-of-platform-scope pending independent review; no historical approval is carried. This is consistent with gap claim_91884eb1 (same ba8b02c2 text digest): both historical identities classify the instruction outside platform authority. The old registry delete-as-obsolete disposition is historical bookkeeping, not authority to delete root instruction text; no registry mutation this turn.",
+  "after": "Source: AGENTS.md:159-159#unheaded-block-34 (historical witness at f4a81c7ea2bf1b2b62bf38ad66dbbde2c6791704); unit SHA256 ba8b02c21fe45af0ba20b280ef182065e87c3410dae024d6ede3983845990c9c.\nTarget: none; retained identity has no mapped platform copy.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition reclassify-out-of-platform-scope: Keep AGENTS.md#unheaded-block-34 in its existing source ownership outside platform documentation authority.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 559,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_dea64a2d50bdbadf3b2ebeceec84fa5d",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-34",
+    "sourceUnitDigest": "ba8b02c21fe45af0ba20b280ef182065e87c3410dae024d6ede3983845990c9c",
+    "claimKind": "procedure",
+    "disposition": "reclassify-out-of-platform-scope",
+    "rationale": "Source: AGENTS.md:159-159#unheaded-block-34 (historical witness at f4a81c7ea2bf1b2b62bf38ad66dbbde2c6791704); unit SHA256 ba8b02c21fe45af0ba20b280ef182065e87c3410dae024d6ede3983845990c9c.\nTarget: none; retained identity has no mapped platform copy.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition reclassify-out-of-platform-scope: Keep AGENTS.md#unheaded-block-34 in its existing source ownership outside platform documentation authority.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16"
+  }
+}
+```
+
+## Entry rationale-561
+
+```json
+{
+  "entryId": "rationale-561",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+  "collection": "claims",
+  "claimId": "claim_14629503e9cad5ebf8241447b03649cc",
+  "before": "Body of the answer verb section (source lines 1073-1077) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-75 of spec.md under the answer verb heading; behavior-format specification of the CLI verb. Authorized A35 correction changes the whole target unit; A22 requires independent re-review, with no approval carried. Full original source, previous target and corrected target are shown; the false clauses are replaced by code-backed facts.",
+  "after": "Source: docs/specs/work-state.md:1073-1077#unheaded-block-88 (current lines); unit SHA256 504b6a5b42d39ff1886b7e1865b5cd54713406e8caff7f6c22e0b3085efb755d.\nTarget: docs/platform/work-state/spec.md:923-927#unheaded-block-75 (current lines); unit SHA256 31381297e4545267ec79a77e7535df60d454ddacffe884ced82a687bfcce2d2c.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 31381297e4545267ec79a77e7535df60d454ddacffe884ced82a687bfcce2d2c at 55ec1e0c4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nU3 resume: \"item về status trước lúc `ask` đậu nó (`statusAtAsk`, ghi lúc `ask`, mặc định `todo` khi vắng — log cũ/gate không mang field này) — **`todo`** nếu item chưa bị cầm claim lúc hỏi, hoặc **`doing`** nếu một claim `pick`/`take` đang sống lúc hỏi (claim-lock §5.1: trước đây LUÔN về `todo` trần, làm rớt claim đang giữ nếu `ask` xảy ra giữa lúc item `doing` — đã sửa).\" → \"item về durable status trước lúc `ask` đậu nó (`durableStatusAtAsk`, do cửa ghi tính từ status bền); log cũ thiếu trường này dùng `statusAtAsk`, thiếu cả hai mặc định `todo`, và mọi giá trị `doing` đều được clamp về `todo`. `putInAwaiting` đã settle và nhả claim lúc đậu, nên trả lời không phục hồi claim cũ.\"; evidence root-authorities-truth-corrections-turn21.json; src/state/store.mjs:1388-1420; src/state/store.mjs:745-777; src/state/status-fsm.mjs:175-190.\nU3 ready consequence: \"item lại actionable — về `todo` thì xuất hiện trong `ready` khi deps đủ điều kiện; về `doing` thì KHÔNG xuất hiện trong `ready` (claim vẫn đang giữ, chờ `fgos return` như bình thường).\" → \"item không resume về `doing`; trường hợp resume về `todo` xuất hiện trong `ready` khi deps, workflow step và lineage đủ điều kiện; một lần `take` sau đó lấy claim mới.\"; evidence root-authorities-truth-corrections-turn21.json; src/state/store.mjs:1388-1420; src/state/frontier.mjs:40-105.\nDisposition supersede: Account for docs/specs/work-state.md#unheaded-block-88 under docs/platform/work-state/spec.md#unheaded-block-75; source context \"Spec: Work-State (tầng quản việc của forgent) / Behaviors & Operations / Trả lời (answer)\", target context \"Work State Specification / 9. Behaviors And Operations / Answer Verb\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "pending",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 560,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_14629503e9cad5ebf8241447b03649cc",
+    "sourceUnitDigest": "504b6a5b42d39ff1",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-75",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/specs/work-state.md:1073-1077#unheaded-block-88 (current lines); unit SHA256 504b6a5b42d39ff1886b7e1865b5cd54713406e8caff7f6c22e0b3085efb755d.\nTarget: docs/platform/work-state/spec.md:923-927#unheaded-block-75 (current lines); unit SHA256 31381297e4545267ec79a77e7535df60d454ddacffe884ced82a687bfcce2d2c.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 31381297e4545267ec79a77e7535df60d454ddacffe884ced82a687bfcce2d2c at 55ec1e0c4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nU3 resume: \"item về status trước lúc `ask` đậu nó (`statusAtAsk`, ghi lúc `ask`, mặc định `todo` khi vắng — log cũ/gate không mang field này) — **`todo`** nếu item chưa bị cầm claim lúc hỏi, hoặc **`doing`** nếu một claim `pick`/`take` đang sống lúc hỏi (claim-lock §5.1: trước đây LUÔN về `todo` trần, làm rớt claim đang giữ nếu `ask` xảy ra giữa lúc item `doing` — đã sửa).\" → \"item về durable status trước lúc `ask` đậu nó (`durableStatusAtAsk`, do cửa ghi tính từ status bền); log cũ thiếu trường này dùng `statusAtAsk`, thiếu cả hai mặc định `todo`, và mọi giá trị `doing` đều được clamp về `todo`. `putInAwaiting` đã settle và nhả claim lúc đậu, nên trả lời không phục hồi claim cũ.\"; evidence root-authorities-truth-corrections-turn21.json; src/state/store.mjs:1388-1420; src/state/store.mjs:745-777; src/state/status-fsm.mjs:175-190.\nU3 ready consequence: \"item lại actionable — về `todo` thì xuất hiện trong `ready` khi deps đủ điều kiện; về `doing` thì KHÔNG xuất hiện trong `ready` (claim vẫn đang giữ, chờ `fgos return` như bình thường).\" → \"item không resume về `doing`; trường hợp resume về `todo` xuất hiện trong `ready` khi deps, workflow step và lineage đủ điều kiện; một lần `take` sau đó lấy claim mới.\"; evidence root-authorities-truth-corrections-turn21.json; src/state/store.mjs:1388-1420; src/state/frontier.mjs:40-105.\nDisposition supersede: Account for docs/specs/work-state.md#unheaded-block-88 under docs/platform/work-state/spec.md#unheaded-block-75; source context \"Spec: Work-State (tầng quản việc của forgent) / Behaviors & Operations / Trả lời (answer)\", target context \"Work State Specification / 9. Behaviors And Operations / Answer Verb\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "targetUnitDigest": "31381297e4545267ec79a77e7535df60d454ddacffe884ced82a687bfcce2d2c",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Answer Verb"
+    ]
+  }
+}
+```
+
+## Entry rationale-562
+
+```json
+{
+  "entryId": "rationale-562",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+  "collection": "claims",
+  "claimId": "claim_2636bbab8d7aeb5e65b5a30fa56de8a9",
+  "before": "Body of the conflicts verb section (source lines 1177-1178) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-91 of spec.md under the conflicts verb heading; behavior-format specification of the CLI verb. Authorized A35 correction changes the whole target unit; A22 requires independent re-review, with no approval carried. Full original source, previous target and corrected target are shown; the false clauses are replaced by code-backed facts.",
+  "after": "Source: docs/specs/work-state.md:1177-1178#unheaded-block-104 (current lines); unit SHA256 27a3ba1515c8ffa4c6db8e9123168b72f583293dd0d4904824848c7187fe2bf1.\nTarget: docs/platform/work-state/spec.md:1027-1028#unheaded-block-91 (current lines); unit SHA256 c6a18ec4c4d25ad879f1d641ceca294e769d4e0da33767626d17a8403c449400.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest c6a18ec4c4d25ad879f1d641ceca294e769d4e0da33767626d17a8403c449400 at 55ec1e0c4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nU20 footprint: \"PHI-CHẶN: chỉ nuôi cố-vấn này, không vào cycle-check/frontier.\" → \"Không vào cycle-check/frontier; footprint còn chặn đề xuất chia có overlap bằng cổng `awaiting-human`, xếp các item xung đột vào wave khác nhau trong `computeSchedule`, và cung cấp tín hiệu cho `mergeReadiness`.\"; evidence root-authorities-truth-corrections-turn21.json; src/intake/plan.mjs:884-898; src/state/graph-metrics.mjs:737-775; src/state/graph-harness.mjs:100-210.\nDisposition supersede: Account for docs/specs/work-state.md#unheaded-block-104 under docs/platform/work-state/spec.md#unheaded-block-91; source context \"Spec: Work-State (tầng quản việc của forgent) / Behaviors & Operations / Cố vấn xung đột dấu chân file (conflicts) — chống đụng độ fan-out song song (S9)\", target context \"Work State Specification / 9. Behaviors And Operations / Conflicts Verb\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "pending",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 561,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_2636bbab8d7aeb5e65b5a30fa56de8a9",
+    "sourceUnitDigest": "27a3ba1515c8ffa4",
+    "targetOwner": "docs/platform/work-state/spec.md",
+    "targetAnchor": "unheaded-block-91",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/specs/work-state.md:1177-1178#unheaded-block-104 (current lines); unit SHA256 27a3ba1515c8ffa4c6db8e9123168b72f583293dd0d4904824848c7187fe2bf1.\nTarget: docs/platform/work-state/spec.md:1027-1028#unheaded-block-91 (current lines); unit SHA256 c6a18ec4c4d25ad879f1d641ceca294e769d4e0da33767626d17a8403c449400.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest c6a18ec4c4d25ad879f1d641ceca294e769d4e0da33767626d17a8403c449400 at 55ec1e0c4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nU20 footprint: \"PHI-CHẶN: chỉ nuôi cố-vấn này, không vào cycle-check/frontier.\" → \"Không vào cycle-check/frontier; footprint còn chặn đề xuất chia có overlap bằng cổng `awaiting-human`, xếp các item xung đột vào wave khác nhau trong `computeSchedule`, và cung cấp tín hiệu cho `mergeReadiness`.\"; evidence root-authorities-truth-corrections-turn21.json; src/intake/plan.mjs:884-898; src/state/graph-metrics.mjs:737-775; src/state/graph-harness.mjs:100-210.\nDisposition supersede: Account for docs/specs/work-state.md#unheaded-block-104 under docs/platform/work-state/spec.md#unheaded-block-91; source context \"Spec: Work-State (tầng quản việc của forgent) / Behaviors & Operations / Cố vấn xung đột dấu chân file (conflicts) — chống đụng độ fan-out song song (S9)\", target context \"Work State Specification / 9. Behaviors And Operations / Conflicts Verb\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "targetUnitDigest": "c6a18ec4c4d25ad879f1d641ceca294e769d4e0da33767626d17a8403c449400",
+    "targetAncestry": [
+      "Work State Specification",
+      "9. Behaviors And Operations",
+      "Conflicts Verb"
+    ]
+  }
+}
+```
+
+## Entry rationale-563
+
+```json
+{
+  "entryId": "rationale-563",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+  "collection": "claims",
+  "claimId": "claim_15a24dbb1f2d0470f04cdf8900da67a0",
+  "before": "Cursor pagination superset (adds permanent list --all --json exception and side-log narrowing) is carried verbatim; the io-contract short text follows it in the same section, so both sources are present. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. L10-21: content-based rebind from reviewed prior target unheaded-block-27 (2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9) to unheaded-block-28 (2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9); inserted paragraphs shift the anchor, prior target text is unchanged.",
+  "after": "Source: docs/specs/work-state.md:692-716#unheaded-block-69 (current lines); unit SHA256 2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:225-249#unheaded-block-28 (current lines); unit SHA256 2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9 at 7854cff84d8bcb67075d4f9c09cd0b6d04808ff4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/specs/work-state.md#unheaded-block-69 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-28; source context \"Spec: Work-State (tầng quản việc của forgent) / Data Dictionary / Sổ verb máy-đọc (manifest) — `--help --json`\", target context \"CLI I/O Contract / 6. Cursor Pagination\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "pending",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 562,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_15a24dbb1f2d0470f04cdf8900da67a0",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "sourceUnitDigest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-28",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/specs/work-state.md:692-716#unheaded-block-69 (current lines); unit SHA256 2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:225-249#unheaded-block-28 (current lines); unit SHA256 2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9 at 7854cff84d8bcb67075d4f9c09cd0b6d04808ff4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/specs/work-state.md#unheaded-block-69 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-28; source context \"Spec: Work-State (tầng quản việc của forgent) / Data Dictionary / Sổ verb máy-đọc (manifest) — `--help --json`\", target context \"CLI I/O Contract / 6. Cursor Pagination\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "2140755c1b59f62f147ba030e77aa0c28f631f3c4e23fb1618ba7ab6eaaa70f9",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "6. Cursor Pagination"
+    ]
+  }
+}
+```
+
+## Entry rationale-564
+
+```json
+{
+  "entryId": "rationale-564",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+  "collection": "claims",
+  "claimId": "claim_5dcb56608e17caeb53c197186ae33827",
+  "before": "csv versus json-array multiValueFormat rule is stated in both sources; candidate carries both texts under the H2 8. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. L10-21: content-based rebind from reviewed prior target unheaded-block-36 (3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62) to unheaded-block-37 (3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62); inserted paragraphs shift the anchor, prior target text is unchanged.",
+  "after": "Source: docs/specs/work-state.md:718-725#unheaded-block-70 (current lines); unit SHA256 3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:343-350#unheaded-block-37 (current lines); unit SHA256 3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62 at 7854cff84d8bcb67075d4f9c09cd0b6d04808ff4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/specs/work-state.md#unheaded-block-70 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-37; source context \"Spec: Work-State (tầng quản việc của forgent) / Data Dictionary / Sổ verb máy-đọc (manifest) — `--help --json`\", target context \"CLI I/O Contract / 8. Multi-Value Flag Convention\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "pending",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 563,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_5dcb56608e17caeb53c197186ae33827",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "sourceUnitDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-37",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/specs/work-state.md:718-725#unheaded-block-70 (current lines); unit SHA256 3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:343-350#unheaded-block-37 (current lines); unit SHA256 3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62 at 7854cff84d8bcb67075d4f9c09cd0b6d04808ff4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/specs/work-state.md#unheaded-block-70 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-37; source context \"Spec: Work-State (tầng quản việc của forgent) / Data Dictionary / Sổ verb máy-đọc (manifest) — `--help --json`\", target context \"CLI I/O Contract / 8. Multi-Value Flag Convention\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "3964ac136b9bb85d72cec95fd1ff5748fd87fbbf1b1487c1cfbef35a34b20d62",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "8. Multi-Value Flag Convention"
+    ]
+  }
+}
+```
+
+## Entry rationale-565
+
+```json
+{
+  "entryId": "rationale-565",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+  "collection": "claims",
+  "claimId": "claim_6fe86521fead9cec7253443e3275a3cf",
+  "before": "Runs-when / Blocked-when bullets of per-verb help are carried verbatim; kept as contract since it is a CLI surface guarantee. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. L10-21: content-based rebind from reviewed prior target unheaded-block-40 (a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798) to unheaded-block-41 (a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798); inserted paragraphs shift the anchor, prior target text is unchanged.",
+  "after": "Source: docs/specs/work-state.md:751-762#unheaded-block-73 (current lines); unit SHA256 a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:382-393#unheaded-block-41 (current lines); unit SHA256 a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798 at 7854cff84d8bcb67075d4f9c09cd0b6d04808ff4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/specs/work-state.md#unheaded-block-73 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-41; source context \"Spec: Work-State (tầng quản việc của forgent) / Data Dictionary / Trợ giúp theo từng verb — `fgos <verb> [<sub>] --help|-h [--json]`\", target context \"CLI I/O Contract / 9. Per-Verb Help\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "pending",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 564,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_6fe86521fead9cec7253443e3275a3cf",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "sourceUnitDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-41",
+    "claimKind": "contract",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/specs/work-state.md:751-762#unheaded-block-73 (current lines); unit SHA256 a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:382-393#unheaded-block-41 (current lines); unit SHA256 a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798 at 7854cff84d8bcb67075d4f9c09cd0b6d04808ff4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/specs/work-state.md#unheaded-block-73 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-41; source context \"Spec: Work-State (tầng quản việc của forgent) / Data Dictionary / Trợ giúp theo từng verb — `fgos <verb> [<sub>] --help|-h [--json]`\", target context \"CLI I/O Contract / 9. Per-Verb Help\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "a1c9e2ebc2ba7e6a03ed7483b533c63fac017dc0a1f4bb9c9eb0c8f772851798",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "9. Per-Verb Help"
+    ]
+  }
+}
+```
+
+## Entry rationale-566
+
+```json
+{
+  "entryId": "rationale-566",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+  "collection": "registryGaps",
+  "claimId": "claim_9959e82e2874baeb627a8441faa07e9a",
+  "before": "Manifest fields are combined from work-state and io-contract in the single Manifest Shape section; the work-state contribution includes the positional-parameter rule. The source schema_version 2.0 sentence is represented by the corrected schema_version 3.0 successor, with the complete fields carried. The reviewed merge disposition is restored: vocabulary merge combines multiple sources and does not require byte equality. The anchor shift changes no target text in this turn. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. L10-21: content-based rebind from reviewed prior target unheaded-block-30 (878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe) to unheaded-block-31 (878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe); inserted paragraphs shift the anchor, prior target text is unchanged.",
+  "after": "Source: docs/specs/work-state.md:649-663#unheaded-block-66 (historical witness at 2636ba229a054750a370bf5c2e9b83f27492bf3d); unit SHA256 a2e6a5ffa58ec1f13d1321cf4b14d70b2a261fba6ce0f15c0bda50975cf8de04.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:269-284#unheaded-block-31 (current lines); unit SHA256 878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe at 7854cff84d8bcb67075d4f9c09cd0b6d04808ff4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/specs/work-state.md#unheaded-block-66 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-31; source context \"Spec: Work-State (tầng quản việc của forgent) / Data Dictionary / Sổ verb máy-đọc (manifest) — `--help --json`\", target context \"CLI I/O Contract / 7. Machine-Readable Verb Registry / Manifest Shape\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "pending",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 565,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_9959e82e2874baeb627a8441faa07e9a",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "sourceUnitDigest": "a2e6a5ffa58ec1f13d1321cf4b14d70b2a261fba6ce0f15c0bda50975cf8de04",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-31",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/specs/work-state.md:649-663#unheaded-block-66 (historical witness at 2636ba229a054750a370bf5c2e9b83f27492bf3d); unit SHA256 a2e6a5ffa58ec1f13d1321cf4b14d70b2a261fba6ce0f15c0bda50975cf8de04.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:269-284#unheaded-block-31 (current lines); unit SHA256 878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe at 7854cff84d8bcb67075d4f9c09cd0b6d04808ff4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/specs/work-state.md#unheaded-block-66 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-31; source context \"Spec: Work-State (tầng quản việc của forgent) / Data Dictionary / Sổ verb máy-đọc (manifest) — `--help --json`\", target context \"CLI I/O Contract / 7. Machine-Readable Verb Registry / Manifest Shape\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "sourcePath": "docs/specs/work-state.md",
+    "sourceAnchor": "unheaded-block-66",
+    "targetUnitDigest": "878d708db7a0afb3e23a0829f98be122c83ac562946b51ab1989e73e5e4a8bfe",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "7. Machine-Readable Verb Registry",
+      "Manifest Shape"
+    ]
+  }
+}
+```
+
+## Entry rationale-567
+
+```json
+{
+  "entryId": "rationale-567",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_38ad96d62f2c6cf7a639fc24a83c2621",
+  "before": "First paragraph of the envelope statement (every successful verb in both binaries prints the fgos.v1 envelope), carried verbatim under Envelope Shape; the same four-field envelope is stated by work-state.md 622-634 in the preceding block (map section 6). L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+  "after": "Source: docs/io-contract.md:59-61#unheaded-block-9 (current lines); unit SHA256 6dcf0faa76d27fed777c0586dad2b3b78200213c58d5606ad5e901e81e13e6fa.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:145-147#unheaded-block-16 (current lines); unit SHA256 6dcf0faa76d27fed777c0586dad2b3b78200213c58d5606ad5e901e81e13e6fa.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 6dcf0faa76d27fed777c0586dad2b3b78200213c58d5606ad5e901e81e13e6fa at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-9 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-16; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất\", target context \"CLI I/O Contract / 3. Output Direction Unified Envelope / Envelope Shape\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 566,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_38ad96d62f2c6cf7a639fc24a83c2621",
+    "sourceUnitDigest": "6dcf0faa76d27fed",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-16",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/io-contract.md:59-61#unheaded-block-9 (current lines); unit SHA256 6dcf0faa76d27fed777c0586dad2b3b78200213c58d5606ad5e901e81e13e6fa.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:145-147#unheaded-block-16 (current lines); unit SHA256 6dcf0faa76d27fed777c0586dad2b3b78200213c58d5606ad5e901e81e13e6fa.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 6dcf0faa76d27fed777c0586dad2b3b78200213c58d5606ad5e901e81e13e6fa at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-9 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-16; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất\", target context \"CLI I/O Contract / 3. Output Direction Unified Envelope / Envelope Shape\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "targetUnitDigest": "6dcf0faa76d27fed777c0586dad2b3b78200213c58d5606ad5e901e81e13e6fa",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "3. Output Direction Unified Envelope",
+      "Envelope Shape"
+    ]
+  }
+}
+```
+
+## Entry rationale-568
+
+```json
+{
+  "entryId": "rationale-568",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_dc506074dcc2f08f6012ebb078b50371",
+  "before": "The fenced envelope shape { contract: 'fgos.v1', generated_at, data_hash, data }, carried verbatim as its own block in Envelope Shape; the work-state.md envelope text under the same heading describes the same four fields. Note: the mechanical suggestion pointed at README.md and was wrong. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+  "after": "Source: docs/io-contract.md:63-65#unheaded-block-10 (current lines); unit SHA256 18c5d821a55d3517cf3efe368fb1d34e13730b3bc1d70ff376d72b147621bdd2.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:149-151#unheaded-block-17 (current lines); unit SHA256 18c5d821a55d3517cf3efe368fb1d34e13730b3bc1d70ff376d72b147621bdd2.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 18c5d821a55d3517cf3efe368fb1d34e13730b3bc1d70ff376d72b147621bdd2 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-10 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-17; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất\", target context \"CLI I/O Contract / 3. Output Direction Unified Envelope / Envelope Shape\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 567,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_dc506074dcc2f08f6012ebb078b50371",
+    "sourceUnitDigest": "18c5d821a55d3517",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-17",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/io-contract.md:63-65#unheaded-block-10 (current lines); unit SHA256 18c5d821a55d3517cf3efe368fb1d34e13730b3bc1d70ff376d72b147621bdd2.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:149-151#unheaded-block-17 (current lines); unit SHA256 18c5d821a55d3517cf3efe368fb1d34e13730b3bc1d70ff376d72b147621bdd2.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 18c5d821a55d3517cf3efe368fb1d34e13730b3bc1d70ff376d72b147621bdd2 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-10 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-17; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất\", target context \"CLI I/O Contract / 3. Output Direction Unified Envelope / Envelope Shape\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "targetUnitDigest": "18c5d821a55d3517cf3efe368fb1d34e13730b3bc1d70ff376d72b147621bdd2",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "3. Output Direction Unified Envelope",
+      "Envelope Shape"
+    ]
+  }
+}
+```
+
+## Entry rationale-569
+
+```json
+{
+  "entryId": "rationale-569",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_62d31ae4e5abfcf0ab158c0c6a8337ee",
+  "before": "The data-is-structured and error-path-not-enveloped paragraph, carried verbatim in Envelope Shape; work-state.md 622-634 states the same (the ws error-path claim 636-639 also lands in the next H3). L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+  "after": "Source: docs/io-contract.md:67-70#unheaded-block-11 (current lines); unit SHA256 84367855d92bb2e3914cb9bc385c2dce9b5625c8acaf9e577c9c791e40d07e71.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:153-156#unheaded-block-18 (current lines); unit SHA256 84367855d92bb2e3914cb9bc385c2dce9b5625c8acaf9e577c9c791e40d07e71.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 84367855d92bb2e3914cb9bc385c2dce9b5625c8acaf9e577c9c791e40d07e71 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-11 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-18; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất\", target context \"CLI I/O Contract / 3. Output Direction Unified Envelope / Envelope Shape\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 568,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_62d31ae4e5abfcf0ab158c0c6a8337ee",
+    "sourceUnitDigest": "84367855d92bb2e3",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-18",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/io-contract.md:67-70#unheaded-block-11 (current lines); unit SHA256 84367855d92bb2e3914cb9bc385c2dce9b5625c8acaf9e577c9c791e40d07e71.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:153-156#unheaded-block-18 (current lines); unit SHA256 84367855d92bb2e3914cb9bc385c2dce9b5625c8acaf9e577c9c791e40d07e71.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 84367855d92bb2e3914cb9bc385c2dce9b5625c8acaf9e577c9c791e40d07e71 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-11 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-18; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất\", target context \"CLI I/O Contract / 3. Output Direction Unified Envelope / Envelope Shape\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "targetUnitDigest": "84367855d92bb2e3914cb9bc385c2dce9b5625c8acaf9e577c9c791e40d07e71",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "3. Output Direction Unified Envelope",
+      "Envelope Shape"
+    ]
+  }
+}
+```
+
+## Entry rationale-570
+
+```json
+{
+  "entryId": "rationale-570",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_5e282fb457ff9ef02e88cf329556cf34",
+  "before": "One envelope per call for fgos.mjs and one single-line envelope per --once/--watch cycle for fgos-runner, carried verbatim under Runner Stdout Envelope; duplicate of work-state.md 641-645 (map section 6). L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+  "after": "Source: docs/io-contract.md:72-76#unheaded-block-12 (current lines); unit SHA256 6a5b9a01b04279716a3d504e251d1de122ff1652714708512706640ec9edd4ca.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:173-177#unheaded-block-21 (current lines); unit SHA256 6a5b9a01b04279716a3d504e251d1de122ff1652714708512706640ec9edd4ca.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 6a5b9a01b04279716a3d504e251d1de122ff1652714708512706640ec9edd4ca at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-12 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-21; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất\", target context \"CLI I/O Contract / 3. Output Direction Unified Envelope / Runner Stdout Envelope\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 569,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_5e282fb457ff9ef02e88cf329556cf34",
+    "sourceUnitDigest": "6a5b9a01b0427971",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-21",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/io-contract.md:72-76#unheaded-block-12 (current lines); unit SHA256 6a5b9a01b04279716a3d504e251d1de122ff1652714708512706640ec9edd4ca.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:173-177#unheaded-block-21 (current lines); unit SHA256 6a5b9a01b04279716a3d504e251d1de122ff1652714708512706640ec9edd4ca.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 6a5b9a01b04279716a3d504e251d1de122ff1652714708512706640ec9edd4ca at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-12 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-21; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất\", target context \"CLI I/O Contract / 3. Output Direction Unified Envelope / Runner Stdout Envelope\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "targetUnitDigest": "6a5b9a01b04279716a3d504e251d1de122ff1652714708512706640ec9edd4ca",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "3. Output Direction Unified Envelope",
+      "Runner Stdout Envelope"
+    ]
+  }
+}
+```
+
+## Entry rationale-571
+
+```json
+{
+  "entryId": "rationale-571",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_5b930b5ce84afec3d4b2c383c7f85925",
+  "before": "Real-envelope recognition rule (parse JSON, check contract === 'fgos.v1', never a text heuristic) carried verbatim under the new H3 Recognizing A Real Envelope; no counterpart in work-state.md. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+  "after": "Source: docs/io-contract.md:78-81#unheaded-block-13 (current lines); unit SHA256 bdeca0144b587f826ce46ea61d3be2e882ad021614d1e5f7c14cf2982573f056.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:181-184#unheaded-block-22 (current lines); unit SHA256 bdeca0144b587f826ce46ea61d3be2e882ad021614d1e5f7c14cf2982573f056.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest bdeca0144b587f826ce46ea61d3be2e882ad021614d1e5f7c14cf2982573f056 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/io-contract.md#unheaded-block-13 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-22; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất\", target context \"CLI I/O Contract / 3. Output Direction Unified Envelope / Recognizing A Real Envelope\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 570,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_5b930b5ce84afec3d4b2c383c7f85925",
+    "sourceUnitDigest": "bdeca0144b587f82",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-22",
+    "claimKind": "contract",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/io-contract.md:78-81#unheaded-block-13 (current lines); unit SHA256 bdeca0144b587f826ce46ea61d3be2e882ad021614d1e5f7c14cf2982573f056.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:181-184#unheaded-block-22 (current lines); unit SHA256 bdeca0144b587f826ce46ea61d3be2e882ad021614d1e5f7c14cf2982573f056.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest bdeca0144b587f826ce46ea61d3be2e882ad021614d1e5f7c14cf2982573f056 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/io-contract.md#unheaded-block-13 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-22; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất\", target context \"CLI I/O Contract / 3. Output Direction Unified Envelope / Recognizing A Real Envelope\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "targetUnitDigest": "bdeca0144b587f826ce46ea61d3be2e882ad021614d1e5f7c14cf2982573f056",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "3. Output Direction Unified Envelope",
+      "Recognizing A Real Envelope"
+    ]
+  }
+}
+```
+
+## Entry rationale-572
+
+```json
+{
+  "entryId": "rationale-572",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_da21278ab32966f6631c82420552ed2b",
+  "before": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+  "after": "Source: docs/io-contract.md:120-129#unheaded-block-18 (current lines); unit SHA256 c34e8e9c9dbf41ceba76b86cd175dcb894ce3eb3de6e988c2bd68a77ece385e4.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:251-260#unheaded-block-29 (current lines); unit SHA256 c34e8e9c9dbf41ceba76b86cd175dcb894ce3eb3de6e988c2bd68a77ece385e4.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest c34e8e9c9dbf41ceba76b86cd175dcb894ce3eb3de6e988c2bd68a77ece385e4 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-18 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-29; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất / Phân trang — con trỏ đục\", target context \"CLI I/O Contract / 6. Cursor Pagination\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 571,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_da21278ab32966f6631c82420552ed2b",
+    "sourceUnitDigest": "c34e8e9c9dbf41ceba76b86cd175dcb894ce3eb3de6e988c2bd68a77ece385e4",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-29",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/io-contract.md:120-129#unheaded-block-18 (current lines); unit SHA256 c34e8e9c9dbf41ceba76b86cd175dcb894ce3eb3de6e988c2bd68a77ece385e4.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:251-260#unheaded-block-29 (current lines); unit SHA256 c34e8e9c9dbf41ceba76b86cd175dcb894ce3eb3de6e988c2bd68a77ece385e4.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest c34e8e9c9dbf41ceba76b86cd175dcb894ce3eb3de6e988c2bd68a77ece385e4 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-18 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-29; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất / Phân trang — con trỏ đục\", target context \"CLI I/O Contract / 6. Cursor Pagination\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "targetUnitDigest": "c34e8e9c9dbf41ceba76b86cd175dcb894ce3eb3de6e988c2bd68a77ece385e4",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "6. Cursor Pagination"
+    ]
+  }
+}
+```
+
+## Entry rationale-573
+
+```json
+{
+  "entryId": "rationale-573",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_b38e730cc466114aa1e1ebba6fa880ed",
+  "before": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+  "after": "Source: docs/io-contract.md:131-132#unheaded-block-19 (current lines); unit SHA256 b82a558166f118f339210d9a475214042a603bd09f64a3a2a8795d96fbdf57ce.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:262-263#unheaded-block-30 (current lines); unit SHA256 b82a558166f118f339210d9a475214042a603bd09f64a3a2a8795d96fbdf57ce.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest b82a558166f118f339210d9a475214042a603bd09f64a3a2a8795d96fbdf57ce at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-19 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-30; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất / Phân trang — con trỏ đục\", target context \"CLI I/O Contract / 6. Cursor Pagination\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 572,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_b38e730cc466114aa1e1ebba6fa880ed",
+    "sourceUnitDigest": "b82a558166f118f339210d9a475214042a603bd09f64a3a2a8795d96fbdf57ce",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-30",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/io-contract.md:131-132#unheaded-block-19 (current lines); unit SHA256 b82a558166f118f339210d9a475214042a603bd09f64a3a2a8795d96fbdf57ce.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:262-263#unheaded-block-30 (current lines); unit SHA256 b82a558166f118f339210d9a475214042a603bd09f64a3a2a8795d96fbdf57ce.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest b82a558166f118f339210d9a475214042a603bd09f64a3a2a8795d96fbdf57ce at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-19 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-30; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất / Phân trang — con trỏ đục\", target context \"CLI I/O Contract / 6. Cursor Pagination\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "targetUnitDigest": "b82a558166f118f339210d9a475214042a603bd09f64a3a2a8795d96fbdf57ce",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "6. Cursor Pagination"
+    ]
+  }
+}
+```
+
+## Entry rationale-574
+
+```json
+{
+  "entryId": "rationale-574",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_535f1aeb31d616e2138a5b3719cb4cd0",
+  "before": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+  "after": "Source: docs/io-contract.md:160-161#unheaded-block-22 (current lines); unit SHA256 78393c0183b6bda3ff166520f4601ab2793cbdf85e2669949001a73b9102f293.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:338-339#unheaded-block-36 (current lines); unit SHA256 78393c0183b6bda3ff166520f4601ab2793cbdf85e2669949001a73b9102f293.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 78393c0183b6bda3ff166520f4601ab2793cbdf85e2669949001a73b9102f293 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-22 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-36; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Sổ verb máy-đọc — CLI tự mô tả\", target context \"CLI I/O Contract / 7. Machine-Readable Verb Registry / Entry Fields And Effect Axes\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 573,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_535f1aeb31d616e2138a5b3719cb4cd0",
+    "sourceUnitDigest": "78393c0183b6bda3ff166520f4601ab2793cbdf85e2669949001a73b9102f293",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-36",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/io-contract.md:160-161#unheaded-block-22 (current lines); unit SHA256 78393c0183b6bda3ff166520f4601ab2793cbdf85e2669949001a73b9102f293.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:338-339#unheaded-block-36 (current lines); unit SHA256 78393c0183b6bda3ff166520f4601ab2793cbdf85e2669949001a73b9102f293.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 78393c0183b6bda3ff166520f4601ab2793cbdf85e2669949001a73b9102f293 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-22 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-36; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Sổ verb máy-đọc — CLI tự mô tả\", target context \"CLI I/O Contract / 7. Machine-Readable Verb Registry / Entry Fields And Effect Axes\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "targetUnitDigest": "78393c0183b6bda3ff166520f4601ab2793cbdf85e2669949001a73b9102f293",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "7. Machine-Readable Verb Registry",
+      "Entry Fields And Effect Axes"
+    ]
+  }
+}
+```
+
+## Entry rationale-575
+
+```json
+{
+  "entryId": "rationale-575",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_d0e16d088cdecf2dd0b491f819009aa6",
+  "before": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+  "after": "Source: docs/io-contract.md:165-169#unheaded-block-23 (current lines); unit SHA256 a8eaefe3669a194a9fa84ca8fa92d4d58a5f7c8405e4d7c970fac1ce183148a5.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:352-356#unheaded-block-38 (current lines); unit SHA256 a8eaefe3669a194a9fa84ca8fa92d4d58a5f7c8405e4d7c970fac1ce183148a5.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest a8eaefe3669a194a9fa84ca8fa92d4d58a5f7c8405e4d7c970fac1ce183148a5 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-23 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-38; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Sổ verb máy-đọc — CLI tự mô tả / Quy ước cờ nhiều-giá-trị\", target context \"CLI I/O Contract / 8. Multi-Value Flag Convention\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 574,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_d0e16d088cdecf2dd0b491f819009aa6",
+    "sourceUnitDigest": "a8eaefe3669a194a9fa84ca8fa92d4d58a5f7c8405e4d7c970fac1ce183148a5",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-38",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/io-contract.md:165-169#unheaded-block-23 (current lines); unit SHA256 a8eaefe3669a194a9fa84ca8fa92d4d58a5f7c8405e4d7c970fac1ce183148a5.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:352-356#unheaded-block-38 (current lines); unit SHA256 a8eaefe3669a194a9fa84ca8fa92d4d58a5f7c8405e4d7c970fac1ce183148a5.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest a8eaefe3669a194a9fa84ca8fa92d4d58a5f7c8405e4d7c970fac1ce183148a5 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-23 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-38; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Sổ verb máy-đọc — CLI tự mô tả / Quy ước cờ nhiều-giá-trị\", target context \"CLI I/O Contract / 8. Multi-Value Flag Convention\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "targetUnitDigest": "a8eaefe3669a194a9fa84ca8fa92d4d58a5f7c8405e4d7c970fac1ce183148a5",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "8. Multi-Value Flag Convention"
+    ]
+  }
+}
+```
+
+## Entry rationale-576
+
+```json
+{
+  "entryId": "rationale-576",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_e9ee744c6e1847ef25b3eb0bf180f577",
+  "before": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+  "after": "Source: docs/io-contract.md:173-174#unheaded-block-24 (current lines); unit SHA256 ae0e60ec193e0ac5ad026b2cf78a37ba3156fea7043460714946bfe66311ab5e.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:397-398#unheaded-block-42 (current lines); unit SHA256 a378c81f6a84c5e3ed9b38917f7136c55dcc4af85295bcf105fa9ac9d6792532.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest a378c81f6a84c5e3ed9b38917f7136c55dcc4af85295bcf105fa9ac9d6792532 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 1, target 1; 1 changed spellings/labels, 1 destination changes; 0 added, 0 removed.\nLink 1: \"0011\" (decisions/0011-version-tuong-minh-cho-moi-contract.md) → \"0011\" (../decisions/retired-decision-history.md#7-adr-0011-explicit-version-for-every-contract); resolved docs/decisions/0011-version-tuong-minh-cho-moi-contract.md → docs/platform/work-state/decisions/retired-decision-history.md#7-adr-0011-explicit-version-for-every-contract.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/io-contract.md#unheaded-block-24 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-42; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Version token\", target context \"CLI I/O Contract / 10. Version Tokens\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 575,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_e9ee744c6e1847ef25b3eb0bf180f577",
+    "sourceUnitDigest": "ae0e60ec193e0ac5ad026b2cf78a37ba3156fea7043460714946bfe66311ab5e",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-42",
+    "claimKind": "contract",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/io-contract.md:173-174#unheaded-block-24 (current lines); unit SHA256 ae0e60ec193e0ac5ad026b2cf78a37ba3156fea7043460714946bfe66311ab5e.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:397-398#unheaded-block-42 (current lines); unit SHA256 a378c81f6a84c5e3ed9b38917f7136c55dcc4af85295bcf105fa9ac9d6792532.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest a378c81f6a84c5e3ed9b38917f7136c55dcc4af85295bcf105fa9ac9d6792532 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 1, target 1; 1 changed spellings/labels, 1 destination changes; 0 added, 0 removed.\nLink 1: \"0011\" (decisions/0011-version-tuong-minh-cho-moi-contract.md) → \"0011\" (../decisions/retired-decision-history.md#7-adr-0011-explicit-version-for-every-contract); resolved docs/decisions/0011-version-tuong-minh-cho-moi-contract.md → docs/platform/work-state/decisions/retired-decision-history.md#7-adr-0011-explicit-version-for-every-contract.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/io-contract.md#unheaded-block-24 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-42; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Version token\", target context \"CLI I/O Contract / 10. Version Tokens\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "targetUnitDigest": "a378c81f6a84c5e3ed9b38917f7136c55dcc4af85295bcf105fa9ac9d6792532",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "10. Version Tokens"
+    ]
+  }
+}
+```
+
+## Entry rationale-577
+
+```json
+{
+  "entryId": "rationale-577",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_6f7c99f38f64abb5af7f07c1e2690730",
+  "before": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+  "after": "Source: docs/io-contract.md:176-182#unheaded-block-25 (current lines); unit SHA256 c9d3ad96d4b03b02fbcf8e5bd0261ab7c77109320f204a18b9a43eef0f4f1fd3.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:400-406#unheaded-block-43 (current lines); unit SHA256 c9d3ad96d4b03b02fbcf8e5bd0261ab7c77109320f204a18b9a43eef0f4f1fd3.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest c9d3ad96d4b03b02fbcf8e5bd0261ab7c77109320f204a18b9a43eef0f4f1fd3 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/io-contract.md#unheaded-block-25 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-43; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Version token\", target context \"CLI I/O Contract / 10. Version Tokens\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 576,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_6f7c99f38f64abb5af7f07c1e2690730",
+    "sourceUnitDigest": "c9d3ad96d4b03b02fbcf8e5bd0261ab7c77109320f204a18b9a43eef0f4f1fd3",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-43",
+    "claimKind": "contract",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/io-contract.md:176-182#unheaded-block-25 (current lines); unit SHA256 c9d3ad96d4b03b02fbcf8e5bd0261ab7c77109320f204a18b9a43eef0f4f1fd3.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:400-406#unheaded-block-43 (current lines); unit SHA256 c9d3ad96d4b03b02fbcf8e5bd0261ab7c77109320f204a18b9a43eef0f4f1fd3.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest c9d3ad96d4b03b02fbcf8e5bd0261ab7c77109320f204a18b9a43eef0f4f1fd3 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/io-contract.md#unheaded-block-25 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-43; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Version token\", target context \"CLI I/O Contract / 10. Version Tokens\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "targetUnitDigest": "c9d3ad96d4b03b02fbcf8e5bd0261ab7c77109320f204a18b9a43eef0f4f1fd3",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "10. Version Tokens"
+    ]
+  }
+}
+```
+
+## Entry rationale-578
+
+```json
+{
+  "entryId": "rationale-578",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_ea280fa29dca090fe3306f6161ac6ae7",
+  "before": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+  "after": "Source: docs/io-contract.md:184-185#unheaded-block-26 (current lines); unit SHA256 03c9a0137385cea34764f24cc92708d2c2c2c6a722f1e24345441232595f92cb.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:408-409#unheaded-block-44 (current lines); unit SHA256 03c9a0137385cea34764f24cc92708d2c2c2c6a722f1e24345441232595f92cb.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 03c9a0137385cea34764f24cc92708d2c2c2c6a722f1e24345441232595f92cb at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/io-contract.md#unheaded-block-26 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-44; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Version token\", target context \"CLI I/O Contract / 10. Version Tokens\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 577,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_ea280fa29dca090fe3306f6161ac6ae7",
+    "sourceUnitDigest": "03c9a0137385cea34764f24cc92708d2c2c2c6a722f1e24345441232595f92cb",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-44",
+    "claimKind": "contract",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/io-contract.md:184-185#unheaded-block-26 (current lines); unit SHA256 03c9a0137385cea34764f24cc92708d2c2c2c6a722f1e24345441232595f92cb.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:408-409#unheaded-block-44 (current lines); unit SHA256 03c9a0137385cea34764f24cc92708d2c2c2c6a722f1e24345441232595f92cb.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 03c9a0137385cea34764f24cc92708d2c2c2c6a722f1e24345441232595f92cb at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/io-contract.md#unheaded-block-26 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-44; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Version token\", target context \"CLI I/O Contract / 10. Version Tokens\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "targetUnitDigest": "03c9a0137385cea34764f24cc92708d2c2c2c6a722f1e24345441232595f92cb",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "10. Version Tokens"
+    ]
+  }
+}
+```
+
+## Entry rationale-579
+
+```json
+{
+  "entryId": "rationale-579",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_8999e61e46d6c02b407b84263d7a2d67",
+  "before": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+  "after": "Source: docs/io-contract.md:189-191#unheaded-block-27 (current lines); unit SHA256 36d44c8bdf5ad1f062c83e623e68e7d429939c8bc1bc44c0b5bf36aba736078d.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:413-415#unheaded-block-45 (current lines); unit SHA256 36d44c8bdf5ad1f062c83e623e68e7d429939c8bc1bc44c0b5bf36aba736078d.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 36d44c8bdf5ad1f062c83e623e68e7d429939c8bc1bc44c0b5bf36aba736078d at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/io-contract.md#unheaded-block-27 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-45; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Ranh giới — điều gì KHÔNG thuộc hợp đồng này\", target context \"CLI I/O Contract / 11. Scope Boundary\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 578,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_8999e61e46d6c02b407b84263d7a2d67",
+    "sourceUnitDigest": "36d44c8bdf5ad1f062c83e623e68e7d429939c8bc1bc44c0b5bf36aba736078d",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-45",
+    "claimKind": "contract",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/io-contract.md:189-191#unheaded-block-27 (current lines); unit SHA256 36d44c8bdf5ad1f062c83e623e68e7d429939c8bc1bc44c0b5bf36aba736078d.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:413-415#unheaded-block-45 (current lines); unit SHA256 36d44c8bdf5ad1f062c83e623e68e7d429939c8bc1bc44c0b5bf36aba736078d.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 36d44c8bdf5ad1f062c83e623e68e7d429939c8bc1bc44c0b5bf36aba736078d at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/io-contract.md#unheaded-block-27 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-45; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Ranh giới — điều gì KHÔNG thuộc hợp đồng này\", target context \"CLI I/O Contract / 11. Scope Boundary\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "targetUnitDigest": "36d44c8bdf5ad1f062c83e623e68e7d429939c8bc1bc44c0b5bf36aba736078d",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "11. Scope Boundary"
+    ]
+  }
+}
+```
+
+## Entry rationale-580
+
+```json
+{
+  "entryId": "rationale-580",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_f10fba22a20755dc700bb1720f98f451",
+  "before": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+  "after": "Source: docs/io-contract.md:193-198#unheaded-block-28 (current lines); unit SHA256 fa405ec4333b43518de9831ea52cd47228294303f0b3374b8d4a981a669414ea.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:417-422#unheaded-block-46 (current lines); unit SHA256 fa405ec4333b43518de9831ea52cd47228294303f0b3374b8d4a981a669414ea.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest fa405ec4333b43518de9831ea52cd47228294303f0b3374b8d4a981a669414ea at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/io-contract.md#unheaded-block-28 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-46; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Ranh giới — điều gì KHÔNG thuộc hợp đồng này\", target context \"CLI I/O Contract / 11. Scope Boundary\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 579,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_f10fba22a20755dc700bb1720f98f451",
+    "sourceUnitDigest": "fa405ec4333b43518de9831ea52cd47228294303f0b3374b8d4a981a669414ea",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-46",
+    "claimKind": "contract",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/io-contract.md:193-198#unheaded-block-28 (current lines); unit SHA256 fa405ec4333b43518de9831ea52cd47228294303f0b3374b8d4a981a669414ea.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:417-422#unheaded-block-46 (current lines); unit SHA256 fa405ec4333b43518de9831ea52cd47228294303f0b3374b8d4a981a669414ea.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest fa405ec4333b43518de9831ea52cd47228294303f0b3374b8d4a981a669414ea at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/io-contract.md#unheaded-block-28 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-46; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Ranh giới — điều gì KHÔNG thuộc hợp đồng này\", target context \"CLI I/O Contract / 11. Scope Boundary\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "targetUnitDigest": "fa405ec4333b43518de9831ea52cd47228294303f0b3374b8d4a981a669414ea",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "11. Scope Boundary"
+    ]
+  }
+}
+```
+
+## Entry rationale-581
+
+```json
+{
+  "entryId": "rationale-581",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_cf56f4a8b7679435c6bf59abd8c23093",
+  "before": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+  "after": "Source: docs/io-contract.md:200-202#unheaded-block-29 (current lines); unit SHA256 30a3d1465b852976e30a3aad9f6729d1f40caacbc299c7fb07e87ff06d42cff7.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:424-426#unheaded-block-47 (current lines); unit SHA256 30a3d1465b852976e30a3aad9f6729d1f40caacbc299c7fb07e87ff06d42cff7.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 30a3d1465b852976e30a3aad9f6729d1f40caacbc299c7fb07e87ff06d42cff7 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/io-contract.md#unheaded-block-29 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-47; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Ranh giới — điều gì KHÔNG thuộc hợp đồng này\", target context \"CLI I/O Contract / 11. Scope Boundary\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 580,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_cf56f4a8b7679435c6bf59abd8c23093",
+    "sourceUnitDigest": "30a3d1465b852976e30a3aad9f6729d1f40caacbc299c7fb07e87ff06d42cff7",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-47",
+    "claimKind": "historical-context",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/io-contract.md:200-202#unheaded-block-29 (current lines); unit SHA256 30a3d1465b852976e30a3aad9f6729d1f40caacbc299c7fb07e87ff06d42cff7.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:424-426#unheaded-block-47 (current lines); unit SHA256 30a3d1465b852976e30a3aad9f6729d1f40caacbc299c7fb07e87ff06d42cff7.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 30a3d1465b852976e30a3aad9f6729d1f40caacbc299c7fb07e87ff06d42cff7 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/io-contract.md#unheaded-block-29 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-47; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Ranh giới — điều gì KHÔNG thuộc hợp đồng này\", target context \"CLI I/O Contract / 11. Scope Boundary\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "targetUnitDigest": "30a3d1465b852976e30a3aad9f6729d1f40caacbc299c7fb07e87ff06d42cff7",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "11. Scope Boundary"
+    ]
+  }
+}
+```
+
+## Entry rationale-582
+
+```json
+{
+  "entryId": "rationale-582",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_deb4b4da2abbc3d6190dfce1c75cabf2",
+  "before": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+  "after": "Source: docs/io-contract.md:204-207#unheaded-block-30 (current lines); unit SHA256 fd7e473ad76cf591e6a132079c9b744fc4a8cfa5672127e446ae7c4f6f323e75.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:428-431#unheaded-block-48 (current lines); unit SHA256 fd7e473ad76cf591e6a132079c9b744fc4a8cfa5672127e446ae7c4f6f323e75.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest fd7e473ad76cf591e6a132079c9b744fc4a8cfa5672127e446ae7c4f6f323e75 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/io-contract.md#unheaded-block-30 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-48; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Ranh giới — điều gì KHÔNG thuộc hợp đồng này\", target context \"CLI I/O Contract / 11. Scope Boundary\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 581,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_deb4b4da2abbc3d6190dfce1c75cabf2",
+    "sourceUnitDigest": "fd7e473ad76cf591e6a132079c9b744fc4a8cfa5672127e446ae7c4f6f323e75",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-48",
+    "claimKind": "contract",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/io-contract.md:204-207#unheaded-block-30 (current lines); unit SHA256 fd7e473ad76cf591e6a132079c9b744fc4a8cfa5672127e446ae7c4f6f323e75.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:428-431#unheaded-block-48 (current lines); unit SHA256 fd7e473ad76cf591e6a132079c9b744fc4a8cfa5672127e446ae7c4f6f323e75.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest fd7e473ad76cf591e6a132079c9b744fc4a8cfa5672127e446ae7c4f6f323e75 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/io-contract.md#unheaded-block-30 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-48; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Ranh giới — điều gì KHÔNG thuộc hợp đồng này\", target context \"CLI I/O Contract / 11. Scope Boundary\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "targetUnitDigest": "fd7e473ad76cf591e6a132079c9b744fc4a8cfa5672127e446ae7c4f6f323e75",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "11. Scope Boundary"
+    ]
+  }
+}
+```
+
+## Entry rationale-583
+
+```json
+{
+  "entryId": "rationale-583",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_d802aabd387ae98595c102f0e857f9b1",
+  "before": "A22 actual working target digest/anchor rebound. Full original/current units and decisions in reports/phase-06/step8-final-rework-accounting.json. Pending independent bounded review; no approval carry, source edit, promotion or cutover. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
+  "after": "Source: docs/io-contract.md:211-217#unheaded-block-31 (current lines); unit SHA256 7fddf59545c800c11029e0609a32bd908db3409f458829aaf1afecc47bd7f4cf.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:435-441#unheaded-block-49 (current lines); unit SHA256 7fddf59545c800c11029e0609a32bd908db3409f458829aaf1afecc47bd7f4cf.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 7fddf59545c800c11029e0609a32bd908db3409f458829aaf1afecc47bd7f4cf at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/io-contract.md#unheaded-block-31 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-49; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Tham chiếu\", target context \"CLI I/O Contract / 12. References\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 582,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_d802aabd387ae98595c102f0e857f9b1",
+    "sourceUnitDigest": "7fddf59545c800c11029e0609a32bd908db3409f458829aaf1afecc47bd7f4cf",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-49",
+    "claimKind": "navigation",
+    "disposition": "promote",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/io-contract.md:211-217#unheaded-block-31 (current lines); unit SHA256 7fddf59545c800c11029e0609a32bd908db3409f458829aaf1afecc47bd7f4cf.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:435-441#unheaded-block-49 (current lines); unit SHA256 7fddf59545c800c11029e0609a32bd908db3409f458829aaf1afecc47bd7f4cf.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 7fddf59545c800c11029e0609a32bd908db3409f458829aaf1afecc47bd7f4cf at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/io-contract.md#unheaded-block-31 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-49; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Tham chiếu\", target context \"CLI I/O Contract / 12. References\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "targetUnitDigest": "7fddf59545c800c11029e0609a32bd908db3409f458829aaf1afecc47bd7f4cf",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "12. References"
+    ]
+  }
+}
+```
+
+## Entry rationale-584
+
+```json
+{
+  "entryId": "rationale-584",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_57f11d837272b3f9781b376ef1665c81",
+  "before": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried. Native identity resolved at 19ca8de23908e161c34c91626e41041b7813167c from the sole native sync. Historical gaps remain separate; no provisional ID is persisted as a decision and no approval carries.",
+  "after": "Source: docs/io-contract.md:24-34#unheaded-block-5 (current lines); unit SHA256 d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:83-93#unheaded-block-10 (current lines); unit SHA256 8aa8491435b1bd76c915faca0aaf324c77472f53839ef536c00d9cd1a7b9a2be.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 8aa8491435b1bd76c915faca0aaf324c77472f53839ef536c00d9cd1a7b9a2be at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 1, target 1; 1 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nLink 1: \"spec Session Identity\" (platform/session-identity/spec.md) → \"spec Session Identity\" (../../session-identity/spec.md); resolved docs/platform/session-identity/spec.md → docs/platform/session-identity/spec.md.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/io-contract.md#unheaded-block-5 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-10; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều vào — verb + danh tính\", target context \"CLI I/O Contract / 2. Input Direction Verb And Identity / Writer Source Trust Levels\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 583,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_57f11d837272b3f9781b376ef1665c81",
+    "sourcePath": "docs/io-contract.md",
+    "sourceAnchor": "unheaded-block-5",
+    "sourceUnitDigest": "d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/io-contract.md:24-34#unheaded-block-5 (current lines); unit SHA256 d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:83-93#unheaded-block-10 (current lines); unit SHA256 8aa8491435b1bd76c915faca0aaf324c77472f53839ef536c00d9cd1a7b9a2be.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 8aa8491435b1bd76c915faca0aaf324c77472f53839ef536c00d9cd1a7b9a2be at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 1, target 1; 1 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nLink 1: \"spec Session Identity\" (platform/session-identity/spec.md) → \"spec Session Identity\" (../../session-identity/spec.md); resolved docs/platform/session-identity/spec.md → docs/platform/session-identity/spec.md.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/io-contract.md#unheaded-block-5 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-10; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều vào — verb + danh tính\", target context \"CLI I/O Contract / 2. Input Direction Verb And Identity / Writer Source Trust Levels\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-10",
+    "targetUnitDigest": "8aa8491435b1bd76c915faca0aaf324c77472f53839ef536c00d9cd1a7b9a2be",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "2. Input Direction Verb And Identity",
+      "Writer Source Trust Levels"
+    ]
+  }
+}
+```
+
+## Entry rationale-585
+
+```json
+{
+  "entryId": "rationale-585",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "claimId": "claim_a14f9308d3f04e10e670c6f178d4ee33",
+  "before": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried. Native identity resolved at 19ca8de23908e161c34c91626e41041b7813167c from the sole native sync. Historical gaps remain separate; no provisional ID is persisted as a decision and no approval carries.",
+  "after": "Source: docs/io-contract.md:44-49#unheaded-block-7 (current lines); unit SHA256 b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:116-121#unheaded-block-13 (current lines); unit SHA256 b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/io-contract.md#unheaded-block-7 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-13; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều vào — verb + danh tính\", target context \"CLI I/O Contract / 2. Input Direction Verb And Identity / Caller Role\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 584,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_a14f9308d3f04e10e670c6f178d4ee33",
+    "sourcePath": "docs/io-contract.md",
+    "sourceAnchor": "unheaded-block-7",
+    "sourceUnitDigest": "b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79",
+    "claimKind": "specification",
+    "disposition": "move",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/io-contract.md:44-49#unheaded-block-7 (current lines); unit SHA256 b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:116-121#unheaded-block-13 (current lines); unit SHA256 b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/io-contract.md#unheaded-block-7 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-13; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều vào — verb + danh tính\", target context \"CLI I/O Contract / 2. Input Direction Verb And Identity / Caller Role\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-13",
+    "targetUnitDigest": "b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "2. Input Direction Verb And Identity",
+      "Caller Role"
+    ]
+  }
+}
+```
+
+## Entry rationale-586
+
+```json
+{
+  "entryId": "rationale-586",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "registryGaps",
+  "claimId": "claim_19495d2772ced1aa1af4b20d4640fa3a",
+  "before": "The fgos --help --json manifest contract is combined with the work-state manifest contribution under Manifest Shape. Its schema_version 2.0 source wording is represented by the corrected schema_version 3.0 successor, including commands and per-verb entries; work-state adds the positional-parameter rule. The reviewed merge disposition is restored: vocabulary merge combines multiple sources and does not require byte equality. The anchor shift changes no target text in this turn. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package. L10-21: content-based rebind from reviewed prior target unheaded-block-32 (51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23) to unheaded-block-33 (51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23); inserted paragraphs shift the anchor, prior target text is unchanged.",
+  "after": "Source: docs/io-contract.md:122-125#unheaded-block-18 (historical witness at 3ea75475d911ca02c9d8b5011dca4f748cc5820f); unit SHA256 83773dda67db8d5f71205bb8c7106186023672125b08cbe4f33b09b0578163ca.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:299-306#unheaded-block-33 (current lines); unit SHA256 51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23 at 7854cff84d8bcb67075d4f9c09cd0b6d04808ff4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-18 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-33; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Sổ verb máy-đọc — CLI tự mô tả\", target context \"CLI I/O Contract / 7. Machine-Readable Verb Registry / Manifest Shape\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "pending",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 585,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_19495d2772ced1aa1af4b20d4640fa3a",
+    "sourceUnitDigest": "83773dda67db8d5f71205bb8c7106186023672125b08cbe4f33b09b0578163ca",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-33",
+    "claimKind": "contract",
+    "disposition": "merge",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/io-contract.md:122-125#unheaded-block-18 (historical witness at 3ea75475d911ca02c9d8b5011dca4f748cc5820f); unit SHA256 83773dda67db8d5f71205bb8c7106186023672125b08cbe4f33b09b0578163ca.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:299-306#unheaded-block-33 (current lines); unit SHA256 51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23 at 7854cff84d8bcb67075d4f9c09cd0b6d04808ff4.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-18 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-33; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Sổ verb máy-đọc — CLI tự mô tả\", target context \"CLI I/O Contract / 7. Machine-Readable Verb Registry / Manifest Shape\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "sourcePath": "docs/io-contract.md",
+    "sourceAnchor": "unheaded-block-18",
+    "targetUnitDigest": "51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "7. Machine-Readable Verb Registry",
+      "Manifest Shape"
+    ]
+  }
+}
+```
+
+## Entry rationale-587
+
+```json
+{
+  "entryId": "rationale-587",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-systemic-native-predecessors.json",
+  "collection": "registryGaps",
+  "claimId": "claim_08f9b4c140ce931a064c131c2bd4e014",
+  "before": "A22/A31/L10-18b/L10-20: native predecessor from 19ca8de23 is superseded by the current same-section unit after authorized source/target link-cell restoration, sentence-order restoration or evolve code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync345-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval.",
+  "after": "Source: docs/platform/runner/operations/h-51f5cd7279fd.md:456-467#unheaded-block-26 (historical witness at 19ca8de23908e161c34c91626e41041b7813167c); unit SHA256 30bbabf9219560dd2744a98e42e43b53e9fbaf15c4282e68860a8682f2b63059.\nTarget: docs/platform/runner/operations/h-51f5cd7279fd.md:456-467#unheaded-block-26 (current lines); unit SHA256 0f61fde6bc880cb19623ecde63a6a137571884e4b6ae2f8b24b8a585b25d600a.\nSource and target unit digests differ.\nTarget changed since last reviewed digest 0dce2b78b5d497ab9dbe1b9cc6d0d8a00ad2ff468b97fe5964c8e86464b0a3b2 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nL10-24/citation-refuseHelp: \"bin/fgos.mjs:4415,4461\" → \"bin/fgos.mjs:4415,4503\"; evidence step10-round3-doc-edits.json; bin/fgos.mjs:4414-4417,4503.\nDisposition supersede: Account for docs/platform/runner/operations/h-51f5cd7279fd.md#unheaded-block-26 under docs/platform/runner/operations/h-51f5cd7279fd.md#unheaded-block-26; source context \"Added in candidate: Runner Behaviors & Operations / Behaviors & Operations / Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\", target context \"Added in candidate: Runner Behaviors & Operations / Behaviors & Operations / Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "pending",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 586,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_08f9b4c140ce931a064c131c2bd4e014",
+    "sourcePath": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "sourceUnitDigest": "30bbabf9219560dd2744a98e42e43b53e9fbaf15c4282e68860a8682f2b63059",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+    "targetAnchor": "unheaded-block-26",
+    "targetUnitDigest": "0f61fde6bc880cb19623ecde63a6a137571884e4b6ae2f8b24b8a585b25d600a",
+    "targetAncestry": [
+      "Added in candidate: Runner Behaviors & Operations",
+      "Behaviors & Operations",
+      "Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)"
+    ],
+    "rationale": "Source: docs/platform/runner/operations/h-51f5cd7279fd.md:456-467#unheaded-block-26 (historical witness at 19ca8de23908e161c34c91626e41041b7813167c); unit SHA256 30bbabf9219560dd2744a98e42e43b53e9fbaf15c4282e68860a8682f2b63059.\nTarget: docs/platform/runner/operations/h-51f5cd7279fd.md:456-467#unheaded-block-26 (current lines); unit SHA256 0f61fde6bc880cb19623ecde63a6a137571884e4b6ae2f8b24b8a585b25d600a.\nSource and target unit digests differ.\nTarget changed since last reviewed digest 0dce2b78b5d497ab9dbe1b9cc6d0d8a00ad2ff468b97fe5964c8e86464b0a3b2 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nL10-24/citation-refuseHelp: \"bin/fgos.mjs:4415,4461\" → \"bin/fgos.mjs:4415,4503\"; evidence step10-round3-doc-edits.json; bin/fgos.mjs:4414-4417,4503.\nDisposition supersede: Account for docs/platform/runner/operations/h-51f5cd7279fd.md#unheaded-block-26 under docs/platform/runner/operations/h-51f5cd7279fd.md#unheaded-block-26; source context \"Added in candidate: Runner Behaviors & Operations / Behaviors & Operations / Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\", target context \"Added in candidate: Runner Behaviors & Operations / Behaviors & Operations / Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16"
+  }
+}
+```
+
+## Entry rationale-588
+
+```json
+{
+  "entryId": "rationale-588",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_db593c2dbf2dbde00be1110c70e94583",
+  "before": "The current successor at docs/platform/agent-coordination/architecture/runtime-recovery-design.md#7-agent-facing-contract supersedes the stale current-state claim shown at docs/platform/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-20 before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
+  "after": "Source: docs/architect/agent-coordination/architecture/runtime-recovery-design.md:203-214#unheaded-block-24 (current lines); unit SHA256 1289cb23be8c139e2279838f8575e142606646e62b2c1afce03b40de10749017.\nTarget: docs/platform/agent-coordination/architecture/runtime-recovery-design.md:168-168#7-agent-facing-contract (current lines); unit SHA256 0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68 at 2300d65571968bb3bcb80123a273272586e3f1db.\nLinks: source 0, target 2; 2 changed spellings/labels, 0 destination changes; 2 added, 0 removed.\nLink 1: \"none\" (none) → \"area portal\" (../README.md); resolved none → docs/platform/agent-coordination/README.md.\nLink 2: \"none\" (none) → \"runner spec\" (../../runner/spec.md); resolved none → docs/platform/runner/spec.md.\nHeading depth: not a heading → 2; title \"Unheaded block 24\" → \"7. Agent-Facing Contract\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-24 under docs/platform/agent-coordination/architecture/runtime-recovery-design.md#7-agent-facing-contract; source context \"Runtime Recovery And Work Continuity / 7. Agent-Facing Contract\", target context \"Runtime Recovery And Work Continuity\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 587,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_db593c2dbf2dbde00be1110c70e94583",
+    "sourceUnitDigest": "1289cb23be8c139e2279838f8575e142606646e62b2c1afce03b40de10749017",
+    "claimKind": "contract",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/runtime-recovery-design.md:203-214#unheaded-block-24 (current lines); unit SHA256 1289cb23be8c139e2279838f8575e142606646e62b2c1afce03b40de10749017.\nTarget: docs/platform/agent-coordination/architecture/runtime-recovery-design.md:168-168#7-agent-facing-contract (current lines); unit SHA256 0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68 at 2300d65571968bb3bcb80123a273272586e3f1db.\nLinks: source 0, target 2; 2 changed spellings/labels, 0 destination changes; 2 added, 0 removed.\nLink 1: \"none\" (none) → \"area portal\" (../README.md); resolved none → docs/platform/agent-coordination/README.md.\nLink 2: \"none\" (none) → \"runner spec\" (../../runner/spec.md); resolved none → docs/platform/runner/spec.md.\nHeading depth: not a heading → 2; title \"Unheaded block 24\" → \"7. Agent-Facing Contract\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-24 under docs/platform/agent-coordination/architecture/runtime-recovery-design.md#7-agent-facing-contract; source context \"Runtime Recovery And Work Continuity / 7. Agent-Facing Contract\", target context \"Runtime Recovery And Work Continuity\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+    "targetAnchor": "7-agent-facing-contract",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68",
+    "targetAncestry": [
+      "Runtime Recovery And Work Continuity"
+    ]
+  }
+}
+```
+
+## Entry rationale-589
+
+```json
+{
+  "entryId": "rationale-589",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_e79e40a9ee21a51be2d37ee413a5b903",
+  "before": "The current successor at docs/platform/agent-coordination/architecture/runtime-recovery-design.md#7-agent-facing-contract supersedes the stale current-state claim shown at docs/platform/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-21 before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
+  "after": "Source: docs/architect/agent-coordination/architecture/runtime-recovery-design.md:216-223#unheaded-block-25 (current lines); unit SHA256 b5104854e5852006e0a118ab4bd69bbfbcdef9750c437c95c8173fd29f02a612.\nTarget: docs/platform/agent-coordination/architecture/runtime-recovery-design.md:168-168#7-agent-facing-contract (current lines); unit SHA256 0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68 at 2300d65571968bb3bcb80123a273272586e3f1db.\nLinks: source 0, target 2; 2 changed spellings/labels, 0 destination changes; 2 added, 0 removed.\nLink 1: \"none\" (none) → \"area portal\" (../README.md); resolved none → docs/platform/agent-coordination/README.md.\nLink 2: \"none\" (none) → \"runner spec\" (../../runner/spec.md); resolved none → docs/platform/runner/spec.md.\nHeading depth: not a heading → 2; title \"Unheaded block 25\" → \"7. Agent-Facing Contract\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-25 under docs/platform/agent-coordination/architecture/runtime-recovery-design.md#7-agent-facing-contract; source context \"Runtime Recovery And Work Continuity / 7. Agent-Facing Contract\", target context \"Runtime Recovery And Work Continuity\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 588,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_e79e40a9ee21a51be2d37ee413a5b903",
+    "sourceUnitDigest": "b5104854e5852006e0a118ab4bd69bbfbcdef9750c437c95c8173fd29f02a612",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/runtime-recovery-design.md:216-223#unheaded-block-25 (current lines); unit SHA256 b5104854e5852006e0a118ab4bd69bbfbcdef9750c437c95c8173fd29f02a612.\nTarget: docs/platform/agent-coordination/architecture/runtime-recovery-design.md:168-168#7-agent-facing-contract (current lines); unit SHA256 0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68 at 2300d65571968bb3bcb80123a273272586e3f1db.\nLinks: source 0, target 2; 2 changed spellings/labels, 0 destination changes; 2 added, 0 removed.\nLink 1: \"none\" (none) → \"area portal\" (../README.md); resolved none → docs/platform/agent-coordination/README.md.\nLink 2: \"none\" (none) → \"runner spec\" (../../runner/spec.md); resolved none → docs/platform/runner/spec.md.\nHeading depth: not a heading → 2; title \"Unheaded block 25\" → \"7. Agent-Facing Contract\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/runtime-recovery-design.md#unheaded-block-25 under docs/platform/agent-coordination/architecture/runtime-recovery-design.md#7-agent-facing-contract; source context \"Runtime Recovery And Work Continuity / 7. Agent-Facing Contract\", target context \"Runtime Recovery And Work Continuity\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+    "targetAnchor": "7-agent-facing-contract",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "pending",
+    "targetUnitDigest": "0304740f98bdab3df44c5b9b88de64409ad96c2bd94bc3ab41aaa4afbbc2fe68",
+    "targetAncestry": [
+      "Runtime Recovery And Work Continuity"
+    ]
+  }
+}
+```
+
+## Entry rationale-590
+
+```json
+{
+  "entryId": "rationale-590",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_26f70ff6e280d95c6a2de80057d12198",
+  "before": "The current successor at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#61-shape supersedes the stale current-state claim shown at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-39 before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval.",
+  "after": "Source: docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md:160-194#unheaded-block-38 (current lines); unit SHA256 5bae5d791db2919b0a4fdc54d9f9898c87d35c97618c125cb64d05827ffb1075.\nTarget: docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md:170-170#61-shape (current lines); unit SHA256 eccd334eee40b5d3dea247a74c141453af4ff788f6bee3e9d9c8d08bd5000343.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest eccd334eee40b5d3dea247a74c141453af4ff788f6bee3e9d9c8d08bd5000343 at dfff335d3f620b49403e4e4b2f70cedee5ca0452.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 38\" → \"6.1 Shape\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-38 under docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#61-shape; source context \"Dispatch Control Plane Redesign / 6. DispatchPlan / 6.1 Shape\", target context \"Dispatch Control Plane Redesign / 6. DispatchPlan\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 589,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_26f70ff6e280d95c6a2de80057d12198",
+    "sourceUnitDigest": "5bae5d791db2919b0a4fdc54d9f9898c87d35c97618c125cb64d05827ffb1075",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md:160-194#unheaded-block-38 (current lines); unit SHA256 5bae5d791db2919b0a4fdc54d9f9898c87d35c97618c125cb64d05827ffb1075.\nTarget: docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md:170-170#61-shape (current lines); unit SHA256 eccd334eee40b5d3dea247a74c141453af4ff788f6bee3e9d9c8d08bd5000343.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest eccd334eee40b5d3dea247a74c141453af4ff788f6bee3e9d9c8d08bd5000343 at dfff335d3f620b49403e4e4b2f70cedee5ca0452.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 38\" → \"6.1 Shape\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-38 under docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#61-shape; source context \"Dispatch Control Plane Redesign / 6. DispatchPlan / 6.1 Shape\", target context \"Dispatch Control Plane Redesign / 6. DispatchPlan\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+    "targetAnchor": "61-shape",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "pending",
+    "priorReview": {
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-files.md",
+      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+      "reviewMode": "ordinary",
+      "reviewNote": "LEG:proposals/dispatch-control-plane-redesign.md#unheaded-block-38 -> proposals/dispatch-control-plane-redesign.md#61-shape (supersede): Old illustrative JSON (target, handback, execution, egress.allowed) is correctly retired; the replacement field list equals the object returned at plan.mjs:444-461."
+    },
+    "amendedBy": "codex-session:42@2026-10-15",
+    "rebindingReason": "A22 consequence of the authorized A19 path/line-number correction; current target bytes or section payload changed.",
+    "targetUnitDigest": "eccd334eee40b5d3dea247a74c141453af4ff788f6bee3e9d9c8d08bd5000343",
+    "targetAncestry": [
+      "Dispatch Control Plane Redesign",
+      "6. DispatchPlan"
+    ]
+  }
+}
+```
+
+## Entry rationale-591
+
+```json
+{
+  "entryId": "rationale-591",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_7788ed260777142b9452d61228e1d1be",
+  "before": "The current successor at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#63-mechanism supersedes the stale current-state claim shown at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-46 before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval.",
+  "after": "Source: docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md:222-222#unheaded-block-45 (current lines); unit SHA256 064779db227d18f5a360332d5f6d5a3cf1eccb3541b74c35c2f8808f5e6765bd.\nTarget: docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md:202-202#63-mechanism (current lines); unit SHA256 be2f8b6fb6fddd1a9fdcbbcaf100e5d07acacec79f314e563786eb6034c4dbba.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest be2f8b6fb6fddd1a9fdcbbcaf100e5d07acacec79f314e563786eb6034c4dbba at dfff335d3f620b49403e4e4b2f70cedee5ca0452.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 45\" → \"6.3 Mechanism\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-45 under docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#63-mechanism; source context \"Dispatch Control Plane Redesign / 6. DispatchPlan / 6.3 Mechanism\", target context \"Dispatch Control Plane Redesign / 6. DispatchPlan\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 590,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_7788ed260777142b9452d61228e1d1be",
+    "sourceUnitDigest": "064779db227d18f5a360332d5f6d5a3cf1eccb3541b74c35c2f8808f5e6765bd",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md:222-222#unheaded-block-45 (current lines); unit SHA256 064779db227d18f5a360332d5f6d5a3cf1eccb3541b74c35c2f8808f5e6765bd.\nTarget: docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md:202-202#63-mechanism (current lines); unit SHA256 be2f8b6fb6fddd1a9fdcbbcaf100e5d07acacec79f314e563786eb6034c4dbba.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest be2f8b6fb6fddd1a9fdcbbcaf100e5d07acacec79f314e563786eb6034c4dbba at dfff335d3f620b49403e4e4b2f70cedee5ca0452.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 45\" → \"6.3 Mechanism\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-45 under docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#63-mechanism; source context \"Dispatch Control Plane Redesign / 6. DispatchPlan / 6.3 Mechanism\", target context \"Dispatch Control Plane Redesign / 6. DispatchPlan\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+    "targetAnchor": "63-mechanism",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "pending",
+    "priorReview": {
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-files.md",
+      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+      "reviewMode": "ordinary",
+      "reviewNote": "LEG:proposals/dispatch-control-plane-redesign.md#unheaded-block-45 -> proposals/dispatch-control-plane-redesign.md#63-mechanism (supersede): Old handback sentence retired: plan.mjs returns top-level agentType/mcpTool (lines 453-454) and no handback key."
+    },
+    "amendedBy": "codex-session:42@2026-10-15",
+    "rebindingReason": "A22 consequence of the authorized A19 path/line-number correction; current target bytes or section payload changed.",
+    "targetUnitDigest": "be2f8b6fb6fddd1a9fdcbbcaf100e5d07acacec79f314e563786eb6034c4dbba",
+    "targetAncestry": [
+      "Dispatch Control Plane Redesign",
+      "6. DispatchPlan"
+    ]
+  }
+}
+```
+
+## Entry rationale-592
+
+```json
+{
+  "entryId": "rationale-592",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_cfd58d692d355e1d05a0babd4fbb2183",
+  "before": "The current successor at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#63-mechanism supersedes the stale current-state claim shown at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-47 before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval.",
+  "after": "Source: docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md:224-232#unheaded-block-46 (current lines); unit SHA256 54aa679ca4d5d3f3fcb3ce80388c2ca8768fea36739b76d19f349ebcfc3b934e.\nTarget: docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md:202-202#63-mechanism (current lines); unit SHA256 be2f8b6fb6fddd1a9fdcbbcaf100e5d07acacec79f314e563786eb6034c4dbba.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest be2f8b6fb6fddd1a9fdcbbcaf100e5d07acacec79f314e563786eb6034c4dbba at dfff335d3f620b49403e4e4b2f70cedee5ca0452.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 46\" → \"6.3 Mechanism\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-46 under docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#63-mechanism; source context \"Dispatch Control Plane Redesign / 6. DispatchPlan / 6.3 Mechanism\", target context \"Dispatch Control Plane Redesign / 6. DispatchPlan\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 591,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_cfd58d692d355e1d05a0babd4fbb2183",
+    "sourceUnitDigest": "54aa679ca4d5d3f3fcb3ce80388c2ca8768fea36739b76d19f349ebcfc3b934e",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md:224-232#unheaded-block-46 (current lines); unit SHA256 54aa679ca4d5d3f3fcb3ce80388c2ca8768fea36739b76d19f349ebcfc3b934e.\nTarget: docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md:202-202#63-mechanism (current lines); unit SHA256 be2f8b6fb6fddd1a9fdcbbcaf100e5d07acacec79f314e563786eb6034c4dbba.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest be2f8b6fb6fddd1a9fdcbbcaf100e5d07acacec79f314e563786eb6034c4dbba at dfff335d3f620b49403e4e4b2f70cedee5ca0452.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 46\" → \"6.3 Mechanism\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-46 under docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#63-mechanism; source context \"Dispatch Control Plane Redesign / 6. DispatchPlan / 6.3 Mechanism\", target context \"Dispatch Control Plane Redesign / 6. DispatchPlan\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+    "targetAnchor": "63-mechanism",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "pending",
+    "priorReview": {
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-files.md",
+      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+      "reviewMode": "ordinary",
+      "reviewNote": "LEG:proposals/dispatch-control-plane-redesign.md#unheaded-block-46 -> proposals/dispatch-control-plane-redesign.md#63-mechanism (supersede): Old native-task handback JSON is retired in favor of top-level agentType in the returned plan (plan.mjs:453), which the current text states."
+    },
+    "amendedBy": "codex-session:42@2026-10-15",
+    "rebindingReason": "A22 consequence of the authorized A19 path/line-number correction; current target bytes or section payload changed.",
+    "targetUnitDigest": "be2f8b6fb6fddd1a9fdcbbcaf100e5d07acacec79f314e563786eb6034c4dbba",
+    "targetAncestry": [
+      "Dispatch Control Plane Redesign",
+      "6. DispatchPlan"
+    ]
+  }
+}
+```
+
+## Entry rationale-593
+
+```json
+{
+  "entryId": "rationale-593",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_3213e2828273933006676b06c204ef11",
+  "before": "The current successor at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#63-mechanism supersedes the stale current-state claim shown at docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-48 before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval.",
+  "after": "Source: docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md:234-244#unheaded-block-47 (current lines); unit SHA256 9a8358da72c22b6c751b1820b9b0a1fce86275081af0b5d2f6d851ce285c844e.\nTarget: docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md:202-202#63-mechanism (current lines); unit SHA256 be2f8b6fb6fddd1a9fdcbbcaf100e5d07acacec79f314e563786eb6034c4dbba.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest be2f8b6fb6fddd1a9fdcbbcaf100e5d07acacec79f314e563786eb6034c4dbba at dfff335d3f620b49403e4e4b2f70cedee5ca0452.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 47\" → \"6.3 Mechanism\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-47 under docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#63-mechanism; source context \"Dispatch Control Plane Redesign / 6. DispatchPlan / 6.3 Mechanism\", target context \"Dispatch Control Plane Redesign / 6. DispatchPlan\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 592,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_3213e2828273933006676b06c204ef11",
+    "sourceUnitDigest": "9a8358da72c22b6c751b1820b9b0a1fce86275081af0b5d2f6d851ce285c844e",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md:234-244#unheaded-block-47 (current lines); unit SHA256 9a8358da72c22b6c751b1820b9b0a1fce86275081af0b5d2f6d851ce285c844e.\nTarget: docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md:202-202#63-mechanism (current lines); unit SHA256 be2f8b6fb6fddd1a9fdcbbcaf100e5d07acacec79f314e563786eb6034c4dbba.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest be2f8b6fb6fddd1a9fdcbbcaf100e5d07acacec79f314e563786eb6034c4dbba at dfff335d3f620b49403e4e4b2f70cedee5ca0452.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 47\" → \"6.3 Mechanism\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md#unheaded-block-47 under docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#63-mechanism; source context \"Dispatch Control Plane Redesign / 6. DispatchPlan / 6.3 Mechanism\", target context \"Dispatch Control Plane Redesign / 6. DispatchPlan\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+    "targetAnchor": "63-mechanism",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "pending",
+    "priorReview": {
+      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
+      "reviewedAt": "2026-10-10",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-files.md",
+      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea",
+      "reviewMode": "ordinary",
+      "reviewNote": "LEG:proposals/dispatch-control-plane-redesign.md#unheaded-block-47 -> proposals/dispatch-control-plane-redesign.md#63-mechanism (supersede): Old mcp-tool handback JSON is retired in favor of top-level mcpTool (plan.mjs:454); cli.mjs decide output also reports mcpTool directly."
+    },
+    "amendedBy": "codex-session:42@2026-10-15",
+    "rebindingReason": "A22 consequence of the authorized A19 path/line-number correction; current target bytes or section payload changed.",
+    "targetUnitDigest": "be2f8b6fb6fddd1a9fdcbbcaf100e5d07acacec79f314e563786eb6034c4dbba",
+    "targetAncestry": [
+      "Dispatch Control Plane Redesign",
+      "6. DispatchPlan"
+    ]
+  }
+}
+```
+
+## Entry rationale-594
+
+```json
+{
+  "entryId": "rationale-594",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_44a720a7dfd21c66efe74d66ad24f9dc",
+  "before": "The current successor at docs/platform/agent-coordination/proposals/README.md#related-architect-level-intentions supersedes the stale current-state claim shown at docs/platform/agent-coordination/proposals/README.md#unheaded-block-8 before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding.",
+  "after": "Source: docs/architect/agent-coordination/proposals/README.md:45-60#unheaded-block-7 (current lines); unit SHA256 54138a55e7b05fd70e135ba8902650cafee90abc13b1d7d32a0f127783b94fe8.\nTarget: docs/platform/agent-coordination/proposals/README.md:60-60#related-architect-level-intentions (current lines); unit SHA256 94e2cece7266f34a0d7dcac63448f64baff18bda11a04a1eee700c8baf5e0b4c.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 94e2cece7266f34a0d7dcac63448f64baff18bda11a04a1eee700c8baf5e0b4c at 2300d65571968bb3bcb80123a273272586e3f1db.\nLinks: source 4, target 4; 1 changed spellings/labels, 1 destination changes; 0 added, 0 removed.\nLink 1: \"Architecture Intent\" (../../architecture-intent.md) → \"Architecture Intent\" (../../system-architecture/architecture/architecture-intent.md); resolved docs/architect/architecture-intent.md → docs/platform/system-architecture/architecture/architecture-intent.md.\nHeading depth: not a heading → 2; title \"Unheaded block 7\" → \"Related Architect-Level Intentions\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/proposals/README.md#unheaded-block-7 under docs/platform/agent-coordination/proposals/README.md#related-architect-level-intentions; source context \"Agent Coordination Proposals / Related Architect-Level Intentions\", target context \"Agent Coordination Proposals\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 593,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_44a720a7dfd21c66efe74d66ad24f9dc",
+    "sourceUnitDigest": "54138a55e7b05fd70e135ba8902650cafee90abc13b1d7d32a0f127783b94fe8",
+    "targetOwner": "docs/platform/agent-coordination/proposals/README.md",
+    "targetAnchor": "related-architect-level-intentions",
+    "claimKind": "navigation",
+    "disposition": "supersede",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/architect/agent-coordination/proposals/README.md:45-60#unheaded-block-7 (current lines); unit SHA256 54138a55e7b05fd70e135ba8902650cafee90abc13b1d7d32a0f127783b94fe8.\nTarget: docs/platform/agent-coordination/proposals/README.md:60-60#related-architect-level-intentions (current lines); unit SHA256 94e2cece7266f34a0d7dcac63448f64baff18bda11a04a1eee700c8baf5e0b4c.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 94e2cece7266f34a0d7dcac63448f64baff18bda11a04a1eee700c8baf5e0b4c at 2300d65571968bb3bcb80123a273272586e3f1db.\nLinks: source 4, target 4; 1 changed spellings/labels, 1 destination changes; 0 added, 0 removed.\nLink 1: \"Architecture Intent\" (../../architecture-intent.md) → \"Architecture Intent\" (../../system-architecture/architecture/architecture-intent.md); resolved docs/architect/architecture-intent.md → docs/platform/system-architecture/architecture/architecture-intent.md.\nHeading depth: not a heading → 2; title \"Unheaded block 7\" → \"Related Architect-Level Intentions\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/proposals/README.md#unheaded-block-7 under docs/platform/agent-coordination/proposals/README.md#related-architect-level-intentions; source context \"Agent Coordination Proposals / Related Architect-Level Intentions\", target context \"Agent Coordination Proposals\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "94e2cece7266f34a0d7dcac63448f64baff18bda11a04a1eee700c8baf5e0b4c",
+    "targetAncestry": [
+      "Agent Coordination Proposals"
+    ]
+  }
+}
+```
+
+## Entry rationale-595
+
+```json
+{
+  "entryId": "rationale-595",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "claims",
+  "claimId": "claim_60a5c12e7c7c78095b2c90db75324462",
+  "before": "The current successor at docs/platform/agent-coordination/vision.md#reading-down-from-the-vision supersedes the stale current-state claim shown at docs/platform/agent-coordination/vision.md#unheaded-block-53 before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval. Package at aecdc30aad0ffd65a2956ff642c4be9410686ede: pending target rebind by native retained identity. Full before/after and digests are in step10-package-rebindings.json; historical approval does not cover the changed binding. Package at 2300d65571968bb3bcb80123a273272586e3f1db: pending target rebind by native retained identity. Full before/after and digests are in step10-sync2300-rebindings.json; historical approval does not cover the changed binding.",
+  "after": "Source: docs/architect/agent-coordination/vision.md:382-398#unheaded-block-65 (current lines); unit SHA256 ea4efb1bd39165a8a159e48b5e5d03a7da8ba4b017f66b0fcfec46fe96db6242.\nTarget: docs/platform/agent-coordination/vision.md:343-343#reading-down-from-the-vision (current lines); unit SHA256 852ed9b500d96e96ae6dfa27c123feb107277c4bd2657c708dee8bdd220d2b52.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 852ed9b500d96e96ae6dfa27c123feb107277c4bd2657c708dee8bdd220d2b52 at 2300d65571968bb3bcb80123a273272586e3f1db.\nLinks: source 9, target 7; 8 changed spellings/labels, 6 destination changes; 0 added, 2 removed.\nLink 1: \"Documentation Governance\" (documentation-governance.md) → \"none\" (none); resolved docs/architect/agent-coordination/documentation-governance.md → none.\nLink 2: \"Accepted Architecture\" (architecture/README.md) → \"Architecture\" (architecture/README.md); resolved docs/architect/agent-coordination/architecture/README.md → docs/platform/agent-coordination/architecture/README.md.\nLink 3: \"Contracts\" (contracts/README.md) → \"Assignment, Run and RunResult contract\" (contracts/assignment-run-runresult.md); resolved docs/architect/agent-coordination/contracts/README.md → docs/platform/agent-coordination/contracts/assignment-run-runresult.md.\nLink 4: \"Architecture Decisions\" (decisions/README.md) → \"Decisions\" (decisions/README.md); resolved docs/architect/agent-coordination/decisions/README.md → docs/platform/agent-coordination/decisions/README.md.\nLink 5: \"Step 07\" (proposals/step-07-coordination-session-adhoc-task.md) → \"Historical Step 07\" (history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md#literal-snapshot); resolved docs/architect/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md → docs/platform/agent-coordination/history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md#literal-snapshot.\nLink 6: \"Step 08\" (proposals/step-08-standalone-coordination-protocols.md) → \"Step 08\" (history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md#literal-snapshot); resolved docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md → docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md#literal-snapshot.\nLink 7: \"Step 09\" (../proposals/step-09-group-thinking-substrate.md) → \"the runner spec\" (../runner/spec.md); resolved docs/architect/proposals/step-09-group-thinking-substrate.md → docs/platform/runner/spec.md.\nLink 9: \"Step 10\" (../proposals/step-10-coding-domain-adoption.md) → \"none\" (none); resolved docs/architect/proposals/step-10-coding-domain-adoption.md → none.\nHeading depth: not a heading → 2; title \"Unheaded block 65\" → \"Reading Down From The Vision\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/vision.md#unheaded-block-65 under docs/platform/agent-coordination/vision.md#reading-down-from-the-vision; source context \"Agent Coordination Foundation Vision / Reading Down From The Vision\", target context \"Agent Coordination Foundation Vision\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 594,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_60a5c12e7c7c78095b2c90db75324462",
+    "sourceUnitDigest": "ea4efb1bd39165a8a159e48b5e5d03a7da8ba4b017f66b0fcfec46fe96db6242",
+    "targetOwner": "docs/platform/agent-coordination/vision.md",
+    "targetAnchor": "reading-down-from-the-vision",
+    "claimKind": "navigation",
+    "disposition": "supersede",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/architect/agent-coordination/vision.md:382-398#unheaded-block-65 (current lines); unit SHA256 ea4efb1bd39165a8a159e48b5e5d03a7da8ba4b017f66b0fcfec46fe96db6242.\nTarget: docs/platform/agent-coordination/vision.md:343-343#reading-down-from-the-vision (current lines); unit SHA256 852ed9b500d96e96ae6dfa27c123feb107277c4bd2657c708dee8bdd220d2b52.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 852ed9b500d96e96ae6dfa27c123feb107277c4bd2657c708dee8bdd220d2b52 at 2300d65571968bb3bcb80123a273272586e3f1db.\nLinks: source 9, target 7; 8 changed spellings/labels, 6 destination changes; 0 added, 2 removed.\nLink 1: \"Documentation Governance\" (documentation-governance.md) → \"none\" (none); resolved docs/architect/agent-coordination/documentation-governance.md → none.\nLink 2: \"Accepted Architecture\" (architecture/README.md) → \"Architecture\" (architecture/README.md); resolved docs/architect/agent-coordination/architecture/README.md → docs/platform/agent-coordination/architecture/README.md.\nLink 3: \"Contracts\" (contracts/README.md) → \"Assignment, Run and RunResult contract\" (contracts/assignment-run-runresult.md); resolved docs/architect/agent-coordination/contracts/README.md → docs/platform/agent-coordination/contracts/assignment-run-runresult.md.\nLink 4: \"Architecture Decisions\" (decisions/README.md) → \"Decisions\" (decisions/README.md); resolved docs/architect/agent-coordination/decisions/README.md → docs/platform/agent-coordination/decisions/README.md.\nLink 5: \"Step 07\" (proposals/step-07-coordination-session-adhoc-task.md) → \"Historical Step 07\" (history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md#literal-snapshot); resolved docs/architect/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md → docs/platform/agent-coordination/history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md#literal-snapshot.\nLink 6: \"Step 08\" (proposals/step-08-standalone-coordination-protocols.md) → \"Step 08\" (history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md#literal-snapshot); resolved docs/architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md → docs/platform/agent-coordination/history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md#literal-snapshot.\nLink 7: \"Step 09\" (../proposals/step-09-group-thinking-substrate.md) → \"the runner spec\" (../runner/spec.md); resolved docs/architect/proposals/step-09-group-thinking-substrate.md → docs/platform/runner/spec.md.\nLink 9: \"Step 10\" (../proposals/step-10-coding-domain-adoption.md) → \"none\" (none); resolved docs/architect/proposals/step-10-coding-domain-adoption.md → none.\nHeading depth: not a heading → 2; title \"Unheaded block 65\" → \"Reading Down From The Vision\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/vision.md#unheaded-block-65 under docs/platform/agent-coordination/vision.md#reading-down-from-the-vision; source context \"Agent Coordination Foundation Vision / Reading Down From The Vision\", target context \"Agent Coordination Foundation Vision\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "852ed9b500d96e96ae6dfa27c123feb107277c4bd2657c708dee8bdd220d2b52",
+    "targetAncestry": [
+      "Agent Coordination Foundation Vision"
+    ]
+  }
+}
+```
+
+## Entry rationale-596
+
+```json
+{
+  "entryId": "rationale-596",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+  "collection": "registryGaps",
+  "claimId": "claim_ab182560a5142f22e010e35a97b115dc",
+  "before": "The same owned unit is rebound to the corrected text authorized by A20/A22 in f4bc8027ff2ef34b7c7c1b084330b62fdcbc353f. The old target wording is superseded in place, with the legacy source and accepted historical carriage unchanged. Independent review must check the current shown text against the section truth ledger; no prior text approval is carried. Previous rationale (historical): The current successor at docs/platform/agent-coordination/architecture/dispatch-control-plane.md#routing-identities supersedes the stale current-state claim shown at docs/platform/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-11 before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval. A31 boundary merge: current target imports main capability tool-executor restriction; the shown full source and target bind this conservation review only. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
+  "after": "Source: docs/architect/agent-coordination/architecture/dispatch-control-plane.md:66-78#unheaded-block-9 (historical witness at f4bc8027ff2ef34b7c7c1b084330b62fdcbc353f); unit SHA256 212ffb52fe719fef01a51f585286aedd6792e48d063ada3a2663933e7c2593ec.\nTarget: docs/platform/agent-coordination/architecture/dispatch-control-plane.md:75-75#routing-identities (current lines); unit SHA256 9c69e65aaa7365451581b53232299d73dd29a2c56b1ae0f85cede6710c0d116e.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 9c69e65aaa7365451581b53232299d73dd29a2c56b1ae0f85cede6710c0d116e at b1e53b4fb0e99963328e84b63a4764c0d87abb21.\nLinks: source 0, target 2; 2 changed spellings/labels, 0 destination changes; 2 added, 0 removed.\nLink 1: \"none\" (none) → \"earlier normalization plan\" (../../../history/dispatch-core-contract-normalization/plan.md); resolved none → docs/history/dispatch-core-contract-normalization/plan.md.\nLink 2: \"none\" (none) → \"Assignment/Run/RunResult Contract\" (../contracts/assignment-run-runresult.md); resolved none → docs/platform/agent-coordination/contracts/assignment-run-runresult.md.\nHeading depth: not a heading → 2; title \"Unheaded block 9\" → \"Routing Identities\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-9 under docs/platform/agent-coordination/architecture/dispatch-control-plane.md#routing-identities; source context \"Dispatch Control Plane / Routing Identities\", target context \"Dispatch Control Plane\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 595,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_ab182560a5142f22e010e35a97b115dc",
+    "sourceUnitDigest": "212ffb52fe719fef01a51f585286aedd6792e48d063ada3a2663933e7c2593ec",
+    "claimKind": "architecture",
+    "disposition": "supersede",
+    "rationale": "Source: docs/architect/agent-coordination/architecture/dispatch-control-plane.md:66-78#unheaded-block-9 (historical witness at f4bc8027ff2ef34b7c7c1b084330b62fdcbc353f); unit SHA256 212ffb52fe719fef01a51f585286aedd6792e48d063ada3a2663933e7c2593ec.\nTarget: docs/platform/agent-coordination/architecture/dispatch-control-plane.md:75-75#routing-identities (current lines); unit SHA256 9c69e65aaa7365451581b53232299d73dd29a2c56b1ae0f85cede6710c0d116e.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 9c69e65aaa7365451581b53232299d73dd29a2c56b1ae0f85cede6710c0d116e at b1e53b4fb0e99963328e84b63a4764c0d87abb21.\nLinks: source 0, target 2; 2 changed spellings/labels, 0 destination changes; 2 added, 0 removed.\nLink 1: \"none\" (none) → \"earlier normalization plan\" (../../../history/dispatch-core-contract-normalization/plan.md); resolved none → docs/history/dispatch-core-contract-normalization/plan.md.\nLink 2: \"none\" (none) → \"Assignment/Run/RunResult Contract\" (../contracts/assignment-run-runresult.md); resolved none → docs/platform/agent-coordination/contracts/assignment-run-runresult.md.\nHeading depth: not a heading → 2; title \"Unheaded block 9\" → \"Routing Identities\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/architecture/dispatch-control-plane.md#unheaded-block-9 under docs/platform/agent-coordination/architecture/dispatch-control-plane.md#routing-identities; source context \"Dispatch Control Plane / Routing Identities\", target context \"Dispatch Control Plane\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+    "targetAnchor": "routing-identities",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "pending",
+    "sourcePath": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md",
+    "sourceAnchor": "unheaded-block-9",
+    "targetUnitDigest": "9c69e65aaa7365451581b53232299d73dd29a2c56b1ae0f85cede6710c0d116e",
+    "targetAncestry": [
+      "Dispatch Control Plane"
+    ]
+  }
+}
+```
+
+## Entry rationale-597
+
+```json
+{
+  "entryId": "rationale-597",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+  "collection": "registryGaps",
+  "claimId": "claim_83c033652dd933ee9b5fc5e519a2b6fb",
+  "before": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+  "after": "Source: docs/architecture-manifest.json:1-257#file-block (historical witness at 6f67a444175e111b1e83c9341319a9908544a595); unit SHA256 6e362a74d975a16c477b8f474f062c5ec769515a149a15dfbba1de7f6e7650a3.\nTarget: docs/architecture-manifest.json:1-269#file-block (current lines); unit SHA256 2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architecture-manifest.json#file-block under docs/architecture-manifest.json#file-block; source context \"file-block\", target context \"file-block\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 596,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_83c033652dd933ee9b5fc5e519a2b6fb",
+    "sourcePath": "docs/architecture-manifest.json",
+    "sourceUnitDigest": "6e362a74d975a16c477b8f474f062c5ec769515a149a15dfbba1de7f6e7650a3",
+    "disposition": "supersede",
+    "targetOwner": "docs/architecture-manifest.json",
+    "targetAnchor": "file-block",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/architecture-manifest.json:1-257#file-block (historical witness at 6f67a444175e111b1e83c9341319a9908544a595); unit SHA256 6e362a74d975a16c477b8f474f062c5ec769515a149a15dfbba1de7f6e7650a3.\nTarget: docs/architecture-manifest.json:1-269#file-block (current lines); unit SHA256 2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architecture-manifest.json#file-block under docs/architecture-manifest.json#file-block; source context \"file-block\", target context \"file-block\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
+    "targetAncestry": []
+  }
+}
+```
+
+## Entry rationale-598
+
+```json
+{
+  "entryId": "rationale-598",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+  "collection": "registryGaps",
+  "claimId": "claim_af89c4e6063eb43c4e690c3fdd430677",
+  "before": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+  "after": "Source: docs/platform/component-boundary.md:60-75#unheaded-block-11 (historical witness at 2098246100d88c7e218066e23838c921e8748cb4); unit SHA256 e7f609881002fff0d6f1ac41035f63cdb09095bb5fbba2f073856682e8f7027b.\nTarget: docs/platform/component-boundary.md:66-82#unheaded-block-11 (current lines); unit SHA256 973ee5615eeb755822f8032d8d11c080f21e340bd20a87952b300cde23661e95.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 973ee5615eeb755822f8032d8d11c080f21e340bd20a87952b300cde23661e95 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 13, target 14; 1 changed spellings/labels, 0 destination changes; 1 added, 0 removed.\nLink 14: \"none\" (none) → \"session-identity/spec.md\" (session-identity/spec.md); resolved none → docs/platform/session-identity/spec.md.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/platform/component-boundary.md#unheaded-block-11 under docs/platform/component-boundary.md#unheaded-block-11; source context \"Component Boundary / 4. Current High-Level Components\", target context \"Component Boundary / 4. Current High-Level Components\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 597,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_af89c4e6063eb43c4e690c3fdd430677",
+    "sourcePath": "docs/platform/component-boundary.md",
+    "sourceUnitDigest": "e7f609881002fff0d6f1ac41035f63cdb09095bb5fbba2f073856682e8f7027b",
+    "disposition": "supersede",
+    "targetOwner": "docs/platform/component-boundary.md",
+    "targetAnchor": "unheaded-block-11",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/platform/component-boundary.md:60-75#unheaded-block-11 (historical witness at 2098246100d88c7e218066e23838c921e8748cb4); unit SHA256 e7f609881002fff0d6f1ac41035f63cdb09095bb5fbba2f073856682e8f7027b.\nTarget: docs/platform/component-boundary.md:66-82#unheaded-block-11 (current lines); unit SHA256 973ee5615eeb755822f8032d8d11c080f21e340bd20a87952b300cde23661e95.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 973ee5615eeb755822f8032d8d11c080f21e340bd20a87952b300cde23661e95 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 13, target 14; 1 changed spellings/labels, 0 destination changes; 1 added, 0 removed.\nLink 14: \"none\" (none) → \"session-identity/spec.md\" (session-identity/spec.md); resolved none → docs/platform/session-identity/spec.md.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/platform/component-boundary.md#unheaded-block-11 under docs/platform/component-boundary.md#unheaded-block-11; source context \"Component Boundary / 4. Current High-Level Components\", target context \"Component Boundary / 4. Current High-Level Components\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "973ee5615eeb755822f8032d8d11c080f21e340bd20a87952b300cde23661e95",
+    "targetAncestry": [
+      "Component Boundary",
+      "4. Current High-Level Components"
+    ]
+  }
+}
+```
+
+## Entry rationale-599
+
+```json
+{
+  "entryId": "rationale-599",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+  "collection": "registryGaps",
+  "claimId": "claim_9c0e5bb670fb2957bb0998cbe5d8d51e",
+  "before": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+  "after": "Source: docs/platform/packaging-distribution/spec.md:28-42#unheaded-block-4 (historical witness at 67a276b0d3534840bd669839776d122ff829ff67); unit SHA256 c068f5dddf466e0aa502a6524b019543a8bff6ed6b34ebed2a18adb3d5d1b745.\nTarget: docs/platform/packaging-distribution/spec.md:36-51#unheaded-block-4 (current lines); unit SHA256 fd8f41577cf07e6e6713f2a48792d88071e7fa072e87b32c08ec0be373173c6c.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest fd8f41577cf07e6e6713f2a48792d88071e7fa072e87b32c08ec0be373173c6c at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/platform/packaging-distribution/spec.md#unheaded-block-4 under docs/platform/packaging-distribution/spec.md#unheaded-block-4; source context \"Spec: Packaging-Distribution / 2. Entry Points\", target context \"Spec: Packaging-Distribution / 2. Entry Points\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 598,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_9c0e5bb670fb2957bb0998cbe5d8d51e",
+    "sourcePath": "docs/platform/packaging-distribution/spec.md",
+    "sourceUnitDigest": "c068f5dddf466e0aa502a6524b019543a8bff6ed6b34ebed2a18adb3d5d1b745",
+    "disposition": "supersede",
+    "targetOwner": "docs/platform/packaging-distribution/spec.md",
+    "targetAnchor": "unheaded-block-4",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/platform/packaging-distribution/spec.md:28-42#unheaded-block-4 (historical witness at 67a276b0d3534840bd669839776d122ff829ff67); unit SHA256 c068f5dddf466e0aa502a6524b019543a8bff6ed6b34ebed2a18adb3d5d1b745.\nTarget: docs/platform/packaging-distribution/spec.md:36-51#unheaded-block-4 (current lines); unit SHA256 fd8f41577cf07e6e6713f2a48792d88071e7fa072e87b32c08ec0be373173c6c.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest fd8f41577cf07e6e6713f2a48792d88071e7fa072e87b32c08ec0be373173c6c at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/platform/packaging-distribution/spec.md#unheaded-block-4 under docs/platform/packaging-distribution/spec.md#unheaded-block-4; source context \"Spec: Packaging-Distribution / 2. Entry Points\", target context \"Spec: Packaging-Distribution / 2. Entry Points\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "fd8f41577cf07e6e6713f2a48792d88071e7fa072e87b32c08ec0be373173c6c",
+    "targetAncestry": [
+      "Spec: Packaging-Distribution",
+      "2. Entry Points"
+    ]
+  }
+}
+```
+
+## Entry rationale-600
+
+```json
+{
+  "entryId": "rationale-600",
+  "kind": "binding-derived-rationale-rebuild",
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+  "collection": "registryGaps",
+  "claimId": "claim_65b61a54c10aa48c0dc423cf65cff0a2",
+  "before": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. L10-18/A31 author correction: current direct target changed by the disclosed source-link restoration, label correction, upstream re-carry or header bookkeeping. Current digest explicitly recorded pending independent re-review; native --rebind and full identity accounting owed next package.",
+  "after": "Source: docs/specs/distribution.md:297-315#unheaded-block-14 (historical witness at 67a276b0d3534840bd669839776d122ff829ff67); unit SHA256 fa3f748914efbaea7c57bef01798385bca7de83421cb30c59670cc603d278f54.\nTarget: docs/specs/distribution.md:297-320#unheaded-block-14 (current lines); unit SHA256 8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/distribution.md#unheaded-block-14 under docs/specs/distribution.md#unheaded-block-14; source context \"Spec: Distribution / Business Rules\", target context \"Spec: Distribution / Business Rules\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+  "priorReviewStatus": "reviewed",
+  "evidenceManifest": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "evidenceIndex": 599,
+  "mechanicalRequired": true,
+  "deepReview": "Independent seeded sample of regenerated rationales; source-claim deep obligations under A36 remain. Recompute every generated rationale by rerunning unchanged checker.",
+  "reviewScope": "One current pending claim verdict; the before prose is historical. CurrentDecision and after are loaded from the immutable content pin.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_65b61a54c10aa48c0dc423cf65cff0a2",
+    "sourcePath": "docs/specs/distribution.md",
+    "sourceUnitDigest": "fa3f748914efbaea7c57bef01798385bca7de83421cb30c59670cc603d278f54",
+    "disposition": "supersede",
+    "targetOwner": "docs/specs/distribution.md",
+    "targetAnchor": "unheaded-block-14",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "reviewStatus": "pending",
+    "rationale": "Source: docs/specs/distribution.md:297-315#unheaded-block-14 (historical witness at 67a276b0d3534840bd669839776d122ff829ff67); unit SHA256 fa3f748914efbaea7c57bef01798385bca7de83421cb30c59670cc603d278f54.\nTarget: docs/specs/distribution.md:297-320#unheaded-block-14 (current lines); unit SHA256 8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/distribution.md#unheaded-block-14 under docs/specs/distribution.md#unheaded-block-14; source context \"Spec: Distribution / Business Rules\", target context \"Spec: Distribution / Business Rules\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetUnitDigest": "8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e",
+    "targetAncestry": [
+      "Spec: Distribution",
+      "Business Rules"
+    ]
+  }
+}
+```
+

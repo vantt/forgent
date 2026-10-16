@@ -1,3 +1,100 @@
+# Step 10 package at287a22d33 — independent re-review next
+
+Assignment `unit-run-1792116045118-73cfbb42/producer/1`; Author session `codex-session:unit-run-1792116045118-73cfbb42@2026-10-16`. **Content/SYNC `287a22d33a0eaf2d9e47549a1142daf62361bb8c`**, author content `0d8c602e2`, input comparison `5035fed52`. Merge includes main; **zero docs delta between0d8c602e2 and287a22d33**, so no Lead-merge re-carry blocker. Runner owns commits. Every workspace write is within this plan. No docs/source/test/checker/gate/extractor/vocabulary/baseline byte changed, fgOS CLI, git write or producer seed/verdict.
+
+## Single native sync and no known-ID loss
+
+One background native carry-forward and complete native inventory, with its own [polled log](step10-sync287-native.log), took **591.447s (9m51.4s)**. Registry persisted **exactly once**, compact one-line JSON, **62,180,224 bytes**; **4,486 files /91,374 active units**. Known IDs **99,549→99,553**, zero loss; complete native active claimId/path/anchor/digest tuple equality. Final audit confirms unchanged registry SHA256 `454d56ea8b3958771060ca4d6af399c2652adf394e3e46071deb479c76ddde65` after this one persistence. [Native proof](step10-sync287-native-proof.json).
+
+Eight directly changed native units resolve as **four retained heading IDs and four new block IDs/four predecessor gaps**, no new retirement. Every gap has immutable prior/current native identities, exact text and ancestry, pending supersede to the same authenticated section. [Reconciliation](step10-sync287-predecessor-reconciliation.json), [pending shard](../../ledger/decisions/s10-round3-native-predecessors.json). All previous identities remain, no identity graft or approval carry. The request enumerates **30 native row transitions**, including the complete metadata/lineage changes, rather than only these eight direct text deltas.
+
+**9,206 target bindings scanned across all claims/registryGaps; zero drift /zero rebinds /zero native --rebind calls.** The existing content-binding repair path remains ready for drift, but no repair was needed after the author corrections. [Complete scan](step10-sync287-rebindings.json). **45 dependent accounting projections refreshed**, including61244b0a's current target/native successor, through committed-row snapshots; historical source/residual/before artifacts remain unchanged. [Current projections](step10-sync287-dependent-accounting.json). None is an approval.
+
+## D, ownership, link cells and every rationale
+
+**D has zero fatal findings against both priors together and each separately**, all on the same complete native inventory transported by v8 from the sole sync; no rescan or truncated fields:
+
+| Prior registry | Duration | Fatal |
+|---|---:|---:|
+| both | 86.246s | 0 |
+| identity | 88.356s | 0 |
+| phase02 | 90.933s | 0 |
+
+[D summary](step10-sync287-D-summary.json), [own D log](step10-sync287-native-D.log). Structural D is measured; strict global E/current-truth/promotion/closure are not claimed.
+
+**Ownership passes:** zero native target identity duplicates, zero target drift and zero new active-source collision pairs relative to the round-3 author audit. **254** many-to-one conservation groups remain fully enumerated (252 previously; three groups affected by pending predecessor references, including two additional groups). These historical/gap references are not silently declared unique source ownership. cli-io block22 remains owned by5b930b5c, withbc091727 at23. [Ownership](step10-sync287-target-ownership.json).
+
+**Link-cell replay:366 original positions +98 later positions +four restored destinations, zero findings.** Labels, destinations, table cell and link index remain checked. [Replay](step10-sync287-link-replay.json).
+
+**Rationale consistency:12,893 rows /91 nonempty unit-decision shards, zero findings; all714 regenerated rationales exactly reproduce.** The unchanged original checker first covers12,889 rows/90 pinned shards and every714 rendered result. The supplemental invocation of unchanged `checkLegacyRationale` checks allfour new package-native rows and proves every pinned decision collection equals its current counterpart. All current shards are covered. [Combined result](step10-sync287-all-shards-consistency.json), [pinned result](step10-sync287-rationale-consistency.json), [independent reproduction run](step10-sync287-reproduce-check.log).
+
+**Measured checker limitation:** a direct run on the newly added native shard errors in historical `oldRow`, because that shard did not exist at5035fed52. [Original failure](step10-sync287-rationale-consistency.log). No checker was edited: the reproduction creates a scratch mirror of the pinned corpus and separately audits the four new rows using the unchanged core function. The combined result is explicitly a two-part check, rather than a one-pass original-checker success. Current source/target witnesses for allfour new rows are authenticated from native/prior units. Full-corpus historical source-text limits remain **84**, including **one** among the714 regenerated rows; no unavailable text/range/equality is invented. Two regenerated retired targets retain authenticated historical targets.
+
+Reviewers can rerun consistency and tests themselves at the runner package checkout, from repository root:
+
+```sh
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work python3 plans/260925-documentation-authority-unification/reports/phase-06/step10-sync287-reproduce.py consistency
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/scripts/doc-*.test.mjs test/scripts/check-doc-*.test.mjs test/scripts/generate-doc-inventory.test.mjs test/scripts/list-doc-anchors.test.mjs test/scripts/verify-phase-02.test.mjs test/scripts/next-doc-id.test.mjs
+```
+
+The reproduction materializes scripts/mirrors only in `/tmp/fgos-work/`; it never applies rationale edits or syncs the registry. The tests passed **473/473**, zero fail/skip/cancel/todo. [Test log](step10-sync287-tests.log). No full npm-suite claim. A/B/H pass; check A reads committed allowed-paths directly with no exceptions and retains only the eight disclosed Lead paths. H:609 files/217 checked entries, zero findings/unresolved links. Frozen I bytes unchanged; current reader links equal content pin, with the existing upstream Session Identity route delta explicitly retained. [Check A/B/H/I record](step10-sync287-checks.json).
+
+## One bounded re-review set
+
+[Single index](review-request-step10-index-287a22d33.md), [JSON projection](review-request-step10-index-287a22d33.json): **1,214 entries /33 request parts**, counts **60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 57, 52, 5, 60, 46, 36, 7, 7, 60, 60, 60, 19, 9, 1, 10, 3, 14, 11, 9, 43, 3, 12, 30**. Each Markdown and sidecar has at most60 entries and400000 bytes; largest **371,291 bytes**. Every header names its exact Author session, content pin and exact checker/test reproduction commands.
+
+The set covers everything changed at0d8c602e2: four complete document diffs/six exact line before-afters; rationale renderer, consistency orchestrator and tests; all714 regenerated rationale before/after records (665 formerly reviewed, all pending); every70 applied-then-reopened row;365 retained ordinary applications (364 current andone historical, confirmation only); all changed author accounting/reproduction evidence; fresh check A;45 current dependent projections;30 native transitions/four pending predecessor decisions. Historical native proofs remain historical, replaced for current purposes by the fresh measurements here.
+
+All immutable `currentDecision` and `after` values are loaded from `git show287a22d33:<shard>` through unchanged `reviewEntryFromCommittedRow`, never from intermediate edit-log after objects. New native predecessor decisions are explicitly package-overlay rows, requiring the runner's package commit before review. The714 rationale entries themselves are the pending claim submissions; accounting references do not request duplicate approvals. [Coverage](step10-sync287-package-coverage.json), [snapshot/scope audit](step10-sync287-final-audit.json).
+
+**Independent review:** recompute every digest/anchor/shard match and every714 rationale mechanically; independently seed a deep sample of at least108/714 rationale rows and the A36 conservative Weak-exact/Judgment population (15%/minimum10/all if fewer). The reviewer chooses/records seeds and sample IDs; all unequal source/target digests, partial/historical rows and marked exact docs/tool/native corrections are also deep. One independent draw may satisfy both population thresholds if coverage is proved; otherwise add draws. >3% deep rework escalates to entire pack. [Exact populations](step10-sync287-A36.json). No producer seed, sample or verdict was selected. Substantive judgment, truth samples and checkpoint/red-team obligations remain independent of generator consistency.
+
+| Request file | Entries | Markdown bytes |
+|---|---:|---:|
+| [review-request-step10-rationales-01-287a22d33.md](review-request-step10-rationales-01-287a22d33.md) | 60 | 307,425 |
+| [review-request-step10-rationales-02-287a22d33.md](review-request-step10-rationales-02-287a22d33.md) | 60 | 312,229 |
+| [review-request-step10-rationales-03-287a22d33.md](review-request-step10-rationales-03-287a22d33.md) | 60 | 318,052 |
+| [review-request-step10-rationales-04-287a22d33.md](review-request-step10-rationales-04-287a22d33.md) | 60 | 333,036 |
+| [review-request-step10-rationales-05-287a22d33.md](review-request-step10-rationales-05-287a22d33.md) | 60 | 330,167 |
+| [review-request-step10-rationales-06-287a22d33.md](review-request-step10-rationales-06-287a22d33.md) | 60 | 359,568 |
+| [review-request-step10-rationales-07-287a22d33.md](review-request-step10-rationales-07-287a22d33.md) | 60 | 332,071 |
+| [review-request-step10-rationales-08-287a22d33.md](review-request-step10-rationales-08-287a22d33.md) | 60 | 357,908 |
+| [review-request-step10-rationales-09-287a22d33.md](review-request-step10-rationales-09-287a22d33.md) | 60 | 331,952 |
+| [review-request-step10-rationales-10-287a22d33.md](review-request-step10-rationales-10-287a22d33.md) | 60 | 314,582 |
+| [review-request-step10-rationales-11-287a22d33.md](review-request-step10-rationales-11-287a22d33.md) | 57 | 353,415 |
+| [review-request-step10-rationales-12-287a22d33.md](review-request-step10-rationales-12-287a22d33.md) | 52 | 360,245 |
+| [review-request-step10-rationales-13-287a22d33.md](review-request-step10-rationales-13-287a22d33.md) | 5 | 71,908 |
+| [review-request-step10-decisions-01-287a22d33.md](review-request-step10-decisions-01-287a22d33.md) | 60 | 318,468 |
+| [review-request-step10-decisions-02-287a22d33.md](review-request-step10-decisions-02-287a22d33.md) | 46 | 357,531 |
+| [review-request-step10-decisions-03-287a22d33.md](review-request-step10-decisions-03-287a22d33.md) | 36 | 356,970 |
+| [review-request-step10-decisions-04-287a22d33.md](review-request-step10-decisions-04-287a22d33.md) | 7 | 66,473 |
+| [review-request-step10-decisions-05-287a22d33.md](review-request-step10-decisions-05-287a22d33.md) | 7 | 60,335 |
+| [review-request-step10-decisions-06-287a22d33.md](review-request-step10-decisions-06-287a22d33.md) | 60 | 308,470 |
+| [review-request-step10-decisions-07-287a22d33.md](review-request-step10-decisions-07-287a22d33.md) | 60 | 296,127 |
+| [review-request-step10-decisions-08-287a22d33.md](review-request-step10-decisions-08-287a22d33.md) | 60 | 276,206 |
+| [review-request-step10-decisions-09-287a22d33.md](review-request-step10-decisions-09-287a22d33.md) | 19 | 108,914 |
+| [review-request-step10-decisions-10-287a22d33.md](review-request-step10-decisions-10-287a22d33.md) | 9 | 53,043 |
+| [review-request-step10-historical-01-287a22d33.md](review-request-step10-historical-01-287a22d33.md) | 1 | 9,465 |
+| [review-request-step10-documents-01-287a22d33.md](review-request-step10-documents-01-287a22d33.md) | 10 | 26,082 |
+| [review-request-step10-tools-01-287a22d33.md](review-request-step10-tools-01-287a22d33.md) | 3 | 44,215 |
+| [review-request-step10-accounting-01-287a22d33.md](review-request-step10-accounting-01-287a22d33.md) | 14 | 203,948 |
+| [review-request-step10-accounting-02-287a22d33.md](review-request-step10-accounting-02-287a22d33.md) | 11 | 71,303 |
+| [review-request-step10-accounting-03-287a22d33.md](review-request-step10-accounting-03-287a22d33.md) | 9 | 131,941 |
+| [review-request-step10-accounting-04-287a22d33.md](review-request-step10-accounting-04-287a22d33.md) | 43 | 353,602 |
+| [review-request-step10-accounting-05-287a22d33.md](review-request-step10-accounting-05-287a22d33.md) | 3 | 31,611 |
+| [review-request-step10-accounting-06-287a22d33.md](review-request-step10-accounting-06-287a22d33.md) | 12 | 17,055 |
+| [review-request-step10-native-01-287a22d33.md](review-request-step10-native-01-287a22d33.md) | 30 | 57,908 |
+
+## Blockers and remaining work
+
+No execution or merge-doc re-carry blocker. The observed direct-checker new-shard limitation has an independently rerunnable all-shard composition; its original failure is retained, not erased. **Independent ordinary review of this one set is next.** Then apply only matching committed verdicts with verbatim Notes and continue the already required global turn: global D/E alone from the same overlay, T9/promotion/current-truth, mutation/third refresh, full corpus and reduced Step2 rehearsal, exact alias/checkpoint populations, sensitivity/red-team and scorecard/effort. A34 residual acceptance, three Rings holds, dashboard predecessor/stale successor,32 groups,14 runner-cutover obligations and inbound/non-doc consumer queues remain open. No global E pass, snapshot sealing, Phase6 closure, promotion, retirement, alias adoption, push or landing. No preview was run under this assignment's write constraints.
+
+[Exact execution witnesses](step10-sync287-reproduction.json). Runner commits.
+
+---
+
+## Historical author and package reports
+
 # Step 10 round-3 author corrections complete — package next
 
 Assignment `unit-run-1792114313040-56132651/producer/1`; input HEAD `5035fed52e60254ecbe034cc987553feb24616f4`, reviewed content `345f15d95`, request `c939e9a51`. All 22 committed reports’ Notes/Concerns were read. This author/docs turn performs **zero native sync, zero native --rebind, zero review packs**. Runner owns commits. Phase 6 remains open.

@@ -1,0 +1,863 @@
+{
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "rowsScanned": 12893,
+  "shardsScanned": 91,
+  "generatedRowsChecked": 714,
+  "pinnedCorpus": {
+    "files": [
+      "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+      "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-first.json",
+      "plans/260925-documentation-authority-unification/pilot/decisions/b-decisions-second.json",
+      "plans/260925-documentation-authority-unification/pilot/decisions/b-entry-actors-rules-pointers.json",
+      "plans/260925-documentation-authority-unification/pilot/decisions/b-files.json",
+      "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s10-confinement-binding.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s10-systemic-native-predecessors.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-closure-successors.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-02.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-05.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-01.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-02.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-03.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-log-duplicates.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-main-merge-pending.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-main-merge.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-reopened-exact.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-binding.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-resolution.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-governance.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-sc1-gaps.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-generated-backlog.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-historical-gaps.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-mapped-conservation.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-retained-navigation-proposal.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-source-completion.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-source-native-successors.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-switchboard-gap-successor.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-template-conservation.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-truth-successors.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-architect-portal.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-architecture-intent.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-architecture-map.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-readme.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-repo-layout-vision.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-portal-classifications.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-roadmap.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-system-overview.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-system-vision-trong-mem-ngoai-cung.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-workspace-topology-audit.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-workspace-topology-roadmap.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-workspace-topology.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-01-dispatch-control-plane-redesign.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-02-documentation-system-design.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-03-documentation-system-discussion.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-04-doing-coordination-redesign.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-05-readme.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-06-knowledge-registry-redesign.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-07-architecture-advisory-panel.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-08-component-authority-boundary-map.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-09-coordination-capability-envelope.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-10-coordination-dispatch-contract.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-11-coordination-envelope-probe-contract.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-12-coordination-envelope-progress.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-13-coordination-worker-provider-boundary.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-14-group-thinking-plan-loop.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-15-readme.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-16-step-09-group-thinking-substrate.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-17-step-09-step-10-replan-handoff-prompt.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-18-step-10-a0-coding-domain-boundary-facade-plan.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-19-step-10-coding-domain-adoption.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-20-visibility-and-interactive-contact-herdr-spawn.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s8-decision-citation-drift-01.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-predecessor.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+      "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json"
+    ],
+    "unchangedCommittedRows": true,
+    "result": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync287-rationale-consistency.json"
+  },
+  "nativePackageShard": {
+    "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-round3-native-predecessors.json",
+    "results": [
+      {
+        "claimId": "claim_d342cec565707124f0b4e7860db2193c",
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-round3-native-predecessors.json",
+        "sourceCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+        "source": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-11",
+          "githubAnchor": "unheaded-block-11",
+          "stableAnchor": "unheaded-block-11",
+          "title": "Unheaded block 11",
+          "startLine": 61,
+          "endLine": 67,
+          "textDigest": "d02d7891949ca1a0284d509b5c8828e1631138f4d32c20830d5491efb75836c8",
+          "sample": "| Direction | Status | Alignment |\n| --- | --- | --- |\n| CLI, remote, and chat are peer hosts that feed one semantic invocation service. | `accepted-not-implemented` | Preserved fr",
+          "identityFingerprint": "feba2a8555eee26e9c64300bc888119427f19d79e7115773bd474f4775d22519",
+          "ancestry": [
+            "Host Invocation Vision",
+            "5. Design Direction"
+          ],
+          "text": "| Direction | Status | Alignment |\n| --- | --- | --- |\n| CLI, remote, and chat are peer hosts that feed one semantic invocation service. | `accepted-not-implemented` | Preserved from [host-invocation-provider-routing.md](spec.md); proof gap in [verification/implementation-alignment.md](verification/implementation-alignment.md). |\n| Legacy Node compatibility is transitional and CLI-local unless a per-operation semantic bridge is needed. | `accepted-not-implemented` with `legacy-current` behavior | Preserved from [legacy-cli-transition.md](../../architect/host-invocation-routing/legacy-cli-transition.md). |\n| Provider manifests describe capability requests and operation claims but never grant authority. | `accepted-not-implemented` | Preserved from [external-provider-protocol.md](architecture/external-provider-protocol.md). |\n| Rust host migration proceeds by complete component/use-case boundaries, reads before writers, and no write dual-run. | `planned` | Preserved from [node-to-rust-component-migration.md](architecture/node-to-rust-migration.md). |\n| Rollback of native R1/R2 behavior is a release rollback through `fgctl`, not a runtime provider-selection toggle. | `accepted-not-implemented` | Depends on packaging-distribution contracts. |"
+        },
+        "target": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-11",
+          "githubAnchor": "unheaded-block-11",
+          "stableAnchor": "unheaded-block-11",
+          "title": "Unheaded block 11",
+          "startLine": 61,
+          "endLine": 67,
+          "textDigest": "ae9e5973a1589865f79a8daee8e14aa245ce6a8b7a0f7af3978006e63771ebb2",
+          "sample": "| Direction | Status | Alignment |\n| --- | --- | --- |\n| CLI, remote, and chat are peer hosts that feed one semantic invocation service. | `accepted-not-implemented` | Preserved fr",
+          "identityFingerprint": "69dc8b96e5e58bf19404dfecc1655813a8f2d33e256386a5b039b7fd966a7167",
+          "ancestry": [
+            "Host Invocation Vision",
+            "5. Design Direction"
+          ],
+          "text": "| Direction | Status | Alignment |\n| --- | --- | --- |\n| CLI, remote, and chat are peer hosts that feed one semantic invocation service. | `accepted-not-implemented` | Preserved from [host-invocation-provider-routing.md](../../architect/host-invocation-routing/host-invocation-provider-routing.md); proof gap in [verification/implementation-alignment.md](verification/implementation-alignment.md). |\n| Legacy Node compatibility is transitional and CLI-local unless a per-operation semantic bridge is needed. | `accepted-not-implemented` with `legacy-current` behavior | Preserved from [legacy-cli-transition.md](../../architect/host-invocation-routing/legacy-cli-transition.md). |\n| Provider manifests describe capability requests and operation claims but never grant authority. | `accepted-not-implemented` | Preserved from [external-provider-protocol.md](../../architect/host-invocation-routing/external-provider-protocol.md). |\n| Rust host migration proceeds by complete component/use-case boundaries, reads before writers, and no write dual-run. | `planned` | Preserved from [node-to-rust-component-migration.md](../../architect/host-invocation-routing/node-to-rust-component-migration.md). |\n| Rollback of native R1/R2 behavior is a release rollback through `fgctl`, not a runtime provider-selection toggle. | `accepted-not-implemented` | Depends on packaging-distribution contracts. |"
+        },
+        "findings": []
+      },
+      {
+        "claimId": "claim_a4ed6ca5cfd26790037b35d1c99373b2",
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-round3-native-predecessors.json",
+        "sourceCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+        "source": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-75",
+          "githubAnchor": "unheaded-block-75",
+          "stableAnchor": "unheaded-block-75",
+          "title": "Unheaded block 75",
+          "startLine": 438,
+          "endLine": 442,
+          "textDigest": "9aefc76daebb502839626d20f26342d459be16ca0412bed1a7d4d3af5dd4ea9c",
+          "sample": "> Status: historical redirect. Active topology remains\n> [docs/architect/workspace-topology.md](../system-architecture/architecture/workspace-topology.md), while active\n> packaging",
+          "identityFingerprint": "f734105d1f5c0b9ab096c145cce3595411b7d2bb5c628d8e508aa75fb87d1dda",
+          "ancestry": [
+            "Spec: Packaging-Distribution",
+            "Retained Workspace Runtime Model Source Detail",
+            "Workspace Runtime Model"
+          ],
+          "text": "> Status: historical redirect. Active topology remains\n> [docs/architect/workspace-topology.md](../system-architecture/architecture/workspace-topology.md), while active\n> packaging-distribution runtime records live under\n> [docs/platform/packaging-distribution/](README.md).\n> Keep this file only as the old pointer that explains the split."
+        },
+        "target": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-75",
+          "githubAnchor": "unheaded-block-75",
+          "stableAnchor": "unheaded-block-75",
+          "title": "Unheaded block 75",
+          "startLine": 438,
+          "endLine": 442,
+          "textDigest": "19851b062b9026d35b203683af36c1a27d3cf542f557549831e1e860138dee6a",
+          "sample": "> Status: historical redirect. Active topology remains\n> [docs/architect/workspace-topology.md](../../architect/workspace-topology.md), while active\n> packaging-distribution runtim",
+          "identityFingerprint": "5bdc6ba3ca67fc37b5134f93302687e43ed98224427a962e9d60de09cf4420da",
+          "ancestry": [
+            "Spec: Packaging-Distribution",
+            "Retained Workspace Runtime Model Source Detail",
+            "Workspace Runtime Model"
+          ],
+          "text": "> Status: historical redirect. Active topology remains\n> [docs/architect/workspace-topology.md](../../architect/workspace-topology.md), while active\n> packaging-distribution runtime records live under\n> [docs/platform/packaging-distribution/](README.md).\n> Keep this file only as the old pointer that explains the split."
+        },
+        "findings": []
+      },
+      {
+        "claimId": "claim_c0f157804addf46fdb20b9c61882794b",
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-round3-native-predecessors.json",
+        "sourceCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+        "source": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-26",
+          "githubAnchor": "unheaded-block-26",
+          "stableAnchor": "unheaded-block-26",
+          "title": "Unheaded block 26",
+          "startLine": 456,
+          "endLine": 467,
+          "textDigest": "0dce2b78b5d497ab9dbe1b9cc6d0d8a00ad2ff468b97fe5964c8e86464b0a3b2",
+          "sample": "Added in candidate — A41/A42 correction: CLI hiện hành không có verb `evolve` (`bin/fgos.mjs:4415,4461`; `evolve --help` trả \"unknown verb\"). Module ranking đã bị xoá ở commit `120",
+          "identityFingerprint": "7048efa94641c54ae38bef92f2da26de9fb17daf145246156e881bad9842679a",
+          "ancestry": [
+            "Added in candidate: Runner Behaviors & Operations",
+            "Behaviors & Operations",
+            "Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)"
+          ],
+          "text": "Added in candidate — A41/A42 correction: CLI hiện hành không có verb `evolve` (`bin/fgos.mjs:4415,4461`; `evolve --help` trả \"unknown verb\"). Module ranking đã bị xoá ở commit `120af6b3d`. Đoạn dưới ghi lại hợp đồng Gate A trước khi bị gỡ, không xác nhận triển khai hiện hành; full truth check owed at promotion.\nBước vào trước đây của vòng tự cải thiện (self-improve loop, STR13 — CONTEXT.md):\nTheo hợp đồng cũ, fgOS xếp hạng chính friction chưa ngã-ngũ của nó thành\nmột danh sách candidate, người chọn đúng một hoặc dừng (Slice 1), rồi có thể\nbắc cầu candidate đã chọn sang một việc thật để runner thi công (Slice 3,\n`--submit`). Loop này chỉ nhắm vào chính `repo/src` của fgOS — không\nphải một tính năng mở cho host project ngoài — và chạy khi người gọi tay,\nkhông bao giờ là một nhánh tự động của vòng dispatch thường. Vòng khép\nkín đầy đủ: `evolve` (liệt kê) → `evolve --pick` (xem một candidate, đọc-thuần)\n→ `evolve --submit` (bắc cầu, HÀNH ĐỘNG GHI duy nhất của cả bề mặt evolve) →\nrunner dispatch việc mới như mọi việc khác → `review`/`approve` qua cổng duyệt\nPR nội bộ, với `approve` chạy thêm phán Iron Law (xem dưới) trước khi merge."
+        },
+        "target": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-26",
+          "githubAnchor": "unheaded-block-26",
+          "stableAnchor": "unheaded-block-26",
+          "title": "Unheaded block 26",
+          "startLine": 456,
+          "endLine": 467,
+          "textDigest": "0f61fde6bc880cb19623ecde63a6a137571884e4b6ae2f8b24b8a585b25d600a",
+          "sample": "Added in candidate — A41/A42 correction: CLI hiện hành không có verb `evolve` (`bin/fgos.mjs:4415,4503`; `evolve --help` trả \"unknown verb\"). Module ranking đã bị xoá ở commit `120",
+          "identityFingerprint": "871f3aa2e8699bc9b5c73af0cbf8305884b3469e1f6e2df1845dd8b030d52add",
+          "ancestry": [
+            "Added in candidate: Runner Behaviors & Operations",
+            "Behaviors & Operations",
+            "Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)"
+          ],
+          "text": "Added in candidate — A41/A42 correction: CLI hiện hành không có verb `evolve` (`bin/fgos.mjs:4415,4503`; `evolve --help` trả \"unknown verb\"). Module ranking đã bị xoá ở commit `120af6b3d`. Đoạn dưới ghi lại hợp đồng Gate A trước khi bị gỡ, không xác nhận triển khai hiện hành; full truth check owed at promotion.\nBước vào trước đây của vòng tự cải thiện (self-improve loop, STR13 — CONTEXT.md):\nTheo hợp đồng cũ, fgOS xếp hạng chính friction chưa ngã-ngũ của nó thành\nmột danh sách candidate, người chọn đúng một hoặc dừng (Slice 1), rồi có thể\nbắc cầu candidate đã chọn sang một việc thật để runner thi công (Slice 3,\n`--submit`). Loop này chỉ nhắm vào chính `repo/src` của fgOS — không\nphải một tính năng mở cho host project ngoài — và chạy khi người gọi tay,\nkhông bao giờ là một nhánh tự động của vòng dispatch thường. Vòng khép\nkín đầy đủ: `evolve` (liệt kê) → `evolve --pick` (xem một candidate, đọc-thuần)\n→ `evolve --submit` (bắc cầu, HÀNH ĐỘNG GHI duy nhất của cả bề mặt evolve) →\nrunner dispatch việc mới như mọi việc khác → `review`/`approve` qua cổng duyệt\nPR nội bộ, với `approve` chạy thêm phán Iron Law (xem dưới) trước khi merge."
+        },
+        "findings": []
+      },
+      {
+        "claimId": "claim_647a9d5f06216a5e9d6fa267e77cbf03",
+        "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-round3-native-predecessors.json",
+        "sourceCommit": "345f15d95663260976200be66d1b9a6c648bcd6d",
+        "source": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-2",
+          "githubAnchor": "unheaded-block-2",
+          "stableAnchor": "unheaded-block-2",
+          "title": "Unheaded block 2",
+          "startLine": 23,
+          "endLine": 23,
+          "textDigest": "35107e63035cafc34d5698a84f60bb1be49f6700d5e2ad14471d6de41ad86cca",
+          "sample": "> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth ",
+          "identityFingerprint": "96946de13c0696253ab306030fc9e269d9aa56a4be5371ba9cbd92064a3badc8",
+          "ancestry": [
+            "Added in candidate: Runner Pointers (implementation)"
+          ],
+          "text": "> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: A41 F2: replace deleted entropy pointer (packages/observe/rust/src/metrics_cli/entropy.rs:1-8; packages/observe/rust/src/metrics_cli/entropy.rs:107-127); A41 F1: replace deleted ranking pointer (bin/fgos.mjs:4640-4643; bin/fgos.mjs:4415-4380); R9-5: remove decisions-placement boilerplate from non-decision carrier."
+        },
+        "target": {
+          "unitKind": "unheaded-block",
+          "anchor": "unheaded-block-2",
+          "githubAnchor": "unheaded-block-2",
+          "stableAnchor": "unheaded-block-2",
+          "title": "Unheaded block 2",
+          "startLine": 23,
+          "endLine": 23,
+          "textDigest": "c354e3357585a5cc6bce8dd57d833b0e85d3f19e58ba6e81e9d6f562aca53edc",
+          "sample": "> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth ",
+          "identityFingerprint": "e1fbde6f58cfdeb1279b92317107b574bff70a5805f3838dcdc8be070ff0a51d",
+          "ancestry": [
+            "Added in candidate: Runner Pointers (implementation)"
+          ],
+          "text": "> Added in candidate: Metadata and map-based placement scaffolding. Original source heading levels, ids and direct sections are retained. Known stale carried sentences; full truth check owed at promotion. A19 carriage and explicit Lead A35 note preserve deleted-module, retired-corpus, moved-plan and runner.md:<line> text verbatim. Corrections in this candidate: A41 F2: replace deleted entropy pointer (packages/observe/rust/src/metrics_cli/entropy.rs:1-8; packages/observe/rust/src/metrics_cli/entropy.rs:107-127); A41 F1: replace deleted ranking pointer (bin/fgos.mjs:4414-4417); R9-5: remove decisions-placement boilerplate from non-decision carrier."
+        },
+        "findings": []
+      }
+    ]
+  },
+  "legacyFindings": [],
+  "generatedFindings": [],
+  "sourceWitnessLimits": [
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+      "claimId": "claim_a55aa524e35b109695acc79c3c4d7c75",
+      "path": "AGENTS.md",
+      "sourceUnitDigest": "d3121f545f6a84c5ffe0eea34fff6dbaf7578c9c6573ecfda87214959a872021",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+      "claimId": "claim_adc150a41d48dfde06422405a5b0f277",
+      "path": "AGENTS.md",
+      "sourceUnitDigest": "e19ff915b019695296a84779c61f78737d18266ded2094e5f712297bbb701861",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+      "claimId": "claim_839bc9774b75e893f078d20ecbbb39f0",
+      "path": "AGENTS.md",
+      "sourceUnitDigest": "a95a9f895ef3158dcea414aad702a9ed3fedd57533c2e08637853324ab897fc8",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+      "claimId": "claim_2c95402110cb9a2551ee02f61dde7da6",
+      "path": "CLAUDE.md",
+      "sourceUnitDigest": "ec9327263ee8a9a9cf8ed835ebf5d5e34bde6f60fae2d2263eae7e7c9024fdb3",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+      "claimId": "claim_91884eb1c5b30d2bae725bd54036af48",
+      "path": "CLAUDE.md",
+      "sourceUnitDigest": "ba8b02c21fe45af0ba20b280ef182065e87c3410dae024d6ede3983845990c9c",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+      "claimId": "claim_b03dcaaf5e17554a35f8f92b6551bcd5",
+      "path": "CLAUDE.md",
+      "sourceUnitDigest": "a95a9f895ef3158dcea414aad702a9ed3fedd57533c2e08637853324ab897fc8",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+      "claimId": "claim_680368f9b96bad5b9081e46ac1c15f71",
+      "path": "CLAUDE.md",
+      "sourceUnitDigest": "c35b7e7e314cf0e8bc31d77baea98b024a88970351e229108dcb6968b6a18501",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "claimId": "claim_d52f4222d940558ef34a2d7c0f174628",
+      "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "sourceUnitDigest": "b053393c73b2fe8eecad5f35e7cb87c2e6a31830b02fec1c22fb6aad1ea85013",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "claimId": "claim_bdeaa6f1cce78532047ba6bf959cc43a",
+      "path": "docs/specs/distribution.md",
+      "sourceUnitDigest": "cdc65be47d5ab1b4f61dfdef36be58ea1c499cff90dd56e3b3bcb5431aa561f4",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "claimId": "claim_45e83e644c43384e188c16e20172a52c",
+      "path": "docs/specs/distribution.md",
+      "sourceUnitDigest": "b1e15730d97d645508d833b30133c31d6ac119466d80377b70c7815d0b8e08b3",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "claimId": "claim_8d6b06dae659395981e196d4f7d33c15",
+      "path": "docs/specs/distribution.md",
+      "sourceUnitDigest": "adbe84814a993cfb5f57b2646665d448fe34ee2d2583e6b2f930855f035722e8",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-resolution.json",
+      "claimId": "claim_9f0812f083e5ff3bac32d3e50e024b88",
+      "path": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "sourceUnitDigest": "d348c7aff00a8cbe0fd6cbff45013ccc9cff3699df7a7ab14b985bbb73ba5ccf",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-resolution.json",
+      "claimId": "claim_743f0b70132cc6fda8271214be7c061a",
+      "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+      "sourceUnitDigest": "ffc24cb21beb67e859d84f86ef48e47a78b8c3e678c78823abd7be210cbd1a2c",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-resolution.json",
+      "claimId": "claim_34de7c299044ca3ebf49837a0ef7f3bb",
+      "path": "docs/platform/packaging-distribution/decisions/installed-default-npm-compatibility.md",
+      "sourceUnitDigest": "8c825fbfc4345283bc92771c4af94d6a38ff5e2b75e2b7097d29267f7d882769",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+      "claimId": "claim_40aafcee52b22eda087c5f85eacb9392",
+      "path": "docs/specs/runner.md",
+      "sourceUnitDigest": "95e75f7d43d50bbae0d6a7979aa0db2f01326f00fc290507fdf8bf046403a547",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+      "claimId": "claim_8eaaa820698633aedf4339ea1f923d89",
+      "path": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "sourceUnitDigest": "feb1ffbbcdc358cd3c725515910cbc9c1d75a7fa40e3ac950a795c3d596a61a9",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+      "claimId": "claim_99600767aa1a793a02dbdc32107693d2",
+      "path": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+      "sourceUnitDigest": "4c1c662a71f24326115932c1feb1872d829ee4b09b426bcfb45f85a9f736d7d5",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+      "claimId": "claim_a4c26f8aae004f1d17d0f5be7e48b585",
+      "path": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "sourceUnitDigest": "ea2d47cd7df1f38d2e62d41f5a7ae009c009b92d67889c1b74841d2335a79560",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "claimId": "claim_f033905b059f073c62ec27f0ee6da620",
+      "path": "docs/specs/runner.md",
+      "sourceUnitDigest": "c331d40816f84d25425abfdfdb8c6bff2a1e92b781bfe82d6f910fc0b1777917",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "claimId": "claim_755cc3f7baeabc42702373bb6d09154c",
+      "path": "docs/how-to/compare-discussion-setups-with-metrics-eval.md",
+      "sourceUnitDigest": "abb98866cc08d2f0cf2991cd0559e537f0bb93fa7e75848a31deeef8ed1a3f0f",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "claimId": "claim_f162d77427a68d4fd4ba8a43c39ba746",
+      "path": "docs/how-to/compare-discussion-setups-with-metrics-eval.md",
+      "sourceUnitDigest": "2e989ebe228c502c9329ad38adec2a72e6bf1f32815aa4750b592aa084f1a144",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "claimId": "claim_e8446ab5cec97974f2099db88f606c3f",
+      "path": "docs/how-to/compare-discussion-setups-with-metrics-eval.md",
+      "sourceUnitDigest": "78326661cd2a64e716752d276fcc489fe412efbe97d209e499a5d261f7b1f82c",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "claimId": "claim_6b514c8b4b2a093c292c034910f88967",
+      "path": "docs/how-to/compare-discussion-setups-with-metrics-eval.md",
+      "sourceUnitDigest": "ac34de0a51785bcb3f46dddc25d78d55828a83236c7a2ba26b7a2bd3920bf470",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "claimId": "claim_5ad7915f076019507cae1a93c14ad2d7",
+      "path": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+      "sourceUnitDigest": "4e2d5012783b54e530525974791c5fee2f7a078ee4a84c4a20cdbeb4da8a5108",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "claimId": "claim_0b03338bd7576f97d0cd046630a49fee",
+      "path": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+      "sourceUnitDigest": "0e208583b6697a5d9d214ac163155519c9546ff4f5c532095aa5a5cf9afef4e0",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "claimId": "claim_d85a5331d5712b2f5c2ecd9cab60e487",
+      "path": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+      "sourceUnitDigest": "12d9fffb49ffa95c2b9387a90947d874c39868bf5cf11fec20992ec249bacd17",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "claimId": "claim_b741539a16b6eb2792ca6c4178b23671",
+      "path": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+      "sourceUnitDigest": "e7eb39699c8b988fcf1907e294d4d34ded00f4a8b3194bd0f3388260bceb749b",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "claimId": "claim_7ae2ffc8a883b917293312f8b63805eb",
+      "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "sourceUnitDigest": "8a476b7de9622de9b60ad5e7b786fdcafe5b788eddbb10b05f818db765b5fd33",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "claimId": "claim_75041e871c0b191949808b55f541184d",
+      "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "sourceUnitDigest": "d319970d29c29c5c781fc873bff405b6868816863f23906712c367d109b2fff8",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "claimId": "claim_b9b42545b42b04889685191ada1a3892",
+      "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "sourceUnitDigest": "685a1962cfdf2a77e004ce63487f93f36b00b332083debf26cda969e833559fd",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "claimId": "claim_c201fb480171293641c2fb049fd33936",
+      "path": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+      "sourceUnitDigest": "6454baa8036f396a464892f0ee01b801236b89cfa5091363bea4d4c4cd881b81",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "claimId": "claim_199501685fd82d464892f7a06aad9516",
+      "path": "docs/platform/packaging-distribution/spec.md",
+      "sourceUnitDigest": "fa1e3475328263494367fdcaa17903829498d7bc435e1dacb33ad8b9ac4b28fc",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "claimId": "claim_73221307a66a364372a7f8206227e62f",
+      "path": "docs/platform/packaging-distribution/spec.md",
+      "sourceUnitDigest": "c14f83e85b43064dd321bf0926e6b98f781c23df08cf772ef8959a30837a2e18",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "claimId": "claim_3d2d87a2a9582e2faebabc79470d8ee8",
+      "path": "docs/platform/work-state/spec.md",
+      "sourceUnitDigest": "f20c0ca6ad7490fa85635d8100333e97787282b0936df18a2f7f7599d5cd3b63",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-historical-gaps.json",
+      "claimId": "claim_0956ea2eadf0a32787b7fd0e51d693a6",
+      "path": "docs/backlog.md",
+      "sourceUnitDigest": "8af4c326a8034fa8b4584cb6795459a32d8e9c0afbc616540092a7d8400382c1",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-retained-navigation-proposal.json",
+      "claimId": "claim_bdfe277773eef55558042590ce9590af",
+      "path": "docs/specs/reading-map.md",
+      "sourceUnitDigest": "f3bcb9045712152762754f78ad2524c9e8bfe13c6d2818f145d021bfb3ded9c4",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-retained-navigation-proposal.json",
+      "claimId": "claim_218d4b42e8ea4b5f0cdc071b33fa3f54",
+      "path": "docs/reading-map.md",
+      "sourceUnitDigest": "8a6a408d2e92d032e23faf4951c3dd36fbeb9d26d32aefb613038924916f8a7d",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-retained-navigation-proposal.json",
+      "claimId": "claim_c3b29b18751a7153eb574a571a8a1009",
+      "path": "docs/reading-map.md",
+      "sourceUnitDigest": "e43f4177f48b53c47017f865260dd121d2a54ab56cf22270a4d698ca0b648e02",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-source-native-successors.json",
+      "claimId": "claim_89727d0eb13008ab3f1ed76092044a4f",
+      "path": "docs/platform/work-state/spec.md",
+      "sourceUnitDigest": "72721c54253ba541180f7b7114d858ce2af06671f1fa05f45162063962b681b2",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-truth-successors.json",
+      "claimId": "claim_ac8be2d94e5bad871f26214d7eaac4af",
+      "path": "docs/platform/work-state/spec.md",
+      "sourceUnitDigest": "896856e1509a84929acc35bbf336ab20a94a6f95415423205fa32a2bfe54d45c",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-truth-successors.json",
+      "claimId": "claim_1a6a7460ede876ae7fa1de7c2e168cfe",
+      "path": "docs/platform/work-state/spec.md",
+      "sourceUnitDigest": "96b669468dbe4f3a8fd6eaa112986cead07ae88fa9de2b233f8fbf27314f9d16",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-truth-successors.json",
+      "claimId": "claim_64efd51dc50d417f21972188bf57afe9",
+      "path": "docs/platform/work-state/spec.md",
+      "sourceUnitDigest": "504b6a5b42d39ff1886b7e1865b5cd54713406e8caff7f6c22e0b3085efb755d",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-truth-successors.json",
+      "claimId": "claim_3b151159fccbac3b57c7ea93fb1d8ca7",
+      "path": "docs/platform/work-state/spec.md",
+      "sourceUnitDigest": "27a3ba1515c8ffa4c6db8e9123168b72f583293dd0d4904824848c7187fe2bf1",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-truth-successors.json",
+      "claimId": "claim_2d8114529b804f49494e6d42548e1372",
+      "path": "docs/platform/platform-foundations.md",
+      "sourceUnitDigest": "8fc59c5dbdac8ab4ef8e31cefed6cddbcce54e9c0f32a697f7101bed0056a06f",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-truth-successors.json",
+      "claimId": "claim_eb0bf7783bb1b1027c012f050c782203",
+      "path": "docs/platform/work-state/spec.md",
+      "sourceUnitDigest": "c8fc6e5bf49179cb6f37f3247ad25c3217a40bd23b96748f5fdf6893dff5581e",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-truth-successors.json",
+      "claimId": "claim_3c9b65402d8ece4ef57ad337ba5d9d72",
+      "path": "docs/platform/work-state/spec.md",
+      "sourceUnitDigest": "fadda0c2061d00de158fb62f8d16aba1e58002c1165e5b3d416be97331217f3e",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-truth-successors.json",
+      "claimId": "claim_1f9fb4feceda8f5bf6a18b151ce0a397",
+      "path": "docs/platform/work-state/spec.md",
+      "sourceUnitDigest": "4b215c2fd35cfdf4e6786cf9adbb44f0e1bbb55662a39329bc271641ef99f6b0",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-truth-successors.json",
+      "claimId": "claim_acab595482e4f9f7ae05e21a1a28f11b",
+      "path": "docs/platform/work-state/spec.md",
+      "sourceUnitDigest": "6507aee6bfe4534417362ff8fbb85c58f51a633e49c81ef69ea29c75effb773a",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-truth-successors.json",
+      "claimId": "claim_7c4295aa058b6a7fa5c6b945a0441a35",
+      "path": "docs/platform/work-state/spec.md",
+      "sourceUnitDigest": "0cee9be267f694d7ef523f3c96e35b1837c9d6bd8f4eb275770357dab32a2cdf",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-truth-successors.json",
+      "claimId": "claim_02a2110f086ac00ef2d59c9d4d9afeb1",
+      "path": "docs/platform/work-state/spec.md",
+      "sourceUnitDigest": "ecb4ec26f8d1cd8578eb40c2e93a7e12016dc4658e1593d04c48fddaf40d4691",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-portal-classifications.json",
+      "claimId": "claim_afcdab4a068dfd573dfa7ec5a5f21c34",
+      "path": "docs/platform/README.md",
+      "sourceUnitDigest": "d2295aa8bb8ade7d7e359ae65c80b310d7baf8921771294e58d0523302d5269e",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-predecessor.json",
+      "claimId": "claim_7d5937c751aa5fa0db3a489560c25b6b",
+      "path": "docs/specs/herdr-web-dashboard.md",
+      "sourceUnitDigest": "dfb39feda064d64c81b97e75de9dc9de5f2f795a6828e777f50fad3014f56e97",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "claimId": "claim_f64fa4a36030f89feab71dc5943015c0",
+      "path": "docs/specs/runner.md",
+      "sourceUnitDigest": "92ca20e4e333b0933210a6adf9f39c7cc0a46eb800a1e19404ad019e80730e0a",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "claimId": "claim_f4058f068a378962aaf237ae038db5af",
+      "path": "docs/specs/runner.md",
+      "sourceUnitDigest": "d2f7e04754c3720cace2cf46bb12fb5e3701574c76182e79aacbd1b6f6de95e8",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "claimId": "claim_77a827ba40c328bd2c4d6a8ec713df65",
+      "path": "docs/specs/runner.md",
+      "sourceUnitDigest": "5a99ae10ac39e5bf6d8b29289aaba42958a45534c58e9e2dfa85fbb744472f14",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "claimId": "claim_3dcf1baab2b0ac4b7ab7f84e30b8ab41",
+      "path": "docs/specs/runner.md",
+      "sourceUnitDigest": "24e736b37697fbd3c3ce53ed568dfa89aa2bff023c3e3deb0ed686b364f327e6",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "claimId": "claim_93d5f2d34cf452029462ea39674fd255",
+      "path": "docs/specs/runner.md",
+      "sourceUnitDigest": "dea0728314fa0ae7aa5070aa2d76aa20e1788d2e18d9fcbbe80f5dae4be9ccd8",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "claimId": "claim_8f8191c13e179af31ad39593af9fe716",
+      "path": "docs/specs/runner.md",
+      "sourceUnitDigest": "1fd1ba41ab74a3e7207569fd1756de81dbbddbc579bb8b3fffac943d1d7fd4cf",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "claimId": "claim_072766aafbaf01714df1aa65347a1d24",
+      "path": "docs/specs/runner.md",
+      "sourceUnitDigest": "f503ccc86158d7a9b67881c8983a4acb08172087f1d5f736628e21ef3832a0b2",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "claimId": "claim_4d5b7f73e28f18b31e0142bf48e21c3a",
+      "path": "docs/specs/runner.md",
+      "sourceUnitDigest": "eb016bbb57ba643787f71c06f78838c1bf0bd938c028c8536acb66ee7c9a8d75",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "claimId": "claim_d5ba1eda7530b865fec747ee0adbc102",
+      "path": "docs/specs/runner.md",
+      "sourceUnitDigest": "77083ab43b25bd2e30eb1ff1f2b24db87e02420e7cc187773951d44a3a9df49f",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "claimId": "claim_a64fabc06da00bb0eb8dfaba5ea0c1a6",
+      "path": "docs/specs/runner.md",
+      "sourceUnitDigest": "b323720a9d4e93b156af47db347755f342dd8ad9fb9720466bb161732ebef4e3",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "claimId": "claim_3c77c59b7806e64e25da72f5e9bea802",
+      "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "sourceUnitDigest": "9e0dc99948248b38dd91987f337f97eb559d1fa43d6cd257a8f0a428b5056047",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "claimId": "claim_b0e551ea3fe61fa000e37c70705f6658",
+      "path": "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+      "sourceUnitDigest": "8632ad901de06bfda070a75dfda5da88c1ca4b7b5dd5137d459d64947138a592",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "claimId": "claim_1447573388987432e0b569c3a978c0f8",
+      "path": "docs/platform/agent-coordination/architecture/evidence-and-results.md",
+      "sourceUnitDigest": "52d247d5d1b8cf406c0e5174ddf4a7b37c220678b070822b47c4b13856004bde",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "claimId": "claim_dc8b3297483f10132845712a7ee50880",
+      "path": "docs/platform/agent-coordination/architecture/evidence-and-results.md",
+      "sourceUnitDigest": "2f7bcf290876a99c52acbcc541bd54a73a4550416b4cd991897da38c9557a24a",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "claimId": "claim_2d9ccc774d84c91978163a37739aaa26",
+      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "sourceUnitDigest": "bb132a423a617e5eda9382504b9ebc87f186077bb3a3cd589d7eb0e7a28d5f07",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "claimId": "claim_fdcff07d67a00e7a098db37705cd7cdb",
+      "path": "docs/platform/agent-coordination/architecture/executor-health-and-fallback.md",
+      "sourceUnitDigest": "f1b6e1a6d5ffdb17b69e2066034e1cd740f477ee0156fc115a8e31c9af1f533c",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "claimId": "claim_8be1f5a856f48c009b2a47816d982eb1",
+      "path": "docs/platform/agent-coordination/architecture/run-handle.md",
+      "sourceUnitDigest": "1326efcc3958a7e8952f474b38053519b7591970a705c9933c3073a9512fe2ff",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "claimId": "claim_a997b51c522d4bffcb867d2599b6abcd",
+      "path": "docs/platform/agent-coordination/architecture/run-handle.md",
+      "sourceUnitDigest": "86dcef8e210ca00ffefd65e566122e711f0c5ec968606d91e1aa86009355ce8e",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "claimId": "claim_3dd2685e166307a3a88ba88d8d51aac8",
+      "path": "docs/platform/agent-coordination/architecture/runtime-model.md",
+      "sourceUnitDigest": "293526a3b0b7a4db25655f4b82b64bb99b0b9eec61ae9c08c060492466bcb158",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "claimId": "claim_64571e3c11045f6d45538c82cf49d75d",
+      "path": "docs/platform/agent-coordination/architecture/runtime-model.md",
+      "sourceUnitDigest": "d5d6279a95277ea82fd794cb70f726cbd8c972c88f953e65d73e9399a81ee474",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "claimId": "claim_0987c0a1c45e842d577d94f9f6e6f0f3",
+      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "sourceUnitDigest": "2766bdfc944ca3fecb7b2be80c6f2de3bf54e8e19b63e9c0ce48e3e11db2333a",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "claimId": "claim_1806033822eb713e7a895a8ca4a516a4",
+      "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+      "sourceUnitDigest": "93843ec1c01297ba03db6770686c84b772ba636705097e021c395aaf8f22c292",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "claimId": "claim_082ec1b74ba54763821380ac91249556",
+      "path": "docs/platform/agent-coordination/architecture/visibility-and-herdr.md",
+      "sourceUnitDigest": "5e37933af62687c540cc34755718c31cace2538861e0c33cadd837e0cad0891e",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "claimId": "claim_97898f3d42beac1ad9fcc0cfa738ad0a",
+      "path": "docs/platform/agent-coordination/architecture/visibility-and-herdr.md",
+      "sourceUnitDigest": "3e3c5a9ab89fb7bf06ce75d64febd6b9e74238c2b608c04cd04752149baca183",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "claimId": "claim_56cfa46dd3a0232f321eb4f65b09aa97",
+      "path": "docs/platform/agent-coordination/architecture/work-integration.md",
+      "sourceUnitDigest": "1068ec95b24aa53d8a2652a9429929b56b338390e91989dab0a045be00e7b76e",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "claimId": "claim_ae3a260419865104d84b52fef843c121",
+      "path": "docs/platform/agent-coordination/architecture/work-integration.md",
+      "sourceUnitDigest": "81b9ccc997d9be514a0ec507e5fc0fbdfc0c7e756128a2ac715d6f74dcf884c3",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "claimId": "claim_ea94b9ecae5207c96adf0549165b733c",
+      "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
+      "sourceUnitDigest": "c31392fce95146229a78c7a4b0f61d256a3171d578a974e2aed2ac3ef8b81c64",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "claimId": "claim_38fc612785175cfbda465ecec2df35b2",
+      "path": "docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
+      "sourceUnitDigest": "d4cd92924420271079aa72bec2d60ec21fe420b21b73578067c7e5212bc01d2d",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "claimId": "claim_20f007d7797e8f83e651fd1b513db8fb",
+      "path": "docs/platform/agent-coordination/decisions/ADR-001-work-lifecycle-authority.md",
+      "sourceUnitDigest": "530f37879d932d5fcbe3ef6bbdbad084efc1d34252560d48f03acf00d5f9ad9d",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "claimId": "claim_f60291fb06b0ef4255e4f5f7d5a17cd1",
+      "path": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+      "sourceUnitDigest": "20b9d81a1baf1a6b7f47e6a0b57eee03250f2c5106ec7feeed612108a07b6abb",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "claimId": "claim_04c6ceb208294c241b9ef398e14f8fc8",
+      "path": "docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md",
+      "sourceUnitDigest": "ef5da2429896256d79892cb650ae2f0e92ed074abe959304bbe3128e9ddb6744",
+      "hasCitations": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "claimId": "claim_21f66ad1c973daaf6c31abf50b6c8cc3",
+      "path": "AGENTS.md",
+      "sourceUnitDigest": "43d98a2d84170eee45f9c337cd6700c7af2e32965c415e3fb26cf3c3ebe14bd7",
+      "hasCitations": false
+    }
+  ],
+  "ok": true,
+  "method": "Unchanged original checker on all90 committed shards and exact714 regenerated rationales; unchanged checkLegacyRationale on all4 additional native predecessor rows. Every current shard and retired collection included; pinned rows verified byte-value-equal to current."
+}

@@ -1,3 +1,27 @@
+# Step 10 package at287a22d33 complete — independent review next
+
+Assignment `unit-run-1792116045118-73cfbb42/producer/1`. **One native sync591.447s;one compact registry persistence**,4,486 files/91,374 units;known IDs99,549→99,553,zero loss/active tuple equality. Eight direct changes=four retained IDs/four new IDs/four pending predecessor gaps. **9,206 bindings/zero drift/zero rebinds**,45 dependent projections refreshed,30 native transitions submitted.
+
+**D zero fatal both priors together/each;ownership no native duplicate/new active collision/target drift;254 historical reference groups enumerated. Link replay366+98+4 zero findings. Rationale consistency12,893 rows/91 shards,all714 reproduced,zero findings**,via unchanged checker on90 pinned shards plus unchanged core check onfour new rows. Direct checker oldRow assumption for a new shard is disclosed with original failure and exact rerunnable composition. **473/473 tests;A/B/H pass;frozen I unchanged/current links equal pin**.
+
+**ONE bounded set:**[1,214 entries/33 request parts](review-request-step10-index-287a22d33.md),each≤60 entries/400000 bytes;counts **60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 57, 52, 5, 60, 46, 36, 7, 7, 60, 60, 60, 19, 9, 1, 10, 3, 14, 11, 9, 43, 3, 12, 30**. All714 rationale before/after records and665 reopened former approvals,all365 retained applications,exact docs/tool/test diffs,check A/native/dependent accounting covered. Committed snapshots via `reviewEntryFromCommittedRow`;no producer seeds/verdicts. Reviewer selects rationale deep sample≥108/714 and A36 draw;checker/test commands in every header.
+
+No merge-doc re-carry or execution blocker. **NEXT:independent ordinary review**,then matching verdict application and outstanding global/A34/holds/groups/consumer/cutover/checkpoint work. Phase6 open. [Report](step-10-report.md),[proof](step10-sync287-native-proof.json),[D](step10-sync287-D-summary.json),[audit](step10-sync287-final-audit.json),[reproduction](step10-sync287-reproduction.json). No docs/protected/checker/baseline edits,fgOS CLI,git writes or workspace.fgos writes;runner commits.
+
+---
+
+# Step 10 native sync complete — D running
+
+Content287a22d33. Sole background native sync 591.447s;one compact persistence;known IDs99549→99553,zero loss/active tuple equality. Bindings9206/zero drift;replay366+98+4/zero findings;ownership no new active collision;all-shard consistency12893/91 and714 exact rationale matches;473 tests pass.45 dependent projections refreshed. D both priors together/each is running on the sole native inventory. One bounded request set in preparation;no seeds/verdicts.
+
+---
+
+# Step 10 package at 287a22d33 in progress
+
+Assignment `unit-run-1792116045118-73cfbb42/producer/1`. One native sync and compact persistence, D against both priors, all-shard binding/ownership/link/rationale checks and one bounded re-review set are in progress. No seeds or verdicts selected; runner commits.
+
+---
+
 # Step 10 round-3 author corrections complete — package next
 
 Assignment `unit-run-1792114313040-56132651/producer/1`; input `5035fed52`, reviewed content `345f15d95`/request `c939e9a51`. All 22 Notes/Concerns read; Lead L10-23–L10-27 executed. **435 matching ok applied verbatim /365 retained /70 reopened after edits. Six exact docs edits in four files** fix scaffold/refuseHelp citations and restore legacy destinations without changing labels.

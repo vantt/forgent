@@ -1,0 +1,835 @@
+# Bounded re-review: accounting 2
+
+Author session: `codex-session:unit-run-1792093168554-f28af963@2026-10-16`
+Packaged by: `codex-session:unit-run-1792116045118-73cfbb42@2026-10-16`
+Content commit: `287a22d33a0eaf2d9e47549a1142daf62361bb8c` (author changes at `0d8c602e2`)
+Comparison base: `5035fed52e60254ecbe034cc987553feb24616f4`
+Entries: **11**; each request at most60 entries and400000 bytes.
+
+[Single request index](review-request-step10-index-287a22d33.md). Before values are historical; currentDecision and after for content rows come from `git show <content commit>:<shard>` through unchanged `reviewEntryFromCommittedRow`. New package-native predecessor rows are explicitly labelled overlay and require the runner package commit. No seed, sample IDs or verdict chosen by producer.
+
+Reproduce all-shard consistency and every714 generated rationale (unchanged checker, no --apply):
+
+```sh
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work python3 plans/260925-documentation-authority-unification/reports/phase-06/step10-sync287-reproduce.py consistency
+```
+
+Reproduce tests yourself (473 expected):
+
+```sh
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/scripts/doc-*.test.mjs test/scripts/check-doc-*.test.mjs test/scripts/generate-doc-inventory.test.mjs test/scripts/list-doc-anchors.test.mjs test/scripts/verify-phase-02.test.mjs test/scripts/next-doc-id.test.mjs
+```
+
+Run at the runner package checkout from repository root. The consistency reproduction materializes scratch only under `/tmp/fgos-work/`, checks all90 pinned shards with the original checker, verifies their current-row equality, then audits all4 package-native rows with unchanged `checkLegacyRationale`:12893 rows/91 nonempty shards in total. The original checker directly on the new shard errors because its historical oldRow lookup assumes every shard existed at5035fed52; that observed limitation is preserved in `step10-sync287-rationale-consistency.log`. No checker code was altered or bypassed for a pass.
+
+Review every submitted current claim with an ordinary verdict and full digest/anchor/shard equality. Rationales are grouped for mechanical regeneration plus an independent seeded deep sample of at least108/714. A36 additionally requires reviewer-seeded at least162/1079 conservative Weak-exact/Judgment population, every unequal source/target digest and partial/historical row deep. One independently selected draw may satisfy both populations if both coverage thresholds are met; otherwise add draws. All exact doc corrections, tool changes and marked native predecessor transitions are deep. >3% deep rework escalates to the entire pack. Report seed/sample IDs and each claim's deep/mechanical note. Independent checkpoint/truth/red-team obligations remain. Confirmations retain existing committed approvals; metadata/evidence/native entries do not approve claims.
+
+## Entry accounting-047
+
+```json
+{
+  "kind": "refreshed-dependent-accounting",
+  "historicalArtifact": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-reconciliation.json",
+  "historicalProjectionPath": "/resolvedDrafts/0/after",
+  "historicalSnapshot": {
+    "claimId": "claim_ccf1acf857fc4e9757a933ca22ed34f1",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "legacy-node-cli-ownership-boundary",
+    "sourceUnitDigest": "fed79e2e75d57ab326d97e74e6b2cd4b8fd1474aa6df3abb284ae2bb6d46f817",
+    "claimKind": "navigation",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Retain in place outside platform documentation authority: AGENTS.md#legacy-node-cli-ownership-boundary, source unit SHA256 fed79e2e75d57ab326d97e74e6b2cd4b8fd1474aa6df3abb284ae2bb6d46f817, source file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. Pending independent review; no authority flip or truth certificate."
+  },
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "relatedClaimId": "claim_ccf1acf857fc4e9757a933ca22ed34f1",
+  "after": {
+    "claimId": "claim_ccf1acf857fc4e9757a933ca22ed34f1",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "legacy-node-cli-ownership-boundary",
+    "sourceUnitDigest": "fed79e2e75d57ab326d97e74e6b2cd4b8fd1474aa6df3abb284ae2bb6d46f817",
+    "claimKind": "navigation",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Retain in place outside platform documentation authority: AGENTS.md#legacy-node-cli-ownership-boundary, source unit SHA256 fed79e2e75d57ab326d97e74e6b2cd4b8fd1474aa6df3abb284ae2bb6d46f817, source file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. Pending independent review; no authority flip or truth certificate.",
+    "reviewNote": "deep: retain-in-place row with no target, AGENTS.md is byte-identical to 19ca8de23 and to the pin (sha256 47f3a4e5...), unit digest fed79e2e recomputed equal and quoted in the rationale, anchor ok; the rationale no longer claims a candidate carry (previous rework answered); read the unit text, it is the Legacy-Node CLI Ownership Boundary section the rationale names",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+  },
+  "currentTarget": null,
+  "currentNativeSuccessor": null,
+  "sourceAndResidualHistoryPreserved": true,
+  "reviewScope": "Current projection supersedes the historical artifact for this package only; historical before/native witness remains immutable. Pending rows receive no approval.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_ccf1acf857fc4e9757a933ca22ed34f1",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "legacy-node-cli-ownership-boundary",
+    "sourceUnitDigest": "fed79e2e75d57ab326d97e74e6b2cd4b8fd1474aa6df3abb284ae2bb6d46f817",
+    "claimKind": "navigation",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Retain in place outside platform documentation authority: AGENTS.md#legacy-node-cli-ownership-boundary, source unit SHA256 fed79e2e75d57ab326d97e74e6b2cd4b8fd1474aa6df3abb284ae2bb6d46f817, source file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. Pending independent review; no authority flip or truth certificate.",
+    "reviewNote": "deep: retain-in-place row with no target, AGENTS.md is byte-identical to 19ca8de23 and to the pin (sha256 47f3a4e5...), unit digest fed79e2e recomputed equal and quoted in the rationale, anchor ok; the rationale no longer claims a candidate carry (previous rework answered); read the unit text, it is the Legacy-Node CLI Ownership Boundary section the rationale names",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+  },
+  "entryId": "accounting-047"
+}
+```
+
+## Entry accounting-048
+
+```json
+{
+  "kind": "refreshed-dependent-accounting",
+  "historicalArtifact": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-reconciliation.json",
+  "historicalProjectionPath": "/resolvedDrafts/1/after",
+  "historicalSnapshot": {
+    "claimId": "claim_c328f1aab4c53a87e5564dab101facf2",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-14",
+    "sourceUnitDigest": "e3c0146e4d7a42d364c551fcb327b9ab9faef893cfe3b6075a4e658836d69972",
+    "claimKind": "navigation",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Retain in place outside platform documentation authority: AGENTS.md#unheaded-block-14, source unit SHA256 e3c0146e4d7a42d364c551fcb327b9ab9faef893cfe3b6075a4e658836d69972, source file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. Pending independent review; no authority flip or truth certificate."
+  },
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "relatedClaimId": "claim_c328f1aab4c53a87e5564dab101facf2",
+  "after": {
+    "claimId": "claim_c328f1aab4c53a87e5564dab101facf2",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-14",
+    "sourceUnitDigest": "e3c0146e4d7a42d364c551fcb327b9ab9faef893cfe3b6075a4e658836d69972",
+    "claimKind": "navigation",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Retain in place outside platform documentation authority: AGENTS.md#unheaded-block-14, source unit SHA256 e3c0146e4d7a42d364c551fcb327b9ab9faef893cfe3b6075a4e658836d69972, source file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. Pending independent review; no authority flip or truth certificate.",
+    "reviewNote": "mechanical: retain-in-place row with no target, AGENTS.md is byte-identical to 19ca8de23 and to the pin (sha256 47f3a4e5...), unit digest e3c0146e recomputed equal and quoted in the rationale, anchor ok; the rationale no longer claims a candidate carry (previous rework answered)",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+  },
+  "currentTarget": null,
+  "currentNativeSuccessor": null,
+  "sourceAndResidualHistoryPreserved": true,
+  "reviewScope": "Current projection supersedes the historical artifact for this package only; historical before/native witness remains immutable. Pending rows receive no approval.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_c328f1aab4c53a87e5564dab101facf2",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "unheaded-block-14",
+    "sourceUnitDigest": "e3c0146e4d7a42d364c551fcb327b9ab9faef893cfe3b6075a4e658836d69972",
+    "claimKind": "navigation",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Retain in place outside platform documentation authority: AGENTS.md#unheaded-block-14, source unit SHA256 e3c0146e4d7a42d364c551fcb327b9ab9faef893cfe3b6075a4e658836d69972, source file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. Pending independent review; no authority flip or truth certificate.",
+    "reviewNote": "mechanical: retain-in-place row with no target, AGENTS.md is byte-identical to 19ca8de23 and to the pin (sha256 47f3a4e5...), unit digest e3c0146e recomputed equal and quoted in the rationale, anchor ok; the rationale no longer claims a candidate carry (previous rework answered)",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+  },
+  "entryId": "accounting-048"
+}
+```
+
+## Entry accounting-049
+
+```json
+{
+  "kind": "refreshed-dependent-accounting",
+  "historicalArtifact": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-reconciliation.json",
+  "historicalProjectionPath": "/resolvedDrafts/2/after",
+  "historicalSnapshot": {
+    "claimId": "claim_51848961a2bbf93d37bc2b46d9f141f5",
+    "sourcePath": "docs/io-contract.md",
+    "sourceAnchor": "chiều-vào-verb-danh-tính",
+    "sourceUnitDigest": "a8638afcbc30af3cfed8ddecb38f890e54215f551afcbd9a9d09d23c02d8bce3",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Heading translated and renumbered: “Chiều vào — verb + danh tính” becomes “2. Input Direction Verb And Identity”. Its forty-line direct source body is carried under new H3 subsections, each body unit has its own decision row. Heading and section digests differ because of translation, numbering and structural relocation, in addition to the disclosed Session Identity relative link rebase. Native identity resolved at 19ca8de23; no provisional identity, source retirement, authority flip or truth approval.",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "2-input-direction-verb-and-identity",
+    "targetUnitDigest": "7c4e0214ec4c8c108c24c1b00a560516fbc5de0bc1a26d70a082eca5ccafb23c",
+    "targetAncestry": [
+      "CLI I/O Contract"
+    ]
+  },
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "relatedClaimId": "claim_51848961a2bbf93d37bc2b46d9f141f5",
+  "after": {
+    "claimId": "claim_51848961a2bbf93d37bc2b46d9f141f5",
+    "sourcePath": "docs/io-contract.md",
+    "sourceAnchor": "chiều-vào-verb-danh-tính",
+    "sourceUnitDigest": "a8638afcbc30af3cfed8ddecb38f890e54215f551afcbd9a9d09d23c02d8bce3",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Heading translated and renumbered: “Chiều vào — verb + danh tính” becomes “2. Input Direction Verb And Identity”. Its forty-line direct source body is carried under new H3 subsections, each body unit has its own decision row. Heading and section digests differ because of translation, numbering and structural relocation, in addition to the disclosed Session Identity relative link rebase. Native identity resolved at 19ca8de23; no provisional identity, source retirement, authority flip or truth approval.",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "2-input-direction-verb-and-identity",
+    "reviewNote": "deep: heading \"Chieu vao\" translated and renumbered to \"2. Input Direction Verb And Identity\"; all 32 non-blank body lines of the source section are found verbatim under the H3 subsections of cli-io-contract.md section 2, the only absent line is the Session Identity bullet whose relative link was rebased as the rationale discloses; binding unchanged from the reviewed state (same anchor and digest), rationale now truthful (previous rework answered)",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "7c4e0214ec4c8c108c24c1b00a560516fbc5de0bc1a26d70a082eca5ccafb23c",
+    "targetAncestry": [
+      "CLI I/O Contract"
+    ],
+    "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "2. Input Direction Verb And Identity",
+    "anchor": "2-input-direction-verb-and-identity",
+    "githubAnchor": "2-input-direction-verb-and-identity",
+    "stableAnchor": "h-ecfbdae30c4d",
+    "startLine": 42,
+    "endLine": 42,
+    "textDigest": "7c4e0214ec4c8c108c24c1b00a560516fbc5de0bc1a26d70a082eca5ccafb23c",
+    "sample": "2. Input Direction Verb And Identity",
+    "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "followingBlockDigest": null,
+    "identityFingerprint": "2f4a6c0d72dcf5460bcafe1057270dd45e876bc10eae33fb3d773fe3d1809645",
+    "ancestry": [
+      "CLI I/O Contract"
+    ],
+    "text": "## 2. Input Direction Verb And Identity",
+    "sectionText": "## 2. Input Direction Verb And Identity"
+  },
+  "currentNativeSuccessor": {
+    "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "unitDigest": "dbde016fc25e17cebcebf0d2a7cb05d0c5ebfc6fafe9f10f0a1e4e1c39d40d3f",
+    "identityFingerprint": "2f4a6c0d72dcf5460bcafe1057270dd45e876bc10eae33fb3d773fe3d1809645",
+    "claimId": "claim_6775ef657a484c69481b14064d50b8f9",
+    "sourceAnchor": "2-input-direction-verb-and-identity",
+    "unitKind": "heading",
+    "sourceUnitDigest": "7c4e0214ec4c8c108c24c1b00a560516fbc5de0bc1a26d70a082eca5ccafb23c",
+    "claimKind": "contract",
+    "status": "future"
+  },
+  "sourceAndResidualHistoryPreserved": true,
+  "reviewScope": "Current projection supersedes the historical artifact for this package only; historical before/native witness remains immutable. Pending rows receive no approval.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_51848961a2bbf93d37bc2b46d9f141f5",
+    "sourcePath": "docs/io-contract.md",
+    "sourceAnchor": "chiều-vào-verb-danh-tính",
+    "sourceUnitDigest": "a8638afcbc30af3cfed8ddecb38f890e54215f551afcbd9a9d09d23c02d8bce3",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Heading translated and renumbered: “Chiều vào — verb + danh tính” becomes “2. Input Direction Verb And Identity”. Its forty-line direct source body is carried under new H3 subsections, each body unit has its own decision row. Heading and section digests differ because of translation, numbering and structural relocation, in addition to the disclosed Session Identity relative link rebase. Native identity resolved at 19ca8de23; no provisional identity, source retirement, authority flip or truth approval.",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "2-input-direction-verb-and-identity",
+    "reviewNote": "deep: heading \"Chieu vao\" translated and renumbered to \"2. Input Direction Verb And Identity\"; all 32 non-blank body lines of the source section are found verbatim under the H3 subsections of cli-io-contract.md section 2, the only absent line is the Session Identity bullet whose relative link was rebased as the rationale discloses; binding unchanged from the reviewed state (same anchor and digest), rationale now truthful (previous rework answered)",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "7c4e0214ec4c8c108c24c1b00a560516fbc5de0bc1a26d70a082eca5ccafb23c",
+    "targetAncestry": [
+      "CLI I/O Contract"
+    ],
+    "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+  },
+  "entryId": "accounting-049"
+}
+```
+
+## Entry accounting-057
+
+```json
+{
+  "kind": "refreshed-dependent-accounting",
+  "historicalArtifact": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-reconciliation.json",
+  "historicalProjectionPath": "/resolvedDrafts/10/after",
+  "historicalSnapshot": {
+    "claimId": "claim_8e290abbe8f1344bf8f19c997da11921",
+    "sourcePath": "docs/specs/reading-map.md",
+    "sourceAnchor": "reading-map-sản-phẩm",
+    "sourceUnitDigest": "19c2ff247fb664d39a56d6194b1d47b6dce16ea18c8ee19369bd2884efbf918a",
+    "claimKind": "navigation",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Retain in place outside platform documentation authority: docs/specs/reading-map.md#reading-map-sản-phẩm, source unit SHA256 19c2ff247fb664d39a56d6194b1d47b6dce16ea18c8ee19369bd2884efbf918a, source file SHA256 22606348608523b94c6a25f1540007aec5512d340278efea1f835713a7e67250 at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. docs/reading-map.md section 5 contains seven labelled truth corrections plus the Session Identity entry; retained legacy docs/specs/reading-map.md is untouched. Pending independent review; no authority flip or truth certificate."
+  },
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-retained-navigation-proposal.json",
+  "collection": "claims",
+  "relatedClaimId": "claim_8e290abbe8f1344bf8f19c997da11921",
+  "after": {
+    "claimId": "claim_8e290abbe8f1344bf8f19c997da11921",
+    "sourcePath": "docs/specs/reading-map.md",
+    "sourceAnchor": "reading-map-sản-phẩm",
+    "sourceUnitDigest": "19c2ff247fb664d39a56d6194b1d47b6dce16ea18c8ee19369bd2884efbf918a",
+    "claimKind": "navigation",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Retain in place outside platform documentation authority: docs/specs/reading-map.md#reading-map-sản-phẩm, source unit SHA256 19c2ff247fb664d39a56d6194b1d47b6dce16ea18c8ee19369bd2884efbf918a, source file SHA256 22606348608523b94c6a25f1540007aec5512d340278efea1f835713a7e67250 at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. docs/reading-map.md section 5 contains seven labelled truth corrections plus the Session Identity entry; retained legacy docs/specs/reading-map.md is untouched. Pending independent review; no authority flip or truth certificate.",
+    "reviewNote": "mechanical: retain-in-place row, no target; docs/specs/reading-map.md byte-identical to 19ca8de23 and to the pin (sha256 22606348...), H1 unit digest 19c2ff24 recomputed equal and quoted in the rationale, anchor ok; the claim that docs/reading-map.md section 5 holds seven labelled truth corrections plus the Session Identity entry was counted true (seven Truth correction labels, line 179 entry); rationale no longer says carried into a candidate (previous rework answered)",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+  },
+  "currentTarget": null,
+  "currentNativeSuccessor": null,
+  "sourceAndResidualHistoryPreserved": true,
+  "reviewScope": "Current projection supersedes the historical artifact for this package only; historical before/native witness remains immutable. Pending rows receive no approval.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_8e290abbe8f1344bf8f19c997da11921",
+    "sourcePath": "docs/specs/reading-map.md",
+    "sourceAnchor": "reading-map-sản-phẩm",
+    "sourceUnitDigest": "19c2ff247fb664d39a56d6194b1d47b6dce16ea18c8ee19369bd2884efbf918a",
+    "claimKind": "navigation",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Retain in place outside platform documentation authority: docs/specs/reading-map.md#reading-map-sản-phẩm, source unit SHA256 19c2ff247fb664d39a56d6194b1d47b6dce16ea18c8ee19369bd2884efbf918a, source file SHA256 22606348608523b94c6a25f1540007aec5512d340278efea1f835713a7e67250 at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. docs/reading-map.md section 5 contains seven labelled truth corrections plus the Session Identity entry; retained legacy docs/specs/reading-map.md is untouched. Pending independent review; no authority flip or truth certificate.",
+    "reviewNote": "mechanical: retain-in-place row, no target; docs/specs/reading-map.md byte-identical to 19ca8de23 and to the pin (sha256 22606348...), H1 unit digest 19c2ff24 recomputed equal and quoted in the rationale, anchor ok; the claim that docs/reading-map.md section 5 holds seven labelled truth corrections plus the Session Identity entry was counted true (seven Truth correction labels, line 179 entry); rationale no longer says carried into a candidate (previous rework answered)",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+  },
+  "entryId": "accounting-057"
+}
+```
+
+## Entry accounting-058
+
+```json
+{
+  "kind": "refreshed-dependent-accounting",
+  "historicalArtifact": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-reconciliation.json",
+  "historicalProjectionPath": "/resolvedDrafts/11/after",
+  "historicalSnapshot": {
+    "claimId": "claim_690e83ad4f79a1bbac8eafc9acb1d4ea",
+    "sourcePath": "docs/specs/reading-map.md",
+    "sourceAnchor": "unheaded-block-2",
+    "sourceUnitDigest": "1c7bbf9e95dcf48b5e1f6de612a5baf82e268ea009eda1ff201ffa5dacdd1fbd",
+    "claimKind": "navigation",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Retain in place outside platform documentation authority: docs/specs/reading-map.md#unheaded-block-2, source unit SHA256 1c7bbf9e95dcf48b5e1f6de612a5baf82e268ea009eda1ff201ffa5dacdd1fbd, source file SHA256 22606348608523b94c6a25f1540007aec5512d340278efea1f835713a7e67250 at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. docs/reading-map.md section 5 contains seven labelled truth corrections plus the Session Identity entry; retained legacy docs/specs/reading-map.md is untouched. Pending independent review; no authority flip or truth certificate."
+  },
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-retained-navigation-proposal.json",
+  "collection": "claims",
+  "relatedClaimId": "claim_690e83ad4f79a1bbac8eafc9acb1d4ea",
+  "after": {
+    "claimId": "claim_690e83ad4f79a1bbac8eafc9acb1d4ea",
+    "sourcePath": "docs/specs/reading-map.md",
+    "sourceAnchor": "unheaded-block-2",
+    "sourceUnitDigest": "1c7bbf9e95dcf48b5e1f6de612a5baf82e268ea009eda1ff201ffa5dacdd1fbd",
+    "claimKind": "navigation",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Retain in place outside platform documentation authority: docs/specs/reading-map.md#unheaded-block-2, source unit SHA256 1c7bbf9e95dcf48b5e1f6de612a5baf82e268ea009eda1ff201ffa5dacdd1fbd, source file SHA256 22606348608523b94c6a25f1540007aec5512d340278efea1f835713a7e67250 at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. docs/reading-map.md section 5 contains seven labelled truth corrections plus the Session Identity entry; retained legacy docs/specs/reading-map.md is untouched. Pending independent review; no authority flip or truth certificate.",
+    "reviewNote": "deep: retain-in-place row, no target; docs/specs/reading-map.md byte-identical to 19ca8de23 and to the pin (sha256 22606348...), unheaded-block-2 digest 1c7bbf9e recomputed equal and quoted, anchor ok; rationale no longer says carried into a candidate and its count of seven labelled truth corrections plus the Session Identity entry in docs/reading-map.md section 5 is true (previous rework answered); wording \"root instruction/navigation file\" is loose for a docs/specs file but not false",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-345f15d95.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+  },
+  "currentTarget": null,
+  "currentNativeSuccessor": null,
+  "sourceAndResidualHistoryPreserved": true,
+  "reviewScope": "Current projection supersedes the historical artifact for this package only; historical before/native witness remains immutable. Pending rows receive no approval.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_690e83ad4f79a1bbac8eafc9acb1d4ea",
+    "sourcePath": "docs/specs/reading-map.md",
+    "sourceAnchor": "unheaded-block-2",
+    "sourceUnitDigest": "1c7bbf9e95dcf48b5e1f6de612a5baf82e268ea009eda1ff201ffa5dacdd1fbd",
+    "claimKind": "navigation",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Retain in place outside platform documentation authority: docs/specs/reading-map.md#unheaded-block-2, source unit SHA256 1c7bbf9e95dcf48b5e1f6de612a5baf82e268ea009eda1ff201ffa5dacdd1fbd, source file SHA256 22606348608523b94c6a25f1540007aec5512d340278efea1f835713a7e67250 at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. docs/reading-map.md section 5 contains seven labelled truth corrections plus the Session Identity entry; retained legacy docs/specs/reading-map.md is untouched. Pending independent review; no authority flip or truth certificate.",
+    "reviewNote": "deep: retain-in-place row, no target; docs/specs/reading-map.md byte-identical to 19ca8de23 and to the pin (sha256 22606348...), unheaded-block-2 digest 1c7bbf9e recomputed equal and quoted, anchor ok; rationale no longer says carried into a candidate and its count of seven labelled truth corrections plus the Session Identity entry in docs/reading-map.md section 5 is true (previous rework answered); wording \"root instruction/navigation file\" is loose for a docs/specs file but not false",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-345f15d95.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+  },
+  "entryId": "accounting-058"
+}
+```
+
+## Entry accounting-059
+
+```json
+{
+  "kind": "refreshed-dependent-accounting",
+  "historicalArtifact": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-reconciliation.json",
+  "historicalProjectionPath": "/resolvedDrafts/12/after",
+  "historicalSnapshot": {
+    "claimId": "claim_c8677c74072e0ac1ac4d9b345de1ee1f",
+    "sourcePath": "docs/reading-map.md",
+    "sourceAnchor": "5-detailed-product-and-source-map",
+    "sourceUnitDigest": "01204e281f177e257efc7b015d93651c874a149f0e4bb3a68054b943a66d2e91",
+    "claimKind": "navigation",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Retain in place outside platform documentation authority: docs/reading-map.md#5-detailed-product-and-source-map, source unit SHA256 01204e281f177e257efc7b015d93651c874a149f0e4bb3a68054b943a66d2e91, source file SHA256 f4fce87549f728da23d13a9ff8c8c85efc397956bfacf5c5cf83badf13dc5abb at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. docs/reading-map.md section 5 contains seven labelled truth corrections plus the Session Identity entry; retained legacy docs/specs/reading-map.md is untouched. Pending independent review; no authority flip or truth certificate."
+  },
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-retained-navigation-proposal.json",
+  "collection": "claims",
+  "relatedClaimId": "claim_c8677c74072e0ac1ac4d9b345de1ee1f",
+  "after": {
+    "claimId": "claim_c8677c74072e0ac1ac4d9b345de1ee1f",
+    "sourcePath": "docs/reading-map.md",
+    "sourceAnchor": "5-detailed-product-and-source-map",
+    "sourceUnitDigest": "01204e281f177e257efc7b015d93651c874a149f0e4bb3a68054b943a66d2e91",
+    "claimKind": "navigation",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Retain in place outside platform documentation authority: docs/reading-map.md#5-detailed-product-and-source-map, source unit SHA256 01204e281f177e257efc7b015d93651c874a149f0e4bb3a68054b943a66d2e91, source file SHA256 f4fce87549f728da23d13a9ff8c8c85efc397956bfacf5c5cf83badf13dc5abb at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. docs/reading-map.md section 5 contains seven labelled truth corrections plus the Session Identity entry; retained legacy docs/specs/reading-map.md is untouched. Pending independent review; no authority flip or truth certificate.",
+    "reviewNote": "deep: retain-in-place row, no target; docs/reading-map.md byte-identical to 19ca8de23 and to the pin (sha256 f4fce875...), section 5 heading unit digest 01204e28 recomputed equal and quoted, anchor ok; read section 5, it holds exactly seven bold Truth correction labels (lines 154 155 172 174 178 181 182) plus the Session Identity entry at 179 as the rationale says; previous rework answered",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+  },
+  "currentTarget": null,
+  "currentNativeSuccessor": null,
+  "sourceAndResidualHistoryPreserved": true,
+  "reviewScope": "Current projection supersedes the historical artifact for this package only; historical before/native witness remains immutable. Pending rows receive no approval.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_c8677c74072e0ac1ac4d9b345de1ee1f",
+    "sourcePath": "docs/reading-map.md",
+    "sourceAnchor": "5-detailed-product-and-source-map",
+    "sourceUnitDigest": "01204e281f177e257efc7b015d93651c874a149f0e4bb3a68054b943a66d2e91",
+    "claimKind": "navigation",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Retain in place outside platform documentation authority: docs/reading-map.md#5-detailed-product-and-source-map, source unit SHA256 01204e281f177e257efc7b015d93651c874a149f0e4bb3a68054b943a66d2e91, source file SHA256 f4fce87549f728da23d13a9ff8c8c85efc397956bfacf5c5cf83badf13dc5abb at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. docs/reading-map.md section 5 contains seven labelled truth corrections plus the Session Identity entry; retained legacy docs/specs/reading-map.md is untouched. Pending independent review; no authority flip or truth certificate.",
+    "reviewNote": "deep: retain-in-place row, no target; docs/reading-map.md byte-identical to 19ca8de23 and to the pin (sha256 f4fce875...), section 5 heading unit digest 01204e28 recomputed equal and quoted, anchor ok; read section 5, it holds exactly seven bold Truth correction labels (lines 154 155 172 174 178 181 182) plus the Session Identity entry at 179 as the rationale says; previous rework answered",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+  },
+  "entryId": "accounting-059"
+}
+```
+
+## Entry accounting-060
+
+```json
+{
+  "kind": "refreshed-dependent-accounting",
+  "historicalArtifact": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-reconciliation.json",
+  "historicalProjectionPath": "/resolvedDrafts/13/after",
+  "historicalSnapshot": {
+    "claimId": "claim_42444c5f44c4076300c2b9c56516c429",
+    "sourcePath": "docs/reading-map.md",
+    "sourceAnchor": "unheaded-block-16",
+    "sourceUnitDigest": "607cd88b7a9323d610811e9bee61bbcb328ad12ba92f9f1b62defc5ab6c6db24",
+    "claimKind": "navigation",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Retain in place outside platform documentation authority: docs/reading-map.md#unheaded-block-16, source unit SHA256 607cd88b7a9323d610811e9bee61bbcb328ad12ba92f9f1b62defc5ab6c6db24, source file SHA256 f4fce87549f728da23d13a9ff8c8c85efc397956bfacf5c5cf83badf13dc5abb at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. docs/reading-map.md section 5 contains seven labelled truth corrections plus the Session Identity entry; retained legacy docs/specs/reading-map.md is untouched. Pending independent review; no authority flip or truth certificate."
+  },
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-retained-navigation-proposal.json",
+  "collection": "claims",
+  "relatedClaimId": "claim_42444c5f44c4076300c2b9c56516c429",
+  "after": {
+    "claimId": "claim_42444c5f44c4076300c2b9c56516c429",
+    "sourcePath": "docs/reading-map.md",
+    "sourceAnchor": "unheaded-block-16",
+    "sourceUnitDigest": "607cd88b7a9323d610811e9bee61bbcb328ad12ba92f9f1b62defc5ab6c6db24",
+    "claimKind": "navigation",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Retain in place outside platform documentation authority: docs/reading-map.md#unheaded-block-16, source unit SHA256 607cd88b7a9323d610811e9bee61bbcb328ad12ba92f9f1b62defc5ab6c6db24, source file SHA256 f4fce87549f728da23d13a9ff8c8c85efc397956bfacf5c5cf83badf13dc5abb at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. docs/reading-map.md section 5 contains seven labelled truth corrections plus the Session Identity entry; retained legacy docs/specs/reading-map.md is untouched. Pending independent review; no authority flip or truth certificate.",
+    "reviewNote": "deep: retain-in-place row, no target; docs/reading-map.md byte-identical to 19ca8de23 and to the pin (sha256 f4fce875...), unheaded-block-16 digest 607cd88b recomputed equal and quoted, anchor ok; the seven Truth correction labels plus Session Identity entry sentence is true; previous rework answered",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-345f15d95.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+  },
+  "currentTarget": null,
+  "currentNativeSuccessor": null,
+  "sourceAndResidualHistoryPreserved": true,
+  "reviewScope": "Current projection supersedes the historical artifact for this package only; historical before/native witness remains immutable. Pending rows receive no approval.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_42444c5f44c4076300c2b9c56516c429",
+    "sourcePath": "docs/reading-map.md",
+    "sourceAnchor": "unheaded-block-16",
+    "sourceUnitDigest": "607cd88b7a9323d610811e9bee61bbcb328ad12ba92f9f1b62defc5ab6c6db24",
+    "claimKind": "navigation",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Retain in place outside platform documentation authority: docs/reading-map.md#unheaded-block-16, source unit SHA256 607cd88b7a9323d610811e9bee61bbcb328ad12ba92f9f1b62defc5ab6c6db24, source file SHA256 f4fce87549f728da23d13a9ff8c8c85efc397956bfacf5c5cf83badf13dc5abb at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. docs/reading-map.md section 5 contains seven labelled truth corrections plus the Session Identity entry; retained legacy docs/specs/reading-map.md is untouched. Pending independent review; no authority flip or truth certificate.",
+    "reviewNote": "deep: retain-in-place row, no target; docs/reading-map.md byte-identical to 19ca8de23 and to the pin (sha256 f4fce875...), unheaded-block-16 digest 607cd88b recomputed equal and quoted, anchor ok; the seven Truth correction labels plus Session Identity entry sentence is true; previous rework answered",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-06-345f15d95.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+  },
+  "entryId": "accounting-060"
+}
+```
+
+## Entry accounting-061
+
+```json
+{
+  "kind": "refreshed-dependent-accounting",
+  "historicalArtifact": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-prior-findings.json",
+  "historicalProjectionPath": "/rows/0/currentDecision",
+  "historicalSnapshot": {
+    "claimId": "claim_51848961a2bbf93d37bc2b46d9f141f5",
+    "sourcePath": "docs/io-contract.md",
+    "sourceAnchor": "chiều-vào-verb-danh-tính",
+    "sourceUnitDigest": "a8638afcbc30af3cfed8ddecb38f890e54215f551afcbd9a9d09d23c02d8bce3",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Heading translated and renumbered: “Chiều vào — verb + danh tính” becomes “2. Input Direction Verb And Identity”. Its forty-line direct source body is carried under new H3 subsections, each body unit has its own decision row. Heading and section digests differ because of translation, numbering and structural relocation, in addition to the disclosed Session Identity relative link rebase. Native identity resolved at 19ca8de23; no provisional identity, source retirement, authority flip or truth approval.",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "2-input-direction-verb-and-identity",
+    "targetUnitDigest": "7c4e0214ec4c8c108c24c1b00a560516fbc5de0bc1a26d70a082eca5ccafb23c",
+    "targetAncestry": [
+      "CLI I/O Contract"
+    ]
+  },
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "relatedClaimId": "claim_51848961a2bbf93d37bc2b46d9f141f5",
+  "after": {
+    "claimId": "claim_51848961a2bbf93d37bc2b46d9f141f5",
+    "sourcePath": "docs/io-contract.md",
+    "sourceAnchor": "chiều-vào-verb-danh-tính",
+    "sourceUnitDigest": "a8638afcbc30af3cfed8ddecb38f890e54215f551afcbd9a9d09d23c02d8bce3",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Heading translated and renumbered: “Chiều vào — verb + danh tính” becomes “2. Input Direction Verb And Identity”. Its forty-line direct source body is carried under new H3 subsections, each body unit has its own decision row. Heading and section digests differ because of translation, numbering and structural relocation, in addition to the disclosed Session Identity relative link rebase. Native identity resolved at 19ca8de23; no provisional identity, source retirement, authority flip or truth approval.",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "2-input-direction-verb-and-identity",
+    "reviewNote": "deep: heading \"Chieu vao\" translated and renumbered to \"2. Input Direction Verb And Identity\"; all 32 non-blank body lines of the source section are found verbatim under the H3 subsections of cli-io-contract.md section 2, the only absent line is the Session Identity bullet whose relative link was rebased as the rationale discloses; binding unchanged from the reviewed state (same anchor and digest), rationale now truthful (previous rework answered)",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "7c4e0214ec4c8c108c24c1b00a560516fbc5de0bc1a26d70a082eca5ccafb23c",
+    "targetAncestry": [
+      "CLI I/O Contract"
+    ],
+    "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 2,
+    "title": "2. Input Direction Verb And Identity",
+    "anchor": "2-input-direction-verb-and-identity",
+    "githubAnchor": "2-input-direction-verb-and-identity",
+    "stableAnchor": "h-ecfbdae30c4d",
+    "startLine": 42,
+    "endLine": 42,
+    "textDigest": "7c4e0214ec4c8c108c24c1b00a560516fbc5de0bc1a26d70a082eca5ccafb23c",
+    "sample": "2. Input Direction Verb And Identity",
+    "sectionPayloadDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "followingBlockDigest": null,
+    "identityFingerprint": "2f4a6c0d72dcf5460bcafe1057270dd45e876bc10eae33fb3d773fe3d1809645",
+    "ancestry": [
+      "CLI I/O Contract"
+    ],
+    "text": "## 2. Input Direction Verb And Identity",
+    "sectionText": "## 2. Input Direction Verb And Identity"
+  },
+  "currentNativeSuccessor": {
+    "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "unitDigest": "dbde016fc25e17cebcebf0d2a7cb05d0c5ebfc6fafe9f10f0a1e4e1c39d40d3f",
+    "identityFingerprint": "2f4a6c0d72dcf5460bcafe1057270dd45e876bc10eae33fb3d773fe3d1809645",
+    "claimId": "claim_6775ef657a484c69481b14064d50b8f9",
+    "sourceAnchor": "2-input-direction-verb-and-identity",
+    "unitKind": "heading",
+    "sourceUnitDigest": "7c4e0214ec4c8c108c24c1b00a560516fbc5de0bc1a26d70a082eca5ccafb23c",
+    "claimKind": "contract",
+    "status": "future"
+  },
+  "sourceAndResidualHistoryPreserved": true,
+  "reviewScope": "Current projection supersedes the historical artifact for this package only; historical before/native witness remains immutable. Pending rows receive no approval.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_51848961a2bbf93d37bc2b46d9f141f5",
+    "sourcePath": "docs/io-contract.md",
+    "sourceAnchor": "chiều-vào-verb-danh-tính",
+    "sourceUnitDigest": "a8638afcbc30af3cfed8ddecb38f890e54215f551afcbd9a9d09d23c02d8bce3",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Heading translated and renumbered: “Chiều vào — verb + danh tính” becomes “2. Input Direction Verb And Identity”. Its forty-line direct source body is carried under new H3 subsections, each body unit has its own decision row. Heading and section digests differ because of translation, numbering and structural relocation, in addition to the disclosed Session Identity relative link rebase. Native identity resolved at 19ca8de23; no provisional identity, source retirement, authority flip or truth approval.",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "2-input-direction-verb-and-identity",
+    "reviewNote": "deep: heading \"Chieu vao\" translated and renumbered to \"2. Input Direction Verb And Identity\"; all 32 non-blank body lines of the source section are found verbatim under the H3 subsections of cli-io-contract.md section 2, the only absent line is the Session Identity bullet whose relative link was rebased as the rationale discloses; binding unchanged from the reviewed state (same anchor and digest), rationale now truthful (previous rework answered)",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "7c4e0214ec4c8c108c24c1b00a560516fbc5de0bc1a26d70a082eca5ccafb23c",
+    "targetAncestry": [
+      "CLI I/O Contract"
+    ],
+    "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+  },
+  "entryId": "accounting-061"
+}
+```
+
+## Entry accounting-063
+
+```json
+{
+  "kind": "refreshed-dependent-accounting",
+  "historicalArtifact": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-prior-findings.json",
+  "historicalProjectionPath": "/rows/2/currentDecision",
+  "historicalSnapshot": {
+    "claimId": "claim_ccf1acf857fc4e9757a933ca22ed34f1",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "legacy-node-cli-ownership-boundary",
+    "sourceUnitDigest": "fed79e2e75d57ab326d97e74e6b2cd4b8fd1474aa6df3abb284ae2bb6d46f817",
+    "claimKind": "navigation",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Retain in place outside platform documentation authority: AGENTS.md#legacy-node-cli-ownership-boundary, source unit SHA256 fed79e2e75d57ab326d97e74e6b2cd4b8fd1474aa6df3abb284ae2bb6d46f817, source file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. Pending independent review; no authority flip or truth certificate."
+  },
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+  "collection": "claims",
+  "relatedClaimId": "claim_ccf1acf857fc4e9757a933ca22ed34f1",
+  "after": {
+    "claimId": "claim_ccf1acf857fc4e9757a933ca22ed34f1",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "legacy-node-cli-ownership-boundary",
+    "sourceUnitDigest": "fed79e2e75d57ab326d97e74e6b2cd4b8fd1474aa6df3abb284ae2bb6d46f817",
+    "claimKind": "navigation",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Retain in place outside platform documentation authority: AGENTS.md#legacy-node-cli-ownership-boundary, source unit SHA256 fed79e2e75d57ab326d97e74e6b2cd4b8fd1474aa6df3abb284ae2bb6d46f817, source file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. Pending independent review; no authority flip or truth certificate.",
+    "reviewNote": "deep: retain-in-place row with no target, AGENTS.md is byte-identical to 19ca8de23 and to the pin (sha256 47f3a4e5...), unit digest fed79e2e recomputed equal and quoted in the rationale, anchor ok; the rationale no longer claims a candidate carry (previous rework answered); read the unit text, it is the Legacy-Node CLI Ownership Boundary section the rationale names",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+  },
+  "currentTarget": null,
+  "currentNativeSuccessor": null,
+  "sourceAndResidualHistoryPreserved": true,
+  "reviewScope": "Current projection supersedes the historical artifact for this package only; historical before/native witness remains immutable. Pending rows receive no approval.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_ccf1acf857fc4e9757a933ca22ed34f1",
+    "sourcePath": "AGENTS.md",
+    "sourceAnchor": "legacy-node-cli-ownership-boundary",
+    "sourceUnitDigest": "fed79e2e75d57ab326d97e74e6b2cd4b8fd1474aa6df3abb284ae2bb6d46f817",
+    "claimKind": "navigation",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Retain in place outside platform documentation authority: AGENTS.md#legacy-node-cli-ownership-boundary, source unit SHA256 fed79e2e75d57ab326d97e74e6b2cd4b8fd1474aa6df3abb284ae2bb6d46f817, source file SHA256 47f3a4e52f036d42838b372a8586535f6b3b152ce67d03ad871002981f658b1f at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. Pending independent review; no authority flip or truth certificate.",
+    "reviewNote": "deep: retain-in-place row with no target, AGENTS.md is byte-identical to 19ca8de23 and to the pin (sha256 47f3a4e5...), unit digest fed79e2e recomputed equal and quoted in the rationale, anchor ok; the rationale no longer claims a candidate carry (previous rework answered); read the unit text, it is the Legacy-Node CLI Ownership Boundary section the rationale names",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+  },
+  "entryId": "accounting-063"
+}
+```
+
+## Entry accounting-069
+
+```json
+{
+  "kind": "refreshed-dependent-accounting",
+  "historicalArtifact": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-prior-findings.json",
+  "historicalProjectionPath": "/rows/8/currentDecision",
+  "historicalSnapshot": {
+    "claimId": "claim_8e290abbe8f1344bf8f19c997da11921",
+    "sourcePath": "docs/specs/reading-map.md",
+    "sourceAnchor": "reading-map-sản-phẩm",
+    "sourceUnitDigest": "19c2ff247fb664d39a56d6194b1d47b6dce16ea18c8ee19369bd2884efbf918a",
+    "claimKind": "navigation",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Retain in place outside platform documentation authority: docs/specs/reading-map.md#reading-map-sản-phẩm, source unit SHA256 19c2ff247fb664d39a56d6194b1d47b6dce16ea18c8ee19369bd2884efbf918a, source file SHA256 22606348608523b94c6a25f1540007aec5512d340278efea1f835713a7e67250 at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. docs/reading-map.md section 5 contains seven labelled truth corrections plus the Session Identity entry; retained legacy docs/specs/reading-map.md is untouched. Pending independent review; no authority flip or truth certificate."
+  },
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-retained-navigation-proposal.json",
+  "collection": "claims",
+  "relatedClaimId": "claim_8e290abbe8f1344bf8f19c997da11921",
+  "after": {
+    "claimId": "claim_8e290abbe8f1344bf8f19c997da11921",
+    "sourcePath": "docs/specs/reading-map.md",
+    "sourceAnchor": "reading-map-sản-phẩm",
+    "sourceUnitDigest": "19c2ff247fb664d39a56d6194b1d47b6dce16ea18c8ee19369bd2884efbf918a",
+    "claimKind": "navigation",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Retain in place outside platform documentation authority: docs/specs/reading-map.md#reading-map-sản-phẩm, source unit SHA256 19c2ff247fb664d39a56d6194b1d47b6dce16ea18c8ee19369bd2884efbf918a, source file SHA256 22606348608523b94c6a25f1540007aec5512d340278efea1f835713a7e67250 at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. docs/reading-map.md section 5 contains seven labelled truth corrections plus the Session Identity entry; retained legacy docs/specs/reading-map.md is untouched. Pending independent review; no authority flip or truth certificate.",
+    "reviewNote": "mechanical: retain-in-place row, no target; docs/specs/reading-map.md byte-identical to 19ca8de23 and to the pin (sha256 22606348...), H1 unit digest 19c2ff24 recomputed equal and quoted in the rationale, anchor ok; the claim that docs/reading-map.md section 5 holds seven labelled truth corrections plus the Session Identity entry was counted true (seven Truth correction labels, line 179 entry); rationale no longer says carried into a candidate (previous rework answered)",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+  },
+  "currentTarget": null,
+  "currentNativeSuccessor": null,
+  "sourceAndResidualHistoryPreserved": true,
+  "reviewScope": "Current projection supersedes the historical artifact for this package only; historical before/native witness remains immutable. Pending rows receive no approval.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_8e290abbe8f1344bf8f19c997da11921",
+    "sourcePath": "docs/specs/reading-map.md",
+    "sourceAnchor": "reading-map-sản-phẩm",
+    "sourceUnitDigest": "19c2ff247fb664d39a56d6194b1d47b6dce16ea18c8ee19369bd2884efbf918a",
+    "claimKind": "navigation",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Retain in place outside platform documentation authority: docs/specs/reading-map.md#reading-map-sản-phẩm, source unit SHA256 19c2ff247fb664d39a56d6194b1d47b6dce16ea18c8ee19369bd2884efbf918a, source file SHA256 22606348608523b94c6a25f1540007aec5512d340278efea1f835713a7e67250 at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. docs/reading-map.md section 5 contains seven labelled truth corrections plus the Session Identity entry; retained legacy docs/specs/reading-map.md is untouched. Pending independent review; no authority flip or truth certificate.",
+    "reviewNote": "mechanical: retain-in-place row, no target; docs/specs/reading-map.md byte-identical to 19ca8de23 and to the pin (sha256 22606348...), H1 unit digest 19c2ff24 recomputed equal and quoted in the rationale, anchor ok; the claim that docs/reading-map.md section 5 holds seven labelled truth corrections plus the Session Identity entry was counted true (seven Truth correction labels, line 179 entry); rationale no longer says carried into a candidate (previous rework answered)",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+  },
+  "entryId": "accounting-069"
+}
+```
+
+## Entry accounting-070
+
+```json
+{
+  "kind": "refreshed-dependent-accounting",
+  "historicalArtifact": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-prior-findings.json",
+  "historicalProjectionPath": "/rows/9/currentDecision",
+  "historicalSnapshot": {
+    "claimId": "claim_c8677c74072e0ac1ac4d9b345de1ee1f",
+    "sourcePath": "docs/reading-map.md",
+    "sourceAnchor": "5-detailed-product-and-source-map",
+    "sourceUnitDigest": "01204e281f177e257efc7b015d93651c874a149f0e4bb3a68054b943a66d2e91",
+    "claimKind": "navigation",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Retain in place outside platform documentation authority: docs/reading-map.md#5-detailed-product-and-source-map, source unit SHA256 01204e281f177e257efc7b015d93651c874a149f0e4bb3a68054b943a66d2e91, source file SHA256 f4fce87549f728da23d13a9ff8c8c85efc397956bfacf5c5cf83badf13dc5abb at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. docs/reading-map.md section 5 contains seven labelled truth corrections plus the Session Identity entry; retained legacy docs/specs/reading-map.md is untouched. Pending independent review; no authority flip or truth certificate."
+  },
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-retained-navigation-proposal.json",
+  "collection": "claims",
+  "relatedClaimId": "claim_c8677c74072e0ac1ac4d9b345de1ee1f",
+  "after": {
+    "claimId": "claim_c8677c74072e0ac1ac4d9b345de1ee1f",
+    "sourcePath": "docs/reading-map.md",
+    "sourceAnchor": "5-detailed-product-and-source-map",
+    "sourceUnitDigest": "01204e281f177e257efc7b015d93651c874a149f0e4bb3a68054b943a66d2e91",
+    "claimKind": "navigation",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Retain in place outside platform documentation authority: docs/reading-map.md#5-detailed-product-and-source-map, source unit SHA256 01204e281f177e257efc7b015d93651c874a149f0e4bb3a68054b943a66d2e91, source file SHA256 f4fce87549f728da23d13a9ff8c8c85efc397956bfacf5c5cf83badf13dc5abb at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. docs/reading-map.md section 5 contains seven labelled truth corrections plus the Session Identity entry; retained legacy docs/specs/reading-map.md is untouched. Pending independent review; no authority flip or truth certificate.",
+    "reviewNote": "deep: retain-in-place row, no target; docs/reading-map.md byte-identical to 19ca8de23 and to the pin (sha256 f4fce875...), section 5 heading unit digest 01204e28 recomputed equal and quoted, anchor ok; read section 5, it holds exactly seven bold Truth correction labels (lines 154 155 172 174 178 181 182) plus the Session Identity entry at 179 as the rationale says; previous rework answered",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+  },
+  "currentTarget": null,
+  "currentNativeSuccessor": null,
+  "sourceAndResidualHistoryPreserved": true,
+  "reviewScope": "Current projection supersedes the historical artifact for this package only; historical before/native witness remains immutable. Pending rows receive no approval.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_c8677c74072e0ac1ac4d9b345de1ee1f",
+    "sourcePath": "docs/reading-map.md",
+    "sourceAnchor": "5-detailed-product-and-source-map",
+    "sourceUnitDigest": "01204e281f177e257efc7b015d93651c874a149f0e4bb3a68054b943a66d2e91",
+    "claimKind": "navigation",
+    "disposition": "reclassify-out-of-platform-scope",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+    "rationale": "Retain in place outside platform documentation authority: docs/reading-map.md#5-detailed-product-and-source-map, source unit SHA256 01204e281f177e257efc7b015d93651c874a149f0e4bb3a68054b943a66d2e91, source file SHA256 f4fce87549f728da23d13a9ff8c8c85efc397956bfacf5c5cf83badf13dc5abb at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. docs/reading-map.md section 5 contains seven labelled truth corrections plus the Session Identity entry; retained legacy docs/specs/reading-map.md is untouched. Pending independent review; no authority flip or truth certificate.",
+    "reviewNote": "deep: retain-in-place row, no target; docs/reading-map.md byte-identical to 19ca8de23 and to the pin (sha256 f4fce875...), section 5 heading unit digest 01204e28 recomputed equal and quoted, anchor ok; read section 5, it holds exactly seven bold Truth correction labels (lines 154 155 172 174 178 181 182) plus the Session Identity entry at 179 as the rationale says; previous rework answered",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-345f15d95.md",
+    "reviewMode": "ordinary",
+    "reviewReportCommit": "5035fed52e60254ecbe034cc987553feb24616f4"
+  },
+  "entryId": "accounting-070"
+}
+```
+

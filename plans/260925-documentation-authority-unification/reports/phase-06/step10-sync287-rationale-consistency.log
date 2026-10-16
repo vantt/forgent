@@ -1,0 +1,28 @@
+fatal: path 'plans/260925-documentation-authority-unification/ledger/decisions/s10-round3-native-predecessors.json' exists on disk, but not in '5035fed52'
+node:internal/errors:985
+  const err = new Error(message);
+              ^
+
+Error: Command failed: git show 5035fed52:plans/260925-documentation-authority-unification/ledger/decisions/s10-round3-native-predecessors.json
+fatal: path 'plans/260925-documentation-authority-unification/ledger/decisions/s10-round3-native-predecessors.json' exists on disk, but not in '5035fed52'
+
+    at genericNodeError (node:internal/errors:985:15)
+    at wrappedFn (node:internal/errors:539:14)
+    at checkExecSyncError (node:child_process:925:11)
+    at execFileSync (node:child_process:961:15)
+    at oldRow (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-rebuild.mjs:55:82)
+    at factsOf (file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-rebuild.mjs:88:17)
+    at file:///home/vantt/projects/forgentX-phase00-documentation-authority-unification/plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-rebuild.mjs:109:14 {
+  status: 128,
+  signal: null,
+  output: [
+    null,
+    '',
+    "fatal: path 'plans/260925-documentation-authority-unification/ledger/decisions/s10-round3-native-predecessors.json' exists on disk, but not in '5035fed52'\n"
+  ],
+  pid: 1123940,
+  stdout: '',
+  stderr: "fatal: path 'plans/260925-documentation-authority-unification/ledger/decisions/s10-round3-native-predecessors.json' exists on disk, but not in '5035fed52'\n"
+}
+
+Node.js v24.18.0

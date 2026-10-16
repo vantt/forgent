@@ -1,0 +1,5678 @@
+# Bounded re-review: accounting 4
+
+Author session: `codex-session:unit-run-1792114313040-56132651@2026-10-16`
+Packaged by: `codex-session:unit-run-1792116045118-73cfbb42@2026-10-16`
+Content commit: `287a22d33a0eaf2d9e47549a1142daf62361bb8c` (author changes at `0d8c602e2`)
+Comparison base: `5035fed52e60254ecbe034cc987553feb24616f4`
+Entries: **43**; each request at most60 entries and400000 bytes.
+
+[Single request index](review-request-step10-index-287a22d33.md). Before values are historical; currentDecision and after for content rows come from `git show <content commit>:<shard>` through unchanged `reviewEntryFromCommittedRow`. New package-native predecessor rows are explicitly labelled overlay and require the runner package commit. No seed, sample IDs or verdict chosen by producer.
+
+Reproduce all-shard consistency and every714 generated rationale (unchanged checker, no --apply):
+
+```sh
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work python3 plans/260925-documentation-authority-unification/reports/phase-06/step10-sync287-reproduce.py consistency
+```
+
+Reproduce tests yourself (473 expected):
+
+```sh
+env -u CLAUDE_CODE_SESSION_ID TMPDIR=/tmp/fgos-work node --test test/scripts/doc-*.test.mjs test/scripts/check-doc-*.test.mjs test/scripts/generate-doc-inventory.test.mjs test/scripts/list-doc-anchors.test.mjs test/scripts/verify-phase-02.test.mjs test/scripts/next-doc-id.test.mjs
+```
+
+Run at the runner package checkout from repository root. The consistency reproduction materializes scratch only under `/tmp/fgos-work/`, checks all90 pinned shards with the original checker, verifies their current-row equality, then audits all4 package-native rows with unchanged `checkLegacyRationale`:12893 rows/91 nonempty shards in total. The original checker directly on the new shard errors because its historical oldRow lookup assumes every shard existed at5035fed52; that observed limitation is preserved in `step10-sync287-rationale-consistency.log`. No checker code was altered or bypassed for a pass.
+
+Review every submitted current claim with an ordinary verdict and full digest/anchor/shard equality. Rationales are grouped for mechanical regeneration plus an independent seeded deep sample of at least108/714. A36 additionally requires reviewer-seeded at least162/1079 conservative Weak-exact/Judgment population, every unequal source/target digest and partial/historical row deep. One independently selected draw may satisfy both populations if both coverage thresholds are met; otherwise add draws. All exact doc corrections, tool changes and marked native predecessor transitions are deep. >3% deep rework escalates to the entire pack. Report seed/sample IDs and each claim's deep/mechanical note. Independent checkpoint/truth/red-team obligations remain. Confirmations retain existing committed approvals; metadata/evidence/native entries do not approve claims.
+
+## Entry accounting-001
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "e28d5a2443a87c2def25cab421cf25a9739cefb9",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+  "entryId": "accounting-001"
+}
+```
+
+## Entry accounting-002
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/owner-answers.md",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "53e78368d082d6b122278aba204488fb9189d8bc",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/reports/phase-06/owner-answers.md",
+  "entryId": "accounting-002"
+}
+```
+
+## Entry accounting-003
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/progress.md",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "50c10fa7d73da018bf60ff2c7d4002d757bab84a",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/reports/phase-06/progress.md",
+  "entryId": "accounting-003"
+}
+```
+
+## Entry accounting-004
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/step-10-report.md",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "93c8c6f4bf9bb8e508861c2bb70f5aa5cd0293d8",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/reports/phase-06/step-10-report.md",
+  "entryId": "accounting-004"
+}
+```
+
+## Entry accounting-005
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-checks.json",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "615378afab756136ee977919ee911cfa026707d8",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-checks.json",
+  "entryId": "accounting-005"
+}
+```
+
+## Entry accounting-006
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-citation-red.log",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "17d9771999e5482ef19925c412f5451eb3277128",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-citation-red.log",
+  "entryId": "accounting-006"
+}
+```
+
+## Entry accounting-007
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-context-red.log",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "9aa85de3bded7de61d706b6692aa5da08e4ac37a",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-context-red.log",
+  "entryId": "accounting-007"
+}
+```
+
+## Entry accounting-008
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-correction-chain-red.log",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "fce0e8fde773e19f74821e766fb0aececb0dcc3f",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-correction-chain-red.log",
+  "entryId": "accounting-008"
+}
+```
+
+## Entry accounting-009
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-doc-edits.json",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "bf43b6460873661dcee21940a158c713d1695571",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-doc-edits.json",
+  "entryId": "accounting-009"
+}
+```
+
+## Entry accounting-010
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-fast-check.json",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "bcdb9cdde0d08f692ee0a0d4409822eb5800e460",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-fast-check.json",
+  "entryId": "accounting-010"
+}
+```
+
+## Entry accounting-011
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-final-audit.json",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "33a64966efe3a869d97485a4640b7e9a5695673e",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-final-audit.json",
+  "entryId": "accounting-011"
+}
+```
+
+## Entry accounting-012
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-historical-red.log",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "45cd5d328408eb06a259e71637f8dab16ead0af1",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-historical-red.log",
+  "entryId": "accounting-012"
+}
+```
+
+## Entry accounting-013
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-id-tests.log",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "4a052694be32a01bcb872ebd07aac943f5c4af6e",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-id-tests.log",
+  "entryId": "accounting-013"
+}
+```
+
+## Entry accounting-014
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-link-alignment-red.log",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "b513a93bb7e34a61ae36b8672e3d2cdf648bb527",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-link-alignment-red.log",
+  "entryId": "accounting-014"
+}
+```
+
+## Entry accounting-015
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-link-context-red.log",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "44cfe6bc2f3169ab1326bb6b4b201c44f34d698a",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-link-context-red.log",
+  "entryId": "accounting-015"
+}
+```
+
+## Entry accounting-016
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-link-replay.json",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "53d07c4a644777094d3ff286ee46ed55a9673d12",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-link-replay.json",
+  "entryId": "accounting-016"
+}
+```
+
+## Entry accounting-017
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-native-refresh-owed.json",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "558603c3c3bb460d57be4dbabb46dadbae8fa877",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-native-refresh-owed.json",
+  "entryId": "accounting-017"
+}
+```
+
+## Entry accounting-018
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-pack-snapshot-red.log",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "ac9fa50f7522a624d2ea2954dfe0054708352018",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-pack-snapshot-red.log",
+  "entryId": "accounting-018"
+}
+```
+
+## Entry accounting-019
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-consistency.json",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "495a25f4265194795c46436d45e8a702f770d6de",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-consistency.json",
+  "entryId": "accounting-019"
+}
+```
+
+## Entry accounting-020
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "944536d3ac9a7ef4ec4ce3e053e7488d1dfdc9ba",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-edits.json",
+  "entryId": "accounting-020"
+}
+```
+
+## Entry accounting-021
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-green.log",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "41c4840a9a3362600283b5d1f9c1891851e34b8e",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-green.log",
+  "entryId": "accounting-021"
+}
+```
+
+## Entry accounting-022
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-rebuild.mjs",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "1b060e481bf476f99cfe5db52d64ea7cc17e84b3",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-rebuild.mjs",
+  "entryId": "accounting-022"
+}
+```
+
+## Entry accounting-023
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-red.log",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "c0343f3c7906f8775e9dd99a86c08cf309e22ad9",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-rationale-red.log",
+  "entryId": "accounting-023"
+}
+```
+
+## Entry accounting-024
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-references-red.log",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "92d9ea84d874254500d535db45816af104688c04",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-references-red.log",
+  "entryId": "accounting-024"
+}
+```
+
+## Entry accounting-025
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-reproduction.json",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "db1dea9cd9d67ac5c68ae78ed47792d845cacb4f",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-reproduction.json",
+  "entryId": "accounting-025"
+}
+```
+
+## Entry accounting-026
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-residual-context-red.log",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "503aca14c340169ef4dd53f72c7afdc58feb894d",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-residual-context-red.log",
+  "entryId": "accounting-026"
+}
+```
+
+## Entry accounting-027
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-review-application.json",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "d468523991ce72b08f21a876450827da431b5419",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-review-application.json",
+  "entryId": "accounting-027"
+}
+```
+
+## Entry accounting-028
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-target-history-red.log",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "2f5ba089063a2a504f85b3779ec97e264cee7114",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-target-history-red.log",
+  "entryId": "accounting-028"
+}
+```
+
+## Entry accounting-029
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-target-identity-red.log",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "2911461b1883e5420171b197c8818f0aa15bfe08",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-target-identity-red.log",
+  "entryId": "accounting-029"
+}
+```
+
+## Entry accounting-030
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-target-ownership.json",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "774001260a1b47072e21f151ea5f6fbe30188cfc",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-target-ownership.json",
+  "entryId": "accounting-030"
+}
+```
+
+## Entry accounting-031
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-tool-tests.log",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "41b2d05b46794007303fdd1d483532313f7f71e2",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-tool-tests.log",
+  "entryId": "accounting-031"
+}
+```
+
+## Entry accounting-032
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-systemic-reproduction.json",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "5cec44a076eefe6bf78d197ff9350dd166804fe0",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/reports/phase-06/step10-systemic-reproduction.json",
+  "entryId": "accounting-032"
+}
+```
+
+## Entry accounting-033
+
+```json
+{
+  "kind": "author-artifact-accounting",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/tooling.md",
+  "contentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "gitBlob": "dfa0461ddfab4f60e0e78a2dd6e69d310649efe6",
+  "reviewScope": "Evidence/receipt delta at the author commit, not independent approval. Immutable bytes can be read using git show 287a22d33a0eaf2d9e47549a1142daf62361bb8c:plans/260925-documentation-authority-unification/reports/phase-06/tooling.md",
+  "entryId": "accounting-033"
+}
+```
+
+## Entry accounting-034
+
+```json
+{
+  "kind": "review-application-record",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-round3-review-application.json",
+  "counts": {
+    "applied-and-retained": 365,
+    "applied-then-reopened": 70,
+    "rework-or-hold": 52
+  },
+  "allReopenedRationaleRows": [
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "collection": "claims",
+      "claimId": "claim_5ba6768e5c4f7d93e77ccceda19d0103",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "collection": "claims",
+      "claimId": "claim_642c9f33b6f971fbe68ee92bbf3f7be9",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "collection": "claims",
+      "claimId": "claim_7553a4868205098ba82d4c03382acce2",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "collection": "claims",
+      "claimId": "claim_6dfbaa59a2f49bc668d9729fed01878a",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "collection": "claims",
+      "claimId": "claim_140216d27eb5609e8b5d51f718ecf493",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "collection": "claims",
+      "claimId": "claim_52b54d49826d7ff8fd38f29925505f2a",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-closing-instructions.json",
+      "collection": "registryGaps",
+      "claimId": "claim_5c520fcb1a68ba27e2093341834258c7",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-systemic-native-predecessors.json",
+      "collection": "registryGaps",
+      "claimId": "claim_61244b0a84842a2771f7cdb493ebb699",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "collection": "claims",
+      "claimId": "claim_2668b04d02367d6019d87a54a7ce3f1d",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "collection": "claims",
+      "claimId": "claim_a17f5abca4885a507c7c2af621f4c191",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "collection": "claims",
+      "claimId": "claim_eb513de9dd1f55fd74ba8a7e2edede13",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "collection": "claims",
+      "claimId": "claim_b16cbd63cee728eec475bdc81b74ff96",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "collection": "claims",
+      "claimId": "claim_1040427a6a529876c2c6c0804a2d4f69",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "collection": "claims",
+      "claimId": "claim_12746c423e60cdb38d2b80fad595e4cd",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "collection": "claims",
+      "claimId": "claim_898ee653f5ee715980c7d4d6f6225c93",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "collection": "claims",
+      "claimId": "claim_a718209070ead83b35c89432cd4f8f93",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "collection": "claims",
+      "claimId": "claim_4308153c9756b0d9071e0d50e0753515",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "collection": "claims",
+      "claimId": "claim_663e11baed516b81ed79d6a16f693233",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "collection": "claims",
+      "claimId": "claim_b2e7ba276481b1271c469d12fd614bdf",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "collection": "claims",
+      "claimId": "claim_ac14e9ff69ba640a6abd226d96490804",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "collection": "claims",
+      "claimId": "claim_a90484399a999985d0e8a14f7e935c5f",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "collection": "claims",
+      "claimId": "claim_436d05aab9ac75398d205d17cf0a0398",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "collection": "claims",
+      "claimId": "claim_5bebe9b972a01c94f4968e0d721d8f7a",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "collection": "claims",
+      "claimId": "claim_aa4f199c71ded094a421b59bbdbc3b90",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "collection": "claims",
+      "claimId": "claim_3647bda58430166a4f1d8ac21c8c3cf3",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "collection": "claims",
+      "claimId": "claim_79d37290194f960128521827a52d7cef",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "collection": "claims",
+      "claimId": "claim_a7adda8515d145237371372a479b0fed",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "collection": "claims",
+      "claimId": "claim_81cb4d578e22df80989070ca854bf181",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "collection": "claims",
+      "claimId": "claim_b570659f53fe08dee4bf9eda19e761b8",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "collection": "claims",
+      "claimId": "claim_d63817bd2e829afcaa3ca8e6b0829099",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "collection": "claims",
+      "claimId": "claim_49bd109f3f24770faae9adfc5b03e415",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-01.json",
+      "collection": "claims",
+      "claimId": "claim_02bc04834a0e3dacab06e16c1a2396c7",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-02.json",
+      "collection": "claims",
+      "claimId": "claim_1794a3b9ec470264eb9fdd9c4c3b1cf1",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_57717742a834b711febbe3dfb0ac5476",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_cbd42abd35dac36233a87f37ee254160",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_4435fbc23775927f045099a8ced17dc5",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_d3ed69f34fc43893cf1e7cb60f4ed408",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_8d367b7e90504846bdd3073d1fa37982",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_d7301384301bbdf8126dd7643655a8c9",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_a743c2a084247fd83a11139b30a9b67c",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_0122703a7557b25c9eb3051dff577a8f",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_9387ad8f993761127abfaf666dd9596a",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_33517f6e8bac4d544620c8608542b992",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_e9777311199033a2df28c8c0d077edb4",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_9c21ce867d7c3f492ca7dfaa577670a0",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_ccdd6165ab50543f0eaa6b8033426415",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_12da7fbeed710fec784d83fe1b0cd68f",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_6ca5b197393b9ff3eb1c975daefc978c",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_dc1955cdc3d4c7412053ae6829d04df2",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_303170450a2ee821ac8a7ec6e7a7afcf",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_b556dd1f488898e5d5a0e3dc7e2b8daf",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_2e2346561b753dfa7d5ad0aa553a80e8",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_6abde1845e791c40a4d1413b26f30953",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_0742b99ea5b3b0b401c8ae34948492a2",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_01bf4d49fa626fc97f77a7791ed1802f",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_697ca466ba107eb32aa9efc9cff9a071",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_4b55362a956ddeb24eb2b9dd5477d17a",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_99d4458d8d725c4801b2ead26ee647ef",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_189b52a1cccbce00053753e2f2c5f414",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_78fd80b808a458d1fff81d31f0893577",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_93143ff7af3d21d35d50096a9711ce80",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_e08d794f548044d171e9fcd84c7cc606",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_c6e92e81163d98bc6938b1ec4b9fe33e",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_278d1100651338cc5a0c766736bf75b7",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_f8ef71511f125cf47661115556a0d62a",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_22fd162742eaf6338625db0b3c891e8c",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_2f82531f1c9638bde376b54c01b3262a",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_ceea50443e5cbb1d8e73d79fd642aacf",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_77c6d3f137e4ed610c64eece3accb6f5",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_ea9c89ff9f92e6dc70e304b947626ca2",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_242afbaa21db02263501e5495e429797",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_3a427a14f4cfa4dacc52440ea35a2e19",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_70903eebe10757eb99fe0397d96ad7d4",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_4cf4131cd163673e8a28b588cc7eb48f",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-03.json",
+      "collection": "claims",
+      "claimId": "claim_370c8997003f37a6534d11591eada7f9",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_824b96e5bdbf98cceb212871ed7101dc",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_093665be42da8c50453afb53b7ac55a5",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_8a80bfb39359705c28607c0c7f99d25f",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_882afd27a90f245b5fb9ece4bdb62d5c",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_39cb769774461a2bf4cb8f9141c4d68d",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_6d6c229b00e4e9558e7fab3bf7da8486",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_bc464f69b9780890094679b1c665a68f",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_f93d4cf3a9455d45357cde918e13031d",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_be72d686a809691a1655432eba1a1f38",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_a4d718116ce5da0bb388a5a5d99d690a",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_7034c248d749b342090acdd8b80b221c",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_179b6be7dc985be066a9a180155d8e07",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_80458f88e0dc781e44edc52c24ed7951",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_bd56da5ca2731e990a4c5f1af27a60bf",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_5a7e196f7f8a316c58fba721f619981b",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_e2a2389b5cf963fbb0cc99899f20e241",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_d83546183b7053a268874ca9c5abc2d4",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_13c2987cfb81b854cac75b1b9ee66d9d",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_04b6ec37215f079b7449be461afe4855",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_b43af2d8406b98263e46ac70830cb4f7",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_21e01a4034e28f51618f809b45dba0c8",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_cc10d4ac8b8c6ad0dce1dc43ee5d1278",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_e7dce9e197497c2f44a8f5971681a587",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_d645da105a558068961c06e1d47aa9ee",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_50cc0ff73dabd1642950365f358125c2",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_34284834ad2dd8f5a0fc5a924b8196a5",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_b602d530010f3b2f66ef5485bbff5bcb",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_c37da632abaadd051eff58492f71c8c7",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_c52e0d7342545a9365e507c17a99e946",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_f4f513bfd7ca5fd9708005243a624f95",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_b165c6ca3702ce5335599867e447ae55",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_8b6511ceef7788eaaecfbe1c17de0ccf",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-04.json",
+      "collection": "claims",
+      "claimId": "claim_033a7b790516e8618c276525412173f8",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_50199fbba53c7b095aac9c5a5044a725",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_b0ba3b41ae0dd07934e68271f5600cc8",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_3a75670f5f502b715c7272ee293d7a6f",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_4e83750abf77998315deed0a55b0bb70",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_fd1d192b4c992dd43976f889fce7b853",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_c83d7dcdcd5cff5827b4c55f3a399dec",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_1cdd77a5d6581e70a9c4acc51ab13245",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_5342c8ef0f0b234c4b9a57a8aead329d",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_b6fcedfc2bf597e1d0b79e04eafc8ecb",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_e14a865f7edd1a7e8c4ab707aea0c4c4",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_5e34af6c8d8c30a7f8fca418a021638f",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_07c68665d6b19d67c6b26491297ed6ba",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_8578eb3520660abdf596e07df634658f",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_39494662eed59b83a66e63b9a2163226",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_2dc0bc012109a1c2d1ea7d8659f957cf",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_233e60f81a8d1f6720b34de45ba20ebb",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_f529cf4e730932682ca57182e498a64a",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_77ecbbd82edfa2add2400f5e5c8de46f",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_3fca52027a801e5437f62e12b4eb9b7b",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_bf7017aee7711f33aff3212852460cb0",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_7b0b32ae2909c878d74a460e3d8aa76d",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_f62d070f9a4550fbd214a4463620b9e9",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_aa5443460af0948fbaf01ca112df6ff0",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_48f565dc68f9dbf41ac773c5b597dcfc",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_ada79ea98a1532eddb6e55b127defcc3",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_24b02cf8c0f01fb72e700dc933178105",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_91c365da1980b105ad5c4615e8a18fec",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_7f42fb8bb62bfc97d9d9c5df7dff62d1",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_2643bffa34cd1c951224cb313ac51ae1",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_435b8ea00763fb2db73a9e915ed850ee",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_bc577af0bdb922ec28a7e5acc975f97b",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_c02d1e666a031b3ef35d9b0931c01aa4",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_5b5ec1a1d59e2b403d48b94ec9f43015",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-exact-06.json",
+      "collection": "claims",
+      "claimId": "claim_9e18f03a6f954d19d1be580ad0cd2302",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-01.json",
+      "collection": "claims",
+      "claimId": "claim_224b0e31c150a4eb39da7beba7e67ff5",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-02.json",
+      "collection": "claims",
+      "claimId": "claim_683438cdada8eea55247624a7637e938",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-02.json",
+      "collection": "claims",
+      "claimId": "claim_7811bd6eb912aa77b086eb0547630505",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-02.json",
+      "collection": "claims",
+      "claimId": "claim_435d32197a708d8225e5d5982e1f89b3",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-02.json",
+      "collection": "claims",
+      "claimId": "claim_f3ea623cee50d188d152d05b56287e18",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-02.json",
+      "collection": "claims",
+      "claimId": "claim_fdda99daec53a75dec21f1f127fc3425",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-02.json",
+      "collection": "claims",
+      "claimId": "claim_71e38c7b7b9839535d3f7d5151942eae",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-02.json",
+      "collection": "claims",
+      "claimId": "claim_7671a6f6a3176b62c9a0734a3379b109",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-02.json",
+      "collection": "claims",
+      "claimId": "claim_f74d9ba5a7cac66024411d63de8acdef",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-02.json",
+      "collection": "claims",
+      "claimId": "claim_0cce3bb5b555e74e59019ce255fc6785",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-02.json",
+      "collection": "claims",
+      "claimId": "claim_24840a5b4807fc0b62e4fbf401378ac4",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-02.json",
+      "collection": "claims",
+      "claimId": "claim_b614987f3b07187d378af2c7315834ac",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-02.json",
+      "collection": "claims",
+      "claimId": "claim_2f2d45fe2b01f5a443997ec695abba97",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-02.json",
+      "collection": "claims",
+      "claimId": "claim_276255b27e5f4955d86121c0f8edefb8",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-02.json",
+      "collection": "claims",
+      "claimId": "claim_be73c8d6ef58e4b00122bcc4fdaf0583",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-02.json",
+      "collection": "claims",
+      "claimId": "claim_007ac529305107d794a6aa0752c8fa85",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-02.json",
+      "collection": "claims",
+      "claimId": "claim_9797e67aadf80be198afbc69817c9ea2",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-judgment-03.json",
+      "collection": "claims",
+      "claimId": "claim_832d730918fd7ec72730438c02b0a1ea",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-main-merge.json",
+      "collection": "claims",
+      "claimId": "claim_119c0b4692416fe71932029c5de677f4",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-main-merge.json",
+      "collection": "claims",
+      "claimId": "claim_014f0a1be5c823ca15a3e1d3a097c3c4",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-main-merge.json",
+      "collection": "claims",
+      "claimId": "claim_18e8ea8f02a61e1406cf4017733bd0c0",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-main-merge.json",
+      "collection": "claims",
+      "claimId": "claim_18fb16d85bf883f7f18a1b2f55f28c50",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-main-merge.json",
+      "collection": "claims",
+      "claimId": "claim_49355bf7a0675fc3526ffa2f3624bde3",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_bb161d438c5c39236401c04ce56ef08d",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_2382adfc5036469ddad709111bc07d2c",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_76b3b4c83b8f395662c1d078b2a033f4",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_3cbbf6679df9f95927ddd24dc3a57172",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_46468eec9b9c3677bb85bd88c60494f8",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_3d8b85a91a420da5d4c72ce76e7199d7",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_170c7a5c7d068ea2ca28126a4608a095",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_2d2e35bb98c0810a6a567bc2118e3f75",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_962abf6092edd6fb7c1cb7d1bee03dd8",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_069e4dd6db4fa703a9e7064cf7e5c34f",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_adf0ba351a44a6b128a321d4b069fdb0",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_9e361aad48c95808dc7d2e00e853cdd6",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_0a5b193e9d643f834ed7a5353ac8b512",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_a8d4656df8484f8a03f6da40ba2d31d1",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_d49d36501d7dffa090b41cc252de8fc6",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_8542779d7837422248635f92de9b3acc",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_00e1655090bf22e4220e1a3ced2d7754",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_e7e86a8ca90d80602b8286cd75c34562",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_786929f6ae58e1e2fefd5e08805433ae",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_37730bd21cb1e3dc98a453dd7f96a13a",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_a9382eb0ecc328ef7350f203cc059ed0",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_e3d4d7b0fa329e89ef258b2b93e0f213",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_57f26b5acbd6bb500ca353f84f486488",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_242208b542d4bb24c84796f43f775d4a",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_88cf23510b37d2048b1a578efc2ebb10",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_abb60eb206ce120877cc9c06f826ab57",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_a6f71d465ebccd696428b94ff6f664af",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_6b4789439adfb6eb3b05c85b7ed8f7e0",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_491f40d6df7f19683306f82f98695e8e",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_8b79ab2d01c7ce85912eb9f0a25bf3ea",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_e16b56644d520a0fe0a4cd6b40c2459a",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_a86887b78fbc23319db13f3bf4816dd8",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_fad0d749adc5ef611ee344c16b7c661e",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_6e6d4e1d3c3621bc16f442c43894284f",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_682c6fe1822ee94db41d02a613e3d451",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_976c9258480b6a6549a86ce7f22c593e",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_88d68c4bcfd5253c805d3f898f3faa4f",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_f90925846cf63161875b4657557bdf4f",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_6d348715644da34b65032ea70555a2c5",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_1da19454b145196be8e6880ee621fc16",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_0548f4c5eada0527c365b6d10bc62b65",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_6ac14c8dfb68eb863ccd6513576a1b9a",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_317581a1ee7c63342e2015d6ef43ec99",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_3eb1d76cbee05b14310c7bf9188db06d",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_d8053a7159526a29d5e92f20793b07d5",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_e373744fe1410b7c47de06bd6a90b6be",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_f5bffd709d33a00b0aa159f55fbb1a8b",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_07dad543c4bb6b7ce874e8466f2a09c6",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_6d43b086d10f2df86b53ddcec381df1a",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_dfe4002bbb3b81c40896dc2d7647c0bc",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_c89663c837918676821535861c41b485",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_92b8f4c6b79700a469ef0a7194d216b2",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_6ccb120b3660788aa96def3f9c9488f0",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_d025ea86a4c37a1d545a30405c95c10e",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_3baa17b96efa5b2e4471ab115b0d7c17",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_41f39b5ae50c28f205b44cedf2042c53",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_9ff39ce2352aa1a1450c05755bcb4b4b",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_7d36c00eba15b11cc07b5583187a1e8e",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_906538d95e180ed10d9fdc235eea846f",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_0e9e0ab53bbc4bdfb7b06b60033e2cc0",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_572b05980d7185a97d83e9167978cfc1",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_7f7eea3837a5a141729c012e44d43903",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_bb98dd8d67f6de65de2b005722ade1fd",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_358f4471159df6d56b6f9ae689efc338",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_c4295f45877ba69492d2a2ea9620acf0",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_1f7afbbdef971d513de11c3bd40fd5c4",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_11980b101ef098a18b76be8c2a78b8a5",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_f7da49f56bb5406dda1b7a9dc8321353",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_d95063546b7db6e2eefcccef844da414",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_1a54f3db0a30f97f58e3f5bdf48a2f18",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_b0ed3798ba3d726ad708747bf9f3e417",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_b5e9a0cb05c450974c572df6c74d80c0",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_6a7f1f2db9e46be482d5db01438a7377",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_a30e0ef293a9486cb916f09f5e245e6a",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_01a4127478b48d367f29f82a84b96736",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_c43d8d2e272e534e1af9a432840b598d",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_43f4cc9c8c58f2d272f31c88a438affd",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_830dc2ba3442539ad565bf50d809fe19",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_2b4dc22d1d766ec309386edf38d3b2b3",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_a9d428f7f706d570664e186c9ef28b25",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_b8d168512446fece1d8ee3be939a16d7",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_f409b5368907ec2f23afec5aaec4900d",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_78c8121663884ea16ea30fc41c7d6383",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_f5bceccd63117ffc5c9d61431b4c289c",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_34cd3d6847a19459c2a40657183462b4",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_0a8f3fc187d453d22cebec55398861da",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_2270c32f627d7b23753d7c3fa4ee462e",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_5c0aa55df46b259a45b7b86ed7effcff",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_0299e61b0a0073d63d8c3b557a5219ab",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_d53e991528b9735b6b4123b5162623f4",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_d20c9842c9bb3795044d9e47f408a1f0",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_ab0fa279fc815f5ed6c67ea49e84608e",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_530ab563b2866c8d34d9742aff683987",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_3668d915063e098d27f5e81873d7854c",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_6aa293eb21f669e244218fbd2a5b75f3",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_85308d78756a2b931f89ede725aa9df3",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_7580121ead7beca585b423ef988abe42",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_05ad37196f82bd1e7d67408a5b9597c0",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_1159ac29ae8400ccc91f2d248ef0626e",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_547f11ef52b01da63ab29a5ce3854d61",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_fee9770069784db63c58dd5ad7587152",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_d5f172dc9a98d1492049b1b1fdea98c5",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_fb70c935086b7e42dc5c094a17ecd550",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_fc04976c24718c8853cf9123a7594ad7",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_4f9c9fbda62cb2d279915e9a40974d38",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_c46a435aacc0a6825652eb8769b75566",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_17128a5990722dadb75e425fc865ed9b",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_ba1dca4f432006d084aa447f6d05f135",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_8a0a4e9c3e4d7f8292f9a45b14f2e929",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_3a65a1ccc318606840cb9a1f86964575",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_f528d11943fd9371f82b5f5f59a18247",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_379ed02e519007bc5486fe9640a4c415",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_7172daba1169d665fbbae950c55b2e8d",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_5531005d1423192b1f83c2a192d05939",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_f8dfb7b8ac517c740ab304fc5100c8c8",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_b6adedcced047cac602c91d287a15975",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_7d5ea217cb14a532478bf2ac0b0976aa",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_0544be1eb82e576df7f734a738b995f1",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_8557d4f67714259e45adce7a9b910d1b",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_90fbeda9e2de642bde1f61e75eb4cb4b",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_4935c2957b1a543bc51aca655db9ace8",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_900031d284de0a2fa3c61714a76a97a4",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_cba515c212c638d95887d49cb32e62fc",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_2db9fc1b87055453a975a905935dc8fb",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_ed1213dfe51bfed60c81bdcbe1443d04",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_c98e7b899accefa155d580575c361434",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_991e0c1c88b8462898e78bb01f76db66",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_1f01c1021b0aa8f2a699899c7343b85d",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_082a27b78d245b00b72bcb23390423ec",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_409096839603c2307eb5ccefb910e75a",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_28c4a9baff6ea75b287aa8dba3ed8328",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_8b4d9c48d10903dad95562eadb59f44f",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_23a302d963323aa22a6a9e8ff35aad4e",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_03bcf93f2a1eb641d2b4681160a35ce8",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_74bb68261a023f96104ac9591bdddd6f",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_a8648a7aeedf0e3b676449beab92c30f",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_14669b63c931eebaaeb2664f0ee78959",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_aa6d3cfae49d49c243cbb2d85d3138b0",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_0dd2b9c7a6cf201063f60b541137a8b4",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_4366f098635c5a8564fcfdb402191b50",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_ca9cfaa38b07d2339b637c7a562476d6",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_38e1494401dc8f58be5239308bf07b21",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_8b68b02188ffca625df1c7dcba9cb8a0",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_d7e3300a73c40ac50a91d45f47337878",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_efee014e9c923b899c9b2fd74fb60f7a",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_b91828db536d2481990bce0b68478735",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_3d73e4a2d6dae0baf907a974a53444c8",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_749a1bdf0d058ac765a2e54a34c40f36",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_b77e786ca1c28b37204b3c2d3af32147",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_4d76fa64e1f58b727c2388180d8963e4",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_d971f89754723d8ca8cf7ee3162412df",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_1f9c5ac30bab055a8a34acab0d31d91b",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_deb6e0500907da30eb43c8a72e85ede0",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_566d5e858feff3f7b42b34e719097dcb",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_8dadb9fe6d698e022bd0dc047597595c",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_1ade04bad28dd68fdd1daf91ec49f0ed",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_6911ce65c274d0bbe3fef19915607c69",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_72f81fed028e9d9ae2d755816f77139d",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_bd8fb3923a823856489a3f5eb101e832",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_88a852c57e217c461ea57067acb241b0",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_0492d45c2c54a256ebdfda12092cba4c",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_237843f43935cfdd341eb8471d77c3e8",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_bee98ef4ef3d1bbe7f849cf6598667fa",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_0573e67e36361fdac77a24c6fc32b15a",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_6ded96239e6537517b4222fe95101816",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_2a6f9a03cf11170e5a4d92f824443ff5",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_c0dc65d7f7e651cdf170e3080f9ca46b",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_d914a73cf88e15ff256bb747a338fecc",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_857665a7f9ff1b6866fa898b07684233",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_fb92651ea85a64c0b6e806926e51a4b2",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_7759181bd522af266855f849ecf8143a",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_9568b972846dae2fe0984168520d2cdf",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_f0516f596a66ef71d4f7e2a318b98e57",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_f7be1d8a794e7f9c867378b67fbc3158",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_128087ed2e98dd5ca8dfdf2adeed72fd",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_a8914714b51091a9f0a487f739172da2",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_70a805be575183f1a48f3d5933770896",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_e03e71322f4966158501e6da370897a6",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_454a911b873012ac0ff8f6c43613cd48",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_4265ae53d6f60a543e5c6ddb87ca352e",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_2d6fead0c43c66d71a75a792b8fc0af4",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_9053d212a1d094dda69ed7e3124ec459",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_c87985222ef9cfb3a5a64ad3f375abb6",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_ccfcc4bcb24e4f5a31aa634b44e95c7f",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_b6dde833e1e94658019aecb31294a7e6",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_921fe2f798d3d1cbd95e02e7b597e1e2",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_df876a1ab74395eaaadda955b740528c",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_f5ac0ef50ab3563ebd907f6fce7bee1b",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_48f849918416a2e7a0253da7188ed3a6",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_8e489ff736ba50a186eef488fdf45c56",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_4a45bed5a7cfbab3868aa12d43769450",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_a3371035f36760e80daff24f1b12ae48",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_b4a122fdf0fb7791b7747ab63d107da5",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_1449692311c75f2f513b0e3838de257d",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_8b66907461f2c1a815924ea9aebf4b09",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_f0bc9fabb69b3fff3a2279ca16dc1386",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_09c41493bee64d87f99ac0d362a6e455",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_cc28adc3c809386b5bad63a0f782f83a",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_5ed2477f55abe3aa4f66bb7b75fe815d",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_c96224f7925e5b4f85066faa056c820b",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_7485ea80c31d4586b12a923c2eaa4577",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_f621f927fe3f6d1d01d6e9fcee3cf5f3",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_92efcd5ebc7e6be578c08f559b57215a",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_aa3b64c48d320e48335959ea7cb89aea",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_31ffb6dabab19ec588e55d3d31d53867",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_c5d593322274924a9603971c41251493",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_f2ecbd975d976c653ce70137afdfe843",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_e976332dd4fb73def367d062991b016e",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_9c60847e6afc58eaac38ab36beda8889",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_3d97c79e3477c56e002f75f27a964f3a",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_fb6f32b5b22654b9f92dfccd337713a4",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_937e450eee820c23e23b237410fad831",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_7a382f6a6153c5b68cdb7fd557598623",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_6ed7f2c285615b6ef028736452657e35",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_d076380d1edd56acb66c6cab20b5df86",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_b7fb67d1eca8921c833ba249ca397d17",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_04267215d393d248ae4d55f9c500d755",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_5b9fb10e553661042da96527b1ea170b",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_0a635df1d38c3d0223aa2bc43724b20c",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_b22d8e8a3d573b5d0254b3fb04b46ecb",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_0261291ac389be7c598690a1c40ef56a",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_f7388f36e2422375b8acf615e169e8c3",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_b43407f65064c93d3f3b8cf51a658814",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_2849a6d9d1bcb4814b5823076640d501",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_326219701affbc3692d11c36a1f8b6b7",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_7f7c89a049856d8f7258d20b540fc6d2",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_8e62a5bc9a8337f8a2fa275fc43e2a0f",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_0a39506143741e4d7246472eac3d9fe0",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_132190178ee9da393d626629b0394c7c",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_4ff3a12817bb891341b26283460beea0",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_ee6b9f0f588bbebae2e0b21f860de343",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_561183a63c84ea7da01f804d6b4a8aba",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_cf2ffb0c8e38fa11099310b03cc01009",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_4f86f5343282b7be666e8614c7b07699",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_d84a785f003f2813a13baf9ca717e874",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_c8714e666c562dbf7bf9196b0112dbae",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_6edeeb46432233c0ba5494739c4d4593",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_af1e98a2255e03bdfed813c07b782e3f",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_9e83c2b1d76e62ae1f91160506fd94d6",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_1dc64098b014e422c98366c2153aa213",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_107aa6389a5ce8f7b219e31c0e035797",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_bf750d9fbc029003115d37d885e8a43d",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_3f0b7f9d49eca4beeb45b83aff2b0f80",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_f11410ffab23bcae1d89e8b6cbedf8bc",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_bd4897029d5fdbab80b1b7ccee475e12",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_371515038b57bcd114632a79a36a922e",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_15308eb4847ddd38be79bd87bd69a0b6",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_97479b13a60800e856813bfd4f0cbb78",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_50dca4885019ac5125d941ea5a86f448",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_07ae72c4d2c93884a120cf2ca12250a8",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_211f0b98400863f2a0e9b9cdaa2259fe",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_1d8baa1def0cea7595b62de99846b489",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_012bfa2639fb107eeb3baee4fb502f54",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_99806d8b21d05eb7a8e8744d765bea00",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_a6f43d98b3eebe97802fd01a4ac7863b",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_af6831310fe9fcdaa7c8e69902e3c767",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_d90840823918415e74ddd353dae32ea3",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_95063c4b27e671f29631d4fd68427008",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_bb84143c32c84b94257bfeb7ca6dacd2",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_d5dd5fbdb3483914743a14791a5f02a8",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_3f7b5a5b5b1c39251e56f0d232e11ec3",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_962d99a375bab41c2063612523bdf348",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_f2755ef85799b9a6ec4fd4f5d03e9106",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_66ce4edf221963b22ad02dbdf872da1c",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_8948a9c62d80ce2692687f3fcfbaf8ff",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_8066684d5e7c7159d6f58caeef26d8cc",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_9a5781f0086209a17330035ff0e58638",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_0ad7cac649772e91b98de923b0e597e0",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_25109471da4be0edce65a48735584744",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_e96351fa78113b589f25b1b0b55e1623",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_0c88f05863191f643e3e9ad87275f0de",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_722917cd4b4e98c8e6ed1498c02a752c",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_04aa8f5405a6c04bb829d2b8057f91cf",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_6ccdb5afe9aeb2433d51be563f10c206",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_c4100e9f00123b488f2793cf48044cd9",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_e4b8bd07e3f3a75850b54f7d8d4398e3",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_1c089a156e3b49003be410a6b22277b6",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_409136e69870a5b65fad1c316d27b2de",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_b36251074aafa1b9a7a18d09d35916c6",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_e48bce114dd451e01284dfedff3189b8",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_ff539e4d9e54b7a23852c01f926c5596",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_80fe1621540d25e5e4f6968bea7e0a0b",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_56a238faac6b847f9682d37b3120ee3d",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_6b0a503ec2f4be776646c3497dd2b654",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_8915e841d73567b51aeafbf90a505e53",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_172f16568383334882a377204d1bda92",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_2d8e20d6682672ff45ace69f776f586e",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_2d3c01cb290b26b07dea9f4253b48a2b",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_3093ee097f4a4c9dd5f2e4c1573baac0",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_26a29b7f2a7b3e9bb7b7f428c1af8ea7",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_305dece113643fd5b84ae2e927d0255c",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_05580d020f4747813ccde0f35a0d4253",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_bd9700b35680814aed54cb5ead71f93e",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_7cebe18b8107697678773ccc51789839",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_640e28371ba46f2a0b4d25d9bd4857cf",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_5ddfd281d81055c96fda317ce953758c",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_79be28c5dff309bf75120de9b05ae4d0",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_d6010b0b5e57e716fdbb2b573a5c2e4a",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_50f8ffbbb93953f5a4d7b276700aaf6d",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_8242c1d38b001421e537d3c00881719e",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_eec8cf4f92eb6874379f999e36411748",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_8428870415cb04160f9b74b632be2f4e",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_dee53f3bfe9661d4d0fa015e3d0783ca",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_76dfcba31d147e73488ea3abeade7ef1",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_be7bb33b5eafddffe9363e3f77cb41b6",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_1af2a90d9a26d86dd7a4366de7cd1940",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_cf5c63a7dd524801f09ae8137fdc3d6e",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_19fc68fdc1c3c1ab6616f2f973c66033",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_60fe87198f033ece2b006252ddc50e4e",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_d261432b2a27b402bd3027b58e918774",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_54536d1078dc6a2b6eacd17105389f2b",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_a069d263becad79e86a1381d36e62f13",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_21a5d8159161b20d737a94c96eb0a55d",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_a8f97838dcc5ffcbacc85b316d50e496",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_7b3c9cdf89fe70d17f3f526bbdffa385",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_0b85ea8ddcbd3d505edf8b110e3a42ad",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_df8ecf59eaba9c13d5ebc60784018f80",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_418ba1eb913f8fb73c2076c098709b9e",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_7cc93760fbe54867480b91577fcbbf34",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_174de09282f33f3be061af276a2f312c",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_19d889291655b99062f6d2a96f4d46e0",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_2150505ad7a90a909c876f86d9f5045b",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_e9ae0be6b74c4968b45802eb2cf6eb4f",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_87f8a5d0c80c3f928422a7ffbef9e8ee",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_b44be17fc9825eab5a9a6822c1473110",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_d3a32297633d7d7cc626d7723dca46c7",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_9a1f08d0bc4045fde2455e9a8d196a29",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_039865ac614bd07bd3b1f00f89e39441",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_2519e82bb2a6054b1b822fc266471424",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_c072318ec582affe5e0e6936961fadc4",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_e960a05c0b656d0dae2cffd3daee5a0d",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_c710c879488536d7a2b949141952f010",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_a29012c7fb94f83828b7835413eebcc2",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_ab6683864cea05c444f1b78cd30475b9",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_a411676b68cace20da24d92621ed8925",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_cde3d5a31e679710c732f892d197b7ef",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_edbd740417658e6cfc22ced75d91b633",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_c84180b3855a6187533b4f6f92c23630",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_fb9821c822ae8aa2c943c79604fe94f1",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_cf0272c9d88e7c921805226ce86f7a61",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_72cb929bf5ecffe3431de368d5cb7def",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_2f7f1c2f7b0f0673f7f2423731f30ae7",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_9b87547dbf5c4930ad55f81ce588af0b",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_97675a05c81f8d594b0023e409ef78de",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_beed103650a3300815a2f9fd55512980",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_2640fd2bf8f2de2fff20a9eecac26afb",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_edc2a35ab327afe6fae3c0079c44c33f",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_aacc6f817470b6af566684cf21db1371",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_d2f98c28ed63bf5bdde71ee9905a5b9c",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_2d10871c46be72d9e7255698a6fcaf9a",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_8a89cd3726b6841b4cce0fccb3963711",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_a86aab8a7c793278b0f40c41445b40ae",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_4c19c4afc310f49b917983466dd84051",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_ad2a4c535503fa65a9d6aaf7e9e16b3f",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_e64b800c425e9aeabfe7001e2f3b2654",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_4bb58b361010872dadfab11d31a82ea0",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_7c356f4986b78e8e534ba028cc9c367a",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_ce523f4693d5650f3b9318313ec44f5c",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_170a6657616537761a61c5f21bd16795",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_b45d296754409e2acbb77c0a4c1fef1b",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_3c530d80d64e3352d8588bc11e13ac6a",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_d9af584b6c9f0301147adddd40c434dc",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_9344ec4f4abbe45957e9e660949bcc50",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_67f27db330eee764c88b7e7b98fa7aec",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_fe3f6f8ac10ba0e516faa2ba0669ab12",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_36867e29d791ecbb5a8afb6510e047f6",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_c0feb8d360ffddc02c84efc83661c458",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_99639b47347fba434b9b7d4bd1327bb5",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_8b2997b208e7079cfdc61218ee3d2a50",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_9ee3c1e8a270afbecd9d993057f83607",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_d4cc5fce1718a48b3f1510a87eb47273",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_76de093f955dea43ee8202b61fd82aa3",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_23895431539495abbc82161abcb35e9d",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_0d786a42ec0d0eb88bfad2d38909ace5",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_51cc2bb9b57c4e57f4d874cedc48d5e1",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_446d721d407f7da7777d6d7598181d1d",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_57d3b9749e5c2300873b408d8bd4bff3",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_a8936ca958a19b57756c7f1451c3d4ae",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_f3a7761da9b79fcd907b36c8b2c83df1",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_9457144f140ce0f5c9c64f3063e3776f",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_c6fb2d851a8aed27c31af82f9056a862",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_2bc13328f1e7a4d1ac848c004a8a0952",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_61d6d1de22e22af7eb3be3da75284378",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_137e7e29c20b6ff1f4855d7f465055ea",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_88d182e8f7f1827e07da42ec9d992e49",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_b9014c66550a776442837dad43e46a3b",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_add5109449e2f6aefc7489ff836f0734",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_ab8c5d3c7ef7884ec870084364b54da4",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "collection": "rows",
+      "claimId": "claim_b12ca1fdc3534fa31f9d7459c1be9ef7",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "collection": "rows",
+      "claimId": "claim_21f66ad1c973daaf6c31abf50b6c8cc3",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "collection": "rows",
+      "claimId": "claim_806342ec2a1c5fd1d0b6d82ebd54d4e0",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "collection": "rows",
+      "claimId": "claim_7a4fef4aa802940385df7cd8fc1bf6f0",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "collection": "rows",
+      "claimId": "claim_7b209ce1498d7ab5ddafe25d203e5852",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "collection": "rows",
+      "claimId": "claim_30f4d7e2306cb4ecdad78086848d139f",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "collection": "rows",
+      "claimId": "claim_dea64a2d50bdbadf3b2ebeceec84fa5d",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+      "collection": "claims",
+      "claimId": "claim_14629503e9cad5ebf8241447b03649cc",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+      "collection": "claims",
+      "claimId": "claim_2636bbab8d7aeb5e65b5a30fa56de8a9",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "collection": "claims",
+      "claimId": "claim_15a24dbb1f2d0470f04cdf8900da67a0",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "collection": "claims",
+      "claimId": "claim_5dcb56608e17caeb53c197186ae33827",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "collection": "claims",
+      "claimId": "claim_6fe86521fead9cec7253443e3275a3cf",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-data-dictionary.json",
+      "collection": "registryGaps",
+      "claimId": "claim_9959e82e2874baeb627a8441faa07e9a",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+      "collection": "claims",
+      "claimId": "claim_38ad96d62f2c6cf7a639fc24a83c2621",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+      "collection": "claims",
+      "claimId": "claim_dc506074dcc2f08f6012ebb078b50371",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+      "collection": "claims",
+      "claimId": "claim_62d31ae4e5abfcf0ab158c0c6a8337ee",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+      "collection": "claims",
+      "claimId": "claim_5e282fb457ff9ef02e88cf329556cf34",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+      "collection": "claims",
+      "claimId": "claim_5b930b5ce84afec3d4b2c383c7f85925",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+      "collection": "claims",
+      "claimId": "claim_da21278ab32966f6631c82420552ed2b",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+      "collection": "claims",
+      "claimId": "claim_b38e730cc466114aa1e1ebba6fa880ed",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+      "collection": "claims",
+      "claimId": "claim_535f1aeb31d616e2138a5b3719cb4cd0",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+      "collection": "claims",
+      "claimId": "claim_d0e16d088cdecf2dd0b491f819009aa6",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+      "collection": "claims",
+      "claimId": "claim_e9ee744c6e1847ef25b3eb0bf180f577",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+      "collection": "claims",
+      "claimId": "claim_6f7c99f38f64abb5af7f07c1e2690730",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+      "collection": "claims",
+      "claimId": "claim_ea280fa29dca090fe3306f6161ac6ae7",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+      "collection": "claims",
+      "claimId": "claim_8999e61e46d6c02b407b84263d7a2d67",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+      "collection": "claims",
+      "claimId": "claim_f10fba22a20755dc700bb1720f98f451",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+      "collection": "claims",
+      "claimId": "claim_cf56f4a8b7679435c6bf59abd8c23093",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+      "collection": "claims",
+      "claimId": "claim_deb4b4da2abbc3d6190dfce1c75cabf2",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+      "collection": "claims",
+      "claimId": "claim_d802aabd387ae98595c102f0e857f9b1",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+      "collection": "claims",
+      "claimId": "claim_57f11d837272b3f9781b376ef1665c81",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+      "collection": "claims",
+      "claimId": "claim_a14f9308d3f04e10e670c6f178d4ee33",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+      "collection": "registryGaps",
+      "claimId": "claim_19495d2772ced1aa1af4b20d4640fa3a",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s10-systemic-native-predecessors.json",
+      "collection": "registryGaps",
+      "claimId": "claim_08f9b4c140ce931a064c131c2bd4e014",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_db593c2dbf2dbde00be1110c70e94583",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_e79e40a9ee21a51be2d37ee413a5b903",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_26f70ff6e280d95c6a2de80057d12198",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_7788ed260777142b9452d61228e1d1be",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_cfd58d692d355e1d05a0babd4fbb2183",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_3213e2828273933006676b06c204ef11",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_44a720a7dfd21c66efe74d66ad24f9dc",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "claims",
+      "claimId": "claim_60a5c12e7c7c78095b2c90db75324462",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-truth-judgment.json",
+      "collection": "registryGaps",
+      "claimId": "claim_ab182560a5142f22e010e35a97b115dc",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_83c033652dd933ee9b5fc5e519a2b6fb",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_af89c4e6063eb43c4e690c3fdd430677",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_9c0e5bb670fb2957bb0998cbe5d8d51e",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_65b61a54c10aa48c0dc423cf65cff0a2",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_0f4d968b593902731bd334f9ed2af711",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-boundary-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_76d404ea624a10455d7a14debe2b2a95",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_080c5cdacf820ed661ab372086ca7e41",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_6bc953eb6105342ced582ea637d33f80",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_559fca19404946ba9ede9006edab6e63",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_eff16b53a71c2109f97bb2e2bab25e87",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_b2a8587f5b61f728d0136e54d808289f",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_04f0605dc840e350f63e53d0e1e96843",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_b098afd80d02a32e6c6dd6c0f1e23284",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_c1993044e428f031329f23c67bc2a1d6",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_b1e44493c254c54dc18efa2088b0018a",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_949229109da1c08a1d85f8503ea3ee9d",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_ac2177776d1a367f2d8e81699b04fc63",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+      "collection": "claims",
+      "claimId": "claim_182dc1f2f896d82f0cf35519579ebbbf",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_5766225be2d76d6239e116a664aec7cf",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_37a8691bba650ed4cd9d98314b6a2b1a",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_088af18a5796ed72fe6d33ff2cc5d05c",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_5b308c0d698cf4b6e679cefd4b72159e",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_163988c8973416bdd64781cc7c667f65",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+      "collection": "claims",
+      "claimId": "claim_d6701453661c34a2331f9d9bd12ef843",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "collection": "claims",
+      "claimId": "claim_4eeb2f406288458e61bad21531966ab1",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+      "collection": "registryGaps",
+      "claimId": "claim_a26a90f97c6a399a30ce1df9207743b0",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+      "collection": "registryGaps",
+      "claimId": "claim_de531cd96f9f92540f16d2ec822dbaf3",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
+      "collection": "claims",
+      "claimId": "claim_d9185072d68925b4c020b13ba6c4d74f",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_970b6ae8bfa6cb7f00a0e4c2d98e4d4d",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_04703f011b22383992b94545055b9e56",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_f2f1dadddff0c5440195d8c00b74d56e",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-governance.json",
+      "collection": "claims",
+      "claimId": "claim_66f7be3b79ca1fe458ce0416ba1adf89",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-governance.json",
+      "collection": "claims",
+      "claimId": "claim_5f99956630d0cb78499c2a3542d2e5e3",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-sc1-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_4a023fa2faa879fb0e1dfd8bc5c051e7",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-sc1-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_7333c439fa8d29886b82168e015ca113",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-sc1-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_665eb7f4bfb9bee7ba3f5e58368eaba1",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-sc1-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_e597b776163803dcf6e4194962ea4f6e",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "collection": "claims",
+      "claimId": "claim_cbc7ad17e0764ac8d1d4d386e3b62e74",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "collection": "claims",
+      "claimId": "claim_b8fa7fa2cd614433de754bbb92302140",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "collection": "claims",
+      "claimId": "claim_9c7dc2d7af79db454e4d63ffffe3d6f6",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "collection": "claims",
+      "claimId": "claim_045b588f4d839f90c40b48fbc0fc3f4d",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "collection": "claims",
+      "claimId": "claim_e8c37a28267ca355475a2286b90ba453",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "collection": "claims",
+      "claimId": "claim_b69096018a7da1d3dc629b5d37f6fdac",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "collection": "registryGaps",
+      "claimId": "claim_2f7cbb5fabfc5e77f7014c54f020c524",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "collection": "registryGaps",
+      "claimId": "claim_4217ac86de0ba075ca046202b2ce4284",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "collection": "registryGaps",
+      "claimId": "claim_0bf4d10d1c0f4cda16abe6091d639b64",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "collection": "registryGaps",
+      "claimId": "claim_bc055098a9e2bedf2ed30ab0dfcacf79",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "collection": "registryGaps",
+      "claimId": "claim_b7876fcb567891ddc8431cdab2f2dab0",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "collection": "registryGaps",
+      "claimId": "claim_c2cb6de3e8b1288ed15fcd60f3154bbb",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "collection": "registryGaps",
+      "claimId": "claim_6f9769825ad867b974bc2f69118c2261",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "collection": "registryGaps",
+      "claimId": "claim_0416642260519cf992931a4968e80c03",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "collection": "registryGaps",
+      "claimId": "claim_daaf3726036adad15b2529ad43f71d44",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-boundary-sync.json",
+      "collection": "registryGaps",
+      "claimId": "claim_cdb2776a59ac6a8bbc129754ffc7380f",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-historical-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_b92ac199356ff830e5554647ab143a90",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-historical-gaps.json",
+      "collection": "registryGaps",
+      "claimId": "claim_6a8087a3f502f37f9c7b729e871bee9c",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+      "collection": "claims",
+      "claimId": "claim_bc091727d4f9526a57978e0ccc1cd5f7",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+      "collection": "claims",
+      "claimId": "claim_812873a889bd4222ea0ab3dc9194e1ad",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+      "collection": "claims",
+      "claimId": "claim_03ef50e87178220032a3eebe5c5d89d9",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+      "collection": "registryGaps",
+      "claimId": "claim_f9c135d80cce2e8cf98c8b3b5b0db4ad",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-mapped-conservation.json",
+      "collection": "claims",
+      "claimId": "claim_e5cc66ff5930f04b7ebd9a8acbc52942",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-source-completion.json",
+      "collection": "registryGaps",
+      "claimId": "claim_4b96f4f42ea417623dcc794155fa17ce",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "collection": "claims",
+      "claimId": "claim_239931ca8e26fd3b19bf970e30e2ae4b",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-component-component-boundary-advisory.json",
+      "collection": "claims",
+      "claimId": "claim_ae47f4ebf4390cd7a05bc5455deb37ed",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-08-component-authority-boundary-map.json",
+      "collection": "claims",
+      "claimId": "claim_c1741ef08c45e88d276f75b668de7452",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-08-component-authority-boundary-map.json",
+      "collection": "claims",
+      "claimId": "claim_d9bc09e7463502aa503b0e6024f5fc32",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "claimId": "claim_cd345b6c8a7da2451c2acf04ba8c5292",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "claimId": "claim_9a1cd05f74418890fbca8955aa76b378",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "claimId": "claim_2c080a72c195a28a1ca8efb0e1187f11",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "claimId": "claim_3770d5a0b897fbd8c1393a38c48c3333",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "claimId": "claim_96b54d15ac01f69e7df991151c2268be",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "claimId": "claim_029dd2509143e3a718a8fc0b7f7be03e",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "claimId": "claim_0a81cfc730773e8a468f69c67e1a7948",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "claimId": "claim_1ef2bc00c79bc7a40787b62a4943f0df",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "claimId": "claim_7aacf43ab14386fce6c4a5a8a0519402",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "claimId": "claim_9168d8af609c58932a87918d4a49b8aa",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "claimId": "claim_78563a2491b11f7a0b412c5b900a7414",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "claimId": "claim_dc8b5bc2507201dd705fcd64deba8224",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "claimId": "claim_b532b9a9eb7f76d041c343e2d45bf859",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "claimId": "claim_e793bd095f4a872b0bc08757c827359f",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "claimId": "claim_c030fece276e5228ec08051c9b243dd4",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "claimId": "claim_7aede254166851de375089f4b0160ca6",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "claimId": "claim_84e60054f3f70565af1fcf9c09352d83",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "claimId": "claim_53e0df53a67f6897195cbf23839c6c9b",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "claimId": "claim_39c40cef341e227d936ea768b12ba435",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "claimId": "claim_eaadf6a68a7c7f9ed4005478db93c95b",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "claimId": "claim_e017f3c0a36bb052472cf9ad2bd616b4",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "claimId": "claim_81ec7e246f5d04771ed8242d9f45a51c",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "claimId": "claim_0da9c2a174db070122d3b5c6af25e677",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "claimId": "claim_bed90dbb7de2a5782fafcdb4a3d6e0da",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "claimId": "claim_3f1a1bbd362edb4ff925ff6de3cbd823",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "claimId": "claim_3751f92605ff426f0c91aea00cf436f9",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "claimId": "claim_3a59166febcee14eae6a7815533da0b8",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "claimId": "claim_9926460074ef65ebbb208553bc11562e",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "claimId": "claim_3be68f87d3d60c946927441f13933a84",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "claimId": "claim_06e68651628b7a731b974ec5c34c9743",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+      "collection": "claims",
+      "claimId": "claim_1d1eb2ce98dcf1855678b2cf86c2ee67",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-decision-citation-drift-01.json",
+      "collection": "claims",
+      "claimId": "claim_fefb1bf47fc375b9e83089dc6059326c",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-decision-citation-drift-01.json",
+      "collection": "claims",
+      "claimId": "claim_4966e71788ccddf622cb3c79fa20b4ec",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json",
+      "collection": "claims",
+      "claimId": "claim_7e17ce226062d06a53b940f64b9d5cdb",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json",
+      "collection": "claims",
+      "claimId": "claim_878e9f5faa08a2977408f49e04af0a7a",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+      "collection": "claims",
+      "claimId": "claim_b2a51d5d39832d330879947bdbbcb227",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+      "collection": "claims",
+      "claimId": "claim_bf1888a05f53ba3cd515eb792c5059b8",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "collection": "claims",
+      "claimId": "claim_552ef3d6e22bac10c24cc31e48463d50",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "collection": "claims",
+      "claimId": "claim_5a944093894be93c5792a1c5e14990c6",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "collection": "claims",
+      "claimId": "claim_224b5f54d28b453f1e3feaced0468399",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "collection": "claims",
+      "claimId": "claim_979ec4a61acca9e1b6a0a3967b1d0c88",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "collection": "claims",
+      "claimId": "claim_0686418ae7571d82eade8059c698709d",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "collection": "claims",
+      "claimId": "claim_add6d13e14df87ad5d5bd46cc5bb98d4",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "collection": "claims",
+      "claimId": "claim_099eb566c825967cf35f9397f2d7b947",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "collection": "claims",
+      "claimId": "claim_36f4a3c4ae623f3a348faadd747dcba7",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "collection": "claims",
+      "claimId": "claim_4efee765e5a47fc42f4d9cccc7a53191",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "collection": "claims",
+      "claimId": "claim_4599d55c9de4262714d378be2b9eaf80",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+      "collection": "registryGaps",
+      "claimId": "claim_a63132a3f76d6b8ea05461c48c818836",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "collection": "rows",
+      "claimId": "claim_0145c13614b75e7da1321473afa8a0f1",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/retired-unit-decisions.json",
+      "collection": "rows",
+      "claimId": "claim_deb1e4063a1eabf13dd8ed523748039f",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-behaviors.json",
+      "collection": "claims",
+      "claimId": "claim_320ba6224015cc3877738795b80dabb7",
+      "previouslyReviewed": false
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-source-native-successors.json",
+      "collection": "registryGaps",
+      "claimId": "claim_8ffb36c0af7a1f88517179b8b1adb0a4",
+      "previouslyReviewed": true
+    },
+    {
+      "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-truth-successors.json",
+      "collection": "registryGaps",
+      "claimId": "claim_8d273e8328dac53565eb0286c6a91d65",
+      "previouslyReviewed": true
+    }
+  ],
+  "reviewScope": "Recompute reopened membership and committed pending statuses.365 retained applications are confirmation entries;70 applied-then-reopened entries are in the714 rationale set. No fresh approval.",
+  "entryId": "accounting-034"
+}
+```
+
+## Entry accounting-035
+
+```json
+{
+  "kind": "shard-header-deltas",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "changes": [],
+  "entryId": "accounting-035"
+}
+```
+
+## Entry accounting-050
+
+```json
+{
+  "kind": "refreshed-dependent-accounting",
+  "historicalArtifact": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-reconciliation.json",
+  "historicalProjectionPath": "/resolvedDrafts/3/after",
+  "historicalSnapshot": {
+    "claimId": "claim_57f11d837272b3f9781b376ef1665c81",
+    "sourcePath": "docs/io-contract.md",
+    "sourceAnchor": "unheaded-block-5",
+    "sourceUnitDigest": "d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+    "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried. Native identity resolved at 19ca8de23908e161c34c91626e41041b7813167c from the sole native sync. Historical gaps remain separate; no provisional ID is persisted as a decision and no approval carries.",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-10",
+    "reviewNote": "deep: docs/io-contract.md#unheaded-block-5 (L24-34) to docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-10 (L83-93): the unit equals its source except one link destination (platform/session-identity/spec.md becomes ../../session-identity/spec.md), a disclosed relative-link rebase, no word changed; the rationale boilerplate fits this row; mandatory unequal row, digests recomputed, anchors pass, target ancestry equals the shard",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "8aa8491435b1bd76c915faca0aaf324c77472f53839ef536c00d9cd1a7b9a2be",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "2. Input Direction Verb And Identity",
+      "Writer Source Trust Levels"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "relatedClaimId": "claim_57f11d837272b3f9781b376ef1665c81",
+  "after": {
+    "claimId": "claim_57f11d837272b3f9781b376ef1665c81",
+    "sourcePath": "docs/io-contract.md",
+    "sourceAnchor": "unheaded-block-5",
+    "sourceUnitDigest": "d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/io-contract.md:24-34#unheaded-block-5 (current lines); unit SHA256 d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:83-93#unheaded-block-10 (current lines); unit SHA256 8aa8491435b1bd76c915faca0aaf324c77472f53839ef536c00d9cd1a7b9a2be.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 8aa8491435b1bd76c915faca0aaf324c77472f53839ef536c00d9cd1a7b9a2be at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 1, target 1; 1 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nLink 1: \"spec Session Identity\" (platform/session-identity/spec.md) → \"spec Session Identity\" (../../session-identity/spec.md); resolved docs/platform/session-identity/spec.md → docs/platform/session-identity/spec.md.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/io-contract.md#unheaded-block-5 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-10; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều vào — verb + danh tính\", target context \"CLI I/O Contract / 2. Input Direction Verb And Identity / Writer Source Trust Levels\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-10",
+    "targetUnitDigest": "8aa8491435b1bd76c915faca0aaf324c77472f53839ef536c00d9cd1a7b9a2be",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "2. Input Direction Verb And Identity",
+      "Writer Source Trust Levels"
+    ]
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-10",
+    "githubAnchor": "unheaded-block-10",
+    "stableAnchor": "unheaded-block-10",
+    "title": "Unheaded block 10",
+    "startLine": 83,
+    "endLine": 93,
+    "textDigest": "8aa8491435b1bd76c915faca0aaf324c77472f53839ef536c00d9cd1a7b9a2be",
+    "sample": "- `writer.id` — cá thể nào đang gọi (phân biệt hai phiên agent chạy song\n  song), luôn có mặt.\n- `writer.source` — độ tin của `id` đó, một trong bốn giá trị theo thứ tự ưu\n  tiên: ",
+    "identityFingerprint": "b45243cbc3aa642918126e02620b2d2fe4b33f96e860cc2345ffa67cd090dc0a",
+    "ancestry": [
+      "CLI I/O Contract",
+      "2. Input Direction Verb And Identity",
+      "Writer Source Trust Levels"
+    ],
+    "text": "- `writer.id` — cá thể nào đang gọi (phân biệt hai phiên agent chạy song\n  song), luôn có mặt.\n- `writer.source` — độ tin của `id` đó, một trong bốn giá trị theo thứ tự ưu\n  tiên: `registry` (đối chiếu được với `.fgos/sessions.json`, tin nhất) ·\n  `env` (biến môi trường, ai cũng set được) · `pid` (tổ tiên cao nhất còn\n  terminal, không có thì session id của tiến trình gọi; best-effort) ·\n  `unresolved` (không nguồn nào xác nhận được — `id` vẫn là\n  pid của chính tiến trình gọi, KHÔNG rỗng, KHÔNG vắng khoá; chỉ nhãn\n  `source` nói giá trị chưa kiểm chứng được). Luật đầy đủ (thứ tự biến env,\n  giới hạn đã biết) chỉ nằm ở [spec Session Identity](../../session-identity/spec.md);\n  nguồn duy nhất là crate Rust `fgos-session-identity`."
+  },
+  "currentNativeSuccessor": {
+    "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "unitDigest": "b45243cbc3aa642918126e02620b2d2fe4b33f96e860cc2345ffa67cd090dc0a",
+    "identityFingerprint": "b45243cbc3aa642918126e02620b2d2fe4b33f96e860cc2345ffa67cd090dc0a",
+    "claimId": "claim_a5eb3c9d9a017ed2c0697dd9aa7581be",
+    "sourceAnchor": "unheaded-block-10",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "8aa8491435b1bd76c915faca0aaf324c77472f53839ef536c00d9cd1a7b9a2be",
+    "claimKind": "contract",
+    "status": "future"
+  },
+  "sourceAndResidualHistoryPreserved": true,
+  "reviewScope": "Current projection supersedes the historical artifact for this package only; historical before/native witness remains immutable. Pending rows receive no approval.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_57f11d837272b3f9781b376ef1665c81",
+    "sourcePath": "docs/io-contract.md",
+    "sourceAnchor": "unheaded-block-5",
+    "sourceUnitDigest": "d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/io-contract.md:24-34#unheaded-block-5 (current lines); unit SHA256 d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:83-93#unheaded-block-10 (current lines); unit SHA256 8aa8491435b1bd76c915faca0aaf324c77472f53839ef536c00d9cd1a7b9a2be.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 8aa8491435b1bd76c915faca0aaf324c77472f53839ef536c00d9cd1a7b9a2be at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 1, target 1; 1 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nLink 1: \"spec Session Identity\" (platform/session-identity/spec.md) → \"spec Session Identity\" (../../session-identity/spec.md); resolved docs/platform/session-identity/spec.md → docs/platform/session-identity/spec.md.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/io-contract.md#unheaded-block-5 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-10; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều vào — verb + danh tính\", target context \"CLI I/O Contract / 2. Input Direction Verb And Identity / Writer Source Trust Levels\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-10",
+    "targetUnitDigest": "8aa8491435b1bd76c915faca0aaf324c77472f53839ef536c00d9cd1a7b9a2be",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "2. Input Direction Verb And Identity",
+      "Writer Source Trust Levels"
+    ]
+  },
+  "entryId": "accounting-050"
+}
+```
+
+## Entry accounting-051
+
+```json
+{
+  "kind": "refreshed-dependent-accounting",
+  "historicalArtifact": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-reconciliation.json",
+  "historicalProjectionPath": "/resolvedDrafts/4/after",
+  "historicalSnapshot": {
+    "claimId": "claim_a14f9308d3f04e10e670c6f178d4ee33",
+    "sourcePath": "docs/io-contract.md",
+    "sourceAnchor": "unheaded-block-7",
+    "sourceUnitDigest": "b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79",
+    "claimKind": "specification",
+    "disposition": "move",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+    "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried. Native identity resolved at 19ca8de23908e161c34c91626e41041b7813167c from the sole native sync. Historical gaps remain separate; no provisional ID is persisted as a decision and no approval carries.",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-13",
+    "reviewNote": "deep: docs/io-contract.md#unheaded-block-7 (L44-49) to docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-13 (L116-121): section text byte-identical (6 lines), digests equal and recomputed, anchors pass, ancestry matches the shard; rationale fits",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "2. Input Direction Verb And Identity",
+      "Caller Role"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "file": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+  "collection": "claims",
+  "relatedClaimId": "claim_a14f9308d3f04e10e670c6f178d4ee33",
+  "after": {
+    "claimId": "claim_a14f9308d3f04e10e670c6f178d4ee33",
+    "sourcePath": "docs/io-contract.md",
+    "sourceAnchor": "unheaded-block-7",
+    "sourceUnitDigest": "b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79",
+    "claimKind": "specification",
+    "disposition": "move",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/io-contract.md:44-49#unheaded-block-7 (current lines); unit SHA256 b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:116-121#unheaded-block-13 (current lines); unit SHA256 b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/io-contract.md#unheaded-block-7 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-13; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều vào — verb + danh tính\", target context \"CLI I/O Contract / 2. Input Direction Verb And Identity / Caller Role\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-13",
+    "targetUnitDigest": "b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "2. Input Direction Verb And Identity",
+      "Caller Role"
+    ]
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-13",
+    "githubAnchor": "unheaded-block-13",
+    "stableAnchor": "unheaded-block-13",
+    "title": "Unheaded block 13",
+    "startLine": 116,
+    "endLine": 121,
+    "textDigest": "b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79",
+    "sample": "Khác với \"chưa xác danh\", **lỗi cài đặt** thì chặn: khi không có binary host\nRust nào trả lời được identity (`host-missing`, `host-version-mismatch`,\n`timeout`, `host-error`, `bad-",
+    "identityFingerprint": "364e81e85037c5701c597a7036c723d620a39c75e5137bb197651b57c9865746",
+    "ancestry": [
+      "CLI I/O Contract",
+      "2. Input Direction Verb And Identity",
+      "Caller Role"
+    ],
+    "text": "Khác với \"chưa xác danh\", **lỗi cài đặt** thì chặn: khi không có binary host\nRust nào trả lời được identity (`host-missing`, `host-version-mismatch`,\n`timeout`, `host-error`, `bad-output`), verb ghi dừng với lỗi `precondition`\n(exit 2) trước khi ghi gì, không bao giờ đoán id. Kênh `node bin/fgos.mjs` và\n`bin.fgos` của npm global vì vậy chỉ ghi được trong project đã activate, hoặc\nkhi `FGOS_HOST_BIN` trỏ tới một binary host."
+  },
+  "currentNativeSuccessor": {
+    "sourcePath": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "unitDigest": "364e81e85037c5701c597a7036c723d620a39c75e5137bb197651b57c9865746",
+    "identityFingerprint": "364e81e85037c5701c597a7036c723d620a39c75e5137bb197651b57c9865746",
+    "claimId": "claim_ebead1511c99c215b7ef32469cdc3831",
+    "sourceAnchor": "unheaded-block-13",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79",
+    "claimKind": "contract",
+    "status": "future"
+  },
+  "sourceAndResidualHistoryPreserved": true,
+  "reviewScope": "Current projection supersedes the historical artifact for this package only; historical before/native witness remains immutable. Pending rows receive no approval.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_a14f9308d3f04e10e670c6f178d4ee33",
+    "sourcePath": "docs/io-contract.md",
+    "sourceAnchor": "unheaded-block-7",
+    "sourceUnitDigest": "b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79",
+    "claimKind": "specification",
+    "disposition": "move",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/io-contract.md:44-49#unheaded-block-7 (current lines); unit SHA256 b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:116-121#unheaded-block-13 (current lines); unit SHA256 b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/io-contract.md#unheaded-block-7 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-13; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều vào — verb + danh tính\", target context \"CLI I/O Contract / 2. Input Direction Verb And Identity / Caller Role\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+    "targetAnchor": "unheaded-block-13",
+    "targetUnitDigest": "b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79",
+    "targetAncestry": [
+      "CLI I/O Contract",
+      "2. Input Direction Verb And Identity",
+      "Caller Role"
+    ]
+  },
+  "entryId": "accounting-051"
+}
+```
+
+## Entry accounting-052
+
+```json
+{
+  "kind": "refreshed-dependent-accounting",
+  "historicalArtifact": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-reconciliation.json",
+  "historicalProjectionPath": "/resolvedDrafts/5/after",
+  "historicalSnapshot": {
+    "claimId": "claim_4eeb2f406288458e61bad21531966ab1",
+    "sourcePath": "docs/specs/distribution.md",
+    "sourceAnchor": "data-dictionary",
+    "sourceUnitDigest": "04f89e98512b5fd7af474ab2abbf362b9a0d30a25b5a911d011037539b3a9d3f",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+    "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried. Native identity resolved at 19ca8de23908e161c34c91626e41041b7813167c from the sole native sync. Historical gaps remain separate; no provisional ID is persisted as a decision and no approval carries.",
+    "targetOwner": "docs/platform/packaging-distribution/spec.md",
+    "targetAnchor": "data-dictionary",
+    "reviewNote": "deep: docs/specs/distribution.md#data-dictionary to docs/platform/packaging-distribution/spec.md#data-dictionary: the 20-line section is byte-identical except the heading depth (## becomes ####), a nesting change that the rationale does not name but that is a heading-depth change only; mandatory unequal row, digests recomputed, anchors pass",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "3dd2d51fac193d78f712a83b2f0918c9f5f48a0e8eb65572afda4bb678b1de95",
+    "targetAncestry": [
+      "Spec: Packaging-Distribution",
+      "Retained Distribution Source Detail",
+      "Spec: Distribution"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+  "collection": "claims",
+  "relatedClaimId": "claim_4eeb2f406288458e61bad21531966ab1",
+  "after": {
+    "claimId": "claim_4eeb2f406288458e61bad21531966ab1",
+    "sourcePath": "docs/specs/distribution.md",
+    "sourceAnchor": "data-dictionary",
+    "sourceUnitDigest": "04f89e98512b5fd7af474ab2abbf362b9a0d30a25b5a911d011037539b3a9d3f",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/specs/distribution.md:55-55#data-dictionary (current lines); unit SHA256 04f89e98512b5fd7af474ab2abbf362b9a0d30a25b5a911d011037539b3a9d3f.\nTarget: docs/platform/packaging-distribution/spec.md:515-515#data-dictionary (current lines); unit SHA256 3dd2d51fac193d78f712a83b2f0918c9f5f48a0e8eb65572afda4bb678b1de95.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 3dd2d51fac193d78f712a83b2f0918c9f5f48a0e8eb65572afda4bb678b1de95 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 4; title \"Data Dictionary\" → \"Data Dictionary\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/distribution.md#data-dictionary under docs/platform/packaging-distribution/spec.md#data-dictionary; source context \"Spec: Distribution\", target context \"Spec: Packaging-Distribution / Retained Distribution Source Detail / Spec: Distribution\". The source text occurs verbatim inside the bound target section; section-level unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/packaging-distribution/spec.md",
+    "targetAnchor": "data-dictionary",
+    "targetUnitDigest": "3dd2d51fac193d78f712a83b2f0918c9f5f48a0e8eb65572afda4bb678b1de95",
+    "targetAncestry": [
+      "Spec: Packaging-Distribution",
+      "Retained Distribution Source Detail",
+      "Spec: Distribution"
+    ]
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 4,
+    "title": "Data Dictionary",
+    "anchor": "data-dictionary",
+    "githubAnchor": "data-dictionary",
+    "stableAnchor": "h-9d3df3b2bec8",
+    "startLine": 515,
+    "endLine": 515,
+    "textDigest": "3dd2d51fac193d78f712a83b2f0918c9f5f48a0e8eb65572afda4bb678b1de95",
+    "sample": "Data Dictionary",
+    "sectionPayloadDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
+    "followingBlockDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
+    "identityFingerprint": "b21182e7c3aa0a098607ad3c94a20aada6a3ef44224b6bfacd30188c36967466",
+    "ancestry": [
+      "Spec: Packaging-Distribution",
+      "Retained Distribution Source Detail",
+      "Spec: Distribution"
+    ],
+    "text": "#### Data Dictionary",
+    "sectionText": "#### Data Dictionary\n\n| # | Element | Meaning | Values | Required | Default |\n|---|-------|---------|--------|----------|---------|\n| 1 | Package name | The npm package identity used for the git-based install command | `forgent` | yes | — |\n| 2 | Package version | A semantic version string tooling (e.g. packaging commands) needs to treat the package as valid | semver string | yes | `0.1.0` |\n| 3 | Distribution file allowlist | The exact set of paths shipped to anyone installing the package — everything else in the source repo is excluded | `bin`, `src`, `scripts`, `core`, `domains`, `.agents`, `README.md`, `LICENSE`, the end-user documentation subset (`docs/how-to`, `docs/explanation`, and `docs/enduser-docs-index.json`), plus `packages/convention/contracts/convention.rules.v1.json`, which installed doctor needs to interpret per-rule cutoffs without duplicating native rule data | yes | — |\n| 4 | CLI entry points | The commands exposed once installed | `fgos` → runs `bin/fgos.mjs`; `fgos-runner` → runs `bin/fgos-runner.mjs` (the autonomous-loop runner, see spec Runner) | yes | — |\n| 4b | Claude Code plugin skill set | `plugins/fgOS/skills/` — the Claude Code plugin's own skill bundle, distributed via the Claude Code plugin marketplace mechanism (a separate distribution channel from the npm-installed `fgos`/`fgos-runner` CLI above). Ships two layers: hand-authored CLI-wrapper skills (`cook`, `discover`, `pick`, `submit`, ...) and mirrored `fgos-*` dev-skills plus `_shared/` for plugin-only consumers. Dev-skills are authored in `core/skills/` or `domains/*/skills/`; run `npm run build:skills` in the fgOS source repo to assemble `.agents/skills/`, generate `.claude/skills/` thin wrappers and references, and mirror dev-skills/shared fragments into the plugin. Plugin mirrors stay byte-identical to `.agents/skills/`, while Claude `SKILL.md` files are thin redirects with byte-identical frontmatter (`test/skills/fgos-mirror.test.mjs`). Assembled Markdown carries a generated-from source header. Do not hand-edit `.agents`, generated `.claude` files, or plugin mirrors; hand-authored CLI-wrapper skills remain sources. `plugin-dev-skills-packaged` (doctor check, row 7 below) detects missing or stale plugin mirrors | mirrored dev-skills + shared fragments + hand-authored CLI-wrapper skills | yes (the mirrors let plugin-only consumers dispatch dev-skills without a source checkout) | — |\n| 5 | Dev checkout shell helper | An opt-in file, sourced from a contributor's own shell profile, exposing the same two CLI entry points from inside a checkout of the source repository — no install, no package fetch | one file, both commands | no (contributor's own choice) | not sourced automatically anywhere |\n| 5b | Global config file | `~/.fgos/config.json` — same schema as the project-local shared config file, initialized/kept current by `fgos setup` (tsk-1ri) the same way it already handles the project-local file; project always wins any key present in both (`mergeWithGlobalConfig`, `src/config/global-config.mjs`) | one file, home-dir-relative | no (optional; a missing file is not an error, resolves to `{}`) | not created by anything except `fgos setup` |\n| 5c | Machine backend registry file | `~/.fgos/confinement-backends.json` (overridable via `FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH`) — machine-local backend registry declaring confinement backends (e.g. `bwrap`, container) available on the host (`confinement-backend-registry.v1`); managed by `fgos doctor --fix` (not project-over-global merge), trust store for security isolation drivers | one file, machine-local path | no (optional; bootstrap creates default bwrap backend on demand) | `~/.fgos/confinement-backends.json` |\n| 5d | Provider-capacity runtime state | `~/.fgos/runtime/provider-capacity/state.json` plus lock `state.lock` — machine-local selected-account lease/quarantine state for provider-capacity rotation. Intentionally host-global only (never project-overridden) so multiple projects sharing provider accounts coordinate concurrency and rate limits safely without starvation. It is never packaged, never committed, and never repaired by `doctor`; `fgos dispatch inspect --provider-capacity` and the `provider-capacity-state` doctor check report it, while manual clear goes through `fgos dispatch reconcile provider-capacity clear-quarantine ...`. An account locked for a dead login is also unlocked by one real call when a dispatch would otherwise find no usable account (the lazy-probe unlock rule, now in `docs/specs/runner.md`). The same directory holds `account-locks/<provider>/<account>/`: the per-account lock, copies of a login renewed elsewhere and waiting to be applied, a scratch home while a renewal runs, and the renewal failure cooldown; it is created only when a renewal or write-back runs and holds no credential outside those copies. | one runtime directory, home-dir-relative | no (created only when a provider account lease/quarantine/write occurs) | absent/inactive |\n| 5e | Confinement attestation store state | `~/.local/state/fgos/attestations/` (or `$XDG_STATE_HOME/fgos/attestations`, overridable via `FGOS_CONFINEMENT_ATTESTATION_STORE_PATH`) — host-global security attestation records. Intentionally host-global only (outside all agent write grants) so confined agents can never tamper with their own audit trails, preserving immutable attestation integrity across projects. | one directory, machine-local path | no (created on first confined dispatch attestation) | absent/inactive |\n| 5f | Workspace customization folder | `fgos/` at the project root: tracked in the project's own git, written once as a skeleton at onboarding and never edited by fgOS afterwards. Holds the customer's own agent definitions (`fgos/agents/<name>.yaml`), which win over a definition of the same name in the installed set (RUL13 (customer customization lives in one tracked workspace folder)). Read by `--seats @name` (runner decision 0057); the `fgctl init` skeleton is not built yet | directory | no | absent — the installed set alone applies |\n| 6 | Config staleness | Whether a config file (project-local or global — same computation, tsk-1ri) already has every setting the current default schema defines | up to date / missing one or more default settings | yes (computed, not stored) | — |\n| 7 | Doctor check | One named diagnostic `fgos doctor` reports on | not a fixed list — an extensible registry (`src/setup/registrations.mjs`'s `registerCheck`); a check registration and a config-default registration are independent, never a forced pairing — a module may register only a check, only a config-default, or both. Today's registered checks: `convention-conformance`, `node-version-and-git`, `cli-version-visible` (tsk-2ej), `shell-integration-sourced`, `project-fgos-launcher` (a release install has one fgos launcher on PATH that runs each project's own activated fgos, see RUL17 (one fgos on PATH runs each project's own activated fgos)), `config-not-stale`, `main-checkout-hook-wired`, `tool-registry-configured`, `work-classification-vocabulary`, `work-step-vocabulary` (tsk-64h), `domain-workflow-operations-coverage`, `root-drift`, `delivered-not-on-trunk` (tsk-1l9), `config-awareness`, `provider-capacity-state` (reports account lease/quarantine state and never auto-clears), `credential-copies-retained` (login copies still pending for a renewal after a day, and private homes held after repeated staging failures, counted by provider/account and age; read-only, a held home fails, copies waiting for a renewal only warn, and, when the machine-global provider inventory was read, copies of any age in a store directory the account's login store layout no longer reads fail, naming the directory for hand recovery (when the global config cannot be read or is refused by the validator the check fails, says the layout was not checked with the reason, lists copies at any age and promises nothing about a dispatch); interrupted stagings (pending/.tmp-*) are reported too once their writer is gone and they have sat for ten minutes, and the over-limit line names the store; kept homes under a registered backend's temp and private-home roots are scanned, which the orphan reaper check does not do, and one there counts as held at once because nothing retries it; the check itself never deletes and never prints a value), `provider-capacity-lock-stale` (Phase 06 C2c: the provider-capacity state.lock file, if any, is not held by a dead process; read-only, never reclaims), `dependencies-installed`, `gate-bypass-configured`, `claude-plugin-marketplace`, `plugin-skill-cli-reachable`, `plugin-dev-skills-packaged` (tsk-32b), `changelog-unreleased-stale`, `herdr-launcher-configured`, `herdr-web-dashboard-configured` (tsk-48w), `enduser-docs-index-stale` (tsk-1m0), `invariant-checks-configured` (tsk-516), `invocation-git-write-grants` (warns when an invocation or executor still grants a git add or git commit tool; the runner commits, workers only edit files; read-only, never rewrites user config), `worktree-setup-configured` (a present worktreeSetup section is a list of non-empty shell commands every runner-created worktree runs after its dependency install; never executes them), `events-jsonl-not-truncated` (tsk-cgg), `worker-slots-ceiling-usable` (tsk-1oz), `gateway-token-configured` (tsk-4r1), `readme-install-tag-exists` (tsk-2t8), `iron-law-configured` (tsk-1y6-1), `leaf-notify-drift` (tsk-1el), `task-specs-resolve` (tsk-2t9c), `agent-claims-resolve` (tsk-2t9c), `agent-type-names-unique` (tsk-397-12; names unique within each tier fgos/agents, domains/*/agents, core/agents, a higher tier replaces a lower one whole, the fgos/agents files checked for shape), `domain-registry-compiled` (every domain's compiled.json file under domains — the YAML-free form of the registry and workflow YAML the Work lifecycle reads, regenerated by the build:domains npm script; a drift test keeps it equal to the YAML), `dispatch-decide-hook-wired` (tsk-60f; also requires the AskUserQuestion decision-question hook), `codex-hook-wired`, `agy-hook-wired`, `omp-hook-wired`, `pi-hook-wired`, `decision-index-stale` (tsk-1lv-2/tsk-1lv), `advise-execute-capabilities-configured` (tsk-2uf-3), `workflow-capabilities-configured` (every capability a core/domain Workflow unit names resolves in runner.capabilities by exact name or bare verb, the way bind() looks it up, and fails when it does not; one that resolves but has no \"prefer\" pool on either name is reported as a warning because bind() refuses its unit headless; fgos setup registers every shipped Workflow's capabilities as description-only defaults, so a fresh project starts with that warning, and never overwrites a project's own entry), `capability-serves-valid` (I19: every runner.capabilities entry's serves attribute set is well-formed, no two entries declare the identical set, and the review slot is present), `agy-permissions-configured` (tsk-1xm), `agy-sub-homes-configured`, `bwrap-available`, `curl-available` (curl runs, because fgctl init downloads a release through it; a missing curl is a warning that only blocks the download paths, never a failure, see RUL15 (fgctl init downloads a checksum-verified release when no source is given)), `main-checkout-guard-warnings` (tsk-1vc-3), `events-compaction-verified` (tsk-3ve-6), `no-stuck-merge-abort` (tsk-40a), `doc-registry-enforce` (tsk-28x), `doc-registry-stale` (tsk-28x), `doc-alias-broken` (tsk-28x), `doc-active-duplicate` (tsk-28x), `doc-near-duplicate` (tsk-28x), `doc-provisional-aged` (tsk-28x), `doc-topic-oversized` (tsk-28x), `doc-role-underused` (tsk-28x), `doc-source-conservation` (tsk-28x), `doc-current-path-missing` (tsk-3uc), `doc-source-unreachable` (tsk-3uc), `coordination-protocol-fixtures-valid` (retired; confirms legacy definition fixtures retired), `operation-prompt-templates-valid` (Phase 03 I04: every discoverable operation prompt template validates against bounded variables and schema), `coordination-example-requests-valid` (Step 08 Phase 07 R3: published fgos coordination run example request files validate against the same schema boundary the CLI itself enforces, and resolve every referenced protocolRef), `herdr-available`, `trust-store-readable`, `non-claude-trust-stores-readable` (Phase 07 herdr-trust-supervisor R3: every executor or invocation declaring a codex-toml or agy/agy-json trustStore reads from a store that is actually readable, using the same reader the live dispatch will use), `confined-pane-accounts` (every confined herdr invocation that binds a private home has an account in the machine-global provider account inventory whose credential files exist, so its pane starts logged in; see RUL65b in the runner spec), `agent-cli-project-trusted` (the project root is trusted in every codex home and agy sub-HOME the configured executors run under, so a headless dispatch does not stop at a \"Trust this folder?\" prompt until its timeout; reads only a yes/no for the one path, names the exact line a person must add, never edits the CLI's config; not applicable when the root is not a git repository or no codex/agy executor is configured), `workflow-pools-satisfy-independence` (for every panel or reviewed Workflow unit, drives the runner's own pattern code through bind() without dispatching anything and fails when the capability prefer pool cannot supply enough distinct provider families for every role (three panelists plus a synthesizer need four); a provider out of quota or blocked on a trust prompt is invisible to bind() and not counted), `blind-steps-use-proven-pools` (for every Workflow unit declared blind, walks each role's candidates through bind() without dispatching anything and fails when the capability prefer pool can bind an executor whose provider family, transport and confinement backend are not in the table of canary-proven pairs kept in the check's own module; read-only, no model call; not applicable when no unit is blind), `executor-posture-coverage` (core capabilities execute, code:implement, and capabilities declaring a pool have at least one candidate executor capable of applying required posture; dry simulation via bind(), no process spawn), `executor-confinement` (dispatch visibility V0 Phase 01 group D: the transport an interactive dispatch needs, a readable folder-trust store so a fresh worktree can be pre-trusted instead of stopping at a dialog, and a second reading of the rule that an executor may only declare bypass permission mode alongside full confinement), `herdr-executor-kinds` (Phase 05 R3: every executor dispatched through a herdr pane names an agent kind herdr can actually start, and none depends on an integration hook herdr reports as outdated -- an installed-but-stale hook is believed by herdr and may report the wrong agent state, while a missing one only degrades detection), `executor-profile-warnings` (Phase 06 executor-policy-dispatch-seams: legacy executor/capability entries hardcoding policy-shaped flags, policy-overrides-as-identity, or account-pool-shaped env, each named with its documented migration target -- informational only, never a hard failure), `active-release-matches-checkout` (read-only Node payload contents against doctor dir working tree, not HEAD or Rust binary freshness; reports changed/missing/extra source files while excluding staged dependencies, skips outside source checkouts and main-owned activation in linked worktrees; use fgos:dev for working-tree code or restage/activate for plain fgos), `rust-host-binary-present`, `rust-host-target-supported`, `legacy-node-payload-present`, `command-routes-drift`, `confinement-policies-declared`, `confinement-backend-registry-readable`, `confinement-bwrap-platform`, `confinement-probe-freshness`, `confinement-blind-read` (a blind unit can be enforced: the registered bwrap backend hides peer run state, homes and processes from a worker; reports pass, fail, or backend-unsupported, in which case every blind unit is refused), `confinement-strict-readiness`, `confinement-orphaned-resources-reaped` (Phase 04 M8: no confinement temp resource is left behind by a dead owning process, and no confinement temp root is readable beyond its owner; a home kept for a still-open pane is not orphaned; the fix tightens the root to 0700 and reaps), `confinement-herdr-maturity`, `instruction-projections-stale`, `coordination-abandoned-claims`, `runner-coordination-orgPolicy-shape`, `operation-capability-resolves` (Unit I21: every discoverable operation's declared policy.capability resolves against the live runner config, reporting reachable provider-family diversity), `shadow-binder-divergence` (dispatch-engine-liveness-hardening Phase 7 C1: real PlacementPolicy/ProviderAdapter shadow-binder divergence is durably recorded to a local JSONL under .fgos/dispatch/, not only an ephemeral stderr line; informational, never fails), `observe-dir-writable`, `observe-friction-migrated`, `observe-host-resolvable`, `writer-identity-resolvable` (the writer identity resolves through the Rust host for both the running host and the workspace activation a plain git commit hook uses; each binary is asked directly, so an older activated release shows as a version mismatch), `observe-run-coverage`, `runner-rigor-config` (validates project/global rigor-to-tier mappings and retired capability overrides), `coordination-protocol-dead-vocabulary` (validates definitions against dead vocabulary), `model-policy-tier-coverage` (validates model policies cover all tiers required by rigor-to-tier), `tier-vocabulary-dead-keys` (validates project and global config do not contain retired tier/rigor keys), `runner-patterns-config` (validates presence, valid checkers, and cumulative checkersByRigor for runner patterns), `runner-generated-paths` (validates runner.generatedPaths source-to-render-target mappings), `mutating-assignment-binding-snapshot` (validates that mutating assignment RunResult bindings match unit.json snapshot). The registry is open, but this list is not a snapshot — it names every registered check, and a module adding one updates this row in the same change | yes | — |\n| 7b | Doctor fix | One named repair `fgos doctor --fix` can run before re-reporting checks | not a fixed list — an extensible registry (`registerFix`), independent of `registerCheck`/`registerConfigDefault` (per tsk-2cs). Today's registered fixes: `credential-copies-retained` (re-checks private homes held after repeated staging failures, and any kept home under a registered backend's own root, which nothing else retries, under the account lock, and removes one only when its login is shown applied or obsolete; also removes an interrupted staging (pending/.tmp-*) only after claiming it by rename, when its writer is gone and it is empty, identical to a copy already kept, or shown no newer than the source login under the account lock; never removes on age), `gate-bypass-configured` (tsk-2qz, the registry's first entry to register all three capabilities at once), `claude-plugin-marketplace` (tsk-4xg), `enduser-docs-index-stale` (tsk-1m0), `bin-discovery-cache` (tsk-2qc-1), `gateway-token-configured` (tsk-4r1), `iron-law-configured` (tsk-1y6-1), `decision-index-stale` (tsk-1lv-2/tsk-1lv), `agy-permissions-configured` (tsk-1xm), `no-stuck-merge-abort` (tsk-40a), `doc-registry-stale` (tsk-28x), `confinement-backend-registry-readable`, `confinement-orphaned-resources-reaped` (Phase 04 M8), `instruction-projections-stale`, `coordination-abandoned-claims`, `runner-coordination-orgPolicy-shape`, `project-fgos-launcher`, `dispatch-decide-hook-wired`, `codex-hook-wired`, `agy-hook-wired`, `omp-hook-wired`, `pi-hook-wired`. Same rule as #7: the registry is open, but this list names every registered fix and a module adding one updates this row in the same change | yes | — |\n| 8 | Output rendering mode | How `fgos setup`/`fgos doctor` present their result | enveloped JSON (every other verb's shape, unchanged) / colored plain text (`--pretty`) | yes | enveloped JSON |"
+  },
+  "currentNativeSuccessor": {
+    "sourcePath": "docs/platform/packaging-distribution/spec.md",
+    "unitDigest": "76072d6308310a074a737f2b974014d8113b212829301afaa19088a2dd935001",
+    "identityFingerprint": "b21182e7c3aa0a098607ad3c94a20aada6a3ef44224b6bfacd30188c36967466",
+    "claimId": "claim_5c7a41cb0091d5fa398c963b4f28b50d",
+    "sourceAnchor": "data-dictionary",
+    "unitKind": "heading",
+    "sourceUnitDigest": "3dd2d51fac193d78f712a83b2f0918c9f5f48a0e8eb65572afda4bb678b1de95",
+    "claimKind": "specification",
+    "status": "future"
+  },
+  "sourceAndResidualHistoryPreserved": true,
+  "reviewScope": "Current projection supersedes the historical artifact for this package only; historical before/native witness remains immutable. Pending rows receive no approval.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_4eeb2f406288458e61bad21531966ab1",
+    "sourcePath": "docs/specs/distribution.md",
+    "sourceAnchor": "data-dictionary",
+    "sourceUnitDigest": "04f89e98512b5fd7af474ab2abbf362b9a0d30a25b5a911d011037539b3a9d3f",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/specs/distribution.md:55-55#data-dictionary (current lines); unit SHA256 04f89e98512b5fd7af474ab2abbf362b9a0d30a25b5a911d011037539b3a9d3f.\nTarget: docs/platform/packaging-distribution/spec.md:515-515#data-dictionary (current lines); unit SHA256 3dd2d51fac193d78f712a83b2f0918c9f5f48a0e8eb65572afda4bb678b1de95.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 3dd2d51fac193d78f712a83b2f0918c9f5f48a0e8eb65572afda4bb678b1de95 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 4; title \"Data Dictionary\" → \"Data Dictionary\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/distribution.md#data-dictionary under docs/platform/packaging-distribution/spec.md#data-dictionary; source context \"Spec: Distribution\", target context \"Spec: Packaging-Distribution / Retained Distribution Source Detail / Spec: Distribution\". The source text occurs verbatim inside the bound target section; section-level unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/packaging-distribution/spec.md",
+    "targetAnchor": "data-dictionary",
+    "targetUnitDigest": "3dd2d51fac193d78f712a83b2f0918c9f5f48a0e8eb65572afda4bb678b1de95",
+    "targetAncestry": [
+      "Spec: Packaging-Distribution",
+      "Retained Distribution Source Detail",
+      "Spec: Distribution"
+    ]
+  },
+  "entryId": "accounting-052"
+}
+```
+
+## Entry accounting-053
+
+```json
+{
+  "kind": "refreshed-dependent-accounting",
+  "historicalArtifact": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-reconciliation.json",
+  "historicalProjectionPath": "/resolvedDrafts/6/after",
+  "historicalSnapshot": {
+    "claimId": "claim_d9185072d68925b4c020b13ba6c4d74f",
+    "sourcePath": "docs/specs/distribution.md",
+    "sourceAnchor": "unheaded-block-5",
+    "sourceUnitDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
+    "claimKind": "specification",
+    "disposition": "move",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+    "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried. Native identity resolved at 19ca8de23908e161c34c91626e41041b7813167c from the sole native sync. Historical gaps remain separate; no provisional ID is persisted as a decision and no approval carries.",
+    "targetOwner": "docs/platform/packaging-distribution/spec.md",
+    "targetAnchor": "unheaded-block-85",
+    "reviewNote": "deep: docs/specs/distribution.md#unheaded-block-5 to docs/platform/packaging-distribution/spec.md#unheaded-block-85: the 17-line table is byte-identical, digests equal and hand-recomputed, anchors pass; it is the carrier of the partial-carry successor of claim_26f62a1a",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
+    "targetAncestry": [
+      "Spec: Packaging-Distribution",
+      "Retained Distribution Source Detail",
+      "Spec: Distribution",
+      "Data Dictionary"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-main-recarry.json",
+  "collection": "claims",
+  "relatedClaimId": "claim_d9185072d68925b4c020b13ba6c4d74f",
+  "after": {
+    "claimId": "claim_d9185072d68925b4c020b13ba6c4d74f",
+    "sourcePath": "docs/specs/distribution.md",
+    "sourceAnchor": "unheaded-block-5",
+    "sourceUnitDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
+    "claimKind": "specification",
+    "disposition": "move",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/specs/distribution.md:57-73#unheaded-block-5 (current lines); unit SHA256 59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e.\nTarget: docs/platform/packaging-distribution/spec.md:517-533#unheaded-block-85 (current lines); unit SHA256 59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/distribution.md#unheaded-block-5 under docs/platform/packaging-distribution/spec.md#unheaded-block-85; source context \"Spec: Distribution / Data Dictionary\", target context \"Spec: Packaging-Distribution / Retained Distribution Source Detail / Spec: Distribution / Data Dictionary\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/packaging-distribution/spec.md",
+    "targetAnchor": "unheaded-block-85",
+    "targetUnitDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
+    "targetAncestry": [
+      "Spec: Packaging-Distribution",
+      "Retained Distribution Source Detail",
+      "Spec: Distribution",
+      "Data Dictionary"
+    ]
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-85",
+    "githubAnchor": "unheaded-block-85",
+    "stableAnchor": "unheaded-block-85",
+    "title": "Unheaded block 85",
+    "startLine": 517,
+    "endLine": 533,
+    "textDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
+    "sample": "| # | Element | Meaning | Values | Required | Default |\n|---|-------|---------|--------|----------|---------|\n| 1 | Package name | The npm package identity used for the git-based i",
+    "identityFingerprint": "efdbc472e987bef628352ebcce1a16bf80b33d017c6b99af37f0f9d20d2dd69f",
+    "ancestry": [
+      "Spec: Packaging-Distribution",
+      "Retained Distribution Source Detail",
+      "Spec: Distribution",
+      "Data Dictionary"
+    ],
+    "text": "| # | Element | Meaning | Values | Required | Default |\n|---|-------|---------|--------|----------|---------|\n| 1 | Package name | The npm package identity used for the git-based install command | `forgent` | yes | — |\n| 2 | Package version | A semantic version string tooling (e.g. packaging commands) needs to treat the package as valid | semver string | yes | `0.1.0` |\n| 3 | Distribution file allowlist | The exact set of paths shipped to anyone installing the package — everything else in the source repo is excluded | `bin`, `src`, `scripts`, `core`, `domains`, `.agents`, `README.md`, `LICENSE`, the end-user documentation subset (`docs/how-to`, `docs/explanation`, and `docs/enduser-docs-index.json`), plus `packages/convention/contracts/convention.rules.v1.json`, which installed doctor needs to interpret per-rule cutoffs without duplicating native rule data | yes | — |\n| 4 | CLI entry points | The commands exposed once installed | `fgos` → runs `bin/fgos.mjs`; `fgos-runner` → runs `bin/fgos-runner.mjs` (the autonomous-loop runner, see spec Runner) | yes | — |\n| 4b | Claude Code plugin skill set | `plugins/fgOS/skills/` — the Claude Code plugin's own skill bundle, distributed via the Claude Code plugin marketplace mechanism (a separate distribution channel from the npm-installed `fgos`/`fgos-runner` CLI above). Ships two layers: hand-authored CLI-wrapper skills (`cook`, `discover`, `pick`, `submit`, ...) and mirrored `fgos-*` dev-skills plus `_shared/` for plugin-only consumers. Dev-skills are authored in `core/skills/` or `domains/*/skills/`; run `npm run build:skills` in the fgOS source repo to assemble `.agents/skills/`, generate `.claude/skills/` thin wrappers and references, and mirror dev-skills/shared fragments into the plugin. Plugin mirrors stay byte-identical to `.agents/skills/`, while Claude `SKILL.md` files are thin redirects with byte-identical frontmatter (`test/skills/fgos-mirror.test.mjs`). Assembled Markdown carries a generated-from source header. Do not hand-edit `.agents`, generated `.claude` files, or plugin mirrors; hand-authored CLI-wrapper skills remain sources. `plugin-dev-skills-packaged` (doctor check, row 7 below) detects missing or stale plugin mirrors | mirrored dev-skills + shared fragments + hand-authored CLI-wrapper skills | yes (the mirrors let plugin-only consumers dispatch dev-skills without a source checkout) | — |\n| 5 | Dev checkout shell helper | An opt-in file, sourced from a contributor's own shell profile, exposing the same two CLI entry points from inside a checkout of the source repository — no install, no package fetch | one file, both commands | no (contributor's own choice) | not sourced automatically anywhere |\n| 5b | Global config file | `~/.fgos/config.json` — same schema as the project-local shared config file, initialized/kept current by `fgos setup` (tsk-1ri) the same way it already handles the project-local file; project always wins any key present in both (`mergeWithGlobalConfig`, `src/config/global-config.mjs`) | one file, home-dir-relative | no (optional; a missing file is not an error, resolves to `{}`) | not created by anything except `fgos setup` |\n| 5c | Machine backend registry file | `~/.fgos/confinement-backends.json` (overridable via `FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH`) — machine-local backend registry declaring confinement backends (e.g. `bwrap`, container) available on the host (`confinement-backend-registry.v1`); managed by `fgos doctor --fix` (not project-over-global merge), trust store for security isolation drivers | one file, machine-local path | no (optional; bootstrap creates default bwrap backend on demand) | `~/.fgos/confinement-backends.json` |\n| 5d | Provider-capacity runtime state | `~/.fgos/runtime/provider-capacity/state.json` plus lock `state.lock` — machine-local selected-account lease/quarantine state for provider-capacity rotation. Intentionally host-global only (never project-overridden) so multiple projects sharing provider accounts coordinate concurrency and rate limits safely without starvation. It is never packaged, never committed, and never repaired by `doctor`; `fgos dispatch inspect --provider-capacity` and the `provider-capacity-state` doctor check report it, while manual clear goes through `fgos dispatch reconcile provider-capacity clear-quarantine ...`. An account locked for a dead login is also unlocked by one real call when a dispatch would otherwise find no usable account (the lazy-probe unlock rule, now in `docs/specs/runner.md`). The same directory holds `account-locks/<provider>/<account>/`: the per-account lock, copies of a login renewed elsewhere and waiting to be applied, a scratch home while a renewal runs, and the renewal failure cooldown; it is created only when a renewal or write-back runs and holds no credential outside those copies. | one runtime directory, home-dir-relative | no (created only when a provider account lease/quarantine/write occurs) | absent/inactive |\n| 5e | Confinement attestation store state | `~/.local/state/fgos/attestations/` (or `$XDG_STATE_HOME/fgos/attestations`, overridable via `FGOS_CONFINEMENT_ATTESTATION_STORE_PATH`) — host-global security attestation records. Intentionally host-global only (outside all agent write grants) so confined agents can never tamper with their own audit trails, preserving immutable attestation integrity across projects. | one directory, machine-local path | no (created on first confined dispatch attestation) | absent/inactive |\n| 5f | Workspace customization folder | `fgos/` at the project root: tracked in the project's own git, written once as a skeleton at onboarding and never edited by fgOS afterwards. Holds the customer's own agent definitions (`fgos/agents/<name>.yaml`), which win over a definition of the same name in the installed set (RUL13 (customer customization lives in one tracked workspace folder)). Read by `--seats @name` (runner decision 0057); the `fgctl init` skeleton is not built yet | directory | no | absent — the installed set alone applies |\n| 6 | Config staleness | Whether a config file (project-local or global — same computation, tsk-1ri) already has every setting the current default schema defines | up to date / missing one or more default settings | yes (computed, not stored) | — |\n| 7 | Doctor check | One named diagnostic `fgos doctor` reports on | not a fixed list — an extensible registry (`src/setup/registrations.mjs`'s `registerCheck`); a check registration and a config-default registration are independent, never a forced pairing — a module may register only a check, only a config-default, or both. Today's registered checks: `convention-conformance`, `node-version-and-git`, `cli-version-visible` (tsk-2ej), `shell-integration-sourced`, `project-fgos-launcher` (a release install has one fgos launcher on PATH that runs each project's own activated fgos, see RUL17 (one fgos on PATH runs each project's own activated fgos)), `config-not-stale`, `main-checkout-hook-wired`, `tool-registry-configured`, `work-classification-vocabulary`, `work-step-vocabulary` (tsk-64h), `domain-workflow-operations-coverage`, `root-drift`, `delivered-not-on-trunk` (tsk-1l9), `config-awareness`, `provider-capacity-state` (reports account lease/quarantine state and never auto-clears), `credential-copies-retained` (login copies still pending for a renewal after a day, and private homes held after repeated staging failures, counted by provider/account and age; read-only, a held home fails, copies waiting for a renewal only warn, and, when the machine-global provider inventory was read, copies of any age in a store directory the account's login store layout no longer reads fail, naming the directory for hand recovery (when the global config cannot be read or is refused by the validator the check fails, says the layout was not checked with the reason, lists copies at any age and promises nothing about a dispatch); interrupted stagings (pending/.tmp-*) are reported too once their writer is gone and they have sat for ten minutes, and the over-limit line names the store; kept homes under a registered backend's temp and private-home roots are scanned, which the orphan reaper check does not do, and one there counts as held at once because nothing retries it; the check itself never deletes and never prints a value), `provider-capacity-lock-stale` (Phase 06 C2c: the provider-capacity state.lock file, if any, is not held by a dead process; read-only, never reclaims), `dependencies-installed`, `gate-bypass-configured`, `claude-plugin-marketplace`, `plugin-skill-cli-reachable`, `plugin-dev-skills-packaged` (tsk-32b), `changelog-unreleased-stale`, `herdr-launcher-configured`, `herdr-web-dashboard-configured` (tsk-48w), `enduser-docs-index-stale` (tsk-1m0), `invariant-checks-configured` (tsk-516), `invocation-git-write-grants` (warns when an invocation or executor still grants a git add or git commit tool; the runner commits, workers only edit files; read-only, never rewrites user config), `worktree-setup-configured` (a present worktreeSetup section is a list of non-empty shell commands every runner-created worktree runs after its dependency install; never executes them), `events-jsonl-not-truncated` (tsk-cgg), `worker-slots-ceiling-usable` (tsk-1oz), `gateway-token-configured` (tsk-4r1), `readme-install-tag-exists` (tsk-2t8), `iron-law-configured` (tsk-1y6-1), `leaf-notify-drift` (tsk-1el), `task-specs-resolve` (tsk-2t9c), `agent-claims-resolve` (tsk-2t9c), `agent-type-names-unique` (tsk-397-12; names unique within each tier fgos/agents, domains/*/agents, core/agents, a higher tier replaces a lower one whole, the fgos/agents files checked for shape), `domain-registry-compiled` (every domain's compiled.json file under domains — the YAML-free form of the registry and workflow YAML the Work lifecycle reads, regenerated by the build:domains npm script; a drift test keeps it equal to the YAML), `dispatch-decide-hook-wired` (tsk-60f; also requires the AskUserQuestion decision-question hook), `codex-hook-wired`, `agy-hook-wired`, `omp-hook-wired`, `pi-hook-wired`, `decision-index-stale` (tsk-1lv-2/tsk-1lv), `advise-execute-capabilities-configured` (tsk-2uf-3), `workflow-capabilities-configured` (every capability a core/domain Workflow unit names resolves in runner.capabilities by exact name or bare verb, the way bind() looks it up, and fails when it does not; one that resolves but has no \"prefer\" pool on either name is reported as a warning because bind() refuses its unit headless; fgos setup registers every shipped Workflow's capabilities as description-only defaults, so a fresh project starts with that warning, and never overwrites a project's own entry), `capability-serves-valid` (I19: every runner.capabilities entry's serves attribute set is well-formed, no two entries declare the identical set, and the review slot is present), `agy-permissions-configured` (tsk-1xm), `agy-sub-homes-configured`, `bwrap-available`, `curl-available` (curl runs, because fgctl init downloads a release through it; a missing curl is a warning that only blocks the download paths, never a failure, see RUL15 (fgctl init downloads a checksum-verified release when no source is given)), `main-checkout-guard-warnings` (tsk-1vc-3), `events-compaction-verified` (tsk-3ve-6), `no-stuck-merge-abort` (tsk-40a), `doc-registry-enforce` (tsk-28x), `doc-registry-stale` (tsk-28x), `doc-alias-broken` (tsk-28x), `doc-active-duplicate` (tsk-28x), `doc-near-duplicate` (tsk-28x), `doc-provisional-aged` (tsk-28x), `doc-topic-oversized` (tsk-28x), `doc-role-underused` (tsk-28x), `doc-source-conservation` (tsk-28x), `doc-current-path-missing` (tsk-3uc), `doc-source-unreachable` (tsk-3uc), `coordination-protocol-fixtures-valid` (retired; confirms legacy definition fixtures retired), `operation-prompt-templates-valid` (Phase 03 I04: every discoverable operation prompt template validates against bounded variables and schema), `coordination-example-requests-valid` (Step 08 Phase 07 R3: published fgos coordination run example request files validate against the same schema boundary the CLI itself enforces, and resolve every referenced protocolRef), `herdr-available`, `trust-store-readable`, `non-claude-trust-stores-readable` (Phase 07 herdr-trust-supervisor R3: every executor or invocation declaring a codex-toml or agy/agy-json trustStore reads from a store that is actually readable, using the same reader the live dispatch will use), `confined-pane-accounts` (every confined herdr invocation that binds a private home has an account in the machine-global provider account inventory whose credential files exist, so its pane starts logged in; see RUL65b in the runner spec), `agent-cli-project-trusted` (the project root is trusted in every codex home and agy sub-HOME the configured executors run under, so a headless dispatch does not stop at a \"Trust this folder?\" prompt until its timeout; reads only a yes/no for the one path, names the exact line a person must add, never edits the CLI's config; not applicable when the root is not a git repository or no codex/agy executor is configured), `workflow-pools-satisfy-independence` (for every panel or reviewed Workflow unit, drives the runner's own pattern code through bind() without dispatching anything and fails when the capability prefer pool cannot supply enough distinct provider families for every role (three panelists plus a synthesizer need four); a provider out of quota or blocked on a trust prompt is invisible to bind() and not counted), `blind-steps-use-proven-pools` (for every Workflow unit declared blind, walks each role's candidates through bind() without dispatching anything and fails when the capability prefer pool can bind an executor whose provider family, transport and confinement backend are not in the table of canary-proven pairs kept in the check's own module; read-only, no model call; not applicable when no unit is blind), `executor-posture-coverage` (core capabilities execute, code:implement, and capabilities declaring a pool have at least one candidate executor capable of applying required posture; dry simulation via bind(), no process spawn), `executor-confinement` (dispatch visibility V0 Phase 01 group D: the transport an interactive dispatch needs, a readable folder-trust store so a fresh worktree can be pre-trusted instead of stopping at a dialog, and a second reading of the rule that an executor may only declare bypass permission mode alongside full confinement), `herdr-executor-kinds` (Phase 05 R3: every executor dispatched through a herdr pane names an agent kind herdr can actually start, and none depends on an integration hook herdr reports as outdated -- an installed-but-stale hook is believed by herdr and may report the wrong agent state, while a missing one only degrades detection), `executor-profile-warnings` (Phase 06 executor-policy-dispatch-seams: legacy executor/capability entries hardcoding policy-shaped flags, policy-overrides-as-identity, or account-pool-shaped env, each named with its documented migration target -- informational only, never a hard failure), `active-release-matches-checkout` (read-only Node payload contents against doctor dir working tree, not HEAD or Rust binary freshness; reports changed/missing/extra source files while excluding staged dependencies, skips outside source checkouts and main-owned activation in linked worktrees; use fgos:dev for working-tree code or restage/activate for plain fgos), `rust-host-binary-present`, `rust-host-target-supported`, `legacy-node-payload-present`, `command-routes-drift`, `confinement-policies-declared`, `confinement-backend-registry-readable`, `confinement-bwrap-platform`, `confinement-probe-freshness`, `confinement-blind-read` (a blind unit can be enforced: the registered bwrap backend hides peer run state, homes and processes from a worker; reports pass, fail, or backend-unsupported, in which case every blind unit is refused), `confinement-strict-readiness`, `confinement-orphaned-resources-reaped` (Phase 04 M8: no confinement temp resource is left behind by a dead owning process, and no confinement temp root is readable beyond its owner; a home kept for a still-open pane is not orphaned; the fix tightens the root to 0700 and reaps), `confinement-herdr-maturity`, `instruction-projections-stale`, `coordination-abandoned-claims`, `runner-coordination-orgPolicy-shape`, `operation-capability-resolves` (Unit I21: every discoverable operation's declared policy.capability resolves against the live runner config, reporting reachable provider-family diversity), `shadow-binder-divergence` (dispatch-engine-liveness-hardening Phase 7 C1: real PlacementPolicy/ProviderAdapter shadow-binder divergence is durably recorded to a local JSONL under .fgos/dispatch/, not only an ephemeral stderr line; informational, never fails), `observe-dir-writable`, `observe-friction-migrated`, `observe-host-resolvable`, `writer-identity-resolvable` (the writer identity resolves through the Rust host for both the running host and the workspace activation a plain git commit hook uses; each binary is asked directly, so an older activated release shows as a version mismatch), `observe-run-coverage`, `runner-rigor-config` (validates project/global rigor-to-tier mappings and retired capability overrides), `coordination-protocol-dead-vocabulary` (validates definitions against dead vocabulary), `model-policy-tier-coverage` (validates model policies cover all tiers required by rigor-to-tier), `tier-vocabulary-dead-keys` (validates project and global config do not contain retired tier/rigor keys), `runner-patterns-config` (validates presence, valid checkers, and cumulative checkersByRigor for runner patterns), `runner-generated-paths` (validates runner.generatedPaths source-to-render-target mappings), `mutating-assignment-binding-snapshot` (validates that mutating assignment RunResult bindings match unit.json snapshot). The registry is open, but this list is not a snapshot — it names every registered check, and a module adding one updates this row in the same change | yes | — |\n| 7b | Doctor fix | One named repair `fgos doctor --fix` can run before re-reporting checks | not a fixed list — an extensible registry (`registerFix`), independent of `registerCheck`/`registerConfigDefault` (per tsk-2cs). Today's registered fixes: `credential-copies-retained` (re-checks private homes held after repeated staging failures, and any kept home under a registered backend's own root, which nothing else retries, under the account lock, and removes one only when its login is shown applied or obsolete; also removes an interrupted staging (pending/.tmp-*) only after claiming it by rename, when its writer is gone and it is empty, identical to a copy already kept, or shown no newer than the source login under the account lock; never removes on age), `gate-bypass-configured` (tsk-2qz, the registry's first entry to register all three capabilities at once), `claude-plugin-marketplace` (tsk-4xg), `enduser-docs-index-stale` (tsk-1m0), `bin-discovery-cache` (tsk-2qc-1), `gateway-token-configured` (tsk-4r1), `iron-law-configured` (tsk-1y6-1), `decision-index-stale` (tsk-1lv-2/tsk-1lv), `agy-permissions-configured` (tsk-1xm), `no-stuck-merge-abort` (tsk-40a), `doc-registry-stale` (tsk-28x), `confinement-backend-registry-readable`, `confinement-orphaned-resources-reaped` (Phase 04 M8), `instruction-projections-stale`, `coordination-abandoned-claims`, `runner-coordination-orgPolicy-shape`, `project-fgos-launcher`, `dispatch-decide-hook-wired`, `codex-hook-wired`, `agy-hook-wired`, `omp-hook-wired`, `pi-hook-wired`. Same rule as #7: the registry is open, but this list names every registered fix and a module adding one updates this row in the same change | yes | — |\n| 8 | Output rendering mode | How `fgos setup`/`fgos doctor` present their result | enveloped JSON (every other verb's shape, unchanged) / colored plain text (`--pretty`) | yes | enveloped JSON |"
+  },
+  "currentNativeSuccessor": {
+    "sourcePath": "docs/platform/packaging-distribution/spec.md",
+    "unitDigest": "efdbc472e987bef628352ebcce1a16bf80b33d017c6b99af37f0f9d20d2dd69f",
+    "identityFingerprint": "efdbc472e987bef628352ebcce1a16bf80b33d017c6b99af37f0f9d20d2dd69f",
+    "claimId": "claim_2c510f453909b3c7e8a107811003b21e",
+    "sourceAnchor": "unheaded-block-85",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
+    "claimKind": "specification",
+    "status": "future"
+  },
+  "sourceAndResidualHistoryPreserved": true,
+  "reviewScope": "Current projection supersedes the historical artifact for this package only; historical before/native witness remains immutable. Pending rows receive no approval.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_d9185072d68925b4c020b13ba6c4d74f",
+    "sourcePath": "docs/specs/distribution.md",
+    "sourceAnchor": "unheaded-block-5",
+    "sourceUnitDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
+    "claimKind": "specification",
+    "disposition": "move",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/specs/distribution.md:57-73#unheaded-block-5 (current lines); unit SHA256 59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e.\nTarget: docs/platform/packaging-distribution/spec.md:517-533#unheaded-block-85 (current lines); unit SHA256 59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/distribution.md#unheaded-block-5 under docs/platform/packaging-distribution/spec.md#unheaded-block-85; source context \"Spec: Distribution / Data Dictionary\", target context \"Spec: Packaging-Distribution / Retained Distribution Source Detail / Spec: Distribution / Data Dictionary\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/packaging-distribution/spec.md",
+    "targetAnchor": "unheaded-block-85",
+    "targetUnitDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
+    "targetAncestry": [
+      "Spec: Packaging-Distribution",
+      "Retained Distribution Source Detail",
+      "Spec: Distribution",
+      "Data Dictionary"
+    ]
+  },
+  "entryId": "accounting-053"
+}
+```
+
+## Entry accounting-054
+
+```json
+{
+  "kind": "refreshed-dependent-accounting",
+  "historicalArtifact": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-reconciliation.json",
+  "historicalProjectionPath": "/resolvedDrafts/7/after",
+  "historicalSnapshot": {
+    "claimId": "claim_b2a51d5d39832d330879947bdbbcb227",
+    "sourcePath": "docs/specs/observe.md",
+    "sourceAnchor": "owns",
+    "sourceUnitDigest": "ca2fd76b4ca2fe575e858e1f9ae76cf0ddf0f7300593c6a58b11ac2249b4d1b2",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+    "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried. Native identity resolved at 19ca8de23908e161c34c91626e41041b7813167c from the sole native sync. Historical gaps remain separate; no provisional ID is persisted as a decision and no approval carries.",
+    "targetOwner": "docs/platform/observe/spec.md",
+    "targetAnchor": "owns",
+    "reviewNote": "deep: docs/specs/observe.md#owns to docs/platform/observe/spec.md#owns: section differs by the friction ping and migrate additions to the first bullet (labelled Truth correction in the candidate scaffold, with evidence friction_cli.rs:7-9) and one link destination rebased (../platform/session-identity/spec.md becomes ../session-identity/spec.md, not named in the scaffold list of rebased links but a pure destination change); nothing lost; mandatory unequal row, digests recomputed, anchors pass",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "a03c9cf9107371c2ec305cd2efea93cc9ca0f549ec485158bdb5e9ecc05c63aa",
+    "targetAncestry": [
+      "Observe Component Specification",
+      "1. Overview & Boundaries"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+  "collection": "claims",
+  "relatedClaimId": "claim_b2a51d5d39832d330879947bdbbcb227",
+  "after": {
+    "claimId": "claim_b2a51d5d39832d330879947bdbbcb227",
+    "sourcePath": "docs/specs/observe.md",
+    "sourceAnchor": "owns",
+    "sourceUnitDigest": "ca2fd76b4ca2fe575e858e1f9ae76cf0ddf0f7300593c6a58b11ac2249b4d1b2",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/specs/observe.md:12-12#owns (current lines); unit SHA256 ca2fd76b4ca2fe575e858e1f9ae76cf0ddf0f7300593c6a58b11ac2249b4d1b2.\nTarget: docs/platform/observe/spec.md:34-34#owns (current lines); unit SHA256 a03c9cf9107371c2ec305cd2efea93cc9ca0f549ec485158bdb5e9ecc05c63aa.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest a03c9cf9107371c2ec305cd2efea93cc9ca0f549ec485158bdb5e9ecc05c63aa at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 1, target 1; 1 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nLink 1: \"spec\" (../platform/session-identity/spec.md) → \"spec\" (../session-identity/spec.md); resolved docs/platform/session-identity/spec.md → docs/platform/session-identity/spec.md.\nHeading depth: 3 → 3; title \"Owns\" → \"Owns\".\nApplicable labelled corrections:\nA40/step8-truth-corrections-1: \"`fgos friction rank`).\" → \"`fgos friction rank`, `fgos friction ping`, `fgos friction migrate`).\"; evidence step8-truth-corrections.json; packages/observe/rust/src/friction_cli.rs:7-9.\nDisposition supersede: Account for docs/specs/observe.md#owns under docs/platform/observe/spec.md#owns; source context \"Observe Component Specification / 1. Overview & Boundaries\", target context \"Observe Component Specification / 1. Overview & Boundaries\". The source text occurs verbatim inside the bound target section; section-level unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/observe/spec.md",
+    "targetAnchor": "owns",
+    "targetUnitDigest": "a03c9cf9107371c2ec305cd2efea93cc9ca0f549ec485158bdb5e9ecc05c63aa",
+    "targetAncestry": [
+      "Observe Component Specification",
+      "1. Overview & Boundaries"
+    ]
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 3,
+    "title": "Owns",
+    "anchor": "owns",
+    "githubAnchor": "owns",
+    "stableAnchor": "h-7876a0bcabd0",
+    "startLine": 34,
+    "endLine": 34,
+    "textDigest": "a03c9cf9107371c2ec305cd2efea93cc9ca0f549ec485158bdb5e9ecc05c63aa",
+    "sample": "Owns",
+    "sectionPayloadDigest": "11717c094b7543079c51f31172bdc5cc8e3d66f9da00bdb02056323819401b2c",
+    "followingBlockDigest": "11717c094b7543079c51f31172bdc5cc8e3d66f9da00bdb02056323819401b2c",
+    "identityFingerprint": "1a6e22e6c6b4960b3cd50cc63bf4495513ec982f916cd4a58f3ab5e05ab13fc2",
+    "ancestry": [
+      "Observe Component Specification",
+      "1. Overview & Boundaries"
+    ],
+    "text": "### Owns",
+    "sectionText": "### Owns\n- Quản lý nhật ký và vòng đời case đo lường (`fgos metrics case`).\n- Thu thập và tính toán scorecard tầng nền (`fgos metrics harness`, `fgos metrics runs`, `fgos metrics coverage`, `fgos metrics outcomes`, `fgos metrics entropy`, `fgos metrics snapshot`).\n- Quản lý kho lưu trữ friction độc lập, phi tập trung (`fgos friction record`, `fgos friction resolve`, `fgos friction list`, `fgos friction show`, `fgos friction rank`, `fgos friction ping`, `fgos friction migrate`).\n- Quản lý store lock (`.fgos/observe/.lock`) và phân mảnh writer shard (`.fgos/observe/<store>/<writerId>.jsonl`). `writerId` lấy từ crate Session Identity ([spec](../session-identity/spec.md)): chính session id khi `source` là `env`/`registry` (gồm `CLAUDE_CODE_SESSION_ID`, `CODEX_THREAD_ID`), `pid-<id>` khi `pid`/`unresolved` (gốc terminal hoặc session, không còn pid của chính process). `sessionId` của friction cũng lấy từ đó. Observe không tự đọc biến env identity.\n- Khai báo traits `ObservationSource` và `LegacyFrictionSource` cho các crate khác triển khai."
+  },
+  "currentNativeSuccessor": {
+    "sourcePath": "docs/platform/observe/spec.md",
+    "unitDigest": "9cbef79c0d7a521e8a8427c1009b95df8e4b6f7c93e382337c265957d6281824",
+    "identityFingerprint": "1a6e22e6c6b4960b3cd50cc63bf4495513ec982f916cd4a58f3ab5e05ab13fc2",
+    "claimId": "claim_9a7f102f2e18a81ce472b2b57f81cff3",
+    "sourceAnchor": "owns",
+    "unitKind": "heading",
+    "sourceUnitDigest": "a03c9cf9107371c2ec305cd2efea93cc9ca0f549ec485158bdb5e9ecc05c63aa",
+    "claimKind": "specification",
+    "status": "future"
+  },
+  "sourceAndResidualHistoryPreserved": true,
+  "reviewScope": "Current projection supersedes the historical artifact for this package only; historical before/native witness remains immutable. Pending rows receive no approval.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_b2a51d5d39832d330879947bdbbcb227",
+    "sourcePath": "docs/specs/observe.md",
+    "sourceAnchor": "owns",
+    "sourceUnitDigest": "ca2fd76b4ca2fe575e858e1f9ae76cf0ddf0f7300593c6a58b11ac2249b4d1b2",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/specs/observe.md:12-12#owns (current lines); unit SHA256 ca2fd76b4ca2fe575e858e1f9ae76cf0ddf0f7300593c6a58b11ac2249b4d1b2.\nTarget: docs/platform/observe/spec.md:34-34#owns (current lines); unit SHA256 a03c9cf9107371c2ec305cd2efea93cc9ca0f549ec485158bdb5e9ecc05c63aa.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest a03c9cf9107371c2ec305cd2efea93cc9ca0f549ec485158bdb5e9ecc05c63aa at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 1, target 1; 1 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nLink 1: \"spec\" (../platform/session-identity/spec.md) → \"spec\" (../session-identity/spec.md); resolved docs/platform/session-identity/spec.md → docs/platform/session-identity/spec.md.\nHeading depth: 3 → 3; title \"Owns\" → \"Owns\".\nApplicable labelled corrections:\nA40/step8-truth-corrections-1: \"`fgos friction rank`).\" → \"`fgos friction rank`, `fgos friction ping`, `fgos friction migrate`).\"; evidence step8-truth-corrections.json; packages/observe/rust/src/friction_cli.rs:7-9.\nDisposition supersede: Account for docs/specs/observe.md#owns under docs/platform/observe/spec.md#owns; source context \"Observe Component Specification / 1. Overview & Boundaries\", target context \"Observe Component Specification / 1. Overview & Boundaries\". The source text occurs verbatim inside the bound target section; section-level unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/observe/spec.md",
+    "targetAnchor": "owns",
+    "targetUnitDigest": "a03c9cf9107371c2ec305cd2efea93cc9ca0f549ec485158bdb5e9ecc05c63aa",
+    "targetAncestry": [
+      "Observe Component Specification",
+      "1. Overview & Boundaries"
+    ]
+  },
+  "entryId": "accounting-054"
+}
+```
+
+## Entry accounting-055
+
+```json
+{
+  "kind": "refreshed-dependent-accounting",
+  "historicalArtifact": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-reconciliation.json",
+  "historicalProjectionPath": "/resolvedDrafts/8/after",
+  "historicalSnapshot": {
+    "claimId": "claim_bf1888a05f53ba3cd515eb792c5059b8",
+    "sourcePath": "docs/specs/observe.md",
+    "sourceAnchor": "unheaded-block-3",
+    "sourceUnitDigest": "36f5428de433214eb4a9a17e3a2366471095b9bb658faa4f11d4bb108beea137",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+    "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried. Native identity resolved at 19ca8de23908e161c34c91626e41041b7813167c from the sole native sync. Historical gaps remain separate; no provisional ID is persisted as a decision and no approval carries.",
+    "targetOwner": "docs/platform/observe/spec.md",
+    "targetAnchor": "unheaded-block-5",
+    "reviewNote": "deep: docs/specs/observe.md#unheaded-block-3 to docs/platform/observe/spec.md#unheaded-block-5: same two-line delta as the Owns heading (labelled ping and migrate truth correction plus one rebased link destination), no word lost, it is the carrier of the partial-carry successor of claim_a7278e15; mandatory unequal row, digests recomputed, anchors pass",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "11717c094b7543079c51f31172bdc5cc8e3d66f9da00bdb02056323819401b2c",
+    "targetAncestry": [
+      "Observe Component Specification",
+      "1. Overview & Boundaries",
+      "Owns"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+  "collection": "claims",
+  "relatedClaimId": "claim_bf1888a05f53ba3cd515eb792c5059b8",
+  "after": {
+    "claimId": "claim_bf1888a05f53ba3cd515eb792c5059b8",
+    "sourcePath": "docs/specs/observe.md",
+    "sourceAnchor": "unheaded-block-3",
+    "sourceUnitDigest": "36f5428de433214eb4a9a17e3a2366471095b9bb658faa4f11d4bb108beea137",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/specs/observe.md:13-17#unheaded-block-3 (current lines); unit SHA256 36f5428de433214eb4a9a17e3a2366471095b9bb658faa4f11d4bb108beea137.\nTarget: docs/platform/observe/spec.md:35-39#unheaded-block-5 (current lines); unit SHA256 11717c094b7543079c51f31172bdc5cc8e3d66f9da00bdb02056323819401b2c.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 11717c094b7543079c51f31172bdc5cc8e3d66f9da00bdb02056323819401b2c at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 1, target 1; 1 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nLink 1: \"spec\" (../platform/session-identity/spec.md) → \"spec\" (../session-identity/spec.md); resolved docs/platform/session-identity/spec.md → docs/platform/session-identity/spec.md.\nApplicable labelled corrections:\nA40/step8-truth-corrections-1: \"`fgos friction rank`).\" → \"`fgos friction rank`, `fgos friction ping`, `fgos friction migrate`).\"; evidence step8-truth-corrections.json; packages/observe/rust/src/friction_cli.rs:7-9.\nDisposition supersede: Account for docs/specs/observe.md#unheaded-block-3 under docs/platform/observe/spec.md#unheaded-block-5; source context \"Observe Component Specification / 1. Overview & Boundaries / Owns\", target context \"Observe Component Specification / 1. Overview & Boundaries / Owns\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/observe/spec.md",
+    "targetAnchor": "unheaded-block-5",
+    "targetUnitDigest": "11717c094b7543079c51f31172bdc5cc8e3d66f9da00bdb02056323819401b2c",
+    "targetAncestry": [
+      "Observe Component Specification",
+      "1. Overview & Boundaries",
+      "Owns"
+    ]
+  },
+  "currentTarget": {
+    "unitKind": "unheaded-block",
+    "anchor": "unheaded-block-5",
+    "githubAnchor": "unheaded-block-5",
+    "stableAnchor": "unheaded-block-5",
+    "title": "Unheaded block 5",
+    "startLine": 35,
+    "endLine": 39,
+    "textDigest": "11717c094b7543079c51f31172bdc5cc8e3d66f9da00bdb02056323819401b2c",
+    "sample": "- Quản lý nhật ký và vòng đời case đo lường (`fgos metrics case`).\n- Thu thập và tính toán scorecard tầng nền (`fgos metrics harness`, `fgos metrics runs`, `fgos metrics coverage`,",
+    "identityFingerprint": "c2a02a1cc546d5037f4f1824c51ada42b9b82d9c49e5a2fb01b5c15aa372e2af",
+    "ancestry": [
+      "Observe Component Specification",
+      "1. Overview & Boundaries",
+      "Owns"
+    ],
+    "text": "- Quản lý nhật ký và vòng đời case đo lường (`fgos metrics case`).\n- Thu thập và tính toán scorecard tầng nền (`fgos metrics harness`, `fgos metrics runs`, `fgos metrics coverage`, `fgos metrics outcomes`, `fgos metrics entropy`, `fgos metrics snapshot`).\n- Quản lý kho lưu trữ friction độc lập, phi tập trung (`fgos friction record`, `fgos friction resolve`, `fgos friction list`, `fgos friction show`, `fgos friction rank`, `fgos friction ping`, `fgos friction migrate`).\n- Quản lý store lock (`.fgos/observe/.lock`) và phân mảnh writer shard (`.fgos/observe/<store>/<writerId>.jsonl`). `writerId` lấy từ crate Session Identity ([spec](../session-identity/spec.md)): chính session id khi `source` là `env`/`registry` (gồm `CLAUDE_CODE_SESSION_ID`, `CODEX_THREAD_ID`), `pid-<id>` khi `pid`/`unresolved` (gốc terminal hoặc session, không còn pid của chính process). `sessionId` của friction cũng lấy từ đó. Observe không tự đọc biến env identity.\n- Khai báo traits `ObservationSource` và `LegacyFrictionSource` cho các crate khác triển khai."
+  },
+  "currentNativeSuccessor": {
+    "sourcePath": "docs/platform/observe/spec.md",
+    "unitDigest": "c2a02a1cc546d5037f4f1824c51ada42b9b82d9c49e5a2fb01b5c15aa372e2af",
+    "identityFingerprint": "c2a02a1cc546d5037f4f1824c51ada42b9b82d9c49e5a2fb01b5c15aa372e2af",
+    "claimId": "claim_5a7fb197c5c92f400d4f4d29e7a60cc7",
+    "sourceAnchor": "unheaded-block-5",
+    "unitKind": "unheaded-block",
+    "sourceUnitDigest": "11717c094b7543079c51f31172bdc5cc8e3d66f9da00bdb02056323819401b2c",
+    "claimKind": "specification",
+    "status": "future"
+  },
+  "sourceAndResidualHistoryPreserved": true,
+  "reviewScope": "Current projection supersedes the historical artifact for this package only; historical before/native witness remains immutable. Pending rows receive no approval.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_bf1888a05f53ba3cd515eb792c5059b8",
+    "sourcePath": "docs/specs/observe.md",
+    "sourceAnchor": "unheaded-block-3",
+    "sourceUnitDigest": "36f5428de433214eb4a9a17e3a2366471095b9bb658faa4f11d4bb108beea137",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/specs/observe.md:13-17#unheaded-block-3 (current lines); unit SHA256 36f5428de433214eb4a9a17e3a2366471095b9bb658faa4f11d4bb108beea137.\nTarget: docs/platform/observe/spec.md:35-39#unheaded-block-5 (current lines); unit SHA256 11717c094b7543079c51f31172bdc5cc8e3d66f9da00bdb02056323819401b2c.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 11717c094b7543079c51f31172bdc5cc8e3d66f9da00bdb02056323819401b2c at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 1, target 1; 1 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nLink 1: \"spec\" (../platform/session-identity/spec.md) → \"spec\" (../session-identity/spec.md); resolved docs/platform/session-identity/spec.md → docs/platform/session-identity/spec.md.\nApplicable labelled corrections:\nA40/step8-truth-corrections-1: \"`fgos friction rank`).\" → \"`fgos friction rank`, `fgos friction ping`, `fgos friction migrate`).\"; evidence step8-truth-corrections.json; packages/observe/rust/src/friction_cli.rs:7-9.\nDisposition supersede: Account for docs/specs/observe.md#unheaded-block-3 under docs/platform/observe/spec.md#unheaded-block-5; source context \"Observe Component Specification / 1. Overview & Boundaries / Owns\", target context \"Observe Component Specification / 1. Overview & Boundaries / Owns\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/observe/spec.md",
+    "targetAnchor": "unheaded-block-5",
+    "targetUnitDigest": "11717c094b7543079c51f31172bdc5cc8e3d66f9da00bdb02056323819401b2c",
+    "targetAncestry": [
+      "Observe Component Specification",
+      "1. Overview & Boundaries",
+      "Owns"
+    ]
+  },
+  "entryId": "accounting-055"
+}
+```
+
+## Entry accounting-056
+
+```json
+{
+  "kind": "refreshed-dependent-accounting",
+  "historicalArtifact": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-reconciliation.json",
+  "historicalProjectionPath": "/resolvedDrafts/9/after",
+  "historicalSnapshot": {
+    "claimId": "claim_03ef50e87178220032a3eebe5c5d89d9",
+    "sourcePath": "docs/architecture-manifest.json",
+    "sourceAnchor": "file-block",
+    "sourceUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
+    "claimKind": "specification",
+    "disposition": "move",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+    "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried. Native identity resolved at 19ca8de23908e161c34c91626e41041b7813167c from the sole native sync. Historical gaps remain separate; no provisional ID is persisted as a decision and no approval carries.",
+    "targetOwner": "docs/platform/contracts/architecture-manifest.json",
+    "targetAnchor": "file-block",
+    "reviewNote": "deep: docs/architecture-manifest.json to docs/platform/contracts/architecture-manifest.json: cmp shows the two files byte-identical, file-block digests equal (2d55be82) and recomputed by python, so move is accurate; the boilerplate rationale fits a pure carry; the target anchor is the non-markdown file-block so the anchor CLI is not applicable",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
+    "targetAncestry": [],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-main-recarry.json",
+  "collection": "claims",
+  "relatedClaimId": "claim_03ef50e87178220032a3eebe5c5d89d9",
+  "after": {
+    "claimId": "claim_03ef50e87178220032a3eebe5c5d89d9",
+    "sourcePath": "docs/architecture-manifest.json",
+    "sourceAnchor": "file-block",
+    "sourceUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
+    "claimKind": "specification",
+    "disposition": "move",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/architecture-manifest.json:1-269#file-block (current lines); unit SHA256 2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a.\nTarget: docs/platform/contracts/architecture-manifest.json:1-269#file-block (current lines); unit SHA256 2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architecture-manifest.json#file-block under docs/platform/contracts/architecture-manifest.json#file-block; source context \"file-block\", target context \"file-block\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/contracts/architecture-manifest.json",
+    "targetAnchor": "file-block",
+    "targetUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
+    "targetAncestry": []
+  },
+  "currentTarget": {
+    "unitKind": "file-block",
+    "anchor": "file-block",
+    "githubAnchor": "file-block",
+    "stableAnchor": "file-block",
+    "title": "architecture-manifest.json",
+    "startLine": 1,
+    "endLine": 269,
+    "textDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
+    "identityFingerprint": "bee0f585dc079a9cf24fe84a2cfacaa3aa99e6818f4fbf4e69dbf76dd601e99c",
+    "sample": "{\n  \"contract\": \"architecture-manifest.v1\",\n  \"map\": \"docs/architecture-map.md\",\n  \"layers\": [\n    \"entry\",\n    \"use-case\",\n    \"infra\",\n    \"domain\",\n    \"kernel\"\n  ],\n  \"rules\": ",
+    "ancestry": [],
+    "text": "{\n  \"contract\": \"architecture-manifest.v1\",\n  \"map\": \"docs/architecture-map.md\",\n  \"layers\": [\n    \"entry\",\n    \"use-case\",\n    \"infra\",\n    \"domain\",\n    \"kernel\"\n  ],\n  \"rules\": [\n    \"one-directional-layer\",\n    \"domain-siloing\"\n  ],\n  \"components\": [\n    \"packaging-distribution\"\n  ],\n  \"domains\": [\n    \"coding\",\n    \"marketing\"\n  ],\n  \"files\": {\n    \"bin/fgos.mjs\": \"entry\",\n    \"bin/fgos-runner.mjs\": \"entry\",\n    \"src/runner/loop.mjs\": \"use-case\",\n    \"src/runner/paths.mjs\": \"infra\",\n    \"src/runner/dispatch.mjs\": \"infra\",\n    \"src/runner/operation-capability.mjs\": \"domain\",\n    \"src/runner/rigor.mjs\": \"kernel\",\n    \"src/runner/fanout-batch.mjs\": \"use-case\",\n    \"src/runner/work-compat.mjs\": \"infra\",\n    \"src/runner/dispatch/adapters.mjs\": \"infra\",\n    \"src/runner/dispatch/config.mjs\": \"infra\",\n    \"src/runner/dispatch/confinement/policies.mjs\": \"infra\",\n    \"src/runner/dispatch/confinement/bypass-pairing.mjs\": \"infra\",\n    \"src/runner/dispatch/confinement/backend-registry.mjs\": \"infra\",\n    \"src/runner/dispatch/confinement/authority.mjs\": \"infra\",\n    \"src/runner/dispatch/confinement/request.mjs\": \"infra\",\n    \"src/runner/dispatch/confinement/resources.mjs\": \"infra\",\n    \"src/runner/dispatch/confinement/cleanup.mjs\": \"infra\",\n    \"src/runner/dispatch/confinement/attestation-store.mjs\": \"infra\",\n    \"src/runner/dispatch/confinement/drivers/bwrap.mjs\": \"infra\",\n    \"src/runner/dispatch/confinement/probes/harness.mjs\": \"infra\",\n    \"src/runner/dispatch/resolve.mjs\": \"infra\",\n    \"src/runner/dispatch/mechanism.mjs\": \"infra\",\n    \"src/runner/dispatch/plan.mjs\": \"infra\",\n    \"src/runner/dispatch/transport.mjs\": \"infra\",\n    \"src/runner/dispatch/prepare.mjs\": \"infra\",\n    \"src/runner/dispatch/result-ladder.mjs\": \"infra\",\n    \"src/runner/dispatch/assignment.mjs\": \"infra\",\n    \"src/runner/dispatch/assignment-layout.mjs\": \"infra\",\n    \"src/runner/dispatch/assignment-normalizer.mjs\": \"infra\",\n    \"src/runner/dispatch/execution-contract.mjs\": \"infra\",\n    \"src/runner/dispatch/effective-execution-contract.mjs\": \"infra\",\n    \"src/runner/dispatch/agent-result-claim-contract.mjs\": \"infra\",\n    \"src/runner/dispatch/evidence-attribution.mjs\": \"infra\",\n    \"src/runner/dispatch/write-scope.mjs\": \"kernel\",\n    \"src/runner/dispatch/run-timeout.mjs\": \"kernel\",\n    \"src/runner/dispatch/run-result.mjs\": \"infra\",\n    \"src/runner/dispatch/usage-parsers.mjs\": \"infra\",\n    \"src/runner/dispatch/runtime-inspection.mjs\": \"infra\",\n    \"src/runner/dispatch/reconciliation-planner.mjs\": \"infra\",\n    \"src/runner/dispatch/assignment-policy.mjs\": \"infra\",\n    \"src/runner/dispatch/operation-prompt-templates.mjs\": \"infra\",\n    \"src/runner/dispatch/provider-adapter.mjs\": \"infra\",\n    \"src/runner/dispatch/provider-capacity.mjs\": \"infra\",\n    \"src/runner/dispatch/provider-auth-failure.mjs\": \"infra\",\n    \"src/runner/dispatch/provider-credential-probe.mjs\": \"infra\",\n    \"src/runner/dispatch/provider-account-probe.mjs\": \"infra\",\n    \"src/runner/dispatch/provider-credential-renewal.mjs\": \"infra\",\n    \"src/runner/dispatch/assignment-runner.mjs\": \"infra\",\n    \"src/runner/dispatch/settlement.mjs\": \"infra\",\n    \"src/runner/dispatch/reconcile-cli-spawn.mjs\": \"infra\",\n    \"src/runner/dispatch/cli.mjs\": \"infra\",\n    \"src/runner/dispatch/detached-run-supervisor.mjs\": \"infra\",\n    \"src/runner/prompt-templates.mjs\": \"infra\",\n    \"src/runner/worker-log.mjs\": \"infra\",\n    \"src/runner/agent-roster.mjs\": \"infra\",\n    \"src/runner/agent-definitions.mjs\": \"infra\",\n    \"src/runner/agent-listing.mjs\": \"infra\",\n    \"src/runner/worktree.mjs\": \"infra\",\n    \"src/runner/promote-preflight.mjs\": \"infra\",\n    \"src/runner/promote-engine.mjs\": \"infra\",\n    \"src/runner/session.mjs\": \"infra\",\n    \"src/runner/gateway-control.mjs\": \"infra\",\n    \"src/runner/goal-check.mjs\": \"infra\",\n    \"src/runner/iron-law-gate.mjs\": \"infra\",\n    \"src/runner/frozen-judge.mjs\": \"domain\",\n    \"src/runner/merge.mjs\": \"infra\",\n    \"src/runner/main-checkout-lock.mjs\": \"infra\",\n    \"src/runner/main-checkout-activity.mjs\": \"infra\",\n    \"src/runner/main-checkout-reset-guard.mjs\": \"infra\",\n    \"src/runner/github-adapter.mjs\": \"infra\",\n    \"src/state/drift-status.mjs\": \"infra\",\n    \"src/state/postland-drift.mjs\": \"infra\",\n    \"src/state/store.mjs\": \"infra\",\n    \"src/state/gate-bypass.mjs\": \"infra\",\n    \"src/state/cursor.mjs\": \"use-case\",\n    \"src/state/porting-store.mjs\": \"infra\",\n    \"src/state/tool-registry.mjs\": \"domain\",\n    \"src/install/coexist.mjs\": \"infra\",\n    \"src/runner/recovery.mjs\": \"domain\",\n    \"src/runner/anti-loop.mjs\": \"domain\",\n    \"src/runner/attestation-guard.mjs\": \"domain\",\n    \"src/runner/claim-port.mjs\": \"infra\",\n    \"src/runner/claim-liveness.mjs\": \"infra\",\n    \"src/runner/lock-wait.mjs\": \"infra\",\n    \"src/runner/write-queue.mjs\": \"domain\",\n    \"src/runner/root-affinity.mjs\": \"domain\",\n    \"src/state/status-fsm.mjs\": \"domain\",\n    \"src/state/decision-question.mjs\": \"domain\",\n    \"src/state/handoff.mjs\": \"domain\",\n    \"src/state/porting.mjs\": \"domain\",\n    \"src/state/frontier.mjs\": \"domain\",\n    \"src/state/impact.mjs\": \"domain\",\n    \"src/state/priority-formula.mjs\": \"domain\",\n    \"src/state/replay.mjs\": \"domain\",\n    \"src/state/events-compaction.mjs\": \"domain\",\n    \"src/state/dep-graph.mjs\": \"domain\",\n    \"src/state/graph-harness.mjs\": \"domain\",\n    \"src/state/graph-metrics.mjs\": \"domain\",\n    \"src/state/awaiting-context.mjs\": \"domain\",\n    \"src/state/cleanup-harness.mjs\": \"domain\",\n    \"src/state/cleanup-pool.mjs\": \"domain\",\n    \"src/state/discover-pool.mjs\": \"domain\",\n    \"src/state/plan-pool.mjs\": \"domain\",\n    \"src/state/retro-pool.mjs\": \"domain\",\n    \"src/state/retrospective-doors.mjs\": \"domain\",\n    \"src/state/worker-slots.mjs\": \"domain\",\n    \"src/intake/discovery.mjs\": \"use-case\",\n    \"src/intake/plan.mjs\": \"use-case\",\n    \"src/intake/plan-verdict-from-plan-md.mjs\": \"use-case\",\n    \"src/intake/verify-pattern-check.mjs\": \"kernel\",\n    \"src/cli/command-registry.mjs\": \"kernel\",\n    \"src/cli/deprecation.mjs\": \"kernel\",\n    \"src/cli/version.mjs\": \"kernel\",\n    \"src/cli/invocation-fault-log.mjs\": \"infra\",\n    \"src/cli/approve-fault-log.mjs\": \"infra\",\n    \"src/report/enduser-index.mjs\": \"domain\",\n    \"src/report/enduser-index-generate.mjs\": \"infra\",\n    \"src/report/decision-index.mjs\": \"infra\",\n    \"src/report/capability-plan-lint.mjs\": \"infra\",\n    \"src/report/context-render.mjs\": \"domain\",\n    \"src/report/frontmatter.mjs\": \"domain\",\n    \"src/report/authoritative-match.mjs\": \"domain\",\n    \"src/evolve/iron-law.mjs\": \"domain\",\n    \"src/state/events.mjs\": \"kernel\",\n    \"src/state/events-jsonl-truncation-guard.mjs\": \"kernel\",\n    \"src/state/main-checkout-guard-warnings.mjs\": \"kernel\",\n    \"src/state/work.mjs\": \"kernel\",\n    \"src/state/envelope.mjs\": \"kernel\",\n    \"src/intake/risk-keywords.mjs\": \"kernel\",\n    \"src/verbs/merge/merge.mjs\": \"use-case\",\n    \"src/verbs/merge/iron-law-level.mjs\": \"use-case\",\n    \"src/verbs/merge/approve.mjs\": \"use-case\",\n    \"src/verbs/merge/review.mjs\": \"use-case\",\n    \"src/verbs/merge/sync-root.mjs\": \"use-case\",\n    \"src/verbs/merge/catchup.mjs\": \"use-case\",\n    \"src/verbs/merge/reject.mjs\": \"use-case\",\n    \"src/verbs/merge/promote-to-component.mjs\": \"use-case\",\n    \"src/verbs/state/edit.mjs\": \"use-case\",\n    \"src/verbs/state/move.mjs\": \"use-case\",\n    \"src/verbs/state/read.mjs\": \"use-case\",\n    \"src/verbs/dispatch/show-run.mjs\": \"use-case\",\n    \"src/verbs/dispatch/inspect.mjs\": \"use-case\",\n    \"src/verbs/dispatch/reconcile.mjs\": \"use-case\",\n    \"src/verbs/dispatch/watch.mjs\": \"use-case\",\n    \"src/verbs/dispatch/recover.mjs\": \"use-case\",\n    \"src/report/item-trace.mjs\": \"domain\",\n    \"src/util/format-bytes.mjs\": \"kernel\",\n    \"src/util/format-duration.mjs\": \"kernel\",\n    \"src/util/normalize-path.mjs\": \"kernel\",\n    \"src/util/git-paths.mjs\": \"kernel\",\n    \"src/util/release-binary-path.mjs\": \"kernel\",\n    \"src/util/release-targets.mjs\": \"kernel\",\n    \"src/util/session-identity.mjs\": \"kernel\",\n    \"src/util/host-bin-path.mjs\": \"kernel\",\n    \"src/util/unique-tmp-tag.mjs\": \"kernel\",\n    \"src/util/host-bin.mjs\": \"infra\",\n    \"src/convention/convention-client.mjs\": \"infra\",\n    \"src/observe/friction-client.mjs\": \"infra\",\n    \"src/intake/classify.mjs\": \"use-case\",\n    \"src/setup/ansi.mjs\": \"domain\",\n    \"src/setup/config-merge.mjs\": \"domain\",\n    \"src/setup/shell-rc.mjs\": \"infra\",\n    \"src/setup/project-launcher.mjs\": \"infra\",\n    \"src/setup/bin-discovery.mjs\": \"infra\",\n    \"src/setup/skill-wrappers.mjs\": \"infra\",\n    \"src/setup/instruction-registry.mjs\": \"infra\",\n    \"src/setup/git-hooks.mjs\": \"infra\",\n    \"src/setup/claude-code-hooks.mjs\": \"infra\",\n    \"src/setup/agent-hooks.mjs\": \"infra\",\n    \"src/setup/agy-permissions.mjs\": \"infra\",\n    \"src/setup/agent-cli-trust.mjs\": \"infra\",\n    \"src/setup/blind-steps-proven-pools.mjs\": \"use-case\",\n    \"src/setup/workflow-pool-independence.mjs\": \"use-case\",\n    \"src/setup/checks.mjs\": \"use-case\",\n    \"src/setup/executor-profile-warnings.mjs\": \"infra\",\n    \"src/config/global-config.mjs\": \"infra\",\n    \"src/setup/registrations.mjs\": \"use-case\",\n    \"src/setup/executor-posture-coverage.mjs\": \"use-case\",\n    \"src/config/shared-config-file.mjs\": \"domain\",\n    \"src/state/knowledge-registry.mjs\": \"domain\",\n    \"src/report/knowledge-resolver.mjs\": \"domain\",\n    \"src/report/knowledge-projection.mjs\": \"domain\",\n    \"src/state/fgos-file-registry.mjs\": \"kernel\",\n    \"src/state/runtime-coordination.mjs\": \"infra\",\n    \"src/runner/dispatch/brief.mjs\": \"infra\",\n    \"src/runner/dispatch/dispatch-error.mjs\": \"infra\",\n    \"src/runner/dispatch/proof-helpers.mjs\": \"infra\",\n    \"src/runner/dispatch/herdr-agent.mjs\": \"infra\",\n    \"src/runner/dispatch/herdr-diagnosis.mjs\": \"infra\",\n    \"src/runner/dispatch/herdr-round.mjs\": \"infra\",\n    \"src/runner/dispatch/herdr-reconcile.mjs\": \"infra\",\n    \"src/runner/dispatch/worker-artifacts.mjs\": \"infra\",\n    \"src/runner/dispatch/liveness.mjs\": \"infra\",\n    \"src/runner/dispatch/visibility-session.mjs\": \"infra\",\n    \"src/runner/dispatch/recovery-planner.mjs\": \"infra\",\n    \"src/runner/dispatch/run-lock.mjs\": \"infra\",\n    \"src/runner/dispatch/process-identity.mjs\": \"infra\",\n    \"src/runner/dispatch/trust-store.mjs\": \"infra\",\n    \"src/runner/dispatch/worker-home.mjs\": \"infra\",\n    \"src/runner/dispatch/stop-processes-inside.mjs\": \"infra\",\n    \"src/runner/dispatch/worker-session.mjs\": \"infra\",\n    \"src/runner/dispatch/worker-session-boot.mjs\": \"infra\",\n    \"src/runner/dispatch/recovery.mjs\": \"infra\",\n    \"src/setup/instruction-composition.mjs\": \"infra\",\n    \"src/setup/instruction-projections.mjs\": \"infra\",\n    \"src/runner/execution/unit.mjs\": \"infra\",\n    \"src/runner/execution/bind.mjs\": \"infra\",\n    \"src/runner/execution/account-pin.mjs\": \"infra\",\n    \"src/runner/execution/account-rotation.mjs\": \"infra\",\n    \"src/runner/execution/dry-bind.mjs\": \"infra\",\n    \"src/runner/execution/role-ledger.mjs\": \"infra\",\n    \"src/runner/execution/commit-unit-work.mjs\": \"infra\",\n    \"src/runner/execution/partial-writes.mjs\": \"infra\",\n    \"src/runner/execution/unit-sync.mjs\": \"infra\",\n    \"src/runner/execution/handoff-refs.mjs\": \"infra\",\n    \"src/runner/execution/unit-run-history.mjs\": \"infra\",\n    \"src/runner/execution/unit-summary.mjs\": \"infra\",\n    \"src/runner/execution/run.mjs\": \"use-case\",\n    \"src/runner/execution/patterns/index.mjs\": \"domain\",\n    \"src/runner/execution/patterns/panel.mjs\": \"domain\",\n    \"src/runner/execution/patterns/presets.mjs\": \"domain\",\n    \"src/runner/execution/patterns/reviewed.mjs\": \"domain\",\n    \"src/runner/execution/patterns/role-tasks.mjs\": \"domain\",\n    \"src/runner/execution/patterns/solo.mjs\": \"domain\",\n    \"src/workflow/definition.mjs\": \"kernel\",\n    \"src/workflow/dir-guard.mjs\": \"infra\",\n    \"src/workflow/loader.mjs\": \"infra\",\n    \"src/workflow/store.mjs\": \"infra\",\n    \"src/workflow/integrate.mjs\": \"infra\",\n    \"src/workflow/plan-source.mjs\": \"infra\",\n    \"src/workflow/units-source.mjs\": \"infra\",\n    \"src/workflow/runner.mjs\": \"use-case\",\n    \"src/workflow/index.mjs\": \"use-case\",\n    \"src/workflow/checked.mjs\": \"infra\",\n    \"src/workflow/ref-digests.mjs\": \"infra\",\n    \"src/workflow/seat-providers.mjs\": \"infra\",\n    \"src/workflow/seats.mjs\": \"infra\",\n    \"src/workflow/steps.mjs\": \"kernel\",\n    \"src/state/domain-registry.mjs\": \"kernel\",\n    \"src/state/step-fsm.mjs\": \"domain\",\n    \"src/verbs/state/step.mjs\": \"use-case\",\n    \"src/runner/operation-choice.mjs\": \"use-case\",\n    \"src/runner/work-dispatch.mjs\": \"use-case\"\n  }\n}"
+  },
+  "currentNativeSuccessor": {
+    "sourcePath": "docs/platform/contracts/architecture-manifest.json",
+    "unitDigest": "bee0f585dc079a9cf24fe84a2cfacaa3aa99e6818f4fbf4e69dbf76dd601e99c",
+    "identityFingerprint": "bee0f585dc079a9cf24fe84a2cfacaa3aa99e6818f4fbf4e69dbf76dd601e99c",
+    "claimId": "claim_95bccfdc53e0c3efcfa29e694d26d5a3",
+    "sourceAnchor": "file-block",
+    "unitKind": "file-block",
+    "sourceUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
+    "claimKind": "contract",
+    "status": "future"
+  },
+  "sourceAndResidualHistoryPreserved": true,
+  "reviewScope": "Current projection supersedes the historical artifact for this package only; historical before/native witness remains immutable. Pending rows receive no approval.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_03ef50e87178220032a3eebe5c5d89d9",
+    "sourcePath": "docs/architecture-manifest.json",
+    "sourceAnchor": "file-block",
+    "sourceUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
+    "claimKind": "specification",
+    "disposition": "move",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/architecture-manifest.json:1-269#file-block (current lines); unit SHA256 2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a.\nTarget: docs/platform/contracts/architecture-manifest.json:1-269#file-block (current lines); unit SHA256 2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architecture-manifest.json#file-block under docs/platform/contracts/architecture-manifest.json#file-block; source context \"file-block\", target context \"file-block\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/contracts/architecture-manifest.json",
+    "targetAnchor": "file-block",
+    "targetUnitDigest": "2d55be82331318dd370052c80940458ce88894b98b049d626e41ba1bc6653b6a",
+    "targetAncestry": []
+  },
+  "entryId": "accounting-056"
+}
+```
+
+## Entry accounting-065
+
+```json
+{
+  "kind": "refreshed-dependent-accounting",
+  "historicalArtifact": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-prior-findings.json",
+  "historicalProjectionPath": "/rows/4/currentDecision",
+  "historicalSnapshot": {
+    "claimId": "claim_4eeb2f406288458e61bad21531966ab1",
+    "sourcePath": "docs/specs/distribution.md",
+    "sourceAnchor": "data-dictionary",
+    "sourceUnitDigest": "04f89e98512b5fd7af474ab2abbf362b9a0d30a25b5a911d011037539b3a9d3f",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "reviewed",
+    "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+    "rationale": "A31 / SYNC 59b9b7087: current upstream text carried into its mapped candidate with only disclosed relative-link rebases; existing labelled truth corrections remain. This is a provisional current-source draft from unchanged buildInventoryRow; next package must resolve native identity. No source retirement, authority flip or approval carried. Native identity resolved at 19ca8de23908e161c34c91626e41041b7813167c from the sole native sync. Historical gaps remain separate; no provisional ID is persisted as a decision and no approval carries.",
+    "targetOwner": "docs/platform/packaging-distribution/spec.md",
+    "targetAnchor": "data-dictionary",
+    "reviewNote": "deep: docs/specs/distribution.md#data-dictionary to docs/platform/packaging-distribution/spec.md#data-dictionary: the 20-line section is byte-identical except the heading depth (## becomes ####), a nesting change that the rationale does not name but that is a heading-depth change only; mandatory unequal row, digests recomputed, anchors pass",
+    "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+    "reviewedAt": "2026-10-16",
+    "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-05-19ca8de23.md",
+    "reviewMode": "ordinary",
+    "targetUnitDigest": "3dd2d51fac193d78f712a83b2f0918c9f5f48a0e8eb65572afda4bb678b1de95",
+    "targetAncestry": [
+      "Spec: Packaging-Distribution",
+      "Retained Distribution Source Detail",
+      "Spec: Distribution"
+    ],
+    "reviewReportCommit": "4a18f35ff5d6a9b7a07e955bd64418282c6a91b2"
+  },
+  "file": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-distribution.json",
+  "collection": "claims",
+  "relatedClaimId": "claim_4eeb2f406288458e61bad21531966ab1",
+  "after": {
+    "claimId": "claim_4eeb2f406288458e61bad21531966ab1",
+    "sourcePath": "docs/specs/distribution.md",
+    "sourceAnchor": "data-dictionary",
+    "sourceUnitDigest": "04f89e98512b5fd7af474ab2abbf362b9a0d30a25b5a911d011037539b3a9d3f",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/specs/distribution.md:55-55#data-dictionary (current lines); unit SHA256 04f89e98512b5fd7af474ab2abbf362b9a0d30a25b5a911d011037539b3a9d3f.\nTarget: docs/platform/packaging-distribution/spec.md:515-515#data-dictionary (current lines); unit SHA256 3dd2d51fac193d78f712a83b2f0918c9f5f48a0e8eb65572afda4bb678b1de95.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 3dd2d51fac193d78f712a83b2f0918c9f5f48a0e8eb65572afda4bb678b1de95 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 4; title \"Data Dictionary\" → \"Data Dictionary\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/distribution.md#data-dictionary under docs/platform/packaging-distribution/spec.md#data-dictionary; source context \"Spec: Distribution\", target context \"Spec: Packaging-Distribution / Retained Distribution Source Detail / Spec: Distribution\". The source text occurs verbatim inside the bound target section; section-level unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/packaging-distribution/spec.md",
+    "targetAnchor": "data-dictionary",
+    "targetUnitDigest": "3dd2d51fac193d78f712a83b2f0918c9f5f48a0e8eb65572afda4bb678b1de95",
+    "targetAncestry": [
+      "Spec: Packaging-Distribution",
+      "Retained Distribution Source Detail",
+      "Spec: Distribution"
+    ]
+  },
+  "currentTarget": {
+    "unitKind": "heading",
+    "level": 4,
+    "title": "Data Dictionary",
+    "anchor": "data-dictionary",
+    "githubAnchor": "data-dictionary",
+    "stableAnchor": "h-9d3df3b2bec8",
+    "startLine": 515,
+    "endLine": 515,
+    "textDigest": "3dd2d51fac193d78f712a83b2f0918c9f5f48a0e8eb65572afda4bb678b1de95",
+    "sample": "Data Dictionary",
+    "sectionPayloadDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
+    "followingBlockDigest": "59297ed6cac29ae0d34e9f3a48ca0c518e8c06fed5e224ca0182f627ae93839e",
+    "identityFingerprint": "b21182e7c3aa0a098607ad3c94a20aada6a3ef44224b6bfacd30188c36967466",
+    "ancestry": [
+      "Spec: Packaging-Distribution",
+      "Retained Distribution Source Detail",
+      "Spec: Distribution"
+    ],
+    "text": "#### Data Dictionary",
+    "sectionText": "#### Data Dictionary\n\n| # | Element | Meaning | Values | Required | Default |\n|---|-------|---------|--------|----------|---------|\n| 1 | Package name | The npm package identity used for the git-based install command | `forgent` | yes | — |\n| 2 | Package version | A semantic version string tooling (e.g. packaging commands) needs to treat the package as valid | semver string | yes | `0.1.0` |\n| 3 | Distribution file allowlist | The exact set of paths shipped to anyone installing the package — everything else in the source repo is excluded | `bin`, `src`, `scripts`, `core`, `domains`, `.agents`, `README.md`, `LICENSE`, the end-user documentation subset (`docs/how-to`, `docs/explanation`, and `docs/enduser-docs-index.json`), plus `packages/convention/contracts/convention.rules.v1.json`, which installed doctor needs to interpret per-rule cutoffs without duplicating native rule data | yes | — |\n| 4 | CLI entry points | The commands exposed once installed | `fgos` → runs `bin/fgos.mjs`; `fgos-runner` → runs `bin/fgos-runner.mjs` (the autonomous-loop runner, see spec Runner) | yes | — |\n| 4b | Claude Code plugin skill set | `plugins/fgOS/skills/` — the Claude Code plugin's own skill bundle, distributed via the Claude Code plugin marketplace mechanism (a separate distribution channel from the npm-installed `fgos`/`fgos-runner` CLI above). Ships two layers: hand-authored CLI-wrapper skills (`cook`, `discover`, `pick`, `submit`, ...) and mirrored `fgos-*` dev-skills plus `_shared/` for plugin-only consumers. Dev-skills are authored in `core/skills/` or `domains/*/skills/`; run `npm run build:skills` in the fgOS source repo to assemble `.agents/skills/`, generate `.claude/skills/` thin wrappers and references, and mirror dev-skills/shared fragments into the plugin. Plugin mirrors stay byte-identical to `.agents/skills/`, while Claude `SKILL.md` files are thin redirects with byte-identical frontmatter (`test/skills/fgos-mirror.test.mjs`). Assembled Markdown carries a generated-from source header. Do not hand-edit `.agents`, generated `.claude` files, or plugin mirrors; hand-authored CLI-wrapper skills remain sources. `plugin-dev-skills-packaged` (doctor check, row 7 below) detects missing or stale plugin mirrors | mirrored dev-skills + shared fragments + hand-authored CLI-wrapper skills | yes (the mirrors let plugin-only consumers dispatch dev-skills without a source checkout) | — |\n| 5 | Dev checkout shell helper | An opt-in file, sourced from a contributor's own shell profile, exposing the same two CLI entry points from inside a checkout of the source repository — no install, no package fetch | one file, both commands | no (contributor's own choice) | not sourced automatically anywhere |\n| 5b | Global config file | `~/.fgos/config.json` — same schema as the project-local shared config file, initialized/kept current by `fgos setup` (tsk-1ri) the same way it already handles the project-local file; project always wins any key present in both (`mergeWithGlobalConfig`, `src/config/global-config.mjs`) | one file, home-dir-relative | no (optional; a missing file is not an error, resolves to `{}`) | not created by anything except `fgos setup` |\n| 5c | Machine backend registry file | `~/.fgos/confinement-backends.json` (overridable via `FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH`) — machine-local backend registry declaring confinement backends (e.g. `bwrap`, container) available on the host (`confinement-backend-registry.v1`); managed by `fgos doctor --fix` (not project-over-global merge), trust store for security isolation drivers | one file, machine-local path | no (optional; bootstrap creates default bwrap backend on demand) | `~/.fgos/confinement-backends.json` |\n| 5d | Provider-capacity runtime state | `~/.fgos/runtime/provider-capacity/state.json` plus lock `state.lock` — machine-local selected-account lease/quarantine state for provider-capacity rotation. Intentionally host-global only (never project-overridden) so multiple projects sharing provider accounts coordinate concurrency and rate limits safely without starvation. It is never packaged, never committed, and never repaired by `doctor`; `fgos dispatch inspect --provider-capacity` and the `provider-capacity-state` doctor check report it, while manual clear goes through `fgos dispatch reconcile provider-capacity clear-quarantine ...`. An account locked for a dead login is also unlocked by one real call when a dispatch would otherwise find no usable account (the lazy-probe unlock rule, now in `docs/specs/runner.md`). The same directory holds `account-locks/<provider>/<account>/`: the per-account lock, copies of a login renewed elsewhere and waiting to be applied, a scratch home while a renewal runs, and the renewal failure cooldown; it is created only when a renewal or write-back runs and holds no credential outside those copies. | one runtime directory, home-dir-relative | no (created only when a provider account lease/quarantine/write occurs) | absent/inactive |\n| 5e | Confinement attestation store state | `~/.local/state/fgos/attestations/` (or `$XDG_STATE_HOME/fgos/attestations`, overridable via `FGOS_CONFINEMENT_ATTESTATION_STORE_PATH`) — host-global security attestation records. Intentionally host-global only (outside all agent write grants) so confined agents can never tamper with their own audit trails, preserving immutable attestation integrity across projects. | one directory, machine-local path | no (created on first confined dispatch attestation) | absent/inactive |\n| 5f | Workspace customization folder | `fgos/` at the project root: tracked in the project's own git, written once as a skeleton at onboarding and never edited by fgOS afterwards. Holds the customer's own agent definitions (`fgos/agents/<name>.yaml`), which win over a definition of the same name in the installed set (RUL13 (customer customization lives in one tracked workspace folder)). Read by `--seats @name` (runner decision 0057); the `fgctl init` skeleton is not built yet | directory | no | absent — the installed set alone applies |\n| 6 | Config staleness | Whether a config file (project-local or global — same computation, tsk-1ri) already has every setting the current default schema defines | up to date / missing one or more default settings | yes (computed, not stored) | — |\n| 7 | Doctor check | One named diagnostic `fgos doctor` reports on | not a fixed list — an extensible registry (`src/setup/registrations.mjs`'s `registerCheck`); a check registration and a config-default registration are independent, never a forced pairing — a module may register only a check, only a config-default, or both. Today's registered checks: `convention-conformance`, `node-version-and-git`, `cli-version-visible` (tsk-2ej), `shell-integration-sourced`, `project-fgos-launcher` (a release install has one fgos launcher on PATH that runs each project's own activated fgos, see RUL17 (one fgos on PATH runs each project's own activated fgos)), `config-not-stale`, `main-checkout-hook-wired`, `tool-registry-configured`, `work-classification-vocabulary`, `work-step-vocabulary` (tsk-64h), `domain-workflow-operations-coverage`, `root-drift`, `delivered-not-on-trunk` (tsk-1l9), `config-awareness`, `provider-capacity-state` (reports account lease/quarantine state and never auto-clears), `credential-copies-retained` (login copies still pending for a renewal after a day, and private homes held after repeated staging failures, counted by provider/account and age; read-only, a held home fails, copies waiting for a renewal only warn, and, when the machine-global provider inventory was read, copies of any age in a store directory the account's login store layout no longer reads fail, naming the directory for hand recovery (when the global config cannot be read or is refused by the validator the check fails, says the layout was not checked with the reason, lists copies at any age and promises nothing about a dispatch); interrupted stagings (pending/.tmp-*) are reported too once their writer is gone and they have sat for ten minutes, and the over-limit line names the store; kept homes under a registered backend's temp and private-home roots are scanned, which the orphan reaper check does not do, and one there counts as held at once because nothing retries it; the check itself never deletes and never prints a value), `provider-capacity-lock-stale` (Phase 06 C2c: the provider-capacity state.lock file, if any, is not held by a dead process; read-only, never reclaims), `dependencies-installed`, `gate-bypass-configured`, `claude-plugin-marketplace`, `plugin-skill-cli-reachable`, `plugin-dev-skills-packaged` (tsk-32b), `changelog-unreleased-stale`, `herdr-launcher-configured`, `herdr-web-dashboard-configured` (tsk-48w), `enduser-docs-index-stale` (tsk-1m0), `invariant-checks-configured` (tsk-516), `invocation-git-write-grants` (warns when an invocation or executor still grants a git add or git commit tool; the runner commits, workers only edit files; read-only, never rewrites user config), `worktree-setup-configured` (a present worktreeSetup section is a list of non-empty shell commands every runner-created worktree runs after its dependency install; never executes them), `events-jsonl-not-truncated` (tsk-cgg), `worker-slots-ceiling-usable` (tsk-1oz), `gateway-token-configured` (tsk-4r1), `readme-install-tag-exists` (tsk-2t8), `iron-law-configured` (tsk-1y6-1), `leaf-notify-drift` (tsk-1el), `task-specs-resolve` (tsk-2t9c), `agent-claims-resolve` (tsk-2t9c), `agent-type-names-unique` (tsk-397-12; names unique within each tier fgos/agents, domains/*/agents, core/agents, a higher tier replaces a lower one whole, the fgos/agents files checked for shape), `domain-registry-compiled` (every domain's compiled.json file under domains — the YAML-free form of the registry and workflow YAML the Work lifecycle reads, regenerated by the build:domains npm script; a drift test keeps it equal to the YAML), `dispatch-decide-hook-wired` (tsk-60f; also requires the AskUserQuestion decision-question hook), `codex-hook-wired`, `agy-hook-wired`, `omp-hook-wired`, `pi-hook-wired`, `decision-index-stale` (tsk-1lv-2/tsk-1lv), `advise-execute-capabilities-configured` (tsk-2uf-3), `workflow-capabilities-configured` (every capability a core/domain Workflow unit names resolves in runner.capabilities by exact name or bare verb, the way bind() looks it up, and fails when it does not; one that resolves but has no \"prefer\" pool on either name is reported as a warning because bind() refuses its unit headless; fgos setup registers every shipped Workflow's capabilities as description-only defaults, so a fresh project starts with that warning, and never overwrites a project's own entry), `capability-serves-valid` (I19: every runner.capabilities entry's serves attribute set is well-formed, no two entries declare the identical set, and the review slot is present), `agy-permissions-configured` (tsk-1xm), `agy-sub-homes-configured`, `bwrap-available`, `curl-available` (curl runs, because fgctl init downloads a release through it; a missing curl is a warning that only blocks the download paths, never a failure, see RUL15 (fgctl init downloads a checksum-verified release when no source is given)), `main-checkout-guard-warnings` (tsk-1vc-3), `events-compaction-verified` (tsk-3ve-6), `no-stuck-merge-abort` (tsk-40a), `doc-registry-enforce` (tsk-28x), `doc-registry-stale` (tsk-28x), `doc-alias-broken` (tsk-28x), `doc-active-duplicate` (tsk-28x), `doc-near-duplicate` (tsk-28x), `doc-provisional-aged` (tsk-28x), `doc-topic-oversized` (tsk-28x), `doc-role-underused` (tsk-28x), `doc-source-conservation` (tsk-28x), `doc-current-path-missing` (tsk-3uc), `doc-source-unreachable` (tsk-3uc), `coordination-protocol-fixtures-valid` (retired; confirms legacy definition fixtures retired), `operation-prompt-templates-valid` (Phase 03 I04: every discoverable operation prompt template validates against bounded variables and schema), `coordination-example-requests-valid` (Step 08 Phase 07 R3: published fgos coordination run example request files validate against the same schema boundary the CLI itself enforces, and resolve every referenced protocolRef), `herdr-available`, `trust-store-readable`, `non-claude-trust-stores-readable` (Phase 07 herdr-trust-supervisor R3: every executor or invocation declaring a codex-toml or agy/agy-json trustStore reads from a store that is actually readable, using the same reader the live dispatch will use), `confined-pane-accounts` (every confined herdr invocation that binds a private home has an account in the machine-global provider account inventory whose credential files exist, so its pane starts logged in; see RUL65b in the runner spec), `agent-cli-project-trusted` (the project root is trusted in every codex home and agy sub-HOME the configured executors run under, so a headless dispatch does not stop at a \"Trust this folder?\" prompt until its timeout; reads only a yes/no for the one path, names the exact line a person must add, never edits the CLI's config; not applicable when the root is not a git repository or no codex/agy executor is configured), `workflow-pools-satisfy-independence` (for every panel or reviewed Workflow unit, drives the runner's own pattern code through bind() without dispatching anything and fails when the capability prefer pool cannot supply enough distinct provider families for every role (three panelists plus a synthesizer need four); a provider out of quota or blocked on a trust prompt is invisible to bind() and not counted), `blind-steps-use-proven-pools` (for every Workflow unit declared blind, walks each role's candidates through bind() without dispatching anything and fails when the capability prefer pool can bind an executor whose provider family, transport and confinement backend are not in the table of canary-proven pairs kept in the check's own module; read-only, no model call; not applicable when no unit is blind), `executor-posture-coverage` (core capabilities execute, code:implement, and capabilities declaring a pool have at least one candidate executor capable of applying required posture; dry simulation via bind(), no process spawn), `executor-confinement` (dispatch visibility V0 Phase 01 group D: the transport an interactive dispatch needs, a readable folder-trust store so a fresh worktree can be pre-trusted instead of stopping at a dialog, and a second reading of the rule that an executor may only declare bypass permission mode alongside full confinement), `herdr-executor-kinds` (Phase 05 R3: every executor dispatched through a herdr pane names an agent kind herdr can actually start, and none depends on an integration hook herdr reports as outdated -- an installed-but-stale hook is believed by herdr and may report the wrong agent state, while a missing one only degrades detection), `executor-profile-warnings` (Phase 06 executor-policy-dispatch-seams: legacy executor/capability entries hardcoding policy-shaped flags, policy-overrides-as-identity, or account-pool-shaped env, each named with its documented migration target -- informational only, never a hard failure), `active-release-matches-checkout` (read-only Node payload contents against doctor dir working tree, not HEAD or Rust binary freshness; reports changed/missing/extra source files while excluding staged dependencies, skips outside source checkouts and main-owned activation in linked worktrees; use fgos:dev for working-tree code or restage/activate for plain fgos), `rust-host-binary-present`, `rust-host-target-supported`, `legacy-node-payload-present`, `command-routes-drift`, `confinement-policies-declared`, `confinement-backend-registry-readable`, `confinement-bwrap-platform`, `confinement-probe-freshness`, `confinement-blind-read` (a blind unit can be enforced: the registered bwrap backend hides peer run state, homes and processes from a worker; reports pass, fail, or backend-unsupported, in which case every blind unit is refused), `confinement-strict-readiness`, `confinement-orphaned-resources-reaped` (Phase 04 M8: no confinement temp resource is left behind by a dead owning process, and no confinement temp root is readable beyond its owner; a home kept for a still-open pane is not orphaned; the fix tightens the root to 0700 and reaps), `confinement-herdr-maturity`, `instruction-projections-stale`, `coordination-abandoned-claims`, `runner-coordination-orgPolicy-shape`, `operation-capability-resolves` (Unit I21: every discoverable operation's declared policy.capability resolves against the live runner config, reporting reachable provider-family diversity), `shadow-binder-divergence` (dispatch-engine-liveness-hardening Phase 7 C1: real PlacementPolicy/ProviderAdapter shadow-binder divergence is durably recorded to a local JSONL under .fgos/dispatch/, not only an ephemeral stderr line; informational, never fails), `observe-dir-writable`, `observe-friction-migrated`, `observe-host-resolvable`, `writer-identity-resolvable` (the writer identity resolves through the Rust host for both the running host and the workspace activation a plain git commit hook uses; each binary is asked directly, so an older activated release shows as a version mismatch), `observe-run-coverage`, `runner-rigor-config` (validates project/global rigor-to-tier mappings and retired capability overrides), `coordination-protocol-dead-vocabulary` (validates definitions against dead vocabulary), `model-policy-tier-coverage` (validates model policies cover all tiers required by rigor-to-tier), `tier-vocabulary-dead-keys` (validates project and global config do not contain retired tier/rigor keys), `runner-patterns-config` (validates presence, valid checkers, and cumulative checkersByRigor for runner patterns), `runner-generated-paths` (validates runner.generatedPaths source-to-render-target mappings), `mutating-assignment-binding-snapshot` (validates that mutating assignment RunResult bindings match unit.json snapshot). The registry is open, but this list is not a snapshot — it names every registered check, and a module adding one updates this row in the same change | yes | — |\n| 7b | Doctor fix | One named repair `fgos doctor --fix` can run before re-reporting checks | not a fixed list — an extensible registry (`registerFix`), independent of `registerCheck`/`registerConfigDefault` (per tsk-2cs). Today's registered fixes: `credential-copies-retained` (re-checks private homes held after repeated staging failures, and any kept home under a registered backend's own root, which nothing else retries, under the account lock, and removes one only when its login is shown applied or obsolete; also removes an interrupted staging (pending/.tmp-*) only after claiming it by rename, when its writer is gone and it is empty, identical to a copy already kept, or shown no newer than the source login under the account lock; never removes on age), `gate-bypass-configured` (tsk-2qz, the registry's first entry to register all three capabilities at once), `claude-plugin-marketplace` (tsk-4xg), `enduser-docs-index-stale` (tsk-1m0), `bin-discovery-cache` (tsk-2qc-1), `gateway-token-configured` (tsk-4r1), `iron-law-configured` (tsk-1y6-1), `decision-index-stale` (tsk-1lv-2/tsk-1lv), `agy-permissions-configured` (tsk-1xm), `no-stuck-merge-abort` (tsk-40a), `doc-registry-stale` (tsk-28x), `confinement-backend-registry-readable`, `confinement-orphaned-resources-reaped` (Phase 04 M8), `instruction-projections-stale`, `coordination-abandoned-claims`, `runner-coordination-orgPolicy-shape`, `project-fgos-launcher`, `dispatch-decide-hook-wired`, `codex-hook-wired`, `agy-hook-wired`, `omp-hook-wired`, `pi-hook-wired`. Same rule as #7: the registry is open, but this list names every registered fix and a module adding one updates this row in the same change | yes | — |\n| 8 | Output rendering mode | How `fgos setup`/`fgos doctor` present their result | enveloped JSON (every other verb's shape, unchanged) / colored plain text (`--pretty`) | yes | enveloped JSON |"
+  },
+  "currentNativeSuccessor": {
+    "sourcePath": "docs/platform/packaging-distribution/spec.md",
+    "unitDigest": "76072d6308310a074a737f2b974014d8113b212829301afaa19088a2dd935001",
+    "identityFingerprint": "b21182e7c3aa0a098607ad3c94a20aada6a3ef44224b6bfacd30188c36967466",
+    "claimId": "claim_5c7a41cb0091d5fa398c963b4f28b50d",
+    "sourceAnchor": "data-dictionary",
+    "unitKind": "heading",
+    "sourceUnitDigest": "3dd2d51fac193d78f712a83b2f0918c9f5f48a0e8eb65572afda4bb678b1de95",
+    "claimKind": "specification",
+    "status": "future"
+  },
+  "sourceAndResidualHistoryPreserved": true,
+  "reviewScope": "Current projection supersedes the historical artifact for this package only; historical before/native witness remains immutable. Pending rows receive no approval.",
+  "currentContentCommit": "287a22d33a0eaf2d9e47549a1142daf62361bb8c",
+  "authorSession": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+  "currentDecision": {
+    "claimId": "claim_4eeb2f406288458e61bad21531966ab1",
+    "sourcePath": "docs/specs/distribution.md",
+    "sourceAnchor": "data-dictionary",
+    "sourceUnitDigest": "04f89e98512b5fd7af474ab2abbf362b9a0d30a25b5a911d011037539b3a9d3f",
+    "claimKind": "specification",
+    "disposition": "supersede",
+    "reviewStatus": "pending",
+    "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+    "rationale": "Source: docs/specs/distribution.md:55-55#data-dictionary (current lines); unit SHA256 04f89e98512b5fd7af474ab2abbf362b9a0d30a25b5a911d011037539b3a9d3f.\nTarget: docs/platform/packaging-distribution/spec.md:515-515#data-dictionary (current lines); unit SHA256 3dd2d51fac193d78f712a83b2f0918c9f5f48a0e8eb65572afda4bb678b1de95.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 3dd2d51fac193d78f712a83b2f0918c9f5f48a0e8eb65572afda4bb678b1de95 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 4; title \"Data Dictionary\" → \"Data Dictionary\".\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/distribution.md#data-dictionary under docs/platform/packaging-distribution/spec.md#data-dictionary; source context \"Spec: Distribution\", target context \"Spec: Packaging-Distribution / Retained Distribution Source Detail / Spec: Distribution\". The source text occurs verbatim inside the bound target section; section-level unit digests differ.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+    "targetOwner": "docs/platform/packaging-distribution/spec.md",
+    "targetAnchor": "data-dictionary",
+    "targetUnitDigest": "3dd2d51fac193d78f712a83b2f0918c9f5f48a0e8eb65572afda4bb678b1de95",
+    "targetAncestry": [
+      "Spec: Packaging-Distribution",
+      "Retained Distribution Source Detail",
+      "Spec: Distribution"
+    ]
+  },
+  "entryId": "accounting-065"
+}
+```
+
