@@ -77,10 +77,10 @@ model* it uses.
    "workers on Sonnet; Opus only after two failed rounds; Fable only for design
    review". `maxTier` is a single global ceiling across every provider family,
    so it cannot express "cap claude at sonnet but allow gpt-6.1-sol".
-3. **Model policy is per family, not per capability.** `modelPolicies.claude`
-   maps tiers to models for every capability. To get "claude codes on Sonnet"
-   we had to flatten the claude ladder (`flagship: sonnet`). That also flattens
-   claude for review and advise when a stronger model might fit there.
+3. **No per-capability tier ceiling.** The tier ladder is fine; what is missing
+   is "code capabilities resolve to `advanced` at most". The only ceiling is the
+   global `maxTier`, which also caps reviews and panels and every provider
+   family.
 4. **No escalation rule exists in code.** The intent "retry on a stronger model
    after N failures" lives only in prose and lead judgment. With no mechanism,
    leads pre-escalate to the top tier "to be safe".
@@ -103,28 +103,36 @@ model* it uses.
 
 ## 4. Stop-gap applied on 2026-10-17 (not the design)
 
-Project `.fgos/config.json`, commits `404b5c43b` and `d95da7c25`:
+The owner clarified the rule.
 
-- `runner.maxTier: "flagship"` blocks `frontier` for every family.
-- `runner.modelPolicies.claude.flagship: "sonnet"`.
+- **The tier ladder is correct as configured:** advanced = Sonnet,
+  flagship = Opus, frontier = Fable.
+- **The fault is choosing a tier above `advanced` for coding.** Coding work
+  belongs at `advanced`.
 
-Effect: claude workers resolve to sonnet for standard, advanced, flagship and a
-frontier override, and haiku for nano. This was verified by calling `bind()`
-with the committed config: no override → sonnet; `{tier:frontier}` → clamped to
-flagship → sonnet.
+Final project `.fgos/config.json` state (commits `404b5c43b`, `d95da7c25`,
+then the revert of the ladder change):
 
-The stop-gap has known flaws:
+- `runner.modelPolicies.claude` is unchanged (`flagship: opus`).
+- `runner.maxTier: "advanced"` is a **global** ceiling, used only because no
+  per-capability ceiling exists.
 
-- It flattens claude for all capabilities.
-- It caps every other family at flagship too.
+Effect: every override above advanced is clamped. This was verified by calling
+`bind()` with the committed config: no override → standard → sonnet;
+`{tier:frontier}` → advanced → sonnet.
+
+Known flaws of the stop-gap:
+
+- It also caps non-code work (panels, reviews, other families such as
+  gpt-6.1-sol) at advanced. It must be raised by hand before such a run.
 - It does not touch the assignment-policy path or in-process agents.
 
 ## 5. Requirements for the new mechanism (from owner statements and the 7 principles)
 
-- **Per-work-kind model choice.** Code implement/fix uses Sonnet-class.
-  Design/architecture review may use the top tier. Docs use a cheap tier. These
-  should be expressible in config, per capability × family, without flattening
-  a family ladder.
+- **Per-work-kind tier.** Code implement/fix resolves to `advanced` (Sonnet on
+  claude). Design/architecture review may use flagship or frontier. Docs use a
+  cheap tier. Express this as a per-capability default **and ceiling** in
+  config. The family ladders stay as they are.
 - **Escalation as a rule, not a caller whim.** For example: start at the
   capability's default; after N failed rounds on the same unit, step up one
   tier, capped by a per-capability ceiling. Record the reason in the unit's
@@ -169,8 +177,8 @@ The stop-gap has known flaws:
 
 ## Unresolved questions
 
-- Should a stronger model for review/advise on claude come back once a
-  per-capability policy exists, and at which tier?
+- Which capabilities get which ceiling (code → advanced is decided by the
+  owner; review/advise/panel → ?).
 - Is an account-level spend signal obtainable from the providers at all, or
   only estimable from local run logs?
 - Should leads (in-process orchestrators) be capped by the same policy, or by a
