@@ -290,7 +290,7 @@ test('reconcile collect-result is blocked (not refused/applied) when no result e
 test('reconcile refuses the retired clear-assignment-claim action as unsupported, never as a half-working door', () => {
   const dir = root();
   assignmentDir(dir, 'a');
-  const plan = planReconciliation(dir, { action: 'clear-assignment-claim', assignmentId: 'a', now: '2026-09-15T00:00:00.000Z' });
+  const plan = planReconciliation(dir, { action: 'clear-assignment-claim', now: '2026-09-15T00:00:00.000Z' });
   assert.equal(plan.outcome, 'refused');
   assert.match(plan.reason, /unsupported reconciliation action/);
 });

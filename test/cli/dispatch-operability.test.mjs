@@ -91,17 +91,8 @@ test('dispatch reconcile plan with --run without --action exits 4 with actionabl
 
   const result = runFgos(['dispatch', 'reconcile', 'plan', '--run', 'run-1', '--dir', root]);
   assert.equal(result.status, 4, `expected exit 4 validation, got ${result.status} (stderr: ${result.stderr})`);
-  assert.match(result.stderr, /dispatch reconcile plan with --run or --assignment requires --action/);
+  assert.match(result.stderr, /dispatch reconcile plan with --run requires --action/);
   assert.match(result.stderr, /collect-result/);
-});
-
-test('dispatch reconcile plan with --assignment without --action exits 4 with actionable validation', () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-operability-cli-'));
-  fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
-
-  const result = runFgos(['dispatch', 'reconcile', 'plan', '--assignment', 'asgn-1', '--dir', root]);
-  assert.equal(result.status, 4, `expected exit 4 validation, got ${result.status} (stderr: ${result.stderr})`);
-  assert.match(result.stderr, /dispatch reconcile plan with --run or --assignment requires --action/);
 });
 
 test('fgos dispatch --help renders the sub-verb positional, and run-id under the sub-verbs that take it', () => {
