@@ -1,9 +1,10 @@
-import { test } from 'node:test';
+import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import crypto from 'node:crypto';
+import net from 'node:net';
 import { execFileSync, spawn } from 'node:child_process';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 import {
@@ -39,6 +40,32 @@ import {
 import { herdrSpawnAdapter } from '../../src/runner/dispatch/transport.mjs';
 import { DispatchError } from '../../src/runner/dispatch/dispatch-error.mjs';
 import { isHerdrSpawnRunStillWorking } from '../../src/runner/dispatch/herdr-reconcile.mjs';
+import { socketPathForSession } from '../../src/runner/dispatch/worker-session.mjs';
+import { normalizeAgentName } from '../../src/runner/dispatch/herdr-agent.mjs';
+import { portKey } from '../../src/runner/dispatch/terminal-slot.mjs';
+import { createTerminalControl } from '../../src/terminal-control/client.mjs';
+import { paneModelSource } from '../helpers/herdr-pane-model.mjs';
+import { startTerminalHarness } from '../helpers/terminal-host-harness.mjs';
+
+// Every herdr call goes through terminal-control, which needs a host binary and a socket whose
+// listener identifies the herdr server; the harness provides both and a private state root.
+let harness;
+let agentPidLog;
+// The live test below talks to the machine's own herdr, not the harness's stand-in server.
+const AMBIENT_HERDR_SOCKET = process.env.HERDR_SOCKET_PATH;
+before(async () => {
+  harness = await startTerminalHarness();
+  agentPidLog = path.join(harness.stateRoot, '..', 'mock-agent-pids.log');
+});
+after(() => {
+  // A kept pane keeps its agent process; none of them may outlive the run.
+  try {
+    for (const pid of fs.readFileSync(agentPidLog, 'utf8').split('\n').filter(Boolean)) {
+      try { process.kill(Number(pid), 'SIGKILL'); } catch { /* already gone */ }
+    }
+  } catch { /* no agent was ever started */ }
+  harness?.stop();
+});
 
 function mkTempDir(prefix = 'fgos-herdr-recon-') {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
@@ -69,6 +96,7 @@ function createMockHerdr(tmpDir, scenario = {}) {
   const statePath = path.join(tmpDir, 'mock-state.json');
   const logPath = path.join(tmpDir, 'mock-log.jsonl');
   const scenarioPath = path.join(tmpDir, 'mock-scenario.json');
+  const paneStatePath = path.join(tmpDir, 'mock-panes.json');
 
   fs.writeFileSync(statePath, JSON.stringify({ prompts: 0, gets: 0, runs: 0, exited: false }));
   fs.writeFileSync(logPath, '');
@@ -82,6 +110,7 @@ function createMockHerdr(tmpDir, scenario = {}) {
   fs.writeFileSync(scriptPath, `
 import fs from 'node:fs';
 import path from 'node:path';
+import { spawn } from 'node:child_process';
 
 const statePath = ${JSON.stringify(statePath)};
 const logPath = ${JSON.stringify(logPath)};
@@ -97,10 +126,6 @@ const fail = (code, message) => { console.log(JSON.stringify({ error: { code, me
 
 const [group, action] = args;
 
-if (group === 'pane' && action === 'split') {
-  ok({ pane: { pane_id: 'mock-pane-1' } });
-}
-if (group === 'tab' && action === 'create') ok({ tab: { tab_id: 'mock-tab-1' }, root_pane: { pane_id: 'mock-tab-root-pane' } });
 const writeWorkerResultIfConfigured = () => {
   if (scenario.worker !== 'silent' && scenario.runDir) {
     const outbox = path.join(scenario.runDir, 'outbox');
@@ -109,7 +134,6 @@ const writeWorkerResultIfConfigured = () => {
   }
 };
 
-if (group === 'pane' && action === 'close') ok({ closed: true });
 if (group === 'pane' && action === 'run') {
   if (scenario.runError) fail(scenario.runError, 'pane run failed');
   const state = readState();
@@ -120,31 +144,39 @@ if (group === 'pane' && action === 'run') {
 if (group === 'pane' && (action === 'report-agent' || action === 'report-agent-session')) {
   ok({ type: 'ok' });
 }
-if (group === 'pane' && action === 'process-info') {
-  const gone = scenario.agentGone || readState().exited;
-  const mockArgv = scenario.mockArgv ?? ['claude', 'worker.mjs'];
-  const foregroundPid = scenario.foregroundPid ?? 200;
-  const foreground = gone
-    ? [{ pid: 100, name: 'zsh' }]
-    : [{ pid: foregroundPid, name: 'bwrap', argv: mockArgv }, { pid: 100, name: 'zsh' }];
-  ok({ process_info: { pane_id: 'mock-pane-1', shell_pid: 100, foreground_process_group_id: gone ? 100 : foregroundPid, foreground_processes: foreground } });
-}
 if (group === 'agent' && action === 'start') {
   if (scenario.startError) fail(scenario.startError, 'agent never reached a ready state');
   writeWorkerResultIfConfigured();
-  ok({ agent: { agent_status: 'idle' } });
 }
-if (group === 'agent' && action === 'read') ok({ read: { text: scenario.screen ?? '' } });
+${paneModelSource({ statePath: paneStatePath, agentPidLog, processInfo: !(scenario.mockArgv || scenario.foregroundPid) })}
+// A scenario can fake the foreground process of a confined launch (a real pid and the argv the
+// launcher is expected to become); otherwise the pane model's own process answers.
+if (group === 'pane' && action === 'process-info' && (scenario.mockArgv || scenario.foregroundPid)) {
+  const paneId = args[args.indexOf('--pane') + 1];
+  if (!paneIsLive(paneId)) fail('pane_not_found', 'pane not found');
+  const gone = scenario.agentGone || readState().exited;
+  const mockArgv = scenario.mockArgv ?? ['claude', 'worker.mjs'];
+  const foregroundPid = scenario.foregroundPid ?? 200;
+  const shell = { pid: 100, name: 'zsh', argv: ['zsh'] };
+  const foreground = gone
+    ? [shell]
+    : [{ pid: foregroundPid, name: 'bwrap', argv: mockArgv }, shell];
+  ok({ process_info: { pane_id: paneId, shell_pid: 100, foreground_process_group_id: gone ? 100 : foregroundPid, foreground_processes: foreground } });
+}
+// herdr prints a screen as plain text, not in the JSON envelope.
+if (group === 'pane' && action === 'read') { console.log(scenario.screen ?? ''); process.exit(0); }
+if (group === 'pane' && (action === 'send-keys' || action === 'send-text')) ok({});
 if (group === 'agent' && action === 'get') {
   if (scenario.getError) fail(scenario.getError, 'the session is not answering');
   const state = readState();
   const status = scenario.statuses[Math.min(state.gets, scenario.statuses.length - 1)];
   writeState({ ...state, gets: state.gets + 1 });
-  ok({ agent: { agent_status: status, pane_id: 'mock-pane-1', state_change_seq: state.gets } });
+  ok({ agent: { agent_status: status, pane_id: args[2], state_change_seq: state.gets } });
 }
 if (group === 'agent' && action === 'prompt') {
   const text = args[3];
   if (text && text.startsWith('/')) {
+    endAgent(args[2]);
     writeState({ ...readState(), exited: true });
     ok({ agent: { agent_status: 'idle' } });
   }
@@ -1141,9 +1173,10 @@ test('19b. a confined round opens its pane without the worker HOME, which only t
     transportDeadlines: { startup: { readyMs: 500, promptMs: 500 }, round: { idleMs: 1000, ceilingMs: 2000 } },
   });
 
-  const split = mock.calls().find((c) => c[0] === 'pane' && c[1] === 'split');
-  assert.ok(split, 'the round must open a pane');
-  const envArgs = split.filter((a, i) => split[i - 1] === '--env');
+  // The first pane of a group is its tab's root pane, so the tab create carries the pane's environment.
+  const create = mock.calls().find((c) => c[0] === 'tab' && c[1] === 'create');
+  assert.ok(create, 'the round must open a pane');
+  const envArgs = create.filter((a, i) => create[i - 1] === '--env');
   assert.ok(envArgs.includes('KEEP_ME=yes'), 'ordinary pane variables still reach the pane');
   assert.ok(!envArgs.some((a) => a.startsWith('HOME=')),
     'a private HOME without shell startup files makes the pane shell run its first-use wizard, which swallows the launch command');
@@ -1163,6 +1196,11 @@ test('19b. a confined round opens its pane without the worker HOME, which only t
 // that directory, not `worker-output/outbox`). A worker that settles here is
 // live proof the grant and the brief agree on where to write.
 test('20. live Herdr gateway executes confined launch end-to-end when gateway is running', async (t) => {
+  // This test is about the machine's own herdr: step out of the harness's stand-in server first.
+  const harnessSocket = process.env.HERDR_SOCKET_PATH;
+  if (AMBIENT_HERDR_SOCKET === undefined) delete process.env.HERDR_SOCKET_PATH;
+  else process.env.HERDR_SOCKET_PATH = AMBIENT_HERDR_SOCKET;
+  t.after(() => { process.env.HERDR_SOCKET_PATH = harnessSocket; });
   const herdrBin = findExecutableOnPath(['herdr']);
   if (!herdrBin) return t.skip('herdr binary not found on PATH');
   try {
@@ -1382,10 +1420,10 @@ test('22. verifyProcessEnvironment catches value overrides and injected addition
 // isHerdrSpawnRunStillWorking's own decision table -- it previously had none
 // beyond indirect integration coverage (flagged in Phase 8a's own report).
 
-function writeHerdrLaunchCommandFixture(runDir, launchCommandId, { paneId, herdrSession }) {
+function writeHerdrLaunchCommandFixture(runDir, launchCommandId, { paneId, herdrSession, herdrName }) {
   const commandsDir = path.join(runDir, 'controller', 'commands');
   fs.mkdirSync(commandsDir, { recursive: true });
-  fs.writeFileSync(path.join(commandsDir, `${launchCommandId}.json`), JSON.stringify({ paneId, ...(herdrSession ? { herdrSession } : {}) }));
+  fs.writeFileSync(path.join(commandsDir, `${launchCommandId}.json`), JSON.stringify({ paneId, ...(herdrName ? { herdrName } : {}), ...(herdrSession ? { herdrSession } : {}) }));
 }
 
 test('isHerdrSpawnRunStillWorking returns false when no controller/commands record exists at all', async () => {
@@ -1407,7 +1445,7 @@ test('isHerdrSpawnRunStillWorking returns false when the latest command record h
   }
 });
 
-test('isHerdrSpawnRunStillWorking maps agentGet\'s real agent_status values to the right liveness decision', async () => {
+test('isHerdrSpawnRunStillWorking maps the slot\'s real agent status values to the right liveness decision', async () => {
   const runDir = mkTempDir('fgos-herdr-still-working-status-');
   try {
     writeHerdrLaunchCommandFixture(runDir, 'cmd-01', { paneId: 'wS:pTest' });
@@ -1419,8 +1457,8 @@ test('isHerdrSpawnRunStillWorking maps agentGet\'s real agent_status values to t
       ['unknown', 'unknown'],
     ];
     for (const [agentStatus, expected, why] of cases) {
-      const herdrClient = { agentGet: () => ({ agentStatus }) };
-      const result = await isHerdrSpawnRunStillWorking(runDir, { herdrClient });
+      const slotIo = { state: () => ({ agentStatus }) };
+      const result = await isHerdrSpawnRunStillWorking(runDir, { slotIo });
       assert.equal(result, expected, why ?? `agentStatus "${agentStatus}" must map to ${expected}`);
     }
   } finally {
@@ -1428,72 +1466,119 @@ test('isHerdrSpawnRunStillWorking maps agentGet\'s real agent_status values to t
   }
 });
 
-test('isHerdrSpawnRunStillWorking falls back to the process-presence check when agentGet itself fails', async () => {
+test('isHerdrSpawnRunStillWorking falls back to the process-presence check when the agent state cannot be read', async () => {
   const runDir = mkTempDir('fgos-herdr-still-working-fallback-');
   try {
     writeHerdrLaunchCommandFixture(runDir, 'cmd-01', { paneId: 'wS:pTest' });
+    const unreadableState = () => { throw new Error('herdr_unavailable'); };
 
-    const workingClient = {
-      agentGet: () => { throw new Error('herdr_unavailable'); },
-      paneProcessInfo: () => ({ shellPid: 100, foregroundProcesses: [{ pid: 200 }] }),
+    const workingIo = {
+      state: unreadableState,
+      foreground: () => ({ pane: 'live', foreground: { pid: 200, startTime: 1, bootId: 'b', pgid: 200 } }),
     };
     assert.equal(
-      await isHerdrSpawnRunStillWorking(runDir, { herdrClient: workingClient }),
+      await isHerdrSpawnRunStillWorking(runDir, { slotIo: workingIo }),
       true,
       'a real foreground worker process (distinct from the shell) still counts as working via the fallback',
     );
 
-    const idleClient = {
-      agentGet: () => { throw new Error('herdr_unavailable'); },
-      paneProcessInfo: () => ({ shellPid: 100, foregroundProcesses: [{ pid: 100 }] }),
+    const idleIo = {
+      state: unreadableState,
+      foreground: () => ({ pane: 'live', foreground: null }),
     };
     assert.equal(
-      await isHerdrSpawnRunStillWorking(runDir, { herdrClient: idleClient }),
+      await isHerdrSpawnRunStillWorking(runDir, { slotIo: idleIo }),
       false,
-      'only the shell process itself in the foreground means nothing else is working, via the fallback',
+      'only the shell in the foreground means nothing else is working, via the fallback',
+    );
+
+    const goneIo = {
+      state: unreadableState,
+      foreground: () => ({ pane: 'gone', foreground: null }),
+    };
+    assert.equal(
+      await isHerdrSpawnRunStillWorking(runDir, { slotIo: goneIo }),
+      false,
+      'a pane that no longer exists holds no working agent',
     );
   } finally {
     fs.rmSync(runDir, { recursive: true, force: true });
   }
 });
 
-test('isHerdrSpawnRunStillWorking fails closed to "unknown" when both agentGet and the process-presence fallback fail', async () => {
+test('isHerdrSpawnRunStillWorking fails closed to "unknown" when both the agent state and the process-presence fallback fail', async () => {
   const runDir = mkTempDir('fgos-herdr-still-working-double-fail-');
   try {
     writeHerdrLaunchCommandFixture(runDir, 'cmd-01', { paneId: 'wS:pTest' });
-    const brokenClient = {
-      agentGet: () => { throw new Error('herdr_unavailable'); },
-      paneProcessInfo: () => { throw new Error('herdr_call_timeout'); },
+    const brokenIo = {
+      state: () => { throw new Error('herdr_unavailable'); },
+      foreground: () => { throw new Error('herdr_call_timeout'); },
     };
-    assert.equal(await isHerdrSpawnRunStillWorking(runDir, { herdrClient: brokenClient }), 'unknown');
+    assert.equal(await isHerdrSpawnRunStillWorking(runDir, { slotIo: brokenIo }), 'unknown');
+
+    const unknownPaneIo = {
+      state: () => { throw new Error('herdr_unavailable'); },
+      foreground: () => ({ pane: 'unknown', foreground: null }),
+    };
+    assert.equal(await isHerdrSpawnRunStillWorking(runDir, { slotIo: unknownPaneIo }), 'unknown', 'a pane that could not be inspected is undecidable, not gone');
   } finally {
     fs.rmSync(runDir, { recursive: true, force: true });
   }
 });
 
 test('recovery asks the herdr session the worker was launched in, not the ambient one', async () => {
+  const home = mkTempDir('fgos-herdr-session-home-');
   const runDir = mkTempDir('fgos-herdr-session-recovery-');
+  let sessionServer;
+  let cockpitServer;
   try {
-    // A fake herdr that knows the worker only inside its own session.
+    // The worker's session is a herdr server of its own: its own socket, which only a listener
+    // there answers for, and a fake herdr that knows the worker only inside that session.
+    const sessionSocket = socketPathForSession('fgos-worker', { home });
+    fs.mkdirSync(path.dirname(sessionSocket), { recursive: true });
+    sessionServer = net.createServer();
+    await new Promise((resolve, reject) => { sessionServer.once('error', reject); sessionServer.listen(sessionSocket, resolve); });
+
     const bin = path.join(runDir, 'fake-herdr.sh');
     fs.writeFileSync(bin, `#!/bin/sh
-if [ "$HERDR_SESSION" = "fgos-worker" ]; then
-  echo '{"result":{"agent":{"agent_status":"working","pane_id":"wS:pTest"}}}'
-else
-  echo '{"error":{"code":"pane_not_found"}}'; exit 1
-fi
+if [ "$1" = "--version" ]; then echo 'herdr 0.9.1-fake'; exit 0; fi
+if [ "$1 $2 $3" = "pane layout --help" ]; then echo 'usage: herdr pane layout'; exit 0; fi
+if [ "$HERDR_SESSION" != "fgos-worker" ]; then echo '{"error":{"code":"pane_not_found"}}'; exit 1; fi
+case "$1 $2" in
+  "tab create") echo '{"result":{"tab":{"tab_id":"wS:tTest"},"root_pane":{"pane_id":"wS:pTest"}}}';;
+  "pane get") echo '{"result":{"pane":{"pane_id":"wS:pTest","tab_id":"wS:tTest"}}}';;
+  "agent get") echo '{"result":{"agent":{"agent_status":"working","pane_id":"wS:pTest"}}}';;
+  *) echo '{"result":{}}';;
+esac
 `, { mode: 0o755 });
-    const ambient = { ...process.env, HERDR_SESSION: 'operator-cockpit' };
 
-    writeHerdrLaunchCommandFixture(runDir, 'cmd-01', { paneId: 'wS:pTest', herdrSession: 'fgos-worker' });
+    // The pane exists in the worker's session: its allocation record lives under that server.
+    const herdrName = 'fgos-run-session-01-cmd-01';
+    const workerTc = createTerminalControl({ herdrBin: bin, env: { HERDR_SESSION: 'fgos-worker', HERDR_SOCKET_PATH: sessionSocket } });
+    const slot = workerTc.allocate({ key: portKey(normalizeAgentName(herdrName)), groupKey: 'session-recovery', display: { label: 'session-recovery' } });
+    assert.equal(slot.result, 'slot');
+
+    // The operator's own cockpit is a different server process (so a different incarnation) on another socket.
+    const cockpitSocket = path.join(home, 'cockpit.sock');
+    cockpitServer = spawn(process.execPath, ['-e', `require('node:net').createServer().listen(${JSON.stringify(cockpitSocket)})`], { stdio: 'ignore' });
+    for (let waited = 0; !fs.existsSync(cockpitSocket); waited += 25) {
+      assert.ok(waited < 5000, 'the cockpit stand-in server must start listening');
+      await new Promise((resolve) => setTimeout(resolve, 25));
+    }
+    const ambient = { ...process.env, HOME: home, HERDR_SESSION: 'operator-cockpit', HERDR_SOCKET_PATH: cockpitSocket };
+
+    writeHerdrLaunchCommandFixture(runDir, 'cmd-01', { paneId: slot.slot.paneId, herdrName, herdrSession: 'fgos-worker' });
     assert.equal(await isHerdrSpawnRunStillWorking(runDir, { herdrBin: bin, env: ambient }), true, 'found through the recorded session');
 
-    writeHerdrLaunchCommandFixture(runDir, 'cmd-01', { paneId: 'wS:pTest' });
+    writeHerdrLaunchCommandFixture(runDir, 'cmd-01', { paneId: slot.slot.paneId, herdrName });
     assert.equal(await isHerdrSpawnRunStillWorking(runDir, { herdrBin: bin, env: ambient }), 'unknown', 'a record without a session keeps asking the ambient one, which does not know the pane');
 
-    writeHerdrLaunchCommandFixture(runDir, 'cmd-01', { paneId: 'wS:pTest', herdrSession: 'Not A Valid Name!' });
+    writeHerdrLaunchCommandFixture(runDir, 'cmd-01', { paneId: slot.slot.paneId, herdrName, herdrSession: 'Not A Valid Name!' });
     assert.equal(await isHerdrSpawnRunStillWorking(runDir, { herdrBin: bin, env: ambient }), 'unknown', 'a session name that cannot be addressed fails closed instead of throwing');
   } finally {
+    sessionServer?.close();
+    cockpitServer?.kill('SIGKILL');
     fs.rmSync(runDir, { recursive: true, force: true });
+    fs.rmSync(home, { recursive: true, force: true });
   }
 });
