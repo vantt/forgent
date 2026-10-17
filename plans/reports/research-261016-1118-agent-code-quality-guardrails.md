@@ -258,9 +258,9 @@ Gỡ khoảng 19 đăng ký hook trùng và sửa `statusLine` đang gọi node 
 
 **Nhóm A: kiểm soát ở nguồn (mục 0).**
 
-1. Sổ luật một nguồn: chốt cách sinh danh sách luật vào `core/instructions/` (P5, Q6); đối chiếu 7 nguyên tắc để lộ luật còn thiếu và chốt chúng (Q4).
+1. Sổ luật một nguồn: dùng registry đã có từ packaging-distribution P3-P5 (mục 6); chuyển dần luật viết tay trong `AGENTS.md` thành đơn vị luật trong `core/instructions/` theo mẫu plan 261008; chốt cách sinh danh sách luật (P5, Q6); đối chiếu 7 nguyên tắc để lộ luật còn thiếu và chốt chúng (Q4).
 2. Giao luật: giữ `AGENTS.md` là kênh chung dưới 32 KiB, không che, không trùng (P5, Q5, Q7); đưa luật cần lúc viết code vào worker contract và mẫu brief (P3, P10).
-3. Kiểm chứng giao luật: check trong doctor và `instruction-audit` cho từng CLI (tới đủ, tới một lần, không nằm sau ngưỡng cắt); xác nhận bảng nạp bằng canary cho pi và agy.
+3. Kiểm chứng giao luật: bổ sung vào nghĩa vụ ở contract mục 11 và check doctor đã có, dùng lại `instruction-audit` (tới đủ, tới một lần, không nằm sau ngưỡng cắt của host); xác nhận bảng nạp bằng canary cho pi và agy.
 4. Gắn luật cưỡng chế được với cơ chế: P2 (chủ của từng năng lực), P1 (test chống trùng), P4 (thay thế thì xoá), P9 (guard chỉ đường), P6 (hook phản hồi sớm), P11 (ngân sách và mục "xoá gì").
 
 **Nhóm B: dọn hậu quả.**
@@ -280,6 +280,27 @@ Mỗi bước ở nhóm A ghi ước lượng trọng lượng (số dòng, số
 | Contract `docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md` và `src/setup/instruction-projections.mjs` | Đã chạy; chỉ ghi `AGENTS.md` | Cơ chế sinh khối "fgOS Effective Instructions". Mục 10 cấm tạo `CLAUDE.md` chỉ để nhân bản `AGENTS.md`, nên commit `40c667c83` khớp contract. |
 | `plans/261006-1415-fgos-single-door-mechanisms/` phase 06 "AGENTS.md single writer" | Xong (`a004bb598`) | Luật một bên ghi chỉ áp cho phần viết tay của `AGENTS.md`. Tiền đề "CLAUDE.md chỉ import `@AGENTS.md`" của phase này sai ở thời điểm đó; đã ghi chú trong file phase. |
 | Backlog `p-7eb9e65b`, `p-68be2ae3` | proposed | Sở hữu phần chồng lấn với ak và `doctor --fix`. |
+
+**Các plan và tài liệu khác về sinh, chống trùng và sắp xếp instruction (rà lại 2026-10-17, gồm `archive/` và `docs/history/`):**
+
+| Mục | Trạng thái | Phạm vi |
+|---|---|---|
+| `docs/platform/packaging-distribution/code-panel-rollout-plan.md`, các dòng P3 `pd-instruction-source-registry`, P4 `pd-instruction-merge-policy`, P5 `pd-instruction-renderers` (dòng 74-76, 185-240) | Done (dòng 8; commit `04be428b6`, `2e03118c3`, `caebec897`, `be24172ad`, `19d0640dc`, `9def51380`) | Đã xây: registry nguồn luật (`src/setup/instruction-registry.mjs`, `InstructionRegistry`, `discoverInstructionSources`), thứ tự ghép theo loại `COMPOSITION_KIND_ORDER` law → boundary → procedure → preference → host-adapter (`src/setup/instruction-composition.mjs:46`), mã xung đột và trùng id `COMPOSITION_CONFLICT_CODES` (`:54`), bộ chiếu `AGENTS.md` có khối quản lý (`src/setup/instruction-projections.mjs:19-22,139`). Chỉ chiếu ra `AGENTS.md`; adapter cho host khác để "khi có nhu cầu"; `README.md:98` ghi độ phủ ledger mới một phần |
+| `plans/261008-1353-decision-question-template-and-cleanup/` | completed (commit `c6078e1b5`, `9c9514f41`, `3d3d32648`) | Ca chống trùng instruction duy nhất đã làm xong: đưa mẫu câu hỏi quyết định vào `core/instructions/decision-question.md` rồi gỡ các đoạn nói trùng ở `AGENTS.md`, skill, prompt (phase 02) |
+| `docs/history/instruction-prose-change-governance/DISCUSSION.md` | Đề xuất, vòng 1, chưa có D-ID | Ai được sửa `AGENTS.md`/`CLAUDE.md`/văn xuôi skill và lúc nào; nửa "chạy lại độc lập tự động" đã bị bác, nửa "cổng cấm sửa ngoài đường tường minh" còn mở |
+| `docs/history/dispatch-contract-agents-md/` (tsk-2te) | Đã làm (`a54ae66e2`) | Thêm mục `## Dispatch` vào `AGENTS.md`; không chống trùng |
+| `archive/plans/261006-1415-fgos-convention-component/phase-06-agents-line.md` | done (`461e12d12`) | Một dòng `AGENTS.md` trỏ tới `fgos convention`, theo nguyên tắc một nguồn |
+| `docs/history/canonical-decision-projection/` (tsk-1lv) | Chưa kiểm trạng thái | Mô hình chiếu quyết định ra index sinh tự động (`docs/decisions/index.md`); tiền lệ cho cách sinh và chống lệch |
+| `archive/plans/260825-1841-knowledge-registry/phase-08-projections-doctor.md` | completed | Tiền lệ projection kèm check doctor cho artifact tri thức |
+
+**Hệ quả cho nhóm A: không dựng mới, mở rộng cái đã có.** Cơ chế sổ luật, thứ tự và bộ chiếu đã có từ P3-P5; chỗ hở là gần như không dùng: `core/instructions/` mới có 2 đơn vị luật (`decision-question.md`, `platform-laws.md`), còn phần lớn luật vẫn viết tay trong `AGENTS.md` ngoài registry. Vì vậy:
+
+- *Sổ luật:* chuyển dần các luật viết tay trong `AGENTS.md` thành đơn vị luật trong `core/instructions/` (theo mẫu của plan 261008), để registry có kind, scope và id cho từng luật; không dựng sổ thứ hai.
+- *Thứ tự:* "luật quan trọng đặt trước" lấy từ `COMPOSITION_KIND_ORDER`, không sắp tay.
+- *Giao luật theo CLI:* thêm ngân sách dung lượng theo host (32 KiB cho codex) vào bộ chiếu và vào contract; adapter cho host khác chỉ thêm khi bảng nạp (mục 2d) cho thấy `AGENTS.md` không đủ.
+- *Kiểm chứng:* bổ sung vào danh sách nghĩa vụ ở contract mục 11 (đã có: projection cũ, registry sai, trùng id, adapter bỏ sót luật, sửa tay vùng quản lý) ba mục mới: vượt ngân sách của host, nạp đúng một lần theo bảng nạp, kiểm chứng bằng canary; dùng lại script `instruction-audit`.
+- *Cổng sửa văn xuôi:* nối với `docs/history/instruction-prose-change-governance` thay vì mở một thảo luận mới.
+- *Rủi ro cần kiểm trước:* plan 261008 có sửa tay trong vùng `AGENTS.md`; cần xác minh vùng khối quản lý có bị ghi đè khi chiếu lại không; khối AGENTKIT của ak nằm ngoài projection và phải được tính vào khi đếm trùng và dung lượng.
 
 **Phân bổ việc:**
 
