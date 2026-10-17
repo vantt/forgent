@@ -187,7 +187,11 @@ function fixtureRepo(makeExecutor = () => HERDR_EXECUTOR) {
 }
 
 const workerServers = [];
-after(() => { for (const server of workerServers) server.close(); });
+const workerHomes = [];
+after(() => {
+  for (const server of workerServers) server.close();
+  for (const home of workerHomes) fs.rmSync(home, { recursive: true, force: true });
+});
 
 /**
  * A worker session that already looks up: a socket is listening under a HOME
@@ -197,7 +201,9 @@ after(() => { for (const server of workerServers) server.close(); });
  * travelled -- and the operator's real HOME is never touched.
  */
 function confinedExecutor(root) {
-  const home = path.join(root, 'worker-home');
+  // A unix socket path holds about a hundred characters, so the worker's HOME is a short directory.
+  const home = fs.mkdtempSync('/tmp/fgos-wh-');
+  workerHomes.push(home);
   const socket = path.join(home, '.config', 'herdr', 'sessions', WORKER_SESSION, 'herdr.sock');
   fs.mkdirSync(path.dirname(socket), { recursive: true });
   workerServers.push(net.createServer().listen(socket));
