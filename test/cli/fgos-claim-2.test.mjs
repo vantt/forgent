@@ -251,7 +251,11 @@ test('lock-status: nothing held -- every row is free, main checkout included, an
   assert.equal(data.mainCheckout.outcome, 'free');
   assert.deepEqual(data.mainCheckout.holders, []);
   assert.ok(data.locks.length > 0);
+  // The full-suite door holds the machine-wide full-suite queue lock for the whole run, so inside
+  // it that one row is legitimately held; every other row must be free.
+  const suiteQueueHeld = process.env.FGOS_FULL_SUITE_QUEUE_HELD === '1';
   for (const row of data.locks) {
+    if (suiteQueueHeld && row.name === 'full-suite') continue;
     assert.ok(['free', 'not-node-owned'].includes(row.status), `${row.name} should be free, got ${row.status}`);
     assert.ok(['repo', 'machine'].includes(row.scope), `${row.name} scope ${row.scope} is not reported`);
   }

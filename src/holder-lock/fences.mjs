@@ -157,7 +157,7 @@ function accountLockDirs(providerRuntimeDir) {
 function mergeSlotCandidates(workspaceRoot) {
   let listing = '';
   try {
-    listing = execFileSync('git', ['for-each-ref', 'refs/heads', '--format=%(refname:short)'], {
+    listing = execFileSync('git', ['for-each-ref', 'refs/heads', '--format=%(refname:lstrip=2)'], {
       cwd: workspaceRoot, encoding: 'utf8', shell: false, stdio: ['ignore', 'pipe', 'ignore'],
     });
   } catch {

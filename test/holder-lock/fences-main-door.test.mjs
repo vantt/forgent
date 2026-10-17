@@ -119,6 +119,14 @@ test('a branch created after the fences were placed has no merge slot tombstone,
   assert.equal(fenceStatus(options(ws)).complete, true);
 });
 
+test('a branch that shares its short name with a tag still gets the merge slot tombstone named after the branch', () => {
+  const ws = makeWorkspace('tag-name-clash');
+  git(['tag', 'late'], ws.root);
+  git(['branch', 'late'], ws.root);
+  const slots = mainDoorTargets(ws).filter((t) => t.lock === 'merge-slot').map((t) => path.basename(t.path)).sort();
+  assert.deepEqual(slots, ['merge-slot--feature%2Fslot.lock', 'merge-slot--late.lock', 'merge-slot--main.lock']);
+});
+
 test('the v1 pre-commit hook refuses a commit on main once the main checkout lock is a tombstone', () => {
   const ws = makeWorkspace('v1-hook');
   assert.equal(placeFences(options(ws)).ok, true);
