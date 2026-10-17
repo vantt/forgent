@@ -1,6 +1,6 @@
 # Rà soát item mở liên quan component git Rust
 
-**Thời điểm rà soát:** 2026-10-17. **Phạm vi:** toàn bộ 126 item trong `.fgos/runtime/tmp/work-open-git-other.json`, đối chiếu đọc-chỉ với `plans/reports/git-lessons-261017-1107-catalogue.md` và mã hiện tại. “Còn” nghĩa là vẫn tồn tại đúng lớp vấn đề của item, không chỉ còn tên item. Catalogue là bằng chứng chuẩn: các dòng G-009/G-011, G-106/G-107, G-118–G-121, G-137, G-140/G-147 và G-155 được trích dưới đây.
+**Thời điểm rà soát:** 2026-10-17. **Phạm vi:** toàn bộ 126 item trong `.fgos/runtime/tmp/work-open-git-other.json`, đối chiếu đọc-chỉ với `plans/reports/research-261017-1032-git-lessons-catalogue.md` và mã hiện tại. “Còn” nghĩa là vẫn tồn tại đúng lớp vấn đề của item, không chỉ còn tên item. Catalogue là bằng chứng chuẩn: các dòng G-009/G-011, G-106/G-107, G-118–G-121, G-137, G-140/G-147 và G-155 được trích dưới đây.
 
 ## Item RELEVANT
 
