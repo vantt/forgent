@@ -1,8 +1,8 @@
 // identity-before-lock.test.mjs -- the identity bridge never runs the host
-// binary while the calling process holds the state hot lock or claims.lock.
+// binary while the calling process holds the state lock.
 //
 // FGOS_HOST_BIN is a small sh stand-in that, at each exec, reads the owner
-// pid of every hot record (state.hot) and claims.lock under the store and records a
+// pid of every hot record (state.hot) under the store and records a
 // violation only when the owner is the caller itself (`--pid`), then execs
 // the real host. A fresh Node process (empty identity cache) runs the real
 // write paths against a real git repo reached through a symlinked path, so
@@ -21,6 +21,7 @@ const HOST = process.env.FGOS_HOST_BIN;
 const UNIX = process.platform !== 'win32';
 const STORE_URL = new URL('../../src/state/store.mjs', import.meta.url).href;
 const EVENTS_URL = new URL('../../src/state/events.mjs', import.meta.url).href;
+const HOT_LOCK_URL = new URL('../../src/state/hot-lock.mjs', import.meta.url).href;
 const CLAIMS_URL = new URL('../../src/state/runtime-coordination.mjs', import.meta.url).href;
 const CLAIM_PORT_URL = new URL('../../src/runner/claim-port.mjs', import.meta.url).href;
 const PORTING_URL = new URL('../../src/state/porting-store.mjs', import.meta.url).href;
@@ -128,12 +129,12 @@ test('resolving while another process holds the lock is fine and is not counted 
   const fixture = setup();
   const marker = path.join(fixture.base, 'holder-in');
   const release = path.join(fixture.base, 'holder-release');
-  const holderScript = `const { withEventsLock } = await import(${JSON.stringify(EVENTS_URL)});
+  const holderScript = `const { withStateTx } = await import(${JSON.stringify(HOT_LOCK_URL)});
 const fs = await import('node:fs');
-withEventsLock(${JSON.stringify(path.join(fixture.dir, 'events.jsonl'))}, () => {
+withStateTx(${JSON.stringify(fixture.dir)}, () => {
   fs.writeFileSync(${JSON.stringify(marker)}, 'in');
   while (!fs.existsSync(${JSON.stringify(release)})) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 10);
-}, ${JSON.stringify(fixture.dir)});`;
+});`;
   const holder = spawn(process.execPath, ['--input-type=module', '-e', holderScript], {
     env: childEnv(fixture.wrapper, { FGOS_SESSION_ID: 'holder-process' }),
     stdio: 'ignore',

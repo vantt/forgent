@@ -28,7 +28,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { withEventsLock, appendEventLocked } from './events.mjs';
 import { viewRevision, serializeView, readAllEventsFromDir, rebuildViewFromDir, buildSnapshotFromDir, VIEW_SCHEMA_VERSION } from './replay.mjs';
 import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, classifyStalePostDelivery, footprintOverlapAmong, goalScopedCriticalPath, goalScopedGreedyTopUnblock, computeSchedule, detectCycles } from './graph-metrics.mjs';
 import { transitionWork, FsmError } from './status-fsm.mjs';
@@ -44,7 +43,7 @@ import { KnowledgeValidationError, applyKnowledgeEvent } from './knowledge-regis
 import { resolveFriction, recordFriction } from '../observe/friction-client.mjs';
 export { recordFriction, resolveFriction };
 import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
-import { readClaim, readClaims, releaseClaim, withClaimsLock, buildEffectiveView, getItemDurableRevision, getMainFgosDir } from './runtime-coordination.mjs';
+import { readClaim, readClaims, releaseClaimTx, withMainState, buildEffectiveView, getItemDurableRevision } from './runtime-coordination.mjs';
 
 export { FsmError, WorkValidationError, EventLogError, KnowledgeValidationError };
 
@@ -134,9 +133,9 @@ function paths(dir) {
 // `paths(dir).logPath` (above) is untouched and stays load-bearing for two
 // unrelated things: it is baseline-0, the pre-cutover log frozen in place
 // (TA-D12, read but never appended to below), and its OWN dirname is what
-// `withEventsLockAndRefresh` derives the cross-process lock from — passing
-// it there keeps `events.lock` scoped to the whole `.fgos/` dir exactly as
-// before (TA-D14: a per-file lock would no longer serialize the CAS
+// `withStateAndRefresh` used to derive the cross-process lock from — the
+// state lock is now one per main checkout, covering the whole `.fgos/` dir
+// exactly as before (TA-D14: a per-file lock would no longer serialize the CAS
 // preconditions every mutation here depends on).
 const EVENTS_SUBDIR = 'events';
 
@@ -189,8 +188,7 @@ function currentView(dir) {
   return rebuildViewFromDir(dir);
 }
 
-function writeView(viewPath, view, snapshot) {
-  fs.mkdirSync(path.dirname(viewPath), { recursive: true });
+function writeView(viewPath, view, snapshot, tx = null) {
   // work-graph-intelligence S3: stamp a deterministic revision-hash onto the
   // ON-DISK derived view only. `view` (what refreshView returns to store
   // callers) stays the pure fold shape rebuildView produces — the revision is
@@ -207,10 +205,15 @@ function writeView(viewPath, view, snapshot) {
   const { viewStr, revision } = serializeView(view);
   const snapshotPart = snapshot !== undefined ? `,"snapshot":${JSON.stringify(snapshot)}` : '';
   const persistedContent = `${viewStr.slice(0, -1)},"revision":${JSON.stringify(revision)},"viewSchemaVersion":${VIEW_SCHEMA_VERSION}${snapshotPart}}\n`;
-  // tsk-4mx: write to a uniquely-named temp file, then rename(2) it onto
-  // viewPath -- an atomic replace on POSIX, so a reader can never observe a
-  // truncated/partial state.json, same pattern as main-checkout-lock.mjs's
-  // own writeAtomicReplace.
+  // tsk-4mx: temp file, then rename(2) onto viewPath -- an atomic replace on
+  // POSIX, so a reader can never observe a truncated/partial state.json.
+  // Inside a state transaction the write goes through `tx`, which does exactly
+  // that and refuses it once the transaction is revoked.
+  if (tx) {
+    tx.writeText(viewPath, persistedContent);
+    return;
+  }
+  fs.mkdirSync(path.dirname(viewPath), { recursive: true });
   const tmpPath = `${viewPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
   fs.writeFileSync(tmpPath, persistedContent, 'utf8');
   fs.renameSync(tmpPath, viewPath);
@@ -219,21 +222,21 @@ function writeView(viewPath, view, snapshot) {
 // Shared tail of every mutation: rebuild the view fresh from the (now
 // updated) log and overwrite state.json. Always called AFTER the event that
 // caused the change has already been appended — never before.
-function refreshView(dir) {
+function refreshView(dir, tx = null) {
   const { viewPath } = paths(dir);
   const view = currentView(dir); // tries T4's incremental fast path first, falls back to a full multi-file fold
   // T4's per-file anchor ({files: {name: {size, lastLine}}, maxTs}) --
   // cheap stat + tail-read per file, never a full-content read. Safe to
   // build here uncontended: refreshView always runs inside
-  // withEventsLockAndRefresh's held lock (tsk-1q5), so no concurrent append
+  // withStateAndRefresh's held lock (tsk-1q5), so no concurrent append
   // can land between currentView's own read above and this snapshot build.
   const snapshot = buildSnapshotFromDir(dir);
-  writeView(viewPath, view, snapshot);
+  writeView(viewPath, view, snapshot, tx);
   return view;
 }
 
 // tsk-1q5: every mutation below used to call `refreshView(dir)` AFTER
-// releasing `withEventsLock` (append-then-refresh, per the header comment
+// releasing the state lock (append-then-refresh, per the header comment
 // above, but as two SEPARATE critical sections). Two processes finishing
 // their own correctly-locked appends close together could then race their
 // unlocked `refreshView` calls: whichever one's whole-file `state.json`
@@ -241,15 +244,15 @@ function refreshView(dir) {
 // before the other process's append — silently overwriting a fresher view
 // with a staler one (a lost-update on the derived cache, not the log
 // itself). Folding `refreshView` into the SAME held lock as the append
-// closes that window structurally, the same way `withEventsLock`'s own doc
+// closes that window structurally, the same way `withStateTx`'s own doc
 // comment already describes for a precondition read ahead of an append.
-function withEventsLockAndRefresh(dir, logPath, fn) {
+function withStateAndRefresh(dir, fn) {
   let view;
-  const event = withEventsLock(logPath, () => {
-    const result = fn();
-    view = refreshView(dir);
+  const event = withMainState(dir, (tx) => {
+    const result = fn(tx);
+    view = refreshView(dir, tx);
     return result;
-  }, dir);
+  });
   return { event, view };
 }
 
@@ -272,16 +275,15 @@ export function initStore(dir) {
  * ids (read fresh, never off the possibly-stale view) BEFORE writing
  * anything — an invalid item never reaches the log.
  *
- * The existence check through the append is one held `events.lock` critical
- * section (via `withEventsLock`/`appendEventLocked`, not the bare
+ * The existence check through the append is one held state-lock critical
+ * section (via `withStateTx`/`tx.append`, not the bare
  * `appendEvent`): two processes racing `addWork` on the same id can no
  * longer both read "id not present yet" and both append a `work.add` — the
  * second to acquire the lock re-reads with the first's event already in the
  * log, so its own existence check now correctly fails.
  */
 export function addWork(dir, work) {
-  const { logPath } = paths(dir);
-  return withEventsLockAndRefresh(dir, logPath, () => {
+  return withStateAndRefresh(dir, (tx) => {
     const before = currentView(dir);
 
     if (before.work[work?.id]) {
@@ -367,7 +369,7 @@ export function addWork(dir, work) {
     assertNoUnifiedCycle(item, before.work);
 
     item.writer = resolveWriterIdentity(dir);
-    return appendEventLocked(resolveWriterLogPath(dir), { type: 'work.add', payload: item }, dir);
+    return tx.append(resolveWriterLogPath(dir), { type: 'work.add', payload: item });
   });
 }
 
@@ -391,7 +393,7 @@ const EDITABLE_FIELDS = new Set(['title', 'description', 'kind', 'risk', 'verify
  * replay can fold exactly the changed keys onto the item.
  */
 // Same held-lock critical section as addWork above (existence + validation
-// check through the append, one withEventsLock/appendEventLocked scope): two
+// check through the append, one withStateTx scope): two
 // processes racing editWork on the same id, or racing editWork against
 // addWork/moveWork/moveStep on ids that would collide (e.g. a deps/parent
 // cycle only the second writer's patch creates), can no longer both read a
@@ -445,12 +447,11 @@ function validateWorkPatch(view, dir, id, patch, role, writer) {
 }
 
 export function editWork(dir, { id, patch, role } = {}) {
-  const { logPath } = paths(dir);
-  return withEventsLockAndRefresh(dir, logPath, () => {
+  return withStateAndRefresh(dir, (tx) => {
     const before = currentView(dir);
     const writer = resolveWriterIdentity(dir);
     const payload = validateWorkPatch(before, dir, id, patch, role, writer);
-    return appendEventLocked(resolveWriterLogPath(dir), { type: 'work.edit', payload }, dir);
+    return tx.append(resolveWriterLogPath(dir), { type: 'work.edit', payload });
   });
 }
 
@@ -459,8 +460,7 @@ export function editWork(dir, { id, patch, role } = {}) {
  * Appends a 'work.resolve-park-reason' event carrying { id, note, role, writer }.
  */
 export function resolveParkReason(dir, { id, note, role } = {}) {
-  const { logPath } = paths(dir);
-  return withEventsLockAndRefresh(dir, logPath, () => {
+  return withStateAndRefresh(dir, (tx) => {
     const before = currentView(dir);
     const work = before.work[id];
     if (!work) {
@@ -484,7 +484,7 @@ export function resolveParkReason(dir, { id, note, role } = {}) {
       payload.role = role;
     }
     payload.writer = resolveWriterIdentity(dir);
-    return appendEventLocked(resolveWriterLogPath(dir), { type: 'work.resolve-park-reason', payload }, dir);
+    return tx.append(resolveWriterLogPath(dir), { type: 'work.resolve-park-reason', payload });
   });
 }
 
@@ -528,8 +528,7 @@ function composeLearning(view, id, closingSettlement) {
  * re-write (idempotent, per plan.md's edge-dimension note).
  */
 export function setFocus(dir, { id, role } = {}) {
-  const { logPath } = paths(dir);
-  return withEventsLockAndRefresh(dir, logPath, () => {
+  return withStateAndRefresh(dir, (tx) => {
     const before = currentView(dir);
     const work = before.work[id];
     if (!work) {
@@ -542,7 +541,7 @@ export function setFocus(dir, { id, role } = {}) {
       );
     }
     const payload = role !== undefined ? { id, role } : { id };
-    return appendEventLocked(resolveWriterLogPath(dir), { type: 'goal.focus', payload }, dir);
+    return tx.append(resolveWriterLogPath(dir), { type: 'goal.focus', payload });
   });
 }
 
@@ -599,7 +598,15 @@ export function assertAcceptanceEvidence(id, work) {
  * scan over history a retroactive plan.md could never honestly satisfy.
  */
 export function assertPlanEvidence(id, work, repoRoot) {
-  if (work.risk !== 'heavy') return;
+  const failure = checkPlanEvidence(id, work, repoRoot);
+  if (failure) throw new StoreError('precondition', failure);
+}
+
+// The git half of `assertPlanEvidence`: the failure message, or null when the
+// plan is there (or the item is not heavy). Runs git, so it never runs inside
+// the state lock; `moveWork` takes it before the lock as a snapshot.
+function checkPlanEvidence(id, work, repoRoot) {
+  if (work.risk !== 'heavy') return null;
   const branch = `fgw/${id}`;
   const candidates = [];
   if (typeof work.docsRef === 'string' && work.docsRef.trim()) {
@@ -629,13 +636,76 @@ export function assertPlanEvidence(id, work, repoRoot) {
     }
   });
 
-  if (!hasPlan) {
-    const locDesc = hasBranch ? `on branch "${branch}"` : `in current tree (no branch "${branch}")`;
-    throw new StoreError(
-      'precondition',
-      `work "${id}" cannot move to "delivered" — risk:heavy but no plan.md found ${locDesc} (checked ${candidates.join(', ')}); write one before landing.`,
-    );
+  if (hasPlan) return null;
+  const locDesc = hasBranch ? `on branch "${branch}"` : `in current tree (no branch "${branch}")`;
+  return `work "${id}" cannot move to "delivered" — risk:heavy but no plan.md found ${locDesc} (checked ${candidates.join(', ')}); write one before landing.`;
+}
+
+// The git directory that holds the refs of the checkout at `repoRoot`: its
+// `.git`, or, for a linked worktree (`.git` is a file naming the worktree's own
+// git dir), the common dir that git dir points at. Files only, no child process.
+function refsGitDir(repoRoot) {
+  const dotGit = path.join(repoRoot, '.git');
+  let gitDir = dotGit;
+  try {
+    if (!fs.statSync(dotGit).isDirectory()) {
+      const pointer = /^gitdir:\s*(.+)$/m.exec(fs.readFileSync(dotGit, 'utf8'));
+      if (!pointer) return null;
+      gitDir = path.resolve(repoRoot, pointer[1].trim());
+      const common = fs.readFileSync(path.join(gitDir, 'commondir'), 'utf8').trim();
+      gitDir = path.resolve(gitDir, common);
+    }
+  } catch (err) {
+    if (err.code === 'ENOENT' || err.code === 'ENOTDIR') return null;
+    throw err;
   }
+  return gitDir;
+}
+
+// Tip of `refs/heads/<branch>` read from the ref files only (no child process):
+// the loose ref, else packed-refs, else null. Used inside the state lock to
+// tell whether the plan-evidence snapshot still describes the branch.
+function readBranchTip(repoRoot, branch) {
+  const gitDir = refsGitDir(repoRoot);
+  if (!gitDir) return null;
+  try {
+    const loose = fs.readFileSync(path.join(gitDir, 'refs', 'heads', ...branch.split('/')), 'utf8').trim();
+    if (!loose.startsWith('ref:')) return loose;
+  } catch (err) {
+    if (err.code !== 'ENOENT' && err.code !== 'ENOTDIR') throw err;
+  }
+  try {
+    const line = fs.readFileSync(path.join(gitDir, 'packed-refs'), 'utf8').split('\n').find((l) => l.endsWith(` refs/heads/${branch}`));
+    return line ? line.split(' ')[0] : null;
+  } catch (err) {
+    if (err.code !== 'ENOENT' && err.code !== 'ENOTDIR') throw err;
+    return null;
+  }
+}
+
+class PlanEvidenceStale extends Error {}
+
+// What the delivered gate needs from git, taken before the state lock: the
+// item's durable revision and branch tip it was judged against, and the
+// verdict. Inside the lock only those two are compared, never git.
+function snapshotPlanEvidence(dir, id) {
+  const view = currentView(dir);
+  const work = view.work[id];
+  if (!work || work.risk !== 'heavy') return null;
+  const repoRoot = path.dirname(dir);
+  return {
+    revision: getItemDurableRevision(view, id),
+    tip: readBranchTip(repoRoot, `fgw/${id}`),
+    failure: checkPlanEvidence(id, work, repoRoot),
+  };
+}
+
+function applyPlanEvidenceSnapshot(dir, snapshot, view, id, work) {
+  if (work.risk !== 'heavy') return;
+  if (!snapshot || snapshot.revision !== getItemDurableRevision(view, id) || snapshot.tip !== readBranchTip(path.dirname(dir), `fgw/${id}`)) {
+    throw new PlanEvidenceStale();
+  }
+  if (snapshot.failure) throw new StoreError('precondition', snapshot.failure);
 }
 
 /**
@@ -643,17 +713,30 @@ export function assertPlanEvidence(id, work, repoRoot) {
  * delegates the precondition/CAS decision to status-fsm.mjs (pure — never writes),
  * and only then appends the event it returns.
  *
- * The lookup, the CAS decision, and the append are one held `events.lock`
- * critical section (via `withEventsLock`/`appendEventLocked`): two processes
+ * The lookup, the CAS decision, and the append are one held state-lock
+ * critical section (via `withStateTx`/`tx.append`): two processes
  * racing `moveWork` on the same id with the same `expectedStatus` can no
  * longer both pass the CAS check against a status that's about to change out
  * from under one of them — the second to acquire the lock re-reads with the
  * first's event already in the log, so its own `expectedStatus` compare
  * correctly conflicts.
  */
-export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, role, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, parentSnapshotAtAsk, claimTrigger, statusAtAsk, releaseTrigger, rationale, alternatives, source, askSource, approved, mergedSha, mergedInto } = {}) {
-  const { logPath } = paths(dir);
-  const result = withEventsLockAndRefresh(dir, logPath, () => {
+export function moveWork(dir, args = {}) {
+  if (args.to !== 'delivered') return moveWorkOnce(dir, args, null);
+  // The delivered gate needs git; take it outside the lock and retry when the
+  // item or its branch moved between the snapshot and the lock.
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      return moveWorkOnce(dir, args, snapshotPlanEvidence(dir, args.id));
+    } catch (err) {
+      if (!(err instanceof PlanEvidenceStale)) throw err;
+    }
+  }
+  throw new StoreError('conflict', `work "${args.id}": its plan evidence kept changing while moving to "delivered"; retry.`);
+}
+
+function moveWorkOnce(dir, { id, to, expectedStatus, reason, ask, answer, role, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, parentSnapshotAtAsk, claimTrigger, statusAtAsk, releaseTrigger, rationale, alternatives, source, askSource, approved, mergedSha, mergedInto } = {}, planSnapshot = null) {
+  const result = withStateAndRefresh(dir, (tx) => {
   const before = currentView(dir);
   const work = before.work[id];
   if (!work) {
@@ -873,7 +956,7 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   // that don't go through that pre-flight.
   if (to === 'delivered') {
     assertAcceptanceEvidence(id, work);
-    assertPlanEvidence(id, work, path.dirname(dir));
+    applyPlanEvidenceSnapshot(dir, planSnapshot, before, id, work);
   }
 
   // Câu-6 tự động (per Phase 3 S3-closeout (c), six-questions L5): BOTH doors
@@ -903,7 +986,7 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
       // best-effort — see comment above.
     }
   }
-  return appendEventLocked(resolveWriterLogPath(dir), rawEvent, dir); // captures the real seq; rawEvent itself has none
+  return tx.append(resolveWriterLogPath(dir), rawEvent); // captures the real seq; rawEvent itself has none
   });
   if (answer) {
     try {
@@ -1027,7 +1110,7 @@ const SIDE_LOG_ONLY_EVENT_TYPES = new Set([
  * against, the same "never a false positive on old data" floor the
  * writer-identity check above already holds to. `readRawEvents` is a
  * plain read (see its own doc comment) — safe to call here, already inside
- * the held events.lock/claims.lock critical section.
+ * the held state-lock critical section.
  */
 function revisionDriftIsSelfCaused(dir, id, claim) {
   if (!claim.writerId) return false;
@@ -1065,7 +1148,7 @@ function revisionDriftIsSelfCaused(dir, id, claim) {
  * doing-coordination-redesign.md §7.3/§9.2) — no durable intermediate
  * work.move(->doing) leg. Validates active runtime claim ownership
  * (claimId, writerId) and durable revision (preClaimRevision) FRESH,
- * inside the same held events.lock + claims.lock critical section the
+ * inside the same held state-lock critical section the
  * write itself runs in — the FSM-validating `transitionWork` call is
  * built and proven valid BEFORE anything is appended, so a bad
  * finalStatus/missing ask never leaves a partial write on disk. Writes
@@ -1106,7 +1189,6 @@ export function settleClaim(dir, {
     throw new StoreError('validation', 'settleClaim: "id" is required.');
   }
 
-  const { logPath } = paths(dir);
   const claim = readClaim(dir, id);
 
   if (claim) {
@@ -1144,19 +1226,17 @@ export function settleClaim(dir, {
       throw new StoreError('conflict', `settleClaim: writer identity mismatch for "${id}" — claim acquired by writer "${claim.writerId}", settling as writer "${currentWriterId}".`);
     }
 
-    // claims.lock is taken inside events.lock below, for the main checkout's
-    // .fgos: resolve that identity now, before either lock is held.
-    resolveWriterIdentity(getMainFgosDir(dir));
-    const res = withEventsLockAndRefresh(dir, logPath, () => {
-      const writeResult = withClaimsLock(dir, () => {
+    // One state transaction covers the claim, the event log and the release;
+    // the identities it needs are resolved by withMainState before the lock.
+    const res = withStateAndRefresh(dir, (tx) => {
       // tsk-40m code-review finding (blocker, TOCTOU race): every check
       // above (claimId, writerId) ran against a snapshot read BEFORE
-      // acquiring events.lock. Waiting for that lock (held by any other
+      // acquiring the state lock. Waiting for that lock (held by any other
       // writer) is unbounded — long enough for claim-port.mjs's own
       // stale-claim-reclaim to release THIS claim and hand it to a
       // different actor in the meantime. Re-reading it here, now holding
-      // BOTH events.lock and claims.lock, closes the window: no release/
-      // reacquire (claims.lock) and no durable write (events.lock) can
+      // the state lock, closes the window: no release/
+      // reacquire and no durable write can
       // land between this read and our own append below.
       const freshClaim = readClaim(dir, id);
       if (!freshClaim || freshClaim.claimId !== targetClaimId) {
@@ -1247,7 +1327,7 @@ export function settleClaim(dir, {
 
       if (patch && typeof patch === 'object' && !Array.isArray(patch) && Object.keys(patch).length > 0) {
         const editPayload = validateWorkPatch(before, dir, id, patch, role, writer);
-        appendEventLocked(writerLogPath, { type: 'work.edit', payload: editPayload }, dir);
+        tx.append(writerLogPath, { type: 'work.edit', payload: editPayload });
       }
 
       // work.attempt: the complete durable record of this attempt —
@@ -1278,12 +1358,12 @@ export function settleClaim(dir, {
       // NO work.move at all, and this marker must still survive somewhere
       // durable for claim-port.mjs's reclaim check to read (tsk-40m).
       if (releaseTrigger !== undefined) attemptPayload.releaseTrigger = releaseTrigger;
-      const attemptEvent = appendEventLocked(writerLogPath, { type: 'work.attempt', payload: attemptPayload }, dir);
+      const attemptEvent = tx.append(writerLogPath, { type: 'work.attempt', payload: attemptPayload });
 
       // tsk-40m code-review finding (blocker, fixed): return the raw event
-      // directly — matching moveWork's own `return appendEventLocked(...)`
+      // directly — matching moveWork's own `return tx.append(...)`
       // pattern immediately above in this file — so
-      // withEventsLockAndRefresh's own `{ event, view }` wrapper (below,
+      // withStateAndRefresh's own `{ event, view }` wrapper (below,
       // after this whole closure returns) produces `res.event` as a real
       // final event (with its own `.seq`), never nested one level too
       // deep. When a durable move actually happened, that move IS the
@@ -1291,24 +1371,13 @@ export function settleClaim(dir, {
       // for its own CLI output; a same-state settle has no move, so the
       // work.attempt (still a real, seq-bearing event) is the final event
       // instead.
-      return move3Raw ? appendEventLocked(writerLogPath, move3Raw, dir) : attemptEvent;
-      });
+      const writeResult = move3Raw ? tx.append(writerLogPath, move3Raw) : attemptEvent;
 
-      // tsk-40m code-review finding (blocker): release the claim HERE,
-      // right after the durable write actually succeeds (claims.lock,
-      // above, is not reentrant — releaseClaim needs its own separate,
-      // immediately-following acquisition, still inside the SAME held
-      // events.lock) — never in an outer `finally` that also ran on a
-      // FAILED settle (a CAS/revision conflict caught above, with nothing
-      // yet written, used to destroy a still-legitimately-held claim
-      // anyway, silently dropping the coordination state for real
-      // in-progress work), and never after the best-effort recordCall*/
-      // recordCallReturn side effects below (which shrinks, not
-      // eliminates, the crash window between "durably settled" and "claim
-      // file actually gone" — buildEffectiveView's own staleness check
-      // below is the defense-in-depth for what this ordering can't fully
-      // close).
-      releaseClaim(dir, { id, claimId: targetClaimId });
+      // Release the claim right after the durable write succeeds, in the same
+      // transaction — never on a failed settle (a conflict thrown above leaves
+      // a still-legitimately-held claim alone), and never after the
+      // best-effort recordCall* side effects below.
+      releaseClaimTx(tx, { id, claimId: targetClaimId });
 
       return writeResult;
     });
@@ -1456,12 +1525,11 @@ export function answerAwaiting(dir, { id, answer, expectedStatus, role, rational
  *
  * Same held-lock critical section as moveWork above — the lookup, the
  * `expectedStep` CAS decision, and the append all run inside one
- * `withEventsLock`/`appendEventLocked` scope.
+ * `withStateTx` scope.
  */
 export function moveStep(dir, { id, to, expectedStep, verify, role } = {}) {
-  const { logPath } = paths(dir);
   let shouldResolveClarify = false;
-  const result = withEventsLockAndRefresh(dir, logPath, () => {
+  const result = withStateAndRefresh(dir, (tx) => {
     const before = currentView(dir);
     const work = before.work[id];
     if (!work) {
@@ -1485,7 +1553,7 @@ export function moveStep(dir, { id, to, expectedStep, verify, role } = {}) {
     // moveStep call records who wrote it, never blocking on a malformed
     // identity (D18).
     rawEvent.payload.writer = resolveWriterIdentity(dir);
-    return appendEventLocked(resolveWriterLogPath(dir), rawEvent, dir);
+    return tx.append(resolveWriterLogPath(dir), rawEvent);
   });
 
   if (shouldResolveClarify) {
@@ -1541,7 +1609,7 @@ function openCallStack(callThreadEntries) {
  * `openSyncDepth` (D28, wired review finding H2/tsk-397): unlike
  * `openCallDepth`, this is NEVER derived from `callThreads` here — a
  * `work.call-summary` event commits atomically at the exact instant this
- * function's own door opens (see the `appendEventLocked` call below), so
+ * function's own door opens (see the `tx.append` call below), so
  * by the time a genuinely NESTED sync call (the callee's own work needing
  * a further sync consult before it finishes) would call `recordCall`
  * again, the outer call's event is already fully committed to the log —
@@ -1555,8 +1623,7 @@ function openCallStack(callThreadEntries) {
  * permanently unreachable dead code.
  */
 export function recordCall(dir, { id, toRole, reason, note, outcome, openSyncDepth = 0 } = {}) {
-  const { logPath } = paths(dir);
-  return withEventsLockAndRefresh(dir, logPath, () => {
+  return withStateAndRefresh(dir, (tx) => {
     const before = currentView(dir);
     const work = before.work[id];
     if (!work) {
@@ -1587,7 +1654,7 @@ export function recordCall(dir, { id, toRole, reason, note, outcome, openSyncDep
       ? { type: 'work.handoff', payload: { id, from: fromRole, to: toRole, reason, mode: 'async', note } }
       : { type: 'work.call-summary', payload: { id, calleeRole: toRole, reason, outcome } };
     rawEvent.payload.writer = resolveWriterIdentity(dir);
-    return appendEventLocked(resolveWriterLogPath(dir), rawEvent, dir);
+    return tx.append(resolveWriterLogPath(dir), rawEvent);
   });
 }
 
@@ -1607,8 +1674,7 @@ export function recordCall(dir, { id, toRole, reason, note, outcome, openSyncDep
  * other refusal in this file.
  */
 export function recordCallReturn(dir, { id, note } = {}) {
-  const { logPath } = paths(dir);
-  return withEventsLockAndRefresh(dir, logPath, () => {
+  return withStateAndRefresh(dir, (tx) => {
     const before = currentView(dir);
     const work = before.work[id];
     if (!work) {
@@ -1624,7 +1690,7 @@ export function recordCallReturn(dir, { id, note } = {}) {
       payload: { id, from: work.holder, to: openCall.from, reason: openCall.reason, mode: 'async', returning: true, note },
     };
     rawEvent.payload.writer = resolveWriterIdentity(dir);
-    return appendEventLocked(resolveWriterLogPath(dir), rawEvent, dir);
+    return tx.append(resolveWriterLogPath(dir), rawEvent);
   });
 }
 
@@ -1636,11 +1702,10 @@ export function recordCallReturn(dir, { id, note } = {}) {
  * single write door + append-then-refresh tail as every mutation here.
  */
 export function addDiscovery(dir, payload) {
-  const { logPath } = paths(dir);
   if (!payload || typeof payload.id !== 'string' || !payload.id.trim()) {
     throw new StoreError('validation', 'discovery requires a non-empty "id".');
   }
-  return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(resolveWriterLogPath(dir), { type: 'work.discovery', payload }, dir));
+  return withStateAndRefresh(dir, (tx) => tx.append(resolveWriterLogPath(dir), { type: 'work.discovery', payload }));
 }
 
 // Gate approve record shape (tsk-19j D1/D11): the 3 skill-embedded Gates
@@ -1662,7 +1727,6 @@ const GATE_APPROVE_ACTORS = new Set(['human', 'bypass']);
  * the item.
  */
 export function recordGateApprove(dir, { id, gate, actor, verify } = {}) {
-  const { logPath } = paths(dir);
   if (typeof id !== 'string' || !id.trim()) {
     throw new StoreError('validation', 'gate-approve requires a non-empty "id".');
   }
@@ -1675,8 +1739,8 @@ export function recordGateApprove(dir, { id, gate, actor, verify } = {}) {
   if (typeof verify !== 'string' || !verify.trim()) {
     throw new StoreError('validation', 'gate-approve requires a non-empty "verify".');
   }
-  return withEventsLockAndRefresh(dir, logPath, () =>
-    appendEventLocked(resolveWriterLogPath(dir), { type: 'work.gate-approve', payload: { id, gate, actor, verify } }, dir));
+  return withStateAndRefresh(dir, (tx) =>
+    tx.append(resolveWriterLogPath(dir), { type: 'work.gate-approve', payload: { id, gate, actor, verify } }));
 }
 
 /**
@@ -1711,7 +1775,6 @@ export function recordGateApprove(dir, { id, gate, actor, verify } = {}) {
  * `parseDecisionRelation` below).
  */
 export function addDecision(dir, payload) {
-  const { logPath } = paths(dir);
   if (!payload || typeof payload.text !== 'string' || !payload.text.trim()) {
     throw new StoreError('validation', 'decision requires a non-empty "text".');
   }
@@ -1719,7 +1782,7 @@ export function addDecision(dir, payload) {
     throw new StoreError('validation', 'decision requires a non-empty "rationale".');
   }
   const eventPayload = { ...payload, source: payload.source ?? 'session', kind: payload.kind ?? 'design' };
-  return withEventsLockAndRefresh(dir, logPath, () => {
+  return withStateAndRefresh(dir, (tx) => {
     // tsk-37t: unlike every neighbouring id-taking verb (editWork/moveWork
     // both throw `work "<id>" not found` first), this used to accept any
     // id at all — a decision scoped to a nonexistent item wrote a success
@@ -1734,7 +1797,7 @@ export function addDecision(dir, payload) {
         throw new StoreError('validation', `work "${payload.id}" not found.`);
       }
     }
-    return appendEventLocked(resolveWriterLogPath(dir), { type: 'decision', payload: eventPayload }, dir);
+    return tx.append(resolveWriterLogPath(dir), { type: 'decision', payload: eventPayload });
   });
 }
 
@@ -1836,12 +1899,11 @@ export function assertValidDocType(payload) {
  * replay's existing spread-fold with zero mechanism change.
  */
 export function addOutcome(dir, payload) {
-  const { logPath } = paths(dir);
   if (!payload || typeof payload.id !== 'string' || !payload.id.trim()) {
     throw new StoreError('validation', 'outcome requires a non-empty "id".');
   }
   assertValidDocType(payload);
-  return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(resolveWriterLogPath(dir), { type: 'work.outcome', payload }, dir));
+  return withStateAndRefresh(dir, (tx) => tx.append(resolveWriterLogPath(dir), { type: 'work.outcome', payload }));
 }
 
 /**
@@ -1861,7 +1923,6 @@ export function addOutcome(dir, payload) {
  * durable event) left no trace an attempt ever happened.
  */
 export function recordClaimAttempt(dir, { id, phase, result, claimId, actor, endedAt } = {}) {
-  const { logPath } = paths(dir);
   if (!id || typeof id !== 'string') {
     throw new StoreError('validation', 'recordClaimAttempt: "id" is required.');
   }
@@ -1869,7 +1930,7 @@ export function recordClaimAttempt(dir, { id, phase, result, claimId, actor, end
     throw new StoreError('validation', 'recordClaimAttempt: "phase" is required.');
   }
   const payload = { id, phase, result, claimId, actor: actor || 'unknown', endedAt: endedAt || new Date().toISOString() };
-  return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(resolveWriterLogPath(dir), { type: 'work.attempt', payload }, dir));
+  return withStateAndRefresh(dir, (tx) => tx.append(resolveWriterLogPath(dir), { type: 'work.attempt', payload }));
 }
 
 export function currentEffectiveView(dir) {
@@ -2086,11 +2147,11 @@ export function rebuild(dir) {
  */
 export function appendKnowledgeEvent(dir, type, payload) {
   const logPath = resolveWriterLogPath(dir);
-  return withEventsLockAndRefresh(dir, logPath, () => {
+  return withStateAndRefresh(dir, (tx) => {
     const before = currentView(dir);
     const event = { type, payload, ts: Date.now() };
     applyKnowledgeEvent(before, event);
-    appendEventLocked(logPath, { type, payload }, dir);
+    tx.append(logPath, { type, payload });
     return event;
   });
 }

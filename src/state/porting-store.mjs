@@ -20,7 +20,8 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { readEvents, withEventsLock, appendEventLocked } from './events.mjs';
+import { readEvents } from './events.mjs';
+import { withStateTx } from './hot-lock.mjs';
 import { transitionPorting, PortingError } from './porting.mjs';
 
 function paths(dir) {
@@ -66,7 +67,11 @@ function rebuildViewFromLog(logPath) {
   return fold(readEvents(logPath));
 }
 
-function writeView(viewPath, view) {
+function writeView(viewPath, view, tx = null) {
+  if (tx) {
+    tx.writeJson(viewPath, view);
+    return;
+  }
   fs.mkdirSync(path.dirname(viewPath), { recursive: true });
   fs.writeFileSync(viewPath, `${JSON.stringify(view, null, 2)}\n`, 'utf8');
 }
@@ -74,25 +79,25 @@ function writeView(viewPath, view) {
 // Shared tail of every mutation: rebuild the view fresh from the (now
 // updated) log and overwrite state.json. Always called AFTER the event that
 // caused the change has already been appended — never before.
-function refreshView(dir) {
+function refreshView(dir, tx = null) {
   const { logPath, viewPath } = paths(dir);
   const view = rebuildViewFromLog(logPath);
-  writeView(viewPath, view);
+  writeView(viewPath, view, tx);
   return view;
 }
 
 // tsk-1q5: same fix as store.mjs's sibling helper — fold `refreshView` into
-// the SAME held `withEventsLock` scope as the append, instead of running it
+// the SAME held `withStateTx` scope as the append, instead of running it
 // as a separate, unlocked critical section afterward. Closes the same
 // lost-update window (two processes' unlocked `refreshView` calls racing to
 // overwrite `state.json`, staler-write-wins) for this store too.
-function withEventsLockAndRefresh(dir, logPath, fn) {
+function withStateAndRefresh(dir, fn) {
   let view;
-  const event = withEventsLock(logPath, () => {
-    const result = fn();
-    view = refreshView(dir);
+  const event = withStateTx(dir, (tx) => {
+    const result = fn(tx);
+    view = refreshView(dir, tx);
     return result;
-  }, dir);
+  }, { resource: 'porting-events' });
   return { event, view };
 }
 
@@ -117,8 +122,8 @@ export function initStore(dir) {
  * against the log's own current ids (read fresh, never off a possibly-stale
  * view) BEFORE writing anything — a duplicate id never reaches the log.
  *
- * The existence check through the append is one held `events.lock` critical
- * section (`withEventsLock`/`appendEventLocked`, not bare `appendEvent`),
+ * The existence check through the append is one held porting-events critical
+ * section (`withStateTx`/`tx.append`, not bare `appendEvent`),
  * mirroring store.mjs's addWork dup-id guard (tsk-1jp): two processes racing
  * `addPorting` on the same id can no longer both read "id not present yet"
  * and both append a `porting.add` — the second to acquire the lock re-reads
@@ -131,14 +136,14 @@ export function addPorting(dir, entry) {
     throw new PortingError('validation', 'addPorting: entry requires a non-empty "id".');
   }
 
-  return withEventsLockAndRefresh(dir, logPath, () => {
+  return withStateAndRefresh(dir, (tx) => {
     const before = rebuildViewFromLog(logPath);
     if (before.porting[entry.id]) {
       throw new PortingError('validation', `porting "${entry.id}" already exists.`);
     }
 
     const item = { ...entry, status: 'candidate' };
-    return appendEventLocked(logPath, { type: 'porting.add', payload: item }, dir);
+    return tx.append(logPath, { type: 'porting.add', payload: item });
   });
 }
 
@@ -147,14 +152,14 @@ export function addPorting(dir, entry) {
  * log, delegates the precondition/CAS decision to porting.mjs (pure — never
  * writes), and only then appends the event it returns.
  *
- * Same one held `events.lock` critical section as `addPorting` above
+ * Same one held porting-events critical section as `addPorting` above
  * (tsk-1jp): the lookup, the CAS decision, and the append all happen inside
- * one `withEventsLock` scope, so a stale `expectedStatus` read can no longer
+ * one `withStateTx` scope, so a stale `expectedStatus` read can no longer
  * slip past the check before a racing write lands.
  */
 export function movePorting(dir, { id, to, expectedStatus } = {}) {
   const { logPath } = paths(dir);
-  return withEventsLockAndRefresh(dir, logPath, () => {
+  return withStateAndRefresh(dir, (tx) => {
     const before = rebuildViewFromLog(logPath);
     const porting = before.porting[id];
     if (!porting) {
@@ -162,7 +167,7 @@ export function movePorting(dir, { id, to, expectedStatus } = {}) {
     }
 
     const rawEvent = transitionPorting({ porting, to, expectedStatus }); // PortingError: precondition | conflict
-    return appendEventLocked(logPath, rawEvent, dir);
+    return tx.append(logPath, rawEvent);
   });
 }
 

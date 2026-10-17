@@ -263,11 +263,12 @@ function underDir(fgosDir, target) {
   return rel !== '' && !rel.startsWith('..') && !path.isAbsolute(rel);
 }
 
-function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null } = {}) {
+function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null, extraRoots = [] } = {}) {
   let live = true;
+  const roots = [fgosDir, ...extraRoots];
   const guard = (target) => {
     if (!live) throw new HotLockError('state-tx-revoked', 'the state transaction was used after its callback returned');
-    if (target !== undefined && !underDir(fgosDir, target)) {
+    if (target !== undefined && !roots.some((root) => underDir(root, target))) {
       throw new HotLockError('state-tx-path-outside', `"${target}" is not under ${fgosDir}; a state transaction touches only its own .fgos`);
     }
   };
@@ -288,10 +289,14 @@ function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null } = 
       fs.appendFileSync(logPath, line, 'utf8');
     },
     writeJson(target, value) {
+      tx.writeText(target, `${JSON.stringify(value, null, 2)}\n`);
+    },
+    /** Replace `target` with `text` atomically (temp file, then rename). */
+    writeText(target, text) {
       guard(target);
       fs.mkdirSync(path.dirname(target), { recursive: true });
       const tmp = `${target}.tmp-${uniqueTmpTag()}`;
-      fs.writeFileSync(tmp, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
+      fs.writeFileSync(tmp, text, 'utf8');
       fs.renameSync(tmp, target);
     },
     readJson(target) {
@@ -302,6 +307,13 @@ function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null } = 
         if (err.code === 'ENOENT') return null;
         throw err;
       }
+    },
+    /** Move `from` onto `to` (rename; both paths under the transaction's roots). */
+    rename(from, to) {
+      guard(from);
+      guard(to);
+      fs.mkdirSync(path.dirname(to), { recursive: true });
+      fs.renameSync(from, to);
     },
     unlink(target) {
       guard(target);
@@ -324,6 +336,8 @@ function createTx(fgosDir, { mainFgosDir = null, head = null, writer = null } = 
  * to compute — `mainFgosDir`, `head`, `writer` — resolved by the caller before
  * the lock; the writer identity is resolved here, before the lock, when the
  * caller did not pass it. A reentrant call throws `hot-lock-reentry` at once.
+ * `prefetched.extraRoots` lists further directories the transaction may write
+ * under (a log directory that is not the lock's own `.fgos`).
  */
 export function withStateTx(fgosDir, fn, { resource = 'state', prefetched = {} } = {}) {
   assertResource(resource);

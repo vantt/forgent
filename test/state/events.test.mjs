@@ -9,6 +9,7 @@ import { appendEvent, readEvents, repairTruncatedLastLine, EventLogError } from 
 import { SCHEMA_VERSION } from '../../src/state/work.mjs';
 
 const EVENTS_MJS = pathToFileURL(path.resolve(fileURLToPath(import.meta.url), '../../../src/state/events.mjs')).href;
+const HOT_LOCK_MJS = pathToFileURL(path.resolve(fileURLToPath(import.meta.url), '../../../src/state/hot-lock.mjs')).href;
 
 // Every test gets its own mkdtemp dir — never touch the repo's .fgos/.
 function tmpLogPath() {
@@ -301,7 +302,7 @@ try {
 });
 
 // tsk-3wq: the actual before/after discriminator. A separate OS process
-// acquires events.lock (via the real withEventsLock, the SAME lock
+// takes the state lock (via the real withStateTx, the SAME lock
 // appendEvent/repairTruncatedLastLine share) and holds it for a fixed
 // duration; the parent then calls repairTruncatedLastLine and times it.
 // Fixed (locked) code MUST block for at least that duration before it can
@@ -321,11 +322,12 @@ test('repairTruncatedLastLine now blocks on a lock another process holds — the
   const markerPath = path.join(workDir, 'lock-acquired.marker');
   const holderScript = `
 import fs from 'node:fs';
-import { withEventsLock } from ${JSON.stringify(EVENTS_MJS)};
+import path from 'node:path';
+import { withStateTx } from ${JSON.stringify(HOT_LOCK_MJS)};
 const logPath = process.argv[2];
 const markerPath = process.argv[3];
 const holdMs = Number(process.argv[4]);
-withEventsLock(logPath, () => {
+withStateTx(path.dirname(logPath), () => {
   fs.writeFileSync(markerPath, String(Date.now()));
   Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, holdMs);
 });

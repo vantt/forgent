@@ -11,7 +11,7 @@
 //
 // Exec happens at most once per process for a given session env (pid-branch
 // answers) or per session env and fgos dir (env/registry answers), and never
-// while this process holds events.lock or claims.lock: the lock helpers prime
+// while this process holds the state lock: the lock helpers prime
 // the cache before taking the lock and report each lock they hold here, and
 // probeIdentity refuses to exec while any is held.
 
@@ -46,12 +46,12 @@ export class WriterIdentityError extends Error {
 
 let heldLocks = 0;
 
-/** Called by withEventsLock/withClaimsLock right after taking a lock. */
+/** Called by withStateTx right after taking a lock. */
 export function noteLockHeld() {
   heldLocks += 1;
 }
 
-/** Called by withEventsLock/withClaimsLock exactly once when that lock is
+/** Called by withStateTx exactly once when that lock is
  * really released. */
 export function noteLockReleased() {
   heldLocks = Math.max(0, heldLocks - 1);
@@ -102,14 +102,14 @@ function classifyExecError(err, bin) {
  *
  * The one place that runs the verb: no cache, so doctor can ask each
  * candidate binary directly. Refuses to exec while this process holds an
- * events/claims lock. The child gets this process's env minus
+ * state lock. The child gets this process's env minus
  * FGOS_INVOCATION_RECORD_PATH, so the verb writes nothing.
  */
 export function probeIdentity(bin, fgosDir) {
   if (heldLocks > 0) {
     throw new WriterIdentityError(
       'identity-in-lock',
-      'resolving the writer identity would exec the host while events.lock/claims.lock is held; resolve before taking the lock',
+      'resolving the writer identity would exec the host while the state lock is held; resolve before taking the lock',
     );
   }
   const env = { ...process.env };

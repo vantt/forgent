@@ -62,7 +62,7 @@ import { checkDispatchAttestation } from '../../runner/attestation-guard.mjs';
 
 // tsk-480: approve's own success paths (merge landed, or verify-only
 // passed) call `moveWork(...to:'delivered'...)` as their very last
-// step. That write can throw on `events.lock` contention even though
+// step. That write can throw on state-lock contention even though
 // the precondition it's recording already succeeded permanently —
 // without a guard, the exception would propagate uncaught, and (per
 // `invocation-fault-log.mjs`'s own documented scope) a fault raised

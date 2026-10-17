@@ -25,7 +25,6 @@ import {
 import { withStateTx } from './hot-lock.mjs';
 
 export { EventLogError, parseEventLines, readEvents, readLastLineBefore, readEventsFromByte };
-export { appendEventCore as appendEventLocked };
 
 /**
  * Operator-invoked repair, scoped ONLY to the common crash-mid-append shape:
@@ -40,10 +39,10 @@ export { appendEventCore as appendEventLocked };
  * "fixed" result.
  *
  * The whole read → validate → backup → write sequence runs inside
- * `withEventsLock` (tsk-3wq: this used to be an unlocked whole-file rewrite,
+ * `withStateTx` (tsk-3wq: this used to be an unlocked whole-file rewrite,
  * so a concurrent `appendEvent` landing between the read and the
  * `writeFileSync` was silently overwritten/dropped — the same
- * read-then-write TOCTOU `withEventsLock`/`appendEventLocked` already close
+ * read-then-write TOCTOU `withStateTx`/`tx.append` already close
  * for `addWork`/`editWork`/`moveWork`/`moveStep` in store.mjs). Folding this
  * function into the SAME cross-process lock `appendEvent` holds means a
  * concurrent append can no longer land mid-repair — it either lands before
@@ -51,7 +50,8 @@ export { appendEventCore as appendEventLocked };
  * after this call releases it (the append reads the just-repaired file).
  */
 export function repairTruncatedLastLine(logPath) {
-  return withEventsLock(logPath, () => {
+  const { root, resource } = lockOfLog(logPath, path.dirname(logPath));
+  return withStateTx(root, (tx) => {
     let raw;
     try {
       raw = fs.readFileSync(logPath, 'utf8');
@@ -87,34 +87,23 @@ export function repairTruncatedLastLine(logPath) {
     fs.copyFileSync(logPath, backupPath);
 
     const repaired = lines.slice(0, -1).map((line) => `${line}\n`).join('');
-    fs.writeFileSync(logPath, repaired, 'utf8');
+    tx.writeText(logPath, repaired);
 
     // Re-validate: readEvents throws if the repaired file is somehow still
     // unreadable, so this call never returns a falsely-reported "fixed" state.
     const events = readEvents(logPath);
 
     return { backupPath, droppedLine: lastLine, eventCount: events.length };
-  });
+  }, { resource });
 }
 
-/**
- * Run `fn` while holding the hot mutex the log at `logPath` belongs to,
- * releasing on every exit path. Exported so a caller with its own precondition
- * check ahead of an append — store.mjs's addWork/editWork/moveWork/moveStep —
- * can widen the exclusive window to cover that whole read-check-append
- * sequence as ONE critical section, instead of only the append itself.
- *
- * `fn` must be synchronous and may not start a child process (see
- * hot-lock.mjs). `fgosDir` is the `.fgos` directory whose writer identity the
- * code inside resolves; it is resolved (and cached) before the lock is taken.
- * A log under `<fgosDir>/porting/` takes the `porting-events` mutex of the
- * parent `.fgos`; every other log takes `state`.
- */
-export function withEventsLock(logPath, fn, fgosDir = path.dirname(logPath)) {
+// The hot mutex a log belongs to: a log under `<fgosDir>/porting/` takes the
+// `porting-events` mutex of the parent `.fgos`; every other log takes `state`.
+export function lockOfLog(logPath, fgosDir) {
   const parent = path.dirname(logPath);
   const porting = path.basename(parent) === 'porting';
   const root = porting && fgosDir === parent ? path.dirname(parent) : fgosDir;
-  return withStateTx(root, () => fn(), { resource: porting ? 'porting-events' : 'state' });
+  return { root, resource: porting ? 'porting-events' : 'state' };
 }
 
 /**
@@ -136,7 +125,7 @@ export function withEventsLock(logPath, fn, fgosDir = path.dirname(logPath)) {
  * already-corrupt log fails loudly with the same 'corrupt-log' category
  * rather than silently continuing on top of unknown state.
  *
- * The read-seq/compute/append sequence runs under `withEventsLock` (released
+ * The read-seq/compute/append sequence runs under `withStateTx` (released
  * in a finally on every exit path), so two concurrent processes never both
  * read the same last seq and write a duplicate.
  *
@@ -145,10 +134,11 @@ export function withEventsLock(logPath, fn, fgosDir = path.dirname(logPath)) {
  * of the append (store.mjs's addWork existing-id check, moveWork's
  * expectedStatus compare-and-swap, editWork, moveStep) needs that read
  * inside the SAME held lock to avoid acting on a precondition that's already
- * gone stale; those callers use `withEventsLock` + `appendEventLocked`
+ * gone stale; those callers use `withStateTx` + `tx.append`
  * directly instead of this function, so their whole read-check-append
  * sequence is one critical section.
  */
 export function appendEvent(logPath, opts, fgosDir) {
-  return withEventsLock(logPath, () => appendEventCore(logPath, opts, fgosDir), fgosDir);
+  const { root, resource } = lockOfLog(logPath, fgosDir ?? path.dirname(logPath));
+  return withStateTx(root, (tx) => tx.append(logPath, opts), { resource });
 }
