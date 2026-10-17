@@ -27,6 +27,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import readline from 'node:readline';
 import { execFileSync, execSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, recordFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, OUTCOME_EXIT_CODES, categoryOf, exitCodeForOutcome, parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
@@ -103,18 +104,11 @@ import { branchNameFor, branchExists, provisionDependencies, resyncWorktree, det
 import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
 import { isReclaimEligible } from '../src/runner/claim-liveness.mjs';
 import { withLockRetry } from '../src/runner/lock-wait.mjs';
-import {
-  acquireMainCheckoutLock,
-  releaseMainCheckoutLock,
-  forceReclaimAmbiguousLock,
-  inspectMainCheckoutLock,
-  ACQUIRED,
-  HELD,
-  DEFAULT_TTL_MS,
-  formatLockDurationMs,
-  lockRefusalDetail,
-  UNSUPPORTED_PROTOCOL,
-} from '../src/runner/main-checkout-lock.mjs';
+import { withMainCheckout, addWorktree } from '../src/runner/repo-locks.mjs';
+import { HolderLockError, createLockScope } from '../src/holder-lock/index.mjs';
+import { collectLockStatus } from '../src/runner/lock-status.mjs';
+import { fenceLock, parseLockParams } from '../src/runner/lock-fence.mjs';
+import { formatLockDurationMs } from '../src/util/format-lock-duration.mjs';
 import { clearBeaconIfOwn, readBeacon } from '../src/runner/main-checkout-activity.mjs';
 import { resolveWriterIdentity } from '../src/util/session-identity.mjs';
 import { createSession, endSession, listSessions, reclaimOrphanedSessions, isSessionWorktree, SessionError } from '../src/runner/session.mjs';
@@ -274,7 +268,7 @@ function excludeIronLawEvidence(files, id) {
 // moved under this gitignored bucket -- kept here too since this regex is
 // evaluated against whatever path list a caller hands it, not only
 // `git diff --name-only` (which would never surface an ignored path).
-const FGOS_NOISE_ONLY_PATHS = /^\.fgos\/(events\.jsonl(\.backup-.*)?|events\/.*\.jsonl|events\/archive\/.*|logs\/.*|observe\/.*|events-jsonl\.truncation-guard\..*|main-checkout-guard-warnings\..*)$/;
+const FGOS_NOISE_ONLY_PATHS = /^\.fgos\/(events\.jsonl(\.backup-.*)?|events\/.*\.jsonl|events\/archive\/.*|logs\/.*|locks\/.*|observe\/.*|events-jsonl\.truncation-guard\..*|main-checkout-guard-warnings\..*)$/;
 function excludeFgosPaths(files) {
   return files.filter((f) => !FGOS_NOISE_ONLY_PATHS.test(normalizePath(f)));
 }
@@ -336,6 +330,29 @@ function optionalField(value, message) {
 // MAX_WAIT_MS bounds that ceiling: a mistyped value must not hang a CLI
 // call near-indefinitely against a holder that never actually releases.
 const MAX_WAIT_MS = 15 * 60 * 1000; // 900000ms, tsk-2rf D3
+
+// A named lock-held answer from a repo-lock door becomes the CLI's
+// `lock-timeout` refusal (exit 7); other lock errors keep their own message.
+function lockErrorToStoreError(err, verbName) {
+  if (!(err instanceof HolderLockError)) return err;
+  const category = err.code === 'lock-held' ? 'lock-timeout' : 'precondition';
+  return new StoreError(category, `${verbName}: ${err.message}`);
+}
+
+// Asks on the terminal before `lock fence` signals anything. Without a
+// terminal there is nobody to ask, so the answer is no (pass --yes).
+async function confirmFence(name, holders) {
+  const list = holders.map((h) => `  pid ${h.pid} (started ${h.startTime}): ${h.cmdline || '(no command line)'}`).join('\n');
+  process.stderr.write(`fgos: lock ${name} is held by:\n${list}\n`);
+  if (!process.stdin.isTTY || !process.stderr.isTTY) return false;
+  const rl = readline.createInterface({ input: process.stdin, output: process.stderr });
+  try {
+    const answer = await new Promise((resolve) => rl.question('Stop these processes? [y/N] ', resolve));
+    return /^y(es)?$/i.test(answer.trim());
+  } finally {
+    rl.close();
+  }
+}
 
 function parseWaitFlags(flags, verbName) {
   const noWait = Boolean(flags['no-wait']);
@@ -497,6 +514,9 @@ async function adhocUnitFromPrompt(prompt, flags, { mainRoot, isLinkedWorktree }
 // Minimal argv parser: `--flag value` or bare `--flag` (boolean), plus
 // positional args. No dependency, no dashes-in-values ambiguity handling
 // beyond what this CLI's own verbs need.
+// Flags that may be given more than once; each use is collected into a list.
+const REPEATABLE_FLAGS = new Set(['context-ref', 'param']);
+
 function parseArgs(args) {
   const flags = {};
   const positional = [];
@@ -506,10 +526,10 @@ function parseArgs(args) {
       const key = arg.slice(2);
       const next = args[i + 1];
       if (next !== undefined && !next.startsWith('--')) {
-        flags[key] = key === 'context-ref' ? [...(flags[key] ?? []), next] : next;
+        flags[key] = REPEATABLE_FLAGS.has(key) ? [...(flags[key] ?? []), next] : next;
         i += 1;
       } else {
-        flags[key] = key === 'context-ref' ? [...(flags[key] ?? []), true] : true;
+        flags[key] = REPEATABLE_FLAGS.has(key) ? [...(flags[key] ?? []), true] : true;
       }
     } else {
       positional.push(arg);
@@ -3113,14 +3133,15 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // Delegate to claim-port.mjs — single choke-point for all claim flows
       // (tsk-53f D1). take uses isolate:false (no worktree creation).
       const { noWait, waitMs } = parseWaitFlags(flags, 'take');
-      const doTake = () => claimWork(dir, {
+      const doTake = (wait) => claimWork(dir, {
         id,
         actor: role,
         isolate: false,
         repoRoot,
+        waitMs: wait?.waitMs,
       });
       try {
-        return noWait ? doTake() : await withLockRetry(doTake, { waitMs });
+        return noWait ? await doTake() : await withLockRetry(doTake, { waitMs });
       } catch (err) {
         if (err instanceof ClaimError) {
           throw new StoreError(err.category, `take: ${err.message}`);
@@ -3184,16 +3205,17 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // default) fails that check past the first switch — pick is the only
       // caller that needs the harness-chainable location; runner/
       // merge-ephemeral callers are untouched.
-      const doPick = () => claimWork(dir, {
+      const doPick = (wait) => claimWork(dir, {
         id,
         actor: 'session',
         isolate: true,
         claimTrigger,
         repoRoot,
         worktreeDir: path.join(repoRoot, '.claude', 'worktrees'),
+        waitMs: wait?.waitMs,
       });
       try {
-        return noWait ? doPick() : await withLockRetry(doPick, { waitMs });
+        return noWait ? await doPick() : await withLockRetry(doPick, { waitMs });
       } catch (err) {
         if (err instanceof ClaimError) {
           throw new StoreError(err.category, `pick: ${err.message}`);
@@ -3355,7 +3377,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           // validating gate caught).
           const tmpWorktree = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-return-'));
           try {
-            gitAt(repoRoot, ['worktree', 'add', '--detach', tmpWorktree, branchHead]);
+            await addWorktree(createLockScope('return-verify'), repoRoot, ['--detach', tmpWorktree, branchHead]);
             // `.fgos/` strip (ADR0020, tsk-26r): since `.fgos/` is
             // git-tracked in this repo, the `worktree add` above just
             // checked out a snapshot of it frozen at branchHead — stale the
@@ -4245,72 +4267,46 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       return { checks };
     }
 
-    // Safely clears .fgos/main-checkout.lock (tsk-3h4). Never force-deletes:
-    // reuses acquireMainCheckoutLock as-is for the ACQUIRED (free/stale,
-    // reclaimed as a side effect of the acquire attempt then immediately
-    // released -- this verb never wants to hold the lock, only clear it) and
-    // HELD (genuinely live elsewhere, refuse) outcomes, and only reaches for
-    // the new forceReclaimAmbiguousLock for the one status that primitive
-    // deliberately never unlinks itself (AMBIGUOUS -- unparseable content,
-    // D5 fail-closed).
-    case 'unlock': {
-      const lockResult = acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS });
-      if (lockResult.status === HELD && lockResult.reason) {
-        throw new StoreError('lock-timeout', `unlock: refusing to clear the main checkout lock${lockRefusalDetail(lockResult)}.`);
+    // `lock fence`: stop the process that holds a registry lock so the lock
+    // can be taken again. Never takes a lock from a live holder: holders are
+    // listed, signalled by identity (SIGTERM, then SIGKILL), and the kernel
+    // is asked with a probe whether the lock is free afterwards.
+    case 'lock': {
+      const sub = requireField(positional[0], 'lock requires a sub-verb: fgos lock fence <name> [--param k=v] [--yes] [--attest-stopped]');
+      if (sub === 'fence') {
+        const name = requireField(positional[1], 'lock fence requires a lock name: fgos lock fence <name> (names: fgos lock-status)');
+        try {
+          return await fenceLock({
+            name,
+            fgosDir: dir,
+            params: parseLockParams(flags.param),
+            attestStopped: Boolean(flags['attest-stopped']),
+            confirm: (holders) => (flags.yes ? true : confirmFence(name, holders)),
+          });
+        } catch (err) {
+          throw lockErrorToStoreError(err, 'lock fence');
+        }
       }
-      if (lockResult.status === HELD) {
-        const ttlPart = lockResult.remainingTtlMs != null
-          ? `, expires in ${formatLockDurationMs(lockResult.remainingTtlMs)}`
-          : ', no TTL window known';
-        // tsk-24t: main-checkout-lock.mjs's own tryAcquireOnce only probes
-        // liveness (isPidAlive) for a NUMERIC holder identity -- a string
-        // identity (the shape .githooks/pre-commit writes per commit) is
-        // judged purely by TTL freshness, by design (D5 fail-closed,
-        // undecidable without a liveness window). Claiming "live session"
-        // for that branch is a fabrication; say what is actually known.
-        const holderDescription = typeof lockResult.holderPid === 'number'
-          ? `a live session (${lockResult.holderPid}`
-          : `an identity whose liveness cannot be determined (${JSON.stringify(lockResult.holderPid)}`;
-        throw new StoreError(
-          'lock-timeout',
-          `unlock: main checkout lock is held by ${holderDescription}, held ${formatLockDurationMs(lockResult.lockAgeMs)}${ttlPart}) -- refusing to clear it.`,
-        );
-      }
-      if (lockResult.status === ACQUIRED) {
-        releaseMainCheckoutLock(dir);
-        return { cleared: true, reason: 'stale-or-free' };
-      }
-      // AMBIGUOUS
-      const reclaim = forceReclaimAmbiguousLock(dir);
-      if (reclaim.status === UNSUPPORTED_PROTOCOL) {
-        throw new StoreError('lock-timeout', `unlock: refusing to clear the main checkout lock${lockRefusalDetail({ reason: UNSUPPORTED_PROTOCOL })}.`);
-      }
-      return { cleared: reclaim.status === 'reclaimed', reason: reclaim.status };
+      throw new StoreError('validation', `unknown lock sub-verb "${sub}". Usage: fgos lock fence <name> [--param k=v] [--yes] [--attest-stopped]`);
     }
 
     case 'lock-status': {
-      const status = inspectMainCheckoutLock(dir);
+      const { mainCheckout, locks } = collectLockStatus({ fgosDir: dir });
       // The commit-activity beacon is reported on its own: it is a hint the
       // pre-commit hook reads, never a lock claim/land/approve wait on.
       const beacon = readBeacon(dir);
-      const activity = beacon.status === 'ok'
-        ? {
-          status: 'present',
-          writer: beacon.record.writer.id,
-          ageMs: Date.now() - beacon.record.writtenAt,
-          windowMs: beacon.record.windowMs,
-          active: Date.now() - beacon.record.writtenAt <= beacon.record.windowMs,
-        }
-        : { status: beacon.status };
       return {
-        outcome: status.outcome,
-        ...(status.reason ? { reason: status.reason } : {}),
-        holderPid: status.holderPid ?? null,
-        lockAgeMs: status.lockAgeMs ?? null,
-        remainingTtlMs: status.remainingTtlMs ?? null,
-        lockAge: status.lockAgeMs != null ? formatLockDurationMs(status.lockAgeMs) : null,
-        remainingTtl: status.remainingTtlMs != null ? formatLockDurationMs(status.remainingTtlMs) : null,
-        activity,
+        mainCheckout,
+        locks,
+        beacon: beacon.status === 'ok'
+          ? {
+            status: 'present',
+            writer: beacon.record.writer.id,
+            ageMs: Date.now() - beacon.record.writtenAt,
+            windowMs: beacon.record.windowMs,
+            active: Date.now() - beacon.record.writtenAt <= beacon.record.windowMs,
+          }
+          : { status: beacon.status },
       };
     }
 
@@ -4373,42 +4369,49 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
             '`fgos main-checkout-reset --sha <sha> --dir "$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)"`.',
         );
       }
-      const confirmed = Boolean(flags.confirm);
-      const dirty = !isMainTreeClean(repoRoot);
-      let lostCommitCount = 0;
-      let lostCommitsOutput = '';
-      try {
-        const revList = gitAt(repoRoot, ['rev-list', `${sha}..HEAD`]).trim();
-        if (revList) {
-          const commits = revList.split('\n').filter(Boolean);
-          lostCommitCount = commits.length;
-          if (lostCommitCount > 0) {
-            lostCommitsOutput = gitAt(repoRoot, ['log', `${sha}..HEAD`, '--format=%h %an (%ae): %s', '--stat']).trim();
+      const reset = async () => {
+        const confirmed = Boolean(flags.confirm);
+        const dirty = !isMainTreeClean(repoRoot);
+        let lostCommitCount = 0;
+        let lostCommitsOutput = '';
+        try {
+          const revList = gitAt(repoRoot, ['rev-list', `${sha}..HEAD`]).trim();
+          if (revList) {
+            const commits = revList.split('\n').filter(Boolean);
+            lostCommitCount = commits.length;
+            if (lostCommitCount > 0) {
+              lostCommitsOutput = gitAt(repoRoot, ['log', `${sha}..HEAD`, '--format=%h %an (%ae): %s', '--stat']).trim();
+            }
           }
+        } catch (_err) {
+          // If git rev-list fails (e.g. invalid SHA), reset --hard below will fail with git's error.
         }
-      } catch (_err) {
-        // If git rev-list fails (e.g. invalid SHA), reset --hard below will fail with git's error.
-      }
 
+        try {
+          assertSafeMainCheckoutReset({ dirty, confirmed, lostCommitCount, sha });
+        } catch (err) {
+          let details = `main-checkout-reset: ${err.message}`;
+          if (dirty) {
+            const statusOutput = gitAt(repoRoot, ['status', '--porcelain']).trim();
+            details += `\n\nFull git status (main checkout, whole repo):\n${statusOutput || '(empty)'}`;
+          }
+          if (lostCommitCount > 0) {
+            details += `\n\nCommits about to be discarded (${lostCommitCount}):\n${lostCommitsOutput || '(none)'}`;
+          }
+          throw new StoreError('validation', details);
+        }
+        gitAt(repoRoot, ['reset', '--hard', sha]);
+        return { sha, wasDirty: dirty, lostCommitCount, confirmed };
+      };
       try {
-        assertSafeMainCheckoutReset({ dirty, confirmed, lostCommitCount, sha });
+        return await withMainCheckout(createLockScope('main-checkout-reset'), 'reset', reset, { fgosDir: dir });
       } catch (err) {
-        let details = `main-checkout-reset: ${err.message}`;
-        if (dirty) {
-          const statusOutput = gitAt(repoRoot, ['status', '--porcelain']).trim();
-          details += `\n\nFull git status (main checkout, whole repo):\n${statusOutput || '(empty)'}`;
-        }
-        if (lostCommitCount > 0) {
-          details += `\n\nCommits about to be discarded (${lostCommitCount}):\n${lostCommitsOutput || '(none)'}`;
-        }
-        throw new StoreError('validation', details);
+        throw lockErrorToStoreError(err, 'main-checkout-reset');
       }
-      gitAt(repoRoot, ['reset', '--hard', sha]);
-      return { sha, wasDirty: dirty, lostCommitCount, confirmed };
     }
 
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <version|init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|item|ask|answer|decision|list|ready|rebuild|repair|rollup|take|return|review|approve|sync-root|reject|catchup|triage|session|gateway|goal|tool|setup|doctor|unlock|lock-status|main-checkout-reset> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <version|init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|item|ask|answer|decision|list|ready|rebuild|repair|rollup|take|return|review|approve|sync-root|reject|catchup|triage|session|gateway|goal|tool|setup|doctor|lock|lock-status|main-checkout-reset> ...`);
   }
 }
 
@@ -4788,13 +4791,14 @@ const STORE_MISSING_WARNING_VERBS = new Set([
 const MUTATING_ONLY_VERBS = new Set([
   'submit', 'take', 'pick', 'move', 'edit', 'ask', 'answer', 'gate-approve', 'reject',
   'add', 'discover', 'plan', 'retrospective', 'cleanup', 'compound', 'resolve-park-reason',
-  'handoff', 'handoff-return', 'decision', 'report', 'topic', 'doc', 'repair', 'unlock',
+  'handoff', 'handoff-return', 'decision', 'report', 'topic', 'doc', 'repair',
 ]);
 
 const MUTATING_SUBCOMMAND_PREDICATES = {
   session: (positional) => ['start', 'end', 'gc'].includes(positional[0]),
   goal: (positional) => positional[0] === 'set',
   gateway: (positional) => ['start', 'stop'].includes(positional[0]),
+  lock: (positional) => positional[0] === 'fence',
   knowledge: (positional) => positional[0] === 'attest',
   coordination: (positional, flags) => [
     'run', 'close', 'launch-master-loop', 'start', 'operation', 'authorize-and-dispatch',

@@ -88,6 +88,8 @@
     "src/runner/frozen-judge.mjs": "domain",
     "src/runner/merge.mjs": "infra",
     "src/runner/repo-locks.mjs": "infra",
+    "src/runner/lock-fence.mjs": "infra",
+    "src/runner/lock-status.mjs": "infra",
     "src/runner/main-fgos-checkpoint.mjs": "infra",
     "src/runner/main-checkout-activity.mjs": "infra",
     "src/runner/main-checkout-reset-guard.mjs": "infra",

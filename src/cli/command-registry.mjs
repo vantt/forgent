@@ -2089,26 +2089,38 @@ export const COMMAND_REGISTRY = [
     paginated: false,
     deprecated: null,
   },
-  {
-    name: 'unlock',
-    invoke: 'fgos unlock',
-    description: 'Safely clears .fgos/main-checkout.lock (the STR65 concurrent-writer guard) when it is stale or corrupt. Never force-deletes: refuses and reports the holder identity when a different session genuinely still holds it live.',
-    parameters: {
-      type: 'object',
-      properties: {},
-      required: [],
+  withSubcommands({
+    name: 'lock',
+    invoke: 'fgos lock fence <name>',
+    description: 'Stop the process that holds a registry lock so the lock can be taken again. Lists the holders (pid, start time, command line), asks for confirmation (--yes skips it), sends SIGTERM by identity, waits 5 s, sends SIGKILL, then asks the kernel with a probe whether the lock is free. A lock is never taken from a live holder: with no listable holder (a platform without /proc) the caller stops it, then --attest-stopped only re-checks the lock. Lock names: fgos lock-status.',
+    subcommands: {
+      fence: {
+        description: 'Fence the holder(s) of one registry lock. Reports free (exit 0) when nobody holds it.',
+        parameters: {
+          type: 'object',
+          properties: {
+            name: { type: 'string', description: 'Positional: the registry lock name (e.g. main-checkout, merge-slot, worktree-admin, gateway).' },
+            param: { type: 'string', description: 'Repeatable key=value for a lock path parameter the verb cannot know (e.g. --param ref=main for merge-slot, --param provider=codex --param account=a1 for provider-account). fgosDir and lockRoot default to this checkout / this machine.' },
+            yes: { type: 'boolean', description: 'Skip the confirmation prompt. Without it and without a terminal, nothing is signalled.' },
+            'attest-stopped': { type: 'boolean', description: 'Only where holders cannot be listed: say the holder is already stopped; the lock is then only re-checked with a probe, never signalled.' },
+          },
+          positional: ['name'],
+          required: ['name'],
+        },
+        examples: ['fgos lock fence main-checkout', 'fgos lock fence merge-slot --param ref=main --yes'],
+      },
     },
-    examples: ['fgos unlock'],
+    examples: ['fgos lock fence main-checkout', 'fgos lock fence merge-slot --param ref=main --yes'],
     touchesState: true,
     requiresExistingStore: true,
-    externalEffect: false,
+    externalEffect: true,
     paginated: false,
     deprecated: null,
-  },
+  }),
   {
     name: 'lock-status',
     invoke: 'fgos lock-status',
-    description: 'Read-only report on .fgos/main-checkout.lock: whether it is free, live (genuinely held), stale (reclaimable), or ambiguous (corrupt/undecidable), plus holder identity, lock age, and remaining TTL, and separately the pre-commit hook\'s commit-activity beacon (.fgos/runtime/main-checkout-activity.json). Never creates, refreshes, or deletes either file.',
+    description: 'Read-only report on every repo- and machine-scoped registry lock (main-checkout, merge-slot, worktree-admin, gateway, ...): free or held, the holder pids the kernel shows, and the guarantee of the filesystem the lock file lives in; plus, separately, the pre-commit hook\'s commit-activity beacon (.fgos/runtime/main-checkout-activity.json). Top-level keys: mainCheckout, locks, beacon. Never creates, refreshes, or deletes a lock file or the beacon.',
     parameters: {
       type: 'object',
       properties: {},
@@ -2143,7 +2155,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'main-checkout-reset',
     invoke: 'fgos main-checkout-reset',
-    description: 'The safe path for a destructive `git reset --hard` on the main checkout (tsk-3au). Refuses when the whole-repo tree is dirty unless --confirm is passed after reviewing the full git status printed in the refusal — closes the failure mode where a session checked only its own files and reset away another in-flight session\'s uncommitted work.',
+    description: 'The safe path for a destructive `git reset --hard` on the main checkout (tsk-3au). Runs while holding the main checkout mutex, so no other fgOS writer touches the checkout meanwhile; when another process holds it the verb refuses at once (lock-timeout), naming the lock and the holder pid, and touches nothing. Refuses when the whole-repo tree is dirty unless --confirm is passed after reviewing the full git status printed in the refusal — closes the failure mode where a session checked only its own files and reset away another in-flight session\'s uncommitted work.',
     parameters: {
       type: 'object',
       properties: {
