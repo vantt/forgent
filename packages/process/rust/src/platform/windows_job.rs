@@ -122,6 +122,46 @@ pub fn tree_from(procs: &[ProcEntry], holder: (u32, u64), keeper: Option<(u32, u
     }
 }
 
+/// Processes that may be members of a closed job whose parent chain to the
+/// holder is broken: created at or after `declared_at`, not the holder or the
+/// keeper, not already in `tree`, and with no parent in `procs` (the parent
+/// exited, or its pid now belongs to a process created after the child).
+///
+/// A job that closed (kill on close) is ending every member at once. A member
+/// whose own parent has already left the snapshot is no longer reachable from
+/// the holder, yet its process object is not signaled until its teardown
+/// finishes; the parent chain alone would miss it. These are only candidates
+/// to wait for, never to signal: an unrelated orphan looks the same.
+pub fn orphans_since(procs: &[ProcEntry], holder: (u32, u64), keeper: Option<(u32, u64)>, declared_at: u64, tree: &Tree) -> Vec<(u32, u64)> {
+    let in_tree: BTreeSet<u32> = tree.members.iter().map(|(pid, _)| *pid).chain(tree.unopenable.iter().copied()).collect();
+    let by_pid: BTreeMap<u32, &ProcEntry> = procs.iter().map(|p| (p.pid, p)).collect();
+    let mut found: BTreeMap<u32, u64> = BTreeMap::new();
+    for p in procs {
+        let Some(created) = p.created else { continue };
+        let parent_alive = by_pid.get(&p.ppid).is_some_and(|parent| parent.created.map_or(true, |pc| pc <= created));
+        let excluded = p.pid == 0 || in_tree.contains(&p.pid) || (p.pid, created) == holder || keeper == Some((p.pid, created));
+        if created >= declared_at && !parent_alive && !excluded {
+            found.insert(p.pid, created);
+        }
+    }
+    // Their own descendants are members of the same ending job.
+    loop {
+        let mut grew = false;
+        for p in procs {
+            let Some(created) = p.created else { continue };
+            let Some(parent_created) = found.get(&p.ppid).copied() else { continue };
+            let excluded = found.contains_key(&p.pid) || in_tree.contains(&p.pid) || keeper == Some((p.pid, created));
+            if !excluded && created >= parent_created && created >= declared_at {
+                found.insert(p.pid, created);
+                grew = true;
+            }
+        }
+        if !grew {
+            return found.into_iter().collect();
+        }
+    }
+}
+
 /// What one query of a job's process-id list answered.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ListRead {
@@ -193,7 +233,7 @@ mod os {
     use windows_sys::Win32::System::RemoteDesktop::ProcessIdToSessionId;
     use windows_sys::Win32::System::Threading::{GetCurrentProcess, GetCurrentProcessId, GetProcessTimes, OpenProcess, OpenThread, ResumeThread, TerminateProcess, WaitForSingleObject, PROCESS_QUERY_LIMITED_INFORMATION, THREAD_SUSPEND_RESUME};
 
-    use super::{decide, format_job_name, read_id_list, tree_from, ListRead, MemberState, ProcEntry};
+    use super::{decide, format_job_name, orphans_since, read_id_list, tree_from, ListRead, MemberState, ProcEntry};
     use crate::control::{signal_by_identity, Signal};
     use crate::facts::{Observed, ProcTuple};
     use crate::platform;
@@ -204,6 +244,9 @@ mod os {
     const JOB_OBJECT_TERMINATE_RIGHT: u32 = 0x0008;
     /// Slots of the id-list buffer a poll starts with; it grows on demand.
     const LIST_SLOTS: usize = 256;
+    /// How long after the job is first found gone a process with a broken parent
+    /// chain may still count as a member that is tearing down.
+    const ORPHAN_SETTLE: std::time::Duration = std::time::Duration::from_millis(500);
     /// Why a record from another Windows session is never judged empty.
     pub const OTHER_SESSION_REASON: &str = "predecessor-other-session";
 
@@ -535,6 +578,9 @@ mod os {
         in_list: bool,
         in_scan: bool,
         in_tree: bool,
+        /// A candidate whose parent chain to the holder is broken (see
+        /// [`orphans_since`]); waited for, never signaled.
+        in_orphan: bool,
     }
 
     struct Poll {
@@ -555,6 +601,9 @@ mod os {
         /// Every pid any poll named, with the sources that named it, kept for
         /// the whole life of the view.
         seen: BTreeMap<u32, Named>,
+        /// While the closed job's members may still be tearing down: set at the
+        /// first poll that finds no job, so unrelated orphans block only briefly.
+        orphan_until: Option<std::time::Instant>,
     }
 
     impl Core {
@@ -603,6 +652,12 @@ mod os {
                     Ok(holder) => {
                         let found = tree_from(&procs, holder, keeper, record.declared_at);
                         found.members.iter().for_each(|(pid, _)| named.entry(*pid).or_default().in_tree = true);
+                        if job.is_none() {
+                            let until = *self.orphan_until.get_or_insert_with(|| std::time::Instant::now() + ORPHAN_SETTLE);
+                            if std::time::Instant::now() < until {
+                                orphans_since(&procs, holder, keeper, record.declared_at, &found).into_iter().for_each(|(pid, _)| named.entry(pid).or_default().in_orphan = true);
+                            }
+                        }
                         unopenable.extend(found.unopenable);
                     }
                     // A holder tuple that cannot be read gives no tree to judge by.
@@ -614,6 +669,7 @@ mod os {
                 seen.in_list |= by.in_list;
                 seen.in_scan |= by.in_scan;
                 seen.in_tree |= by.in_tree;
+                seen.in_orphan |= by.in_orphan;
             }
             for pid in named.keys().copied().collect::<Vec<_>>() {
                 if self.tracked.contains_key(&pid) {
@@ -766,7 +822,7 @@ mod os {
 
         /// Every pid the polls so far named, with the sources that named it.
         pub fn trace(&self) -> Vec<(u32, NamedBy)> {
-            self.core.seen.iter().map(|(pid, n)| (*pid, NamedBy { list: n.in_list, scan: n.in_scan, tree: n.in_tree })).collect()
+            self.core.seen.iter().map(|(pid, n)| (*pid, NamedBy { list: n.in_list, scan: n.in_scan, tree: n.in_tree || n.in_orphan })).collect()
         }
 
         /// Set once a poll answered "not empty" because the record is from
@@ -843,6 +899,47 @@ mod tests {
 
     fn dead(pid: u32) -> MemberState {
         MemberState { pid, signaled: true }
+    }
+
+    fn row(pid: u32, ppid: u32, created: u64) -> ProcEntry {
+        ProcEntry { pid, ppid, created: Some(created) }
+    }
+
+    #[test]
+    fn a_member_whose_parent_left_is_a_candidate_with_its_own_descendants() {
+        // holder 10 (dead, absent), git 20 under it is gone; sh 30 lost its parent, hook 40 is sh's child.
+        let procs = [row(30, 20, 300), row(40, 30, 400), row(50, 5, 50), row(60, 1, 500)];
+        let tree = tree_from(&procs, (10, 100), None, 200);
+        assert!(tree.members.is_empty(), "the chain through 20 is broken");
+        let found = orphans_since(&procs, (10, 100), None, 200, &tree);
+        let pids: Vec<u32> = found.iter().map(|(pid, _)| *pid).collect();
+        assert_eq!(pids, vec![30, 40, 60]);
+    }
+
+    #[test]
+    fn processes_with_a_live_parent_or_older_than_the_declare_are_not_candidates() {
+        // 50 predates the declare; 70's parent 60 is alive and unrelated to the domain.
+        let procs = [row(50, 5, 50), row(60, 1, 150), row(70, 60, 300), row(10, 2, 100)];
+        let tree = tree_from(&procs, (10, 100), None, 200);
+        let found = orphans_since(&procs, (10, 100), None, 200, &tree);
+        assert!(found.iter().all(|(pid, _)| *pid != 70 && *pid != 50 && *pid != 10), "{found:?}");
+    }
+
+    #[test]
+    fn the_keeper_and_tree_members_are_never_candidates() {
+        let procs = [row(20, 10, 300), row(30, 9, 310), row(31, 30, 320)];
+        let tree = tree_from(&procs, (10, 100), Some((30, 310)), 200);
+        assert_eq!(tree.members, vec![(20, 300)]);
+        let found = orphans_since(&procs, (10, 100), Some((30, 310)), 200, &tree);
+        assert!(found.iter().all(|(pid, _)| *pid != 20 && *pid != 30), "{found:?}");
+    }
+
+    #[test]
+    fn a_parent_created_after_its_child_is_a_reused_pid_not_a_parent() {
+        let procs = [row(30, 20, 300), row(20, 1, 900)];
+        let tree = Tree::default();
+        let found = orphans_since(&procs, (10, 100), None, 200, &tree);
+        assert!(found.iter().any(|(pid, _)| *pid == 30), "{found:?}");
     }
 
     #[test]
