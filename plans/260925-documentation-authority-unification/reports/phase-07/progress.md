@@ -15,8 +15,9 @@
   2 classification rework; vocabulary 13/13 ok). A45 and Lead decisions
   L11-12..L11-14 have been applied. Step 3 has no remaining stop condition and
   is accepted-pending-review; Step 4's reviewer notes are applied.
-- Next action: one fresh-context reviewer checks exactly the 15 bounded entries in
-  `review-request-a38-step-03-step-04-bounded-rework-01.md`.
+- Bounded re-review (Lead note): 15/15 ok, 0 rework, pins match, at `df3626178`;
+  report `review-a38-step-03-step-04-bounded-rework-01.md`. Steps 3 and 4 accepted.
+- Next action: Step 5, held until the owner says to continue.
 - Final turn verification: changed JSON parses; matrix/stop and unpark assertions
   pass; strict candidate-status checks 217 documents with zero findings;
   `git diff --check` passes; all changed paths remain inside the assignment scope.
@@ -195,9 +196,9 @@ resolved path, author, reviewer, digest and status here.
 |---:|---|---|---|---|
 | 1 | accepted | 11/11 independent rework verdicts ok at `1d78440f9`; A45 applied | none | none |
 | 2 | accepted | 28/28 independent semantic verdicts ok at `1d78440f9` | X-SEM-29/31 route to Step 6 duplicate handling | none |
-| 3 | reviewing | accepted-pending-review; 22 rows, zero stop arrays, A45 + L11-12..L11-14 applied | none | bounded 15-entry re-review |
-| 4 | reviewing | 13/13 initial verdicts ok; V-05 citation/pointer applied; green bounded checks | native rebind waits for Step 9 by L11-2 | bounded 15-entry re-review |
-| 5 | not-started | none | none | wait for Step 1 |
+| 3 | accepted | 22 rows, zero stop arrays, A45 + L11-12..L11-14 applied; bounded re-review 15/15 ok at `df3626178` | none | none |
+| 4 | accepted | 13/13 initial verdicts ok; V-05 fix confirmed by bounded re-review 15/15 ok | native rebind waits for Step 9 by L11-2 | none |
+| 5 | ready | none | none | wait for owner go-ahead |
 | 6 | not-started | none | none | wait for Step 1 |
 | 7 | not-started | none | none | wait for all candidate edits in Steps 2-6 |
 | 8 | not-started | none | none | wait for sealed key |
