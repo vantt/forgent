@@ -28,10 +28,13 @@ function attemptLockState(project, dir) {
 /** The first attempt directory that satisfies `where`, waited for at a 5 ms poll. */
 const attemptWhere = (project, where, opts) => waitUntil(() => project.attemptDirs().find(where), { timeoutMs: 120_000, ...opts });
 
-function assertSettledAttempt(project, dir) {
+async function assertSettledAttempt(project, dir) {
   for (const name of ['result.json', 'exit.json', 'evidence.json', 'receipt.json', 'steps/settle-attempt.json', 'steps/finalize-home.json', 'closed.json']) {
     assert.ok(exists(dir, name), `${name} is missing in ${dir}`);
   }
+  // The supervisor ends a moment after it wrote closed.json, and the lock goes with its process.
+  const freeBy = Date.now() + 10_000;
+  while (attemptLockState(project, dir) !== 'free' && Date.now() < freeBy) await sleep(25);
   assert.equal(attemptLockState(project, dir), 'free', 'the attempt lock is free');
   assert.deepEqual(project.homesLeft(), [], 'every private home is removed');
 }
@@ -47,7 +50,7 @@ test('1. a controller killed with SIGKILL after the binding leaves an agent that
   run.child.kill('SIGKILL');
   assert.equal((await run.exited).signal, 'SIGKILL');
   await waitUntil(() => exists(dir, 'closed.json'), { timeoutMs: 150_000, what: 'the attempt to close without its controller' });
-  assertSettledAttempt(project, dir);
+  await assertSettledAttempt(project, dir);
   assert.equal(starts(dir).length, 1, 'the agent ran exactly once');
   assert.deepEqual(pidsWithToken(tok), [], 'the setsid grandchild did not outlive the attempt');
   assert.equal(readJson(here(dir, 'receipt.json')).outcome, 'exited');
@@ -60,7 +63,7 @@ test('2. a controller that gets SIGTERM does not stop the attempt either: the co
   run.child.kill('SIGTERM');
   assert.equal((await run.exited).signal, 'SIGTERM');
   await waitUntil(() => exists(dir, 'closed.json'), { timeoutMs: 150_000, what: 'the attempt to close without its controller' });
-  assertSettledAttempt(project, dir);
+  await assertSettledAttempt(project, dir);
   assert.equal(starts(dir).length, 1);
   assert.equal(readJson(here(dir, 'receipt.json')).outcome, 'exited');
 });
@@ -95,7 +98,7 @@ test('3. a supervisor killed midway: the agent runs to its end and the next fgos
   assert.equal(exists(dir, 'closed.json'), false);
   await sweepWith(project, 'crash-supervisor-next');
   assert.equal(readJson(here(dir, 'receipt.json')).synthesizedBy, 'adopt');
-  assertSettledAttempt(project, dir);
+  await assertSettledAttempt(project, dir);
   assert.equal(starts(dir).length, 1, 'the agent ran exactly once');
   assert.deepEqual(pidsWithToken(tok), []);
   assert.equal(readJson(here(dir, 'closed.json')).closedBy, 'adopt');
@@ -112,7 +115,7 @@ test('4. the soft deadline passes after the controller died: the supervisor stop
   await waitUntil(() => exists(dir, 'closed.json'), { timeoutMs: 120_000, what: 'the attempt to close' });
   assert.equal(readJson(here(dir, 'receipt.json')).outcome, 'timeout');
   assert.deepEqual(pidsWithToken(tok), [], 'the setsid grandchild died with the attempt');
-  assertSettledAttempt(project, dir);
+  await assertSettledAttempt(project, dir);
 });
 
 test('5. controller and supervisor both dead: the gate enforces the hard ceiling and the next run settles a timeout', { skip, timeout: 300_000 }, async () => {
@@ -125,7 +128,7 @@ test('5. controller and supervisor both dead: the gate enforces the hard ceiling
   project.reconfigure({ agent: { runMs: 200 }, timeoutMs: 30_000 });
   await sweepWith(project, 'crash-ceiling-next');
   assert.equal(readJson(here(dir, 'receipt.json')).outcome, 'timeout');
-  assertSettledAttempt(project, dir);
+  await assertSettledAttempt(project, dir);
 });
 
 test('6. two fgos run starting together over one attempt that needs adopting: it is adopted once', { skip, timeout: 240_000 }, async () => {
@@ -136,7 +139,7 @@ test('6. two fgos run starting together over one attempt that needs adopting: it
   const second = startRun(project, project.unitFile('adopter-b'));
   const [a, b] = await Promise.all([first.exited, second.exited]);
   assert.deepEqual([a.code, b.code], [0, 0], `${first.output().stderr}\n${second.output().stderr}`);
-  assertSettledAttempt(project, dir);
+  await assertSettledAttempt(project, dir);
   assert.equal(readJson(here(dir, 'closed.json')).closedBy, 'adopt');
   const receipts = fs.readdirSync(here(dir, 'steps')).filter((f) => f.endsWith('.json'));
   assert.deepEqual(receipts.sort(), ['finalize-home.json', 'settle-attempt.json'], 'each step ran once and left one receipt');
@@ -190,7 +193,7 @@ test('7c. a controller that dies after the prepare and before the spawn: adopt c
   await sweepWith(project, 'edge-after-prepare-sweep');
   assert.equal(readJson(here(dir, 'receipt.json')).outcome, 'abandoned-not-started');
   assert.equal(fs.existsSync(here(dir, 'worker-output/outbox/agent-starts.txt')), false, 'the agent never started');
-  assertSettledAttempt(project, dir);
+  await assertSettledAttempt(project, dir);
 });
 
 test('7d. a controller that dies right after the spawn: the attempt is settled once, whichever side of the binding the kill fell on', { skip, timeout: 240_000 }, async () => {
@@ -206,7 +209,7 @@ test('7d. a controller that dies right after the spawn: the attempt is settled o
     assert.equal(readJson(here(dir, 'receipt.json')).outcome, 'abandoned-not-started');
     assert.equal(fs.existsSync(here(dir, 'worker-output/outbox/agent-starts.txt')), false);
   }
-  assertSettledAttempt(project, dir);
+  await assertSettledAttempt(project, dir);
 });
 
 /** `pid` and its parents up to init, read from /proc. */

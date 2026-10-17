@@ -310,11 +310,12 @@ async function waitForClosed(runDir, child, { timeoutMs = CLOSE_WAIT_MS } = {}) 
   const closed = path.join(runDir, 'closed.json');
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
-    if (fs.existsSync(closed)) return true;
-    if (child.exitCode !== null || child.signalCode !== null) return fs.existsSync(closed);
+    const gone = child.exitCode !== null || child.signalCode !== null;
+    // The supervisor drops the attempt lock when its process ends, a moment after it wrote closed.json.
+    if (gone) return fs.existsSync(closed);
     await sleep(POLL_MS);
   }
-  return false;
+  return fs.existsSync(closed);
 }
 
 /**
