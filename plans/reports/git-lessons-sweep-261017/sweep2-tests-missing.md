@@ -4,7 +4,7 @@ Ngày: 2026-10-17. Vai trò: producer. Assignment: unit-run-1792199169566-1678cc
 
 ## Tóm tắt công việc
 
-Tôi đã đọc plans/reports/git-lessons-catalogue-261017.md (đặc biệt Phụ lục B và cột "Test hiện có" cho thấy 18 mục NONE và 52 mục partial). Sau đó dùng rg tìm kiếm trong test/ các file chứa execFileSync('git'), worktree, MERGE_HEAD, update-ref, lock. Xác định các suite bị lane tests bỏ sót: test/runner/execution/run-sync.test.mjs, test/runner/claim-liveness.test.mjs, test/runner/claim-port.test.mjs, test/runner/goal-check.test.mjs, test/runner/execution/partial-writes.test.mjs, test/state/events.test.mjs, test/state/runtime-coordination.test.mjs và các file liên quan. Đọc chi tiết từng file để trích xuất test name, behavior locked, kind, loại repo (black-box temp repo hay internal unit), và mapping G-id.
+Tôi đã đọc plans/reports/research-261017-1032-git-lessons-catalogue.md (đặc biệt Phụ lục B và cột "Test hiện có" cho thấy 18 mục NONE và 52 mục partial). Sau đó dùng rg tìm kiếm trong test/ các file chứa execFileSync('git'), worktree, MERGE_HEAD, update-ref, lock. Xác định các suite bị lane tests bỏ sót: test/runner/execution/run-sync.test.mjs, test/runner/claim-liveness.test.mjs, test/runner/claim-port.test.mjs, test/runner/goal-check.test.mjs, test/runner/execution/partial-writes.test.mjs, test/state/events.test.mjs, test/state/runtime-coordination.test.mjs và các file liên quan. Đọc chi tiết từng file để trích xuất test name, behavior locked, kind, loại repo (black-box temp repo hay internal unit), và mapping G-id.
 
 Mỗi finding được cite evidence trực tiếp từ file:line và tên test. Không tìm thấy commit cụ thể vì test là black-box. Tất cả đều là NEW vì catalogue appendix B và cột test không trích các suite này.
 

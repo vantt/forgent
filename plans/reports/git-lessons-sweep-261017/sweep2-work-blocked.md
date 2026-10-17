@@ -4,7 +4,7 @@ Trạng thái: **done** (thao tác đọc-chỉ, không thay đổi workspace). 
 
 ## 1. Tóm tắt kết quả phân loại
 
-Từ danh sách 117 work items chưa hoàn thành (trạng thái `blocked`, `todo`, `doing`, `awaiting-*`) trong `.fgos/runtime/tmp/work-open-git-blocked.json`, qua rà soát toàn bộ mã nguồn hiện tại (`src/`, `bin/`, `test/`, `.githooks/`) và đối chiếu với Catalogue bài học Git (`G-001`…`G-182` tại `plans/reports/git-lessons-catalogue-261017.md`), kết quả phân loại như sau:
+Từ danh sách 117 work items chưa hoàn thành (trạng thái `blocked`, `todo`, `doing`, `awaiting-*`) trong `.fgos/runtime/tmp/work-open-git-blocked.json`, qua rà soát toàn bộ mã nguồn hiện tại (`src/`, `bin/`, `test/`, `.githooks/`) và đối chiếu với Catalogue bài học Git (`G-001`…`G-182` tại `plans/reports/research-261017-1032-git-lessons-catalogue.md`), kết quả phân loại như sau:
 
 - **Tổng số work items đã rà soát:** 117 items.
 - **Số items LIÊN QUAN (RELEVANT) tới Git component:** 39 items (chiếm 33.3%). Các items này chạm trực tiếp vào các hành vi: đột biến kho (repo mutation), cô lập và dọn dẹp worktree, quản lý branch/ref, các quy trình merge/land/sync/approve/catchup, khóa điều phối và race conditions, phục hồi crash, pre-commit hook và checkpoint commit cho `.fgos`.
