@@ -15,6 +15,7 @@ process.env.FGOS_STATE_ROOT = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-holder
 const {
   checkLockKernelSemantics,
   checkLockBorrowVectors,
+  guaranteeRefusal,
   checkLockHolders,
   checkLockFences,
   fixLockFences,
@@ -179,14 +180,21 @@ test('the probe refuses a probe file another process already holds', async () =>
   await stop(holder);
 });
 
+test('a guarantee of unsupported fails by name, a network filesystem too, a kernel one passes', () => {
+  const shape = { driver: 'none', borrow: 'unsupported', holders: 'unsupported' };
+  const unsupported = guaranteeRefusal('workspace', '/x/locks', { ...shape, exclusion: 'unsupported', platform: 'plan9' });
+  assert.match(unsupported, /^workspace \/x\/locks .*"exclusion":"unsupported".*: holder-lock has no driver on plan9;/);
+  assert.match(guaranteeRefusal('machine', '/x/locks', { ...shape, exclusion: 'none', notes: ['nfs'] }), /no lock exclusion \(nfs\)/);
+  assert.equal(guaranteeRefusal('machine', '/x/locks', { driver: 'flock', exclusion: 'kernel', borrow: 'kernel', holders: 'kernel' }), null);
+});
+
 // ─── lock-borrow-vectors ────────────────────────────────────────────────
 
-test('lock-borrow-vectors passes with the real host and real git; Windows is not applicable', () => {
+test('lock-borrow-vectors passes with the real host and real git', () => {
   const root = workspace('vectors');
   const res = checkLockBorrowVectors(root);
   assert.equal(res.passed, true, res.message);
   assert.match(res.message, /^all 4 vectors and the sibling check green \(git version /);
-  assert.deepEqual(checkLockBorrowVectors(root, { platform: 'win32' }), { passed: true, message: 'info: not applicable on Windows (no holder-lock driver yet)' });
 });
 
 // ─── lock-holders ───────────────────────────────────────────────────────
@@ -253,6 +261,23 @@ test('lock-holders: a predecessor domain that is still running warns with the do
 
   fs.writeFileSync(`${lockFile}.predecessor.json`, JSON.stringify({ v: 2, domainKind: 'linux-gate' }));
   assert.match(checkLockHolders(root).message, /^warning: runner: .* has unknown version 2/);
+});
+
+test('lock-holders: a windows-job record the host cannot judge here warns with the domain and the reason', () => {
+  const root = workspace('predecessor-windows-job');
+  fixLockDirs(root);
+  const lockFile = path.join(root, '.fgos', 'locks', 'runner.lock');
+  fs.writeFileSync(lockFile, '');
+  const holder = { host: os.hostname(), pid: 4242, startTime: '133800000000000000' };
+  const domainId = { job: 'Local\\fgos-borrow-runner-4242-1-1', sessionId: '1', declaredAt: '133800000000000001', holder, keeper: null };
+  fs.writeFileSync(`${lockFile}.predecessor.json`, JSON.stringify({ v: 1, domainKind: 'windows-job', domainId }));
+  const res = checkLockHolders(root);
+  assert.match(res.message, /^warning: runner: .*runner\.lock\.predecessor\.json: windows-job domain .* is unknown \(no-judge-on-this-platform\)/);
+  assert.ok(res.message.includes('"pid":4242'));
+  assert.ok(fs.existsSync(`${lockFile}.predecessor.json`), 'the read-only route leaves the record');
+
+  fs.writeFileSync(`${lockFile}.predecessor.json`, JSON.stringify({ v: 1, domainKind: 'windows-job', domainId: 'Local\\old-string-shape' }));
+  assert.match(checkLockHolders(root).message, /^warning: runner: .*is unknown \(record-unknown-shape\)/);
 });
 
 // ─── lock-fences ────────────────────────────────────────────────────────

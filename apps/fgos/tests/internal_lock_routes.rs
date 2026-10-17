@@ -253,6 +253,41 @@ fn lock_fd_runs_the_predecessor_rule_before_answering_acquired() {
 }
 
 #[test]
+fn predecessor_state_reads_the_record_once_and_never_kills() {
+    let _serial = serial();
+    let dir = temp_dir("predecessor-state");
+    let lock = dir.join("state.lock");
+    let record = record_path(&lock);
+    let lock_arg = lock.to_str().unwrap();
+    let state = || {
+        let out = route(&["lock-fd", "--protocol", "1", "--predecessor-state", lock_arg]);
+        assert_eq!(out.status.code(), Some(0));
+        json_line(&out)
+    };
+    assert_eq!(state()["state"], "absent");
+    // A live, SIGTERM-ignoring gate: reported not empty, and left running.
+    let mut gate = spawn_term_ignoring_sleep();
+    declare(&record, &Domain::LinuxGate(tuple_of(&gate))).unwrap();
+    let v = state();
+    assert_eq!((v["result"].clone(), v["state"].clone(), v["domain"]["domainKind"].clone()), ("predecessor".into(), "not-empty".into(), "linux-gate".into()));
+    assert!(matches!(observe(ProcId(gate.id())), Observed::Live { .. }), "the read-only route must not kill");
+    assert!(record.exists());
+    let tuple = tuple_of(&gate);
+    let _ = gate.kill();
+    let _ = gate.wait();
+    declare(&record, &Domain::LinuxGate(tuple)).unwrap();
+    assert_eq!(state()["state"], "empty");
+    assert!(record.exists(), "an empty domain is not cleaned up by a read");
+    // A windows-job record cannot be judged on Linux.
+    fs::write(&record, r#"{"v":1,"domainKind":"windows-job","domainId":{"job":"Local\\j","sessionId":"1","declaredAt":"2","holder":{"host":"h","pid":7,"startTime":"3"},"keeper":null}}"#).unwrap();
+    let v = state();
+    assert_eq!((v["state"].clone(), v["reason"].clone()), ("unknown".into(), "no-judge-on-this-platform".into()));
+    fs::write(&record, "{not json").unwrap();
+    assert_eq!(state()["state"], "unknown");
+    let _ = fs::remove_dir_all(&dir);
+}
+
+#[test]
 fn probe_opens_its_own_description_and_answers_free_or_held() {
     let _serial = serial();
     let dir = temp_dir("probe");

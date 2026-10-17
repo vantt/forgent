@@ -229,11 +229,3 @@ test('the CLI door builds a host binary before the queue only when none resolves
     else process.env.FGOS_HOST_BIN = saved;
   }
 });
-
-test('on a platform with no holder-lock driver the queue warns and runs unqueued', { skip: process.platform !== 'win32' && 'only Windows has no holder-lock driver yet' }, () => {
-  const lockRoot = tmpDir('full-suite-queue-unsupported-');
-  const warnings = [];
-  const release = acquireFullSuiteQueue({ env: {}, lockRoot, log: (msg) => warnings.push(msg), sleep: () => assert.fail('must not wait') });
-  release();
-  assert.match(warnings.join('\n'), /running unqueued/);
-});
