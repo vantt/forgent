@@ -16,6 +16,8 @@ const REAL_HOOK = path.join(ROOT, '.githooks', 'pre-commit');
 const REAL_SRC = path.join(ROOT, 'src');
 
 const { bin: HOST_BIN } = resolveActiveHostBin({ fgosDir: path.join(ROOT, '.fgos') });
+// The hook in a /tmp repo finds its host only through the env: hand it the one this run resolved.
+if (HOST_BIN) process.env.FGOS_HOST_BIN ??= HOST_BIN;
 const GIT_PRESENT = spawnSync('git', ['--version'], { encoding: 'utf8' }).status === 0;
 
 /** Why the kernel-lock hook tests cannot run here, or false. */

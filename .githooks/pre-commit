@@ -26,7 +26,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
-import { probe, checkBorrowedDescription, resolveLock, LOCK_FD_ENV } from '../src/holder-lock/index.mjs';
+import { probe, lockHolders, checkBorrowedDescription, resolveLock, LOCK_FD_ENV } from '../src/holder-lock/index.mjs';
 import { readBeacon, judgeBeacon, writeBeacon, DEFAULT_BEACON_WINDOW_MS } from '../src/runner/main-checkout-activity.mjs';
 import { resolveWriterIdentity } from '../src/util/session-identity.mjs';
 
@@ -117,14 +117,22 @@ function resolveTtlMs() {
 // Without a usable host binary no fgOS writer can hold the mutex either, so
 // the commit proceeds with a warning; any other failure refuses (fail-closed).
 function mainLockVerdict(fgosDir) {
-  try {
-    if (process.env[LOCK_FD_ENV]) {
-      const lockPath = resolveLock('main-checkout', { fgosDir }).v3Path;
+  const lockPath = resolveLock('main-checkout', { fgosDir }).v3Path;
+  if (process.env[LOCK_FD_ENV]) {
+    try {
       if (checkBorrowedDescription(lockPath, { fgosDir }).result === 'borrower') return { kind: 'borrower' };
+    } catch {
+      // A stale variable (slot 3 not open) or an unusable host: not a borrower; the probe below decides.
     }
+  }
+  try {
     return { kind: probe('main-checkout', { fgosDir }).result };
   } catch (err) {
     if (err?.code === 'lock-driver-unavailable') {
+      // No host binary can answer, but the kernel still lists who holds the
+      // lock file: refuse when somebody does, continue only when nobody does.
+      const holders = lockHolders('main-checkout', { fgosDir });
+      if (holders.kind === 'list' && holders.pids.length > 0) return { kind: 'held' };
       process.stderr.write(`warning: the main-checkout lock could not be checked (${err.message}); continuing.\n`);
       return { kind: 'free' };
     }

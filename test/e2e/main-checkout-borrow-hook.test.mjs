@@ -217,3 +217,35 @@ test('a checkpoint whose commit fails resets the index while still holding main'
   assert.equal(commitCount(repoRoot), before);
   assert.equal(git(repoRoot, ['diff', '--cached', '--name-only']).trim(), '', 'the failed commit left nothing staged');
 });
+
+test('a stale FGOS_LOCK_FD with no descriptor open falls through to the probe: free passes, held refuses', { skip }, async () => {
+  const repoRoot = initRepoWithHook();
+  const fgosDir = path.join(repoRoot, '.fgos');
+  const stale = { FGOS_SESSION_ID: 'session-stale', FGOS_LOCK_FD: 'main-checkout:3' };
+  const free = commitAsSession(repoRoot, stale);
+  assert.equal(free.status, 0, free.stderr);
+
+  const holder = await holdLockInChild('main-checkout', { fgosDir });
+  try {
+    const refused = commitAsSession(repoRoot, stale);
+    assert.notEqual(refused.status, 0);
+    assert.match(refused.stderr, /fgOS is writing the main checkout right now/);
+  } finally {
+    holder.child.kill('SIGKILL');
+    await holder.exited;
+  }
+});
+
+test('with no usable host binary the hook still refuses while the kernel lists a holder of the lock file', { skip }, async () => {
+  const repoRoot = initRepoWithHook();
+  const fgosDir = path.join(repoRoot, '.fgos');
+  const holder = await holdLockInChild('main-checkout', { fgosDir });
+  try {
+    const refused = commitAsSession(repoRoot, { FGOS_SESSION_ID: 'session-nohost', FGOS_HOST_BIN: path.join(repoRoot, 'no-such-host') });
+    assert.notEqual(refused.status, 0);
+    assert.match(refused.stderr, /fgOS is writing the main checkout right now/);
+  } finally {
+    holder.child.kill('SIGKILL');
+    await holder.exited;
+  }
+});

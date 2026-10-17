@@ -30,10 +30,19 @@ async function withRepoLock(scope, name, params, label, fn, { waitMs } = {}) {
     );
   }
   const { handle } = res;
+  let failed = false;
   try {
     return await fn(handle);
+  } catch (err) {
+    failed = true;
+    throw err;
   } finally {
-    handle.release();
+    try {
+      handle.release();
+    } catch (err) {
+      // A borrowed child still running when fn threw must not hide fn's own error.
+      if (!failed) throw err;
+    }
   }
 }
 
