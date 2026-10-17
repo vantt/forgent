@@ -162,6 +162,32 @@ pub fn orphans_since(procs: &[ProcEntry], holder: (u32, u64), keeper: Option<(u3
     }
 }
 
+/// How long after the job is first found gone a process with a broken parent
+/// chain may still count as a member that is tearing down. Teardown after a
+/// kill-on-close takes milliseconds; the window only has to outlast it.
+pub const ORPHAN_SETTLE: std::time::Duration = std::time::Duration::from_millis(200);
+
+/// The one-shot window of the orphan clause: it opens on the first poll that
+/// finds the job gone and closes for good `ORPHAN_SETTLE` later, so a stale
+/// record never sweeps up the processes that appear after it.
+#[derive(Debug, Default, Clone, Copy)]
+pub struct OrphanWindow {
+    until: Option<std::time::Instant>,
+}
+
+impl OrphanWindow {
+    /// Whether the clause may name candidates at `now`; the first call starts the window.
+    pub fn is_open(&mut self, now: std::time::Instant) -> bool {
+        let until = *self.until.get_or_insert(now + ORPHAN_SETTLE);
+        now < until
+    }
+
+    /// Whether the window has started and is over at `now`.
+    pub fn is_closed(&self, now: std::time::Instant) -> bool {
+        self.until.is_some_and(|until| now >= until)
+    }
+}
+
 /// What one query of a job's process-id list answered.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ListRead {
@@ -233,7 +259,7 @@ mod os {
     use windows_sys::Win32::System::RemoteDesktop::ProcessIdToSessionId;
     use windows_sys::Win32::System::Threading::{GetCurrentProcess, GetCurrentProcessId, GetProcessTimes, OpenProcess, OpenThread, ResumeThread, TerminateProcess, WaitForSingleObject, PROCESS_QUERY_LIMITED_INFORMATION, THREAD_SUSPEND_RESUME};
 
-    use super::{decide, format_job_name, orphans_since, read_id_list, tree_from, ListRead, MemberState, ProcEntry};
+    use super::{decide, format_job_name, orphans_since, read_id_list, tree_from, ListRead, MemberState, OrphanWindow, ProcEntry, ORPHAN_SETTLE};
     use crate::control::{signal_by_identity, Signal};
     use crate::facts::{Observed, ProcTuple};
     use crate::platform;
@@ -244,9 +270,6 @@ mod os {
     const JOB_OBJECT_TERMINATE_RIGHT: u32 = 0x0008;
     /// Slots of the id-list buffer a poll starts with; it grows on demand.
     const LIST_SLOTS: usize = 256;
-    /// How long after the job is first found gone a process with a broken parent
-    /// chain may still count as a member that is tearing down.
-    const ORPHAN_SETTLE: std::time::Duration = std::time::Duration::from_millis(500);
     /// Why a record from another Windows session is never judged empty.
     pub const OTHER_SESSION_REASON: &str = "predecessor-other-session";
 
@@ -603,7 +626,7 @@ mod os {
         seen: BTreeMap<u32, Named>,
         /// While the closed job's members may still be tearing down: set at the
         /// first poll that finds no job, so unrelated orphans block only briefly.
-        orphan_until: Option<std::time::Instant>,
+        orphan_window: OrphanWindow,
         /// Pids named only as orphan candidates; dropped from `tracked` once the window ends.
         orphan_pids: BTreeSet<u32>,
     }
@@ -655,8 +678,7 @@ mod os {
                         let found = tree_from(&procs, holder, keeper, record.declared_at);
                         found.members.iter().for_each(|(pid, _)| named.entry(*pid).or_default().in_tree = true);
                         if job.is_none() {
-                            let until = *self.orphan_until.get_or_insert_with(|| std::time::Instant::now() + ORPHAN_SETTLE);
-                            if std::time::Instant::now() < until {
+                            if self.orphan_window.is_open(std::time::Instant::now()) {
                                 orphans_since(&procs, holder, keeper, record.declared_at, &found).into_iter().for_each(|(pid, _)| named.entry(pid).or_default().in_orphan = true);
                             }
                         }
@@ -679,7 +701,7 @@ mod os {
                 }
             }
             // After the window an orphan candidate that no other source ever named stops counting.
-            if self.orphan_until.is_some_and(|until| std::time::Instant::now() >= until) {
+            if self.orphan_window.is_closed(std::time::Instant::now()) {
                 for pid in std::mem::take(&mut self.orphan_pids) {
                     let by_other = self.seen.get(&pid).is_some_and(|n| n.in_list || n.in_scan || n.in_tree);
                     if !by_other {
@@ -956,6 +978,20 @@ mod tests {
         let tree = Tree::default();
         let found = orphans_since(&procs, (10, 100), None, 200, &tree);
         assert!(found.iter().any(|(pid, _)| *pid == 30), "{found:?}");
+    }
+
+    #[test]
+    fn the_orphan_window_opens_once_and_never_reopens() {
+        let t0 = std::time::Instant::now();
+        let mut window = OrphanWindow::default();
+        assert!(!window.is_closed(t0), "not started yet");
+        assert!(window.is_open(t0), "the first poll that finds the job gone starts it");
+        assert!(window.is_open(t0 + ORPHAN_SETTLE / 2));
+        let late = t0 + ORPHAN_SETTLE + std::time::Duration::from_millis(1);
+        assert!(!window.is_open(late), "closed: the clause names nothing");
+        assert!(window.is_closed(late));
+        // A later poll, however long after, does not start a new window.
+        assert!(!window.is_open(late + std::time::Duration::from_secs(60)));
     }
 
     #[test]
