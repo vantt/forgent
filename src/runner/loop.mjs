@@ -103,6 +103,7 @@ import { chooseStageOperation, executeDriverOperationChoice } from './operation-
 import { runOutcome } from './dispatch/run-result.mjs';
 import { reapOrphanedConfinementResources, resolveConfinementTempRoot } from './dispatch/confinement/cleanup.mjs';
 import { setTimeout as delay } from 'node:timers/promises';
+import { acquireSync, createLockScope, lockHolders, resolveLock } from '../holder-lock/index.mjs';
 
 // errorClass -> failure layer: 5-layer self-attribution (task-spec / context /
 // environment / verification / state) the runner stamps on every friction
@@ -132,10 +133,6 @@ const FRICTION_LAYER = Object.freeze({
  * result — and distinct from every code already spoken for (0 ok, 1
  * unexpected, 2-5 in store.mjs's EXIT_CODES). */
 export const EXIT_BUSY = 6;
-
-export const LOCK_FILE = 'runner.lock';
-
-let lockTmpCounter = 0;
 
 /** Two-tier parallelism defaults (D10), applied when the runner config
  * declares no `parallel` block at all — every existing config keeps working
@@ -205,134 +202,27 @@ function selectWave(steered, view, { maxRoots, maxLeavesPerRoot }) {
   return wave;
 }
 
-/** Signal-0 liveness probe. EPERM means the pid exists but belongs to
- * another user — still very much alive, so still busy. */
-function isPidAlive(pid) {
-  try {
-    process.kill(pid, 0);
-    return true;
-  } catch (err) {
-    return err.code === 'EPERM';
-  }
-}
-
 /**
- * Take the exclusive inter-process lock: `.fgos/runner.lock`, holding this
- * process's pid.
- *
- * Creation writes the pid to a per-attempt temp file THEN `fs.linkSync`s it
- * onto `lockPath` — this module's own original `fs.openSync(lockPath, 'wx')`
- * + separate `fs.writeSync` created a window where the lock file existed but
- * was still empty, so a competing process reading it mid-write could see
- * unparseable (NaN) content, fall through to the "dead/garbage holder"
- * branch, and unlink a lock a live process legitimately held — letting two
- * processes both believe they held it. This exact TOCTOU was found and
- * fixed twice in the two modules that mirror this function's shape
- * (`src/state/events.mjs`'s `tryAcquireEventsLockOnce`, tsk-3ld;
- * `src/runner/session.mjs`'s `tryAcquireOnce`, tsk-1u7 — see
- * `docs/history/tsk-1u7-session-lock-contention-flake/plan.md`, which named
- * this function itself as the one sibling still carrying the bug and out of
- * that item's scope) but never ported back to this, the original. `link()`
- * only ever exposes `lockPath` fully-written or not-yet-existing — never
- * partially written — so the window is closed structurally, not papered
- * over with a retry.
- *
- * When the file already exists, the pid inside decides: a live pid means a
- * runner is genuinely working this repo — back off (`acquired: false`,
- * never touch the holder's lock). A dead pid (or unreadable/non-positive
- * content, which no live holder can prove ownership of) is a crash
- * leftover: CLEAN AND YIELD — re-read the file immediately before the
- * unlink (the slow liveness probe sat between the first read and now; if
- * the content changed, a fresh holder took the path and nothing is
- * deleted), remove it, and return busy with `reclaimedStale: true`. The
- * reclaimer NEVER creates its own lock in the same call that deleted one:
- * every acquisition is a bare atomic create on an empty path, so two
- * processes racing the same stale lock can each at worst clean-and-yield —
- * neither can steal a lock the other just created (delete-then-create in
- * one call was the TOCTOU the review flagged). The next invocation
- * acquires cleanly; under a cron/loop cadence that costs one tick after a
- * crash.
+ * Take the exclusive inter-process lock: the `runner` kernel lock
+ * (`.fgos/locks/runner.lock`, src/holder-lock). Never waits: two tries,
+ * then `acquired: false` with the holder's pid when the kernel can list it.
+ * A busy result touches nothing. A runner that dies releases the lock at
+ * once, so the next invocation acquires on its first try — there is no
+ * stale record to clean.
  */
-export function acquireRunnerLock(dir, { pid = process.pid } = {}) {
-  const lockPath = path.join(dir, LOCK_FILE);
-  fs.mkdirSync(dir, { recursive: true });
-
+export function acquireRunnerLock(dir) {
+  const params = { fgosDir: dir };
+  const lockPath = resolveLock('runner', params).v3Path;
   for (let attempt = 0; attempt < 2; attempt += 1) {
-    lockTmpCounter += 1;
-    const tmpPath = path.join(dir, `.runner.lock.tmp-${pid}-${Date.now()}-${lockTmpCounter}`);
-    fs.writeFileSync(tmpPath, String(pid), 'utf8');
-    let created = false;
-    try {
-      fs.linkSync(tmpPath, lockPath);
-      created = true;
-    } catch (err) {
-      if (err.code !== 'EEXIST' && !(process.platform === 'win32' && (err.code === 'EPERM' || err.code === 'EBUSY'))) throw err;
-    } finally {
-      try {
-        fs.unlinkSync(tmpPath);
-      } catch (err) {
-        if (err.code !== 'ENOENT' && !(process.platform === 'win32' && (err.code === 'EPERM' || err.code === 'EBUSY'))) throw err;
-      }
+    const res = acquireSync(createLockScope('runner'), 'runner', params);
+    if (res.result === 'acquired') {
+      const { handle } = res;
+      return { acquired: true, lockPath, release: () => handle.release() };
     }
-    if (created) {
-      return {
-        acquired: true,
-        lockPath,
-        release() {
-          try {
-            fs.unlinkSync(lockPath);
-          } catch (err) {
-            if (err.code !== 'ENOENT' && err.code !== 'EPERM') throw err;
-          }
-        },
-      };
-    }
-
-    let raw;
-    try {
-      raw = fs.readFileSync(lockPath, 'utf8');
-    } catch (err) {
-      if (err.code === 'ENOENT' || err.code === 'EPERM' || err.code === 'EBUSY') continue; // holder released in between — retry the create
-      throw err;
-    }
-    const holderPid = parseInt(raw.trim(), 10);
-
-    // pid must be a positive integer before probing: kill(0, 0) would probe
-    // our own process group and misread garbage content as "alive".
-    if (Number.isInteger(holderPid) && holderPid > 0 && isPidAlive(holderPid)) {
-      return { acquired: false, holderPid, lockPath };
-    }
-
-    // Stale. Re-read right before the delete: the liveness probe above is
-    // the slow window — a competitor may have cleaned this lock and a fresh
-    // holder created its own here since `raw` was read. Changed content is
-    // a live lock we must not touch.
-    let current;
-    try {
-      current = fs.readFileSync(lockPath, 'utf8');
-    } catch (err) {
-      if (err.code === 'ENOENT' || err.code === 'EPERM' || err.code === 'EBUSY') {
-        // someone else already cleaned it — same yield, nothing deleted
-        return { acquired: false, holderPid: null, reclaimedStale: true, lockPath };
-      }
-      throw err;
-    }
-    if (current !== raw) {
-      const freshPid = parseInt(current.trim(), 10);
-      return { acquired: false, holderPid: Number.isInteger(freshPid) && freshPid > 0 ? freshPid : null, lockPath };
-    }
-
-    try {
-      fs.unlinkSync(lockPath); // stale — dead holder; clean…
-    } catch (err) {
-      if (err.code !== 'ENOENT' && err.code !== 'EPERM' && err.code !== 'EBUSY') throw err;
-    }
-    // …and yield: never wx-create on the path this call just deleted.
-    return { acquired: false, holderPid: null, reclaimedStale: true, lockPath };
   }
-
-  // Lost the wx create twice in a row: a live contender keeps beating us.
-  return { acquired: false, holderPid: null, lockPath };
+  const holders = lockHolders('runner', params);
+  const holderPid = holders.kind === 'list' && holders.pids.length > 0 ? holders.pids[0] : null;
+  return { acquired: false, holderPid, lockPath };
 }
 
 // resolveRepoRoot moved to paths.mjs (tsk-63j D1/D2/D5, the canonical
@@ -687,7 +577,7 @@ async function claimItem({ dir, ownershipStore, queue, ownerIdentity, item, repo
       // token, never re-read "whichever claim is active right now" at
       // settle time (that would settle a DIFFERENT actor's claim if this
       // one got reclaimed as stale in the meantime).
-      claimId = claimWork(dir, { id: item.id, actor: 'runner', isolate: false, repoRoot, skipOutcome: true }).claimId;
+      claimId = (await claimWork(dir, { id: item.id, actor: 'runner', isolate: false, repoRoot, skipOutcome: true })).claimId;
     }
     return { ...decision, claimId };
   });
@@ -1427,10 +1317,8 @@ export async function runOnce(options = {}) {
   // holder's lock file.
   const lock = acquireRunnerLock(dir);
   if (!lock.acquired) {
-    log(lock.reclaimedStale
-      ? `fgos-runner: busy — stale lock at ${lock.lockPath} cleaned (dead holder); run again to acquire`
-      : `fgos-runner: busy — another runner${lock.holderPid ? ` (pid ${lock.holderPid})` : ''} holds ${lock.lockPath}`);
-    return { outcome: 'busy', holderPid: lock.holderPid, reclaimedStale: lock.reclaimedStale ?? false, parked, exitCode: EXIT_BUSY };
+    log(`fgos-runner: busy — another runner${lock.holderPid ? ` (pid ${lock.holderPid})` : ''} holds ${lock.lockPath}`);
+    return { outcome: 'busy', holderPid: lock.holderPid, parked, exitCode: EXIT_BUSY };
   }
 
   try {

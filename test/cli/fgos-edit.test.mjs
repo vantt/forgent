@@ -5,7 +5,6 @@ import { test } from 'node:test';
 import { editUseCase } from '../../src/verbs/state/edit.mjs';
 import {
   ADD_BAD_FLAG_CASES,
-  DEFAULT_TTL_MS,
   EDIT_BAD_FLAG_CASES,
   EDIT_PRIORITY_MATRIX_BAD_FLAG_CASES,
   FGOS,
@@ -47,7 +46,6 @@ import {
   initSessionSafeCwd,
   linkFgosBinInto,
   logPath,
-  mainCheckoutLockPath,
   makeAlreadyCaughtUpItem,
   makeBlockedBranchItem,
   makeBlockedLeafItem,
@@ -83,7 +81,6 @@ import {
   writeCreateFake,
   writeFakeGh,
   writeHangScript,
-  writeLiveLock,
   writeMarkerFake,
   writeMergeSuccessFake,
   writeRunnerConfig,

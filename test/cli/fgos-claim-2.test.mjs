@@ -2,9 +2,10 @@
 // từ test/cli/fgos.test.mjs (tsk-3um). Nội dung test không đổi, chỉ chỗ ở đổi.
 // Bộ đồ nghề dùng chung nằm ở ./helpers/fgos-cli-harness.mjs.
 import { test } from 'node:test';
+import { spawn } from 'node:child_process';
+import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
 import {
   ADD_BAD_FLAG_CASES,
-  DEFAULT_TTL_MS,
   EDIT_BAD_FLAG_CASES,
   EDIT_PRIORITY_MATRIX_BAD_FLAG_CASES,
   FGOS,
@@ -49,7 +50,6 @@ import {
   initSessionSafeCwd,
   linkFgosBinInto,
   logPath,
-  mainCheckoutLockPath,
   makeAlreadyCaughtUpItem,
   makeBlockedBranchItem,
   makeBlockedLeafItem,
@@ -86,7 +86,6 @@ import {
   writeCreateFake,
   writeFakeGh,
   writeHangScript,
-  writeLiveLock,
   writeMarkerFake,
   writeMergeSuccessFake,
   writeRunnerConfig,
@@ -227,154 +226,70 @@ test('session gc spares a session with uncommitted (never-committed) changes, ex
 });
 
 
-test('unlock: no lock file present -- reports cleared, exit 0', () => {
+test('unlock is gone: an unknown verb, and no manifest entry', () => {
   const cwd = tmpCwdFast();
   const result = run(cwd, ['unlock']);
-  assert.equal(result.status, 0, result.stderr);
-  const data = envelopeData(result.stdout);
-  assert.equal(data.cleared, true);
-  assert.equal(data.reason, 'stale-or-free');
+  assert.equal(result.status, 4, result.stderr);
+  assert.match(result.stderr, /unknown verb "unlock"/);
+
+  const manifest = JSON.parse(run(cwd, ['--help', '--json']).stdout);
+  assert.equal(manifest.commands.find((c) => c.name === 'unlock'), undefined);
+  const lock = manifest.commands.find((c) => c.name === 'lock');
+  assert.ok(lock, 'lock entry missing from --help --json manifest');
+  assert.equal(lock.touchesState, true);
+  assert.equal(lock.externalEffect, true);
 });
 
 
-test('unlock: lock held by a dead pid -- self-heals via the existing reclaim path, reports cleared', () => {
-  const cwd = tmpCwdFast();
-  fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
-  // A pid essentially guaranteed dead: an implausibly high, never-assigned value.
-  fs.writeFileSync(mainCheckoutLockPath(cwd), JSON.stringify({ pid: 999999999, ts: Date.now() }));
+// --- `fgos lock-status`: read-only report of every repo/machine registry lock
 
-  const result = run(cwd, ['unlock']);
-
-  assert.equal(result.status, 0, result.stderr);
-  const data = envelopeData(result.stdout);
-  assert.equal(data.cleared, true);
-  assert.equal(data.reason, 'stale-or-free');
-});
-
-
-test('unlock: lock genuinely held by a live session -- refuses, reports the holder identity, never deletes the file', () => {
-  const cwd = tmpCwdFast();
-  fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
-  // The test process's own pid is genuinely alive and distinct from the
-  // spawned CLI child's pid -- a real live-other-holder case.
-  fs.writeFileSync(mainCheckoutLockPath(cwd), JSON.stringify({ pid: process.pid, ts: Date.now() }));
-
-  const result = run(cwd, ['unlock']);
-
-  assert.equal(result.status, 7, result.stderr);
-  assert.match(result.stderr, new RegExp(`held by a live session \\(${process.pid}, `));
-  assert.match(result.stderr, /held \d+[ms].*expires in \d+[ms]/);
-  assert.equal(fs.existsSync(mainCheckoutLockPath(cwd)), true);
-});
-
-
-test('unlock: string-identity lock within TTL -- still refuses (D5 fail-closed, unchanged), but never claims "live session" (tsk-24t)', () => {
-  const cwd = tmpCwdFast();
-  fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
-  // The exact shape .githooks/pre-commit writes per commit: a STRING
-  // identity, not a numeric pid -- tryAcquireOnce can never probe its
-  // liveness (no pid to check), so held-ness is judged by TTL freshness
-  // alone (main-checkout-lock.mjs's own documented D5 fail-closed design).
-  fs.writeFileSync(mainCheckoutLockPath(cwd), JSON.stringify({ pid: 'some-writer-session-id', ts: Date.now() }));
-
-  const result = run(cwd, ['unlock']);
-
-  // Behavior unchanged (D1): still refuses, still never deletes the file.
-  assert.equal(result.status, 7, result.stderr);
-  assert.equal(fs.existsSync(mainCheckoutLockPath(cwd)), true);
-  // Message honesty (D2): must not fabricate "live session" for a branch
-  // that never checked liveness -- must say plainly that liveness is
-  // undetermined.
-  assert.doesNotMatch(result.stderr, /live session/);
-  assert.match(result.stderr, /liveness cannot be determined/);
-  assert.match(result.stderr, /some-writer-session-id/);
-});
-
-
-test('unlock: corrupt (unparseable) lock content -- force-reclaims via forceReclaimAmbiguousLock, removes the file', () => {
-  const cwd = tmpCwdFast();
-  fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
-  fs.writeFileSync(mainCheckoutLockPath(cwd), 'not json at all {{{');
-
-  const result = run(cwd, ['unlock']);
-
-  assert.equal(result.status, 0, result.stderr);
-  const data = envelopeData(result.stdout);
-  assert.equal(data.cleared, true);
-  assert.equal(data.reason, 'reclaimed');
-  assert.equal(fs.existsSync(mainCheckoutLockPath(cwd)), false);
-});
-
-
-test('unlock: registered in the --help --json manifest with write-only touchesState/externalEffect labels', () => {
-  const cwd = tmpCwdFast();
-  const result = run(cwd, ['--help', '--json']);
-  assert.equal(result.status, 0, result.stderr);
-  const manifest = JSON.parse(result.stdout);
-  const entry = manifest.commands.find((c) => c.name === 'unlock');
-  assert.ok(entry, 'unlock entry missing from --help --json manifest');
-  assert.equal(entry.touchesState, true);
-  assert.equal(entry.externalEffect, false);
-});
-
-
-// --- `fgos lock-status` (tsk-5z2, D1): read-only main-checkout.lock report -
-
-test('lock-status: no lock file present -- reports "free"', () => {
+test('lock-status: nothing held -- every row is free, main checkout included, and no lock file is created', () => {
   const cwd = tmpCwdFast();
   const result = run(cwd, ['lock-status']);
   assert.equal(result.status, 0, result.stderr);
   const data = envelopeData(result.stdout);
-  assert.equal(data.outcome, 'free');
-  assert.equal(data.holderPid, null);
+  assert.equal(data.mainCheckout.outcome, 'free');
+  assert.deepEqual(data.mainCheckout.holders, []);
+  assert.ok(data.locks.length > 0);
+  for (const row of data.locks) {
+    assert.ok(['free', 'not-node-owned'].includes(row.status), `${row.name} should be free, got ${row.status}`);
+    assert.ok(['repo', 'machine'].includes(row.scope), `${row.name} scope ${row.scope} is not reported`);
+  }
+  assert.equal(fs.existsSync(path.join(cwd, '.fgos', 'locks')), false, 'a status read creates nothing');
+  assert.equal(data.beacon.status, 'none');
 });
 
 
-test('lock-status: held by a live session -- reports "live" with holder identity, age, and remaining TTL, exit 0 (never refuses)', () => {
-  const cwd = tmpCwdFast();
-  fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
-  fs.writeFileSync(mainCheckoutLockPath(cwd), JSON.stringify({ pid: process.pid, ts: Date.now() }));
-
-  const result = run(cwd, ['lock-status']);
-
-  assert.equal(result.status, 0, result.stderr);
-  const data = envelopeData(result.stdout);
-  assert.equal(data.outcome, 'live');
-  assert.equal(data.holderPid, process.pid);
-  assert.ok(typeof data.lockAgeMs === 'number');
-  assert.ok(typeof data.remainingTtlMs === 'number');
-  assert.match(data.lockAge, /^\d+[ms]/);
-  assert.match(data.remainingTtl, /^\d+[ms]/);
+test('lock-status: main held by another process -- held with that pid, other rows stay free', async () => {
+  const cwd = initGitCwdFast();
+  await withMainHeldByChild(cwd, async (holder) => {
+    const result = await runAsync(cwd, ['lock-status']);
+    assert.equal(result.status, 0, result.stderr);
+    const data = envelopeData(result.stdout);
+    assert.equal(data.mainCheckout.outcome, 'held');
+    assert.deepEqual(data.mainCheckout.holders, [holder.child.pid]);
+    const main = data.locks.find((row) => row.name === 'main-checkout');
+    assert.equal(main.status, 'held');
+    assert.equal(main.via, 'probe');
+    assert.ok(main.guarantee, 'the guarantee of the lock directory is reported');
+    assert.equal(data.locks.find((row) => row.name === 'worktree-admin').status, 'free');
+  });
 });
 
 
-test('lock-status: held by a dead pid -- reports "stale" and never reclaims the file', () => {
-  const cwd = tmpCwdFast();
-  fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
-  fs.writeFileSync(mainCheckoutLockPath(cwd), JSON.stringify({ pid: 999999999, ts: Date.now() }));
-
-  const result = run(cwd, ['lock-status']);
-
-  assert.equal(result.status, 0, result.stderr);
-  const data = envelopeData(result.stdout);
-  assert.equal(data.outcome, 'stale');
-  assert.equal(data.holderPid, 999999999);
-  assert.equal(fs.existsSync(mainCheckoutLockPath(cwd)), true);
-});
-
-
-test('lock-status: corrupt lock content -- reports "ambiguous" and never removes the file', () => {
-  const cwd = tmpCwdFast();
-  fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
-  fs.writeFileSync(mainCheckoutLockPath(cwd), 'not json at all {{{');
-
-  const result = run(cwd, ['lock-status']);
-
-  assert.equal(result.status, 0, result.stderr);
-  const data = envelopeData(result.stdout);
-  assert.equal(data.outcome, 'ambiguous');
-  assert.equal(fs.existsSync(mainCheckoutLockPath(cwd)), true);
-  assert.equal(fs.readFileSync(mainCheckoutLockPath(cwd), 'utf8'), 'not json at all {{{');
+test('lock-status: a merge slot held for one ref is listed as an instance of the parametric row', async () => {
+  const cwd = initGitCwdFast();
+  const holder = await holdLockInChild('merge-slot', { fgosDir: path.join(cwd, '.fgos'), ref: 'main' });
+  try {
+    const data = envelopeData((await runAsync(cwd, ['lock-status'])).stdout);
+    const slot = data.locks.find((row) => row.name === 'merge-slot');
+    assert.equal(slot.parametric, true);
+    assert.equal(slot.status, 'held');
+    assert.deepEqual(slot.instances.map((i) => i.holders), [[holder.child.pid]]);
+  } finally {
+    holder.child.kill('SIGKILL');
+    await holder.exited;
+  }
 });
 
 
@@ -390,58 +305,64 @@ test('lock-status: registered in the --help --json manifest as read-only (touche
 });
 
 
-test('take --no-wait fails immediately on a live-held lock, same message/exit code as an unwaited claim, no retry delay', () => {
+// The main checkout mutex is a kernel lock: a holder is a live process, never
+// a record with a TTL, so these hold it from a real child and kill that child.
+async function withMainHeldByChild(cwd, fn) {
+  const holder = await holdLockInChild('main-checkout', { fgosDir: path.join(cwd, '.fgos') });
+  try {
+    return await fn(holder);
+  } finally {
+    holder.child.kill('SIGKILL');
+    await holder.exited;
+  }
+}
+
+function runAsync(cwd, args) {
+  return new Promise((resolve) => {
+    const started = Date.now();
+    const child = spawn(process.execPath, [FGOS, ...args], { cwd, env: { ...process.env, FGOS_SESSION_ID: 'fgos-cli-harness-test' }, stdio: ['ignore', 'pipe', 'pipe'] });
+    let stdout = '';
+    let stderr = '';
+    child.stdout.on('data', (d) => { stdout += d; });
+    child.stderr.on('data', (d) => { stderr += d; });
+    child.on('exit', (status) => resolve({ status, stdout, stderr, elapsed: Date.now() - started }));
+  });
+}
+
+test('take --no-wait fails at once while another process holds main, naming the lock and the holder pid', async () => {
   const cwd = initGitCwdFast();
   addOk(cwd, 'wait-no-wait-take', { verify: 'true' });
-  writeLiveLock(cwd, 1000); // well within DEFAULT_TTL_MS -- would never clear on its own during this test
-
-  const result = run(cwd, ['take', 'wait-no-wait-take', '--no-wait']);
-
-  assert.equal(result.status, 7, result.stderr);
-  assert.match(result.stderr, /main checkout locked by pid/);
-  assert.doesNotMatch(result.stderr, /waited \d+ms before giving up/, '--no-wait must never engage the retry loop at all');
-  // A run that waited prints its retry progress line before every sleep; the lock holder (this
-  // process) never releases, so a waiting run could not have succeeded either.
-  assert.doesNotMatch(result.stderr, /still waiting on main-checkout lock/, '--no-wait must not enter the retry loop');
+  await withMainHeldByChild(cwd, async (holder) => {
+    const result = await runAsync(cwd, ['take', 'wait-no-wait-take', '--no-wait']);
+    assert.equal(result.status, 7, result.stderr);
+    assert.match(result.stderr, new RegExp(`main checkout \\(claim\\) is held by another process \\(pid ${holder.child.pid}\\)`));
+    assert.doesNotMatch(result.stderr, /after waiting/, '--no-wait is one try, never a wait');
+  });
 });
 
 
-test('take (default, no flags) retries through a lock whose remainingTtlMs is short, and succeeds once it clears -- D3\'s default-ON behavior', () => {
+test('take (default, no flags) waits for the holder of main and succeeds once it lets go', async () => {
   const cwd = initGitCwdFast();
   addOk(cwd, 'wait-default-take', { verify: 'true' });
-  // remainingTtlMs ~= 3s at write time: short enough to clear inside this
-  // test without waiting out the real DEFAULT_TTL_MS (3 minutes). The
-  // budget's own BOUNDARY_GRACE_MS (lock-wait.mjs) is what actually makes
-  // this reliable, not a large margin here -- without it, the loop's own
-  // give-up instant and the lock's real clearance instant are derived from
-  // the same clock read and coincide almost exactly, racing event-loop
-  // timer jitter regardless of how big this margin is.
-  writeLiveLock(cwd, DEFAULT_TTL_MS - 3000);
-
-  const start = Date.now();
-  const result = run(cwd, ['take', 'wait-default-take']);
-  const elapsed = Date.now() - start;
-
-  assert.equal(result.status, 0, result.stderr);
-  assert.equal(envelopeData(result.stdout).id, 'wait-default-take');
-  assert.ok(elapsed >= 500, `must have actually waited for the lock to clear, not raced past it (took ${elapsed}ms)`);
+  await withMainHeldByChild(cwd, async (holder) => {
+    setTimeout(() => holder.child.kill('SIGKILL'), 1500);
+    const result = await runAsync(cwd, ['take', 'wait-default-take']);
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(envelopeData(result.stdout).id, 'wait-default-take');
+    assert.ok(result.elapsed >= 500, `must have waited for the holder, not raced past it (took ${result.elapsed}ms)`);
+  });
 });
 
 
-test('take --wait <ms> tightens the budget below the lock\'s own remainingTtlMs, and fails with the exhausted-budget message once spent', () => {
+test('take --wait <ms> is the budget: it fails naming the wait once spent while the holder keeps main', async () => {
   const cwd = initGitCwdFast();
   addOk(cwd, 'wait-tight-budget-take', { verify: 'true' });
-  writeLiveLock(cwd, 1000); // remainingTtlMs ~179s -- would never clear naturally in a test
-
-  const start = Date.now();
-  const result = run(cwd, ['take', 'wait-tight-budget-take', '--wait', '600']);
-  const elapsed = Date.now() - start;
-
-  assert.equal(result.status, 7, result.stderr);
-  assert.match(result.stderr, /waited \d+ms before giving up/, 'an exhausted explicit --wait budget must be distinguishable from an immediate-fail');
-  // The lock's remainingTtlMs is ~179s; only the explicit 600ms budget can have ended this run, so
-  // the ceiling here is far below that snapshot rather than a tight multiple of the budget.
-  assert.ok(elapsed >= 500 && elapsed < 60_000, `must have waited roughly the --wait budget, not the full remainingTtlMs (took ${elapsed}ms)`);
+  await withMainHeldByChild(cwd, async () => {
+    const result = await runAsync(cwd, ['take', 'wait-tight-budget-take', '--wait', '600']);
+    assert.equal(result.status, 7, result.stderr);
+    assert.match(result.stderr, /after waiting \d+ ms/, 'an exhausted --wait budget is distinguishable from an immediate fail');
+    assert.ok(result.elapsed >= 500 && result.elapsed < 60_000, `must have waited roughly the --wait budget (took ${result.elapsed}ms)`);
+  });
 });
 
 
@@ -465,17 +386,15 @@ test('take --wait rejects a value above the 900000ms (15 min) cap -- tsk-2rf D3'
 });
 
 
-test('pick --no-wait fails immediately on a live-held lock, same as take --no-wait', () => {
+test('pick --no-wait fails at once while another process holds main, same as take --no-wait', async () => {
   const cwd = initGitCwdFast();
   addOk(cwd, 'wait-no-wait-pick', { verify: 'true' });
-  writeLiveLock(cwd, 1000);
-
-  const result = run(cwd, ['pick', 'wait-no-wait-pick', '--no-wait']);
-
-  assert.equal(result.status, 7, result.stderr);
-  assert.match(result.stderr, /main checkout locked by pid/);
-  assert.doesNotMatch(result.stderr, /still waiting on main-checkout lock/, '--no-wait must not enter the retry loop');
-  assert.doesNotMatch(result.stderr, /waited \d+ms before giving up/, '--no-wait must not wait before giving up');
+  await withMainHeldByChild(cwd, async (holder) => {
+    const result = await runAsync(cwd, ['pick', 'wait-no-wait-pick', '--no-wait']);
+    assert.equal(result.status, 7, result.stderr);
+    assert.match(result.stderr, new RegExp(`main checkout \\(claim\\) is held by another process \\(pid ${holder.child.pid}\\)`));
+    assert.doesNotMatch(result.stderr, /after waiting/, '--no-wait is one try, never a wait');
+  });
 });
 
 

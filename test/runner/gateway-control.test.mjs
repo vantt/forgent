@@ -283,7 +283,7 @@ test('startGateway: a repo with no apps/fgos-gateway/ directory is refused with 
 // tsk-2n2: real cross-process mutual exclusion. A single JS thread cannot
 // prove a lock actually excludes a CONCURRENT holder (everything in one
 // process is serialized by the event loop regardless of the lock) -- a
-// second real OS process is spawned to hold `gateway.lock` while this
+// second real OS process is spawned to hold the gateway lock while this
 // process attempts to acquire the SAME lock, proving the exclusion is
 // real, not just an in-process illusion.
 test('acquireGatewayLock: a live holder in ANOTHER process blocks this process from acquiring, and names the real holder pid', async () => {
@@ -314,7 +314,7 @@ test('acquireGatewayLock: a live holder in ANOTHER process blocks this process f
     }
 
     assert.throws(
-      () => acquireGatewayLock(fgosDir, { timeoutMs: 300, retryMs: 20 }),
+      () => acquireGatewayLock(fgosDir, { timeoutMs: 300 }),
       (err) => {
         assert.ok(err instanceof GatewayControlError);
         assert.match(err.message, /timed out acquiring gateway\.lock/);
@@ -326,10 +326,126 @@ test('acquireGatewayLock: a live holder in ANOTHER process blocks this process f
     // The holder releases after 2s (already elapsed by now) -- a fresh
     // acquire attempt with a real window succeeds, proving this is a
     // real, releasable lock, not a permanent deadlock.
-    const lock = acquireGatewayLock(fgosDir, { timeoutMs: 3000, retryMs: 20 });
+    const lock = acquireGatewayLock(fgosDir, { timeoutMs: 3000 });
     lock.release();
   } finally {
     process.kill(holderPid, 'SIGKILL');
+    cleanup(repoRoot);
+  }
+});
+
+/** Start a detached Node process that takes the gateway lock and keeps it
+ * until killed. Resolves its pid once it holds the lock. */
+async function spawnLockHolder(fgosDir) {
+  const readyPath = path.join(fgosDir, `holder-ready-${Date.now()}`);
+  const script = `
+    import fs from 'node:fs';
+    import { acquireGatewayLock } from ${JSON.stringify(GATEWAY_CONTROL_MOD_PATH)};
+    acquireGatewayLock(${JSON.stringify(fgosDir)});
+    fs.writeFileSync(${JSON.stringify(readyPath)}, String(process.pid));
+    setInterval(() => {}, 1000);
+  `;
+  const out = execFileSync('sh', [
+    '-c',
+    `setsid "$0" --input-type=module -e "$1" </dev/null >/dev/null 2>&1 & echo $!`,
+    process.execPath,
+    script,
+  ]);
+  const pid = parseInt(out.toString().trim(), 10);
+  const deadline = Date.now() + 5000;
+  while (!fs.existsSync(readyPath)) {
+    assert.ok(Date.now() < deadline, 'holder process never acquired the lock');
+    await new Promise((resolve) => setTimeout(resolve, 10));
+  }
+  return pid;
+}
+
+test('acquireGatewayLock: a holder killed with SIGKILL releases the lock at once -- the next acquire does not wait', async () => {
+  if (os.platform() !== 'linux') return;
+  const { repoRoot, fgosDir } = mkFgosDir();
+  const holderPid = await spawnLockHolder(fgosDir);
+  try {
+    assert.throws(() => acquireGatewayLock(fgosDir, { timeoutMs: 100 }), GatewayControlError);
+    process.kill(holderPid, 'SIGKILL');
+    const deadline = Date.now() + 5000;
+    while (isAlive(holderPid)) {
+      assert.ok(Date.now() < deadline, 'holder never died');
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    }
+    const startedAt = Date.now();
+    const lock = acquireGatewayLock(fgosDir, { timeoutMs: 1000 });
+    assert.ok(Date.now() - startedAt < 1000, 'acquire after a dead holder must not wait out the timeout');
+    lock.release();
+  } finally {
+    try {
+      process.kill(holderPid, 'SIGKILL');
+    } catch {
+      // already dead
+    }
+    cleanup(repoRoot);
+  }
+});
+
+// Two real `startGateway` processes at once over a repo whose `cargo` and
+// gateway binary are small scripts: the lock serializes them, so exactly
+// one builds and spawns, and the other sees the live registry entry and
+// refuses without building.
+test('startGateway: two concurrent starts build and spawn exactly once; the other refuses as already running', async () => {
+  if (os.platform() !== 'linux') return;
+  const { repoRoot, fgosDir } = mkFgosDir();
+  const gatewayDir = path.join(repoRoot, 'apps', 'fgos-gateway');
+  const binDir = path.join(repoRoot, 'bin-shim');
+  const buildLog = path.join(repoRoot, 'cargo-calls.log');
+  fs.mkdirSync(gatewayDir, { recursive: true });
+  fs.mkdirSync(binDir, { recursive: true });
+  const releaseDir = path.join(gatewayDir, 'target', 'release');
+  fs.writeFileSync(path.join(binDir, 'cargo'), [
+    '#!/bin/sh',
+    `echo "$$" >> ${JSON.stringify(buildLog)}`,
+    'sleep 0.3',
+    `mkdir -p ${JSON.stringify(releaseDir)}`,
+    `printf '#!/bin/sh\necho "listening on 127.0.0.1:0"\nexec sleep 300\n' > ${JSON.stringify(path.join(releaseDir, 'fgos-gateway'))}`,
+    `chmod +x ${JSON.stringify(path.join(releaseDir, 'fgos-gateway'))}`,
+    '',
+  ].join('\n'), { mode: 0o755 });
+  const script = `
+    import { startGateway } from ${JSON.stringify(GATEWAY_CONTROL_MOD_PATH)};
+    try {
+      const entry = startGateway(${JSON.stringify(repoRoot)}, ${JSON.stringify(fgosDir)});
+      console.log(JSON.stringify({ started: true, pid: entry.pid }));
+    } catch (err) {
+      console.log(JSON.stringify({ started: false, message: err.message }));
+    }
+  `;
+  const env = { ...process.env, PATH: `${binDir}${path.delimiter}${process.env.PATH}` };
+  const runOne = () => new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, ['--input-type=module', '-e', script], { env, stdio: ['ignore', 'pipe', 'inherit'] });
+    let out = '';
+    child.stdout.on('data', (chunk) => { out += chunk; });
+    child.on('error', reject);
+    child.on('exit', () => resolve(JSON.parse(out.trim().split('\n').pop())));
+  });
+  let results = [];
+  try {
+    results = await Promise.all([runOne(), runOne()]);
+    const started = results.filter((r) => r.started);
+    const refused = results.filter((r) => !r.started);
+    assert.equal(started.length, 1, JSON.stringify(results));
+    assert.equal(refused.length, 1, JSON.stringify(results));
+    assert.match(refused[0].message, /gateway is already running/);
+    assert.equal(fs.readFileSync(buildLog, 'utf8').trim().split('\n').length, 1, 'cargo ran exactly once');
+    const registry = JSON.parse(fs.readFileSync(path.join(fgosDir, 'gateway.json'), 'utf8'));
+    assert.equal(registry.pid, started[0].pid);
+  } finally {
+    for (const r of results) {
+      if (r.started) {
+        try {
+          process.kill(r.pid, 'SIGKILL');
+        } catch {
+          // already gone
+        }
+      }
+    }
     cleanup(repoRoot);
   }
 });

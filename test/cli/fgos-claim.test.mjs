@@ -4,7 +4,6 @@
 import { test } from 'node:test';
 import {
   ADD_BAD_FLAG_CASES,
-  DEFAULT_TTL_MS,
   EDIT_BAD_FLAG_CASES,
   EDIT_PRIORITY_MATRIX_BAD_FLAG_CASES,
   FGOS,
@@ -49,7 +48,6 @@ import {
   initSessionSafeCwd,
   linkFgosBinInto,
   logPath,
-  mainCheckoutLockPath,
   makeAlreadyCaughtUpItem,
   makeBlockedBranchItem,
   makeBlockedLeafItem,
@@ -86,7 +84,6 @@ import {
   writeCreateFake,
   writeFakeGh,
   writeHangScript,
-  writeLiveLock,
   writeMarkerFake,
   writeMergeSuccessFake,
   writeRunnerConfig,
@@ -100,7 +97,7 @@ test('lock-status from a .fgos/-less linked worktree with no --dir warns on stde
   const result = run(wt, ['lock-status']);
   assert.equal(result.status, 0, 'lock-status is requiresExistingStore:false -- it warns, never refuses');
   assert.match(result.stderr, /\.fgos\/ not found/);
-  assert.equal(envelopeData(result.stdout).outcome, 'free', 'the structurally-forced empty-store answer, never silently trusted as a real lock read');
+  assert.equal(envelopeData(result.stdout).mainCheckout.outcome, 'free', 'the structurally-forced empty-store answer, never silently trusted as a real lock read');
 });
 
 

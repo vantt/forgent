@@ -123,6 +123,15 @@ test('every lock owned by 4.2 has a fence and a v1 shape that agrees with it', (
   assert.deepEqual(owned.filter((lock) => lock.fence === 'none').map((lock) => lock.name), ['full-suite']);
 });
 
+test('a tombstoned lock never takes its v3 lock at the path its tombstone occupies', () => {
+  for (const lock of registry.locks.filter((row) => row.fence === 'tombstone' && typeof row.v3Path === 'string')) {
+    const v3Tail = lock.v3Path.replace(/^<[^>]+>/, '');
+    for (const v1 of [lock.v1Path].flat().filter((value) => typeof value === 'string')) {
+      assert.ok(!v1.endsWith(v3Tail), `${lock.name}: v3 ${lock.v3Path} lands on the tombstone at ${v1}`);
+    }
+  }
+});
+
 test('machine and run locks keep the scope the plan gives them', () => {
   const scopeOf = Object.fromEntries(registry.locks.map((lock) => [lock.name, lock.scope]));
   assert.equal(scopeOf['full-suite'], 'machine');
@@ -172,14 +181,12 @@ test('judge vector names are unique', () => {
   assert.deepEqual(names.filter((name, i) => names.indexOf(name) !== i), []);
 });
 
-test('the main checkout family keeps its ranks, v3 paths and tombstone fences', () => {
+test('the repo lock family keeps its ranks, v3 paths and tombstone fences', () => {
   const byName = Object.fromEntries(registry.locks.map((lock) => [lock.name, lock]));
   const expected = {
     'merge-slot': { kind: 'mutex', rank: 20, v3Path: '<fgosDir>/locks/merge-slot--<ref>.lock', v1Path: '.fgos/merge-slot--<ref>.lock', fence: 'tombstone' },
     'worktree-admin': { kind: 'mutex', rank: 40, v3Path: '<fgosDir>/locks/worktree-admin.lock', v1Path: null, fence: null },
     'main-checkout': { kind: 'mutex', rank: 50, v3Path: '<fgosDir>/locks/main-checkout.lock', v1Path: '.fgos/main-checkout.lock', fence: 'tombstone' },
-    state: { kind: 'hot-mutex', rank: 60, v3Path: '<fgosDir>/locks/state.hot', fence: 'tombstone' },
-    'porting-events': { kind: 'hot-mutex', rank: 60, v3Path: '<fgosDir>/locks/porting-events.hot', v1Path: '.fgos/porting/events.lock', fence: 'tombstone' },
   };
   for (const [name, want] of Object.entries(expected)) {
     const lock = byName[name];
@@ -188,5 +195,4 @@ test('the main checkout family keeps its ranks, v3 paths and tombstone fences', 
     assert.equal(lock.scope, 'repo', `${name}: scope`);
     for (const [key, value] of Object.entries(want)) assert.deepEqual(lock[key], value, `${name}: ${key}`);
   }
-  assert.deepEqual(byName.state.v1Path, ['.fgos/events.lock', '.fgos/runtime/claims.lock']);
 });

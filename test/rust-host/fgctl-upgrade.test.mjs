@@ -13,6 +13,7 @@ import {
   computeArtifactDigest,
 } from '../../scripts/build-rust-distribution.mjs';
 import { releaseBinaryPath } from '../../src/util/release-binary-path.mjs';
+import { pathWithGcLeakingGit } from './fgctl-init-fixture.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -952,3 +953,38 @@ test('download: fgctl upgrade downloads the target release, verifies SHA256SUMS,
   }
 });
 
+
+test('holder-lock gate: a git that leaves a background gc while it borrows a lock refuses upgrade and repair and leaves the activation untouched', { skip: process.platform === 'win32' && 'no holder-lock driver on Windows' }, () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-lock-gate-upgrade-'));
+  const stateHome = path.join(root, 'state');
+  const projDir = path.join(root, 'proj');
+  try {
+    fs.mkdirSync(stateHome);
+    fs.mkdirSync(projDir);
+    execFileSync('git', ['init'], { cwd: projDir });
+    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: projDir });
+    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: projDir });
+
+    const initRes = runFgctl(['init', '--from', releaseDirA], { cwd: projDir, stateHome });
+    assert.equal(initRes.status, 0, `init must succeed: ${initRes.stderr}`);
+    const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
+    const before = fs.readFileSync(activationPath, 'utf8');
+    const leaky = { PATH: pathWithGcLeakingGit(root) };
+
+    const upgradeRes = runFgctl(['upgrade', '--from', releaseDirB], { cwd: projDir, stateHome, env: leaky });
+    assert.notEqual(upgradeRes.status, 0, 'upgrade must be refused when a borrow vector is red');
+    assert.match(upgradeRes.stderr, /lock-borrow-vectors-failed: .*gc-auto-loose-objects/);
+    assert.equal(fs.readFileSync(activationPath, 'utf8'), before, 'activation unchanged after the refused upgrade');
+
+    const repairRes = runFgctl(['repair'], { cwd: projDir, stateHome, env: leaky });
+    assert.notEqual(repairRes.status, 0, 'repair must be refused when a borrow vector is red');
+    assert.match(repairRes.stderr, /lock-borrow-vectors-failed: .*gc-auto-loose-objects/);
+    assert.equal(fs.readFileSync(activationPath, 'utf8'), before, 'activation unchanged after the refused repair');
+
+    const greenUpgrade = runFgctl(['upgrade', '--from', releaseDirB], { cwd: projDir, stateHome });
+    assert.equal(greenUpgrade.status, 0, `upgrade with the real git passes the gate: ${greenUpgrade.stderr}`);
+    assert.equal(JSON.parse(fs.readFileSync(activationPath, 'utf8')).artifactDigest, digestB);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});

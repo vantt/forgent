@@ -246,6 +246,13 @@ pub fn execute_legacy_cli(
     if let Ok(exe) = std::env::current_exe() {
         cmd.env("FGOS_HOST_BIN", exe);
     }
+    // One state root for the whole invocation tree: the payload reads it
+    // instead of resolving its own, and a root already pinned by the caller
+    // (dispatch, a sandbox HOME) is kept as it is.
+    let (state_root, source) = fgos_holder_lock::state_root::state_root();
+    if source != fgos_holder_lock::state_root::Source::Pinned {
+        cmd.env(fgos_holder_lock::state_root::PINNED_ROOT_ENV, state_root);
+    }
     cmd.stdin(Stdio::inherit());
     cmd.stdout(Stdio::inherit());
     cmd.stderr(Stdio::inherit());

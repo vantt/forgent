@@ -60,8 +60,9 @@ function freezeRegistryData(registryData) {
 }
 
 // Each domain's registry.yaml and workflows/*.yaml are compiled to domains/<d>/compiled.json
-// (scripts/build-domain-registry.mjs) so this module needs no YAML parser: the Work lifecycle
-// must load in a plain unpacked copy with no node_modules. A test keeps the two in step.
+// (scripts/build-domain-registry.mjs) and this module reads that file at import time, so a YAML typo
+// cannot take down every verb and hook; `fgos doctor` (domain-registry-compiled) and a test report a
+// compiled file that is stale or whose YAML does not parse.
 function loadDomainsFromDisk() {
   const domains = {};
   const repoRoot = path.resolve(import.meta.dirname, '../../');
