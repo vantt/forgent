@@ -29,9 +29,17 @@ const fixtureDir = (prefix) => {
   return dir;
 };
 let harness;
-before(async () => { harness = await startTerminalHarness(); });
+let savedTmpdir;
+before(async () => {
+  // Every runUnit sweeps the confinement root under the temp dir, asking herdr about the homes it finds.
+  // A private temp dir keeps this file's sweeps (and the herdr calls they make) off other runs' homes.
+  savedTmpdir = process.env.TMPDIR;
+  process.env.TMPDIR = fixtureDir('fgos-herdr-tmp-');
+  harness = await startTerminalHarness();
+});
 after(() => {
   harness?.stop();
+  if (savedTmpdir === undefined) delete process.env.TMPDIR; else process.env.TMPDIR = savedTmpdir;
   for (const fake of fakes) fake.cleanup();
   for (const dir of fixtureDirs) fs.rmSync(dir, { recursive: true, force: true });
 });
