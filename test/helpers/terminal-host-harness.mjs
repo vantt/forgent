@@ -19,7 +19,9 @@ import path from 'node:path';
 const TOUCHED = ['FGOS_STATE_ROOT', 'HERDR_SOCKET_PATH', 'HERDR_SESSION'];
 
 export async function startTerminalHarness() {
-  const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-tc-harness-'));
+  // A unix socket path is limited to about a hundred characters, and a test run's own temp dir can
+  // be long: the harness lives under /tmp directly.
+  const scratch = fs.mkdtempSync(path.join(process.platform === 'win32' ? os.tmpdir() : '/tmp', 'fgos-tch-'));
   const socketPath = path.join(scratch, 'herdr.sock');
   const stateRoot = path.join(scratch, 'state');
   const server = net.createServer();
