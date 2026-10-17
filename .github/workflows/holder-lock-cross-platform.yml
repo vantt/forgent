@@ -81,3 +81,77 @@ jobs:
           $inJob = $false
           [void][JobProbe]::IsProcessInJob([JobProbe]::GetCurrentProcess(), [IntPtr]::Zero, [ref]$inJob)
           Write-Host "step process runs inside a job: $inJob"
+
+  # The predecessor stress gate needs hundreds of repeats on the owner's own
+  # machine; this job builds the exe the owner runs there, and runs it once
+  # here with a few repeats to prove the artifact works.
+  stress-artifact:
+    name: stress artifact (windows-latest)
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: windows-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Rust toolchain
+        run: rustup show
+
+      - name: Build the host binary and the stress test
+        run: |
+          cargo build --release -p fgos
+          cargo test --release -p fgos --test windows_predecessor_stress --no-run --message-format=json > stress-build.json
+
+      - name: Assemble the artifact
+        run: |
+          mkdir stress-artifact
+          test_exe=$(node -e "
+            const lines = require('fs').readFileSync('stress-build.json', 'utf8').split('\n').filter(Boolean);
+            for (const line of lines) {
+              const m = JSON.parse(line);
+              if (m.reason === 'compiler-artifact' && m.target?.name === 'windows_predecessor_stress' && m.executable) { console.log(m.executable); break; }
+            }")
+          test -n "$test_exe"
+          cp "$test_exe" stress-artifact/windows_predecessor_stress.exe
+          cp target/release/fgos.exe stress-artifact/fgos.exe
+          cat > stress-artifact/README.txt <<'README'
+          Predecessor stress gate (Windows)
+
+          Keep windows_predecessor_stress.exe and fgos.exe in this folder. The test
+          starts fgos.exe as the lock holder through the path it was built with; if
+          that path does not exist on this machine, point FGOS_STRESS_FGOS_BIN at the
+          fgos.exe next to the test.
+
+          Run (PowerShell), 500 repeats of each scenario, about 15 minutes:
+
+            $env:FGOS_STRESS_FGOS_BIN = "$PWD\fgos.exe"
+            $env:HL_STRESS_REPEATS = "500"
+            $env:HL_STRESS_OUT = "$PWD\stress-report.json"
+            .\windows_predecessor_stress.exe --ignored --test-threads=1
+
+          Required: every scenario reports violations = 0, dying-job-open reports
+          jobOpened >= 50% of repeats, and namedByOneSourceOnly is reported.
+          README
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-predecessor-stress
+          path: stress-artifact
+
+      - name: Run the artifact once (50 repeats)
+        run: |
+          cd stress-artifact
+          FGOS_STRESS_FGOS_BIN="$PWD/fgos.exe" HL_STRESS_REPEATS=50 HL_STRESS_OUT="$PWD/stress-report.json" ./windows_predecessor_stress.exe --ignored --test-threads=1 --nocapture
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windows-predecessor-stress-report
+          path: stress-artifact/stress-report.json
+          if-no-files-found: ignore
