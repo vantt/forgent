@@ -19,3 +19,9 @@ pub mod steps;
 
 /// The `fgos internal adopt` route and its recovery matrix.
 pub mod adopt;
+
+/// Frames on the GO channel between supervisor and gate.
+pub mod go_channel;
+
+/// One-time publication of a layout file by hard link.
+pub mod publish;

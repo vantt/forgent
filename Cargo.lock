@@ -209,6 +209,8 @@ dependencies = [
 name = "fgos-run-supervisor"
 version = "0.2.0"
 dependencies = [
+ "fgos-process",
+ "libc",
  "serde_json",
  "sha2",
 ]

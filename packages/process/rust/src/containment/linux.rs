@@ -6,7 +6,7 @@ use std::fs::{self, File};
 use std::io::{self, Read};
 use std::os::fd::{AsRawFd, FromRawFd};
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
+use std::process::{Child, Command, Stdio};
 use std::sync::{Mutex, OnceLock};
 use std::time::{Duration, Instant};
 
@@ -138,14 +138,12 @@ impl ContainmentDriver for BwrapPidns {
         let gate_pid = match read_child_pid(read_end) {
             Ok(pid) => pid,
             Err(why) => {
-                let _ = child.kill();
-                let _ = child.wait();
+                end_failed_spawn(&mut child);
                 return Err(ContainmentError::NamespaceUnavailable(why));
             }
         };
         let Some(root) = tuple_of(ProcId(gate_pid)) else {
-            let _ = child.kill();
-            let _ = child.wait();
+            end_failed_spawn(&mut child);
             return Err(ContainmentError::SpawnFailed("gate left before its identity was read".into()));
         };
         domain.set_domain(Domain::LinuxGate(root.clone()));
@@ -183,6 +181,26 @@ impl ContainmentDriver for BwrapPidns {
             escapes: vec!["processes created by a daemon outside the namespace on the agent's request (herdr, systemd, docker)"],
         }
     }
+}
+
+/// A spawn that failed after bwrap started: end the whole attempt, not just the
+/// monitor. The gate is pid 1 of the namespace and a child of the monitor; in
+/// `direct` mode it has no `--die-with-parent`, so killing only the monitor
+/// would leave the gate and the agent running with no record of them. Killing
+/// the namespace's init (every child of the monitor) takes the namespace down.
+fn end_failed_spawn(monitor: &mut Child) {
+    for _ in 0..50 {
+        let children = members(monitor.id(), true, None);
+        if children.is_empty() {
+            break;
+        }
+        for row in children.iter().filter_map(tuple_of_row) {
+            let _ = control::signal_by_identity(&row, Signal::Kill);
+        }
+        std::thread::sleep(POLL);
+    }
+    let _ = monitor.kill();
+    let _ = monitor.wait();
 }
 
 /// `linux-pgroup`: the gate leads its own session and process group, and the
