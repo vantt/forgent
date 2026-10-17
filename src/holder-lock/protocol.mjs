@@ -19,6 +19,7 @@ export const LOCK_FD_SLOT = 3;
 export const LOCK_FD_ENV = 'FGOS_LOCK_FD';
 
 export const DEFAULT_KILL_WAIT_MS = 2000;
+export const MAX_KILL_WAIT_MS = 60_000;
 export const KILL_WAIT_CONFIG_KEY = 'lock.predecessorKillWaitMs';
 
 /** Raised for every failure the facade names. `code` is the stable key a
@@ -76,8 +77,8 @@ export function readPredecessorKillWaitMs({ projectRoot } = {}) {
   if (!section || typeof section !== 'object' || Array.isArray(section)) return DEFAULT_KILL_WAIT_MS;
   const value = section.predecessorKillWaitMs;
   if (value === undefined) return DEFAULT_KILL_WAIT_MS;
-  if (!Number.isInteger(value) || value < 1) {
-    throw new HolderLockError('lock-config-invalid', `${KILL_WAIT_CONFIG_KEY} must be an integer >= 1, got ${JSON.stringify(value)}`, { key: KILL_WAIT_CONFIG_KEY, value });
+  if (!Number.isInteger(value) || value < 1 || value > MAX_KILL_WAIT_MS) {
+    throw new HolderLockError('lock-config-invalid', `${KILL_WAIT_CONFIG_KEY} must be an integer from 1 to ${MAX_KILL_WAIT_MS}, got ${JSON.stringify(value)}`, { key: KILL_WAIT_CONFIG_KEY, value });
   }
   return value;
 }

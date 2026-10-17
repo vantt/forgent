@@ -256,9 +256,12 @@ test('a malformed lock.predecessorKillWaitMs is refused, never guessed around', 
   const { dir, fgosDir } = makeProject();
   try {
     fs.mkdirSync(fgosDir, { recursive: true });
-    fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ lock: { predecessorKillWaitMs: '2s' } }));
-    assert.throws(() => acquireSync(createLockScope('x'), LOCK, { fgosDir }), (err) => err.code === 'lock-config-invalid' && err.key === 'lock.predecessorKillWaitMs');
-    assert.equal(fs.existsSync(path.join(fgosDir, 'locks')), false, 'refused before any lock file was touched');
+    // The same range doctor's lock-predecessor-kill-wait check enforces.
+    for (const value of ['2s', 0, 60_001]) {
+      fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ lock: { predecessorKillWaitMs: value } }));
+      assert.throws(() => acquireSync(createLockScope('x'), LOCK, { fgosDir }), (err) => err.code === 'lock-config-invalid' && err.key === 'lock.predecessorKillWaitMs', `value ${JSON.stringify(value)}`);
+      assert.equal(fs.existsSync(path.join(fgosDir, 'locks')), false, 'refused before any lock file was touched');
+    }
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }

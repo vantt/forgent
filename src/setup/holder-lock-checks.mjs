@@ -16,7 +16,7 @@ import path from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
 
 import { hostBin, guaranteeFor, runLockRouteSync, runStateRootRoute, descriptionHolders, ROUTE_CALL_TIMEOUT_MS } from '../holder-lock/driver.mjs';
-import { PROTOCOL, KILL_WAIT_CONFIG_KEY, DEFAULT_KILL_WAIT_MS, LOCK_FD_ENV } from '../holder-lock/protocol.mjs';
+import { PROTOCOL, KILL_WAIT_CONFIG_KEY, DEFAULT_KILL_WAIT_MS, MAX_KILL_WAIT_MS, LOCK_FD_ENV } from '../holder-lock/protocol.mjs';
 import { resolveStateRoot, STATE_ROOT_ENV, LOCKS_DIR } from '../holder-lock/state-root.mjs';
 import { loadLockRegistry } from '../holder-lock/registry.mjs';
 import { CUTOVER_RELEASE, fenceStatus, fenceCutover, defaultProviderRuntimeDir } from '../holder-lock/fences.mjs';
@@ -27,7 +27,7 @@ import { loadGlobalConfig } from '../config/global-config.mjs';
 
 /** Largest `lock.predecessorKillWaitMs` doctor accepts: past a minute a dead holder's
  * leftovers are not "being killed" any more, and every contender would wait that long. */
-export const MAX_KILL_WAIT_MS = 60_000;
+export { MAX_KILL_WAIT_MS };
 
 const BORROW_VECTORS_TIMEOUT_MS = 30_000;
 /** The kernel drops a dead holder's lock at once; this only covers a racing fork in the caller. */
