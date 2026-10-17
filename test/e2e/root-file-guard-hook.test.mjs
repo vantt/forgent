@@ -33,10 +33,14 @@ function fixture(t, { marker = true } = {}) {
   if (marker) put('apps/fgos/Cargo.toml', '[package]\nname="fixture"\n');
   git(['add', '.']);
   git(['commit', '-q', '-m', 'fixture baseline']);
-  for (const relative of ['.githooks/pre-commit', 'src/runner/main-checkout-lock.mjs', 'src/runner/main-checkout-activity.mjs', 'src/runner/dispatch/process-identity.mjs', 'src/runner/dispatch/run-timeout.mjs', 'src/util/session-identity.mjs', 'src/util/host-bin-path.mjs']) {
-    const destination = path.join(host, relative);
-    fs.mkdirSync(path.dirname(destination), { recursive: true });
-    fs.copyFileSync(path.join(sourceRoot, relative), destination);
+  const hookDestination = path.join(host, '.githooks/pre-commit');
+  fs.mkdirSync(path.dirname(hookDestination), { recursive: true });
+  fs.copyFileSync(path.join(sourceRoot, '.githooks/pre-commit'), hookDestination);
+  // The hook's imports resolve through symlinks to this checkout's src; the
+  // convention client is left out on purpose (a copied hook without it must warn and pass).
+  fs.mkdirSync(path.join(host, 'src'));
+  for (const entry of fs.readdirSync(path.join(sourceRoot, 'src'))) {
+    if (entry !== 'convention') fs.symlinkSync(path.join(sourceRoot, 'src', entry), path.join(host, 'src', entry));
   }
   fs.chmodSync(path.join(host, '.githooks/pre-commit'), 0o755);
   git(['config', 'core.hooksPath', path.join(host, '.githooks')]);
