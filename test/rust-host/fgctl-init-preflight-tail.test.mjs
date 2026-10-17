@@ -5,6 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync, execFileSync } from 'node:child_process';
 import { computeArtifactDigest, hashFile } from '../../scripts/build-rust-distribution.mjs';
+import { holdLock } from './fgctl-lock-holder.mjs';
 import { useReleaseFixture, releaseDirName, fixture, runFgctl, runShim, pathWithGcLeakingGit } from './fgctl-init-fixture.mjs';
 
 useReleaseFixture();
@@ -61,7 +62,7 @@ test('P7: Candidate preflight failure refuses init before publishing activation 
   }
 });
 
-test('P7 (red-team HIGH): a hostile candidate that passes every static preflight check is never executed before publish and cannot write outside its release tree', () => {
+test('P7 (red-team HIGH): a hostile candidate that passes every static preflight check is never executed before publish and cannot write outside its release tree', async () => {
   const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-hostile-home-'));
   const tempState = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-hostile-state-'));
   const tempProj = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-hostile-proj-'));
@@ -133,14 +134,17 @@ test('P7 (red-team HIGH): a hostile candidate that passes every static preflight
     // preflight used to run <candidate>/bin/fgos. Nothing else in that
     // window may execute candidate code.
     const installDir = path.join(tempProj, '.fgos', 'installation');
-    fs.mkdirSync(installDir, { recursive: true });
-    fs.writeFileSync(path.join(installDir, 'activation.lock'), JSON.stringify({ pid: process.pid, ts: Date.now() }));
-
-    const res = runFgctl(['init', '--from', hostileReleaseDir], {
-      cwd: tempProj,
-      stateHome: tempState,
-      env: { HOME: tempHome },
-    });
+    const holder = await holdLock('activation', { fgosDir: path.join(tempProj, '.fgos') });
+    let res;
+    try {
+      res = runFgctl(['init', '--from', hostileReleaseDir], {
+        cwd: tempProj,
+        stateHome: tempState,
+        env: { HOME: tempHome },
+      });
+    } finally {
+      await holder.kill();
+    }
 
     assert.notEqual(res.status, 0, 'init must stop at the held activation lock');
     assert.match(res.stderr, /activation-lock-held/, 'control must have reached lock acquisition, i.e. past preflight');
