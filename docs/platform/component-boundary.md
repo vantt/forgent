@@ -7,7 +7,7 @@ Purpose: Track the whole-system component and authority boundary map
 Design status: Draft
 Canonical: Yes, after review
 Owner: Platform documentation
-Last reviewed: 2026-10-04
+Last reviewed: 2026-10-16
 Related:
 - docs/architect/component-boundary/README.md
 - docs/architect/component-boundary/component-boundary-advisory.md
@@ -80,6 +80,8 @@ This table is a compact navigation surface, not a full replacement for the advis
 | Observe (Metrics & Friction) | Measurement and friction tracking across substrate entities (cases, runs, sessions, friction, snapshots). Owned in Rust (`packages/observe/rust`), native routing. | [../specs/observe.md](../specs/observe.md) |
 | Convention (Executable Names & Placement) | Platform-core authority for deterministic artifact names, repository-relative placement, path classification, and conformance checking. Implemented; owns no state and depends only on `fgos-host-runtime`. | [convention/spec.md](convention/spec.md) |
 | Session Identity (Writer Identity) | Foundation authority for "who is the writer of this process" (`{id, source}`). One implementation, the Rust crate `fgos-session-identity` (`packages/session-identity/rust`, native verb `fgos identity`); Observe calls it in process, Node through the facade `src/util/session-identity.mjs`. Owns no state and depends only on `fgos-host-runtime`; Observe depends on it. Grants no lock or claim authority. | [session-identity/spec.md](session-identity/spec.md) |
+| Process Facts & Control (L0) | Single authority for "is this process tuple `{host, bootId, pidNs, pid, startTime}` alive, dead or unknown" (`judge`, one shared vector file for Rust and Node), for signalling a process by identity (`pidfd` on Linux, never a bare pid), for spawning with an explicit fd mapping, and for the domain primitives `domain_is_empty`/`domain_kill_all` the predecessor rule of holder-lock needs. Never spawns to read facts, never kills by bare pid, never reads mtime, knows no run, lock or pane. Rust crate `fgos-process` (`packages/process/rust`), one driver per OS; the Node leaf `src/runner/dispatch/process-identity.mjs` reads the same vectors, and reconcile imports only `facts`. The gate primitives (subreaper, PDEATHSIG, PID namespace, tty) and the containment port stay with the run supervisor. Depends only on the OS. | [process/spec.md](process/spec.md) |
+| Holder-lock (L1) | Single authority for "who holds which resource", as the kernel sees it: kernel locks on open file descriptions behind one OS-neutral port (`acquire`, `release`, `run_borrowed`, `probe`, `holders`, `guarantee`), the lock registry (`packages/holder-lock/contracts/lock-registry.v1.json`: every lock's kind, scope, rank, path, legacy shape and fence), lock order inside one `LockScope`, the description rules, the predecessor-domain rule, the single state-root resolution and the cutover fences. Never reads writer identity, never takes a lock from a live holder, never derives a decision from a pid, TTL or mtime. Rust crate `fgos-holder-lock` (`packages/holder-lock/rust`) plus the internal routes `fgos internal lock-fd|state-root|quiesce-scan|lock-borrow-vectors`; Node only through the facade `src/holder-lock/`, which never exposes an fd. Depends on Process Facts & Control and the kernel. Owns the cold locks of this track (gateway, runner, sessions, advance, reconcile, recovery, full-suite, provider account/state, dispatch cwd); main checkout, merge slot and the hot `state` mutex follow in the next track. | [holder-lock/spec.md](holder-lock/spec.md) |
 ## 5. How To Change
 
 1. Read this anchor and the current detailed component-boundary source.
@@ -97,6 +99,8 @@ This table is a compact navigation surface, not a full replacement for the advis
 | draft authority map | [proposals/component-authority-boundary-map.md](proposals/component-authority-boundary-map.md) |
 | packaging-distribution area | [packaging-distribution/README.md](packaging-distribution/README.md) |
 | observe component | [observe/spec.md](observe/spec.md) |
+| process facts & control component | [process/spec.md](process/spec.md) |
+| holder-lock component | [holder-lock/spec.md](holder-lock/spec.md) |
 
 ## Added in candidate: component-boundary-advisory source carriage
 

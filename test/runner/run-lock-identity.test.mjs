@@ -67,9 +67,9 @@ test('resolveHolderLiveness: bootId recorded and different from the current boot
   assert.equal(resolveHolderLiveness(holder), HAS_BOOT_ID ? 'dead' : 'held');
 });
 
-test('resolveHolderLiveness: no pid at all -> dead', () => {
-  assert.equal(resolveHolderLiveness({ id: 'no-pid' }), 'dead');
-  assert.equal(resolveHolderLiveness(null), 'dead');
+test('resolveHolderLiveness: no pid at all -> held (a record that cannot be disproven is never reclaimed)', () => {
+  assert.equal(resolveHolderLiveness({ id: 'no-pid' }), 'held');
+  assert.equal(resolveHolderLiveness(null), 'held');
 });
 
 test('acquireRunControl: a live holder (real process, matching processStartTime) is never reclaimed by a contender, even with no ttlMs (always-attempt path)', () => {

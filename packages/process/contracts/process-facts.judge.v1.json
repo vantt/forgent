@@ -1,0 +1,265 @@
+{
+  "contract": { "id": "process-facts-judge", "version": 1 },
+  "description": "Vectors for judge(record) -> alive | dead | unknown, as seen by one observer. Rules are evaluated in the order of `rules`; the first rule that applies decides. Every vector states the whole world it needs, so a driver test can build a fake process table from it.",
+  "tuple": {
+    "fields": ["host", "bootId", "pidNs", "pid", "startTime"],
+    "legacyAdapter": "a record written before the tuple existed carries `processStartTime`; the adapter reads it as startTime"
+  },
+  "observer": {
+    "host": "string",
+    "bootId": "boot id of the running kernel as the observer reads it",
+    "pidNs": "string",
+    "inInitPidNs": "boolean: the observer lives in the initial PID namespace"
+  },
+  "world": {
+    "proc": {
+      "state": ["absent", "R", "S", "D", "T", "Z", "X"],
+      "startTime": "string|null: the start time the observer reads for the record's pid",
+      "startTimeReadable": "boolean: false when the driver is missing, permission is denied or the read timed out",
+      "unreadableCause": ["driver-missing", "permission", "timeout"]
+    },
+    "anchorJudge": "alive|dead|unknown: the observer's own judge() of the record's anchor tuple, computed first; only present when the record has an anchor"
+  },
+  "rules": [
+    { "id": "t1.other-host-or-pidns", "table": 1, "event": "other host, or other pidNs without a decisive anchor", "result": "unknown" },
+    { "id": "t1.boot-id-differs", "table": 1, "event": "same host, recorded bootId differs from the kernel's current bootId", "result": "dead" },
+    { "id": "t1.no-pid", "table": 1, "event": "no pid in the record (missing, corrupt, not a positive integer)", "result": "unknown" },
+    { "id": "t1.esrch", "table": 1, "event": "pid does not exist (ESRCH)", "result": "dead" },
+    { "id": "t1.zombie", "table": 1, "event": "pid exists in state Z or X in /proc/<pid>/stat", "result": "dead" },
+    { "id": "t1.start-match", "table": 1, "event": "pid exists, startTime matches", "result": "alive" },
+    { "id": "t1.start-differs", "table": 1, "event": "pid exists, startTime differs (pid reused)", "result": "dead" },
+    { "id": "t1.start-unreadable", "table": 1, "event": "startTime cannot be read (driver missing, permission, timeout)", "result": "unknown" },
+    { "id": "t2.anchor-dead", "table": 2, "event": "record pidNs differs from the observer's, record has an anchor, the anchor is dead", "result": "dead" },
+    { "id": "t2.anchor-alive-or-absent", "table": 2, "event": "record pidNs differs from the observer's, anchor alive, unknown or absent", "result": "unknown" },
+    { "id": "t2.observer-outside-init-no-pidns", "table": 2, "event": "observer is not in the initial PID namespace and the record has no pidNs", "result": "unknown" }
+  ],
+  "vectors": [
+    {
+      "name": "other-host",
+      "row": "t1.other-host-or-pidns",
+      "observer": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "inInitPidNs": true },
+      "record": { "host": "h2", "bootId": "b1", "pidNs": "pidns:[1]", "pid": 4242, "startTime": "100" },
+      "world": { "proc": { "state": "S", "startTime": "100", "startTimeReadable": true } },
+      "expect": "unknown"
+    },
+    {
+      "name": "other-host-and-boot-id-differs",
+      "row": "t1.other-host-or-pidns",
+      "observer": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "inInitPidNs": true },
+      "record": { "host": "h2", "bootId": "b0", "pidNs": "pidns:[1]", "pid": 4242, "startTime": "100" },
+      "world": { "proc": { "state": "absent" } },
+      "expect": "unknown",
+      "note": "the host check comes first: another host's boot id and pid table mean nothing here"
+    },
+    {
+      "name": "other-pidns-no-anchor",
+      "row": "t1.other-host-or-pidns",
+      "observer": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "inInitPidNs": true },
+      "record": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[7]", "pid": 12, "startTime": "100" },
+      "world": { "proc": { "state": "absent" } },
+      "expect": "unknown",
+      "note": "pid 12 does not exist in the observer's table but lives in another namespace: never judged dead"
+    },
+    {
+      "name": "boot-id-differs",
+      "row": "t1.boot-id-differs",
+      "observer": { "host": "h1", "bootId": "b2", "pidNs": "pidns:[1]", "inInitPidNs": true },
+      "record": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "pid": 4242, "startTime": "100" },
+      "world": { "proc": { "state": "S", "startTime": "100", "startTimeReadable": true } },
+      "expect": "dead",
+      "note": "after a reboot a live pid with the same start time is a different process"
+    },
+    {
+      "name": "no-pid-field-missing",
+      "row": "t1.no-pid",
+      "observer": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "inInitPidNs": true },
+      "record": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "startTime": "100" },
+      "world": { "proc": { "state": "absent" } },
+      "expect": "unknown",
+      "note": "today's process-identity code answers dead here; a record without a pid proves nothing"
+    },
+    {
+      "name": "no-pid-null",
+      "row": "t1.no-pid",
+      "observer": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "inInitPidNs": true },
+      "record": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "pid": null, "startTime": "100" },
+      "world": { "proc": { "state": "absent" } },
+      "expect": "unknown"
+    },
+    {
+      "name": "no-pid-corrupt-string",
+      "row": "t1.no-pid",
+      "observer": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "inInitPidNs": true },
+      "record": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "pid": "abc", "startTime": "100" },
+      "world": { "proc": { "state": "absent" } },
+      "expect": "unknown"
+    },
+    {
+      "name": "no-pid-zero",
+      "row": "t1.no-pid",
+      "observer": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "inInitPidNs": true },
+      "record": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "pid": 0, "startTime": "100" },
+      "world": { "proc": { "state": "absent" } },
+      "expect": "unknown"
+    },
+    {
+      "name": "pid-does-not-exist",
+      "row": "t1.esrch",
+      "observer": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "inInitPidNs": true },
+      "record": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "pid": 4242, "startTime": "100" },
+      "world": { "proc": { "state": "absent" } },
+      "expect": "dead"
+    },
+    {
+      "name": "zombie-state-z",
+      "row": "t1.zombie",
+      "observer": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "inInitPidNs": true },
+      "record": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "pid": 4242, "startTime": "100" },
+      "world": { "proc": { "state": "Z", "startTime": "100", "startTimeReadable": true } },
+      "expect": "dead",
+      "note": "kill(pid, 0) succeeds for a zombie; the stat state decides"
+    },
+    {
+      "name": "dead-state-x",
+      "row": "t1.zombie",
+      "observer": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "inInitPidNs": true },
+      "record": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "pid": 4242, "startTime": "100" },
+      "world": { "proc": { "state": "X", "startTime": "100", "startTimeReadable": true } },
+      "expect": "dead"
+    },
+    {
+      "name": "start-time-matches",
+      "row": "t1.start-match",
+      "observer": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "inInitPidNs": true },
+      "record": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "pid": 4242, "startTime": "100" },
+      "world": { "proc": { "state": "S", "startTime": "100", "startTimeReadable": true } },
+      "expect": "alive"
+    },
+    {
+      "name": "start-time-matches-legacy-field-name",
+      "row": "t1.start-match",
+      "observer": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "inInitPidNs": true },
+      "record": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "pid": 4242, "processStartTime": "100" },
+      "world": { "proc": { "state": "R", "startTime": "100", "startTimeReadable": true } },
+      "expect": "alive"
+    },
+    {
+      "name": "start-time-differs-pid-reused",
+      "row": "t1.start-differs",
+      "observer": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "inInitPidNs": true },
+      "record": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "pid": 4242, "startTime": "100" },
+      "world": { "proc": { "state": "S", "startTime": "250", "startTimeReadable": true } },
+      "expect": "dead"
+    },
+    {
+      "name": "start-time-unreadable-driver-missing",
+      "row": "t1.start-unreadable",
+      "observer": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "inInitPidNs": true },
+      "record": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "pid": 4242, "startTime": "100" },
+      "world": { "proc": { "state": "S", "startTime": null, "startTimeReadable": false, "unreadableCause": "driver-missing" } },
+      "expect": "unknown"
+    },
+    {
+      "name": "start-time-unreadable-permission",
+      "row": "t1.start-unreadable",
+      "observer": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "inInitPidNs": true },
+      "record": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "pid": 4242, "startTime": "100" },
+      "world": { "proc": { "state": "S", "startTime": null, "startTimeReadable": false, "unreadableCause": "permission" } },
+      "expect": "unknown"
+    },
+    {
+      "name": "start-time-unreadable-timeout",
+      "row": "t1.start-unreadable",
+      "observer": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "inInitPidNs": true },
+      "record": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "pid": 4242, "startTime": "100" },
+      "world": { "proc": { "state": "S", "startTime": null, "startTimeReadable": false, "unreadableCause": "timeout" } },
+      "expect": "unknown"
+    },
+    {
+      "name": "other-pidns-anchor-dead",
+      "row": "t2.anchor-dead",
+      "observer": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "inInitPidNs": true },
+      "record": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[7]", "pid": 12, "startTime": "100", "anchor": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "pid": 900, "startTime": "50" } },
+      "world": { "proc": { "state": "absent" }, "anchorJudge": "dead" },
+      "expect": "dead",
+      "note": "the init process of that namespace is dead, so the kernel already killed the whole namespace"
+    },
+    {
+      "name": "other-pidns-anchor-alive",
+      "row": "t2.anchor-alive-or-absent",
+      "observer": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "inInitPidNs": true },
+      "record": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[7]", "pid": 12, "startTime": "100", "anchor": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "pid": 900, "startTime": "50" } },
+      "world": { "proc": { "state": "absent" }, "anchorJudge": "alive" },
+      "expect": "unknown"
+    },
+    {
+      "name": "other-pidns-anchor-unknown",
+      "row": "t2.anchor-alive-or-absent",
+      "observer": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "inInitPidNs": true },
+      "record": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[7]", "pid": 12, "startTime": "100", "anchor": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "pid": 900, "startTime": "50" } },
+      "world": { "proc": { "state": "absent" }, "anchorJudge": "unknown" },
+      "expect": "unknown"
+    },
+    {
+      "name": "other-pidns-no-anchor-pid-visible-and-matching",
+      "row": "t2.anchor-alive-or-absent",
+      "observer": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "inInitPidNs": true },
+      "record": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[7]", "pid": 12, "startTime": "100" },
+      "world": { "proc": { "state": "S", "startTime": "100", "startTimeReadable": true } },
+      "expect": "unknown",
+      "note": "pid 12 in the observer's table is a different process that happens to match: the namespaces differ, so the table says nothing about the record"
+    },
+    {
+      "name": "observer-outside-init-record-without-pidns-would-be-alive",
+      "row": "t2.observer-outside-init-no-pidns",
+      "observer": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[7]", "inInitPidNs": false },
+      "record": { "host": "h1", "bootId": "b1", "pid": 4242, "startTime": "100" },
+      "world": { "proc": { "state": "S", "startTime": "100", "startTimeReadable": true } },
+      "expect": "unknown",
+      "note": "an agent in a sandbox must not decide anything about an old {pid, startTime} record of a host holder"
+    },
+    {
+      "name": "observer-outside-init-record-without-pidns-would-be-dead",
+      "row": "t2.observer-outside-init-no-pidns",
+      "observer": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[7]", "inInitPidNs": false },
+      "record": { "host": "h1", "bootId": "b1", "pid": 4242, "startTime": "100" },
+      "world": { "proc": { "state": "absent" } },
+      "expect": "unknown",
+      "note": "pid absent from the sandbox's table: the host holder is not visible from here, never cleaned"
+    },
+    {
+      "name": "observer-outside-init-legacy-record-pid-and-start-time-only",
+      "row": "t2.observer-outside-init-no-pidns",
+      "observer": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[7]", "inInitPidNs": false },
+      "record": { "pid": 4242, "processStartTime": "100" },
+      "world": { "proc": { "state": "absent" } },
+      "expect": "unknown"
+    },
+    {
+      "name": "control-observer-in-init-record-without-pidns-alive",
+      "row": "t1.start-match",
+      "observer": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "inInitPidNs": true },
+      "record": { "host": "h1", "bootId": "b1", "pid": 4242, "startTime": "100" },
+      "world": { "proc": { "state": "S", "startTime": "100", "startTimeReadable": true } },
+      "expect": "alive",
+      "note": "the missing pidNs only matters to an observer outside the initial namespace"
+    },
+    {
+      "name": "control-observer-in-init-record-without-pidns-dead",
+      "row": "t1.esrch",
+      "observer": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[1]", "inInitPidNs": true },
+      "record": { "host": "h1", "bootId": "b1", "pid": 4242, "startTime": "100" },
+      "world": { "proc": { "state": "absent" } },
+      "expect": "dead"
+    },
+    {
+      "name": "control-observer-outside-init-record-same-pidns-alive",
+      "row": "t1.start-match",
+      "observer": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[7]", "inInitPidNs": false },
+      "record": { "host": "h1", "bootId": "b1", "pidNs": "pidns:[7]", "pid": 12, "startTime": "100" },
+      "world": { "proc": { "state": "S", "startTime": "100", "startTimeReadable": true } },
+      "expect": "alive",
+      "note": "two processes inside the same sandbox namespace judge each other normally"
+    }
+  ]
+}

@@ -55,6 +55,31 @@ export function useReleaseFixture() {
   });
 }
 
+// A PATH whose first `git` drops the `-c gc.auto=0` and `-c maintenance.auto=false` switches a
+// borrowed git runs with, then runs the real git: a git that can start a background gc while it
+// borrows a lock. An environment fixture for the activation gate's red case, not a code branch.
+export function pathWithGcLeakingGit(dir) {
+  const real = execFileSync('sh', ['-c', 'command -v git'], { encoding: 'utf8' }).trim();
+  const bin = path.join(dir, 'gc-leaking-git');
+  fs.mkdirSync(bin, { recursive: true });
+  fs.writeFileSync(
+    path.join(bin, 'git'),
+    [
+      '#!/bin/sh',
+      'n=$#',
+      'while [ $n -gt 0 ]; do',
+      '  a=$1; shift; n=$((n-1))',
+      '  if [ "$a" = -c ] && { [ "$1" = gc.auto=0 ] || [ "$1" = maintenance.auto=false ]; }; then shift; n=$((n-1)); continue; fi',
+      '  set -- "$@" "$a"',
+      'done',
+      `exec '${real}' "$@"`,
+      '',
+    ].join('\n'),
+    { mode: 0o755 },
+  );
+  return `${bin}${path.delimiter}${process.env.PATH}`;
+}
+
 export function waitForProcess(proc) {
   return new Promise((resolve) => {
     let stdout = '';

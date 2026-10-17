@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "lock-registry.schema.v1.json",
+  "title": "fgOS lock registry",
+  "type": "object",
+  "required": ["contract", "ranks", "locks"],
+  "additionalProperties": false,
+  "properties": {
+    "contract": {
+      "type": "object",
+      "required": ["id", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "const": "lock-registry" },
+        "version": { "const": 1 }
+      }
+    },
+    "description": { "type": "string" },
+    "ranks": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["kinds"],
+        "additionalProperties": false,
+        "properties": {
+          "kinds": { "type": "array", "items": { "enum": ["mutex", "lease", "hot-mutex", "beacon"] } },
+          "note": { "type": "string" }
+        }
+      }
+    },
+    "locks": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/lock" }
+    }
+  },
+  "$defs": {
+    "lock": {
+      "type": "object",
+      "required": ["name", "kind", "scope", "rank", "v3Path", "v1Shape", "v1Path", "fence", "owner"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+        "kind": { "enum": ["mutex", "lease", "hot-mutex", "beacon"] },
+        "scope": { "enum": ["repo", "machine", "run"] },
+        "rank": { "type": "integer", "minimum": 1 },
+        "v3Path": { "type": ["string", "null"] },
+        "v1Shape": { "enum": ["file-link", "file-wx", "ledger-dir", "file-by-cwd", null] },
+        "v1Path": { "type": ["string", "array", "null"], "items": { "type": "string" } },
+        "fence": { "enum": ["tombstone", "blocking-generation", "none", null] },
+        "fenceNote": { "type": "string" },
+        "owner": { "enum": ["4.2", "4.3", "4.4", "6.2"] },
+        "note": { "type": "string" }
+      },
+      "allOf": [
+        {
+          "if": { "required": ["owner"], "properties": { "owner": { "const": "4.2" } } },
+          "then": {
+            "required": ["fence", "v1Shape", "v1Path", "v3Path"],
+            "properties": {
+              "fence": { "enum": ["tombstone", "blocking-generation", "none"] },
+              "v1Shape": { "enum": ["file-link", "file-wx", "ledger-dir", "file-by-cwd"] },
+              "v1Path": { "type": ["string", "array"] },
+              "v3Path": { "type": "string" }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -3,7 +3,7 @@
 // A leaf: the confinement reaper reads the ceiling without importing the runner config module.
 //
 // The floor keeps a typo ("90s" for "90m") from killing a real turn at once. The ceiling bounds how
-// long a hung worker can hold its worktree's dispatch lock and the private home holding a copy of an
+// long a hung worker runs in its worktree and keeps the private home holding a copy of an
 // account login (the reaper keeps a live run's home until its own timeout, held to this ceiling): four
 // times the heaviest turn seen, about an hour.
 

@@ -14,7 +14,6 @@ import {
   inspectMainCheckoutLock,
   formatLockDurationMs,
   mergeSlotLockFile,
-  dispatchLockFile,
   LOCK_FILE,
   ACQUIRED,
   HELD,
@@ -511,55 +510,16 @@ test('abandoned-lock self-healing is unchanged: a dead holder whose last heartbe
   assert.equal(contender.status, ACQUIRED, 'a crashed holder stops heartbeating, so self-healing still reclaims the lock after ttlMs from its LAST real write, unchanged from before this fix');
 });
 
-// --- S2 fix (dispatch-engine-liveness-hardening Phase 3): the per-cwd
-// dispatch lock's own composite pid identity (dispatchLockFile,
-// `${pid}:${acquiredAtMs}:${rand}`) is now liveness-checked at acquire time
-// instead of judged by ttlMs freshness alone, matching audit repro C
-// ("dead-pid holder blocks for the full ttlMs, mislabeled live"). ------------
-
 test('HELD no longer overclaims verified liveness -- was "held-by-live-other-pid", a status also returned for a holder whose liveness (a string identity, or now-reclaimed dead pid) was never actually confirmed live', () => {
   assert.equal(HELD, 'held');
 });
 
-test('acquireMainCheckoutLock recognizes a dead-pid dispatch-lock composite identity as dead immediately, reclaiming it well before a long ttlMs elapses (S2 fix, real dead process)', () => {
+// A holder with a long ttl renews every ttl/3; a contender with a shorter ttl of its own must judge
+// that holder by the ttl the holder took.
+test('a live string-identity holder is judged by the ttlMs it took, not by a contender\'s shorter one, and keeps it across renewals', () => {
   const { dir } = setup();
   fs.mkdirSync(dir, { recursive: true });
-  const dead = deadPid();
-  const lockFile = dispatchLockFile('/some/worktree');
-  const composite = `${dead}:${Date.now()}:abc123`;
-  fs.writeFileSync(path.join(dir, lockFile), JSON.stringify({ pid: composite, ts: Date.now() }));
-
-  // A long ttlMs (1 hour) -- before this fix, a string identity's held-ness
-  // was judged purely by ttlMs freshness, so this dead-pid holder would
-  // read as HELD ("held-by-live-other-pid") for the entire hour, exactly
-  // the audit's own reproduced probe (a 999999 dead pid blocking for the
-  // full 35-minute dispatch timeout).
-  const contender = acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: 60 * 60 * 1000, lockFile });
-
-  assert.equal(contender.status, ACQUIRED, 'a dead-pid composite holder must be reclaimed immediately, never blocked for the full ttlMs');
-});
-
-test('acquireMainCheckoutLock still honors ttlMs for a LIVE dispatch-lock composite identity -- only a confirmed-dead pid short-circuits, a live one is unaffected', () => {
-  const { dir } = setup();
-  fs.mkdirSync(dir, { recursive: true });
-  const lockFile = dispatchLockFile('/some/worktree');
-  const ts = Date.now() - 100;
-  const composite = `${process.pid}:${ts}:abc123`;
-  fs.writeFileSync(path.join(dir, lockFile), JSON.stringify({ pid: composite, ts }));
-
-  const contender = acquireMainCheckoutLock(dir, { identity: process.pid + 100_000, ttlMs: 60_000, lockFile });
-
-  assert.equal(contender.status, HELD, 'a live composite holder within ttlMs is still HELD, unchanged from before this fix');
-  assert.equal(contender.holderPid, composite);
-});
-
-// A dispatch given a long run timeout renews its per-cwd lock every timeout/3; a contender with a
-// shorter timeout of its own must judge that holder by the ttl the holder took, or it takes the lock
-// of a worktree whose worker is still running.
-test('a live dispatch-lock holder is judged by the ttlMs it took, not by a contender\'s shorter one, and keeps it across renewals', () => {
-  const { dir } = setup();
-  fs.mkdirSync(dir, { recursive: true });
-  const lockFile = dispatchLockFile('/some/worktree');
+  const lockFile = 'ttl-judged.lock';
   const H = 3600000;
   const identity = `${process.pid}:${Date.now()}:longrun`;
   const t0 = Date.now() - 2 * H;
@@ -579,35 +539,25 @@ test('a live dispatch-lock holder is judged by the ttlMs it took, not by a conte
 
 // A pid reused after a holder was killed reads as live; the ttl a record claims is honoured only up to
 // the run-timeout ceiling, so no record blocks a worktree for longer than one run may take.
-test('a dispatch-lock holder\'s recorded ttl is honoured only up to the run-timeout ceiling', () => {
+test('a string-identity holder\'s recorded ttl is honoured only up to the run-timeout ceiling', () => {
   const { dir } = setup();
   fs.mkdirSync(dir, { recursive: true });
-  const lockFile = dispatchLockFile('/some/worktree');
+  const lockFile = 'ttl-judged.lock';
   const H = 3600000;
   fs.writeFileSync(path.join(dir, lockFile), JSON.stringify({ pid: `${process.pid}:${Date.now()}:huge`, ts: Date.now() - 5 * H, ttlMs: 9e15 }));
   const contender = acquireMainCheckoutLock(dir, { identity: `${process.pid}:${Date.now()}:next`, ttlMs: 15 * 60000, lockFile });
   assert.equal(contender.status, ACQUIRED);
 });
 
-test('a live dispatch-lock holder that took a SHORTER ttl than a contender is free once its own ttl elapses (readers never use their own ttl)', () => {
+test('a live string-identity holder that took a SHORTER ttl than a contender is free once its own ttl elapses (readers never use their own ttl)', () => {
   const { dir } = setup();
   fs.mkdirSync(dir, { recursive: true });
-  const lockFile = dispatchLockFile('/some/worktree');
+  const lockFile = 'ttl-judged.lock';
   const identity = `${process.pid}:${Date.now()}:shortholder`;
   fs.writeFileSync(path.join(dir, lockFile), JSON.stringify({ pid: identity, ts: Date.now() - 2 * 60000, ttlMs: 60000 }));
 
   const contender = acquireMainCheckoutLock(dir, { identity: `${process.pid}:${Date.now()}:longcontender`, ttlMs: 4 * 3600000, lockFile });
   assert.equal(contender.status, ACQUIRED);
-});
-
-test('a legacy dispatch composite record (no ttlMs) is held up to the run-timeout ceiling while its pid lives', () => {
-  const { dir } = setup();
-  fs.mkdirSync(dir, { recursive: true });
-  const lockFile = dispatchLockFile('/some/worktree');
-  fs.writeFileSync(path.join(dir, lockFile), JSON.stringify({ pid: `${process.pid}:${Date.now()}:legacy`, ts: Date.now() - 60 * 60000 }));
-
-  const contender = acquireMainCheckoutLock(dir, { identity: `${process.pid}:${Date.now()}:next`, ttlMs: 15 * 60000, lockFile });
-  assert.equal(contender.status, HELD);
 });
 
 test('a merge-slot holder (numeric pid) is judged by the ttl it recorded, like the main lock', () => {
@@ -1167,15 +1117,6 @@ test('mergeSlotLockFile output only ever contains filesystem-safe characters (no
     assert.ok(!name.includes('\0'), `"${name}" must not contain a null byte`);
   }
 });
-
-test('dispatchLockFile is injective and produces filesystem-safe lock filenames (tsk-64hk)', () => {
-  const a = dispatchLockFile('/path/to/worktree-a');
-  const b = dispatchLockFile('/path/to/worktree-b');
-  assert.notEqual(a, b);
-  assert.equal(a, `dispatch--${encodeURIComponent('/path/to/worktree-a')}.lock`);
-  assert.ok(!a.includes('/'), `"${a}" must not contain path separators`);
-});
-
 
 test('acquireMainCheckoutLock omitting lockFile still resolves to LOCK_FILE (byte-identical default)', () => {
   const { dir } = setup();

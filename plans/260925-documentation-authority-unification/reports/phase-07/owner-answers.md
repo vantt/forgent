@@ -332,6 +332,27 @@ the independent findings without authorizing promotion, cutover or retirement.
   `src/runner/dispatch/assignment-runner.mjs:1570-1583`.
 - **Affected rows/steps:** S3-02, S3-04; Step 3.
 
+### L11-15 — Merge the holder-lock landing now and carry it at the close
+
+- **Date:** 2026-10-17
+- **Status:** decided by the owner ("merge nhé"), Lead recommendation
+- **What is happening:** main `0d6da9033` landed holder-lock with lock fences; a
+  plan branch that keeps the old lock code fails against the fences, so Step 5
+  Doer runs need main merged first.
+- **Cause:** main changed the identity scope (8 files: `docs/architecture-manifest.json`,
+  `docs/platform/component-boundary.md`, new `docs/platform/holder-lock/spec.md` and
+  `docs/platform/process/spec.md`, `docs/specs/{distribution,reading-map,runner}.md`,
+  one install guide), which L11-3 would defer.
+- **Options and costs:** defer per L11-3 (blocks Step 5 runs); merge now (native
+  identity stays unsynced until the single closing carry already required by L11-2).
+- **Recommendation:** merge now; this one case overrides L11-3's deferral.
+- **Scope of answer:** this merge only; L11-3 stays the default for later merges.
+- **Lead action:** merged; the one conflict in `docs/platform/component-boundary.md`
+  is resolved keeping both sides (logged in `post-review-edits.md`); the two new
+  `docs/platform/` specs join the Step 5/6 scope; all identity-scope changes ride the
+  Step 9 native carry.
+- **Affected rows/steps:** Steps 5, 6, 9.
+
 ## Resolved owner question — CTR010 (A45)
 
 - **Question:** Which contract keeps CTR010, and which verified-free identity should
