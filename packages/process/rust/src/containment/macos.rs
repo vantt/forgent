@@ -24,8 +24,6 @@ const PROC_PPID_ONLY: u32 = 6;
 /// is best-effort.
 const RESCAN: Duration = Duration::from_millis(500);
 const POLL: Duration = Duration::from_millis(10);
-/// How long `kill_all` waits for the domain to be empty.
-const EMPTY_WAIT: Duration = Duration::from_secs(5);
 
 /// `macos-tree`.
 pub struct MacosTree;
@@ -89,7 +87,8 @@ impl ContainmentDriver for MacosTree {
             let _ = signal_group(&root, libc::SIGTERM);
             wait_until(Duration::from_millis(grace_ms), || tree_state(&root, &domain.seen) == DomainState::Empty);
         }
-        tree_kill(&root, &mut domain.seen)
+        let wait = domain.empty_wait();
+        tree_kill(&root, &mut domain.seen, wait)
     }
 
     fn guarantee(&self) -> Guarantee {
@@ -207,7 +206,7 @@ pub(crate) fn tree_state_adopt(root: &ProcTuple) -> DomainState {
 
 /// `killpg` while the root is provably the group's leader, then kill by
 /// identity everything seen in the tree or the group, until a pass finds none.
-pub(crate) fn tree_kill(root: &ProcTuple, seen: &mut Vec<ProcTuple>) -> KillOutcome {
+pub(crate) fn tree_kill(root: &ProcTuple, seen: &mut Vec<ProcTuple>, empty_wait: Duration) -> KillOutcome {
     let mut refused = false;
     for _ in 0..10 {
         let root_alive = facts::judge_here(&root.to_record()) == Verdict::Alive;
@@ -238,7 +237,7 @@ pub(crate) fn tree_kill(root: &ProcTuple, seen: &mut Vec<ProcTuple>) -> KillOutc
         }
         std::thread::sleep(POLL);
     }
-    wait_until(EMPTY_WAIT, || tree_state(root, seen) == DomainState::Empty);
+    wait_until(empty_wait, || tree_state(root, seen) == DomainState::Empty);
     if !refused && tree_state(root, seen) == DomainState::Empty {
         KillOutcome::Ok
     } else {

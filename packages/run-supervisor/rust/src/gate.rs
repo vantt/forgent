@@ -271,6 +271,7 @@ pub(crate) fn stop_for(cause: Option<String>) -> Stop {
     match cause.as_deref() {
         Some("soft-deadline") => Stop { stopped_by: "soft-deadline", cause: "soft-deadline".into() },
         Some("idle") => Stop { stopped_by: "idle", cause: "idle".into() },
+        Some("output-limit") => Stop { stopped_by: "output-limit", cause: "output-limit".into() },
         Some("cancel") => Stop { stopped_by: "cancel", cause: "cancel".into() },
         _ => Stop { stopped_by: "cancel", cause: "signal".into() },
     }
@@ -279,6 +280,20 @@ pub(crate) fn stop_for(cause: Option<String>) -> Stop {
 /// Does the GO frame name this attempt's envelope. The pid is never compared.
 pub(crate) fn go_matches(config: &Config, frame: &Value) -> bool {
     frame["type"] == "GO" && frame["attemptId"] == config.attempt_id.as_str() && frame["envelopeDigest"] == config.digest.as_str()
+}
+
+/// A line from the gate in the agent's own stderr capture, where whoever reads the run's output looks.
+pub(crate) fn note_in_capture(config: &Config, text: &str) {
+    use std::io::Write;
+    eprintln!("fgos internal gate: {text}");
+    if let Ok(mut file) = fs::OpenOptions::new().append(true).open(&config.stderr) {
+        let _ = writeln!(file, "fgos internal gate: {text}");
+    }
+}
+
+/// Say why the agent could not start.
+pub(crate) fn note_agent_not_started(config: &Config, why: &str) {
+    note_in_capture(config, why);
 }
 
 /// Publish `gate-exit.json` once. `exit_code` and `signal` are JSON values
@@ -295,6 +310,13 @@ pub(crate) fn publish_gate_exit(config: &Config, exit_code: Value, signal: Value
         "exitedAt": iso_utc_now(),
     });
     let bytes = serde_json::to_vec(&exit).map_err(|e| e.to_string())?;
+    let target = config.run_dir.join("gate-exit.json");
+    // A sandbox whose root is read-only takes no new file in the attempt directory. The controller then
+    // leaves an empty `gate-exit.json` bound into it and the gate fills it in place. No process of the
+    // agent exists any more at this point, so nothing else can write it: the gate has the last word.
+    if fs::symlink_metadata(&target).is_ok_and(|meta| meta.is_file()) {
+        return write_in_place(&target, &bytes).map_err(|e| format!("gate-exit.json not written: {e}"));
+    }
     publish_once(&config.run_dir, "gate-exit.json", &bytes).map_err(|e| format!("gate-exit.json not published: {e}"))?;
     Ok(())
 }
@@ -321,4 +343,19 @@ mod tests {
         assert!(matches!(parse_args(&argv(&["--protocol", "1", "--envelope", "/e"])), Err(ArgsError::Usage(_))));
         assert!(matches!(parse_args(&argv(&["--protocol", "1", "--envelope", "/e", "--go-fd", "5", "--go-socket", "p"])), Err(ArgsError::Usage(_))));
     }
+}
+
+/// Replace the content of an existing regular file, never through a symlink, and make it durable.
+fn write_in_place(target: &Path, bytes: &[u8]) -> std::io::Result<()> {
+    use std::io::Write;
+    let mut options = fs::OpenOptions::new();
+    options.write(true).truncate(true);
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::OpenOptionsExt;
+        options.custom_flags(libc::O_NOFOLLOW);
+    }
+    let mut file = options.open(target)?;
+    file.write_all(bytes)?;
+    file.sync_all()
 }

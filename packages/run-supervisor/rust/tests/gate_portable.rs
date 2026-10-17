@@ -194,3 +194,18 @@ fn a_child_in_its_own_session_dies_with_the_gate() {
     let child = pid_in(&pids);
     assert!(wait_dead(child, Duration::from_secs(10)), "the child {child} outlived the gate");
 }
+
+#[test]
+fn an_agent_that_cannot_start_ends_the_attempt_like_a_shell_command_that_cannot() {
+    let mut options = Options::new(&[]);
+    options.command = Some(std::env::temp_dir().join("fgos-no-such-agent-binary").to_string_lossy().into_owned());
+    let attempt = Attempt::new("nostart", &options);
+    let mut gate = start_gate(&attempt);
+    read_hello(&mut gate);
+    send_go(&mut gate, &attempt.attempt_id, &attempt.digest);
+    assert_eq!(wait_exit(&mut gate, &attempt, Duration::from_secs(15)), 0, "{}", attempt.gate_log());
+    let exit = attempt.gate_exit().expect("the gate still reports the end of the attempt");
+    assert_eq!(exit["exitCode"], 127, "program not found is 127: {exit}");
+    assert_eq!(exit["stoppedBy"], "agent");
+    assert!(fs::read_to_string(&attempt.stderr).unwrap().contains("did not start"), "the reason reaches the capture stderr");
+}

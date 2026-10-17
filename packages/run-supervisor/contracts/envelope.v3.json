@@ -7,7 +7,7 @@
     "envelope": "<attemptDir>/envelope.json",
     "sideFile": "<attemptDir>/protected/attempt-secrets.json, mode 0600, directory 0700",
     "binding": "<attemptDir>/supervisor-binding.json",
-    "gateExit": "<attemptDir>/gate-exit.json",
+    "gateExit": "<attemptDir>/gate-exit.json (in a sandbox whose root is read-only the controller creates it empty and binds it writable; the gate fills it in place)",
     "receipt": "<attemptDir>/receipt.json",
     "stepReceipts": "<attemptDir>/steps/<stepId>.json",
     "stopRequested": "<attemptDir>/stop-requested.json",
@@ -38,6 +38,7 @@
     "keyRestriction": "all keys written by fgOS are ASCII, so UTF-16 order and byte order agree; a non-ASCII key is a contract violation"
   },
   "optionalFields": {
+    "launch.maxOutputBytes": "integer >= 1: the supervisor stops the agent (stop cause output-limit, receipt outcome output-limit) once the two capture files hold more than this together (config maxBuffer, default 10485760); absent means no limit",
     "cwdLeaseFile": "string, Windows only: the dispatch-cwd lease file the supervisor takes itself (a LockFileEx lock is never inherited). A mutating Windows envelope without it is refused with exit 65; absent on Unix, where the lease arrives at fd 4",
     "createdAt": "object {bootId, boottimeNs}: the controller's boot id and monotonic boot time (CLOCK_BOOTTIME ns; Windows GetTickCount64 ms * 1e6) when it wrote the envelope. Windows adopt gives an unbound attempt with a free lock a 60 s start grace measured from it, on the same boot only; absent or another boot means no grace. File times are never used"
   },
@@ -74,10 +75,11 @@
       "idleMs": "integer >= 1 or null; the supervisor stops the agent after this long without activity (agent-protocol activity source)",
       "hardCeiling": { "bootId": "string", "boottimeNs": "integer, absolute CLOCK_BOOTTIME nanoseconds" },
       "gateKillGraceMs": "integer >= 0, SIGTERM -> SIGKILL grace used by the gate and by kill_all; source config dispatch.gateKillGraceMs (default 10000)",
+      "killWaitMs": "integer >= 1, optional; the bound kill_all waits for the domain to be provably empty (config lock.predecessorKillWaitMs); absent means 5000",
       "rule": "deadlines are absolute; a later start, an adopt or a resume never extends them. A bootId that differs from the current boot means every process of the attempt is already dead"
     },
     "agentProtocol": {
-      "cli": { "enum": ["claude", "codex", "agy", "pi", "omp"] },
+      "cli": { "enum": ["claude", "codex", "agy", "pi", "omp"], "other": "any other command name selects the generic adapter (exit and outbox only)" },
       "mode": { "enum": ["direct", "terminal"], "meaning": "always equal to the top-level mode" }
     },
     "slot": "object {key} or absent; terminal mode only (terminal-control key, equal to attemptId)",

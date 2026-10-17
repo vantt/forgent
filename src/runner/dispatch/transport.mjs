@@ -51,7 +51,6 @@ import { resolveVerifiedProviderArgs, recordShadowBinderDivergence, renderReason
 import { runHerdrRound } from './herdr-round.mjs';
 import { resolveHerdrBin } from './terminal-slot.mjs';
 import { DispatchError } from './dispatch-error.mjs';
-import { startDetachedRunSupervisorProcess } from './detached-run-supervisor.mjs';
 import { resolveWriterIdentity } from '../../util/session-identity.mjs';
 
 import {
@@ -361,170 +360,15 @@ function killChildTree(child, signal) {
 }
 
 /**
- * Bind a cli-spawn round's confined homes to the detached run supervisor that runs its worker, so the
- * orphan reaper keeps them while the supervisor lives even after this controller is gone. The supervisor
- * is already running when its pid exists, so a binding that cannot be written leaves the home as prepare
- * wrote it (bound to this controller), reported by a fixed code; it never stops the run.
+ * The short-call cli-spawn adapter: it starts the agent as a child of the caller and returns when the
+ * child has exited. It serves the callers whose agent lives and dies with the calling process (an account
+ * probe, a panel judge, a goal check, `executeExecutorCli`). An attempt of a unit that must survive its
+ * controller never comes here: it runs through `fgos internal supervise`
+ * (src/run-supervisor/direct-launch.mjs), whose supervisor owns the agent's process tree.
  */
-export function bindConfinedHomesToSupervisor(binding, supervisorProc) {
-  if (!binding || !Number.isInteger(supervisorProc?.pid)) return false;
-  try {
-    binding.bind({ binderPid: supervisorProc.pid });
-    return true;
-  } catch {
-    process.stderr.write('fgos: confined home not bound to its run supervisor (confinement-bind-failed)\n');
-    return false;
-  }
-}
-
 export function cliSpawnAdapter(invocation, opts) {
   const { command, args, env: rawEnv } = invocation;
   const { cwd, timeoutMs, idleTimeoutMs, maxBuffer, onChunk, workId, tier, model } = opts;
-
-  if (opts.envelopePath) {
-    const launchCommandId = opts.launchCommandId || path.basename(opts.envelopePath, '.json');
-    const runDir = opts.runDir || path.dirname(path.dirname(path.dirname(opts.envelopePath)));
-    const receiptPath = path.join(runDir, 'protected', 'adapter-receipts', `${launchCommandId}.json`);
-
-    return new Promise((resolve, reject) => {
-      let supervisorProc = null;
-      try {
-        supervisorProc = startDetachedRunSupervisorProcess({
-          envelopePath: opts.envelopePath,
-          detached: true,
-          onChunk: opts.onChunk,
-        });
-      } catch (err) {
-        return reject(new DispatchError('worker-spawn-fail', `executor failed to start for work "${workId}": ${err.message}`, {
-          workId,
-          tier,
-          model,
-          cause: err.message,
-        }));
-      }
-      bindConfinedHomesToSupervisor(opts.confinementBinding, supervisorProc);
-
-      let settled = false;
-      let pollInterval = null;
-      let watcher = null;
-
-      const cleanupWatcher = () => {
-        if (watcher) {
-          try { watcher.close(); } catch {}
-          watcher = null;
-        }
-      };
-
-      function finishWithReceipt() {
-        if (settled) return;
-        if (!fs.existsSync(receiptPath)) return;
-        settled = true;
-        if (pollInterval) clearInterval(pollInterval);
-        cleanupWatcher();
-
-        let receipt;
-        try {
-          receipt = JSON.parse(fs.readFileSync(receiptPath, 'utf8'));
-        } catch (err) {
-          return reject(new DispatchError('worker-spawn-fail', `executor failed to start for work "${workId}": failed to parse receipt: ${err.message}`, {
-            workId,
-            tier,
-            model,
-          }));
-        }
-
-        const stdoutPath = path.join(runDir, receipt.output.stdoutPath);
-        const stderrPath = path.join(runDir, receipt.output.stderrPath);
-        let stdout = '';
-        let stderr = '';
-        try { stdout = fs.readFileSync(stdoutPath, 'utf8'); } catch {}
-        try { stderr = fs.readFileSync(stderrPath, 'utf8'); } catch {}
-
-        const kind = receipt.completion?.kind;
-        if (kind === 'timeout' || kind === 'idle-timeout') {
-          return reject(new DispatchError(
-            'worker-timeout',
-            kind === 'idle-timeout'
-              ? `executor for work "${workId}" was killed after ${idleTimeoutMs}ms with no output (idle timeout).`
-              : `executor timed out after ${timeoutMs}ms for work "${workId}".`,
-            { workId, tier, model, stdout, stderr, receipt },
-          ));
-        }
-
-        if (kind === 'max-buffer') {
-          return reject(new DispatchError(
-            'worker-spawn-fail',
-            `executor for work "${workId}" exceeded maxBuffer (${maxBuffer} bytes) and was killed.`,
-            { workId, tier, model, cause: 'maxBuffer exceeded', stdout, stderr, receipt },
-          ));
-        }
-
-        if (kind === 'spawn-failed') {
-          return reject(new DispatchError(
-            'worker-spawn-fail',
-            `executor failed to start for work "${workId}": ${receipt.completion?.cause || 'spawn failed'}`,
-            { workId, tier, model, cause: receipt.completion?.cause, stdout, stderr, receipt },
-          ));
-        }
-
-        return resolve({
-          status: receipt.completion?.exitCode ?? 0,
-          exitCode: receipt.completion?.exitCode ?? 0,
-          signal: receipt.completion?.signal ?? null,
-          stdout,
-          stderr,
-          tier,
-          model,
-          receipt,
-        });
-      }
-
-      // Event-driven receipt detection: watch the receipts directory for immediate resolution
-      const receiptsDir = path.dirname(receiptPath);
-      try {
-        fs.mkdirSync(receiptsDir, { recursive: true });
-        watcher = fs.watch(receiptsDir, (eventType, filename) => {
-          if (!filename || filename === path.basename(receiptPath)) {
-            if (fs.existsSync(receiptPath)) {
-              finishWithReceipt();
-            }
-          }
-        });
-      } catch {}
-
-      // Fast fallback poll interval (20ms) ensures p95 latency is bounded tightly <= 100ms
-      pollInterval = setInterval(() => {
-        if (fs.existsSync(receiptPath)) {
-          finishWithReceipt();
-        }
-      }, 20);
-
-      if (supervisorProc) {
-        supervisorProc.on('close', () => {
-          if (fs.existsSync(receiptPath)) {
-            finishWithReceipt();
-            return;
-          }
-          setTimeout(() => {
-            if (!settled) {
-              if (fs.existsSync(receiptPath)) {
-                finishWithReceipt();
-              } else {
-                settled = true;
-                if (pollInterval) clearInterval(pollInterval);
-                cleanupWatcher();
-                reject(new DispatchError('worker-spawn-fail', `executor failed to start for work "${workId}": supervisor exited without receipt`, {
-                  workId,
-                  tier,
-                  model,
-                }));
-              }
-            }
-          }, 20);
-        });
-      }
-    });
-  }
 
   const depth = currentDispatchDepth();
   if (depth >= MAX_DISPATCH_DEPTH) {

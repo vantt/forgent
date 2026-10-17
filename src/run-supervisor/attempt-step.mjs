@@ -13,6 +13,9 @@ import { fileURLToPath } from 'node:url';
 import { EXIT_DONE, EXIT_ENVELOPE_INVALID, EXIT_PAYLOAD_MISSING, EXIT_ERROR, EXIT_RETRY, StepError, readEnvelope } from './step-support.mjs';
 import { settleAttempt } from './steps/settle-attempt.mjs';
 import { finalizeHome } from './steps/finalize-home.mjs';
+import { realpathOrNull, releasePayloadRoot } from './payload-root.mjs';
+
+export { releasePayloadRoot };
 
 const PROTOCOL = 1;
 const PAYLOAD_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -25,34 +28,6 @@ const STEPS = Object.freeze({
 /** Variables a step needs from `steps[].env`: the runner starts it with nothing else. */
 const REQUIRED_ENV = Object.freeze(['FGOS_STATE_ROOT', process.platform === 'win32' ? 'USERPROFILE' : 'HOME']);
 
-function realpathOrNull(p) {
-  try { return fs.realpathSync(p); } catch { return null; }
-}
-
-/**
- * The legacy-node payload root of the release that holds `hostBin`, read from that release's
- * manifest the way apps/fgos/src/legacy_exec.rs finds it: next to the host binary, never through
- * PATH, the cwd or the active-release variables (the active release may be another one by now).
- */
-export function releasePayloadRoot(hostBin) {
-  const host = realpathOrNull(hostBin);
-  if (!host) return null;
-  const up = (n) => { let p = host; for (let i = 0; i < n; i += 1) p = path.dirname(p); return p; };
-  const candidates = [
-    [up(3), path.join(up(3), 'manifest.json')],
-    [up(3), path.join(up(3), 'target', 'dev-manifest.json')],
-    [up(2), path.join(up(2), 'manifest.json')],
-  ];
-  for (const [releaseRoot, manifestPath] of candidates) {
-    if (!fs.existsSync(manifestPath)) continue;
-    let root;
-    try { root = JSON.parse(fs.readFileSync(manifestPath, 'utf8'))?.components?.legacyNode?.root; } catch { continue; }
-    if (typeof root !== 'string' || path.isAbsolute(root) || root.split(/[\\/]/).includes('..')) continue;
-    return realpathOrNull(path.join(releaseRoot, root));
-  }
-  return null;
-}
-
 /** The payload that runs this step is the one the envelope names and the release manifest declares. */
 export function verifyPayload(envelope) {
   const named = typeof envelope.payloadRoot === 'string' ? realpathOrNull(envelope.payloadRoot) : null;
@@ -60,8 +35,13 @@ export function verifyPayload(envelope) {
   if (realpathOrNull(PAYLOAD_ROOT) !== named) {
     throw new StepError('payload-missing', 'this step runs from a payload other than the envelope payloadRoot', EXIT_PAYLOAD_MISSING);
   }
+  if (!realpathOrNull(envelope.hostBin)) {
+    throw new StepError('payload-missing', 'the release manifest of hostBin cannot be read: hostBin does not exist', EXIT_PAYLOAD_MISSING);
+  }
+  // A host with no release manifest next to it is a development host: the payload that started the
+  // controller is the only anchor there is, and the check above already holds the step to it.
   const declared = releasePayloadRoot(envelope.hostBin);
-  if (declared !== named) {
+  if (declared !== null && declared !== named) {
     throw new StepError('payload-missing', 'the release manifest of hostBin does not declare the envelope payloadRoot', EXIT_PAYLOAD_MISSING);
   }
 }

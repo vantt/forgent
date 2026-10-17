@@ -132,7 +132,16 @@ fn supervise_agent(config: &Config, go_frame: &Value, secrets: BTreeMap<String, 
         // A ceiling already behind us: the agent never starts.
         stop = Some(Stop { stopped_by: "hard-ceiling", cause: "hard-ceiling".into() });
     } else {
-        let started = spawn_agent(config, go_frame, secrets, &nested)?;
+        let started = match spawn_agent(config, go_frame, secrets, &nested) {
+            Ok(started) => started,
+            Err(why) => {
+                // An agent that cannot start ends like a shell command that cannot start: 127 when the
+                // program is not there, 126 when it cannot be run. The reason lands in the capture stderr.
+                crate::gate::note_agent_not_started(config, &why);
+                let code = if why.contains("cannot find") || why.contains("not found") || why.contains("os error 2") { 127 } else { 126 };
+                return publish_gate_exit(config, Value::from(code), Value::Null, None);
+            }
+        };
         let tuple = facts::identity_of(ProcId(started.id())).map_or(Value::Null, |t| t.to_record().to_json());
         let _ = write_frame(go, &json!({"type": "AGENT", "tuple": tuple}));
         agent = Some(started);

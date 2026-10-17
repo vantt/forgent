@@ -170,7 +170,8 @@ function derivePhase(l, terminal) {
   try {
     hasCommands = fs.existsSync(commandsDir) && fs.readdirSync(commandsDir).length > 0;
   } catch {}
-  if (hasCommands || l.run?.status === 'bound' || l.run?.controller || l.run?.bound) {
+  const supervised = fs.existsSync(path.join(l.runDir, 'supervisor-binding.json'));
+  if (hasCommands || supervised || l.run?.status === 'bound' || l.run?.controller || l.run?.bound) {
     return 'bound';
   }
 

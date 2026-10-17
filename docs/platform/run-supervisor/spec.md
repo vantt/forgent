@@ -61,7 +61,7 @@ Layout (all names from the envelope contract; `<attemptDir>` is `<assignmentDir>
 | `envelope.json` | controller, once | After the locks are held, before any agent process exists |
 | `protected/attempt-secrets.json` (0600, dir 0700) | controller | Secret env and run-control token; never copied elsewhere |
 | `supervisor-binding.json` | supervisor | After the gate runs inside the domain, before GO |
-| `gate-exit.json` | gate | After the agent exited and the domain was emptied |
+| `gate-exit.json` | gate | After the agent exited and the domain was emptied. Inside a sandbox with a read-only root the controller leaves an empty `gate-exit.json` bound writable (as the two capture files) and the gate fills it in place, never through a symlink; no process of the agent exists then, so the gate has the last word |
 | `stop-requested.json` | supervisor | Before SIGTERM to the gate |
 | `cancel-requested.json` | anyone allowed to cancel | Polled by the supervisor |
 | `receipt.json` | supervisor, or adopt | After the gate is gone |
@@ -89,18 +89,22 @@ The envelope is immutable and carries no secret. It names: `attemptId`, `unitRun
 
 No child process starts inside the hot state mutex (`exec-under-hot-lock`): the host binary is resolved and the envelope built before any `withStateTx`.
 
+**Controller implementation** (`src/run-supervisor/direct-launch.mjs`, called from `executeAssignment`). The sandbox's root is read-only, so the controller creates the capture files and `gate-exit.json` empty before the prepare and asks the sandbox driver to bind exactly those files writable (`attemptBinds`); the outbox is the one writable directory. The sandbox program leads `containment.bwrapPrefix` (the driver's prefix carries only its arguments). `spawnWithLocks` (holder-lock facade) hands the lock descriptions to the supervisor at 3 and 4; no other descriptor of the controller reaches it. After the result appears the controller still waits for `closed.json` (bounded) so the next dispatch never meets a step in flight; a supervisor that is gone while the agent lives is waited for through the adopt door. `controller/settle-context.json` carries what only the controller knows (effective policy, provider account evidence, fallback, stray-write baseline of the main checkout) to the settle step; `assignment.json` in the attempt directory is the effective assignment. A `supervise` for an attempt that already has a `supervisor-binding.json` or a `receipt.json` refuses with exit 71 `attempt-already-bound` before it touches any lock: its predecessor rule would otherwise end the live domain. The envelope's `deadlines.killWaitMs` (config `lock.predecessorKillWaitMs`) is the bound `kill_all` waits for an empty domain.
+
 The controller does not settle while a supervisor lives. The controller reads receipts from files; it holds no handle to the supervisor.
 
 ## 5. Supervisor and gate
 
 **Supervisor sequence.** Set `FD_CLOEXEC` on fd 3 and 4 before any other syscall; read and verify the envelope (digest, `hostBin` equals the running binary, else `host-version-mismatch`); `containment.create`; declare the domain in `attempt.lock.predecessor.json` (and on the cwd lease file) before the domain has a process; start the gate in the domain with fd map `{3 attempt, 4 cwd, 5 GO end}`; publish the binding `{supervisor, gate host tuple, domain, guarantee}`; wait for HELLO (15 s limit); send GO; watch.
 
-**Watch** (50 ms tick): new bytes of the stdout and stderr captures, judged by the agent-protocol adapter, feed the idle timer; cancel request; soft deadline; idle. On a stop cause the supervisor publishes `stop-requested.json {cause: soft-deadline|idle|cancel}` first, then sends STOP and SIGTERM to the gate. A gate that outlives `gateKillGraceMs` plus 5 s has its whole domain ended by `kill_all`. When the gate is gone the supervisor makes sure the domain is empty, **releases the cwd lease at once** (the next round of the controller need not wait for the steps), publishes the receipt, runs the steps, publishes `closed.json` and exits 0 with `{result: closed|open, outcome, pendingStep?}`.
+**Watch** (50 ms tick): new bytes of the stdout and stderr captures, judged by the agent-protocol adapter, feed the idle timer; cancel request; output budget (`launch.maxOutputBytes`); soft deadline; idle. On a stop cause the supervisor publishes `stop-requested.json {cause: soft-deadline|idle|output-limit|cancel}` first, then sends STOP and SIGTERM to the gate. A gate that outlives `gateKillGraceMs` plus 5 s has its whole domain ended by `kill_all`. When the gate is gone the supervisor makes sure the domain is empty, **releases the cwd lease at once** (the next round of the controller need not wait for the steps), publishes the receipt, runs the steps, publishes `closed.json` and exits 0 with `{result: closed|open, outcome, pendingStep?}`.
 
 **Gate sequence.** Set `FD_CLOEXEC` on lock fds and the GO fd; verify the envelope; send HELLO; wait for GO. EOF or refusal before GO: exit 64 without running the agent and without `gate-exit.json`. GO carries `attemptId`, `envelopeDigest` and the gate's host tuple; a mismatch against the gate's own envelope exits 65. The gate then opens the capture files (`dup2` to fd 1 and 2) and stdin per `launch.stdinPolicy` (`brief-file` or null), spawns the agent with env `launch.env` plus the side file env and `FGOS_PIDNS_ANCHOR`, sends AGENT, and waits.
 
 | Event at the gate | Result |
 |---|---|
+| Working directory not visible in the sandbox | The agent starts at `/` (as a process started by bwrap itself would) and the gate says so in the capture stderr. A read-only attempt whose worktree lies under `/tmp` hits this: the sandbox's private tmpfs hides it |
+| Agent cannot start | `gate-exit.json` with `exitCode` 127 (program not found) or 126 (cannot be run), `stoppedBy: agent`; the reason is appended to the capture stderr. The settle step sees an ordinary failed execution; `spawnWorker` reads 127 as `worker-spawn-fail` |
 | Agent exits | `kill(-1, SIGKILL)` for the rest of the domain, `waitpid(-1)` until `ECHILD`, then `gate-exit.json {exitCode, signal, stoppedBy: agent}`; the lock is held until the namespace is empty |
 | SIGTERM or SIGINT | The gate is pid 1 and installs handlers (pid 1 ignores a signal without one). Forward SIGTERM to the agent group; SIGKILL after `gateKillGraceMs`. `stoppedBy` and `cause` come from `stop-requested.json`; the signal without the file is `cancel` with cause `signal` |
 | Hard ceiling | The envelope's absolute `CLOCK_BOOTTIME` instant (with its boot id; a later start never extends it): SIGTERM, `gateKillGraceMs`, SIGKILL; `stoppedBy: hard-ceiling` |
@@ -136,6 +140,7 @@ The binding records `guarantee.containment` (`kernel` or `best-effort`) and `gua
 | `exited` | `gate-exit.stoppedBy == agent`; also an `orphan` stop with an outbox result |
 | `timeout` | `stoppedBy` is `soft-deadline`, `idle` or `hard-ceiling` |
 | `cancelled` | `stoppedBy == cancel` |
+| `output-limit` | `stoppedBy == output-limit`: the two capture files passed `launch.maxOutputBytes` (config `maxBuffer`, default 10 MiB) and the supervisor stopped the agent; the settle step judges it as a failed execution |
 | `gate-lost` | A binding exists but there is no `gate-exit.json` (the lock being free proves the domain empty) |
 | `abandoned-not-started` | No binding; adopt found the lock free |
 | `carrier-lost` | Terminal mode only (plan 6.3) |
@@ -261,6 +266,10 @@ The check for orphaned confinement resources skips attempt homes (marker version
 - `fgos internal lock-scan` is in the route contract, but no such route exists in the crate: the scan of lock files is `adopt --scan` itself (a shared, non-blocking probe per attempt in one process).
 - Windows adopt of an unbound attempt relies on the 60 s start grace measured from `createdAt`; an envelope without it gets no grace.
 - `best-effort` containment (macOS, Linux without user namespaces) cannot prove no writer remains when the lock is free; adopt waits and rescans, and the attempt records the level.
+- A host with no release manifest next to it (a raw `FGOS_HOST_BIN`, development) has no payload to check against: the payload that started the controller is the one the envelope names and the step accepts it only when its own root is that one. A release host is held to its manifest.
+- In a sandbox, `gate-exit.json` and the two capture files are bound writable, so the agent can write them while it runs. The gate overwrites `gate-exit.json` at the end, after the agent tree is dead, so the record that counts is the gate's. It matters only if the gate dies abnormally (an outside kill) after the agent forged the file; the agent cannot kill the gate itself, because a signal from inside a PID namespace never reaches its pid 1. The record names no secret the agent lacks, and the evaluator judges the work from its own evidence.
+- Windows controller: it lets go of the attempt lock and the cwd lease right after the spawn. A second dispatch may take the lease first; the supervisor then ends with `start-refused:lock-held` after its wait and the run reports `launch-unknown` with that reason. The attempt is refused, never run late.
+- `reconcileRun` (run status read) no longer settles a stale supervised run on read; an attempt nobody finished is settled by the next `fgos run`, runner loop, `dispatch reconcile` or `fgos doctor --fix` through adopt.
 - A step whose payload release was removed from disk returns `payload-missing` and stays for adopt to retry; the store of releases is immutable after deactivation, so this is a manual-removal case only.
 
 ## 16. Lịch sử quyết định
@@ -269,6 +278,7 @@ The check for orphaned confinement resources skips attempt homes (marker version
 - **2026-10-16 — Kongming M1-M3, N1-N8.** `--die-with-parent` chỉ ở terminal; `--as-pid-1` và handler SIGTERM/SIGINT ở gate; GO mang `attemptId` và digest, không so pid; bước sau receipt không nhận fd lock; rỗng ⇔ `judge(gate) == dead`; `lock-holders` coi monitor bwrap là thành viên.
 - **2026-10-16 — D4: argv không dựng ở Rust.** Agent-protocol `direct` đọc cấu hình executor đã dựng argv vào envelope; chuyển binder ProviderAdapter sang Rust là việc riêng. Xem [agent-protocol](../agent-protocol/spec.md).
 - **2026-10-17 — D6: miền Windows thuộc 4.4b.** Supervisor chỉ gọi `create_kill_job`, `open_job`, `assign_and_resume` và `Domain::WindowsJob`; gate luôn là thành viên job, `holder` là gate, `keeper` là supervisor.
+- **2026-10-18 — Cutover của `direct` (6.2 P09).** `executeAssignment` giao agent cho supervisor Rust; xoá `detached-run-supervisor.mjs`, kênh IPC, `reconcile-cli-spawn.mjs`, `legacySpawn`, `bindConfinedHomesToSupervisor`. Phát hiện khi chạy bwrap thật: gate nằm trong sandbox root chỉ-đọc nên không tạo được `gate-exit.json` và file capture; controller tạo sẵn file rỗng, driver bind đúng các file đó, gate ghi tại chỗ. Controller đợi `closed.json` sau result; settle step nhận ngữ cảnh controller qua `controller/settle-context.json`.
 - **2026-10-18 — D9: `dispatch.gateKillGraceMs`, mặc định 10000, tối thiểu 1000.** Doctor `gate-kill-grace`; setup không ghi khoá vào config global.
 
 ## 17. Related files

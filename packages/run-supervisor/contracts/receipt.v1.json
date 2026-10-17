@@ -4,7 +4,7 @@
   "fields": {
     "v": { "const": 1 },
     "attemptId": "string",
-    "outcome": { "enum": ["exited", "timeout", "cancelled", "gate-lost", "carrier-lost", "abandoned-not-started"] },
+    "outcome": { "enum": ["exited", "timeout", "cancelled", "output-limit", "gate-lost", "carrier-lost", "abandoned-not-started"] },
     "gateExit": "the gate-exit.v1 object, or absent when no gate-exit.json exists",
     "captureDigests": { "stdout": "\"sha256:<hex>\" of the capture file bytes or null when absent", "stderr": "same" },
     "outboxPresent": "boolean, an outbox result-<N>.json exists in launch.outboxDir",
@@ -16,6 +16,7 @@
     "exited: gate-exit.stoppedBy == agent",
     "timeout: gate-exit.stoppedBy in {soft-deadline, idle, hard-ceiling}",
     "cancelled: gate-exit.stoppedBy == cancel",
+    "output-limit: gate-exit.stoppedBy == output-limit (the capture files passed launch.maxOutputBytes and the supervisor stopped the agent)",
     "gate-lost: a binding exists but the gate died without gate-exit.json (the domain is empty because the lock is free)",
     "carrier-lost: terminal mode; the terminal carrier died (6.3)",
     "abandoned-not-started: no binding; adopt found the lock free",

@@ -1385,7 +1385,13 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
 
   // Prepared Worker Invocation
   const sourceInvocation = preparedConfinement?.invocation || request.invocation;
-  const workerCommand = sourceInvocation.command;
+  // A supervised attempt runs the agent under the gate: the sandbox prefix travels in the envelope and
+  // the worker is the agent argv itself, never the sandbox wrapper command line.
+  const supervisedAttempt = typeof request.attemptId === 'string' && request.attemptId !== '';
+  const attemptAgentArgv = supervisedAttempt
+    ? (preparedConfinement?.agentArgv ?? [request.invocation.command, ...(request.invocation.args || [])])
+    : null;
+  const workerCommand = supervisedAttempt ? attemptAgentArgv[0] : sourceInvocation.command;
   const claudeTrust = sourceInvocation.interactiveMode?.trustStore;
   // A prepared record that already exists is the invocation this launch was published with: its
   // args do not change with files that can change between attempts (.mcp.json, the trust store).
@@ -1393,7 +1399,7 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
   let publishedArgs = null;
   try { publishedArgs = JSON.parse(fs.readFileSync(publishedInvocationPath, 'utf8'))?.workerInvocation?.args ?? null; } catch { /* first attempt */ }
   const workerArgs = Array.isArray(publishedArgs) ? publishedArgs : [
-    ...(sourceInvocation.args || []),
+    ...(supervisedAttempt ? attemptAgentArgv.slice(1) : (sourceInvocation.args || [])),
     // The target project's own MCP servers are approved for this worker only, so the claude
     // dialog that asks a person cannot stop an unattended seat.
     ...(claudeTrust?.kind === 'claude-json'
@@ -1428,7 +1434,9 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
   const redactedEnv = redactEnvForPersistence(workerEnv);
   const secretsRefRelative = path.join('protected', 'secrets', `${launchCommandId}.env.json`);
   const secretsPath = path.join(runDir, secretsRefRelative);
-  publishSecretSideFile(secretsPath, workerEnv);
+  // An attempt keeps its secret environment in the attempt side file the controller writes next to the
+  // envelope, so no second copy is published here.
+  if (!supervisedAttempt) publishSecretSideFile(secretsPath, workerEnv);
 
   // Resource bindings with ownership marker digests
   const resourceBindingsList = [];
@@ -1614,6 +1622,29 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
 
   const finalizationPath = path.join(runDir, 'protected', 'confinement-finalization', `${launchCommandId}.json`);
   publishMutableProjection(finalizationPath, finalizationDescBody);
+
+  if (supervisedAttempt) {
+    return {
+      attempt: {
+        command: workerCommand,
+        args: workerArgs,
+        cwd: workerCwd,
+        env: redactedEnv,
+        secretEnv: workerEnv,
+        envDigest,
+        bwrapPrefix: preparedConfinement?.bwrapPrefix ?? null,
+        bwrapExecutable: preparedConfinement?.bwrapPrefix ? (backendInstance?.config?.executable || '/usr/bin/bwrap') : null,
+        launchDigest: preparedConfinement?.launchDigest ?? null,
+      },
+      preparedInvocation: preparedInvocationRecord,
+      preparedInvocationDigest,
+      providerCapacity: preparedConfinement?.providerCapacity || null,
+      finalizationPath,
+      finalizationDescriptor: finalizationDescBody,
+      backendPlan,
+      preparedConfinement,
+    };
+  }
 
   if (adapterName === 'herdr-spawn') {
     // Must be the exact same normalization the launch call itself applies

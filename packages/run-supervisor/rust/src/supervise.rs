@@ -29,7 +29,7 @@ use crate::envelope;
 use crate::gate::boottime_ns;
 use crate::go_channel::{read_frame, write_frame};
 use crate::publish::{iso_utc_now, publish_once};
-use crate::route::{emit, refuse, report, Flags, EXIT_ENVELOPE_INVALID, EXIT_INTERNAL, EXIT_VERSION_MISMATCH};
+use crate::route::{emit, refuse, report, Flags, EXIT_ATTEMPT_BOUND, EXIT_ENVELOPE_INVALID, EXIT_INTERNAL, EXIT_VERSION_MISMATCH};
 
 #[cfg(unix)]
 mod unix;
@@ -59,6 +59,7 @@ pub fn outcome_for(gate_exit: Option<&Value>, outbox_present: bool) -> &'static 
     match gate_exit.and_then(|g| g["stoppedBy"].as_str()) {
         Some("agent") => "exited",
         Some("soft-deadline" | "idle" | "hard-ceiling") => "timeout",
+        Some("output-limit") => "output-limit",
         Some("cancel") => "cancelled",
         Some("orphan") if outbox_present => "exited",
         _ => "gate-lost",
@@ -157,6 +158,8 @@ struct Watch {
     idle: Option<Duration>,
     grace: Duration,
     captures: [PathBuf; 2],
+    /// The most the two capture files may hold together before the agent is stopped.
+    max_output: Option<u64>,
     adapter: &'static dyn DirectAdapter,
     boot_id: Option<String>,
 }
@@ -176,6 +179,7 @@ impl Watch {
             idle: envelope["deadlines"]["idleMs"].as_u64().map(Duration::from_millis),
             grace: Duration::from_millis(envelope["deadlines"]["gateKillGraceMs"].as_u64().ok_or("envelope field deadlines.gateKillGraceMs missing")?),
             captures: [text(&envelope["launch"]["capture"]["stdout"], "launch.capture.stdout")?.into(), text(&envelope["launch"]["capture"]["stderr"], "launch.capture.stderr")?.into()],
+            max_output: envelope["launch"]["maxOutputBytes"].as_u64(),
             adapter: adapter_for(envelope["agentProtocol"]["cli"].as_str().unwrap_or_default()),
             boot_id: facts::boot_id(),
         })
@@ -185,6 +189,13 @@ impl Watch {
         let Some((boot_id, at)) = &self.soft_at else { return false };
         // Another boot than the recorded one: the instant is meaningless, treat it as past.
         self.boot_id.as_ref().is_some_and(|current| current != boot_id) || boottime_ns() >= *at
+    }
+
+    /// The capture files hold more than the attempt's output budget.
+    fn output_over_limit(&self) -> bool {
+        let Some(max) = self.max_output else { return false };
+        let total: u64 = self.captures.iter().filter_map(|path| fs::metadata(path).ok()).map(|meta| meta.len()).sum();
+        total > max
     }
 
     fn cancel_requested(&self) -> bool {
@@ -236,7 +247,9 @@ pub fn run(args: &[String]) -> i32 {
     match supervise(&args) {
         Ok(code) => code,
         Err(refusal) => {
-            record_start_refusal(&args.envelope, &refusal);
+            if refusal.code != "attempt-already-bound" {
+                record_start_refusal(&args.envelope, &refusal);
+            }
             report("supervise", refusal.code, &refusal.why);
             refusal.exit
         }
@@ -278,11 +291,19 @@ fn supervise(args: &SuperviseArgs) -> Result<i32, Refusal> {
     if envelope["mode"] != "direct" {
         return Err(Refusal::internal("only the direct mode is supervised by this route"));
     }
+    // A supervisor already ran this attempt (or its receipt exists): a second one would take the lock and,
+    // by the predecessor rule, end the live domain the first one left running. Leave the attempt to adopt.
+    if run_dir.join("supervisor-binding.json").exists() || run_dir.join("receipt.json").exists() {
+        return Err(Refusal { exit: EXIT_ATTEMPT_BOUND, code: "attempt-already-bound", why: "the attempt directory already has a supervisor binding or a receipt".into() });
+    }
     locks.complete(&envelope, &run_dir)?;
     let watch = Watch::from(&envelope, &run_dir).map_err(|why| Refusal { exit: EXIT_ENVELOPE_INVALID, code: "envelope-invalid", why })?;
 
     let driver = open_driver(&envelope).map_err(Refusal::internal)?;
     let mut domain = driver.create(&watch.attempt_id).map_err(|why| Refusal::internal(why.to_string()))?;
+    if let Some(ms) = envelope["deadlines"]["killWaitMs"].as_u64() {
+        domain.set_empty_wait(Duration::from_millis(ms));
+    }
     let mut link = os::GoLink::new(&domain).map_err(Refusal::internal)?;
     let spec = os::gate_spec(&envelope, &run_dir, &locks, &mut link, &domain).map_err(Refusal::internal)?;
     let mut spawned = driver.spawn_in(&mut domain, spec).map_err(|why| Refusal::internal(format!("gate did not start: {why}")))?;
@@ -430,6 +451,8 @@ fn watch_gate(watch: &Watch, go: &mut os::Go, driver: &dyn ContainmentDriver, do
         if stopped.is_none() {
             let cause = if watch.cancel_requested() {
                 Some("cancel")
+            } else if watch.output_over_limit() {
+                Some("output-limit")
             } else if watch.soft_deadline_passed() {
                 Some("soft-deadline")
             } else if watch.idle.is_some_and(|idle| last_active.elapsed() >= idle) {

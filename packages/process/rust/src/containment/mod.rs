@@ -62,6 +62,9 @@ pub struct Spawned {
     pub root: ProcTuple,
 }
 
+/// The bound on the wait for an empty domain when nobody set one.
+pub const DEFAULT_EMPTY_WAIT: std::time::Duration = std::time::Duration::from_secs(5);
+
 /// A domain being built for one attempt. `domain` is set by `spawn_in`.
 #[derive(Debug)]
 pub struct ContainmentDomain {
@@ -71,6 +74,9 @@ pub struct ContainmentDomain {
     /// process tree is still counted while it lives (`linux-pgroup`).
     #[cfg_attr(windows, allow(dead_code))]
     pub(crate) seen: Vec<ProcTuple>,
+    /// How long `kill_all` waits for the domain to be provably empty (the supervisor sets it from the
+    /// envelope's `killWaitMs`).
+    empty_wait: std::time::Duration,
     /// `windows-job`: the job the supervisor holds open for the attempt.
     #[cfg(windows)]
     pub(crate) job: Option<windows::JobHold>,
@@ -82,9 +88,18 @@ impl ContainmentDomain {
             attempt_id: attempt_id.to_string(),
             domain: None,
             seen: Vec::new(),
+            empty_wait: DEFAULT_EMPTY_WAIT,
             #[cfg(windows)]
             job: None,
         }
+    }
+
+    pub fn set_empty_wait(&mut self, wait: std::time::Duration) {
+        self.empty_wait = wait;
+    }
+
+    pub fn empty_wait(&self) -> std::time::Duration {
+        self.empty_wait
     }
 
     pub fn attempt_id(&self) -> &str {
@@ -226,7 +241,7 @@ pub(crate) fn pgroup_state(leader: &ProcTuple) -> DomainState {
 /// End a `linux-pgroup` domain judged from its record alone.
 pub(crate) fn pgroup_kill(leader: &ProcTuple) -> KillOutcome {
     #[cfg(target_os = "linux")]
-    return linux::pgroup_kill(leader, &mut Vec::new());
+    return linux::pgroup_kill(leader, &mut Vec::new(), DEFAULT_EMPTY_WAIT);
     #[cfg(not(target_os = "linux"))]
     {
         let _ = leader;
@@ -248,10 +263,24 @@ pub(crate) fn tree_state(root: &ProcTuple) -> DomainState {
 /// End a `macos-tree` domain judged from its record alone.
 pub(crate) fn tree_kill(root: &ProcTuple) -> KillOutcome {
     #[cfg(target_os = "macos")]
-    return macos::tree_kill(root, &mut Vec::new());
+    return macos::tree_kill(root, &mut Vec::new(), DEFAULT_EMPTY_WAIT);
     #[cfg(not(target_os = "macos"))]
     {
         let _ = root;
         KillOutcome::Refused
+    }
+}
+
+#[cfg(test)]
+mod empty_wait_tests {
+    use super::*;
+    use std::time::Duration;
+
+    #[test]
+    fn a_domain_waits_five_seconds_for_emptiness_until_told_otherwise() {
+        let mut domain = ContainmentDomain::new("att-wait");
+        assert_eq!(domain.empty_wait(), DEFAULT_EMPTY_WAIT);
+        domain.set_empty_wait(Duration::from_millis(1_234));
+        assert_eq!(domain.empty_wait(), Duration::from_millis(1_234));
     }
 }

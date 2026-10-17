@@ -4,7 +4,7 @@
   "fields": {
     "v": { "const": 1 },
     "attemptId": "string",
-    "cause": { "enum": ["soft-deadline", "idle", "cancel"] },
+    "cause": { "enum": ["soft-deadline", "idle", "output-limit", "cancel"] },
     "at": "string, ISO-8601 UTC"
   }
 }

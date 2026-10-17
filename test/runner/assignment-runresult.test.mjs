@@ -8,7 +8,6 @@ import { execFileSync } from 'node:child_process';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import {
   executeAssignment,
-  reconcileCliSpawnRun,
   snapshotDirtyBeforeFiles,
 } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { findMutatedDirtyBeforeFiles, safeGitStatusFiles, safeGitCommittedDiffFiles } from '../../src/runner/dispatch/settlement.mjs';

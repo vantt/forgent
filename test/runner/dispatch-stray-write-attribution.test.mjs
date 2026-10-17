@@ -260,7 +260,7 @@ process.stdout.write('reviewed\\n');
       timeoutMs: 20000,
     };
     const assignment = buildAssignment({ workId: 'tsk-stray-asgn', stage: 'planning', operation: 'validate-plan' });
-    const result = await executeAssignment(assignment, { cwd: worktree, repoRoot: root, runnerConfig, legacySpawn: true });
+    const result = await executeAssignment(assignment, { cwd: worktree, repoRoot: root, runnerConfig });
     assert.ok(fs.existsSync(stray), 'the worker wrote outside its workspace');
     assert.deepEqual(
       (result.warnings ?? []).filter((w) => w.code === 'stray-write-correlated').map((w) => w.paths),

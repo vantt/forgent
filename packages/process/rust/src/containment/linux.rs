@@ -20,8 +20,6 @@ const BWRAP_LOCATIONS: [&str; 3] = ["/usr/bin/bwrap", "/bin/bwrap", "/usr/local/
 /// The longest wait for bwrap to report the gate's pid.
 const INFO_TIMEOUT: Duration = Duration::from_secs(10);
 const POLL: Duration = Duration::from_millis(10);
-/// How long `kill_all` waits for the domain to be provably empty.
-const EMPTY_WAIT: Duration = Duration::from_secs(5);
 
 /// The driver for this machine: `bwrap-pidns` when bwrap can make a pid
 /// namespace, else `linux-pgroup`.
@@ -167,7 +165,7 @@ impl ContainmentDriver for BwrapPidns {
         if !signal_settled(&control::signal_by_identity(&gate, Signal::Kill)) {
             return KillOutcome::Refused;
         }
-        if wait_until(EMPTY_WAIT, || facts::judge_here(&gate.to_record()) == Verdict::Dead) {
+        if wait_until(domain.empty_wait(), || facts::judge_here(&gate.to_record()) == Verdict::Dead) {
             KillOutcome::Ok
         } else {
             KillOutcome::Refused
@@ -267,7 +265,8 @@ impl ContainmentDriver for LinuxPgroup {
             let _ = signal_group(&leader, libc::SIGTERM);
             wait_until(Duration::from_millis(grace_ms), || pgroup_state(&leader, &domain.seen) == DomainState::Empty);
         }
-        pgroup_kill(&leader, &mut domain.seen)
+        let wait = domain.empty_wait();
+        pgroup_kill(&leader, &mut domain.seen, wait)
     }
 
     fn guarantee(&self) -> Guarantee {
@@ -379,7 +378,7 @@ pub(crate) fn pgroup_state(leader: &ProcTuple, seen: &[ProcTuple]) -> DomainStat
 
 /// `killpg` while the leader is provably the group's leader, then kill by
 /// identity everything seen in the tree or the group, until a pass finds none.
-pub(crate) fn pgroup_kill(leader: &ProcTuple, seen: &mut Vec<ProcTuple>) -> KillOutcome {
+pub(crate) fn pgroup_kill(leader: &ProcTuple, seen: &mut Vec<ProcTuple>, empty_wait: Duration) -> KillOutcome {
     let mut refused = false;
     for _ in 0..10 {
         let leader_alive = facts::judge_here(&leader.to_record()) == Verdict::Alive;
@@ -410,7 +409,7 @@ pub(crate) fn pgroup_kill(leader: &ProcTuple, seen: &mut Vec<ProcTuple>) -> Kill
         }
         std::thread::sleep(POLL);
     }
-    wait_until(EMPTY_WAIT, || pgroup_state(leader, seen) == DomainState::Empty);
+    wait_until(empty_wait, || pgroup_state(leader, seen) == DomainState::Empty);
     if !refused && pgroup_state(leader, seen) == DomainState::Empty {
         KillOutcome::Ok
     } else {
