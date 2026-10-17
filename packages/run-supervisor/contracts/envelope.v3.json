@@ -48,7 +48,7 @@
     "hostBin": "absolute path of the fgos host binary of the release that wrote the envelope; resolved once by the controller, never through PATH or a shim",
     "payloadRoot": "absolute path of the legacy-node payload root of the same release (components.legacyNode.root of the activated manifest); resolved like apps/fgos/src/legacy_exec.rs",
     "cwd": "absolute working directory of the agent",
-    "mutation": { "enum": ["mutating", "read-only"], "meaning": "mutating attempts also hold the dispatch-cwd lease (rank 30) handed to the supervisor at fd 4" },
+    "mutation": { "enum": ["mutating", "read-only"], "meaning": "mutating attempts also hold the dispatch-cwd lease (rank 30) handed to the supervisor at fd 4. Windows: a LockFileEx lock is never inherited, so the supervisor takes the attempt lock and, when mutating, the lease itself; the envelope then carries the lease file in an optional string `cwdLeaseFile` (absent on Unix; a mutating Windows envelope without it is refused with exit 65)" },
     "launch": {
       "command": "string, absolute executable path of the agent CLI (resolved by resolveExecutorCommand in src/runner/dispatch/transport.mjs)",
       "args": "string[]",

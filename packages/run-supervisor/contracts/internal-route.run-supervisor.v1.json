@@ -23,6 +23,7 @@
         "stdio": "stdin /dev/null; stdout and stderr appended to <attemptDir>/supervisor.log by the controller"
       },
       "process": "the controller spawns it with setsid, detached, no IPC channel; it outlives the controller",
+      "windows": "one flow, platform parts only: no inherited lock (the supervisor takes attempt.lock, and the lease named by envelope.cwdLeaseFile when mutating, after reading the envelope; the controller must have released them); the GO channel is a named pipe the supervisor listens on before the gate starts (gate --go-socket, --job-name from the driver); the supervisor is the keeper in the declared windows-job record; the stop is stop-requested.json only (the gate polls it, no signal); steps start through the handle-list spawn with their own kill-on-close job",
       "sequence": [
         "CLOEXEC fd 3 (and 4)",
         "containment.create(attemptId) -> domain",

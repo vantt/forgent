@@ -17,12 +17,14 @@ use fgos_run_supervisor::envelope;
 use fgos_run_supervisor::go_channel::{read_frame, write_frame};
 use serde_json::{json, Value};
 
+pub mod supervisor;
+
 pub trait Channel: Read + Write + Send {}
 impl<T: Read + Write + Send> Channel for T {}
 
 const EXE: &str = if cfg!(windows) { ".exe" } else { "" };
 
-fn example(name: &str) -> PathBuf {
+pub fn example(name: &str) -> PathBuf {
     let exe = std::env::current_exe().expect("current_exe");
     exe.parent().unwrap().parent().unwrap().join("examples").join(format!("{name}{EXE}"))
 }

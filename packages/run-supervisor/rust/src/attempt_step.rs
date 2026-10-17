@@ -48,10 +48,11 @@ pub fn run(args: &[String]) -> i32 {
 }
 
 /// `node` through PATH; a step runner clears the environment, so without a
-/// PATH the standard system directories are searched instead.
+/// PATH the standard system directories are searched instead (Unix).
 fn node_program() -> PathBuf {
-    let path = std::env::var_os("PATH").unwrap_or_else(|| "/usr/local/bin:/usr/bin:/bin".into());
-    std::env::split_paths(&path).map(|dir| dir.join("node")).find(|candidate| candidate.is_file()).unwrap_or_else(|| PathBuf::from("node"))
+    let program = if cfg!(windows) { "node.exe" } else { "node" };
+    let path = std::env::var_os("PATH").unwrap_or_else(|| if cfg!(windows) { "".into() } else { "/usr/local/bin:/usr/bin:/bin".into() });
+    std::env::split_paths(&path).map(|dir| dir.join(program)).find(|candidate| candidate.is_file()).unwrap_or_else(|| PathBuf::from(program))
 }
 
 #[cfg(unix)]
@@ -64,7 +65,7 @@ fn hand_over(entry: &Path, step_id: &str, run_dir: &Path) -> i32 {
 
 #[cfg(not(unix))]
 fn hand_over(entry: &Path, step_id: &str, run_dir: &Path) -> i32 {
-    match std::process::Command::new("node").arg(entry).arg(step_id).arg("--run-dir").arg(run_dir).status() {
+    match std::process::Command::new(node_program()).arg(entry).arg(step_id).arg("--run-dir").arg(run_dir).status() {
         Ok(status) => status.code().unwrap_or(EXIT_INTERNAL),
         Err(err) => {
             report("attempt-step", "internal", &format!("node did not start: {err}"));
