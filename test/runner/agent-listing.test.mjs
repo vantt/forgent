@@ -27,11 +27,12 @@ test('a well-formed definition has no render warnings', () => {
   assert.deepEqual(agentRenderWarnings(text), []);
 });
 
-test('keys and block scalars the renderer drops are named', () => {
+test('keys the renderer drops are named; block scalars are read in full', () => {
   const text = [
     'name: a',
     'description: >',
-    '  a long folded description',
+    '  a long folded',
+    '  description',
     'persona:',
     '  voice: |',
     '    two lines',
@@ -40,13 +41,14 @@ test('keys and block scalars the renderer drops are named', () => {
     '  may_decide:',
     '    - x',
   ].join('\n');
-  const warnings = agentRenderWarnings(text);
-  assert.ok(warnings.some((w) => w.startsWith('description is a multi-line block')));
-  assert.ok(warnings.some((w) => w.startsWith('persona.voice is a multi-line block')));
-  assert.ok(warnings.some((w) => w.startsWith('persona.tone is not rendered')));
-  assert.ok(warnings.some((w) => w.startsWith('decision_boundary.may_decide is not rendered')));
-  assert.equal(agentDescription(text), '', 'a block-scalar description is not read as text');
+  assert.deepEqual(agentRenderWarnings(text), [
+    'persona.tone is not rendered (only voice, style, archetype are)',
+    'decision_boundary.may_decide is not rendered (only can_decide, must_escalate are)',
+  ]);
+  assert.equal(agentDescription(text), 'a long folded description', 'a block-scalar description is read in full');
   assert.equal(agentDescription(definition('a')), 'a posture');
+  assert.deepEqual(agentRenderWarnings('name: a\npersona: [unclosed\n'), [], 'a parse failure is the shape check\'s to name');
+  assert.equal(agentDescription('name: a\npersona: [unclosed\n'), '');
 });
 
 test('the listing reports tier, shadowed lower copies and shape problems', (t) => {
@@ -54,6 +56,7 @@ test('the listing reports tier, shadowed lower copies and shape problems', (t) =
   write('core/agents/planner.yaml', definition('planner'));
   write('domains/finance/agents/planner.yaml', definition('planner'));
   write('fgos/agents/broken.yaml', 'name: other\ndescription: x\n');
+  write('fgos/agents/malformed.yaml', 'name: malformed\ndescription: a: b\n');
   write('fgos/agents/typo.yml', definition('typo'));
 
   const listing = listAgents({ projectRoot: root, installRoot: root });
@@ -62,6 +65,8 @@ test('the listing reports tier, shadowed lower copies and shape problems', (t) =
   assert.deepEqual(planner.shadows, ['core/agents/planner.yaml']);
   const broken = listing.agents.find((agent) => agent.name === 'broken');
   assert.match(broken.problems[0], /must declare name: broken/);
+  const malformed = listing.agents.find((agent) => agent.name === 'malformed');
+  assert.match(malformed.problems[0], /^cannot be parsed: .* \(line 2, column \d+\)$/);
   assert.deepEqual(listing.ignored, ['fgos/agents/typo.yml']);
   assert.deepEqual(listing.masked, [], 'a project that is its own install hides nothing');
 });

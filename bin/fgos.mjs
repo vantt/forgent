@@ -90,6 +90,7 @@ import { mergeList, mergeNext } from '../src/verbs/merge/merge.mjs';
 import { catchupUseCase } from '../src/verbs/merge/catchup.mjs';
 import { discoverUseCase, planUseCase } from '../src/verbs/state/step.mjs';
 import { editUseCase, parseEditFlags } from '../src/verbs/state/edit.mjs';
+import { unknownFlagMessage } from '../src/cli/flag-check.mjs';
 import { moveUseCase } from '../src/verbs/state/move.mjs';
 import { listUseCase, graphUseCase, workflowUseCase, gateCheckUseCase, staleUseCase } from '../src/verbs/state/read.mjs';
 import { showRunUseCase } from '../src/verbs/dispatch/show-run.mjs';
@@ -4987,6 +4988,11 @@ async function main() {
     if ((rest.includes('--help') || rest.includes('-h')) && handleVerbHelp(verb, flags, positional)) {
       return;
     }
+
+    faultClass = 'unknown-flag';
+    const flagEntry = COMMAND_REGISTRY.find((e) => e.name === verb);
+    const unknownFlag = flagEntry && !flagEntry.nativeOnly ? unknownFlagMessage(flagEntry, flags, positional) : null;
+    if (unknownFlag) throw new StoreError('validation', unknownFlag);
 
     faultClass = 'dir-invalid';
     dir = dataDir(flags.dir);

@@ -213,20 +213,35 @@ pub fn try_acquire(path: &Path) -> Option<Guard> {
     }
 }
 
-/// An opened handle to the previous holder's process domain (a named job), plus
-/// SYNCHRONIZE handles to every member seen so far. A member that has been
-/// terminated can still be running its last instructions after the job already
-/// reports it gone, so "empty" means: job accounting says 0 AND every member
-/// process object is signaled.
+/// A process of the predecessor domain: a SYNCHRONIZE handle opened when it was first seen, and which
+/// sources named it at open and at any later read.
+struct Member {
+    pid: u32,
+    h: HANDLE,
+    open: Sources,
+    ever: Sources,
+}
+
+/// An opened handle to the previous holder's process domain (a named job). Its membership is the union of
+/// three sources, re-read on every query: the job's process id list, every process in a snapshot for which
+/// `IsProcessInJob` is true, and the recorded holder's process tree. Each process seen is tracked by a
+/// SYNCHRONIZE handle. A terminated member can still be running its last instructions after the job already
+/// dropped it from both the count and the list, so "empty" means: accounting 0 AND every process ever named
+/// by the union is signaled.
 pub struct Dom {
     job: HANDLE,
-    members: Vec<(u32, HANDLE)>,
+    holder: Option<(u32, u64)>,
+    members: Vec<Member>,
+    /// Job accounting (`ActiveProcesses`) at the moment the job was opened.
+    open_active: Option<u32>,
+    /// `JobObjectBasicProcessIdList` at the moment the job was opened.
+    open_list: Vec<u32>,
 }
 impl Drop for Dom {
     fn drop(&mut self) {
         unsafe {
-            for (_, h) in &self.members {
-                CloseHandle(*h);
+            for m in &self.members {
+                CloseHandle(m.h);
             }
             CloseHandle(self.job);
         }
@@ -251,16 +266,46 @@ unsafe fn job_pids(job: HANDLE) -> Vec<u32> {
     (0..n).map(|i| *ids.add(i) as u32).collect()
 }
 
+/// Whether `pid` is a member of `job` (None: cannot be determined, e.g. the process is gone).
+unsafe fn pid_in_job(job: HANDLE, pid: u32) -> Option<bool> {
+    let hp = OpenProcess(0x1000 /* PROCESS_QUERY_LIMITED_INFORMATION */, 0, pid);
+    if hp.is_null() {
+        return None;
+    }
+    let mut r = 0;
+    let ok = IsProcessInJob(hp, job, &mut r);
+    CloseHandle(hp);
+    if ok == 0 { None } else { Some(r != 0) }
+}
+
 impl Dom {
-    /// Opens a SYNCHRONIZE handle to every member not yet tracked.
-    fn refresh(&mut self) {
+    /// Re-reads the union and opens a SYNCHRONIZE handle to every process not yet tracked; records, per
+    /// process, which sources named it (`at_open`: also as the open-time view).
+    fn refresh(&mut self, at_open: bool) {
         unsafe {
-            for pid in job_pids(self.job) {
-                if !self.members.iter().any(|m| m.0 == pid) {
-                    let h = OpenProcess(SYNCHRONIZE, 0, pid);
-                    if !h.is_null() {
-                        self.members.push((pid, h));
+            let list = job_pids(self.job);
+            let procs = snapshot_procs(Some(self.job));
+            let tree = self.holder.map(|(hp, hc)| chain_from(&procs, hp, hc)).unwrap_or_default();
+            let mut named: BTreeMap<u32, Sources> = BTreeMap::new();
+            list.iter().for_each(|p| named.entry(*p).or_default().list = true);
+            procs.iter().filter(|p| p.in_job).for_each(|p| named.entry(p.pid).or_default().scan = true);
+            tree.iter().for_each(|p| named.entry(*p).or_default().tree = true);
+            for (pid, src) in named {
+                let idx = match self.members.iter().position(|m| m.pid == pid) {
+                    Some(i) => i,
+                    None => {
+                        let h = OpenProcess(SYNCHRONIZE, 0, pid);
+                        if h.is_null() {
+                            continue;
+                        }
+                        self.members.push(Member { pid, h, open: Sources::default(), ever: Sources::default() });
+                        self.members.len() - 1
                     }
+                };
+                let m = &mut self.members[idx];
+                m.ever = Sources { list: m.ever.list || src.list, scan: m.ever.scan || src.scan, tree: m.ever.tree || src.tree };
+                if at_open {
+                    m.open = src;
                 }
             }
         }
@@ -269,27 +314,51 @@ impl Dom {
 
 /// None when the job no longer exists by name. NOTE: that does not prove its former
 /// members are dead: kill-on-close terminates them asynchronously after the name is gone.
-pub fn domain_open(id: &str) -> Option<Dom> {
+pub fn domain_open(id: &str, holder: Option<(u32, u64)>) -> Option<Dom> {
     let w: Vec<u16> = id.encode_utf16().chain(std::iter::once(0)).collect();
     let h = unsafe { OpenJobObjectW(JOB_OBJECT_QUERY | JOB_OBJECT_TERMINATE | SYNCHRONIZE, 0, w.as_ptr()) };
     if h.is_null() {
         return None;
     }
-    let mut d = Dom { job: h, members: vec![] };
-    d.refresh();
+    let mut d = Dom { job: h, holder, members: vec![], open_active: None, open_list: vec![] };
+    d.open_active = unsafe { job_active(h) };
+    d.open_list = unsafe { job_pids(h) };
+    d.refresh(true);
     Some(d)
 }
 
-/// Number of members still alive: job accounting or any tracked member process not yet signaled.
+/// Which sources named `pid` in the union read taken when the job was opened.
+pub fn domain_open_sources(d: &Dom, pid: u32) -> Sources {
+    d.members.iter().find(|m| m.pid == pid).map(|m| m.open).unwrap_or_default()
+}
+
+/// Which sources named `pid` in any union read so far (open included).
+pub fn domain_ever_sources(d: &Dom, pid: u32) -> Sources {
+    d.members.iter().find(|m| m.pid == pid).map(|m| m.ever).unwrap_or_default()
+}
+
+/// `IsProcessInJob(pid, job)` now (None: the process could not be opened).
+pub fn domain_in_job(d: &Dom, pid: u32) -> Option<bool> {
+    unsafe { pid_in_job(d.job, pid) }
+}
+
+/// Job accounting and member list as seen when the job was opened.
+pub fn domain_open_view(d: &Dom) -> (Option<u32>, Vec<u32>) {
+    (d.open_active, d.open_list.clone())
+}
+
+/// Number of members still alive. The union is re-read on every call (also when accounting already says 0),
+/// so this is the union empty rule: accounting is 0 AND every process ever named by the list, the in-job scan
+/// or the holder's tree is signaled.
 pub fn domain_active(d: &mut Dom) -> Option<u32> {
-    d.refresh();
+    d.refresh(false);
     let acct = unsafe { job_active(d.job) }?;
-    let pending = d.members.iter().filter(|(_, h)| unsafe { WaitForSingleObject(*h, 0) } == WAIT_TIMEOUT).count() as u32;
+    let pending = d.members.iter().filter(|m| unsafe { WaitForSingleObject(m.h, 0) } == WAIT_TIMEOUT).count() as u32;
     Some(acct.max(pending))
 }
 
 pub fn domain_kill(d: &mut Dom) {
-    d.refresh();
+    d.refresh(false);
     unsafe {
         TerminateJobObject(d.job, 1);
     }
@@ -311,16 +380,7 @@ impl Sup {
     }
     /// Whether the pid is currently a member of this job (None: cannot be determined).
     pub fn contains(&self, pid: u32) -> Option<bool> {
-        unsafe {
-            let hp = OpenProcess(0x1000 /* PROCESS_QUERY_LIMITED_INFORMATION */, 0, pid);
-            if hp.is_null() {
-                return None;
-            }
-            let mut r = 0;
-            let ok = IsProcessInJob(hp, self.h, &mut r);
-            CloseHandle(hp);
-            if ok == 0 { None } else { Some(r != 0) }
-        }
+        unsafe { pid_in_job(self.h, pid) }
     }
 }
 impl Drop for Sup {
@@ -354,14 +414,21 @@ struct ProcInfo {
     pid: u32,
     ppid: u32,
     created: Option<u64>,
+    /// `IsProcessInJob` for the job passed to `snapshot_procs` (false when none was passed).
+    in_job: bool,
 }
 
-unsafe fn snapshot_procs() -> Vec<ProcInfo> {
+unsafe fn snapshot_procs(job: Option<HANDLE>) -> Vec<ProcInfo> {
     let mut v = vec![];
     for (pid, ppid) in parent_map() {
         let h = OpenProcess(0x1000, 0, pid);
         let mut created = None;
+        let mut in_job = false;
         if !h.is_null() {
+            if let Some(j) = job {
+                let mut r = 0;
+                in_job = IsProcessInJob(h, j, &mut r) != 0 && r != 0;
+            }
             let mut c: FILETIME = std::mem::zeroed();
             let mut e: FILETIME = std::mem::zeroed();
             let mut k: FILETIME = std::mem::zeroed();
@@ -371,7 +438,7 @@ unsafe fn snapshot_procs() -> Vec<ProcInfo> {
             }
             CloseHandle(h);
         }
-        v.push(ProcInfo { pid, ppid, created });
+        v.push(ProcInfo { pid, ppid, created, in_job });
     }
     v
 }
@@ -422,7 +489,7 @@ pub fn fallback_wait(holder_pid: u32, holder_created: u64, kill_wait: Duration) 
     let mut first: Option<Vec<u32>> = None;
     let mut quiet_rounds = 0;
     loop {
-        let procs = unsafe { snapshot_procs() };
+        let procs = unsafe { snapshot_procs(None) };
         let chain = chain_from(&procs, holder_pid, holder_created);
         if first.is_none() {
             first = Some(chain.clone());
@@ -619,6 +686,25 @@ pub fn role(name: &str, a: &[String]) -> bool {
                 Err(e) => write_atomic(Path::new(&a[1]), &format!("error {e}")),
             }
             park()
+        }
+        // jobhold <jobname> <ready> <delay-ms> <pid>...: opens the job and the given processes, then once every
+        // one of those processes is gone keeps the job handle for the delay and exits: the last handle closes
+        // while a contender is probably already looking at the job.
+        "jobhold" => {
+            let delay: u64 = a[2].parse().unwrap_or(0);
+            let w: Vec<u16> = a[0].encode_utf16().chain(std::iter::once(0)).collect();
+            let job = unsafe { OpenJobObjectW(JOB_OBJECT_QUERY, 0, w.as_ptr()) };
+            if job.is_null() {
+                write_atomic(Path::new(&a[1]), &format!("error OpenJobObjectW {}", unsafe { GetLastError() }));
+                park()
+            }
+            let handles: Vec<usize> = a[3..].iter().filter_map(|s| s.parse::<u32>().ok()).map(|p| unsafe { OpenProcess(SYNCHRONIZE, 0, p) } as usize).collect();
+            write_atomic(Path::new(&a[1]), &std::process::id().to_string());
+            for h in handles.into_iter().filter(|h| *h != 0) {
+                unsafe { WaitForSingleObject(h as HANDLE, INFINITE) };
+            }
+            std::thread::sleep(Duration::from_millis(delay));
+            std::process::exit(0); // the job handle closes with the process
         }
         // githolder <lockfile> <ready> <repo> <block|noblock>: job + lock, then git inside the job.
         "githolder" => {

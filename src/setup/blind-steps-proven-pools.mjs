@@ -9,12 +9,10 @@
 // Candidates are never resolved here: each blind unit's roles are walked through the runner's own
 // bind() (the same candidate walk a quota fallback takes), so nothing is dispatched, written or paid for.
 
-import path from 'node:path';
-
 import { bind } from '../runner/execution/bind.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
 import { deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
-import { loadWorkflowDefinitions } from './workflow-pool-independence.mjs';
+import { loadWorkflowDefinitions, withUnreadableDefinitions, workflowRoots } from './workflow-pool-independence.mjs';
 
 /**
  * Pairs a live canary proved blind: a worker of that provider family, run through that transport
@@ -95,15 +93,14 @@ export async function checkBlindStepsUseProvenPools(cwd, { packageRoot, loadRunn
   } catch (err) {
     return { passed: true, message: `runner config not loadable here, blind pools not evaluated: ${err.message}` };
   }
-  const roots = path.resolve(cwd) === path.resolve(packageRoot) ? [packageRoot] : [packageRoot, cwd];
-  const loaded = loadWorkflowDefinitions(roots);
-  if (loaded.unavailable) {
-    return { passed: true, message: `blind pools not evaluated: ${loaded.unavailable}` };
-  }
+  const loaded = loadWorkflowDefinitions(workflowRoots(cwd, packageRoot));
+  return withUnreadableDefinitions(await evaluateBlindPools(loaded.workflows, runnerConfig), loaded.unreadable);
+}
 
+async function evaluateBlindPools(workflows, runnerConfig) {
   const problems = [];
   let evaluated = 0;
-  for (const wf of loaded.workflows.values()) {
+  for (const wf of workflows.values()) {
     for (const step of wf.steps) {
       for (const u of step?.units ?? []) {
         const template = u?.template ?? {};

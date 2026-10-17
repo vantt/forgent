@@ -1778,3 +1778,20 @@ test('a unit persona defined in the workspace tier reaches the prompt as text pi
   // The pin is recorded once, so an edit to the file after the start never reaches a resume.
   assert.equal(JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8')).personaPin.text, personaText);
 });
+
+test('a unit persona whose file cannot be parsed or has the wrong shape refuses the run and leaves no unit directory', async (t) => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
+  t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
+  fs.mkdirSync(path.join(repoRoot, 'fgos', 'agents'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, 'fgos', 'agents', 'broken-keeper.yaml'), 'name: broken-keeper\ndescription: fine\npersona:\n  voice: direct: no hedging\n');
+  fs.writeFileSync(path.join(repoRoot, 'fgos', 'agents', 'mapping-keeper.yaml'), 'name: mapping-keeper\ndescription: fine\ndecision_boundary:\n  must_escalate:\n    - Escalate when: budget exceeded\n');
+  const attempt = (persona) => runUnit({
+    unitData: { id: 'u-bad-persona', objective: 'Write docs', capability: 'docs:write', writes: [], persona },
+    repoRoot, cwd: worktreeDir, worktree: worktreeDir,
+  });
+  await assert.rejects(attempt('broken-keeper'), /persona "broken-keeper" \(fgos\/agents\/broken-keeper\.yaml\) cannot be parsed: .*line 4/);
+  await assert.rejects(attempt('mapping-keeper'), /persona "mapping-keeper" \(fgos\/agents\/mapping-keeper\.yaml\) decision_boundary\.must_escalate\[0\] is a mapping/);
+  const assignments = path.join(repoRoot, '.fgos', 'assignments');
+  assert.deepEqual(fs.existsSync(assignments) ? fs.readdirSync(assignments) : [], [], 'no unit directory is left behind');
+});

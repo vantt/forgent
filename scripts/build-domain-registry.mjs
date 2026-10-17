@@ -2,29 +2,42 @@
 // build-domain-registry.mjs — compile each domain's YAML (registry.yaml + workflows/*.yaml)
 // into domains/<domain>/compiled.json.
 //
-// src/state/domain-registry.mjs loads the compiled file so the Work lifecycle works in a
-// plain unpacked copy of fgOS with no node_modules (doctor and setup must load there, see
-// src/setup/registrations.mjs). The YAML stays the source of truth; test/state/
-// domain-registry-compiled.test.mjs fails when the two drift, `--check` does the same
-// from the command line.
+// src/state/domain-registry.mjs loads the compiled file at import time, so one YAML typo cannot
+// take down every verb (hooks included) and `fgos doctor` is still there to report it. The YAML
+// stays the source of truth: test/state/domain-registry-compiled.test.mjs fails when the two
+// drift, `--check` does the same from the command line, and the doctor check
+// `domain-registry-compiled` reports a stale or unparsable one using compileDomain below.
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import YAML from 'yaml';
+import { describeYamlError, parseYaml } from '../src/util/yaml.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
+// Parses one domain YAML file; a failure names the file as domains/<domain>/<name> with the
+// parser's line and column.
+function parseDomainFile(file, domain, relName) {
+  const rel = `domains/${domain}/${relName}`;
+  try {
+    return parseYaml(fs.readFileSync(file, 'utf8'), { filename: rel });
+  } catch (error) {
+    throw new Error(`${rel}: cannot be parsed: ${describeYamlError(error)}`, { cause: error });
+  }
+}
+
+/** The compiled form of one domain directory, or null when it has no registry.yaml. */
 export function compileDomain(domainDir) {
   const registryPath = path.join(domainDir, 'registry.yaml');
   if (!fs.existsSync(registryPath)) return null;
-  const registry = YAML.parse(fs.readFileSync(registryPath, 'utf8')) ?? {};
+  const domain = path.basename(domainDir);
+  const registry = parseDomainFile(registryPath, domain, 'registry.yaml') ?? {};
   const workflows = {};
   const workflowsDir = path.join(domainDir, 'workflows');
   if (fs.existsSync(workflowsDir)) {
     for (const file of fs.readdirSync(workflowsDir).sort()) {
       if (!/\.ya?ml$/.test(file)) continue;
-      workflows[path.basename(file, path.extname(file))] = YAML.parse(fs.readFileSync(path.join(workflowsDir, file), 'utf8'));
+      workflows[path.basename(file, path.extname(file))] = parseDomainFile(path.join(workflowsDir, file), domain, `workflows/${file}`);
     }
   }
   return { registry, workflows };

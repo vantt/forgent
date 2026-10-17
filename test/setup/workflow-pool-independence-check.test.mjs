@@ -163,10 +163,10 @@ test('a runner config that cannot be loaded passes with a note instead of throwi
   }
 });
 
-test('a malformed workflow definition is skipped and named, never thrown', async () => {
+test('a malformed workflow definition fails the check and is named with its position, never thrown', async () => {
   const result = await run('id: [unterminated', { 'fixture:generate': prefer('alpha') });
-  assert.equal(result.passed, true);
-  assert.match(result.message, /unreadable definitions skipped: fixture\.yaml/);
+  assert.equal(result.passed, false);
+  assert.match(result.message, /fixture\.yaml: cannot be parsed: .* \(line \d+, column \d+\)/);
 });
 
 test('the registered check runs against the shipped Workflows without throwing', async () => {
