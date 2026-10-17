@@ -563,7 +563,13 @@ impl TerminalDriver for HerdrDriver {
         self.require("activity.state")?;
         // `agent get` answers only for a pane herdr knows an agent in: for any
         // other pane it says `agent_not_found`, which is "no activity", not a fault.
-        let result = self.run(&["agent", "get", pane])?;
+        let result = match self.call(&["agent", "get", pane]) {
+            Ok(result) => result,
+            // herdr answered: no agent is recognised in this pane. That is an answer
+            // (`unknown` state), not a failure to read one.
+            Err(CallError::Herdr(e)) if e.code == "agent_not_found" => return Ok(Activity { state: "unknown".into(), ..Default::default() }),
+            Err(other) => return Err(other.into_refusal()),
+        };
         parse_activity(&result).ok_or_else(|| unknown("herdr agent get reported no agent_status"))
     }
 

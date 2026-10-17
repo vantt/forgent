@@ -112,16 +112,19 @@ export function createSlotIo({ tc, key, groupKey }) {
       return must(answer, 'screen', `read ${key}`).screen;
     },
 
-    /** The agent's status as the driver reports it; `unknown` when it reports none.
-     * `recognised` says the driver knows an agent runs in the pane. */
+    /** The agent's status as the driver reports it (`unknown` when it looked and saw no agent);
+     * throws when the status could not be read. `recognised` says the driver knows an agent runs in the pane. */
     state() {
       const seen = livePane(inspect({ foreground: false }));
       const activity = seen.activity ?? null;
+      // No activity at all means the driver could not read one: that is a failure to look, which a
+      // caller counts as blind time. A driver that looked and recognised no agent answers `unknown`.
+      if (!activity) throw new TerminalSlotError('terminal_unknown', `agent state of ${key} could not be read`);
       return {
-        agentStatus: activity?.state || 'unknown',
-        agentSession: activity?.session ?? null,
-        agent: activity?.agent ?? null,
-        recognised: typeof activity?.agent === 'string' && activity.agent !== '',
+        agentStatus: activity.state || 'unknown',
+        agentSession: activity.session ?? null,
+        agent: activity.agent ?? null,
+        recognised: typeof activity.agent === 'string' && activity.agent !== '',
       };
     },
 

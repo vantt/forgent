@@ -1,13 +1,14 @@
 // test/runner/dispatch-governance-operability.test.mjs
 // Verification test suite for dispatch governance, public CLI, observation truth, and doctor coherence.
 
-import { test } from 'node:test';
+import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { startTerminalHarness } from '../helpers/terminal-host-harness.mjs';
 
 import {
   RunnerConfigError,
@@ -466,6 +467,11 @@ test('provider-family warning suppresses for all-non-CLI and warns for bare unve
 
 // ─── 8. Herdr Polling Skips Liveness Check During Working State (Behavioral) ───
 
+// The terminal-control route finds the herdr server by the process listening on its socket.
+let harness;
+before(async () => { harness = await startTerminalHarness(); });
+after(() => { harness?.stop(); });
+
 function createMockHerdr(tmpDir, scenario = {}) {
   const scriptPath = path.join(tmpDir, 'mock-herdr.mjs');
   const wrapperPath = path.join(tmpDir, 'mock-herdr.sh');
@@ -486,9 +492,13 @@ function createMockHerdr(tmpDir, scenario = {}) {
   fs.writeFileSync(scriptPath, `
 import fs from "node:fs";
 import path from "node:path";
+import { spawn } from "node:child_process";
 const args = process.argv.slice(2);
 fs.appendFileSync(${JSON.stringify(logPath)}, JSON.stringify(args) + "\\n");
 const [group, action] = args;
+if (args[0] === "--version") { console.log("herdr 0.9.1-mock"); process.exit(0); }
+if (group === "tab" && action === "create") { console.log(JSON.stringify({ id: "cli:mock", result: { tab: { tab_id: "mock-tab-1" }, root_pane: { pane_id: "mock-pane-1" } } })); process.exit(0); }
+if (group === "pane" && action === "read") { console.log(""); process.exit(0); }
 if (group === "pane" && action === "split") { console.log(JSON.stringify({ id: "cli:mock", result: { pane: { pane_id: "mock-pane-1" } } })); process.exit(0); }
 if (group === "pane" && action === "close") { console.log(JSON.stringify({ id: "cli:mock", result: { closed: true } })); process.exit(0); }
 if (group === "pane" && action === "run") { console.log(JSON.stringify({ id: "cli:mock", result: { type: "ok" } })); process.exit(0); }
@@ -498,10 +508,21 @@ if (group === "pane" && action === "process-info") {
     console.log(JSON.stringify({ id: "cli:mock", result: { process_info: { pane_id: "mock-pane-1", shell_pid: 100, foreground_process_group_id: 100, foreground_processes: [{ pid: 100, name: "bash" }] } } }));
     process.exit(0);
   }
-  console.log(JSON.stringify({ id: "cli:mock", result: { process_info: { pane_id: "mock-pane-1", shell_pid: 100, foreground_process_group_id: 200, foreground_processes: [{ pid: 200, name: "agy" }] } } }));
+  // The agent is a real process: the port identifies it by its pid.
+  const agent = state.agentPid ? (() => { try { process.kill(state.agentPid, 0); return fs.readFileSync("/proc/" + state.agentPid + "/cmdline", "utf8").split("\\0").filter(Boolean); } catch { return null; } })() : null;
+  const foreground = agent ? [{ pid: state.agentPid, name: agent[0], argv: agent }, { pid: 100, name: "bash", argv: ["bash"] }] : [{ pid: 100, name: "bash", argv: ["bash"] }];
+  console.log(JSON.stringify({ id: "cli:mock", result: { process_info: { pane_id: "mock-pane-1", shell_pid: 100, foreground_process_group_id: agent ? state.agentPid : 100, foreground_processes: foreground } } }));
   process.exit(0);
 }
-if (group === "agent" && action === "start") { console.log(JSON.stringify({ id: "cli:mock", result: { agent: { agent_status: "idle" } } })); process.exit(0); }
+if (group === "agent" && action === "start") {
+  const child = spawn("bash", ["-c", "exec -a agy sleep 600"], { detached: true, stdio: "ignore" });
+  child.unref();
+  const state = JSON.parse(fs.readFileSync(${JSON.stringify(statePath)}, "utf8"));
+  state.agentPid = child.pid;
+  fs.writeFileSync(${JSON.stringify(statePath)}, JSON.stringify(state));
+  console.log(JSON.stringify({ id: "cli:mock", result: { agent: { agent_status: "idle" } } }));
+  process.exit(0);
+}
 if (group === "agent" && action === "get") {
   const scenario = JSON.parse(fs.readFileSync(${JSON.stringify(scenarioPath)}, "utf8"));
   if (scenario.getError) { console.log(JSON.stringify({ error: { code: scenario.getError }, id: "cli:mock" })); process.exit(1); }
@@ -518,6 +539,7 @@ if (group === "agent" && action === "prompt") {
     const state = JSON.parse(fs.readFileSync(${JSON.stringify(statePath)}, "utf8"));
     state.exited = true;
     fs.writeFileSync(${JSON.stringify(statePath)}, JSON.stringify(state));
+    if (state.agentPid) { try { process.kill(state.agentPid, "SIGKILL"); } catch {} }
     console.log(JSON.stringify({ id: "cli:mock", result: { agent: { agent_status: "idle" } } }));
     process.exit(0);
   }

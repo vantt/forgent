@@ -418,3 +418,13 @@ fn a_screen_comes_back_as_plain_text_or_in_the_envelope_and_a_failure_is_named()
         other => panic!("a failed read must be a named refusal, got {other:?}"),
     }
 }
+
+#[test]
+fn a_pane_with_no_recognised_agent_answers_unknown_state_while_a_failed_read_stays_a_refusal() {
+    let none = Fake::new("no-agent").env("FAKE_HERDR_AGENT_NOT_FOUND", "1");
+    let activity = none.driver().activity("wS:p59Y").unwrap();
+    assert_eq!((activity.state.as_str(), activity.agent), ("unknown", None));
+
+    let failing = Fake::new("agent-get-garbled").env("FAKE_HERDR_GARBLE", "1");
+    assert!(is_unknown(failing.driver().activity("wS:p59Y")), "an unreadable answer is not \"no agent\"");
+}

@@ -6,6 +6,7 @@
 #   FAKE_HERDR_PANE_GONE  set: pane commands answer pane_not_found
 #   FAKE_HERDR_ON_CLOSE   shell snippet run when `pane close` is called
 #   FAKE_HERDR_NO_WORKSPACE  set: `tab create` answers workspace_not_found, `workspace create` makes the tab
+#   FAKE_HERDR_AGENT_NOT_FOUND  set: `agent get` answers agent_not_found
 #   FAKE_HERDR_READ_JSON     set: `pane read` answers in the JSON envelope (older herdr)
 #   FAKE_HERDR_GARBLE     set: every command answers text that is not JSON
 #   FAKE_HERDR_FDS        file that receives the list of open fds of this process
@@ -21,6 +22,9 @@ if [ "$1" = "--session" ]; then shift 2; fi
 case "$FAKE_HERDR_HANG" in "$1 $2") exec sleep 30 ;; esac
 if [ -n "$FAKE_HERDR_PANE_GONE" ]; then
   case "$1 $2" in "pane "*|"agent get") cat "$dir/pane-close-not-found.json" >&2; exit 1 ;; esac
+fi
+if [ -n "$FAKE_HERDR_AGENT_NOT_FOUND" ] && [ "$1 $2" = "agent get" ]; then
+  echo '{"error":{"code":"agent_not_found","message":"agent target not found"},"id":"cli:agent:get"}' >&2; exit 1
 fi
 if [ -n "$FAKE_HERDR_NO_WORKSPACE" ] && [ "$1 $2" = "tab create" ]; then
   echo '{"error":{"code":"workspace_not_found","message":"no active workspace"},"id":"cli:tab:create"}' >&2; exit 1
