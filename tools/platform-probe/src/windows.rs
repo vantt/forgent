@@ -221,6 +221,10 @@ pub fn try_acquire(path: &Path) -> Option<Guard> {
 pub struct Dom {
     job: HANDLE,
     members: Vec<(u32, HANDLE)>,
+    /// Job accounting (`ActiveProcesses`) at the moment the job was opened.
+    open_active: Option<u32>,
+    /// `JobObjectBasicProcessIdList` at the moment the job was opened.
+    open_list: Vec<u32>,
 }
 impl Drop for Dom {
     fn drop(&mut self) {
@@ -275,12 +279,20 @@ pub fn domain_open(id: &str) -> Option<Dom> {
     if h.is_null() {
         return None;
     }
-    let mut d = Dom { job: h, members: vec![] };
+    let mut d = Dom { job: h, members: vec![], open_active: None, open_list: vec![] };
+    d.open_active = unsafe { job_active(h) };
+    d.open_list = unsafe { job_pids(h) };
     d.refresh();
     Some(d)
 }
 
-/// Number of members still alive: job accounting or any tracked member process not yet signaled.
+/// Job accounting and member list as seen when the job was opened.
+pub fn domain_open_view(d: &Dom) -> (Option<u32>, Vec<u32>) {
+    (d.open_active, d.open_list.clone())
+}
+
+/// Number of members still alive. The list is re-read on every call (also when accounting already says 0),
+/// so this is the full empty rule: accounting is 0 AND every member ever listed is signaled.
 pub fn domain_active(d: &mut Dom) -> Option<u32> {
     d.refresh();
     let acct = unsafe { job_active(d.job) }?;
@@ -413,6 +425,8 @@ fn chain_from(procs: &[ProcInfo], holder_pid: u32, holder_created: u64) -> Vec<u
 pub struct Fallback {
     pub empty: bool,
     pub chain_at_first_snapshot: Vec<u32>,
+    /// Members of that first chain that were still running at that snapshot.
+    pub live_at_first_snapshot: Vec<u32>,
 }
 
 /// Fallback when the job cannot be opened (every handle owner is gone): wait until no process whose
@@ -420,11 +434,13 @@ pub struct Fallback {
 pub fn fallback_wait(holder_pid: u32, holder_created: u64, kill_wait: Duration) -> Option<Fallback> {
     let t0 = Instant::now();
     let mut first: Option<Vec<u32>> = None;
+    let mut live_first: Vec<u32> = vec![];
     let mut quiet_rounds = 0;
     loop {
         let procs = unsafe { snapshot_procs() };
         let chain = chain_from(&procs, holder_pid, holder_created);
         if first.is_none() {
+            live_first = chain.iter().copied().filter(|p| pid_alive(*p)).collect();
             first = Some(chain.clone());
         }
         if chain.iter().any(|p| pid_alive(*p)) {
@@ -433,10 +449,10 @@ pub fn fallback_wait(holder_pid: u32, holder_created: u64, kill_wait: Duration) 
             quiet_rounds += 1; // two clean snapshots in a row so a last-moment spawn is seen
         }
         if quiet_rounds >= 2 {
-            return Some(Fallback { empty: true, chain_at_first_snapshot: first.unwrap_or_default() });
+            return Some(Fallback { empty: true, chain_at_first_snapshot: first.unwrap_or_default(), live_at_first_snapshot: live_first });
         }
         if t0.elapsed() >= kill_wait {
-            return Some(Fallback { empty: false, chain_at_first_snapshot: first.unwrap_or_default() });
+            return Some(Fallback { empty: false, chain_at_first_snapshot: first.unwrap_or_default(), live_at_first_snapshot: live_first });
         }
         std::thread::sleep(Duration::from_millis(1));
     }

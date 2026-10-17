@@ -4,6 +4,7 @@ use serde_json::Value;
 use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Stdio};
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
 
@@ -208,4 +209,16 @@ pub fn which(name: &str) -> bool {
     };
     let path = std::env::var_os("PATH").unwrap_or_default();
     std::env::split_paths(&path).any(|d| exts.iter().any(|e| d.join(format!("{name}{e}")).is_file()))
+}
+
+/// Repeat count for the repeated predecessor tests (`--repeats N`).
+pub const DEFAULT_REPEATS: usize = 200;
+static REPEATS: AtomicUsize = AtomicUsize::new(DEFAULT_REPEATS);
+
+pub fn set_repeats(n: usize) {
+    REPEATS.store(n.max(1), Ordering::Relaxed);
+}
+
+pub fn repeats() -> usize {
+    REPEATS.load(Ordering::Relaxed)
 }
