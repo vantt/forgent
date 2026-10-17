@@ -22,7 +22,7 @@
     "unknownFlag": "usage error, exit 2"
   },
   "fds": {
-    "in": "fd 3 = the lock file description (inherited, O_RDWR). The helper sets FD_CLOEXEC on it before any other syscall.",
+    "in": "POSIX: fd 3 = the lock file description (inherited, O_RDWR). The helper sets FD_CLOEXEC on it before any other syscall. Windows: the path-based flags (--probe, --predecessor-state, --borrowed-check) read no slot.",
     "out": "stdout = one JSON line then newline; stderr = free text for humans, never parsed",
     "stdin": "unused, may be closed"
   },
