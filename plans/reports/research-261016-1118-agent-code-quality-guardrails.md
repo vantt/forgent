@@ -259,7 +259,7 @@ Gỡ khoảng 19 đăng ký hook trùng và sửa `statusLine` đang gọi node 
 **Nhóm A: kiểm soát ở nguồn (mục 0).**
 
 1. Sổ luật một nguồn: dùng registry đã có từ packaging-distribution P3-P5 (mục 6); chuyển dần luật viết tay trong `AGENTS.md` thành đơn vị luật trong `core/instructions/` theo mẫu plan 261008; chốt cách sinh danh sách luật (P5, Q6); đối chiếu 7 nguyên tắc để lộ luật còn thiếu và chốt chúng (Q4).
-2. Giao luật: giữ `AGENTS.md` là kênh chung dưới 32 KiB, không che, không trùng (P5, Q5, Q7); đưa luật cần lúc viết code vào worker contract và mẫu brief (P3, P10).
+2. Giao luật theo các tầng của proposal §4.6: `AGENTS.md` chỉ giữ L0 (câu chỉ đường và luật luôn cần), dưới 32 KiB, không che, không trùng (P5, Q5, Q7); luật cần lúc viết code (L1) đi vào worker contract và mẫu brief theo phạm vi việc (P3, P10); bộ chiếu có ngân sách theo host, giảm theo độ sâu thay vì cắt, fail closed khi tập luật bắt buộc vượt ngân sách.
 3. Kiểm chứng giao luật: bổ sung vào nghĩa vụ ở contract mục 11 và check doctor đã có, dùng lại `instruction-audit` (tới đủ, tới một lần, không nằm sau ngưỡng cắt của host); xác nhận bảng nạp bằng canary cho pi và agy.
 4. Gắn luật cưỡng chế được với cơ chế: P2 (chủ của từng năng lực), P1 (test chống trùng), P4 (thay thế thì xoá), P9 (guard chỉ đường), P6 (hook phản hồi sớm), P11 (ngân sách và mục "xoá gì").
 
@@ -292,6 +292,14 @@ Mỗi bước ở nhóm A ghi ước lượng trọng lượng (số dòng, số
 | `archive/plans/261006-1415-fgos-convention-component/phase-06-agents-line.md` | done (`461e12d12`) | Một dòng `AGENTS.md` trỏ tới `fgos convention`, theo nguyên tắc một nguồn |
 | `docs/history/canonical-decision-projection/` (tsk-1lv) | Chưa kiểm trạng thái | Mô hình chiếu quyết định ra index sinh tự động (`docs/decisions/index.md`); tiền lệ cho cách sinh và chống lệch |
 | `archive/plans/260825-1841-knowledge-registry/phase-08-projections-doctor.md` | completed | Tiền lệ projection kèm check doctor cho artifact tri thức |
+
+**Thiết kế đích đã có trong proposal document-unification** (`docs/platform/proposals/documentation-system-unification.md`, H3, kiến trúc giữ lại cho tương lai, "never a blocker"; plan `plans/260925-documentation-authority-unification/plan.md:547,579` cấm âm thầm mở rộng sang nó):
+
+- **§4.4 One authoring door (dòng 404-415):** tầng luôn nạp chỉ giữ một câu chỉ đường ổn định; luật chi tiết nằm trong governance, constitution và skill "để chúng không trôi dạt trong mọi file AGENTS được sinh ra".
+- **§4.6 Dynamic agent context (dòng 484-620):** năm tầng nạp dần: L0 câu kích hoạt (luôn nạp), L1 effective brief (văn xuôi, RULES, quyết định đang hiệu lực, tách ba phần), L2 gói context theo việc, L3 nguồn chuẩn, L4 lịch sử. Mỗi brief khai phạm vi, host, ID nguồn, digest, **ngân sách byte hoặc token**, phần bị lược kèm link, và fail closed khi có xung đột. Khi vượt ngân sách thì *"degrade by depth, not by arbitrary truncation"* — đúng lời giải cho việc codex cắt cụt `AGENTS.md` (mục 2d). Bề mặt dự kiến: `fgos doc context --for <op> --area <a> --paths <p> --stage <s> --budget <n>` trả về `mustRead`, `inlineBrief`, `readOnDemand`, `historyOnDemand`, `excluded`. Proposal cũng ghi nhận nền hiện tại "implemented but not yet sufficient": effective set chỉ có một đơn vị luật, chưa có brief theo phạm vi kèm ngân sách.
+- **§4.7.2 Agent Context Engine (dòng 680-713):** sở hữu Instruction Composer, Effective Decision Reducer, Reading Plan Compiler, Context Budgeter và Context Explainability; fail closed khi tập luật bắt buộc vượt ngân sách. Registry và composition trong `src/setup/` là "mầm" của engine này. Packaging-Distribution chỉ render gói context ra file theo host và giữ ledger, không quyết ghép luật (§4.7.3).
+
+Vì vậy nhóm A nên được đóng khung là **lát cắt đầu tiên của Agent Context Engine theo đúng thiết kế đó**, không phải một cơ chế riêng: giữ L0 trong `AGENTS.md` nhỏ (chỉ câu chỉ đường và luật thật sự luôn cần), đưa L1 vào brief và worker contract theo phạm vi việc, thêm ngân sách theo host vào bộ chiếu với quy tắc giảm theo độ sâu thay vì cắt, và dùng tiêu chí fail closed khi tập luật bắt buộc vượt ngân sách. Làm như vậy vẫn khớp với ranh giới của plan document-unification (không âm thầm mở rộng sang engine đầy đủ), vì chỉ chạm phần đã có mầm trong `src/setup/`.
 
 **Hệ quả cho nhóm A: không dựng mới, mở rộng cái đã có.** Cơ chế sổ luật, thứ tự và bộ chiếu đã có từ P3-P5; chỗ hở là gần như không dùng: `core/instructions/` mới có 2 đơn vị luật (`decision-question.md`, `platform-laws.md`), còn phần lớn luật vẫn viết tay trong `AGENTS.md` ngoài registry. Vì vậy:
 
