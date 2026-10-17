@@ -10,7 +10,6 @@
 // outside this module except for FSM-internal transitions.
 
 import { moveWork, addOutcome, addDecision, recordClaimAttempt, readRawEvents, FsmError } from '../state/store.mjs';
-import { withEventsLock } from '../state/events.mjs';
 import { foldEvents } from '../state/replay.mjs';
 import { isResolvedStatus, resolveRoot } from '../state/frontier.mjs';
 import { getDomain, stepForPhase, effectiveStep } from '../state/domain-registry.mjs';
@@ -22,8 +21,7 @@ import { createClaimWorktree, branchNameFor, branchExists } from './worktree.mjs
 import { lastActivityAt, isReclaimEligible } from './claim-liveness.mjs';
 import { hasWorkerSlotRoom } from '../state/worker-slots.mjs';
 import { readSharedConfigOrEmpty } from '../config/shared-config-file.mjs';
-import { acquireClaim, releaseClaim, readClaims, readClaim, buildEffectiveView, getItemDurableRevision, getMainFgosDir } from '../state/runtime-coordination.mjs';
-import { resolveWriterIdentity } from '../util/session-identity.mjs';
+import { acquireClaimTx, releaseClaim, readClaims, readClaim, buildEffectiveView, getItemDurableRevision, withMainState } from '../state/runtime-coordination.mjs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
@@ -266,10 +264,9 @@ export async function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoo
     // being written — the read-validate-write sequence is now atomic with
     // respect to every other writer, not just this call's own prior
     // reclaim.
-    // acquireClaim takes claims.lock inside events.lock, for the main
-    // checkout's .fgos: resolve that identity now, before either lock.
-    resolveWriterIdentity(getMainFgosDir(dir));
-    const runtimeClaim = withEventsLock(path.join(dir, 'events.jsonl'), () => {
+    // HEAD needs git, so it is read before the state lock.
+    const headAtTakeForClaim = useBranchSource ? undefined : currentHead(repoRoot);
+    const runtimeClaim = withMainState(dir, (tx) => {
       const freshDurableView = foldEvents(readRawEvents(dir));
       const freshStatus = freshDurableView.work[id]?.status;
       if (freshStatus !== expectedStatus) {
@@ -280,19 +277,19 @@ export async function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoo
       }
       const freshRevision = getItemDurableRevision(freshDurableView, id);
 
-      return acquireClaim(dir, {
+      return acquireClaimTx(tx, {
         id,
         actor,
         source: useBranchSource ? 'branch' : 'main',
         branch: useBranchSource ? branch : undefined,
         branchHeadAtTake: useBranchSource ? branchHeadAtTake : undefined,
-        headAtTake: useBranchSource ? undefined : currentHead(repoRoot),
+        headAtTake: headAtTakeForClaim,
         claimTrigger,
         preClaimStatus: freshStatus,
         preClaimRevision: freshRevision,
         claimRole: actor,
       });
-    }, dir);
+    });
 
     if (!skipOutcome) {
       addOutcome(dir, {

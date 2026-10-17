@@ -49,7 +49,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
-import { withEventsLock } from "../src/state/events.mjs";
+import { withStateTx } from "../src/state/hot-lock.mjs";
 import { isMainModule } from "./lib/is-main-module.mjs";
 
 // The six front-segment statuses -> statusCategory, per decision record
@@ -177,8 +177,7 @@ function assertUsableBackupPath(logPath, backupPath) {
 }
 
 /**
- * Rewrite `logPath` in place. Always runs inside events.mjs's own
- * `events.lock` (derived from the log directory) -- a live holder makes this
+ * Rewrite `logPath` in place. Always runs inside the state lock of the log directory -- a live holder makes this
  * BLOCK for events.mjs's fixed timeout and then throw EventLogError, it
  * never writes over a live append. `dryRun: true` still acquires the lock
  * (read consistency against a concurrent writer) but never writes the
@@ -187,7 +186,7 @@ function assertUsableBackupPath(logPath, backupPath) {
 export function backfillStatusCategory(logPath, { backupPath, dryRun = false } = {}) {
   const resolvedBackup = assertUsableBackupPath(logPath, backupPath);
 
-  return withEventsLock(logPath, () => {
+  return withStateTx(path.dirname(logPath), (tx) => {
     const raw = fs.readFileSync(logPath, "utf8");
     const { rewritten, changed, totalLines, countsByStatus } = backfillLogText(raw);
 
@@ -212,7 +211,7 @@ export function backfillStatusCategory(logPath, { backupPath, dryRun = false } =
       }
     }
 
-    fs.writeFileSync(logPath, rewritten, "utf8");
+    tx.writeText(logPath, rewritten);
     return { dryRun: false, changed, totalLines, countsByStatus, logPath, backupPath: resolvedBackup ?? null };
   });
 }

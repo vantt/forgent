@@ -161,9 +161,9 @@ export function parsesAsJson(line) {
 
 /**
  * The unlocked core of `appendEvent` — same seq derivation and write, minus
- * lock acquisition. For a caller that already holds the `events.lock` via
- * `withEventsLock` and wants to append inside that same held lock, without
- * `appendEvent`'s own (non-reentrant) acquire/release around it.
+ * lock acquisition. Inside a state transaction a caller appends through
+ * `tx.append`, which is this function with the transaction's writer and path
+ * confinement.
  *
  * `fgosDir` (Tầng A/T2 follow-up): the real `.fgos`-shaped directory whose
  * `sessions.json` registry `resolveWriterIdentity` consults to confirm an
@@ -221,5 +221,3 @@ export function appendEventCore(logPath, { type, payload = null } = {}, fgosDir 
   }
   return event;
 }
-
-export { appendEventCore as appendEventLocked };

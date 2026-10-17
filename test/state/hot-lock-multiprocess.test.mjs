@@ -14,7 +14,6 @@ import os from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { hotPaths, readHotRecord, withStateTx } from '../../src/state/hot-lock.mjs';
-import { withEventsLock } from '../../src/state/events.mjs';
 import { resolveWriterIdentity, IDENTITY_ENV_KEYS } from '../../src/util/session-identity.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
@@ -279,7 +278,7 @@ test('fast path: uncontended acquire and release is not more than 10% slower tha
     for (let r = 0; r < 5; r += 1) {
       rounds.push({
         old: measure(() => withOldLock(logPath, () => {}, f.fgosDir), 400),
-        now: measure(() => withEventsLock(logPath, () => {}, f.fgosDir), 400),
+        now: measure(() => withStateTx(f.fgosDir, () => {}), 400),
       });
     }
     const median = (key) => rounds.map((round) => round[key]).sort((a, b) => a - b)[2];

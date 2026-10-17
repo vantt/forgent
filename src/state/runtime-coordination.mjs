@@ -9,16 +9,42 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
 import { resolveMainCheckoutRoot, fgosDirFromRoot } from '../runner/paths.mjs';
-import { noteLockHeld, noteLockReleased, resolveWriterIdentity } from '../util/session-identity.mjs';
+import { resolveWriterIdentity } from '../util/session-identity.mjs';
+import { withStateTx } from './hot-lock.mjs';
 
+const mainFgosDirCache = new Map();
+
+/**
+ * The `.fgos` of the main checkout that `dir` belongs to. Resolving it runs
+ * git, so it is done once per process and `dir`; callers resolve it before
+ * taking the state lock and pass the answer into the transaction.
+ */
 export function getMainFgosDir(dir) {
   if (!dir) return dir;
-  try {
+  const key = path.resolve(dir);
+  let resolved = mainFgosDirCache.get(key);
+  if (resolved === undefined) {
     const mainRoot = resolveMainCheckoutRoot(path.dirname(dir));
-    return mainRoot ? fgosDirFromRoot(mainRoot) : dir;
-  } catch {
-    return dir;
+    resolved = mainRoot ? fgosDirFromRoot(mainRoot) : dir;
+    mainFgosDirCache.set(key, resolved);
   }
+  return resolved;
+}
+
+/**
+ * Run `fn(tx)` in the `state` hot mutex of the main checkout's `.fgos` — the
+ * one lock for the event log and the runtime claims. Everything that needs a
+ * child process (the main checkout root, the writer identity of both
+ * directories) is resolved here, before the lock; `fn` reads `tx.mainFgosDir`.
+ * `dirInput` is the `.fgos` the caller operates on; the transaction may write
+ * there too when it is not the main one.
+ */
+export function withMainState(dirInput, fn) {
+  const mainFgosDir = getMainFgosDir(dirInput);
+  const writer = resolveWriterIdentity(dirInput).id;
+  if (mainFgosDir !== dirInput) resolveWriterIdentity(mainFgosDir);
+  const extraRoots = path.resolve(mainFgosDir) === path.resolve(dirInput) ? [] : [dirInput];
+  return withStateTx(mainFgosDir, fn, { prefetched: { mainFgosDir, writer, extraRoots } });
 }
 
 export class ClaimError extends Error {
@@ -26,19 +52,6 @@ export class ClaimError extends Error {
     super(message);
     this.name = 'ClaimError';
     this.category = category;
-  }
-}
-
-function sleepSync(ms) {
-  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
-}
-
-function isPidAlive(pid) {
-  try {
-    process.kill(pid, 0);
-    return true;
-  } catch (err) {
-    return err.code === 'EPERM';
   }
 }
 
@@ -50,71 +63,6 @@ export function getItemDurableRevision(view, id) {
   const item = view?.work?.[id];
   if (!item) return 'none';
   return crypto.createHash('sha256').update(JSON.stringify(item)).digest('hex').slice(0, 16);
-}
-
-/**
- * Acquire `.fgos/runtime/claims.lock` exclusively for reading/modifying claims.
- */
-export function withClaimsLock(fgosDirInput, fn, { timeoutMs = 2000, retryMs = 10 } = {}) {
-  const fgosDir = getMainFgosDir(fgosDirInput);
-  // Resolve (and cache) the writer identity before taking the lock: the code
-  // inside resolves it for this same dir, and the identity bridge never
-  // execs while the lock is held.
-  resolveWriterIdentity(fgosDir);
-  const lockPath = resolveFgosFile(fgosDir, FGOS_FILE.CLAIMS_LOCK);
-  fs.mkdirSync(path.dirname(lockPath), { recursive: true });
-  const deadline = Date.now() + timeoutMs;
-  const pid = process.pid;
-  let acquired = false;
-
-  while (Date.now() < deadline) {
-    const tmpPath = `${lockPath}.tmp-${pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    try {
-      fs.writeFileSync(tmpPath, JSON.stringify({ pid, ts: Date.now() }), 'utf8');
-      fs.linkSync(tmpPath, lockPath);
-      acquired = true;
-      try { fs.unlinkSync(tmpPath); } catch {}
-      break;
-    } catch (err) {
-      try { fs.unlinkSync(tmpPath); } catch {}
-      if (err.code !== 'EEXIST') throw err;
-    }
-
-    let raw;
-    try {
-      raw = fs.readFileSync(lockPath, 'utf8');
-    } catch (err) {
-      if (err.code === 'ENOENT') continue;
-      throw err;
-    }
-
-    let parsed;
-    try { parsed = JSON.parse(raw); } catch { parsed = null; }
-    if (parsed && typeof parsed.pid === 'number') {
-      if (!isPidAlive(parsed.pid) || (Date.now() - parsed.ts > 30000)) {
-        try { fs.unlinkSync(lockPath); } catch {}
-        continue;
-      }
-    }
-    sleepSync(retryMs);
-  }
-
-  if (!acquired) {
-    throw new ClaimError('lock-timeout', `Timed out acquiring claims.lock at "${lockPath}"`);
-  }
-
-  noteLockHeld();
-  try {
-    return fn();
-  } finally {
-    try {
-      fs.unlinkSync(lockPath);
-    } catch (err) {
-      if (err.code !== 'ENOENT') throw err;
-    } finally {
-      noteLockReleased();
-    }
-  }
 }
 
 /**
@@ -187,9 +135,18 @@ export function readClaims(fgosDirInput) {
 }
 
 /**
- * Acquire a runtime claim record for item `id`.
+ * Acquire a runtime claim record for item `id` (opens its own state
+ * transaction; inside one, call `acquireClaimTx`).
  */
-export function acquireClaim(fgosDirInput, {
+export function acquireClaim(fgosDirInput, args = {}) {
+  if (!args.id || typeof args.id !== 'string') {
+    throw new ClaimError('validation', 'acquireClaim: "id" is required');
+  }
+  return withMainState(fgosDirInput, (tx) => acquireClaimTx(tx, args));
+}
+
+/** `acquireClaim` inside an open state transaction. */
+export function acquireClaimTx(tx, {
   id,
   actor,
   source,
@@ -208,61 +165,56 @@ export function acquireClaim(fgosDirInput, {
     throw new ClaimError('validation', 'acquireClaim: "id" is required');
   }
 
-  const fgosDir = getMainFgosDir(fgosDirInput);
-  return withClaimsLock(fgosDir, () => {
-    const claimsDir = resolveFgosFile(fgosDir, FGOS_FILE.CLAIMS_DIR);
-    fs.mkdirSync(claimsDir, { recursive: true });
-    const claimFilePath = path.join(claimsDir, `${id}.json`);
+  const fgosDir = tx.mainFgosDir;
+  const claimsDir = resolveFgosFile(fgosDir, FGOS_FILE.CLAIMS_DIR);
+  const claimFilePath = path.join(claimsDir, `${id}.json`);
 
-    if (!force) {
-      const existing = readClaim(fgosDir, id);
-      if (existing) {
-        throw new ClaimError('conflict', `Item "${id}" is already claimed by claimId "${existing.claimId}"`);
-      }
-      if (preClaimStatus === 'doing') {
-        throw new ClaimError('conflict', `Item "${id}" is already in status "doing"`);
-      }
+  if (!force) {
+    const existing = readClaimFile(claimsDir, id);
+    if (existing) {
+      throw new ClaimError('conflict', `Item "${id}" is already claimed by claimId "${existing.claimId}"`);
     }
+    if (preClaimStatus === 'doing') {
+      throw new ClaimError('conflict', `Item "${id}" is already in status "doing"`);
+    }
+  }
 
-    const now = new Date().toISOString();
-    // tsk-40m code-review finding (blocker, confirmed needed by product
-    // decision): the session/shell identity fgOS already resolves for
-    // every mutation (session-identity.mjs — stable across separate CLI
-    // invocations from the SAME terminal, via an env session id or the
-    // terminal root / session id). Recorded here so settleClaim can verify, at
-    // settle time, that the caller is really the same actor/session that
-    // acquired this claim — independent of claimId, which a caller with no
-    // in-process token (a fresh CLI invocation, e.g. `fgos return`,
-    // separate from the take/pick that claimed it) can only ever discover
-    // by reading "whichever claim is active right now". Taking over a
-    // DIFFERENT session's still-live claim goes through the sanctioned
-    // stale-claim-reclaim path (claim-port.mjs, gated on real liveness),
-    // never a direct `return` under a different identity.
-    const writerId = String(resolveWriterIdentity(fgosDir).id);
-    const claimRecord = {
-      claimId: `clm-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`,
-      id,
-      actor: actor ?? null,
-      writerId,
-      source: source ?? null,
-      branch: branch ?? null,
-      branchHeadAtTake: branchHeadAtTake ?? null,
-      headAtTake: headAtTake ?? null,
-      claimTrigger: claimTrigger ?? null,
-      preClaimStatus: preClaimStatus ?? null,
-      preClaimRevision: preClaimRevision ?? null,
-      claimRole: claimRole ?? actor ?? null,
-      acquiredAt: now,
-      lastObservedActivityAt: lastObservedActivityAt || now,
-      hardExpiresAt: hardExpiresAt ?? null,
-    };
+  const now = new Date().toISOString();
+  // tsk-40m code-review finding (blocker, confirmed needed by product
+  // decision): the session/shell identity fgOS already resolves for
+  // every mutation (session-identity.mjs — stable across separate CLI
+  // invocations from the SAME terminal, via an env session id or the
+  // terminal root / session id). Recorded here so settleClaim can verify, at
+  // settle time, that the caller is really the same actor/session that
+  // acquired this claim — independent of claimId, which a caller with no
+  // in-process token (a fresh CLI invocation, e.g. `fgos return`,
+  // separate from the take/pick that claimed it) can only ever discover
+  // by reading "whichever claim is active right now". Taking over a
+  // DIFFERENT session's still-live claim goes through the sanctioned
+  // stale-claim-reclaim path (claim-port.mjs, gated on real liveness),
+  // never a direct `return` under a different identity.
+  const writerId = String(resolveWriterIdentity(fgosDir).id);
+  const claimRecord = {
+    claimId: `clm-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`,
+    id,
+    actor: actor ?? null,
+    writerId,
+    source: source ?? null,
+    branch: branch ?? null,
+    branchHeadAtTake: branchHeadAtTake ?? null,
+    headAtTake: headAtTake ?? null,
+    claimTrigger: claimTrigger ?? null,
+    preClaimStatus: preClaimStatus ?? null,
+    preClaimRevision: preClaimRevision ?? null,
+    claimRole: claimRole ?? actor ?? null,
+    acquiredAt: now,
+    lastObservedActivityAt: lastObservedActivityAt || now,
+    hardExpiresAt: hardExpiresAt ?? null,
+  };
 
-    const tmpPath = `${claimFilePath}.tmp-${process.pid}-${Date.now()}`;
-    fs.writeFileSync(tmpPath, JSON.stringify(claimRecord, null, 2), 'utf8');
-    fs.renameSync(tmpPath, claimFilePath);
+  tx.writeText(claimFilePath, JSON.stringify(claimRecord, null, 2));
 
-    return claimRecord;
-  });
+  return claimRecord;
 }
 
 /**
@@ -278,51 +230,55 @@ export function acquireClaim(fgosDirInput, {
  * both writer ids so the caller can record it. A claim written before
  * `writerId` existed skips the check, as in settleClaim.
  */
-export function releaseClaim(fgosDirInput, { id, claimId, adminReason } = {}) {
+export function releaseClaim(fgosDirInput, args = {}) {
+  validateReleaseArgs(args);
+  return withMainState(fgosDirInput, (tx) => releaseClaimTx(tx, args));
+}
+
+function validateReleaseArgs({ id, adminReason }) {
   if (!id || typeof id !== 'string') {
     throw new ClaimError('validation', 'releaseClaim: "id" is required');
   }
   if (adminReason !== undefined && (typeof adminReason !== 'string' || !adminReason.trim())) {
     throw new ClaimError('validation', 'releaseClaim: "adminReason" must be a non-empty string when given');
   }
+}
 
-  const fgosDir = getMainFgosDir(fgosDirInput);
-  return withClaimsLock(fgosDir, () => {
-    const claimsDir = resolveFgosFile(fgosDir, FGOS_FILE.CLAIMS_DIR);
-    const claimFilePath = path.join(claimsDir, `${id}.json`);
+/** `releaseClaim` inside an open state transaction. */
+export function releaseClaimTx(tx, args = {}) {
+  validateReleaseArgs(args);
+  const { id, claimId, adminReason } = args;
+  const fgosDir = tx.mainFgosDir;
+  const claimsDir = resolveFgosFile(fgosDir, FGOS_FILE.CLAIMS_DIR);
+  const claimFilePath = path.join(claimsDir, `${id}.json`);
 
-    let existing;
-    try {
-      const raw = fs.readFileSync(claimFilePath, 'utf8');
-      existing = JSON.parse(raw);
-    } catch (err) {
-      if (err.code === 'ENOENT') return { released: false, reason: 'no-claim' };
-      throw err;
-    }
+  let existing;
+  try {
+    const raw = fs.readFileSync(claimFilePath, 'utf8');
+    existing = JSON.parse(raw);
+  } catch (err) {
+    if (err.code === 'ENOENT') return { released: false, reason: 'no-claim' };
+    throw err;
+  }
 
-    if (claimId && existing.claimId !== claimId) {
-      return { released: false, reason: 'mismatched-claim-id', existingClaimId: existing.claimId };
-    }
+  if (claimId && existing.claimId !== claimId) {
+    return { released: false, reason: 'mismatched-claim-id', existingClaimId: existing.claimId };
+  }
 
-    let admin;
-    if (existing.writerId !== undefined) {
-      const currentWriterId = String(resolveWriterIdentity(fgosDir).id);
-      if (existing.writerId !== currentWriterId) {
-        if (adminReason === undefined) {
-          throw new ClaimError('conflict', `releaseClaim: writer identity mismatch for "${id}" — claim acquired by writer "${existing.writerId}", releasing as writer "${currentWriterId}".`);
-        }
-        admin = { reason: adminReason.trim(), ownerWriterId: existing.writerId, releasedByWriterId: currentWriterId };
+  let admin;
+  if (existing.writerId !== undefined) {
+    const currentWriterId = String(resolveWriterIdentity(fgosDir).id);
+    if (existing.writerId !== currentWriterId) {
+      if (adminReason === undefined) {
+        throw new ClaimError('conflict', `releaseClaim: writer identity mismatch for "${id}" — claim acquired by writer "${existing.writerId}", releasing as writer "${currentWriterId}".`);
       }
+      admin = { reason: adminReason.trim(), ownerWriterId: existing.writerId, releasedByWriterId: currentWriterId };
     }
+  }
 
-    try {
-      fs.unlinkSync(claimFilePath);
-    } catch (err) {
-      if (err.code !== 'ENOENT') throw err;
-    }
+  tx.unlink(claimFilePath);
 
-    return admin ? { released: true, claim: existing, admin } : { released: true, claim: existing };
-  });
+  return admin ? { released: true, claim: existing, admin } : { released: true, claim: existing };
 }
 
 /**

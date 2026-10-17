@@ -38,6 +38,17 @@ before(() => {
   for (const file of ['src/state/hot-lock.mjs', 'src/state/event-log.mjs', 'src/state/events.mjs', 'packages/holder-lock/contracts/lock-registry.v1.json']) {
     fs.copyFileSync(path.join(ROOT, file), path.join(tree, file));
   }
+  // The baseline callers still use the pre-cutover names; give them to the
+  // copied events module as thin wrappers over the real hot lock.
+  fs.appendFileSync(path.join(tree, 'src/state/events.mjs'), `
+export { appendEventCore as appendEventLocked };
+export function withEventsLock(logPath, fn, fgosDir = path.dirname(logPath)) {
+  const parent = path.dirname(logPath);
+  const porting = path.basename(parent) === 'porting';
+  const root = porting && fgosDir === parent ? path.dirname(parent) : fgosDir;
+  return withStateTx(root, () => fn(), { resource: porting ? 'porting-events' : 'state' });
+}
+`);
   fs.symlinkSync(path.join(ROOT, 'node_modules'), path.join(tree, 'node_modules'));
 });
 
