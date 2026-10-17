@@ -127,12 +127,13 @@ mod unix {
         let identity = facts::identity_of(ProcId(child.id()));
         let pid = child.id() as libc::pid_t;
         let mut stdout = child.stdout.take().map(|s| s.take(STDOUT_LIMIT));
-        let reader = std::thread::spawn(move || {
+        let (text_tx, text_rx) = std::sync::mpsc::channel();
+        std::thread::spawn(move || {
             let mut text = String::new();
             if let Some(out) = stdout.as_mut() {
                 let _ = out.read_to_string(&mut text);
             }
-            text
+            let _ = text_tx.send(text);
         });
 
         let started = Instant::now();
@@ -146,7 +147,6 @@ mod unix {
                     // SAFETY: the child is not reaped yet, so its pid still names its own group.
                     unsafe { libc::killpg(pid, libc::SIGKILL) };
                     let _ = child.wait();
-                    let _ = reader.join();
                     return Err(fail(format!("step exceeded stepTimeoutMs ({} ms)", timeout.as_millis())));
                 }
                 Ok(None) => std::thread::sleep(Duration::from_millis(20)),
@@ -156,7 +156,8 @@ mod unix {
         // A descendant that outlived the step must not outlive the chain.
         // SAFETY: the pid was reaped just now, but a group with this id can only be this step's own.
         unsafe { libc::killpg(pid, libc::SIGKILL) };
-        let text = reader.join().unwrap_or_default();
+        // A descendant outside the step's group may still hold the pipe: wait a bounded time, never forever.
+        let text = text_rx.recv_timeout(Duration::from_secs(2)).unwrap_or_default();
         let reported = text.lines().rev().find_map(|line| serde_json::from_str::<Value>(line.trim()).ok().filter(Value::is_object));
 
         match status.code() {

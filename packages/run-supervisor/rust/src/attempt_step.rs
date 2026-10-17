@@ -47,10 +47,17 @@ pub fn run(args: &[String]) -> i32 {
     hand_over(&entry, step_id, &run_dir)
 }
 
+/// `node` through PATH; a step runner clears the environment, so without a
+/// PATH the standard system directories are searched instead.
+fn node_program() -> PathBuf {
+    let path = std::env::var_os("PATH").unwrap_or_else(|| "/usr/local/bin:/usr/bin:/bin".into());
+    std::env::split_paths(&path).map(|dir| dir.join("node")).find(|candidate| candidate.is_file()).unwrap_or_else(|| PathBuf::from("node"))
+}
+
 #[cfg(unix)]
 fn hand_over(entry: &Path, step_id: &str, run_dir: &Path) -> i32 {
     use std::os::unix::process::CommandExt;
-    let err = std::process::Command::new("node").arg(entry).arg(step_id).arg("--run-dir").arg(run_dir).exec();
+    let err = std::process::Command::new(node_program()).arg(entry).arg(step_id).arg("--run-dir").arg(run_dir).exec();
     report("attempt-step", "internal", &format!("node did not start: {err}"));
     EXIT_INTERNAL
 }

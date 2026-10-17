@@ -272,7 +272,6 @@ mod unix {
             report("supervise", "fd-invalid", "descriptor 3 (the attempt lock) was not handed over");
             return EXIT_INTERNAL;
         };
-        let mut cwd_lease = take_slot(CWD_LEASE_SLOT);
 
         let envelope = match envelope::read_verified(&args.envelope) {
             Ok(envelope) => envelope,
@@ -285,6 +284,8 @@ mod unix {
             report("supervise", "host-version-mismatch", "the envelope names another host binary than the one running");
             return EXIT_VERSION_MISMATCH;
         }
+        // Slot 4 is a lease only for a mutating attempt; anything else there is not ours.
+        let mut cwd_lease = if envelope["mutation"] == "mutating" { take_slot(CWD_LEASE_SLOT) } else { None };
         let Some(run_dir) = envelope["runDir"].as_str().map(PathBuf::from) else {
             report("supervise", "envelope-invalid", "runDir missing");
             return EXIT_ENVELOPE_INVALID;
