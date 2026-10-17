@@ -24,6 +24,10 @@ Merged main (`c2cadb082`, state hot-lock, `186c257a5`). Conflicts in `CHANGELOG.
 3. Stale cache could judge a live holder dead: reclaim bypasses the cache. Fixed.
 No defect found in handle list, attribute list, quoting, handle ownership, exit codes.
 
+## Stress gate findings (all_owners_dead)
+Stress-artifact dispatches on Windows CI: 640695398 first run 39041782155 failed (round 5, contender `Held PredecessorDomainNotEmpty`, no violation); re-runs 39042069379 and 39042077449 green. Old tip 60bf4967b: 39042125653, 39042134059 green. a24d58e48: 39042084746 FAILED with a safety violation (round 14, pid 3768 still running when the contender was admitted, named by no source), 39042092823 green. So the race predates this phase (not a regression of the handle list), at roughly 1 in 150 rounds, and the probe's 0/500 did not cover it.
+Cause of the violation (by reading, not yet reproduced): when all owners die the kill-on-close job is gone, so only the holder's parent-chain tree can name members; a member whose intermediate parent already left the Toolhelp snapshot is unreachable while its own teardown is not finished. Fix: `orphans_since` (windows_job.rs): in the no-job fallback, candidates created at/after `declaredAt` with a missing parent (or a reused-pid parent), plus their descendants, are waited for, for 500 ms after the job was first found gone; never signaled. Unit tests cover the pure rule. The `Held` failure has no confirmed cause; the stress test now prints the trace (job opened, named pids, hook pids) on that failure so the next occurrence is diagnosable.
+
 ## Evidence
 - Linux: `cargo test -p fgos --test internal_lock_routes` 14 pass; `cargo test -p fgos-holder-lock -p fgos-process` 67 pass; `cargo check --tests --target x86_64-pc-windows-msvc` clean for process, holder-lock, fgos.
 - Node on integration after merge: holder-lock, state, setup lock checks, architecture, lock-fence CLI: 1530 tests, 1511 pass, 0 fail, 19 skipped (Windows-only). Host built in a private target (`.fgos/runtime/phase-target`), `FGOS_HOST_BIN` set.
