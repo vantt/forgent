@@ -71,17 +71,18 @@ impl ContainmentDriver for WindowsJobDriver {
         if !spec.fd_map.is_empty() {
             return Err(ContainmentError::SpawnFailed("descriptor maps are not supported on windows".into()));
         }
-        let Some(hold) = domain.job.as_ref() else {
+        if domain.job.is_none() {
             return Err(ContainmentError::DriverUnavailable("the domain has no job; it was not made by `create`".into()));
-        };
+        }
         let Some(session_id) = own_session() else {
             return Err(ContainmentError::DriverUnavailable("the windows session of this process is unreadable".into()));
         };
         // A second spawn replaces the record, so the watch of the first is stale.
-        if let Some(hold) = domain.job.as_mut() {
+        let hold_name = {
+            let hold = domain.job.as_mut().expect("job checked above");
             hold.watch = None;
-        }
-        let hold = domain.job.as_ref().expect("job checked above");
+            hold.name.clone()
+        };
         let pick = |file: &Option<File>| file.as_ref().and_then(|f| f.try_clone().ok()).map_or_else(Stdio::null, Stdio::from);
         let mut cmd = Command::new(program);
         cmd.args(args).env_clear().envs(&spec.env).current_dir(&spec.cwd).creation_flags(CREATE_SUSPENDED);
@@ -96,11 +97,11 @@ impl ContainmentDriver for WindowsJobDriver {
             return Err(ContainmentError::SpawnFailed("gate has no readable identity".into()));
         };
         // On failure `assign_and_resume` ends the suspended gate itself.
-        if let Err(err) = assign_and_resume(&hold.job, &child) {
+        if let Err(err) = assign_and_resume(&domain.job.as_ref().expect("job checked above").job, &child) {
             let _ = child.wait();
             return Err(ContainmentError::SpawnFailed(format!("gate could not enter the job: {err}")));
         }
-        domain.set_domain(Domain::WindowsJob(WindowsJob { job: hold.name.clone(), session_id, declared_at, holder: root.clone(), keeper: None }));
+        domain.set_domain(Domain::WindowsJob(WindowsJob { job: hold_name, session_id, declared_at, holder: root.clone(), keeper: None }));
         Ok(Spawned { child, root })
     }
 
