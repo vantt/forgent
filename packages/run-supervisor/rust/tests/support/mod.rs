@@ -52,8 +52,12 @@ pub fn node() -> String {
 
 pub fn boottime_ns() -> u64 {
     let mut ts = libc::timespec { tv_sec: 0, tv_nsec: 0 };
+    #[cfg(target_os = "linux")]
+    let clock = libc::CLOCK_BOOTTIME;
+    #[cfg(not(target_os = "linux"))]
+    let clock = libc::CLOCK_MONOTONIC;
     // SAFETY: clock_gettime writes one timespec.
-    unsafe { libc::clock_gettime(libc::CLOCK_BOOTTIME, &mut ts) };
+    unsafe { libc::clock_gettime(clock, &mut ts) };
     ts.tv_sec as u64 * 1_000_000_000 + ts.tv_nsec as u64
 }
 

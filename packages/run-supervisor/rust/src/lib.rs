@@ -23,6 +23,10 @@ pub mod adopt;
 /// Frames on the GO channel between supervisor and gate.
 pub mod go_channel;
 
+/// The GO channel on Windows: a named pipe.
+#[cfg(windows)]
+pub mod go_pipe;
+
 /// One-time publication of a layout file by hard link.
 pub mod publish;
 
