@@ -9,6 +9,7 @@
 
 use std::io::{BufRead, Write};
 use std::path::{Path, PathBuf};
+use std::time::{Duration, SystemTime};
 
 use fgos_holder_lock::{predecessor, Acquire, HeldReason, Mode, Probe, Resource, Wait, DEFAULT_KILL_WAIT_MS};
 use fgos_process::{domain_watch, facts, DomainState};
@@ -116,6 +117,9 @@ pub fn adopt_one(dir: &Path, args: &AdoptArgs) -> Verdict {
         Err(err) => return Verdict::because("open", format!("lock probe failed: {err}")),
     }
     let binding = read_json(&dir.join("supervisor-binding.json"));
+    if binding.is_none() && !dir.join("receipt.json").exists() && still_starting(&dir.join("envelope.json"), START_GRACE) {
+        return Verdict::because("running", "starting");
+    }
     // Lock free is not enough: the domain must be provably empty.
     // A supervisor that died between declaring the domain and binding it left only the declared record.
     let declared = read_json(&predecessor::record_path(&lock_path));
@@ -219,6 +223,23 @@ fn read_json(path: &Path) -> Option<Value> {
     serde_json::from_str(&std::fs::read_to_string(path).ok()?).ok()
 }
 
+/// How long after the envelope was written an attempt with no binding may
+/// still be starting. Only Windows has the window: a `LockFileEx` lock cannot
+/// be inherited, so the controller lets go and the supervisor takes the lock
+/// itself, and in between the lock is free with no binding. Elsewhere the
+/// supervisor inherits the held lock, so the lock free with no binding already
+/// means it never started.
+#[cfg(windows)]
+const START_GRACE: Duration = Duration::from_secs(60);
+#[cfg(not(windows))]
+const START_GRACE: Duration = Duration::ZERO;
+
+/// Whether the envelope (written once, before the supervisor is spawned) is
+/// younger than `grace`: a supervisor that has not bound yet may still be starting.
+pub(crate) fn still_starting(envelope: &Path, grace: Duration) -> bool {
+    std::fs::metadata(envelope).and_then(|m| m.modified()).ok().and_then(|at| SystemTime::now().duration_since(at).ok()).is_some_and(|age| age < grace)
+}
+
 /// Cheap check for a scan: the file is JSON with `v` 3. The digest is checked when the attempt is adopted.
 fn is_v3_envelope(path: &Path) -> bool {
     read_json(path).is_some_and(|envelope| envelope["v"] == 3)
@@ -238,6 +259,17 @@ mod tests {
 
     fn argv(items: &[&str]) -> Vec<String> {
         items.iter().map(|s| s.to_string()).collect()
+    }
+
+    #[test]
+    fn a_fresh_envelope_is_still_starting_and_an_old_or_missing_one_is_not() {
+        let dir = std::env::temp_dir().join(format!("fgos-adopt-starting-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let envelope = dir.join("envelope.json");
+        std::fs::write(&envelope, "{}").unwrap();
+        assert!(still_starting(&envelope, Duration::from_secs(60)));
+        assert!(!still_starting(&envelope, Duration::ZERO));
+        assert!(!still_starting(&dir.join("missing.json"), Duration::from_secs(60)));
     }
 
     #[test]

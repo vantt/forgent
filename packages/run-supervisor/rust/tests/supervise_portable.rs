@@ -164,3 +164,21 @@ fn a_step_exit_of_75_leaves_no_receipt_and_stops_the_chain() {
     assert_eq!(line["pendingStep"], "settle-attempt");
     assert!(!run.path("steps/settle-attempt.json").exists() && !run.path("ran").exists() && !run.path("closed.json").exists());
 }
+
+/// Windows only: the supervisor takes the lock itself, so between the controller
+/// letting go and the supervisor binding the lock is free and nothing is bound.
+/// An adopter that looks then must see an attempt that is starting, not one
+/// that never started.
+#[cfg(windows)]
+#[test]
+fn an_attempt_whose_supervisor_has_not_bound_yet_is_starting_not_abandoned() {
+    let opts = Opts::agent(&["say", ""]);
+    let run = Run::new("starting", &opts);
+    fs::write(run.path("attempt.lock"), "").unwrap();
+    for extra in [&["--probe-only"][..], &[][..]] {
+        let line = run.adopt(extra);
+        assert_eq!(line["state"], "running", "{line}");
+        assert_eq!(line["reason"], "starting", "{line}");
+    }
+    assert!(!run.path("receipt.json").exists() && !run.path("closed.json").exists(), "nothing was closed");
+}
