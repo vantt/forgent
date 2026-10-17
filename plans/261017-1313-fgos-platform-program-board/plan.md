@@ -45,6 +45,8 @@ Trạng thái: `landed` · `running` · `ready` (chạy được, chưa ai nhậ
 | 5.1 | Identity resolver thành crate Rust | [plan](../261015-2102-identity-resolver-rust-crate/plan.md) | crate `session-identity` đã có trên main; frontmatter còn ghi P05 (đo cold) và P06 | — | đo lại cold trên máy rảnh, đóng plan | 6.3 (nửa launcher) |
 | DOC | Thống nhất thẩm quyền tài liệu (260925) | [plan](../260925-documentation-authority-unification/) | **held** | nhánh `plan/260925-documentation-authority-unification`, lead `forgentx-5f`; owner đang giữ trước Phase 7 Step 5 | owner | — |
 | COOK | `fgos-cook` và đường chạy cho cook (roadmap P1, P3–P6) | [roadmap](../reports/roadmap-261016-2212-fgos-cook-and-git-component.md) | **not-planned** | — | P1 và P3 chạy được ngay; P4, P5, P6 cần GIT | — |
+| YAML | Vendor js-yaml: một cửa đọc YAML, fgOS không còn dependency npm lúc chạy | [plan](../261016-0635-vendor-js-yaml-single-yaml-door/plan.md) | **landed** 10-16, quyết định RUL101 (`docs/specs/distribution.md`) | xong; phiên `56677996` | — | — |
+| INS | Kiểm soát luật ở nguồn: luật phải tới đúng agent (đủ L1–L10, nguyên tắc thiết kế, luật dùng lại trước khi thêm), rồi mới dọn hậu quả | [báo cáo](../reports/research-261016-1118-agent-code-quality-guardrails.md) mục 0, 5 (nhóm A, B), 6 | **landed** phần làm tay 10-17 15:10 (`f9ea9c219`, `40c667c83`); phần cơ chế (nhóm A) **not-planned** | 10-17 15:30, phiên `56677996`: đã chiếu đủ L1–L10, thêm `core/instructions/design-principles.md`, luật dùng lại vào worker contract và `fgos-coding-implement`; `CLAUDE.md` chỉ còn `@AGENTS.md`. Quyền ghép luật: Agent Context Engine (RUL102) | D6 (Q4–Q7 trong báo cáo) trước khi lập plan nhóm A | backlog `p-7eb9e65b`, `p-68be2ae3` |
 
 ## Phụ thuộc
 
@@ -79,6 +81,7 @@ flowchart LR
 | D3 | Giờ landing 4.3-R (đặt tombstone `main-checkout.lock`) | owner | — |
 | D4 | Lập plan component Git (G0) và plan nhỏ cho cook P1/P3 | owner giao | GIT, COOK |
 | D5 | ~~Duyệt plan 4.4b~~: đã duyệt 13:53, gồm D3 | — | — |
+| D6 | Luật instruction: khoá 7 nguyên tắc thành luật hay giữ `procedure` (Q4); xử lý ngưỡng 32 KiB của codex (Q5); nguồn sinh danh sách luật (Q6); quyết định 10-06 "không sửa đồ của ak/ck" còn hiệu lực không (Q7) | owner | INS nhóm A, dọn khối AGENTKIT trong `AGENTS.md` |
 
 ## File chung dễ va
 
@@ -93,6 +96,7 @@ Hai luồng cùng sửa một file thì **luồng land sau rebase hoặc merge m
 | `src/runner/merge.mjs`, `src/runner/worktree.mjs` | 4.3-R P05/P06, sau này GIT G4 |
 | `packages/distribution/rust/src/lock.rs` | 4.4a P01, 4.3-R P08 (sau 4.4a) |
 | `src/runner/execution/bind.mjs`, config `modelPolicies` | MP-A |
+| `AGENTS.md` (khối do bộ chiếu sinh ra và phần viết tay), `CLAUDE.md`, `core/instructions/*`, `.fgos/instructions/effective/repo.json`, `src/setup/instruction-*.mjs`, `core/skills/_shared/coding-worker-contract.md` | INS. Sửa luật thì sửa ở `core/instructions/` rồi tái sinh khối, không sửa tay trong khối sinh. Khối AGENTKIT của ak trong `AGENTS.md` đang **chưa commit** ở máy owner: commit `AGENTS.md` bằng cách chỉ stage phần của mình |
 | `.gitattributes`, luật strip `.fgos`, `merge=union` | **không ai sửa** cho tới khi D1 có kết luận (rào chắn F10) |
 
 ## Luật chung cho mọi luồng
@@ -104,6 +108,7 @@ Hai luồng cùng sửa một file thì **luồng land sau rebase hoặc merge m
 - **Chuỗi lead trên máy owner:** kịch bản ở `.fgos/runtime/tmp/phase-leads/` (không commit). Lead nhắn big lead `forgentx-95` khi xong hoặc khi bị chặn. Agent ở máy khác báo bằng cách cập nhật dòng của mình trong file này.
 
 ## Nhật ký
+- 2026-10-17 15:30 (phiên `56677996`): thêm luồng YAML (landed 10-16) và INS (phần làm tay landed `f9ea9c219`; nhóm A chờ D6).
 
 - 2026-10-17 13:55: đặt `maxTier` là flagship; plan 4.4b đã lên main. 4.4a xong P00–P02; 4.3-R xong P00, P03, P05, P04r và P06.
 - 2026-10-17 13:15: tạo bảng. 4.2 đã land. 4.4a và 4.3-R đang chạy. 4.4b đang viết plan. Phần state của 4.3 chờ hội đồng event store.
