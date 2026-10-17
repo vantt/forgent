@@ -1,7 +1,7 @@
 ---
 phase: 6
 title: "Transform all platform areas as candidate material"
-status: awaiting-owner-review
+status: completed
 priority: P1
 effort: ""
 dependencies: [5]
@@ -13,7 +13,7 @@ dependencies: [5]
 
 ## Overview
 
-**Status:** `awaiting-owner-review`. The authorized candidate transformation and Step 10 close evidence are complete; only the owner closes Phase 6. Phase 7 remains unauthorized. Final evidence and owner decisions are indexed in [step-10-report.md](reports/phase-06/step-10-report.md) and [owner-queue.md](reports/phase-06/owner-queue.md).
+**Status:** `completed`, closed by the owner on 2026-10-17 (A44 in [owner-answers.md](reports/phase-06/owner-answers.md)). Final evidence and the carried owner obligations are indexed in [step-10-report.md](reports/phase-06/step-10-report.md) and [owner-queue.md](reports/phase-06/owner-queue.md). Phase 7 is authorized.
 **Mode:** the plan worktree only. One executor session at a time: OpenAI Codex run by the owner, with repo access (read files, run `node` and `git` in the worktree) and no chat history. The executor does every step itself, inline and in order: no subagents, no dispatch (the dispatch rules of `AGENTS.md` do not apply), no skills. Candidate and review only; no authority flips.
 **Review model:** the executor authors rows (`pending`). A row becomes `reviewed` only through a separate review session per batch (the Claude Lead or another fresh session, started by the owner). The executor stops at "ready for review" and resumes when the verdicts are committed. The owner personally reviews only the lists routed to the owner: `archive-with-reason` outside the Q3 delegation, every `delete-as-obsolete`, real conflicts, holds.
 **Purpose:** Build the complete target corpus without creating a second live system. Every legacy platform claim ends with one reviewed owner in `docs/platform/**` or a recorded non-carry; every platform document carries the full header.

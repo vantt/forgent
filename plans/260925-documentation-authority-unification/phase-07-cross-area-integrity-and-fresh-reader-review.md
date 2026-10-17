@@ -1,7 +1,7 @@
 ---
 phase: 7
 title: "Cross-area integrity and fresh-reader review"
-status: pending
+status: in-progress
 priority: P1
 effort: ""
 dependencies: [6]
@@ -13,7 +13,7 @@ dependencies: [6]
 
 ## Overview
 
-**Status:** `not-started`, `not-authorized`, blocked by Phase 6. Harness per `plan.md` §7.2.
+**Status:** authorized by the owner on 2026-10-17 (A44, `reports/phase-06/owner-answers.md`); Phase 6 closed. Implementation steps are being detailed. Harness per `plan.md` §7.2.
 **Mode:** plan branch, review only except fixes
 **Purpose:** Catch errors that per-area migration cannot see.
 
