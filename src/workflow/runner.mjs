@@ -35,6 +35,7 @@ import { matchesWriteScope } from '../runner/dispatch/write-scope.mjs';
 import { nulPaths } from '../util/git-paths.mjs';
 import { normalizeStanceOptions } from '../runner/execution/unit.mjs';
 import { anonymousInputName, gateAnswerFile, OWN_PREVIOUS_NAME, SEAT_PLACEHOLDER, resolveUnitInputs } from '../runner/execution/handoff-refs.mjs';
+import { acquireSync, createLockScope, lockHolders, probe, resolveLock } from '../holder-lock/index.mjs';
 
 const GATE_ANSWER_NOTE_CHARS = 200;
 
@@ -780,37 +781,30 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
   return state;
 }
 
-const ADVANCE_LOCK_FILE = 'advance.lock';
-// A lock file that exists but holds no pid yet is a holder caught between creating and writing it.
-const ADVANCE_LOCK_WRITE_GRACE_MS = 2000;
-
+// The advance lock is a kernel mutex on `<runDir>/locks/advance.lock` (src/holder-lock): the kernel
+// lets one process advance a run at a time and releases it the moment that process dies, so a holder
+// killed mid-advance never leaves the run stuck.
 function workflowRunDirOf(mainRoot, workflowRunId) {
   return path.join(mainRoot, '.fgos', 'workflow-runs', workflowRunId);
 }
 
-function isProcessAlive(pid) {
-  try {
-    process.kill(pid, 0);
-    return true;
-  } catch (err) {
-    return err.code === 'EPERM';
-  }
+function advanceLockParams(mainRoot, workflowRunId) {
+  return { fgosDir: path.join(mainRoot, '.fgos'), workflowRunDir: workflowRunDirOf(mainRoot, workflowRunId) };
 }
 
-/** Pid of the process currently advancing the run, 0 for a holder still writing its pid, null when nothing live holds it. */
-function liveAdvanceHolder(runDir) {
-  const lockPath = path.join(runDir, ADVANCE_LOCK_FILE);
-  let text;
-  let mtimeMs;
-  try {
-    text = fs.readFileSync(lockPath, 'utf8');
-    mtimeMs = fs.statSync(lockPath).mtimeMs;
-  } catch {
-    return null;
-  }
-  const pid = Number.parseInt(text, 10);
-  if (Number.isInteger(pid) && pid > 0) return isProcessAlive(pid) ? pid : null;
-  return Date.now() - mtimeMs < ADVANCE_LOCK_WRITE_GRACE_MS ? 0 : null;
+/** Pid of a process holding the run's advance lock, or null when the kernel cannot list one. */
+function advanceHolderPid(params) {
+  const holders = lockHolders('advance', params);
+  return holders.kind === 'list' && holders.pids.length > 0 ? holders.pids[0] : null;
+}
+
+/** `{ pid }` of the process currently advancing the run (pid null when unlistable), null when nothing holds it. */
+function liveAdvanceHolder(mainRoot, workflowRunId) {
+  const params = advanceLockParams(mainRoot, workflowRunId);
+  // A run whose lock file was never created was never advanced under this lock: nothing to probe.
+  if (!fs.existsSync(resolveLock('advance', params).v3Path)) return null;
+  if (probe('advance', params).result === 'free') return null;
+  return { pid: advanceHolderPid(params) };
 }
 
 function advanceRefusal(workflowRunId, pid) {
@@ -822,39 +816,19 @@ function advanceRefusal(workflowRunId, pid) {
 
 /** Refuse when a live process is already advancing the run. */
 function assertNoLiveAdvance(mainRoot, workflowRunId) {
-  const pid = liveAdvanceHolder(workflowRunDirOf(mainRoot, workflowRunId));
-  if (pid !== null) throw advanceRefusal(workflowRunId, pid);
+  const holder = liveAdvanceHolder(mainRoot, workflowRunId);
+  if (holder !== null) throw advanceRefusal(workflowRunId, holder.pid);
 }
 
 /**
  * Hold the run for this process while it advances, so two processes never advance one run at
- * once. A lock left by a dead process is taken over. Returns the function that releases it.
+ * once. Returns the function that releases it.
  */
 function acquireAdvanceLock(mainRoot, workflowRunId) {
-  const runDir = workflowRunDirOf(mainRoot, workflowRunId);
-  const lockPath = path.join(runDir, ADVANCE_LOCK_FILE);
-  for (let attempt = 0; attempt < 2; attempt += 1) {
-    try {
-      fs.writeFileSync(lockPath, String(process.pid), { flag: 'wx' });
-      return () => {
-        try {
-          if (fs.readFileSync(lockPath, 'utf8') === String(process.pid)) fs.unlinkSync(lockPath);
-        } catch {
-          // Already gone.
-        }
-      };
-    } catch (err) {
-      if (err.code !== 'EEXIST') throw err;
-      const pid = liveAdvanceHolder(runDir);
-      if (pid !== null) throw advanceRefusal(workflowRunId, pid);
-      try {
-        fs.unlinkSync(lockPath);
-      } catch {
-        // Another process cleared it first; the next attempt decides.
-      }
-    }
-  }
-  throw advanceRefusal(workflowRunId, 0);
+  const params = advanceLockParams(mainRoot, workflowRunId);
+  const res = acquireSync(createLockScope('advance'), 'advance', params);
+  if (res.result === 'acquired') return () => res.handle.release();
+  throw advanceRefusal(workflowRunId, advanceHolderPid(params));
 }
 
 const ADVANCE_TAIL_LINES = 20;
@@ -885,10 +859,11 @@ function tailAdvanceLog(logPath) {
 }
 
 /** What the detached advance of a run is doing: liveness from the lock holder, plus its log tail. */
-function advanceReport(runDir, workflowRunId, state, events) {
-  const holder = liveAdvanceHolder(runDir);
+function advanceReport(mainRoot, workflowRunId, state, events) {
+  const runDir = workflowRunDirOf(mainRoot, workflowRunId);
+  const holder = liveAdvanceHolder(mainRoot, workflowRunId);
   const logPath = path.join(runDir, 'advance.log');
-  const advance = { running: holder !== null, pid: holder || null, logPath };
+  const advance = { running: holder !== null, pid: holder?.pid ?? null, logPath };
   if (state.status !== 'completed') {
     const lastLines = tailAdvanceLog(logPath);
     if (lastLines.length > 0) advance.lastLines = lastLines;
@@ -1170,7 +1145,7 @@ export function statusWorkflow(workflowRunId, options = {}) {
   const state = projectWorkflowState(events);
   // A seated run also says who actually served each seat; an unseated run's status is unchanged.
   const served = state.seats ? { seatProviders: seatProviders(state) } : {};
-  return { ...state, ...served, advance: advanceReport(workflowRunDirOf(mainRoot, workflowRunId), workflowRunId, state, events) };
+  return { ...state, ...served, advance: advanceReport(mainRoot, workflowRunId, state, events) };
 }
 
 /**
