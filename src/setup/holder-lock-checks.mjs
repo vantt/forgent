@@ -445,9 +445,13 @@ export function checkLockFences(repoRoot, { providerRuntimeDir = defaultProvider
   }
   if (status.complete) return { passed: true, message: `all ${status.targets.length} legacy lock path(s) fenced` };
   const present = status.v1Present.length > 0 ? `; old lock still present (blocks the fix until its holder is gone): ${listed(status.v1Present)}` : '';
+  const activated = activatedHolderLockRelease(repoRoot);
+  const next = activated.release
+    ? 'stop every fgOS process of this workspace, then run fgos doctor --fix'
+    : `the fix waits for this release to be activated here (${activated.reason})`;
   return {
     passed: true,
-    message: warn(`${status.missing.length} of ${status.targets.length} legacy lock path(s) not fenced: ${listed(status.missing)}${present} -- stop every fgOS process of this workspace, then run fgos doctor --fix`),
+    message: warn(`${status.missing.length} of ${status.targets.length} legacy lock path(s) not fenced: ${listed(status.missing)}${present} -- ${next}`),
   };
 }
 
@@ -573,7 +577,9 @@ export function checkStateRoot(repoRoot, { env = process.env } = {}) {
     return { passed: false, message: `cannot resolve the state root: ${err.message}` };
   }
   const describe = (r) => `stateRoot ${r.stateRoot}, lockRoot ${r.lockRoot} (${r.source})`;
-  if (node.stateRoot !== host.stateRoot || node.lockRoot !== host.lockRoot) {
+  // Two spellings of one directory (a trailing slash in a pin) are the same root.
+  const same = (a, b) => path.resolve(a) === path.resolve(b);
+  if (!same(node.stateRoot, host.stateRoot) || !same(node.lockRoot, host.lockRoot)) {
     return { passed: false, message: `Node and the host disagree: Node ${describe(node)}; host ${describe(host)}` };
   }
   if (node.source !== 'pinned') return { passed: true, message: describe(node) };
@@ -592,8 +598,9 @@ export function checkStateRoot(repoRoot, { env = process.env } = {}) {
 // ---------------------------------------------------------------------
 
 /**
- * Create `<fgosDir>/locks` and `<lockRoot>` (mode 0700) when missing.
- * Existing directories are left as they are.
+ * Create `<fgosDir>/locks` and `<lockRoot>` with mode 0700 when missing, and
+ * tighten an existing one to 0700 (the first acquire may have created it
+ * with the umask's mode before setup ran).
  */
 export function fixLockDirs(repoRoot) {
   const created = [];
@@ -603,7 +610,17 @@ export function fixLockDirs(repoRoot) {
       skipped.push(`${label} lock root unresolved: ${error}`);
       continue;
     }
-    if (isDirectory(dir)) continue;
+    if (isDirectory(dir)) {
+      try {
+        if ((fs.statSync(dir).mode & 0o077) !== 0) {
+          fs.chmodSync(dir, 0o700);
+          created.push(`${dir} (mode tightened to 0700)`);
+        }
+      } catch (err) {
+        skipped.push(`${dir}: ${err.code ?? err.message}`);
+      }
+      continue;
+    }
     try {
       fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
       fs.chmodSync(dir, 0o700);
@@ -613,7 +630,7 @@ export function fixLockDirs(repoRoot) {
     }
   }
   const parts = [];
-  if (created.length > 0) parts.push(`created ${created.join(', ')}`);
+  if (created.length > 0) parts.push(`created or tightened ${created.join(', ')}`);
   if (skipped.length > 0) parts.push(`not created: ${skipped.join('; ')}`);
   return { changed: created.length > 0, message: parts.length > 0 ? parts.join('; ') : 'lock directories present' };
 }

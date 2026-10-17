@@ -134,6 +134,13 @@ test('lock-dirs creates both lock directories with mode 0700, and only once', ()
     assert.equal(fs.statSync(dir).mode & 0o777, 0o700, dir);
   }
   assert.deepEqual(fixLockDirs(root), { changed: false, message: 'lock directories present' });
+
+  // A directory an acquire created before setup ran, with the umask's mode, is tightened.
+  fs.chmodSync(lockRoot, 0o775);
+  const tightened = fixLockDirs(root);
+  assert.equal(tightened.changed, true);
+  assert.match(tightened.message, /mode tightened to 0700/);
+  assert.equal(fs.statSync(lockRoot).mode & 0o777, 0o700);
 });
 
 test('lock-kernel-semantics warns for a missing lock directory, then passes on the real mount once setup created it', async () => {
@@ -252,7 +259,7 @@ test('lock-fences sees the missing fences, and the fix places them only under an
   const providerRuntimeDir = path.join(scratch, 'fences-provider-capacity');
   const before = checkLockFences(root, { providerRuntimeDir });
   assert.equal(before.passed, true);
-  assert.match(before.message, /^warning: 5 of 5 legacy lock path\(s\) not fenced: .*gateway\.lock.* -- stop every fgOS process of this workspace, then run fgos doctor --fix$/);
+  assert.match(before.message, /^warning: 5 of 5 legacy lock path\(s\) not fenced: .*gateway\.lock.* -- the fix waits for this release to be activated here \(no readable activation at .*\)$/);
 
   const noActivation = fixLockFences(root, { providerRuntimeDir, hostBin: HOST_BIN });
   assert.equal(noActivation.changed, false);
@@ -264,6 +271,7 @@ test('lock-fences sees the missing fences, and the fix places them only under an
   assert.equal(fenceStatus({ fgosDir: path.join(root, '.fgos'), workspaceRoot: root, providerRuntimeDir }).complete, false, 'nothing was written');
 
   activate(root, { withRegistry: true });
+  assert.match(checkLockFences(root, { providerRuntimeDir }).message, / -- stop every fgOS process of this workspace, then run fgos doctor --fix$/);
   let fixed;
   for (let attempt = 0; attempt < 20; attempt += 1) {
     fixed = fixLockFences(root, { providerRuntimeDir, hostBin: HOST_BIN, excludePids: otherSessionPids() });
