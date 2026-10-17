@@ -241,7 +241,7 @@ piece one question to answer:
 | Piece | Answers | File |
 |---|---|---|
 | `capabilities.<cap>.prefer` | which families, in which order | project |
-| `modelPolicies.<family>` | which model per tier, from which pool | project or global |
+| `modelPolicies.<family>` | which model per tier, from which service provider (pool) | project or global |
 | `executors.<id>` | which harness runs the family | project |
 | `llmAccounts.<pool>` | which accounts a pool has, and where each CLI keeps its login | global only |
 
@@ -249,13 +249,27 @@ Decisions:
 
 1. **`prefer` names a family**, not an executor.
 2. **`modelPolicies.<family>.<tier>` is a string or an ordered list of
-   `model` / `model@pool`.** Each entry carries the model id as that pool spells
-   it, so no hidden id-mapping table exists. An entry without `@` uses the
-   family's default pool. The list order is the source fallback order for that
-   tier; source fallback never changes the tier.
-3. **`modelPolicies.<family>.pool` sets the family's default pool**; without it
-   the default pool is the family name. `pool` is a reserved key, never a tier
-   name.
+   `model` / `model@pool`.** Every key of `modelPolicies.<family>` is a tier and
+   every value has this one grammar; there is no default-pool key. An entry
+   without `@` uses the pool named after the family. Each entry carries the model
+   id as that pool spells it (`deepseek-v4-flash@deepseek-api`,
+   `deepseek/deepseek-v4-flash@openrouter`), so no id-mapping table exists; the
+   part before `@` goes into the invocation's `{model}`. The entry is split at
+   the **last** `@`, because some ids contain one (Vertex AI
+   `claude-opus-4@20250514@vertex`); a pool name never contains `@`, and
+   validation refuses one that does.
+3. **A pool is a service provider's set of interchangeable accounts with one
+   billing kind.** Usually one pool per service provider (`openrouter`,
+   `deepseek-api`, `openai`). One provider splits into two pools when its
+   accounts cannot stand in for each other, for example `claude` (subscription,
+   5-hour window) and `anthropic-api` (pay per token). The spec calls it
+   "service provider (account pool)"; config never names it `provider`, which
+   would read as `providerModel`. The list order inside a tier is fallback
+   order, not load balancing: the next pool is used only when the previous one
+   has no usable account. Load is balanced only among accounts of one pool, by
+   today's least-lease then least-recently-used ranking. Fallback never leaves
+   the tier, and two ids in one tier cell are equivalent because the owner put
+   them there; provenance and `explain` record the id that ran and its pool.
 4. **One family has exactly one executor.** An executor carries
    `providerModel` and its `invocations` only; it has no pool field. Transport
    (cli or herdr), harness (codex, pi, omp) and confinement are invocations of
@@ -285,7 +299,9 @@ Decisions:
 
 Rejected alternatives: `model@pool:executor` (no case in the current config
 needs a second executor per family; a harness per pool is already expressed by
-which stores the pool's accounts have); a separate `modelSources` map keyed by
+which stores the pool's accounts have); a default-pool key inside
+`modelPolicies.<family>` (a non-tier key among tiers; writing `@pool` in each
+cell is longer but uniform and explicit); a separate `modelSources` map keyed by
 model (the owner preferred the simpler per-tier form); an `accountPool` field on
 the executor (it put a supply fact on the harness layer).
 
@@ -306,8 +322,7 @@ How the pieces join at run time:
 
 ```
 capabilities.<cap>.prefer            -> family, in order
-modelPolicies.<family>.<tier>        -> [model | model@pool, ...]   (source order)
-modelPolicies.<family>.pool          -> default pool (else the family name)
+modelPolicies.<family>.<tier>        -> [model | model@pool, ...]   (source order; no @ = pool named after the family)
 executors (providerModel = family)   -> the family's one executor -> invocation by bind() rules
 invocation.credentialStore.use       -> llmAccounts.<pool>.<account>.credentialStore.<use>
 invocation.credentialStore.homeEnv   <- private-home copy of that store path
@@ -357,14 +372,13 @@ Project `.fgos/config.json`:
     },
     "modelPolicies": {
       "deepseek": {
-        "pool":     "openrouter",
         "nano":     "deepseek-v4-flash@deepseek-api",
-        "standard": ["deepseek-v4-flash@deepseek-api", "deepseek/deepseek-v4-flash"],
-        "advanced": ["deepseek/deepseek-v4-pro", "deepseek-v4-pro@deepseek-api"],
-        "flagship": "deepseek/deepseek-v4-pro",
-        "frontier": "deepseek/deepseek-v4-pro"
+        "standard": ["deepseek-v4-flash@deepseek-api", "deepseek/deepseek-v4-flash@openrouter"],
+        "advanced": ["deepseek/deepseek-v4-pro@openrouter", "deepseek-v4-pro@deepseek-api"],
+        "flagship": "deepseek/deepseek-v4-pro@openrouter",
+        "frontier": "deepseek/deepseek-v4-pro@openrouter"
       },
-      "z-ai": { "pool": "openrouter", "standard": "z-ai/glm-5.3", "advanced": "z-ai/glm-5.3" },
+      "z-ai": { "standard": "z-ai/glm-5.3@openrouter", "advanced": "z-ai/glm-5.3@openrouter" },
       "claude": { "advanced": "sonnet", "flagship": "opus", "frontier": "fable" }
     },
     "rigorToTier": { "low": "nano", "standard": "standard", "high": "flagship", "critical": "frontier" },
