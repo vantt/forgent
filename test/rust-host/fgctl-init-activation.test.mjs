@@ -10,11 +10,12 @@ import { useReleaseFixture, releaseDirName, fixture, runFgctl } from './fgctl-in
 
 useReleaseFixture();
 
-test('Item 3: Idempotent re-run skips stage_release entirely (does not contend for install.lock)', () => {
+test('Item 3: Idempotent re-run skips stage_release entirely (does not contend for install.lock)', async () => {
   const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-m2-home-'));
   const tempState = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-m2-state-'));
   const tempProj = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-m2-proj-'));
 
+  let holder = null;
   try {
     execFileSync('git', ['init'], { cwd: tempProj });
     execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: tempProj });
@@ -28,9 +29,8 @@ test('Item 3: Idempotent re-run skips stage_release entirely (does not contend f
     });
     assert.equal(initRes.status, 0);
 
-    // 2. Intentionally block the release store's install.lock
-    const installLockPath = path.join(tempState, 'install.lock');
-    fs.writeFileSync(installLockPath, 'artificially locked store');
+    // 2. Intentionally block the release store's install.lock with a real process holding the kernel lock
+    holder = await holdLock('install', { lockRoot: path.join(tempState, 'locks') });
 
     // 3. Re-run init at the same digest: must skip stage_release and succeed without failing on install.lock!
     const rerunRes = runFgctl(['init', '--from', fixture.releaseDir], {
@@ -39,10 +39,8 @@ test('Item 3: Idempotent re-run skips stage_release entirely (does not contend f
       env: { HOME: tempHome },
     });
     assert.equal(rerunRes.status, 0, `Idempotent re-run must not touch install.lock: ${rerunRes.stderr}`);
-
-    // Cleanup artificial lock
-    fs.unlinkSync(installLockPath);
   } finally {
+    if (holder) await holder.kill();
     fs.rmSync(tempHome, { recursive: true, force: true });
     fs.rmSync(tempState, { recursive: true, force: true });
     fs.rmSync(tempProj, { recursive: true, force: true });

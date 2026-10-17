@@ -6,6 +6,7 @@ import path from 'node:path';
 import { spawnSync, spawn, execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { releaseBinaryPath } from '../../src/util/release-binary-path.mjs';
+import { probe } from '../../src/holder-lock/index.mjs';
 
 import {
   REPO_ROOT,
@@ -170,7 +171,7 @@ test('R6 & R9: Concurrent stage invocations observe lock refusal (exactly one wi
   const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-concurrent-'));
   try {
     // Fire several truly concurrent stage processes (no delay hook -- the
-    // production binary carries none) and assert the create-exclusive lock
+    // production binary carries none) and assert the kernel lock
     // lets exactly one through.
     const procCount = 8;
     const procs = Array.from({ length: procCount }, () =>
@@ -191,11 +192,11 @@ test('R6 & R9: Concurrent stage invocations observe lock refusal (exactly one wi
     }
     assert.match(succeeded[0].stdout, /staged release/, 'Winning invocation must report staged release');
 
-    // releases/ has exactly one release; install.lock is gone afterward
+    // releases/ has exactly one release; install.lock is free afterward
     const statusRes = runFgctl(['status', '--json'], { stateHome });
     const releases = JSON.parse(statusRes.stdout.trim());
     assert.equal(releases.length, 1);
-    assert.ok(!fs.existsSync(path.join(stateHome, 'install.lock')), 'install.lock must be released');
+    assert.equal(probe('install', { lockRoot: path.join(stateHome, 'locks') }).result, 'free', 'install.lock must be released');
   } finally {
     fs.rmSync(stateHome, { recursive: true, force: true });
   }
