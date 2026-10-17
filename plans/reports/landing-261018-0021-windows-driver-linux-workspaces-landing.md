@@ -3,7 +3,7 @@
 Date 2026-10-18, 00:15–00:25. The owner ran the 500-repeat gate on the Windows machine and sent the report; the lane lead runs landings on this machine under the owner's 2026-10-17 19:05 authorization.
 
 - **Plan:** [plan.md](../261017-1256-windows-lockfileex-driver-and-macos-handoff/plan.md), phase 06 sections B and C.
-- **Section A and gate:** [P06A report](phase-lead-261017-2049-win-driver-p06a-integration-and-ci.md), sections "Gate procedure for the owner" and "Stress gate"; the follow-up phase P05b (`phase-lead-*-win-driver-p05b-hotlock-judge-handle-list.md`).
+- **Section A and gate:** [P06A report](phase-lead-261017-2049-win-driver-p06a-integration-and-ci.md), sections "Gate procedure for the owner" and "Stress gate"; the follow-up phase P05b ([report](phase-lead-261017-2140-win-driver-p05b-hotlock-judge-handle-list.md)).
 
 ## Gate (owner's Windows machine)
 Artifact `windows-predecessor-stress` of run `39044432620` (tree `6cf430051`), 500 repeats per scenario, all three tests `ok`. Evidence: [evidence-261018-0015-windows-driver-stress-report.json](evidence-261018-0015-windows-driver-stress-report.json).
