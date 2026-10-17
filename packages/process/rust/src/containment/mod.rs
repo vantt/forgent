@@ -15,12 +15,16 @@ use crate::{Domain, DomainState, FdSlot, KillOutcome};
 #[cfg(target_os = "linux")]
 pub(crate) mod linux;
 #[cfg(target_os = "macos")]
-mod macos;
+pub(crate) mod macos;
 #[cfg(windows)]
 mod windows;
 
 #[cfg(target_os = "linux")]
 pub use linux::{BwrapPidns, LinuxPgroup};
+#[cfg(target_os = "macos")]
+pub use macos::MacosTree;
+#[cfg(windows)]
+pub use windows::WindowsJobDriver;
 
 /// How the attempt is started. `Direct` must outlive its supervisor; a
 /// `Terminal` attempt dies with the process that spawned it.
@@ -65,12 +69,22 @@ pub struct ContainmentDomain {
     domain: Option<Domain>,
     /// Processes of the domain a scan has seen, so a descendant that left the
     /// process tree is still counted while it lives (`linux-pgroup`).
+    #[cfg_attr(windows, allow(dead_code))]
     pub(crate) seen: Vec<ProcTuple>,
+    /// `windows-job`: the job the supervisor holds open for the attempt.
+    #[cfg(windows)]
+    pub(crate) job: Option<windows::JobHold>,
 }
 
 impl ContainmentDomain {
     pub fn new(attempt_id: &str) -> Self {
-        Self { attempt_id: attempt_id.to_string(), domain: None, seen: Vec::new() }
+        Self {
+            attempt_id: attempt_id.to_string(),
+            domain: None,
+            seen: Vec::new(),
+            #[cfg(windows)]
+            job: None,
+        }
     }
 
     pub fn attempt_id(&self) -> &str {
@@ -172,7 +186,8 @@ pub struct SelectEnv {
 }
 
 /// The best driver this machine can run: Linux tries `bwrap-pidns`
-/// (a probe run once per process and path), then `linux-pgroup`.
+/// (a probe run once per process and path), then `linux-pgroup`; Windows runs
+/// `windows-job`; macOS runs `macos-tree`.
 pub fn select(env: &SelectEnv) -> Result<Box<dyn ContainmentDriver>, ContainmentError> {
     select_platform(env)
 }
@@ -182,7 +197,17 @@ fn select_platform(env: &SelectEnv) -> Result<Box<dyn ContainmentDriver>, Contai
     Ok(linux::select(env))
 }
 
-#[cfg(not(target_os = "linux"))]
+#[cfg(target_os = "macos")]
+fn select_platform(_env: &SelectEnv) -> Result<Box<dyn ContainmentDriver>, ContainmentError> {
+    Ok(Box::new(MacosTree))
+}
+
+#[cfg(windows)]
+fn select_platform(_env: &SelectEnv) -> Result<Box<dyn ContainmentDriver>, ContainmentError> {
+    Ok(Box::new(WindowsJobDriver))
+}
+
+#[cfg(not(any(target_os = "linux", target_os = "macos", windows)))]
 fn select_platform(_env: &SelectEnv) -> Result<Box<dyn ContainmentDriver>, ContainmentError> {
     Err(ContainmentError::UnsupportedPlatform)
 }
@@ -205,6 +230,28 @@ pub(crate) fn pgroup_kill(leader: &ProcTuple) -> KillOutcome {
     #[cfg(not(target_os = "linux"))]
     {
         let _ = leader;
+        KillOutcome::Refused
+    }
+}
+
+/// `macos-tree` domain judged from its record alone, with the adopt rescan.
+pub(crate) fn tree_state(root: &ProcTuple) -> DomainState {
+    #[cfg(target_os = "macos")]
+    return macos::tree_state_adopt(root);
+    #[cfg(not(target_os = "macos"))]
+    {
+        let _ = root;
+        DomainState::Unknown
+    }
+}
+
+/// End a `macos-tree` domain judged from its record alone.
+pub(crate) fn tree_kill(root: &ProcTuple) -> KillOutcome {
+    #[cfg(target_os = "macos")]
+    return macos::tree_kill(root, &mut Vec::new());
+    #[cfg(not(target_os = "macos"))]
+    {
+        let _ = root;
         KillOutcome::Refused
     }
 }
