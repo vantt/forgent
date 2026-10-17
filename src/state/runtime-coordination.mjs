@@ -10,7 +10,7 @@ import crypto from 'node:crypto';
 import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
 import { resolveMainCheckoutRoot, fgosDirFromRoot } from '../runner/paths.mjs';
 import { resolveWriterIdentity } from '../util/session-identity.mjs';
-import { withStateTx } from './hot-lock.mjs';
+import { withStateTx, hotLockDepth } from './hot-lock.mjs';
 
 const mainFgosDirCache = new Map();
 
@@ -22,13 +22,15 @@ const mainFgosDirCache = new Map();
 export function getMainFgosDir(dir) {
   if (!dir) return dir;
   const key = path.resolve(dir);
-  let resolved = mainFgosDirCache.get(key);
-  if (resolved === undefined) {
-    const mainRoot = resolveMainCheckoutRoot(path.dirname(dir));
-    resolved = mainRoot ? fgosDirFromRoot(mainRoot) : dir;
-    mainFgosDirCache.set(key, resolved);
-  }
-  return resolved;
+  const cached = mainFgosDirCache.get(key);
+  // A real answer is final. A fallback (not inside a git checkout, or git
+  // failed) may be wrong later, so it is trusted only inside a transaction,
+  // where nothing may start git; outside one it is looked up again.
+  if (cached && (cached.real || hotLockDepth() > 0)) return cached.dir;
+  const mainRoot = resolveMainCheckoutRoot(path.dirname(dir));
+  const entry = mainRoot ? { dir: fgosDirFromRoot(mainRoot), real: true } : { dir, real: false };
+  mainFgosDirCache.set(key, entry);
+  return entry.dir;
 }
 
 /**

@@ -641,13 +641,36 @@ function checkPlanEvidence(id, work, repoRoot) {
   return `work "${id}" cannot move to "delivered" — risk:heavy but no plan.md found ${locDesc} (checked ${candidates.join(', ')}); write one before landing.`;
 }
 
+// The git directory that holds the refs of the checkout at `repoRoot`: its
+// `.git`, or, for a linked worktree (`.git` is a file naming the worktree's own
+// git dir), the common dir that git dir points at. Files only, no child process.
+function refsGitDir(repoRoot) {
+  const dotGit = path.join(repoRoot, '.git');
+  let gitDir = dotGit;
+  try {
+    if (!fs.statSync(dotGit).isDirectory()) {
+      const pointer = /^gitdir:\s*(.+)$/m.exec(fs.readFileSync(dotGit, 'utf8'));
+      if (!pointer) return null;
+      gitDir = path.resolve(repoRoot, pointer[1].trim());
+      const common = fs.readFileSync(path.join(gitDir, 'commondir'), 'utf8').trim();
+      gitDir = path.resolve(gitDir, common);
+    }
+  } catch (err) {
+    if (err.code === 'ENOENT' || err.code === 'ENOTDIR') return null;
+    throw err;
+  }
+  return gitDir;
+}
+
 // Tip of `refs/heads/<branch>` read from the ref files only (no child process):
 // the loose ref, else packed-refs, else null. Used inside the state lock to
 // tell whether the plan-evidence snapshot still describes the branch.
 function readBranchTip(repoRoot, branch) {
-  const gitDir = path.join(repoRoot, '.git');
+  const gitDir = refsGitDir(repoRoot);
+  if (!gitDir) return null;
   try {
-    return fs.readFileSync(path.join(gitDir, 'refs', 'heads', ...branch.split('/')), 'utf8').trim();
+    const loose = fs.readFileSync(path.join(gitDir, 'refs', 'heads', ...branch.split('/')), 'utf8').trim();
+    if (!loose.startsWith('ref:')) return loose;
   } catch (err) {
     if (err.code !== 'ENOENT' && err.code !== 'ENOTDIR') throw err;
   }

@@ -258,7 +258,7 @@ export async function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoo
     // liveness check) takes real wall-clock time with no lock held — long
     // enough for a genuinely DIFFERENT process's moveWork/settleClaim to
     // durably move this item without this call ever seeing it. Wrapped in
-    // the SAME events.lock every durable writer serializes on (even though
+    // the SAME state lock every durable writer serializes on (even though
     // acquireClaim itself never appends an event) so no other durable
     // write can land between this read and the runtime claim actually
     // being written — the read-validate-write sequence is now atomic with

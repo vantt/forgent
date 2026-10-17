@@ -1,8 +1,8 @@
 // identity-before-lock.test.mjs -- the identity bridge never runs the host
-// binary while the calling process holds the state hot lock or claims.lock.
+// binary while the calling process holds the state lock.
 //
 // FGOS_HOST_BIN is a small sh stand-in that, at each exec, reads the owner
-// pid of every hot record (state.hot) and claims.lock under the store and records a
+// pid of every hot record (state.hot) under the store and records a
 // violation only when the owner is the caller itself (`--pid`), then execs
 // the real host. A fresh Node process (empty identity cache) runs the real
 // write paths against a real git repo reached through a symlinked path, so

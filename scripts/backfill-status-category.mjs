@@ -50,6 +50,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { withStateTx } from "../src/state/hot-lock.mjs";
+import { lockOfLog } from "../src/state/events.mjs";
 import { isMainModule } from "./lib/is-main-module.mjs";
 
 // The six front-segment statuses -> statusCategory, per decision record
@@ -186,7 +187,8 @@ function assertUsableBackupPath(logPath, backupPath) {
 export function backfillStatusCategory(logPath, { backupPath, dryRun = false } = {}) {
   const resolvedBackup = assertUsableBackupPath(logPath, backupPath);
 
-  return withStateTx(path.dirname(logPath), (tx) => {
+  const { root, resource } = lockOfLog(logPath, path.dirname(logPath));
+  return withStateTx(root, (tx) => {
     const raw = fs.readFileSync(logPath, "utf8");
     const { rewritten, changed, totalLines, countsByStatus } = backfillLogText(raw);
 
@@ -213,7 +215,7 @@ export function backfillStatusCategory(logPath, { backupPath, dryRun = false } =
 
     tx.writeText(logPath, rewritten);
     return { dryRun: false, changed, totalLines, countsByStatus, logPath, backupPath: resolvedBackup ?? null };
-  });
+  }, { resource });
 }
 
 // CLI: a single positional path argument (never `--log <path>`), plus

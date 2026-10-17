@@ -37,7 +37,7 @@ function readRawPortingEvents(dir) {
 // call site below is byte-for-byte unaffected unless it opts in): mirrors
 // store.test.mjs's own raceAcrossProcesses extension — caps how many child
 // processes are synchronized to the SAME start instant at once, reducing
-// peak simultaneous contention against the shared events.lock without
+// peak simultaneous contention against the shared state lock without
 // changing total operation count or the cross-process race semantics under
 // test (docs/history/tsk-4fx-concurrency-test-lock-timeout-flake/RESEARCH.md).
 async function raceAcrossProcesses(dir, storeCall, nProcesses, extraArgvPerChild = null, batchSize = nProcesses) {
@@ -211,7 +211,7 @@ test('addPorting under concurrent OS processes racing the SAME id: exactly one s
     `addPorting(dir, { id: 'race-add', title: 'Race Add' });`,
     N,
     null,
-    4, // tsk-597: batch to reduce peak events.lock contention under load —
+    4, // tsk-597: batch to reduce peak state lock contention under load —
     // same mechanism as the "on DIFFERENT ids" test below and its
     // store.test.mjs sibling (tsk-4fx); still a genuine simultaneous
     // race within each batch of 4, so the "exactly one winner" assertion
@@ -243,7 +243,7 @@ test('movePorting under concurrent OS processes racing the SAME expectedStatus C
     `movePorting(dir, { id: 'race-move', to: 'ported', expectedStatus: 'in-progress' });`,
     N,
     null,
-    4, // tsk-597: batch to reduce peak events.lock contention under load — see the addPorting race test above for the same reasoning.
+    4, // tsk-597: batch to reduce peak state lock contention under load — see the addPorting race test above for the same reasoning.
   );
 
   const succeeded = results.filter((r) => r.ok);
@@ -262,7 +262,7 @@ test('movePorting under concurrent OS processes racing the SAME expectedStatus C
 
 // Cross-process regression (tsk-1q5, same fix as store.test.mjs's sibling
 // test): before this fix, refreshView(dir) ran AFTER releasing
-// withEventsLock, in its own unlocked critical section. Two processes
+// withStateTx, in its own unlocked critical section. Two processes
 // racing DIFFERENT ids could interleave their unlocked rebuild-and-
 // overwrite-state.json calls, letting the process with the staler log read
 // finish (and win) last — silently overwriting a fresher state.json with
@@ -289,7 +289,7 @@ for (const id of ids) {
 }`,
     N_PROC,
     idLists.map((ids) => ids.join(',')),
-    2, // batch to reduce peak events.lock contention under load — see raceAcrossProcesses' own comment
+    2, // batch to reduce peak state lock contention under load — see raceAcrossProcesses' own comment
   );
 
   assert.deepEqual(results, Array(N_PROC).fill({ ok: true }), 'every concurrent movePorting loop on distinct ids must succeed (no CAS conflict expected across different ids)');

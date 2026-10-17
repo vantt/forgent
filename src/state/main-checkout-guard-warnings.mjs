@@ -1,7 +1,7 @@
 // main-checkout-guard-warnings.mjs — records a D1 events.jsonl truncation guard warning
 // when a silent truncation (git reset/checkout/clean) is detected on the main checkout.
 //
-// Deliberately NOT events.jsonl and deliberately NOT sharing events.lock — same reasoning
+// Deliberately NOT events.jsonl and deliberately NOT sharing the state lock — same reasoning
 // as approve-fault-log.mjs: plain fs.appendFileSync to its own file.
 // Never throws into caller.
 

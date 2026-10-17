@@ -99,7 +99,7 @@ export function repairTruncatedLastLine(logPath) {
 
 // The hot mutex a log belongs to: a log under `<fgosDir>/porting/` takes the
 // `porting-events` mutex of the parent `.fgos`; every other log takes `state`.
-function lockOfLog(logPath, fgosDir) {
+export function lockOfLog(logPath, fgosDir) {
   const parent = path.dirname(logPath);
   const porting = path.basename(parent) === 'porting';
   const root = porting && fgosDir === parent ? path.dirname(parent) : fgosDir;

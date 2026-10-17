@@ -26,6 +26,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { withStateTx } from "../src/state/hot-lock.mjs";
+import { lockOfLog } from "../src/state/events.mjs";
 import { isMainModule } from "./lib/is-main-module.mjs";
 
 const OLD_VALUE = "proposed";
@@ -129,7 +130,8 @@ function assertUsableBackupPath(logPath, backupPath) {
 export function migrateStatusProposedToAwaitingApproval(logPath, { backupPath, dryRun = false } = {}) {
   const resolvedBackup = assertUsableBackupPath(logPath, backupPath);
 
-  return withStateTx(path.dirname(logPath), (tx) => {
+  const { root, resource } = lockOfLog(logPath, path.dirname(logPath));
+  return withStateTx(root, (tx) => {
     const raw = fs.readFileSync(logPath, "utf8");
     const { rewritten, changed, totalLines } = migrateLogText(raw);
 
@@ -154,7 +156,7 @@ export function migrateStatusProposedToAwaitingApproval(logPath, { backupPath, d
 
     tx.writeText(logPath, rewritten);
     return { dryRun: false, changed, totalLines, logPath, backupPath: resolvedBackup };
-  });
+  }, { resource });
 }
 
 function parseArgs(argv) {
