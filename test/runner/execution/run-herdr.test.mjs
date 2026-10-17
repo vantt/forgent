@@ -3,7 +3,7 @@
 // the role to the next candidate. Everything goes through runUnit (the door `fgos run` uses);
 // herdr is a fake binary that gives each pane a real process (test/helpers/fake-herdr-pane.mjs).
 
-import test, { after } from 'node:test';
+import test, { after, before } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -15,6 +15,7 @@ import { withRunDirReadAccess } from '../../../src/runner/dispatch/cli.mjs';
 import { acquireSync, createLockScope } from '../../../src/holder-lock/index.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
 import { createFakeHerdr, SANDBOXED_AGENT_SOURCE } from '../../helpers/fake-herdr-pane.mjs';
+import { startTerminalHarness } from '../../helpers/terminal-host-harness.mjs';
 
 seedFileLocalBwrapRegistry();
 
@@ -27,7 +28,10 @@ const fixtureDir = (prefix) => {
   fixtureDirs.push(dir);
   return dir;
 };
+let harness;
+before(async () => { harness = await startTerminalHarness(); });
 after(() => {
+  harness?.stop();
   for (const fake of fakes) fake.cleanup();
   for (const dir of fixtureDirs) fs.rmSync(dir, { recursive: true, force: true });
 });
@@ -186,7 +190,7 @@ test('with herdr present the run goes through a pane and the record says so', { 
   assert.equal(unitRecord.bindings['producer/1'][0].invocation, 'alpha-herdr');
 
   const calls = fake.calls();
-  assert.ok(calls.some((c) => c[0] === 'pane' && c[1] === 'split'), 'a pane must have been opened');
+  assert.ok(calls.some((c) => (c[0] === 'tab' && c[1] === 'create') || (c[0] === 'pane' && c[1] === 'split')), 'a pane must have been opened');
   assert.ok(calls.some((c) => c[0] === 'pane' && c[1] === 'run'), 'the agent must have been launched in the pane');
 });
 
@@ -456,8 +460,12 @@ test('a provider-limit screen moves the role to the next candidate in a new pane
   assert.equal(res.outcome, 'pass', JSON.stringify(res.results[0]).slice(0, 2000));
 
   // Two panes: the limited one stayed open (never closed), the next candidate got its own.
-  const splits = fake.calls().filter((c) => c[0] === 'pane' && c[1] === 'split');
-  assert.equal(splits.length, 2);
+  const opened = fake.calls().filter((c) => (c[0] === 'tab' && c[1] === 'create') || (c[0] === 'pane' && c[1] === 'split'));
+  assert.equal(opened.length, 2);
+  // The kept pane left the group's live panes, so the next candidate opens a tab of its own under the same label.
+  const labels = fake.calls().filter((c) => c[0] === 'tab' && c[1] === 'create').map((c) => c[c.indexOf('--label') + 1]);
+  assert.equal(labels.length, 2);
+  assert.equal(labels[0], labels[1], 'both tabs carry the unit run label');
   assert.ok(!fake.closedPaneIds().includes('mock-pane-1'), 'the limited pane must stay open');
   assert.ok(fake.closedPaneIds().includes('mock-pane-2'), 'the pane of the finished run closes normally');
 
@@ -529,7 +537,7 @@ test('with no candidate left a provider limit stays a structured provider-limit 
   assert.equal(res.outcome, 'provider-limit');
   assert.equal(res.results[0].fallbackExhausted.from.executor, 'alpha');
   assert.ok(res.results[0].fallbackExhausted.reason);
-  assert.equal(fake.calls().filter((c) => c[0] === 'pane' && c[1] === 'split').length, 1, 'no second pane is opened');
+  assert.equal(fake.calls().filter((c) => (c[0] === 'tab' && c[1] === 'create') || (c[0] === 'pane' && c[1] === 'split')).length, 1, 'no second pane is opened');
   assert.ok(!fake.closedPaneIds().includes('mock-pane-1'));
 });
 
@@ -553,7 +561,7 @@ test('an agent stopped on a trust prompt ends as blocked, not as a timeout, and 
   assert.match(runResult.runnerNote.summary, /Back to Agent Command Center/);
   assert.match(runResult.runnerNote.summary, /grant trust for this project in the agent's own home/);
   // Not a timeout and not a provider limit: no second candidate is tried, the pane stays for the person.
-  assert.equal(fake.calls().filter((c) => c[0] === 'pane' && c[1] === 'split').length, 1);
+  assert.equal(fake.calls().filter((c) => (c[0] === 'tab' && c[1] === 'create') || (c[0] === 'pane' && c[1] === 'split')).length, 1);
   assert.ok(!fake.closedPaneIds().includes('mock-pane-1'));
 });
 
@@ -599,7 +607,7 @@ test('guards: the run path reads bound.transport and calls nextCandidate', () =>
 // ---------------------------------------------------------------------------------------------
 
 const promptCalls = (fake) => fake.calls().filter((c) => c[0] === 'agent' && c[1] === 'prompt' && !String(c[3] ?? '').startsWith('/'));
-const enterCalls = (fake) => fake.calls().filter((c) => c[0] === 'agent' && c[1] === 'send-keys' && c.slice(3).includes('Enter'));
+const enterCalls = (fake) => fake.calls().filter((c) => (c[0] === 'agent' || c[0] === 'pane') && c[1] === 'send-keys' && c.slice(3).includes('Enter'));
 
 test('a brief whose submit key was lost stays an unsent draft and is submitted with Enter, not by hand', { skip: SKIP }, async () => {
   const { repoRoot, worktreeDir, signalDir } = setup(['alpha']);

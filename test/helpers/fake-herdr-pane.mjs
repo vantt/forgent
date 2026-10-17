@@ -46,30 +46,95 @@ const alive = (pid) => { try { process.kill(pid, 0); return true; } catch { retu
 const flag = (name) => { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : undefined; };
 const flagAll = (name) => args.flatMap((a, i) => (a === name ? [args[i + 1]] : []));
 const sleepSync = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+const envOf = () => {
+  const env = {};
+  for (const kv of flagAll('--env')) { const eq = kv.indexOf('='); env[kv.slice(0, eq)] = kv.slice(eq + 1); }
+  return env;
+};
+
+if (args[0] === '--version') { console.log('herdr 0.9.1-fake'); process.exit(0); }
+if (args[0] === 'pane' && args[1] === 'layout' && args[2] === '--help') { console.log('usage: herdr pane layout'); process.exit(0); }
 
 const [group, action] = args;
 const state = readState();
+state.tabs ??= {};
 const paneIndex = (id) => Number(String(id).replace('mock-pane-', ''));
 const scripted = (id) => scenario.panes?.[paneIndex(id) - 1] ?? {};
+const openPane = (id) => (state.panes[id] && !state.panes[id].closed ? state.panes[id] : null);
+const liveIds = () => Object.keys(state.panes).filter((id) => !state.panes[id].closed);
 
-if (group === 'tab' && action === 'create') ok({ tab: { tab_id: 'mock-tab-1' }, root_pane: { pane_id: 'mock-root' } });
-if (group === 'tab') ok({ tab: { tab_id: 'mock-tab-1', pane_count: 1 } });
+const newPane = (tab, extra = {}) => {
+  const id = 'mock-pane-' + (Object.keys(state.panes).length + 1);
+  state.panes[id] = { tab, cwd: flag('--cwd') ?? process.cwd(), env: envOf(), pid: null, closed: false, exited: false, ...extra };
+  return id;
+};
+
+if (group === 'status' && action === 'server') ok({ running: true, socket: process.env.HERDR_SOCKET_PATH ?? scenario.socketPath ?? null });
+
+if ((group === 'tab' || group === 'workspace') && action === 'create') {
+  const tab = 'mock-tab-' + (Object.keys(state.tabs).length + 1);
+  state.tabs[tab] = { label: flag('--label') ?? null };
+  const pane = newPane(tab);
+  writeState(state);
+  ok({ tab: { tab_id: tab }, root_pane: { pane_id: pane } });
+}
+if ((group === 'tab' || group === 'pane') && action === 'rename') {
+  if (group === 'tab') state.tabs[args[2]] = { ...(state.tabs[args[2]] ?? {}), label: args[3] };
+  else if (state.panes[args[2]]) state.panes[args[2]].label = args[3];
+  writeState(state);
+  ok({});
+}
 
 if (group === 'pane' && action === 'split') {
-  const id = 'mock-pane-' + (Object.keys(state.panes).length + 1);
-  const env = {};
-  for (const kv of flagAll('--env')) { const eq = kv.indexOf('='); env[kv.slice(0, eq)] = kv.slice(eq + 1); }
-  state.panes[id] = { cwd: flag('--cwd') ?? process.cwd(), env, pid: null, closed: false, exited: false };
+  const target = flag('--pane');
+  if (scenario.deadAnchorPane && target === scenario.deadAnchorPane) fail('pane_not_found', 'no such pane');
+  const anchor = openPane(target);
+  if (!anchor) fail('pane_not_found', 'no such pane');
+  const id = newPane(anchor.tab);
   writeState(state);
-  ok({ pane: { pane_id: id } });
+  ok({ pane: { pane_id: id, tab_id: anchor.tab } });
 }
+
+if (group === 'pane' && action === 'layout') {
+  const pane = openPane(flag('--pane'));
+  if (!pane) fail('pane_not_found', 'no such pane');
+  const ids = liveIds().filter((id) => state.panes[id].tab === pane.tab);
+  const height = Math.floor(69 / ids.length);
+  ok({
+    layout: {
+      tab_id: pane.tab,
+      area: { x: 0, y: 0, width: 352, height: 69 },
+      panes: ids.map((id, i) => ({ pane_id: id, rect: { x: 0, y: i * height, width: 352, height } })),
+    },
+  });
+}
+
+if (group === 'pane' && action === 'get') {
+  if (scenario.paneVanishesAfterBrief && Object.values(state.panes).some((p) => p.delivered)) fail('pane_not_found', 'pane not found');
+  const id = args[2];
+  if (!openPane(id)) fail('pane_not_found', 'pane not found');
+  ok({ pane: { pane_id: id, tab_id: state.panes[id].tab } });
+}
+
+const startProcess = (id, name) => {
+  const pane = state.panes[id];
+  const child = spawn('bash', ['-c', 'exec -a ' + name + ' sleep 600'], {
+    cwd: pane.cwd,
+    env: { ...process.env, ...pane.env, FAKE_HERDR_DIR: undefined },
+    detached: true,
+    stdio: 'ignore',
+  });
+  child.unref();
+  pane.pid = child.pid;
+};
 
 if (group === 'pane' && action === 'run') {
   const id = args[2];
-  const pane = state.panes[id];
+  const pane = openPane(id);
   if (!pane) fail('pane_not_found');
+  if (scenario.runError) fail(scenario.runError, 'pane run failed');
   const command = args.slice(3).join(' ');
-  const child = spawn('bash', ['-c', 'exec ' + command], {
+  const child = spawn('bash', ['-c', command], {
     cwd: pane.cwd,
     env: { ...process.env, ...pane.env, FAKE_HERDR_DIR: undefined },
     detached: true,
@@ -84,45 +149,64 @@ if (group === 'pane' && action === 'run') {
 
 if (group === 'pane' && action === 'process-info') {
   const id = flag('--pane');
-  const pane = state.panes[id] ?? {};
-  const foreground = [{ pid: 100, name: 'zsh' }];
+  const paneVanished = scenario.paneVanishesAfterBrief && Object.values(state.panes).some((p) => p.delivered);
+  if (paneVanished || !openPane(id)) fail('pane_not_found', 'pane not found');
+  const pane = state.panes[id];
+  const foreground = [{ pid: 100, name: 'zsh', argv: ['zsh'] }];
   let fgPid = 100;
-  if (pane.pid && !pane.exited && alive(pane.pid)) {
+  const gone = scenario.agentGone || pane.exited;
+  if (pane.pid && !gone && alive(pane.pid)) {
     let argv = [];
     try { argv = fs.readFileSync('/proc/' + pane.pid + '/cmdline', 'utf8').split('\0').filter((a, i, all) => a !== '' || i < all.length - 1); } catch {}
     foreground.unshift({ pid: pane.pid, name: argv[0] ?? 'agent', argv });
     fgPid = pane.pid;
-    state.panes[id].lastArgv = argv;
+    pane.lastArgv = argv;
     writeState(state);
   }
   ok({ process_info: { pane_id: id, shell_pid: 100, foreground_process_group_id: fgPid, foreground_processes: foreground } });
 }
 
-if (group === 'pane' && (action === 'report-agent' || action === 'report-agent-session')) ok({ type: 'ok' });
+if (group === 'pane' && (action === 'report-agent' || action === 'report-agent-session')) {
+  const pane = openPane(args[2]);
+  if (pane) { pane.reported = true; writeState(state); }
+  ok({ type: 'ok' });
+}
 
 if (group === 'pane' && action === 'close') {
   const pane = state.panes[args[2]];
-  if (pane) {
-    pane.closed = true;
-    if (pane.pid && alive(pane.pid)) { try { process.kill(pane.pid, 'SIGKILL'); } catch {} }
-    writeState(state);
-  }
+  if (!pane || pane.closed) fail('pane_not_found', 'pane not found');
+  pane.closed = true;
+  if (pane.pid && alive(pane.pid)) { try { process.kill(pane.pid, 'SIGKILL'); } catch {} }
+  writeState(state);
   ok({ closed: true });
 }
 
 if (group === 'agent' && action === 'get') {
   const id = args[2];
-  const blocked = scripted(id).blockedAfterBrief && state.panes[id]?.delivered;
-  ok({ agent: { agent_status: blocked ? 'blocked' : scripted(id).reportedWorking ? 'working' : 'idle', pane_id: id, state_change_seq: 0 } });
+  if (scenario.paneVanishesAfterBrief && Object.values(state.panes).some((p) => p.delivered)) fail('agent_not_found', 'agent target ' + id + ' not found');
+  const pane = openPane(id);
+  if (!pane) fail('agent_not_found', 'agent target ' + id + ' not found');
+  if (scenario.unrecognisedAgent && !pane.reported) fail('agent_not_found', 'agent target ' + id + ' not found');
+  const blocked = scripted(id).blockedAfterBrief && pane.delivered;
+  ok({ agent: { agent: 'fake', agent_status: blocked ? 'blocked' : scripted(id).reportedWorking ? 'working' : 'idle', pane_id: id, state_change_seq: 0 } });
 }
 
-if (group === 'agent' && action === 'read') {
+if (group === 'pane' && action === 'read' || group === 'agent' && action === 'read') {
   const id = args[2];
-  const blockedText = scripted(id).blockedAfterBrief && state.panes[id]?.delivered ? (scenario.blockScreen ?? '') : '';
-  ok({ read: { text: scripted(id).limit ? (scenario.limitScreen ?? '') : blockedText } });
+  const pane = openPane(id);
+  if (!pane) fail('pane_not_found', 'pane not found');
+  const blockedText = scripted(id).blockedAfterBrief && pane.delivered ? (scenario.blockScreen ?? '') : '';
+  console.log(scripted(id).limit ? (scenario.limitScreen ?? '') : blockedText);
+  process.exit(0);
 }
 
-if (group === 'agent' && action === 'start') ok({ agent: { agent_status: 'idle' } });
+if (group === 'agent' && action === 'start') {
+  const id = flag('--pane');
+  if (!openPane(id)) fail('pane_not_found');
+  startProcess(id, flag('--kind') ?? 'agent');
+  writeState(state);
+  ok({ agent: { agent_status: 'idle' } });
+}
 
 const deliver = (id, text) => {
   let briefText = text;
@@ -147,7 +231,8 @@ const deliver = (id, text) => {
 if (group === 'agent' && action === 'explain') {
   const id = args[2];
   const script = scripted(id);
-  const pane = state.panes[id];
+  const pane = openPane(id);
+  if (!pane) fail('agent_not_found', 'agent target ' + id + ' not found');
   if (!script.detector && !script.startupPolls && !script.swallowEnter) ok({});
   pane.explainCalls = (pane.explainCalls ?? 0) + 1;
   writeState(state);
@@ -165,7 +250,7 @@ if (group === 'agent' && action === 'explain') {
   process.exit(0);
 }
 
-if (group === 'agent' && action === 'send-keys') {
+if ((group === 'agent' || group === 'pane') && action === 'send-keys') {
   const id = args[2];
   const pane = state.panes[id];
   if (pane && args.slice(3).includes('Enter') && pane.draft) {
@@ -183,16 +268,23 @@ if (group === 'agent' && action === 'send-keys') {
   ok({});
 }
 
+if (group === 'pane' && action === 'send-text') {
+  const pane = openPane(args[2]);
+  if (!pane) fail('pane_not_found');
+  pane.draft = args[3] ?? '';
+  writeState(state);
+  ok({});
+}
+
 if (group === 'agent' && action === 'prompt') {
   const id = args[2];
   const text = args[3] ?? '';
   const pane = state.panes[id];
+  if (!pane || pane.closed) fail('agent_not_found', 'agent target ' + id + ' not found');
   if (text.startsWith('/')) {
-    if (pane) {
-      pane.exited = true;
-      if (pane.pid && alive(pane.pid)) { try { process.kill(pane.pid, 'SIGKILL'); } catch {} }
-      writeState(state);
-    }
+    pane.exited = true;
+    if (pane.pid && alive(pane.pid)) { try { process.kill(pane.pid, 'SIGKILL'); } catch {} }
+    writeState(state);
     ok({ agent: { agent_status: 'idle' } });
   }
   if (scripted(id).limit) ok({ agent: { agent_status: 'idle' } });

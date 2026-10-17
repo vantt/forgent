@@ -37,7 +37,8 @@ import { executeAssignment, reconcileCliSpawnRun } from './assignment-runner.mjs
 import { runAccountProbe } from './provider-account-probe.mjs';
 import { reapOrphanedConfinementResources, resolveConfinementTempRoot, createConfinementCredentialRenewal, paneOpenUnlessClosed } from './confinement/cleanup.mjs';
 import { defaultConfinementTempRoots } from './confinement/backend-registry.mjs';
-import { createHerdrClient } from './herdr-agent.mjs';
+import { createRoundTerminalControl } from './terminal-slot.mjs';
+import { envForSession } from './worker-session.mjs';
 import { resolveHerdrBin } from './transport.mjs';
 export { reconcileCliSpawnRun };
 import { buildAssignment, claimAssignmentId } from './assignment.mjs';
@@ -1157,10 +1158,20 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
             isReadOnlyMode: true,
             providerCredentialRenew: createConfinementCredentialRenewal({ tempRoots: defaultConfinementTempRoots }),
           }),
-          closePane: ({ paneId, herdrSession }) => {
-            const closed = createHerdrClient({
-              herdrBin, cwd, env: herdrSession ? { ...process.env, HERDR_SESSION: herdrSession } : process.env,
-            }).paneClose(paneId);
+          closePane: ({ paneId, herdrSession, terminalKey }) => {
+            // A run record that carries no key was written before panes were addressed by key:
+            // nothing proves which pane it was, so it is left open.
+            if (!terminalKey) return false;
+            let closed = false;
+            try {
+              const tc = createRoundTerminalControl({
+                herdrBin, herdrEnv: herdrSession ? envForSession(process.env, herdrSession) : process.env,
+              });
+              // A pane a settled round already closed is not "closed by the probe".
+              if (tc.inspect({ key: terminalKey }).pane === 'live') {
+                closed = tc.release({ key: terminalKey, disposition: 'close' }).result === 'released';
+              }
+            } catch { /* a pane that cannot be closed stays open */ }
             if (closed) closedPanes.add(paneId);
             return closed;
           },

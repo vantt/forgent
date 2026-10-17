@@ -26,21 +26,20 @@ const attempt = (read) => {
 };
 
 /**
- * @param {object} client the herdr client (`agentGet`, `agentExplain`, `agentRead`)
- * @param {string} target agent name or pane id
+ * @param {object} io the round's slot (`state`, `explain`, `read`, `key`)
  * @param {{ lines?: number, now?: () => number }} [options]
  */
-export function captureHerdrDiagnosis(client, target, { lines = 40, now = Date.now } = {}) {
-  const agent = attempt(() => client.agentGet(target));
-  const explain = attempt(() => client.agentExplain(target));
+export function captureHerdrDiagnosis(io, { lines = 40, now = Date.now } = {}) {
+  const agent = attempt(() => io.state());
+  const explain = attempt(() => io.explain());
   const detectionScreen = attempt(() => {
-    const text = client.agentRead(target, { lines, source: 'detection' });
+    const text = io.read({ lines, source: 'detection' });
     return typeof text === 'string' && text.length > MAX_SCREEN_CHARS ? text.slice(-MAX_SCREEN_CHARS) : text;
   });
   return {
     contract: DIAGNOSIS_CONTRACT,
     capturedAt: new Date(now()).toISOString(),
-    target,
+    target: io.key,
     agent,
     explain,
     detectionScreen,

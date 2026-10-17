@@ -33,7 +33,8 @@ import os from 'node:os';
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { DispatchError } from './dispatch-error.mjs';
-import { createHerdrClient, createBatchTab, normalizeAgentName, isReadyState } from './herdr-agent.mjs';
+import { normalizeAgentName, isReadyState } from './herdr-agent.mjs';
+import { createRoundTerminalControl, createSlotIo, portKey, slotDisplay, refusalError } from './terminal-slot.mjs';
 import { briefPaths, renderBrief, renderPointer } from './brief.mjs';
 import {
   evaluateLadder, evaluateWorkingScreen, paneFateFor, WORKING_STALL_PROBE_MS, WORKING_STALL_TAIL_LINES,
@@ -48,7 +49,7 @@ import {
 } from './trust-store.mjs';
 export { trustRoots };
 import { ensureWorkerSession, DEFAULT_WORKER_SESSION } from './worker-session-boot.mjs';
-import { herdrEndpointForEnv } from './worker-session.mjs';
+import { herdrEndpointForEnv, envForSession } from './worker-session.mjs';
 import { normalizeLegacyConfinement } from './confinement/policies.mjs';
 import { evaluateBypassPairing } from './confinement/bypass-pairing.mjs';
 import { interpretRunResult } from './run-result.mjs';
@@ -271,6 +272,15 @@ const ENV_INJECTION_VECTORS = Object.freeze([
  * compare against) -- `null` is "no evidence either way", never a pass,
  * same contract as `verifyProcessExeIdentity`.
  */
+/** The argv of a live process, from the kernel; null when it cannot be read. */
+function readProcessArgv(pid) {
+  try {
+    return fs.readFileSync(`/proc/${pid}/cmdline`, 'utf8').split('\0').filter((a, i, all) => a !== '' || i < all.length - 1);
+  } catch {
+    return null;
+  }
+}
+
 function readProcessEnviron(pid) {
   let raw;
   try {
@@ -313,19 +323,18 @@ export function verifyProcessEnvironment(pid, expectedEnv) {
  * every post-launch failure path below that must not leave a live,
  * unaccounted process behind: a detected tamper (argv/exe/env mismatch),
  * and a launch that failed for an unrelated reason after the worker was
- * already live. `pInfo` may be passed in when the caller already has a
- * fresh read, to avoid asking herdr again for information it just gave.
+ * already live.
  */
-function killPaneForegroundAndClose(client, paneId, pInfo = null, target = null) {
+async function killSlotForegroundAndClose(io) {
   // The pane's last lines are read before it closes -- once closed the screen is gone.
   let screen = null;
-  try { screen = screenTail(client.agentRead(target ?? paneId, { lines: 40 })); } catch { screen = null; }
+  try { screen = screenTail(io.read({ lines: 40 })); } catch { screen = null; }
   try {
-    const info = pInfo ?? client.paneProcessInfo(paneId);
-    const stray = info?.foregroundProcesses?.find((p) => p.pid && p.pid !== info.shellPid);
-    if (stray?.pid) process.kill(stray.pid, 'SIGKILL');
+    const { foreground } = io.foreground();
+    // Only the process the port identified: a pid that was reused since carries another start time.
+    if (foreground?.pid && getProcessStartTime(foreground.pid) === foreground.startTime) process.kill(foreground.pid, 'SIGKILL');
   } catch { /* already gone, or pane info unavailable -- close regardless */ }
-  try { client.paneClose(paneId); } catch { /* best effort */ }
+  try { await io.release('close'); } catch { /* best effort */ }
   return screen;
 }
 
@@ -341,16 +350,15 @@ function killPaneForegroundAndClose(client, paneId, pInfo = null, target = null)
  * exact kill+close path a detected tamper already uses rather than a
  * second copy of it; an empty pane is left exactly as before.
  */
-function cleanupIfWorkerStillLive(client, paneId, target = null) {
-  let info = null;
-  try { info = client.paneProcessInfo(paneId); } catch { return null; }
-  const stray = info?.foregroundProcesses?.find((p) => p.pid && p.pid !== info.shellPid);
-  return stray?.pid ? killPaneForegroundAndClose(client, paneId, info, target) : null;
+async function cleanupIfWorkerStillLive(io) {
+  let seen = null;
+  try { seen = io.foreground(); } catch { return null; }
+  return seen?.foreground?.pid ? killSlotForegroundAndClose(io) : null;
 }
 
 /** Closing the pane for a failure keeps what was on its screen in the failure record. */
-export function cleanupAndKeepScreen(client, round, err) {
-  const screen = cleanupIfWorkerStillLive(client, round.paneId, round.targetName ?? round.agentName);
+export async function cleanupAndKeepScreen(io, round, err) {
+  const screen = await cleanupIfWorkerStillLive(io);
   if (screen && err && typeof err === 'object' && !err.screen) err.screen = screen;
 }
 
@@ -517,6 +525,8 @@ function openRound({ runDir, workId, tier, model, agentName }) {
     model,
     agentName,
     paneId: null,
+    // The terminal-control key of the pane, so a later close finds it by key.
+    terminalKey: null,
     // The herdr session the pane lives in, so a later reaper or recovery asks the right server.
     herdrSession: null,
     // True only when this round wrote a trust entry, so teardown removes what it wrote and
@@ -527,7 +537,7 @@ function openRound({ runDir, workId, tier, model, agentName }) {
     },
     fail(errorClass, reason, message, extra = {}) {
       return new DispatchError(errorClass, message, {
-        workId, tier, model, reason, runDir, agentName, paneId: round.paneId, herdrSession: round.herdrSession, ...extra,
+        workId, tier, model, reason, runDir, agentName, paneId: round.paneId, terminalKey: round.terminalKey, herdrSession: round.herdrSession, ...extra,
       });
     },
   };
@@ -644,8 +654,6 @@ export async function establishConfinement({ confinement, round, fullEnv, cwd, r
       // to compare it against.
       const session = await ensureWorkerSession(DEFAULT_WORKER_SESSION, {
         callerEnv: fullEnv,
-        workerHome: workerHomePath,
-        cwd,
         herdrBin,
       });
       round.note({ workerSession: session.sessionName });
@@ -795,41 +803,41 @@ function removeWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv, worke
  * failure on purpose: whatever stopped the agent from becoming ready is still
  * on that screen.
  */
-function startAgent({ client, round, agentKind, agentArgs, readyMs }) {
+function startAgent({ tc, io, round, agentKind, agentArgs, readyMs, cwd }) {
+  let launched;
   try {
-    client.agentStart(round.agentName, { kind: agentKind, paneId: round.paneId, timeoutMs: readyMs, agentArgs });
+    launched = tc.launch({
+      key: io.key,
+      launchSpec: {
+        command: agentKind, args: agentArgs ?? [], cwd, env: {},
+        activity: { kind: agentKind, args: agentArgs ?? [], timeoutMs: readyMs },
+      },
+    });
   } catch (err) {
     throw round.fail('worker-spawn-fail', err.code ?? 'agent_not_ready',
-      `executor failed to start for work "${round.workId}": herdr could not bring a "${agentKind}" agent to ready in pane ${round.paneId} (${err.code ?? 'unknown'}): ${err.message}`);
+      `executor failed to start for work "${round.workId}": terminal-control could not bring a "${agentKind}" agent to ready in pane ${round.paneId}: ${err.message}`);
+  }
+  if (launched.result !== 'launched') {
+    const refusal = launched.result === 'not-started' ? { result: 'unknown', reason: launched.reason } : launched;
+    const err = refusalError(refusal, `launch ${io.key}`);
+    throw round.fail('worker-spawn-fail', err.code ?? 'agent_not_ready',
+      `executor failed to start for work "${round.workId}": terminal-control could not bring a "${agentKind}" agent to ready in pane ${round.paneId} (${err.code ?? 'unknown'}): ${err.message}`);
   }
 
   // The agent session id exists from the moment the agent is ready, so it is
   // recorded now rather than at the first time something needs it -- a
   // reattach after a gateway restart matches on this.
   try {
-    const info = client.agentGet(round.agentName);
-    // This is the binding read elsewhere as `round.agentSession?.value`
-    // (receipts, command projections) -- it was never assigned on `round`
-    // itself, only logged via `note`, so a mismatch signal (a new
-    // agent_session on the same pane) had no real data to compare against.
-    //
-    // herdr's own `agent_session` is ALREADY an object shaped
-    // `{agent, kind, source, value}`, not a plain string -- `.value` is the
-    // flat session-id string every downstream reader expects (receipts,
-    // command projections, and reconcileHerdrSpawnRun's own incarnation
-    // probe, which compares against a plain string it reads straight off a
-    // live herdr call). Wrapping the whole object one level deeper here
-    // doubly-nested it, so every consumer stored/compared an object instead
-    // of a string and the reconcile probe's `!==` check never matched even
-    // for a live, healthy worker.
-    const flatAgentSession = (info.agentSession && typeof info.agentSession === 'object')
-      ? info.agentSession.value
-      : info.agentSession;
-    round.agentSession = { value: flatAgentSession };
-    round.note({ status: 'agent-ready', agentSession: info.agentSession, stateChangeSeq: info.stateChangeSeq });
+    const info = io.state();
+    // `agentSession` is the flat session-id string every downstream reader
+    // expects (receipts, command projections, and reconcileHerdrSpawnRun's own
+    // incarnation probe, which compares against a plain string).
+    round.agentSession = { value: info.agentSession };
+    round.note({ status: 'agent-ready', agentSession: info.agentSession });
   } catch {
     round.note({ status: 'agent-ready' });
   }
+  return launched.identity;
 }
 
 /**
@@ -851,15 +859,9 @@ function briefMessage({ delivery = 'inline', briefText, runDir, roundNumber }) {
  * Returns the error instead of throwing it, because a first send and a later
  * re-send report the same failure differently.
  */
-function submitBrief({ client, round, message, promptMs }) {
-  const target = round.targetName ?? round.agentName;
-  const isConfinedTarget = Boolean(round.targetName && round.targetName === round.paneId);
+function submitBrief({ io, round, message, promptMs, until = ['working'] }) {
   try {
-    if (isConfinedTarget) {
-      client.agentPrompt(target, message, { wait: false, timeoutMs: promptMs });
-    } else {
-      client.agentPrompt(target, message, { wait: true, until: ['working'], timeoutMs: promptMs });
-    }
+    io.prompt(message);
     return null;
   } catch (err) {
     return err;
@@ -868,38 +870,31 @@ function submitBrief({ client, round, message, promptMs }) {
 
 /** The first submission. A brief the agent cannot even be handed is a spawn
  * failure, and `agent_blocked` means something is on screen worth quoting. */
-function deliverBrief({ client, round, message, promptMs, resultPath }) {
-  const err = submitBrief({ client, round, message, promptMs });
+function deliverBrief({ io, round, message, promptMs, resultPath }) {
+  const err = submitBrief({ io, round, message, promptMs });
   if (!err) {
     round.note({ status: 'briefed' });
     return;
   }
-  // `--until working` waits for herdr to observe the turn begin. A turn that
-  // finishes faster than herdr polls would never be observed in that state,
-  // and the wait would report a timeout for a brief that in fact landed and
-  // was answered. Unverifiable without herdr's source, so it is guarded
-  // instead of assumed: the worker's own result file outranks a transport
-  // timeout, here exactly as it does everywhere else.
+  // A turn that finishes faster than the driver polls would never be observed
+  // as started, and a wait would report a timeout for a brief that in fact
+  // landed and was answered. The worker's own result file outranks a
+  // transport timeout, here exactly as it does everywhere else.
   if (err.code === 'timeout' && resultPath && fs.existsSync(resultPath)) {
     round.note({ status: 'briefed', briefTimeoutWithResultOnDisk: true });
     return;
   }
   // A bare submit timeout, with no result on disk yet either, is not proof
-  // the brief never reached the agent -- herdr's own `--until working` wait
-  // not observing the transition in time is a transport ambiguity, the same
-  // kind the branch above already gives the benefit of the doubt to when a
-  // result exists. Typed `unknown` rather than failed here (first field of a
-  // tri-state, nothing else) so the poll loop below -- the only place a
-  // result file actually settles a round -- gets the chance to observe the
-  // real outcome instead of a submit-side guess ending the round early.
+  // the brief never reached the agent: typed `unknown` rather than failed here
+  // so the poll loop below -- the only place a result file actually settles a
+  // round -- gets the chance to observe the real outcome.
   if (err.code === 'timeout') {
     round.note({ status: 'briefed', delivery: 'unknown' });
     return;
   }
   let screen = null;
   if (err.code === 'agent_blocked') {
-    const target = round.targetName ?? round.agentName;
-    try { screen = lastScreenLine(client.agentRead(target, { lines: 40 })); } catch { screen = null; }
+    try { screen = lastScreenLine(io.read({ lines: 40 })); } catch { screen = null; }
   }
   throw round.fail('worker-spawn-fail', err.code ?? 'agent_prompt_failed',
     `executor failed to brief the worker for work "${round.workId}": ${err.message}${screen ? ` -- last line on screen: ${screen}` : ''}`,
@@ -916,11 +911,11 @@ function deliverBrief({ client, round, message, promptMs, resultPath }) {
  * detector first to see through it, two herdr calls per poll. fgos no longer reports one.
  * The detector is asked only when `agent get` has no answer.
  */
-export function readAgentState(client, target) {
-  const status = client.agentGet(target).agentStatus;
+export function readAgentState(io) {
+  const status = io.state().agentStatus;
   if (status !== 'unknown') return status;
   try {
-    const seen = client.agentExplain(target);
+    const seen = io.explain();
     if (typeof seen?.state === 'string' && seen.state) return seen.state;
   } catch {
     // the detector cannot be asked either: the status stays unknown
@@ -939,20 +934,21 @@ export function readAgentState(client, target) {
  *
  * @returns {Promise<'detected'|'reported'>}
  */
-export async function ensureHerdrKnowsAgent({ client, round, paneId, agentKind, graceMs = AGENT_DETECT_GRACE_MS, pollMs = 250 }) {
+export async function ensureHerdrKnowsAgent({ io, round, agentKind, label, graceMs = AGENT_DETECT_GRACE_MS, pollMs = 250 }) {
   const deadline = Date.now() + graceMs;
   for (;;) {
     try {
-      client.agentGet(paneId);
-      round.note({ agentKnownToHerdr: 'detected' });
-      return 'detected';
+      if (io.state().recognised) {
+        round.note({ agentKnownToHerdr: 'detected' });
+        return 'detected';
+      }
     } catch {
       // not recognised (yet)
     }
     if (Date.now() >= deadline) break;
     await sleep(pollMs);
   }
-  client.reportAgent(paneId, { source: 'fgos', agent: agentKind, state: 'working' });
+  io.reportAgent({ agent: agentKind, label, state: 'working' });
   round.note({ agentKnownToHerdr: 'reported' });
   return 'reported';
 }
@@ -971,7 +967,7 @@ const squash = (text) => String(text ?? '').replace(/\s+/g, '');
  * verdict, so an agent kind herdr cannot detect is not made to wait out the deadline.
  * Returns what ended the wait.
  */
-export async function awaitPromptReady({ client, target, readyMs, settleMs = PROMPT_SETTLE_MS, pollMs = SUBMIT_POLL_MS }) {
+export async function awaitPromptReady({ io, readyMs, settleMs = PROMPT_SETTLE_MS, pollMs = SUBMIT_POLL_MS }) {
   const deadline = Date.now() + readyMs;
   // Only used when herdr has no rule for this agent: see below.
   let launchScreen = null;
@@ -980,7 +976,7 @@ export async function awaitPromptReady({ client, target, readyMs, settleMs = PRO
   let unruledSince = null;
   for (;;) {
     let seen;
-    try { seen = client.agentExplain(target); } catch { return 'no-detector'; }
+    try { seen = io.explain(); } catch { return 'no-detector'; }
     if (seen.state === null) return 'no-detector';
     if (seen.visibleBlocker || seen.state === 'blocked') return 'blocked';
     if (seen.state === 'idle' && !seen.visibleWorking) {
@@ -994,7 +990,7 @@ export async function awaitPromptReady({ client, target, readyMs, settleMs = PRO
       // hold still for a settle period.
       unruledSince ??= Date.now();
       let screen = null;
-      try { screen = client.agentRead(target, { source: 'visible' }); } catch { screen = null; }
+      try { screen = io.read({ source: 'visible' }); } catch { screen = null; }
       if (typeof screen !== 'string') {
         await sleep(settleMs);
         return 'ready';
@@ -1021,16 +1017,15 @@ export async function awaitPromptReady({ client, target, readyMs, settleMs = PRO
  * the idle ceiling. When readiness says `blocked` or `timeout`, fail the round
  * now, with the line on screen, and type nothing.
  */
-export function refuseBriefIntoUnreadyPane({ client, round, readiness }) {
+export async function refuseBriefIntoUnreadyPane({ io, round, readiness }) {
   if (readiness !== 'blocked' && readiness !== 'timeout') return;
-  const target = round.targetName ?? round.agentName;
   let screenLine = null;
-  try { screenLine = lastScreenLine(client.agentRead(target, { lines: 60 })); } catch { /* the failure stands without it */ }
+  try { screenLine = lastScreenLine(io.read({ lines: 60 })); } catch { /* the failure stands without it */ }
   const reason = readiness === 'blocked' ? 'agent_blocked' : 'agent_not_ready';
   const why = readiness === 'blocked'
     ? 'the agent is showing a dialog that needs an answer'
     : 'the agent never reached a prompt that takes input';
-  cleanupIfWorkerStillLive(client, round.paneId, target);
+  await cleanupIfWorkerStillLive(io);
   throw round.fail('worker-spawn-fail', reason,
     `executor for work "${round.workId}" not briefed: ${why}.${screenLine ? ` Last line on screen: ${screenLine}` : ''}`,
     { readiness, ...(readiness === 'blocked' ? { outcome: 'blocked' } : {}), ...(screenLine ? { screen: screenLine } : {}) });
@@ -1089,7 +1084,7 @@ export function isDraftStillInComposer({ message, promptText, visibleScreen }) {
  * soon as the worker's own ack or result file exists, a blocking dialog is up (pressing
  * a key there would answer it), or the window ends. Returns the number of Enters pressed.
  */
-export async function confirmBriefSubmitted({ client, target, message, paths, round, windowMs = SUBMIT_CONFIRM_MS, pollMs = SUBMIT_POLL_MS }) {
+export async function confirmBriefSubmitted({ io, message, paths, round, windowMs = SUBMIT_CONFIRM_MS, pollMs = SUBMIT_POLL_MS }) {
   const deadline = Date.now() + windowMs;
   let enters = 0;
   let lastEnterAt = 0;
@@ -1099,14 +1094,14 @@ export async function confirmBriefSubmitted({ client, target, message, paths, ro
   while (Date.now() < deadline) {
     if (fs.existsSync(paths.ackPath) || fs.existsSync(paths.resultPath)) break;
     let seen;
-    try { seen = client.agentExplain(target); } catch { break; }
+    try { seen = io.explain(); } catch { break; }
     if (seen.state === null) break;
     if (seen.visibleBlocker || seen.state === 'blocked') break;
     if (seen.visibleWorking || seen.state === 'working') break;
 
     let visibleScreen = '';
     if (seen.state === 'idle' && !seen.promptText) {
-      try { visibleScreen = client.agentRead(target, { source: 'visible', lines: 20 }); } catch { visibleScreen = ''; }
+      try { visibleScreen = io.read({ source: 'visible', lines: 20 }); } catch { visibleScreen = ''; }
       const bottomTail = String(visibleScreen)
         .split(/\r?\n/)
         .filter((line) => line.trim().length > 0)
@@ -1126,7 +1121,7 @@ export async function confirmBriefSubmitted({ client, target, message, paths, ro
       if (enters >= SUBMIT_MAX_ENTERS) break;
       if (Date.now() - lastEnterAt >= SUBMIT_ENTER_EVERY_MS) {
         try {
-          client.agentSendKeys(target, ['Enter']);
+          io.sendKeys(['Enter']);
         } catch {
           break;
         }
@@ -1155,19 +1150,18 @@ export async function confirmBriefSubmitted({ client, target, message, paths, ro
  */
 export const PANE_NOT_FOUND_CODE = 'pane_not_found';
 
-function livenessProbe(client, paneId) {
+function livenessProbe(io) {
   const probe = () => {
     probe.cause = null;
     try {
-      const info = client.paneProcessInfo(paneId);
-      return info.foregroundProcesses.some((p) => p.pid && p.pid !== info.shellPid)
-        ? 'present'
-        : 'absent';
-    } catch (err) {
-      if (err?.code === PANE_NOT_FOUND_CODE) {
-        probe.cause = `herdr reports pane ${paneId} not found`;
+      const seen = io.foreground();
+      if (seen.pane === 'gone') {
+        probe.cause = `pane of ${io.key} not found`;
         return 'absent';
       }
+      if (seen.pane !== 'live') return 'unknown';
+      return seen.foreground ? 'present' : 'absent';
+    } catch {
       return 'unknown';
     }
   };
@@ -1183,7 +1177,7 @@ function livenessProbe(client, paneId) {
  * result file ends the round. A round short enough to produce its result
  * before the first poll never shows an ack, and that is not a failure.
  */
-async function pollForOutcome({ client, round, paths, message, deadlines, usageLimitPatterns, readLiveness }) {
+async function pollForOutcome({ io, round, paths, message, deadlines, usageLimitPatterns, readLiveness }) {
   const limits = {
     idleTimeoutMs: deadlines.round.idleMs,
     ceilingMs: deadlines.round.ceilingMs,
@@ -1210,12 +1204,11 @@ async function pollForOutcome({ client, round, paths, message, deadlines, usageL
    * stopped, so this never becomes a screen read per tick -- and because both
    * calls happen here, no screen text survives into the next tick.
    */
-  const target = round.targetName ?? round.agentName;
   const decide = (observation) => {
     const first = evaluateLadder({ observation, limits, prior });
     if (!first.needsScreen) return first;
     let screen = '';
-    try { screen = client.agentRead(target, { lines: 60 }); } catch { screen = ''; }
+    try { screen = io.read({ lines: 60 }); } catch { screen = ''; }
     return evaluateLadder({ observation: { ...observation, screen }, limits, prior });
   };
 
@@ -1254,7 +1247,7 @@ async function pollForOutcome({ client, round, paths, message, deadlines, usageL
     let agentState = 'unknown';
     let statusReadable = false;
     try {
-      agentState = readAgentState(client, target);
+      agentState = readAgentState(io);
       statusReadable = true;
     } catch {
       agentState = 'unknown';
@@ -1286,7 +1279,7 @@ async function pollForOutcome({ client, round, paths, message, deadlines, usageL
     if (agentState !== 'working' && statusReadable && observedAt - lastScreenProbeAt >= screenProbeMs) {
       lastScreenProbeAt = observedAt;
       let screenNow = null;
-      try { screenNow = client.agentRead(target, { lines: SCREEN_PROGRESS_LINES }); } catch { screenNow = null; }
+      try { screenNow = io.read({ lines: SCREEN_PROGRESS_LINES }); } catch { screenNow = null; }
       if (typeof screenNow === 'string') {
         const digest = crypto.createHash('sha256').update(screenNow).digest('hex');
         if (lastScreenDigest !== null && digest !== lastScreenDigest) {
@@ -1318,7 +1311,7 @@ async function pollForOutcome({ client, round, paths, message, deadlines, usageL
     if (agentState === 'working' && observedAt - lastStallProbeAt >= deadlines.round.stallProbeMs) {
       lastStallProbeAt = observedAt;
       let tail = '';
-      try { tail = client.agentRead(target, { lines: WORKING_STALL_TAIL_LINES }); } catch { tail = ''; }
+      try { tail = io.read({ lines: WORKING_STALL_TAIL_LINES }); } catch { tail = ''; }
       const watched = evaluateWorkingScreen({ screen: tail, now: observedAt, prior: stall, probeMs: deadlines.round.stallProbeMs });
       stall = watched.next;
       if (watched.outcome) {
@@ -1337,7 +1330,7 @@ async function pollForOutcome({ client, round, paths, message, deadlines, usageL
       if (isReadyState(agentState)) {
         resends += 1;
         lastResendAt = Date.now();
-        const retryError = submitBrief({ client, round, message, promptMs: deadlines.startup.promptMs });
+        const retryError = submitBrief({ io, round, message, promptMs: deadlines.startup.promptMs });
         if (retryError) {
           throw round.fail('worker-spawn-fail', retryError.code ?? 'agent_prompt_failed',
             `executor failed to re-brief the worker for work "${round.workId}" (attempt ${resends + 1}): ${retryError.message}`);
@@ -1357,16 +1350,15 @@ async function pollForOutcome({ client, round, paths, message, deadlines, usageL
  * a line it can quote instead of the word "timeout". That is one extra read
  * on a round that has already failed, so a false positive costs nothing.
  */
-function concludeFailure({ client, round, decision, closeAlways }) {
-  const target = round.targetName ?? round.agentName;
+async function concludeFailure({ io, round, decision, closeAlways, retainFailedPaneMs }) {
   let screenLine = decision.screenLine;
   if (!screenLine) {
-    try { screenLine = lastScreenLine(client.agentRead(target, { lines: 60 })); } catch { screenLine = null; }
+    try { screenLine = lastScreenLine(io.read({ lines: 60 })); } catch { screenLine = null; }
   }
 
   // herdr's own account of the agent, taken before the pane can be closed: the pane is often gone
   // soon after, and the next stall should not have to be guessed at again.
-  const diagnosis = writeHerdrDiagnosis(round.runDir, captureHerdrDiagnosis(client, target));
+  const diagnosis = writeHerdrDiagnosis(round.runDir, captureHerdrDiagnosis(io));
 
   // `died` and `blocked` are states a watcher can act on; the timeouts have
   // no state of their own, so they leave the last real one standing and add
@@ -1379,7 +1371,10 @@ function concludeFailure({ client, round, decision, closeAlways }) {
   });
 
   const fate = paneFateFor(decision.outcome, { closeAlways });
-  if (fate === 'close') client.paneClose(round.paneId);
+  try {
+    if (fate === 'close') await io.release('close');
+    else await io.release('retain', { until: Number.isFinite(retainFailedPaneMs) ? Date.now() + retainFailedPaneMs : null });
+  } catch { /* closing or keeping a pane is cleanup, never a dispatch result */ }
 
   return round.fail(
     ERROR_CLASS_FOR_OUTCOME[decision.outcome] ?? 'worker-timeout',
@@ -1401,8 +1396,7 @@ function concludeFailure({ client, round, decision, closeAlways }) {
  * dies and a `setsid` descendant survives it. Nothing here reports this round
  * as cancelled, and nothing should.
  */
-async function settleRound({ client, round, paths, exitCommand = '/exit', promptMs, readLiveness, workerHomePath, launcherScriptPath, trustStore, cwd, repoRoot, fullEnv, workerEnv }) {
-  const target = round.targetName ?? round.agentName;
+async function settleRound({ io, round, paths, exitCommand = '/exit', promptMs, readLiveness, workerHomePath, launcherScriptPath, trustStore, cwd, repoRoot, fullEnv, workerEnv }) {
   let stdout = '';
   try {
     stdout = fs.existsSync(paths.reportPath)
@@ -1415,7 +1409,7 @@ async function settleRound({ client, round, paths, exitCommand = '/exit', prompt
   round.note({ status: 'settling', outcome: 'settled' });
 
   try {
-    client.agentPrompt(target, exitCommand, { wait: false, timeoutMs: promptMs });
+    io.prompt(exitCommand);
   } catch {
     // A worker that already produced its result but will not take /exit is
     // still a completed round; the pane close below is what actually ends it.
@@ -1427,7 +1421,7 @@ async function settleRound({ client, round, paths, exitCommand = '/exit', prompt
     await sleep(250);
   }
 
-  client.paneClose(round.paneId);
+  try { await io.release('close'); } catch { /* the pane stays for a person; the round is settled */ }
   round.note({ status: 'reconciled' });
 
   // The private HOME held a copy of the operator's credential, so it is
@@ -1555,12 +1549,19 @@ export async function runHerdrRound(ctx) {
     const existingCmd = readHerdrLaunchCommand(preResumeRunDir, ctx.launchCommandId);
     if (existingCmd) {
       if (existingCmd.state === 'reconciled' || (existingCmd.state === 'pending' && existingCmd.paneId)) {
-        // Production `ctx` carries no `herdrClient`/`probe` -- only test
+        // Production `ctx` carries no `slotIo`/`probe` -- only test
         // callers pass one explicitly -- so a resumed round for a
         // live-but-not-yet-observed worker fell through reconcile's probe
         // branch to `unknown-launch` instead of actually asking herdr.
-        const reconcileClient = ctx.herdrClient ?? createHerdrClient({ herdrBin, cwd, env: fullEnv });
-        const rec = await reconcileHerdrSpawnRun(preResumeRunDir, { ...ctx, herdrClient: reconcileClient });
+        let reconcileEnv = fullEnv;
+        try {
+          if (existingCmd.herdrSession) reconcileEnv = envForSession(fullEnv ?? process.env, existingCmd.herdrSession);
+        } catch { /* a session that cannot be addressed leaves the ambient one */ }
+        const reconcileIo = ctx.slotIo ?? createSlotIo({
+          tc: createRoundTerminalControl({ herdrBin, herdrEnv: reconcileEnv }),
+          key: portKey(normalizeAgentName(existingCmd.herdrName)),
+        });
+        const rec = await reconcileHerdrSpawnRun(preResumeRunDir, { ...ctx, slotIo: reconcileIo });
         // C1a/M15a (R2): reconcile's own internal status vocabulary
         // ('parked'/'refused'/'observed'/'waiting'/'failed', each with its
         // own `reason`) is an implementation detail of the reconcile
@@ -1642,32 +1643,6 @@ export async function runHerdrRound(ctx) {
   }
 }
 
-// One batch tab per `dispatchBatchKey`, for the lifetime of this process --
-// which is also the lifetime of one `fgos coordination run` invocation (R1:
-// its steps run sequentially in-process), so this is exactly "one tab per
-// batch" without any cross-process persistence. Labeled with a per-process
-// timestamp suffix so a coordinationId's separate invocations over time (a
-// panel's open/fix/close) show up as visibly distinct tabs, not identically-
-// named ones -- the label is only ever built here, at first creation, never
-// passed in by the caller.
-const batchTabsByKey = new Map();
-let batchTabExitHookRegistered = false;
-
-function batchTabFor(key, { cwd } = {}) {
-  let batchTab = batchTabsByKey.get(key);
-  if (!batchTab) {
-    batchTab = createBatchTab({ label: `fgos-lead-${key}-${Date.now().toString(36)}`, cwd });
-    batchTabsByKey.set(key, batchTab);
-    if (!batchTabExitHookRegistered) {
-      batchTabExitHookRegistered = true;
-      process.once('exit', () => {
-        for (const bt of batchTabsByKey.values()) bt.closeIfEmpty();
-      });
-    }
-  }
-  return batchTab;
-}
-
 /** The round proper, once its home and session exist. Split from
  * `runHerdrRound` only so the credential teardown above wraps every exit
  * from it -- not as a second seam. */
@@ -1682,24 +1657,31 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
     anchorPaneId,
     // A caller-supplied string naming the batch this round belongs to (a
     // coordination round's own coordinationId, a future fanout batch id) --
-    // never a live handle, so the caller (run.mjs) never has to import
-    // anything herdr-shaped to build it. The batch tab itself is process-
-    // local state owned entirely by this module (`batchTabFor`, above).
+    // never a live handle. It is the group key: every round of one batch
+    // shares a tab, which terminal-control owns.
     dispatchBatchKey,
+    retainFailedPaneMs,
   } = ctx;
 
-  const client = createHerdrClient({ herdrBin, cwd, env: sessionEnv });
+  // The slot key is the round's own agent name: deterministic per launch
+  // command for an assignment run, unique per ad-hoc round, and already in the
+  // shape both herdr and the port accept.
+  const key = portKey(round.agentName);
+  round.terminalKey = key;
+  round.note({ terminalKey: key });
+  const groupKey = portKey(dispatchBatchKey ?? ctx.runId ?? workId ?? key);
+  const tc = createRoundTerminalControl({
+    herdrBin,
+    herdrEnv: sessionEnv,
+    config: { launchIdentifyTimeoutMs: Math.min(deadlines.startup.readyMs || 10000, 5000), ...(ctx.terminalConfig ?? {}) },
+  });
+  const io = createSlotIo({ tc, key, groupKey });
   // A confined worker's pane gets the private HOME; herdr honours `--env` for
   // ordinary variables, which is exactly what this relies on.
   const effectivePaneEnv = workerHomePath ? { ...paneEnv, HOME: workerHomePath } : paneEnv;
 
-  // A confined round talks to a different herdr server (a different socket,
-  // a different pane-id namespace) than an unconfined one -- HERDR_SESSION is
-  // what `isolatedSessionEnv` sets it to, so it is what distinguishes them.
-  const sessionKey = sessionEnv?.HERDR_SESSION ?? 'default';
   // Only a session actually named: assuming 'default' would send a later reaper to the wrong socket.
   round.herdrSession = sessionEnv?.HERDR_SESSION ?? null;
-  const batchTab = dispatchBatchKey ? batchTabFor(dispatchBatchKey, { cwd }) : null;
 
   const isAssignmentRun = Boolean(ctx.runId && ctx.launchCommandId);
   const existingCmd = isAssignmentRun ? readHerdrLaunchCommand(runDir, ctx.launchCommandId) : null;
@@ -1768,40 +1750,36 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
     splitEnv = rest;
   }
 
+  const display = slotDisplay({ groupKey, agent: agentKind ?? (ctx.command ? path.basename(ctx.command) : 'claude'), model });
   if (existingCmd?.paneId) {
     round.paneId = existingCmd.paneId;
     round.note({ status: 'pane-reused', paneId: round.paneId });
   } else {
-    let anchor = anchorPaneId;
-    if (anchor === undefined && batchTab) {
+    // A pane already sitting in the caller's own tab joins the round's group,
+    // so the batch opens beside it. A pane that cannot be taken is no anchor:
+    // the group simply opens its own tab.
+    if (anchorPaneId) {
       try {
-        anchor = batchTab.ensure(client, sessionKey);
-      } catch {
-        anchor = undefined;
-      }
+        tc.attach({ key: portKey(`anchor-${groupKey}`), pane: anchorPaneId, groupKey, display });
+      } catch { /* no anchor */ }
     }
-
+    let slot;
     try {
-      round.paneId = isConfined
-        ? client.paneSplit({ pane: anchor, direction: 'down', ratio: 0.3, focus: false, cwd, env: splitEnv })
-        : client.paneSplit({ pane: anchor, cwd, env: splitEnv });
-      round.note({ status: 'pane-created', paneId: round.paneId });
+      slot = await tc.allocateAsync({
+        key, groupKey, display, cwd,
+        env: Object.fromEntries(Object.entries(splitEnv ?? {}).filter(([, value]) => typeof value === 'string')),
+      });
     } catch (err) {
-      if (!anchor || err.code !== 'pane_not_found') {
-        throw round.fail('worker-spawn-fail', err.code ?? 'pane_split_failed',
-          `executor failed to start for work "${workId}": herdr could not open a pane (${err.code ?? 'unknown'}): ${err.message}`);
-      }
-      batchTab?.invalidate(sessionKey);
-      try {
-        round.paneId = isConfined
-          ? client.paneSplit({ direction: 'down', ratio: 0.3, focus: false, cwd, env: splitEnv })
-          : client.paneSplit({ cwd, env: splitEnv });
-        round.note({ status: 'pane-created', paneId: round.paneId, anchorLost: true });
-      } catch (retryErr) {
-        throw round.fail('worker-spawn-fail', retryErr.code ?? 'pane_split_failed',
-          `executor failed to start for work "${workId}": herdr could not open a pane (${retryErr.code ?? 'unknown'}): ${retryErr.message}`);
-      }
+      throw round.fail('worker-spawn-fail', err.code ?? 'pane_split_failed',
+        `executor failed to start for work "${workId}": terminal-control could not open a pane (${err.code ?? 'unknown'}): ${err.message}`);
     }
+    if (slot.result !== 'slot') {
+      const err = refusalError(slot, `allocate ${key}`);
+      throw round.fail('worker-spawn-fail', err.code === 'terminal_unknown' ? 'pane_split_failed' : err.code,
+        `executor failed to start for work "${workId}": terminal-control could not open a pane (${err.code}): ${err.message}`);
+    }
+    round.paneId = slot.slot.paneId;
+    round.note({ status: 'pane-created', paneId: round.paneId });
   }
 
   // A confined run needs no seeding here: its private HOME is provisioned with
@@ -1814,8 +1792,6 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
       accountSource: trustAccountSource ?? null,
     });
   }
-
-  round.targetName = isConfined ? round.paneId : round.agentName;
 
   const agentKindToUse = agentKind ?? (ctx.command ? path.basename(ctx.command) : 'claude');
   const effectiveAgentArgs = (agentArgs && agentArgs.length) ? agentArgs : (ctx.args || []);
@@ -1868,7 +1844,7 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
       // The pane above is already split and open by this point -- a
       // write/readback failure here (EACCES, disk full, a corrupted
       // readback) must not leave it orphaned the way a bare throw would.
-      try { client.paneClose(round.paneId); } catch { /* best effort */ }
+      try { await io.release('close'); } catch { /* best effort */ }
       throw round.fail('worker-spawn-fail', err.code ?? 'launcher-script-write-failed',
         `executor for work "${workId}" could not prepare its launcher script at ${scriptPath}: ${err.message}`);
     }
@@ -1897,9 +1873,9 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
     const binding = ctx.confinementBinding ?? null;
     if (binding) {
       try {
-        binding.bind({ paneId: round.paneId, ...herdrEndpointForEnv(sessionEnv ?? process.env), binderPid: process.pid });
+        binding.bind({ paneId: round.paneId, terminalKey: key, ...herdrEndpointForEnv(sessionEnv ?? process.env), binderPid: process.pid });
       } catch (err) {
-        try { client.paneClose(round.paneId); } catch { /* best effort */ }
+        try { await io.release('close'); } catch { /* best effort */ }
         throw round.fail('worker-spawn-fail', 'confinement-bind-failed',
           `executor for work "${workId}" could not bind its confined home to pane "${round.paneId}" before launch: ${err.message}`);
       }
@@ -1922,7 +1898,6 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
     }
 
     let verifiedProc = null;
-    let pInfo = null;
 
     // F1: `existingCmd.paneId` already set (this round is reusing a pane
     // from a prior attempt at this same launchCommandId -- see the
@@ -1932,14 +1907,17 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
     // in that pane before deciding whether a launch is still needed at all.
     if (existingCmd?.paneId && !existingCmd?.resourceIncarnation) {
       try {
-        pInfo = client.paneProcessInfo(round.paneId);
-        verifiedProc = verifyForegroundProcessArgv({
-          foregroundProcesses: pInfo?.foregroundProcesses,
-          shellPid: pInfo?.shellPid,
+        const { foreground } = io.foreground();
+        const argv = foreground ? readProcessArgv(foreground.pid) : null;
+        if (argv && verifyForegroundProcessArgv({
+          foregroundProcesses: [{ pid: foreground.pid, argv }],
+          shellPid: null,
           argv0: agentKindToUse,
           command: preparedCommand,
           args: preparedArgs,
-        });
+        })) {
+          verifiedProc = foreground;
+        }
       } catch {}
     }
 
@@ -1950,7 +1928,7 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
       try {
         binding.markLaunched();
       } catch (err) {
-        try { client.paneClose(round.paneId); } catch { /* best effort */ }
+        try { await io.release('close'); } catch { /* best effort */ }
         throw round.fail('worker-spawn-fail', 'confinement-bind-failed',
           `executor for work "${workId}" could not record the launch in its confined home's marker for pane "${round.paneId}": ${err.message}`);
       }
@@ -1961,7 +1939,23 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
       // or generated id>.sh`), never user input, so this was never an
       // injection vector -- quoted anyway for defense in depth, the same
       // way every other argument this module hands to a shell already is.
-      client.paneRun(round.paneId, `bash ${shellEscapeArg(scriptPath)}`);
+      // The launcher execs the real worker under the agent's own argv0, so
+      // the port is told what process the pane is expected to become.
+      let launchedIdentity = null;
+      let launchProblem = null;
+      try {
+        const launched = tc.launch({
+          key,
+          launchSpec: {
+            command: 'bash', args: [scriptPath], cwd, env: {},
+            expect: { argv0: agentKindToUse, command: preparedCommand, args: preparedArgs },
+          },
+        });
+        if (launched.result === 'launched') launchedIdentity = launched.identity;
+        else launchProblem = launched.reason ?? launched.detail ?? launched.result;
+      } catch (err) {
+        launchProblem = err.message;
+      }
 
       // F-env-baseline-fix: a second read of the SAME on-disk script this
       // round already wrote and read back once above (before `pane run`)
@@ -1989,57 +1983,36 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
       let exeIdentityMismatch = false;
       let envMismatch = false;
       let cwdMismatch = false;
-      if (!scriptMismatch) {
-        const verifyDeadline = Date.now() + Math.min(deadlines.startup.readyMs || 10000, 5000);
-        while (Date.now() < verifyDeadline) {
-          try {
-            pInfo = client.paneProcessInfo(round.paneId);
-            verifiedProc = verifyForegroundProcessArgv({
-              foregroundProcesses: pInfo?.foregroundProcesses,
-              shellPid: pInfo?.shellPid,
-              argv0: agentKindToUse,
-              command: preparedCommand,
-              args: preparedArgs,
-            });
-            if (verifiedProc) {
-              // F3: argv is a claim the process makes about itself and cannot
-              // catch a binary swap -- same argv0/args, a different real
-              // executable behind it. Cross-check the kernel's own identity
-              // signal when it is available (Linux, process still alive);
-              // `null` (signal unavailable) is not treated as a pass, only an
-              // explicit `false` is -- there is no live evidence to act on
-              // either way when the check itself could not run.
-              if (verifyProcessExeIdentity(verifiedProc.pid, preparedCommand) === false) {
-                exeIdentityMismatch = true;
-                verifiedProc = null;
-                break;
-              }
-              // An env-only tamper -- an injected preload hook, an overridden
-              // prepared variable -- leaves argv and the executable both
-              // untouched, so neither check above sees it. Same
-              // null-is-not-a-pass contract as the exe-identity check.
-              if (verifyProcessEnvironment(verifiedProc.pid, preparedEnv) === false) {
-                envMismatch = true;
-                verifiedProc = null;
-                break;
-              }
-              // A `cd` injected into the launcher script's exec line
-              // changes where the process runs without touching its
-              // argv, executable, or environment -- none of the checks
-              // above see it. `null` here is NOT treated as a pass, unlike
-              // the exe-identity/env checks above: an unreadable
-              // `/proc/<pid>/cwd` gets the same fail-closed treatment as a
-              // confirmed mismatch, so this checks for `=== true` rather
-              // than `!== false`.
-              if (verifyProcessCwd(verifiedProc.pid, preparedCwd) !== true) {
-                cwdMismatch = true;
-                verifiedProc = null;
-                break;
-              }
-              break;
-            }
-          } catch {}
-          await sleep(100);
+      if (!scriptMismatch && launchedIdentity) {
+        verifiedProc = launchedIdentity;
+        // F3: argv is a claim the process makes about itself and cannot
+        // catch a binary swap -- same argv0/args, a different real
+        // executable behind it. Cross-check the kernel's own identity
+        // signal when it is available (Linux, process still alive);
+        // `null` (signal unavailable) is not treated as a pass, only an
+        // explicit `false` is -- there is no live evidence to act on
+        // either way when the check itself could not run.
+        if (verifyProcessExeIdentity(verifiedProc.pid, preparedCommand) === false) {
+          exeIdentityMismatch = true;
+          verifiedProc = null;
+        // An env-only tamper -- an injected preload hook, an overridden
+        // prepared variable -- leaves argv and the executable both
+        // untouched, so neither check above sees it. Same
+        // null-is-not-a-pass contract as the exe-identity check.
+        } else if (verifyProcessEnvironment(verifiedProc.pid, preparedEnv) === false) {
+          envMismatch = true;
+          verifiedProc = null;
+        // A `cd` injected into the launcher script's exec line
+        // changes where the process runs without touching its
+        // argv, executable, or environment -- none of the checks
+        // above see it. `null` here is NOT treated as a pass, unlike
+        // the exe-identity/env checks above: an unreadable
+        // `/proc/<pid>/cwd` gets the same fail-closed treatment as a
+        // confirmed mismatch, so this checks for `=== true` rather
+        // than `!== false`.
+        } else if (verifyProcessCwd(verifiedProc.pid, preparedCwd) !== true) {
+          cwdMismatch = true;
+          verifiedProc = null;
         }
       }
 
@@ -2050,7 +2023,7 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
         // someone to unknowingly keep watching a process that is not what
         // it claims -- actively kill whatever IS in the pane and close it,
         // rather than only refusing and reporting.
-        const screen = killPaneForegroundAndClose(client, round.paneId, pInfo, round.targetName ?? round.agentName);
+        const screen = await killSlotForegroundAndClose(io);
         throw round.fail('worker-spawn-fail', 'confinement-mismatch',
           scriptMismatch
             ? `launcher script at "${scriptPath}" no longer matches what this round wrote and read back before launching it in pane "${round.paneId}" -- possible script-content tamper (e.g. an injected command); process killed and pane closed.`
@@ -2060,7 +2033,7 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
                 ? `foreground process in pane "${round.paneId}" matched prepared argv and executable but its real environment (/proc/<pid>/environ) does not match the prepared invocation's env -- possible env-injection tamper (e.g. LD_PRELOAD or an overridden prepared variable); process killed and pane closed.`
                 : cwdMismatch
                   ? `foreground process in pane "${round.paneId}" matched prepared argv, executable, and environment but its real working directory (/proc/<pid>/cwd) does not match the prepared invocation's cwd "${preparedCwd}" -- possible cwd-injection tamper (e.g. an injected "cd" in the launcher script), or /proc/<pid>/cwd was unreadable; process killed and pane closed.`
-                  : `foreground process in pane "${round.paneId}" does not match prepared command argv; process killed and pane closed.`,
+                  : `foreground process in pane "${round.paneId}" does not match prepared command argv${launchProblem ? ` (${launchProblem})` : ''}; process killed and pane closed.`,
           screen ? { screen } : {});
       }
     }
@@ -2070,19 +2043,17 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
       // fgos reported ("working") became the pane's status authority and froze `agent get` for the
       // whole round, hiding a finished, stalled or limited agent. Only a process herdr cannot
       // recognise as an agent gets a reported state, because that is the one way to address it.
-      await ensureHerdrKnowsAgent({ client, round, paneId: round.paneId, agentKind: agentKindToUse, graceMs: deadlines.startup.detectMs });
+      await ensureHerdrKnowsAgent({ io, round, agentKind: agentKindToUse, label: display.label, graceMs: deadlines.startup.detectMs });
       try {
-        const ag = client.agentGet(round.paneId);
-        if (ag?.agentSession) {
-          round.agentSession = { value: typeof ag.agentSession === 'object' ? ag.agentSession.value : ag.agentSession };
-        }
+        const ag = io.state();
+        if (ag.agentSession) round.agentSession = { value: ag.agentSession };
       } catch {}
 
       resourceIncarnation = computeHerdrResourceIncarnation({
         paneId: round.paneId,
-        shellPid: pInfo?.shellPid || null,
+        shellPid: null,
         workerPid: verifiedProc.pid,
-        foregroundPgid: pInfo?.foregroundPgid || null,
+        foregroundPgid: verifiedProc.pgid || null,
         processStartTime: getProcessStartTime(verifiedProc.pid),
       });
     } else {
@@ -2091,6 +2062,7 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
   } else {
     herdrStartArgv = ['agent', 'start', round.agentName, '--kind', agentKindToUse, '--pane', round.paneId, '--timeout', String(deadlines.startup.readyMs), ...((effectiveAgentArgs && effectiveAgentArgs.length) ? ['--', ...effectiveAgentArgs] : [])];
 
+    let startedIdentity = null;
     if (!existingCmd?.paneId || !existingCmd?.resourceIncarnation) {
       // H-2/F-1: this is the legacy unconfined path -- `startAgent` already
       // fails by name and deliberately leaves the pane open (see its own
@@ -2100,25 +2072,19 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
       // property of THAT path's security contract, not of this one; wrapping
       // this call the same way silently changed pre-existing, intentional
       // behaviour (test/runner/herdr-spawn-adapter.test.mjs:477).
-      startAgent({ client, round, agentKind: agentKindToUse, agentArgs: effectiveAgentArgs, readyMs: deadlines.startup.readyMs });
+      startedIdentity = startAgent({ tc, io, round, agentKind: agentKindToUse, agentArgs: effectiveAgentArgs, readyMs: deadlines.startup.readyMs, cwd });
     }
 
     if (existingCmd?.resourceIncarnation) {
       resourceIncarnation = existingCmd.resourceIncarnation;
     } else {
-      try {
-        const pInfo = client.paneProcessInfo(round.paneId);
-        const workerProc = pInfo?.foregroundProcesses?.find((p) => p.pid && p.pid !== pInfo.shellPid);
-        resourceIncarnation = computeHerdrResourceIncarnation({
-          paneId: round.paneId,
-          shellPid: pInfo?.shellPid || null,
-          workerPid: workerProc?.pid || null,
-          foregroundPgid: pInfo?.foregroundPgid || null,
-          processStartTime: workerProc?.pid ? getProcessStartTime(workerProc.pid) : null,
-        });
-      } catch {
-        resourceIncarnation = computeHerdrResourceIncarnation({ paneId: round.paneId });
-      }
+      resourceIncarnation = computeHerdrResourceIncarnation({
+        paneId: round.paneId,
+        shellPid: null,
+        workerPid: startedIdentity?.pid || null,
+        foregroundPgid: startedIdentity?.pgid || null,
+        processStartTime: startedIdentity?.pid ? getProcessStartTime(startedIdentity.pid) : null,
+      });
     }
   }
 
@@ -2146,27 +2112,27 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
 
   const message = briefMessage({ delivery, briefText, runDir, roundNumber });
   try {
-    const confinedTarget = Boolean(round.targetName && round.targetName === round.paneId);
+    const confinedTarget = isConfined;
     if (confinedTarget) {
       // Nothing started this agent through herdr, so herdr never waited for its prompt.
-      const readiness = await awaitPromptReady({ client, target: round.targetName, readyMs: deadlines.startup.readyMs });
+      const readiness = await awaitPromptReady({ io, readyMs: deadlines.startup.readyMs });
       round.note({ promptReadiness: readiness });
-      refuseBriefIntoUnreadyPane({ client, round, readiness });
+      await refuseBriefIntoUnreadyPane({ io, round, readiness });
     }
-    deliverBrief({ client, round, message, promptMs: deadlines.startup.promptMs, resultPath: paths.resultPath });
+    deliverBrief({ io, round, message, promptMs: deadlines.startup.promptMs, resultPath: paths.resultPath });
     if (confinedTarget) {
-      await confirmBriefSubmitted({ client, target: round.targetName, message, paths, round });
+      await confirmBriefSubmitted({ io, message, paths, round });
     }
   } catch (err) {
-    cleanupAndKeepScreen(client, round, err);
+    await cleanupAndKeepScreen(io, round, err);
     throw err;
   }
 
-  const readLiveness = livenessProbe(client, round.paneId);
+  const readLiveness = livenessProbe(io);
   let decision;
   try {
     decision = await pollForOutcome({
-      client, round, paths, message: briefMessage({ delivery, briefText, runDir, roundNumber }), deadlines, usageLimitPatterns, readLiveness,
+      io, round, paths, message: briefMessage({ delivery, briefText, runDir, roundNumber }), deadlines, usageLimitPatterns, readLiveness,
     });
   } catch (err) {
     // The only way `pollForOutcome` itself throws (rather than returning a
@@ -2174,7 +2140,7 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
     // ready -- every other outcome (timeout/died/blocked/settled) returns
     // normally and is handled by `concludeFailure`'s own considered
     // pane-fate policy below, which this must not interfere with.
-    cleanupAndKeepScreen(client, round, err);
+    await cleanupAndKeepScreen(io, round, err);
     throw err;
   }
 
@@ -2212,11 +2178,11 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
         }
       }
     }
-    throw concludeFailure({ client, round, decision, closeAlways });
+    throw await concludeFailure({ io, round, decision, closeAlways, retainFailedPaneMs });
   }
 
   const stdout = await settleRound({
-    client, round, paths, exitCommand,
+    io, round, paths, exitCommand,
     promptMs: deadlines.startup.promptMs, readLiveness, workerHomePath, launcherScriptPath,
     trustStore, cwd, repoRoot, fullEnv, workerEnv: isConfined ? (preparedWorkerInvocation.env || null) : null,
   });
