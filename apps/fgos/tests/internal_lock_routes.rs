@@ -252,6 +252,51 @@ fn lock_fd_runs_the_predecessor_rule_before_answering_acquired() {
 }
 
 #[test]
+fn probe_opens_its_own_description_and_answers_free_or_held() {
+    let _serial = serial();
+    let dir = temp_dir("probe");
+    let res = Resource::new("probe", dir.join("probe.lock"));
+    let path = res.path.to_string_lossy().into_owned();
+    // A lock file that does not exist is free, and the probe does not create it.
+    let none = route(&["lock-fd", "--protocol", "1", "--probe", &path]);
+    assert_eq!((none.status.code(), json_line(&none)["result"].clone()), (Some(0), Value::from("free")));
+    assert!(!res.path.exists());
+    let owner = match acquire(&res, Mode::Ex, Wait::Try, 2000) {
+        Acquire::Acquired(h) => h,
+        other => panic!("{other:?}"),
+    };
+    let held = route(&["lock-fd", "--protocol", "1", "--probe", &path]);
+    assert_eq!((held.status.code(), json_line(&held)["result"].clone()), (Some(10), Value::from("held")));
+    release(owner);
+    let free = route(&["lock-fd", "--protocol", "1", "--probe", &path]);
+    assert_eq!((free.status.code(), json_line(&free)["result"].clone()), (Some(0), Value::from("free")));
+    let _ = fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn lock_hold_is_refused_by_name_off_windows_and_checks_its_usage() {
+    let _serial = serial();
+    let dir = temp_dir("hold-usage");
+    let path = dir.join("hold.lock").to_string_lossy().into_owned();
+    let work = dir.to_string_lossy().into_owned();
+    let out = route(&["lock-hold", "--protocol", "1", "--path", &path, "--mode", "ex", "--work", &work, "--try"]);
+    assert_eq!(out.status.code(), Some(12));
+    let v = json_line(&out);
+    assert_eq!((v["result"].as_str(), v["reason"].as_str()), (Some("unavailable"), Some("unsupported-platform")));
+    for args in [
+        vec!["lock-hold", "--protocol", "1", "--path", &path, "--mode", "ex", "--work", &work],
+        vec!["lock-hold", "--protocol", "1", "--path", &path, "--mode", "rw", "--work", &work, "--try"],
+        vec!["lock-hold", "--protocol", "1", "--mode", "ex", "--work", &work, "--try"],
+        vec!["lock-hold", "--protocol", "1", "--path", &path, "--mode", "ex", "--work", &work, "--try", "--wait-ms", "5"],
+    ] {
+        let out = route(&args);
+        assert_eq!(out.status.code(), Some(2), "{args:?}");
+        assert_eq!(json_line(&out)["code"], "usage", "{args:?}");
+    }
+    let _ = fs::remove_dir_all(&dir);
+}
+
+#[test]
 fn protocol_and_usage_errors_fail_closed() {
     let _serial = serial();
     for args in [vec!["state-root"], vec!["state-root", "--protocol", "2"], vec!["lock-fd", "--try"], vec!["quiesce-scan", "--protocol", "0", "--root", "/"]] {

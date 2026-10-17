@@ -21,6 +21,16 @@ export const ROUTE_CALL_TIMEOUT_MS = 2000;
 /** Headroom added to every bounded wait, so the helper is only killed when it really hung. */
 export const ROUTE_SLACK_MS = 1000;
 
+/**
+ * How a lock reaches the kernel from Node: `fd` hands an open description to
+ * `lock-fd` (POSIX flock), `hold` keeps one `lock-hold` helper alive per held
+ * lock (Windows LockFileEx belongs to the process that took it). The only
+ * place that looks at the platform; the facade branches on this answer.
+ */
+export function lockTransport(platform = process.platform) {
+  return platform === 'win32' ? 'hold' : 'fd';
+}
+
 let resolvedBin = null;
 
 /**
@@ -81,7 +91,12 @@ function interpretRoute({ status, signal, stdout, stderr, error, timedOut }, bin
     const how = signal ? `signal ${signal}` : `exit ${status}`;
     throw new HolderLockError('lock-route-bad-output', `${bin} ${verb} printed nothing (${how})${err ? `: ${err.slice(0, 300)}` : ''}`, { status, signal, stderr: err.slice(0, 300) });
   }
-  const line = parseRouteLine(text, bin);
+  return routeLineOrThrow(parseRouteLine(text, bin), bin, verb, status);
+}
+
+/** A parsed route line, or the named error when the route answered `error`.
+ * Shared by the fd transport (stdout) and the hold transport (`ready.json`). */
+export function routeLineOrThrow(line, bin, verb, status = null) {
   if (line.result === 'error') {
     if (line.code === 'host-version-mismatch') throw unavailable('host-version-mismatch', `${bin} ${verb}: ${line.message}`);
     if (line.code === 'usage') throw new HolderLockError('lock-route-usage', `${bin} ${verb}: ${line.message}`, { argv: verb });

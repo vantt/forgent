@@ -154,6 +154,7 @@
     "src/holder-lock/registry.mjs": "infra",
     "src/holder-lock/state-root.mjs": "infra",
     "src/holder-lock/driver.mjs": "infra",
+    "src/holder-lock/hold-transport.mjs": "infra",
     "src/holder-lock/protocol.mjs": "infra",
     "src/holder-lock/lock-scope.mjs": "infra",
     "src/holder-lock/fences.mjs": "infra",
