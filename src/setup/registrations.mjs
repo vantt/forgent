@@ -137,6 +137,8 @@ import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
 import { probeIdentity } from '../util/session-identity.mjs';
 import { listAssignmentRuns, scanAssignmentLayout, projectRunEligibility } from '../runner/dispatch/assignment-layout.mjs';
 import { conventionCheck } from '../convention/convention-client.mjs';
+import { checkTerminalControl, checkTerminalConfig, checkTerminalAllocations, fixTerminalDir } from './terminal-control-checks.mjs';
+import { TERMINAL_CONFIG_KEY, DEFAULT_TERMINAL_CONFIG } from '../terminal-control/config.mjs';
 import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, checkLockFences, fixLockFences, checkLockPredecessorKillWait, checkStateRoot, fixLockDirs } from './holder-lock-checks.mjs';
 import { checkLockRecordUnreadable } from './lock-record-checks.mjs';
 import { DEFAULT_KILL_WAIT_MS } from '../holder-lock/protocol.mjs';
@@ -4312,37 +4314,6 @@ registerCheck({
 // of the same invariant is cheap, and it catches a config that arrived by some
 // route the loader never saw.
 
-/** herdr is the transport every interactive mechanism depends on; without it
- * there is nothing to dispatch into. */
-export function checkHerdrAvailable() {
-  const bin = resolveHerdrBin();
-  try {
-    const out = execFileSync(bin, ['--version'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
-    const anchorPane = process.env.FGOS_HERDR_ANCHOR_PANE;
-    let anchorDetails = '';
-    if (anchorPane !== undefined) {
-      const trimmed = anchorPane.trim();
-      if (!trimmed) {
-        return { passed: false, message: `herdr is available (${out}), but FGOS_HERDR_ANCHOR_PANE is empty` };
-      }
-      try {
-        const paneOut = execFileSync(bin, ['pane', 'get', trimmed], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 3000 });
-        let parsed;
-        try { parsed = JSON.parse(paneOut); } catch {}
-        if (parsed?.error) {
-          return { passed: false, message: `herdr is available (${out}), but FGOS_HERDR_ANCHOR_PANE="${trimmed}" cannot be resolved: ${parsed.error.message || parsed.error.code}` };
-        }
-        anchorDetails = `; anchor pane "${trimmed}" verified`;
-      } catch (paneErr) {
-        return { passed: false, message: `herdr is available (${out}), but FGOS_HERDR_ANCHOR_PANE="${trimmed}" cannot be resolved: ${paneErr.message}` };
-      }
-    }
-    return { passed: true, message: `herdr is available on PATH (${out})${anchorDetails}` };
-  } catch (err) {
-    return { passed: false, message: `herdr is not usable on PATH (${bin}): ${err.message}` };
-  }
-}
-
 /** The folder-trust store must be readable and well-formed, or every dispatch
  * into a fresh worktree stops at a trust dialog with nobody there to answer it. */
 export function checkTrustStoreWritable(storePath = path.join(os.homedir(), '.claude.json')) {
@@ -4519,7 +4490,7 @@ export function checkInvocationGitWriteGrants(runnerCfg = {}) {
 /** herdr's own list of agent kinds it can start, read from the command that
  * enforces it rather than copied into this repo where it would go stale in
  * silence. Returns null when herdr cannot be asked -- absence is already
- * `herdr-available`'s business, and reporting it twice helps nobody. */
+ * `terminal-control`'s business, and reporting it twice helps nobody. */
 export function readHerdrAgentKinds(run = defaultHerdrRun) {
   const help = run(['agent', 'start', '--help']);
   if (help === null) return null;
@@ -4628,10 +4599,22 @@ export function checkHerdrExecutorKinds(runnerCfg = {}, injected = {}) {
 }
 
 registerCheck({
-  id: 'herdr-available',
-  description: 'herdr resolves on PATH and reports a version -- the transport every interactive dispatch mechanism needs',
-  check: () => checkHerdrAvailable(),
+  id: 'terminal-control',
+  description: 'the terminal-control driver (herdr) answers, which capabilities it declares and which server it talks to; a bad FGOS_HERDR_ANCHOR_PANE fails, a missing herdr only warns',
+  check: () => checkTerminalControl(),
 });
+registerCheck({
+  id: 'terminal-config',
+  description: 'terminal.* after the config merge, each value with its source; allocationGraceMs, retainFailedPaneMs, the layout policy and limits must satisfy their rules',
+  check: (cwd) => checkTerminalConfig(cwd),
+});
+registerCheck({
+  id: 'terminal-allocations',
+  description: 'terminal slots past allocationGraceMs that never launched and retained panes past their time; reports only, closes nothing',
+  check: (cwd) => checkTerminalAllocations(cwd),
+});
+registerConfigDefault({ id: 'terminal', key: TERMINAL_CONFIG_KEY, shape: DEFAULT_TERMINAL_CONFIG });
+registerFix({ id: 'terminal-dir', fix: (cwd) => fixTerminalDir(cwd) });
 
 registerCheck({
   id: 'herdr-executor-kinds',

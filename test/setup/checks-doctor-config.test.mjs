@@ -4,6 +4,7 @@
 // `node --test` trải suite ra các core. Thân test bê nguyên văn; chỉ
 // import/helper đổi cho khớp phần nào file này thật sự dùng.
 import { test } from 'node:test';
+import { DEFAULT_TERMINAL_CONFIG } from '../../src/terminal-control/config.mjs';
 import {
   DEFAULT_CLEANUP_LEAF_TTL_DAYS,
   DEFAULT_CLEANUP_TTL_DAYS,
@@ -244,6 +245,7 @@ test('config-not-stale passes when the existing config already has every default
       worktreeSetup: { commands: [] },
       workerSlots: { ceiling: null },
       lock: { predecessorKillWaitMs: 2000 },
+      terminal: DEFAULT_TERMINAL_CONFIG,
       gateway: { port: 4170, token: null },
       ironLaw: { level: DEFAULT_IRON_LAW_LEVEL },
       checkpoint: { fallbackIntervalSec: DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC },
