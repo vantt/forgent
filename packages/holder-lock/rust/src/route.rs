@@ -14,7 +14,9 @@ use serde_json::{json, Map, Value};
 
 use crate::borrow_vectors::{self, RunError};
 use crate::driver;
-use crate::port::{self, BorrowedCheck, DescriptionLock, Mode, NotBorrowerReason, Wait, BORROW_SLOT, DEFAULT_KILL_WAIT_MS, LOCK_FD_ENV};
+#[cfg(not(windows))]
+use crate::port::{NotBorrowerReason, LOCK_FD_ENV};
+use crate::port::{self, BorrowedCheck, DescriptionLock, Mode, Wait, BORROW_SLOT, DEFAULT_KILL_WAIT_MS};
 use crate::state_root;
 
 mod hold;
@@ -208,12 +210,21 @@ fn lock_fd(args: &[String]) -> i32 {
         if !drv.supported() {
             return emit(Some("unavailable"), json!({ "reason": "unsupported-platform", "detail": drv.unsupported_detail() }), EXIT_UNAVAILABLE);
         }
-        let file = match take_slot3() {
-            Ok(file) => file,
-            Err(_) => return emit(Some("not-borrower"), json!({ "reason": NotBorrowerReason::FdMissing.as_str() }), EXIT_NEGATIVE),
+        #[cfg(windows)]
+        let answer = {
+            let env = std::env::var(crate::LOCK_JOB_ENV).ok();
+            crate::borrowed_check_job(&lock_path, env.as_deref())
         };
-        let env = std::env::var(LOCK_FD_ENV).ok();
-        return match port::borrowed_check(&file, &lock_path, env.as_deref(), BORROW_SLOT) {
+        #[cfg(not(windows))]
+        let answer = {
+            let file = match take_slot3() {
+                Ok(file) => file,
+                Err(_) => return emit(Some("not-borrower"), json!({ "reason": NotBorrowerReason::FdMissing.as_str() }), EXIT_NEGATIVE),
+            };
+            let env = std::env::var(LOCK_FD_ENV).ok();
+            port::borrowed_check(&file, &lock_path, env.as_deref(), BORROW_SLOT)
+        };
+        return match answer {
             BorrowedCheck::Borrower => emit(Some("borrower"), json!({}), EXIT_OK),
             BorrowedCheck::NotBorrower(reason) => emit(Some("not-borrower"), json!({ "reason": reason.as_str() }), EXIT_NEGATIVE),
         };
@@ -325,7 +336,11 @@ fn lock_borrow_vectors(args: &[String]) -> i32 {
         Err(message) => return usage(&message),
     };
     let only: Vec<String> = flags.values("--vector").into_iter().map(str::to_string).collect();
-    let report = match borrow_vectors::run(Path::new("git"), &only, flags.has("--keep-repo")) {
+    let ran = match crate::port::HelperExe::current() {
+        Ok(helper) => borrow_vectors::run(Path::new("git"), &helper, &only, flags.has("--keep-repo")),
+        Err(err) => Err(RunError::Unavailable(format!("the running executable is unknown: {err}"))),
+    };
+    let report = match ran {
         Ok(report) => report,
         Err(RunError::Usage(message)) => return usage(&message),
         Err(RunError::Unavailable(detail)) => return emit(Some("unavailable"), json!({ "detail": detail }), EXIT_UNAVAILABLE),

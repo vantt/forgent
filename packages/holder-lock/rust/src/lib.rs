@@ -12,6 +12,8 @@
 //! `route`. Contracts, lock registry and shared vectors:
 //! `packages/holder-lock/contracts/`.
 
+#[cfg(windows)]
+mod borrow_windows;
 pub mod borrow_vectors;
 pub mod driver;
 pub mod helper;
@@ -25,4 +27,8 @@ pub use port::{
     acquire, borrowed_check, guarantee, holders, probe, release, run_borrowed, Acquire, BorrowError, BorrowOutcome, BorrowSpec, BorrowStdio, BorrowedCheck, Guarantee, Handle, HeldReason, HelperExe,
     HoldersList, Level, Mode, NotBorrowerReason, Probe, Resource, UnavailableReason, Wait, DEFAULT_KILL_WAIT_MS,
 };
+#[cfg(windows)]
+pub use borrow_windows::{borrowed_check_job, LOCK_JOB_ENV};
+#[doc(hidden)]
+pub use port::acquire_with_trace;
 pub use state_root::{lock_root, state_root, Source};

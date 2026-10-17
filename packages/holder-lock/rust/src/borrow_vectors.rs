@@ -3,6 +3,11 @@
 //! description leaks to a background process. Each vector takes the lock,
 //! runs git through `run_borrowed`, releases, and asserts the lock is free
 //! at once. Red means doctor FAIL and activate refuses.
+//!
+//! On Windows the borrow carries no descriptor, so a free lock proves nothing
+//! about leaked processes. Each background command writes its Windows pid; the
+//! vector opens its own `SYNCHRONIZE` handle to every such pid and asserts it
+//! is signaled once `run_borrowed` returned.
 
 use std::collections::BTreeMap;
 use std::fs;
@@ -11,7 +16,7 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::time::Instant;
 
-use crate::port::{self, Acquire, BorrowSpec, BorrowStdio, BorrowedCheck, Mode, Probe, Resource, Wait};
+use crate::port::{self, Acquire, BorrowSpec, BorrowStdio, BorrowedCheck, HelperExe, Mode, Probe, Resource, Wait};
 
 /// The four vectors, in run order.
 pub const VECTORS: [&str; 4] = ["shell-alias-background", "filter-clean-smudge", "hook-background", "gc-auto-loose-objects"];
@@ -139,8 +144,16 @@ fn write_hook(repo: &Path, name: &str, body: &str) -> Result<(), String> {
 }
 
 /// A background process that keeps every inherited descriptor but not the
-/// caller's stdio.
-const BACKGROUND: &str = "sleep 30 >/dev/null 2>&1 </dev/null &";
+/// caller's stdio. On Windows it also appends its own Windows pid to
+/// `pidfile` (`/proc/$!/winpid` under Git for Windows' `sh`).
+fn background(pidfile: &Path) -> String {
+    if cfg!(windows) {
+        let pidfile = pidfile.to_string_lossy().replace('\\', "/");
+        format!("sleep 30 >/dev/null 2>&1 </dev/null & echo $(cat /proc/$!/winpid) >> '{pidfile}';")
+    } else {
+        "sleep 30 >/dev/null 2>&1 </dev/null &".to_string()
+    }
+}
 
 /// Make `gc --auto` eligible under `gc.auto=1`: more than one loose object
 /// in `objects/17`, the directory git samples.
@@ -183,6 +196,7 @@ pub fn add_loose_objects(git: &Path, repo: &Path) -> Result<usize, String> {
 
 struct Borrowing<'a> {
     git: &'a Path,
+    helper: &'a HelperExe,
     repo: &'a Path,
     resource: Resource,
 }
@@ -200,8 +214,8 @@ impl Borrowing<'_> {
         for args in calls {
             let mut argv = vec![self.git.to_string_lossy().into_owned(), "-C".into(), self.repo.to_string_lossy().into_owned()];
             argv.extend(args.iter().map(|a| a.to_string()));
-            let spec = BorrowSpec { argv, cwd: Some(self.repo.to_path_buf()), env: git_env(), stdio: BorrowStdio::Null };
-            match port::run_borrowed(&handle, &spec) {
+            let spec = BorrowSpec { argv, cwd: Some(self.repo.to_path_buf()), env: git_env(), clear_env: false, stdio: BorrowStdio::Null };
+            match port::run_borrowed(&handle, &spec, self.helper) {
                 Ok(outcome) => {
                     killed += outcome.leftovers_killed;
                     if outcome.exit != Some(0) {
@@ -220,22 +234,24 @@ impl Borrowing<'_> {
     }
 }
 
-fn vector(name: &str, git: &Path, dir: &Path) -> VectorResult {
+fn vector(name: &str, git: &Path, helper: &HelperExe, dir: &Path) -> VectorResult {
     let started = Instant::now();
     let repo = dir.join(name);
     let resource = Resource::new("borrow-vectors", dir.join(format!("{name}.lock")));
+    let pidfile = dir.join(format!("{name}.pids"));
+    let bg = background(&pidfile);
     let result = (|| -> Result<(bool, String), String> {
         init_repo(git, &repo)?;
-        let borrowing = Borrowing { git, repo: &repo, resource };
+        let borrowing = Borrowing { git, helper, repo: &repo, resource };
         let (killed, probe, notes, expect_no_leftovers) = match name {
             "shell-alias-background" => {
-                config(git, &repo, "alias.bgsleep", &format!("!{BACKGROUND} true"))?;
+                config(git, &repo, "alias.bgsleep", &format!("!{bg} true"))?;
                 let (k, p, n) = borrowing.run(&[vec!["bgsleep"]])?;
                 (k, p, n, false)
             }
             "filter-clean-smudge" => {
-                config(git, &repo, "filter.bg.clean", &format!("{BACKGROUND} cat"))?;
-                config(git, &repo, "filter.bg.smudge", &format!("{BACKGROUND} cat"))?;
+                config(git, &repo, "filter.bg.clean", &format!("{bg} cat"))?;
+                config(git, &repo, "filter.bg.smudge", &format!("{bg} cat"))?;
                 fs::write(repo.join(".gitattributes"), "*.flt filter=bg\n").map_err(|e| e.to_string())?;
                 fs::write(repo.join("data.flt"), "filtered\n").map_err(|e| e.to_string())?;
                 let (k, p, n) = borrowing.run(&[
@@ -247,7 +263,7 @@ fn vector(name: &str, git: &Path, dir: &Path) -> VectorResult {
                 (k, p, n, false)
             }
             "hook-background" => {
-                let body = format!("#!/bin/sh\n{BACKGROUND}\nexit 0\n");
+                let body = format!("#!/bin/sh\n{bg}\nexit 0\n");
                 write_hook(&repo, "pre-commit", &body)?;
                 write_hook(&repo, "post-commit", &body)?;
                 let (k, p, n) = borrowing.run(&[vec!["commit", "-q", "--allow-empty", "-m", "hooked"]])?;
@@ -272,32 +288,106 @@ fn vector(name: &str, git: &Path, dir: &Path) -> VectorResult {
             pass = false;
             detail.push_str("; a background gc outlived git although run_borrowed disables gc.auto");
         }
+        if cfg!(windows) && !expect_no_leftovers {
+            match background_pids_ended(&pidfile) {
+                Ok(count) => detail.push_str(&format!("; {count} background process(es) ended")),
+                Err(why) => {
+                    pass = false;
+                    detail.push_str("; ");
+                    detail.push_str(&why);
+                }
+            }
+        }
         Ok((pass, detail))
     })();
     let (pass, detail) = result.unwrap_or_else(|err| (false, err));
     VectorResult { name: name.to_string(), pass, elapsed_ms: ms(started), detail }
 }
 
+/// Every pid the vector's background command wrote is a process that has
+/// ended, judged by this process's own `SYNCHRONIZE` handle (never the
+/// driver's empty rule). No pid at all means the command never ran: `sh`
+/// could not run it, which is named, because Git for Windows' `sh` must be
+/// reachable by git for the vectors to mean anything.
+#[cfg(windows)]
+fn background_pids_ended(pidfile: &Path) -> Result<usize, String> {
+    use windows_sys::Win32::Foundation::{CloseHandle, GetLastError, ERROR_INVALID_PARAMETER, WAIT_OBJECT_0};
+    use windows_sys::Win32::Storage::FileSystem::SYNCHRONIZE;
+    use windows_sys::Win32::System::Threading::{OpenProcess, WaitForSingleObject};
+
+    let text = fs::read_to_string(pidfile).unwrap_or_default();
+    let pids: Vec<u32> = text.lines().filter_map(|l| l.trim().parse().ok()).collect();
+    if pids.is_empty() {
+        return Err("no background process wrote its pid: `sh` did not run the vector's command (git must find Git for Windows' sh)".to_string());
+    }
+    for pid in &pids {
+        // SAFETY: OpenProcess takes plain values and returns a handle or null.
+        let handle = unsafe { OpenProcess(SYNCHRONIZE, 0, *pid) };
+        if handle.is_null() {
+            // SAFETY: reads the calling thread's last error.
+            let err = unsafe { GetLastError() };
+            if err == ERROR_INVALID_PARAMETER {
+                continue;
+            }
+            return Err(format!("cannot open background pid {pid} to judge it (Win32 error {err})"));
+        }
+        // SAFETY: a zero wait polls an open handle, which is closed right after.
+        let ended = unsafe { WaitForSingleObject(handle, 0) == WAIT_OBJECT_0 };
+        unsafe { CloseHandle(handle) };
+        if !ended {
+            return Err(format!("background pid {pid} is still running after run_borrowed returned"));
+        }
+    }
+    Ok(pids.len())
+}
+
+#[cfg(not(windows))]
+fn background_pids_ended(_pidfile: &Path) -> Result<usize, String> {
+    Ok(0)
+}
+
 /// The sibling check, in this process: while an owner holds the lock, a
-/// fresh description of the same file that claims the borrow slot through
-/// the environment is refused.
+/// process outside the borrow that only copied what the borrow tells its
+/// child (POSIX: the variable and a description it opened itself; Windows:
+/// the job variable, without being in the job) is refused.
 fn sibling(dir: &Path) -> (bool, String) {
     let resource = Resource::new("borrow-vectors", dir.join("sibling.lock"));
     let handle = match port::acquire(&resource, Mode::Ex, Wait::Ms(2000), KILL_WAIT_MS) {
         Acquire::Acquired(h) => h,
         other => return (false, format!("owner could not take the sibling lock: {other:?}")),
     };
-    let own = match fs::OpenOptions::new().read(true).write(true).open(&resource.path) {
-        Ok(f) => f,
-        Err(e) => return (false, format!("sibling open: {e}")),
-    };
-    let answer = port::borrowed_check(&own, &resource.path, Some(&format!("borrow-vectors:{}", port::BORROW_SLOT)), port::BORROW_SLOT);
-    drop(own);
+    let answer = sibling_answer(&handle, &resource);
     port::release(handle);
     match answer {
-        BorrowedCheck::NotBorrower(reason) => (true, format!("sibling refused ({})", reason.as_str())),
-        BorrowedCheck::Borrower => (false, "a sibling that opened the file itself was accepted as borrower".into()),
+        Ok(BorrowedCheck::NotBorrower(reason)) => (true, format!("sibling refused ({})", reason.as_str())),
+        Ok(BorrowedCheck::Borrower) => (false, "a sibling outside the borrow was accepted as borrower".into()),
+        Err(why) => (false, why),
     }
+}
+
+#[cfg(unix)]
+fn sibling_answer(_handle: &port::Handle, resource: &Resource) -> Result<BorrowedCheck, String> {
+    let own = fs::OpenOptions::new().read(true).write(true).open(&resource.path).map_err(|e| format!("sibling open: {e}"))?;
+    Ok(port::borrowed_check(&own, &resource.path, Some(&format!("borrow-vectors:{}", port::BORROW_SLOT)), port::BORROW_SLOT))
+}
+
+/// A real record and a real job the owner declared, with this process
+/// outside it: the check must stop at "not in the job".
+#[cfg(windows)]
+fn sibling_answer(handle: &port::Handle, resource: &Resource) -> Result<BorrowedCheck, String> {
+    use fgos_process::platform::windows_job::{create_kill_job, filetime_now, job_name, own_session};
+    use fgos_process::{Domain, WindowsJob};
+
+    let name = job_name("fgos-borrow", "borrow-vectors");
+    let holder = fgos_process::facts::self_identity().ok_or("cannot read this process's identity")?;
+    let session_id = own_session().ok_or("cannot read this process's session")?;
+    let domain = Domain::WindowsJob(WindowsJob { job: name.clone(), session_id, declared_at: filetime_now(), holder, keeper: None });
+    handle.declare_domain(&domain).map_err(|e| format!("declare: {e}"))?;
+    let job = create_kill_job(&name).map_err(|e| format!("create job: {e}"))?;
+    let answer = crate::borrowed_check_job(&resource.path, Some(&format!("borrow-vectors:{name}")));
+    drop(job);
+    crate::predecessor::remove_record(&crate::predecessor::record_path(&resource.path));
+    Ok(answer)
 }
 
 fn temp_dir() -> io::Result<PathBuf> {
@@ -308,7 +398,7 @@ fn temp_dir() -> io::Result<PathBuf> {
 }
 
 /// Run the named vectors (all four when `only` is empty) with `git`.
-pub fn run(git: &Path, only: &[String], keep_repo: bool) -> Result<Report, RunError> {
+pub fn run(git: &Path, helper: &HelperExe, only: &[String], keep_repo: bool) -> Result<Report, RunError> {
     let started = Instant::now();
     for name in only {
         if !VECTORS.contains(&name.as_str()) {
@@ -325,7 +415,7 @@ pub fn run(git: &Path, only: &[String], keep_repo: bool) -> Result<Report, RunEr
     let vectors = VECTORS
         .iter()
         .filter(|name| only.is_empty() || only.iter().any(|o| o == *name))
-        .map(|name| vector(name, git, &dir))
+        .map(|name| vector(name, git, helper, &dir))
         .collect();
     let sibling = sibling(&dir);
     let kept = if keep_repo {

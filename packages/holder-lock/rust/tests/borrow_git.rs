@@ -36,10 +36,15 @@ fn borrowing_git_disables_automatic_gc_and_maintenance() {
     assert_eq!(borrowed_argv(&other), other);
 }
 
+/// POSIX borrowing never starts a helper; the path only fills the parameter.
+fn helper() -> fgos_holder_lock::HelperExe {
+    fgos_holder_lock::HelperExe::current().expect("current exe")
+}
+
 #[test]
 fn the_four_borrow_vectors_and_the_sibling_check_are_green() {
     let _serial = serial();
-    let report = borrow_vectors::run(git(), &[], false).expect("vectors run");
+    let report = borrow_vectors::run(git(), &helper(), &[], false).expect("vectors run");
     for v in &report.vectors {
         println!("vector {}: {} in {} ms ({})", v.name, if v.pass { "pass" } else { "FAIL" }, v.elapsed_ms, v.detail);
     }
@@ -51,7 +56,7 @@ fn the_four_borrow_vectors_and_the_sibling_check_are_green() {
 #[test]
 fn an_unknown_vector_name_is_a_usage_error() {
     let _serial = serial();
-    assert!(matches!(borrow_vectors::run(git(), &["nope".to_string()], false), Err(borrow_vectors::RunError::Usage(_))));
+    assert!(matches!(borrow_vectors::run(git(), &helper(), &["nope".to_string()], false), Err(borrow_vectors::RunError::Usage(_))));
 }
 
 fn others_holding(lock: &Path) -> Vec<u32> {
@@ -150,10 +155,11 @@ fn run_borrowed_kills_a_setsid_escaper_before_returning() {
         argv: vec!["git".into(), "-C".into(), repo.to_string_lossy().into_owned(), "commit".into(), "-q".into(), "--allow-empty".into(), "-m".into(), "hooked".into()],
         cwd: None,
         env: git_env(),
+        clear_env: false,
         stdio: BorrowStdio::Null,
     };
     let started = Instant::now();
-    let outcome = run_borrowed(&handle, &spec).expect("run_borrowed");
+    let outcome = run_borrowed(&handle, &spec, &helper()).expect("run_borrowed");
     assert_eq!(outcome.exit, Some(0));
     assert!(outcome.leftovers_killed >= 1, "{outcome:?}");
     let escaper: u32 = fs::read_to_string(&pidfile).unwrap().trim().parse().unwrap();

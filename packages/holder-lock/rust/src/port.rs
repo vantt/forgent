@@ -14,11 +14,14 @@ use std::collections::BTreeMap;
 use std::fs::{File, OpenOptions};
 use std::io;
 use std::path::{Path, PathBuf};
+#[cfg(unix)]
 use std::process::{Command, Stdio};
 use std::time::{Duration, Instant};
 
 use fgos_process::facts::ProcTuple;
-use fgos_process::{Domain, FdSlot};
+#[cfg(unix)]
+use fgos_process::FdSlot;
+use fgos_process::{Domain, WatchTrace};
 use serde_json::{json, Value};
 
 use crate::driver::{self, LockDriver, TryLock};
@@ -163,8 +166,8 @@ pub enum Acquire {
 pub struct Handle {
     file: File,
     resource: Resource,
-    mode: Mode,
-    kill_wait_ms: u64,
+    pub(crate) mode: Mode,
+    pub(crate) kill_wait_ms: u64,
 }
 
 impl Drop for Handle {
@@ -280,13 +283,21 @@ pub enum HoldersList {
 }
 
 /// Where a borrowing child's stdio goes.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub enum BorrowStdio {
     /// Inherit the caller's stdio.
     #[default]
     Inherit,
     /// `/dev/null` for all three.
     Null,
+    /// stdin from null; stdout and stderr appended to these files (Windows
+    /// only: the `lock-hold` helper hands a Node caller the output this way).
+    Files {
+        /// Receives the child's stdout.
+        out: PathBuf,
+        /// Receives the child's stderr.
+        err: PathBuf,
+    },
 }
 
 /// The command [`run_borrowed`] runs with the holder's authority.
@@ -296,8 +307,11 @@ pub struct BorrowSpec {
     pub argv: Vec<String>,
     /// Working directory; `None` keeps the caller's.
     pub cwd: Option<PathBuf>,
-    /// Variables set on top of the caller's environment.
+    /// Variables set on top of the caller's environment, or, with
+    /// `clear_env`, the child's whole environment.
     pub env: BTreeMap<String, String>,
+    /// Start the child from an empty environment instead of this process's.
+    pub clear_env: bool,
     /// Where the child's stdio goes.
     pub stdio: BorrowStdio,
 }
@@ -451,6 +465,20 @@ fn open_lock_file(path: &Path) -> io::Result<File> {
 /// previous holder declared is empty (killed at once if it is not, waiting
 /// at most `kill_wait_ms` for it to be gone).
 pub fn acquire(resource: &Resource, mode: Mode, wait: Wait, kill_wait_ms: u64) -> Acquire {
+    acquire_with_trace(resource, mode, wait, kill_wait_ms).0
+}
+
+/// [`acquire`], plus what the predecessor rule saw (see
+/// [`predecessor::admit_with_trace`]); the same code path, the trace is empty
+/// when no record was judged.
+#[doc(hidden)]
+pub fn acquire_with_trace(resource: &Resource, mode: Mode, wait: Wait, kill_wait_ms: u64) -> (Acquire, WatchTrace) {
+    let mut trace = WatchTrace::default();
+    let answer = acquire_traced(resource, mode, wait, kill_wait_ms, &mut trace);
+    (answer, trace)
+}
+
+fn acquire_traced(resource: &Resource, mode: Mode, wait: Wait, kill_wait_ms: u64, trace: &mut WatchTrace) -> Acquire {
     let drv = driver::current();
     if !drv.supported() {
         return Acquire::Unavailable { reason: UnavailableReason::UnsupportedPlatform, detail: drv.unsupported_detail().to_string() };
@@ -497,7 +525,9 @@ pub fn acquire(resource: &Resource, mode: Mode, wait: Wait, kill_wait_ms: u64) -
             }
             continue;
         }
-        if let Some(domain) = admit_after_lock(&resource.path, kill_wait_ms) {
+        let (admitted, seen) = predecessor::admit_with_trace(&predecessor::record_path(&resource.path), Duration::from_millis(kill_wait_ms));
+        *trace = seen;
+        if let Admit::NotEmpty { domain } = admitted {
             drop(locked);
             drop(file);
             return Acquire::Held { reason: HeldReason::PredecessorDomainNotEmpty, domain: Some(domain) };
@@ -533,12 +563,32 @@ pub fn borrowed_argv(argv: &[String]) -> Vec<String> {
     out
 }
 
-/// Run one child command with the holder's authority: the description goes
-/// to the child at slot 3 with `FGOS_LOCK_FD=<name>:3`. After the child
-/// exits, whatever else still holds the description (Linux: every other
-/// process listed as a holder; macOS: the child's process group) is killed
-/// and waited for, up to the handle's kill wait, before this returns.
-pub fn run_borrowed(handle: &Handle, spec: &BorrowSpec) -> Result<BorrowOutcome, BorrowError> {
+/// Run one child command with the holder's authority.
+///
+/// POSIX: the description goes to the child at slot 3 with
+/// `FGOS_LOCK_FD=<name>:3`. After the child exits, whatever else still holds
+/// the description (Linux: every other process listed as a holder; macOS: the
+/// child's process group) is killed and waited for, up to the handle's kill
+/// wait, before this returns.
+///
+/// Windows: the child runs inside a named kill-on-close job this process
+/// creates, a second job owner (`helper`, role `job-keeper`) outlives a dead
+/// holder, and nothing is handed to the child (`borrow_windows`). `helper` is
+/// unused on POSIX.
+pub fn run_borrowed(handle: &Handle, spec: &BorrowSpec, helper: &HelperExe) -> Result<BorrowOutcome, BorrowError> {
+    #[cfg(windows)]
+    {
+        crate::borrow_windows::run(handle, spec, helper, &crate::borrow_windows::BorrowControl::none())
+    }
+    #[cfg(unix)]
+    {
+        let _ = helper;
+        run_borrowed_posix(handle, spec)
+    }
+}
+
+#[cfg(unix)]
+fn run_borrowed_posix(handle: &Handle, spec: &BorrowSpec) -> Result<BorrowOutcome, BorrowError> {
     let drv = driver::current();
     if !drv.supported() {
         return Err(BorrowError::Unsupported);
@@ -555,10 +605,17 @@ pub fn run_borrowed(handle: &Handle, spec: &BorrowSpec) -> Result<BorrowOutcome,
     if let Some(cwd) = &spec.cwd {
         cmd.current_dir(cwd);
     }
+    if spec.clear_env {
+        cmd.env_clear();
+    }
     cmd.envs(&spec.env);
     cmd.env(LOCK_FD_ENV, format!("{}:{BORROW_SLOT}", handle.resource.name));
-    if spec.stdio == BorrowStdio::Null {
-        cmd.stdin(Stdio::null()).stdout(Stdio::null()).stderr(Stdio::null());
+    match &spec.stdio {
+        BorrowStdio::Inherit => {}
+        BorrowStdio::Null => {
+            cmd.stdin(Stdio::null()).stdout(Stdio::null()).stderr(Stdio::null());
+        }
+        BorrowStdio::Files { .. } => return Err(BorrowError::InvalidSpec("file stdio is only available on Windows".into())),
     }
     drv.prepare_borrow(&mut cmd);
     let mut child = fgos_process::control::spawn_with_fds(cmd, &[(FdSlot(BORROW_SLOT), &handle.file)]).map_err(BorrowError::Spawn)?;
@@ -584,8 +641,8 @@ pub fn run_borrowed(handle: &Handle, spec: &BorrowSpec) -> Result<BorrowOutcome,
 }
 
 /// Block until `pid` (a child of this process) has exited, without reaping it.
+#[cfg(unix)]
 fn wait_exited_unreaped(pid: u32) -> io::Result<()> {
-    #[cfg(unix)]
     loop {
         // SAFETY: waitid fills a zeroed siginfo for our own child; WNOWAIT
         // leaves it waitable for the reap that follows.
@@ -598,23 +655,12 @@ fn wait_exited_unreaped(pid: u32) -> io::Result<()> {
             return Err(err);
         }
     }
-    #[cfg(not(unix))]
-    {
-        let _ = pid;
-        Ok(())
-    }
 }
 
+#[cfg(unix)]
 fn exit_parts(status: &std::process::ExitStatus) -> (Option<i32>, Option<i32>) {
-    #[cfg(unix)]
-    {
-        use std::os::unix::process::ExitStatusExt;
-        (status.code(), status.signal())
-    }
-    #[cfg(not(unix))]
-    {
-        (status.code(), None)
-    }
+    use std::os::unix::process::ExitStatusExt;
+    (status.code(), status.signal())
 }
 
 /// Why a description is not a borrower.
@@ -629,6 +675,17 @@ pub enum NotBorrowerReason {
     LockNotHeldByDescription,
     /// The lock file does not exist.
     NotALockFile,
+    /// Windows: `FGOS_LOCK_JOB` is absent or malformed.
+    JobMissing,
+    /// Windows: the predecessor record is absent, unreadable, or names
+    /// another job or no holder.
+    RecordMismatch,
+    /// Windows: this process is not a member of the job.
+    NotInJob,
+    /// Windows: the recorded holder is not one of this process's ancestors.
+    HolderNotAncestor,
+    /// Windows: the lock is free.
+    LockNotHeld,
 }
 
 impl NotBorrowerReason {
@@ -639,6 +696,11 @@ impl NotBorrowerReason {
             NotBorrowerReason::InodeMismatch => "inode-mismatch",
             NotBorrowerReason::LockNotHeldByDescription => "lock-not-held-by-description",
             NotBorrowerReason::NotALockFile => "not-a-lock-file",
+            NotBorrowerReason::JobMissing => "job-missing",
+            NotBorrowerReason::RecordMismatch => "record-mismatch",
+            NotBorrowerReason::NotInJob => "not-in-job",
+            NotBorrowerReason::HolderNotAncestor => "holder-not-ancestor",
+            NotBorrowerReason::LockNotHeld => "lock-not-held",
         }
     }
 }

@@ -113,7 +113,17 @@ pub fn domain_watch(domain: &Domain) -> DomainWatch {
 
 /// The job view of the named Windows job, for the release rule and the keeper.
 #[cfg(windows)]
-pub use platform::windows_job::job_view;
+pub use platform::windows_job::{job_view, NamedBy};
+
+/// What a watch saw while it judged a domain: whether the job could be opened
+/// and, per pid, which sources named it. Empty off Windows.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct WatchTrace {
+    /// The job opened by name (not the fallback over the tree).
+    pub job_opened: bool,
+    /// `(pid, listed, scanned, in tree)` for every pid any poll named.
+    pub named: Vec<(u32, bool, bool, bool)>,
+}
 
 /// Is the signal outcome one that leaves nothing to end: sent, or the process
 /// was already gone or is no longer the recorded one.
@@ -152,6 +162,15 @@ impl DomainWatch {
                 }
             }
             Watch::Direct(_) => KillOutcome::Refused,
+        }
+    }
+
+    /// What this watch saw so far (see [`WatchTrace`]).
+    pub fn trace(&self) -> WatchTrace {
+        match &self.inner {
+            #[cfg(windows)]
+            Watch::Job(view) => WatchTrace { job_opened: view.job_opened(), named: view.trace().into_iter().map(|(pid, by)| (pid, by.list, by.scan, by.tree)).collect() },
+            Watch::Direct(_) => WatchTrace::default(),
         }
     }
 
