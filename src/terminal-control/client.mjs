@@ -157,7 +157,16 @@ export function createTerminalControl({ hostBin, herdrBin, env, config, timeoutM
         timedOut = true;
         child.kill('SIGKILL');
       }, timeoutMs);
-      child.stdout.on('data', (chunk) => { if (stdout.length < MAX_OUTPUT_BYTES) stdout += chunk; });
+      // Decode as a stream: a multi-byte character may straddle two chunks.
+      child.stdout.setEncoding('utf8');
+      child.stderr.setEncoding('utf8');
+      child.stdout.on('data', (chunk) => {
+        stdout += chunk;
+        if (stdout.length > MAX_OUTPUT_BYTES) {
+          spawnError = Object.assign(new Error('output exceeded the buffer'), { code: 'ENOBUFS' });
+          child.kill('SIGKILL');
+        }
+      });
       child.stderr.on('data', (chunk) => { if (stderr.length < MAX_OUTPUT_BYTES) stderr += chunk; });
       child.stdin.on('error', () => {});
       child.on('error', (error) => { spawnError = error; });
@@ -184,13 +193,20 @@ export function createTerminalControl({ hostBin, herdrBin, env, config, timeoutM
   };
 
   const client = {
-    allocate: (request) => callSync('allocate', request),
+    allocate(request) {
+      groupOfKey.set(request.key, request.groupKey);
+      return callSync('allocate', request);
+    },
     attach: (request) => callSync('attach', request),
     launch: (request) => callSync('launch', request),
     send: (request) => callSync('send', request),
     read: (request) => callSync('read', request),
     inspect: (request) => callSync('inspect', request),
-    release: (request) => callSync('release', request),
+    release(request) {
+      const result = callSync('release', request);
+      if (result.result === 'released') groupOfKey.delete(request.key);
+      return result;
+    },
     label: (request) => callSync('label', request),
     capabilities: () => callSync('capabilities', {}),
     reconcileScan: (request) => callSync('reconcile-scan', request),
@@ -202,12 +218,20 @@ export function createTerminalControl({ hostBin, herdrBin, env, config, timeoutM
     },
 
     /** `release` that waits behind earlier allocate/close calls of the same
-     * group. `groupKey` is taken from the earlier `allocateAsync` of the key,
-     * or given as `{ ..., groupKey }` (never sent to the route). */
-    releaseAsync({ groupKey, ...request }) {
-      const group = groupKey ?? groupOfKey.get(request.key) ?? request.key;
-      if (request.disposition !== 'close') return callAsync('release', request);
-      return queued(group, () => callAsync('release', request));
+     * group. The group is the one the key was allocated under by this client,
+     * or `{ ..., groupKey }` (never sent to the route); a close of a key whose
+     * group is unknown is refused instead of running outside the queue. */
+    releaseAsync({ groupKey, ...request } = {}) {
+      const finish = (result) => {
+        if (result.result === 'released') groupOfKey.delete(request.key);
+        return result;
+      };
+      if (request.disposition !== 'close') return callAsync('release', request).then(finish);
+      const group = groupKey ?? groupOfKey.get(request.key);
+      if (!group) {
+        return Promise.reject(new TerminalControlError('terminal-control-unknown-group', `release(close) of ${request.key}: its groupKey is unknown to this client; pass groupKey`));
+      }
+      return queued(group, () => callAsync('release', request)).then(finish);
     },
   };
   return client;

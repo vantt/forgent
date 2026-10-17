@@ -53,9 +53,15 @@ fn line(result: &str, fields: Value) -> String {
     Value::Object(map).to_string()
 }
 
+/// One line on stdout; a closed pipe is the caller's business, not a panic.
+fn emit(text: &str) {
+    use std::io::Write;
+    let _ = writeln!(std::io::stdout(), "{text}");
+}
+
 fn error(code: &str, message: &str, exit: i32) -> i32 {
     eprintln!("fgos internal: {code}: {message}");
-    println!("{}", line("error", json!({ "code": code, "message": message })));
+    emit(&line("error", json!({ "code": code, "message": message })));
     exit
 }
 
@@ -194,6 +200,11 @@ fn dispatch(op: &str, core: &Core, request: &Value) -> Result<Answer, String> {
                 return Err("request.lines needs an integer >= 1".into());
             }
             let source: Option<String> = optional(request, "source")?;
+            if let Some(source) = &source {
+                if !["visible", "recent", "recent-unwrapped", "detection"].contains(&source.as_str()) {
+                    return Err(format!("request.source must be visible, recent, recent-unwrapped or detection, got {source}"));
+                }
+            }
             answer(core.read(&key, lines, source.as_deref()), |screen| ("screen".into(), json!({ "screen": screen })))
         }
         "inspect" => {
@@ -253,19 +264,29 @@ pub fn main(args: &[String]) -> i32 {
     let mut protocol: Option<&str> = None;
     let mut json_flag = false;
     let mut op: Option<&str> = None;
+    // Reported after the protocol check: a caller of another release learns
+    // the version mismatch first.
+    let mut stray: Option<String> = None;
     let mut it = args.iter();
     while let Some(arg) = it.next() {
         match arg.as_str() {
             "--protocol" => protocol = it.next().map(String::as_str),
             "--json" => json_flag = true,
-            other if other.starts_with("--") => return usage(&format!("unknown argument {other}")),
+            other if other.starts_with("--") => {
+                stray.get_or_insert_with(|| format!("unknown argument {other}"));
+            }
             other if op.is_none() => op = Some(other),
-            other => return usage(&format!("unexpected argument {other}")),
+            other => {
+                stray.get_or_insert_with(|| format!("unexpected argument {other}"));
+            }
         }
     }
     if protocol != Some("1") {
         let message = format!("this host speaks internal protocol {PROTOCOL}; the call asked for {}", protocol.unwrap_or("none"));
         return error("host-version-mismatch", &message, EXIT_MISMATCH);
+    }
+    if let Some(message) = stray {
+        return usage(&message);
     }
     let Some(op) = op else {
         return usage("fgos internal terminal-control <op> --protocol 1 --json");
@@ -307,7 +328,7 @@ pub fn main(args: &[String]) -> i32 {
             let mut fields = fields;
             // `op` rides next to the result, as the contract's stdout shape says.
             fields["op"] = json!(op);
-            println!("{}", line(&result, fields));
+            emit(&line(&result, fields));
             EXIT_OK
         }
         Err(message) => usage(&message),
@@ -326,6 +347,8 @@ mod tests {
     fn a_protocol_other_than_one_is_a_version_mismatch() {
         assert_eq!(main(&args(&["capabilities", "--json"])), EXIT_MISMATCH);
         assert_eq!(main(&args(&["capabilities", "--protocol", "2", "--json"])), EXIT_MISMATCH);
+        assert_eq!(main(&args(&["capabilities", "--protocol=2", "--json"])), EXIT_MISMATCH);
+        assert_eq!(main(&args(&["capabilities", "--new-flag", "--protocol", "2", "--json"])), EXIT_MISMATCH);
     }
 
     #[test]

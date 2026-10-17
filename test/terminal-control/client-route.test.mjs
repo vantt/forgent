@@ -108,6 +108,7 @@ test('unknown keys and a missing herdr come back as results, not exceptions', ()
 
 test('a bad request or a wrong protocol throws a named error', () => {
   assert.throws(() => client().send({ key: 'k-one' }), (e) => e instanceof TerminalControlError && e.code === 'terminal-control-route-usage');
+  assert.throws(() => client().read({ key: 'k-one', source: 'nope' }), (e) => e.code === 'terminal-control-route-usage');
   assert.throws(() => client().allocate({ key: 'k' }), (e) => e.code === 'terminal-control-route-usage');
   assert.throws(() => createTerminalControl({ hostBin: path.join(scratch, 'missing-host') }).capabilities(), (e) => e.code === 'terminal-control-no-host-binary');
   const direct = spawnSync(HOST_BIN, ['internal', 'terminal-control', 'capabilities', '--protocol', '2', '--json'], { encoding: 'utf8' });

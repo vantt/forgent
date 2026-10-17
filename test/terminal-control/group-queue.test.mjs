@@ -77,6 +77,12 @@ test('a failed call does not stall the calls queued behind it', async () => {
   assert.equal((await second).result, 'slot');
 });
 
+test('closing a key whose group is unknown is refused, not run outside the queue', async () => {
+  const tc = createTerminalControl({ hostBin: recorder });
+  await assert.rejects(tc.releaseAsync({ key: 'stranger', disposition: 'close' }), (e) => e.code === 'terminal-control-unknown-group');
+  assert.equal((await tc.releaseAsync({ key: 'stranger', disposition: 'close', groupKey: 'g-given' })).result, 'slot');
+});
+
 test('a route error rejects its own call and the queue moves on', async () => {
   const tc = createTerminalControl({ hostBin: path.join(scratch, 'missing-host') });
   const bad = tc.allocateAsync({ key: 'k1', groupKey: 'g-err', display: { label: 'x' } });
