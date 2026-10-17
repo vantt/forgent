@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { fork } from 'node:child_process';
+import childProcess, { fork } from 'node:child_process';
+import { syncBuiltinESMExports } from 'node:module';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { initStore, addWork, settleClaim, listWork, readyWork, moveWork, editWork, graphWhatIf, footprintConflicts, computedSchedule, staleDoingAdvisory, readRawEvents, addDecision, recordGateApprove, StoreError } from '../../src/state/store.mjs';
 import { acquireClaim, releaseClaim, readClaim, readClaims, buildEffectiveView, getItemDurableRevision, ClaimError } from '../../src/state/runtime-coordination.mjs';
@@ -247,6 +248,33 @@ test('readClaim returns null only for a genuinely missing claim file, and fails 
     () => readClaim(dir, 'tsk-1'),
     (err) => err instanceof ClaimError && err.category === 'corrupt-log',
   );
+});
+
+test('readClaims resolves the main checkout once, not once per claim file', () => {
+  const dir = makeTmpDir();
+  const claimsDir = resolveFgosFile(dir, FGOS_FILE.CLAIMS_DIR);
+  fs.mkdirSync(claimsDir, { recursive: true });
+  for (let i = 1; i <= 5; i += 1) {
+    fs.writeFileSync(path.join(claimsDir, `tsk-${i}.json`), JSON.stringify({ id: `tsk-${i}`, claimId: `clm-${i}` }), 'utf8');
+  }
+
+  const original = childProcess.execFileSync;
+  let resolves = 0;
+  childProcess.execFileSync = function countingExecFileSync(file, args, ...rest) {
+    if (Array.isArray(args) && args.includes('--git-common-dir')) resolves += 1;
+    return original.call(this, file, args, ...rest);
+  };
+  syncBuiltinESMExports();
+  let claims;
+  try {
+    claims = readClaims(dir);
+  } finally {
+    childProcess.execFileSync = original;
+    syncBuiltinESMExports();
+  }
+
+  assert.deepEqual(Object.keys(claims).sort(), ['tsk-1', 'tsk-2', 'tsk-3', 'tsk-4', 'tsk-5']);
+  assert.equal(resolves, 1, 'one git spawn for the whole read, however many claims are open');
 });
 
 // tsk-40m code-review finding (blocker, TOCTOU race): settleClaim validated
