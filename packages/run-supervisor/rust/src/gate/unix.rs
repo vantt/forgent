@@ -229,7 +229,17 @@ fn supervise_agent(config: &Config, go_frame: &Value, secrets: BTreeMap<String, 
         // A ceiling already behind us: the agent never starts.
         stop = Some(Stop { stopped_by: "hard-ceiling", cause: "hard-ceiling".into() });
     } else {
-        let child = spawn_agent(config, go_frame, secrets)?;
+        let child = match spawn_agent(config, go_frame, secrets) {
+            Ok(child) => child,
+            Err(why) => {
+                // An agent that cannot start ends like a shell command that cannot start: 127 when the
+                // program is not there, 126 when it cannot be run. The reason lands in the capture stderr.
+                crate::gate::note_agent_not_started(config, &why);
+                let code = if why.contains("No such file or directory") { 127 } else { 126 };
+                end_domain(None, None, pid1);
+                return publish_gate_exit(config, Value::from(code), Value::Null, None);
+            }
+        };
         let pid = child.id() as libc::pid_t;
         agent_pid = Some(pid);
         agent_tuple = facts::identity_of(ProcId(child.id()));

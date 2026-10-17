@@ -271,6 +271,7 @@ pub(crate) fn stop_for(cause: Option<String>) -> Stop {
     match cause.as_deref() {
         Some("soft-deadline") => Stop { stopped_by: "soft-deadline", cause: "soft-deadline".into() },
         Some("idle") => Stop { stopped_by: "idle", cause: "idle".into() },
+        Some("output-limit") => Stop { stopped_by: "output-limit", cause: "output-limit".into() },
         Some("cancel") => Stop { stopped_by: "cancel", cause: "cancel".into() },
         _ => Stop { stopped_by: "cancel", cause: "signal".into() },
     }
@@ -279,6 +280,15 @@ pub(crate) fn stop_for(cause: Option<String>) -> Stop {
 /// Does the GO frame name this attempt's envelope. The pid is never compared.
 pub(crate) fn go_matches(config: &Config, frame: &Value) -> bool {
     frame["type"] == "GO" && frame["attemptId"] == config.attempt_id.as_str() && frame["envelopeDigest"] == config.digest.as_str()
+}
+
+/// Say why the agent could not start in its own stderr capture, where whoever reads the run's output looks.
+pub(crate) fn note_agent_not_started(config: &Config, why: &str) {
+    use std::io::Write;
+    eprintln!("fgos internal gate: {why}");
+    if let Ok(mut file) = fs::OpenOptions::new().append(true).open(&config.stderr) {
+        let _ = writeln!(file, "fgos internal gate: {why}");
+    }
 }
 
 /// Publish `gate-exit.json` once. `exit_code` and `signal` are JSON values

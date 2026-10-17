@@ -68,11 +68,13 @@ pub struct Options {
     pub args: Vec<String>,
     pub ceiling: Option<(String, u64)>,
     pub grace_ms: u64,
+    /// Replaces the agent program (default: the test agent).
+    pub command: Option<String>,
 }
 
 impl Options {
     pub fn new(args: &[&str]) -> Self {
-        Self { args: args.iter().map(|a| a.to_string()).collect(), ceiling: None, grace_ms: 10_000 }
+        Self { args: args.iter().map(|a| a.to_string()).collect(), ceiling: None, grace_ms: 10_000, command: None }
     }
 }
 
@@ -113,7 +115,7 @@ impl Attempt {
             "cwd": dir,
             "mutation": "read-only",
             "launch": {
-                "command": agent_exe(),
+                "command": options.command.clone().unwrap_or_else(agent_exe),
                 "args": options.args,
                 "env": env,
                 "stdinPolicy": "null",

@@ -175,3 +175,22 @@ fn a_gate_that_dies_without_gate_exit_gives_a_gate_lost_receipt() {
     assert!(!run.marker.exists());
     assert!(lock_is_free(&run.path("attempt.lock")));
 }
+
+#[test]
+fn an_agent_that_prints_past_its_output_budget_is_stopped_and_the_receipt_says_so() {
+    let Some(_driver) = bwrap_driver("supervise-output-limit") else { return };
+    let mut opts = RunOpts::agent(60_000);
+    opts.max_output = Some(400);
+    let mut run = SupRun::new("output-limit", &opts);
+    let supervisor = run.start();
+    let (code, line) = finish(supervisor, LIMIT);
+    assert_eq!(code, 0, "{}", run.log());
+    assert_eq!(line["outcome"], "output-limit");
+    let stop = run.json("stop-requested.json").expect("the supervisor named why it stopped the agent");
+    assert_eq!(stop["cause"], "output-limit");
+    let exit = run.json("gate-exit.json").expect("gate-exit.json");
+    assert_eq!(exit["stoppedBy"], "output-limit");
+    let printed = fs::metadata(&run.stdout).unwrap().len();
+    assert!(printed > 400 && printed < 20_000, "the agent was stopped soon after the budget, it printed {printed} bytes");
+    assert!(run.json("receipt.json").unwrap()["outcome"] == "output-limit");
+}

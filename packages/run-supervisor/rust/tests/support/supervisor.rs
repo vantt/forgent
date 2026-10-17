@@ -39,12 +39,14 @@ pub struct RunOpts {
     pub grace_ms: u64,
     /// A hard ceiling that already passed: the gate never starts the agent.
     pub ceiling_past: bool,
+    /// `launch.maxOutputBytes`: the budget of the two capture files together.
+    pub max_output: Option<u64>,
 }
 
 impl RunOpts {
     /// A `noisy-agent.mjs` that works for `run_ms`.
     pub fn agent(run_ms: u64) -> Self {
-        Self { agent_args: vec!["--run-ms".into(), run_ms.to_string()], soft_ms: None, idle_ms: None, steps: Vec::new(), mutating: false, host_bin: None, preferred: "linux-gate".into(), grace_ms: 3_000, ceiling_past: false }
+        Self { agent_args: vec!["--run-ms".into(), run_ms.to_string()], soft_ms: None, idle_ms: None, steps: Vec::new(), mutating: false, host_bin: None, preferred: "linux-gate".into(), grace_ms: 3_000, ceiling_past: false, max_output: None }
     }
 }
 
@@ -124,6 +126,7 @@ impl SupRun {
                 "briefPath": null,
                 "outboxDir": outbox,
                 "capture": {"stdout": stdout, "stderr": stderr},
+                "maxOutputBytes": opts.max_output,
             },
             "containment": {"preferred": opts.preferred},
             "deadlines": {

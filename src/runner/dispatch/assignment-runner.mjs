@@ -2448,6 +2448,7 @@ export async function executeAssignment(assignment, opts = {}) {
         attempt: prepResult.attempt,
         timeoutMs,
         idleTimeoutMs: cfg.idleTimeoutMs,
+        maxOutputBytes: cfg.maxBuffer || 10485760,
         cli: commandCli(prepResult.attempt.command),
         stepEnv: attemptStepEnv,
         gateKillGraceMs: attemptSettings.gateKillGraceMs,

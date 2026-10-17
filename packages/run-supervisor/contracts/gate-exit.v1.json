@@ -6,13 +6,13 @@
     "attemptId": "string",
     "exitCode": "integer or null (null when the agent died by a signal)",
     "signal": "string signal name (\"SIGKILL\") or null",
-    "stoppedBy": { "enum": ["agent", "soft-deadline", "idle", "cancel", "hard-ceiling", "orphan"] },
+    "stoppedBy": { "enum": ["agent", "soft-deadline", "idle", "cancel", "output-limit", "hard-ceiling", "orphan"] },
     "cause": "string or null; copied from stop-requested.json cause when the gate received SIGTERM/SIGINT and that file exists; `hard-ceiling` when the gate's own ceiling fired; `abandoned-before-brief` or `orphan-result` for the terminal orphan branch",
     "exitedAt": "string, ISO-8601 UTC"
   },
   "stoppedByRule": [
     "agent: the agent exited on its own (no SIGTERM to the gate, no ceiling)",
-    "soft-deadline | idle | cancel: the gate received SIGTERM/SIGINT and read that cause from stop-requested.json; SIGTERM/SIGINT without the file is stoppedBy cancel with cause \"signal\"",
+    "soft-deadline | idle | output-limit | cancel: the gate received SIGTERM/SIGINT and read that cause from stop-requested.json; SIGTERM/SIGINT without the file is stoppedBy cancel with cause \"signal\"",
     "hard-ceiling: CLOCK_BOOTTIME passed envelope.deadlines.hardCeiling",
     "orphan: terminal mode orphan branch (6.3)"
   ]

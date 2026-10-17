@@ -97,12 +97,13 @@ The controller does not settle while a supervisor lives. The controller reads re
 
 **Supervisor sequence.** Set `FD_CLOEXEC` on fd 3 and 4 before any other syscall; read and verify the envelope (digest, `hostBin` equals the running binary, else `host-version-mismatch`); `containment.create`; declare the domain in `attempt.lock.predecessor.json` (and on the cwd lease file) before the domain has a process; start the gate in the domain with fd map `{3 attempt, 4 cwd, 5 GO end}`; publish the binding `{supervisor, gate host tuple, domain, guarantee}`; wait for HELLO (15 s limit); send GO; watch.
 
-**Watch** (50 ms tick): new bytes of the stdout and stderr captures, judged by the agent-protocol adapter, feed the idle timer; cancel request; soft deadline; idle. On a stop cause the supervisor publishes `stop-requested.json {cause: soft-deadline|idle|cancel}` first, then sends STOP and SIGTERM to the gate. A gate that outlives `gateKillGraceMs` plus 5 s has its whole domain ended by `kill_all`. When the gate is gone the supervisor makes sure the domain is empty, **releases the cwd lease at once** (the next round of the controller need not wait for the steps), publishes the receipt, runs the steps, publishes `closed.json` and exits 0 with `{result: closed|open, outcome, pendingStep?}`.
+**Watch** (50 ms tick): new bytes of the stdout and stderr captures, judged by the agent-protocol adapter, feed the idle timer; cancel request; output budget (`launch.maxOutputBytes`); soft deadline; idle. On a stop cause the supervisor publishes `stop-requested.json {cause: soft-deadline|idle|output-limit|cancel}` first, then sends STOP and SIGTERM to the gate. A gate that outlives `gateKillGraceMs` plus 5 s has its whole domain ended by `kill_all`. When the gate is gone the supervisor makes sure the domain is empty, **releases the cwd lease at once** (the next round of the controller need not wait for the steps), publishes the receipt, runs the steps, publishes `closed.json` and exits 0 with `{result: closed|open, outcome, pendingStep?}`.
 
 **Gate sequence.** Set `FD_CLOEXEC` on lock fds and the GO fd; verify the envelope; send HELLO; wait for GO. EOF or refusal before GO: exit 64 without running the agent and without `gate-exit.json`. GO carries `attemptId`, `envelopeDigest` and the gate's host tuple; a mismatch against the gate's own envelope exits 65. The gate then opens the capture files (`dup2` to fd 1 and 2) and stdin per `launch.stdinPolicy` (`brief-file` or null), spawns the agent with env `launch.env` plus the side file env and `FGOS_PIDNS_ANCHOR`, sends AGENT, and waits.
 
 | Event at the gate | Result |
 |---|---|
+| Agent cannot start | `gate-exit.json` with `exitCode` 127 (program not found) or 126 (cannot be run), `stoppedBy: agent`; the reason is appended to the capture stderr. The settle step sees an ordinary failed execution; `spawnWorker` reads 127 as `worker-spawn-fail` |
 | Agent exits | `kill(-1, SIGKILL)` for the rest of the domain, `waitpid(-1)` until `ECHILD`, then `gate-exit.json {exitCode, signal, stoppedBy: agent}`; the lock is held until the namespace is empty |
 | SIGTERM or SIGINT | The gate is pid 1 and installs handlers (pid 1 ignores a signal without one). Forward SIGTERM to the agent group; SIGKILL after `gateKillGraceMs`. `stoppedBy` and `cause` come from `stop-requested.json`; the signal without the file is `cancel` with cause `signal` |
 | Hard ceiling | The envelope's absolute `CLOCK_BOOTTIME` instant (with its boot id; a later start never extends it): SIGTERM, `gateKillGraceMs`, SIGKILL; `stoppedBy: hard-ceiling` |
@@ -138,6 +139,7 @@ The binding records `guarantee.containment` (`kernel` or `best-effort`) and `gua
 | `exited` | `gate-exit.stoppedBy == agent`; also an `orphan` stop with an outbox result |
 | `timeout` | `stoppedBy` is `soft-deadline`, `idle` or `hard-ceiling` |
 | `cancelled` | `stoppedBy == cancel` |
+| `output-limit` | `stoppedBy == output-limit`: the two capture files passed `launch.maxOutputBytes` (config `maxBuffer`, default 10 MiB) and the supervisor stopped the agent; the settle step judges it as a failed execution |
 | `gate-lost` | A binding exists but there is no `gate-exit.json` (the lock being free proves the domain empty) |
 | `abandoned-not-started` | No binding; adopt found the lock free |
 | `carrier-lost` | Terminal mode only (plan 6.3) |

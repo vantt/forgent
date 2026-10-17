@@ -33,7 +33,7 @@ import {
   computeSha256Digest,
   publishImmutableProof,
   publishMutableProjection,
-} from '../../src/runner/dispatch/detached-run-supervisor.mjs';
+} from '../../src/runner/dispatch/proof-helpers.mjs';
 import {
   BUILTIN_POLICIES,
 } from '../../src/runner/dispatch/confinement/policies.mjs';

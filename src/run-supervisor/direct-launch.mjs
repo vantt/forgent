@@ -136,7 +136,7 @@ export function attemptStepEnv({ fgosDir, env = process.env } = {}) {
  * @param {object} p.attempt          `prepareConfinementForLaunch(...).attempt`
  * @param {string} p.capture          directory that holds the agent's stdout and stderr files
  */
-export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutating, attempt, timeoutMs, idleTimeoutMs, cli, stepEnv, gateKillGraceMs, killWaitMs, cwdLeaseFile }) {
+export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutating, attempt, timeoutMs, idleTimeoutMs, maxOutputBytes, cli, stepEnv, gateKillGraceMs, killWaitMs, cwdLeaseFile }) {
   const paths = attemptPaths(runDir, attemptId);
   const sideFile = paths.sideFile;
   const step = (stepId) => ({
@@ -167,6 +167,7 @@ export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutatin
       stdinPolicy: 'null',
       briefPath: null,
       outboxDir: paths.outboxDir,
+      ...(maxOutputBytes ? { maxOutputBytes } : {}),
       capture: { stdout: paths.stdout, stderr: paths.stderr },
     },
     containment: { preferred: confined ? 'linux-gate' : (process.platform === 'win32' ? 'windows-job' : process.platform === 'darwin' ? 'macos-tree' : 'linux-pgroup'), ...(confined ? { bwrapPrefix: [attempt.bwrapExecutable, ...attempt.bwrapPrefix] } : {}) },

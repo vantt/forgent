@@ -2009,8 +2009,8 @@ function writeTwoRoundSeatBase(tmp) {
 
 function seatBrief(tmp, unitRunId, role) {
   const dir = path.join(tmp, '.fgos', 'assignments', unitRunId, role, '1');
-  const envelope = JSON.parse(fs.readFileSync(path.join(dir, 'runs', '01', 'protected', 'launch-envelope.json'), 'utf8'));
-  return envelope.invocation.args.find((arg) => arg.includes('Write structured JSON to'));
+  const envelope = JSON.parse(fs.readFileSync(path.join(dir, 'runs', '01', 'envelope.json'), 'utf8'));
+  return envelope.launch.args.find((arg) => arg.includes('Write structured JSON to'));
 }
 
 function seatAssignment(tmp, unitRunId, role) {

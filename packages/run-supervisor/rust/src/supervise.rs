@@ -59,6 +59,7 @@ pub fn outcome_for(gate_exit: Option<&Value>, outbox_present: bool) -> &'static 
     match gate_exit.and_then(|g| g["stoppedBy"].as_str()) {
         Some("agent") => "exited",
         Some("soft-deadline" | "idle" | "hard-ceiling") => "timeout",
+        Some("output-limit") => "output-limit",
         Some("cancel") => "cancelled",
         Some("orphan") if outbox_present => "exited",
         _ => "gate-lost",
@@ -157,6 +158,8 @@ struct Watch {
     idle: Option<Duration>,
     grace: Duration,
     captures: [PathBuf; 2],
+    /// The most the two capture files may hold together before the agent is stopped.
+    max_output: Option<u64>,
     adapter: &'static dyn DirectAdapter,
     boot_id: Option<String>,
 }
@@ -176,6 +179,7 @@ impl Watch {
             idle: envelope["deadlines"]["idleMs"].as_u64().map(Duration::from_millis),
             grace: Duration::from_millis(envelope["deadlines"]["gateKillGraceMs"].as_u64().ok_or("envelope field deadlines.gateKillGraceMs missing")?),
             captures: [text(&envelope["launch"]["capture"]["stdout"], "launch.capture.stdout")?.into(), text(&envelope["launch"]["capture"]["stderr"], "launch.capture.stderr")?.into()],
+            max_output: envelope["launch"]["maxOutputBytes"].as_u64(),
             adapter: adapter_for(envelope["agentProtocol"]["cli"].as_str().unwrap_or_default()),
             boot_id: facts::boot_id(),
         })
@@ -185,6 +189,13 @@ impl Watch {
         let Some((boot_id, at)) = &self.soft_at else { return false };
         // Another boot than the recorded one: the instant is meaningless, treat it as past.
         self.boot_id.as_ref().is_some_and(|current| current != boot_id) || boottime_ns() >= *at
+    }
+
+    /// The capture files hold more than the attempt's output budget.
+    fn output_over_limit(&self) -> bool {
+        let Some(max) = self.max_output else { return false };
+        let total: u64 = self.captures.iter().filter_map(|path| fs::metadata(path).ok()).map(|meta| meta.len()).sum();
+        total > max
     }
 
     fn cancel_requested(&self) -> bool {
@@ -440,6 +451,8 @@ fn watch_gate(watch: &Watch, go: &mut os::Go, driver: &dyn ContainmentDriver, do
         if stopped.is_none() {
             let cause = if watch.cancel_requested() {
                 Some("cancel")
+            } else if watch.output_over_limit() {
+                Some("output-limit")
             } else if watch.soft_deadline_passed() {
                 Some("soft-deadline")
             } else if watch.idle.is_some_and(|idle| last_active.elapsed() >= idle) {

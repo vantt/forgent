@@ -84,7 +84,7 @@ test('receipt outcomes and step ids are shared by every contract that names them
   const step = readJson('packages/run-supervisor/contracts/step-receipt.v1.json');
   const envelope = readJson('packages/run-supervisor/contracts/envelope.v3.json');
   assert.deepEqual(step.fields.stepId.enum, envelope.fields.steps.item.stepId.enum);
-  assert.deepEqual(receipt.fields.outcome.enum, ['exited', 'timeout', 'cancelled', 'gate-lost', 'carrier-lost', 'abandoned-not-started']);
+  assert.deepEqual(receipt.fields.outcome.enum, ['exited', 'timeout', 'cancelled', 'output-limit', 'gate-lost', 'carrier-lost', 'abandoned-not-started']);
   assert.equal(route.common.exitCodes['3'], 'host-version-mismatch');
   for (const name of ['supervise', 'gate', 'adopt', 'attempt-step', 'lock-scan']) {
     assert.match(route.routes[name].argv, /--protocol 1/, `${name} requires the protocol flag`);

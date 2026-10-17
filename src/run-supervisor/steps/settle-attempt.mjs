@@ -23,8 +23,11 @@ function readJson(file) {
 function readTail(file) {
   let fd;
   try {
-    fd = fs.openSync(file, 'r');
-    const { size } = fs.fstatSync(fd);
+    // The agent can write what the capture files hold: never follow a link it may have put there.
+    fd = fs.openSync(file, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW ?? 0));
+    const stat = fs.fstatSync(fd);
+    if (!stat.isFile()) return '';
+    const { size } = stat;
     const length = Math.min(size, CAPTURE_TAIL_BYTES);
     const buffer = Buffer.alloc(length);
     fs.readSync(fd, buffer, 0, length, size - length);
