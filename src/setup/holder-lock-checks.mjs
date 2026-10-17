@@ -23,6 +23,7 @@ import { loadLockRegistry } from '../holder-lock/registry.mjs';
 import { isCutOverLock, fenceStatus, fenceCutover, defaultProviderRuntimeDir } from '../holder-lock/fences.mjs';
 import { judge } from '../runner/dispatch/process-identity.mjs';
 import { listAssignmentRuns } from '../runner/dispatch/assignment-layout.mjs';
+import { listOpenAttemptDirs } from '../run-supervisor/client.mjs';
 import { readSharedConfig } from '../config/shared-config-file.mjs';
 import { loadGlobalConfig } from '../config/global-config.mjs';
 
@@ -423,6 +424,32 @@ export function holderOrigin(pid, lockName) {
   return null;
 }
 
+/** The parent pid of `pid` from /proc, or null. The comm field may hold spaces, so the row is cut after its last `)`. */
+function parentPidOf(pid) {
+  const stat = readProc(pid, 'stat');
+  if (!stat) return null;
+  const text = stat.toString('utf8');
+  const fields = text.slice(text.lastIndexOf(')') + 2).split(' ');
+  const ppid = Number(fields[1]);
+  return Number.isInteger(ppid) && ppid > 0 ? ppid : null;
+}
+
+/**
+ * A holder of an attempt lock that is not itself a fgOS process but whose parent is: the bwrap
+ * monitor the supervisor (or the gate) started carries the same lock description, and it is as much
+ * a member of the attempt as they are. Only a parent that holds the same lock counts, so a monitor
+ * left behind after both are gone is still named.
+ */
+function isAttemptMember(pid, holderPids, lockName) {
+  const parent = parentPidOf(pid);
+  return parent !== null && holderPids.includes(parent) && holderOrigin(parent, lockName) !== null;
+}
+
+/** The `attempt.lock` files of attempts that are not closed. Closed attempts hold nothing. */
+function attemptLockFiles(fgosDir) {
+  return listOpenAttemptDirs(path.join(fgosDir, 'assignments')).flatMap((dir) => existing(path.join(dir, 'attempt.lock')));
+}
+
 function cmdlineOf(pid) {
   const raw = readProc(pid, 'cmdline');
   return raw ? raw.toString('utf8').split('\0').filter(Boolean).join(' ').slice(0, 200) : '<unreadable>';
@@ -505,7 +532,9 @@ export function checkLockHolders(repoRoot) {
   const unlistable = [];
   let files = 0;
   let held = 0;
-  for (const { lock, files: lockFiles } of rows) {
+  // The attempt lock belongs to the run supervisor (not a cut-over row of the lock registry), so it is added here.
+  const scanned = [...rows, { lock: 'attempt', files: attemptLockFiles(fgosDir) }];
+  for (const { lock, files: lockFiles } of scanned) {
     for (const file of lockFiles) {
       files += 1;
       const problem = predecessorProblem(file, fgosDir);
@@ -517,7 +546,7 @@ export function checkLockHolders(repoRoot) {
       }
       if (holders.pids.length > 0) held += 1;
       for (const pid of holders.pids) {
-        if (!holderOrigin(pid, lock)) foreign.push(`${lock} ${file} held by pid ${pid} (${cmdlineOf(pid)}), not a fgOS process nor a borrowed child`);
+        if (!holderOrigin(pid, lock) && !(lock === 'attempt' && isAttemptMember(pid, holders.pids, lock))) foreign.push(`${lock} ${file} held by pid ${pid} (${cmdlineOf(pid)}), not a fgOS process nor a borrowed child`);
       }
     }
   }

@@ -243,6 +243,46 @@ test('lock-holders covers the main checkout, merge slot and worktree-admin files
   await stop(heldSlot);
 });
 
+test('lock-holders: a monitor whose parent is the supervisor of the attempt is a member; once the parent is gone it is named', { skip: !HAS_FLOCK && 'util-linux flock missing' }, async () => {
+  const root = workspace('holders-attempt');
+  fixLockDirs(root);
+  const dir = path.join(root, '.fgos', 'assignments', 'asgn-1', 'runs', '01');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'envelope.json'), JSON.stringify({ v: 3, attemptId: 'att-holders' }));
+  const lock = path.join(dir, 'attempt.lock');
+  fs.writeFileSync(lock, '');
+
+  // The parent plays the supervisor (it carries the lock marker); its child keeps the same description
+  // with no marker at all, as the bwrap monitor does.
+  const supervisor = spawn('sh', ['-c', 'exec 9>>"$1"; flock -x 9; env -i PATH="$PATH" sleep 30 & wait', 'sh', lock], { env: foreignEnv({ FGOS_LOCK_FD: 'attempt:9' }), stdio: 'ignore' });
+  children.add(supervisor);
+  let monitorPid;
+  const deadline = Date.now() + 5000;
+  for (;;) {
+    const holders = descriptionHolders(lock);
+    if (holders.kind === 'list' && holders.pids.length === 2 && holders.pids.includes(supervisor.pid)) {
+      monitorPid = holders.pids.find((pid) => pid !== supervisor.pid);
+      break;
+    }
+    assert.ok(Date.now() < deadline, 'supervisor and monitor did not both hold the lock');
+    await new Promise((resolve) => { setTimeout(resolve, 20); });
+  }
+  const member = checkLockHolders(root);
+  assert.match(member.message, /^1 lock file\(s\) of 18 locks, 1 held, every holder a fgOS process or a borrowed child$/, member.message);
+
+  process.kill(supervisor.pid, 'SIGKILL');
+  const named = await (async () => {
+    for (;;) {
+      const res = checkLockHolders(root);
+      if (res.message.startsWith('warning:')) return res;
+      assert.ok(Date.now() < deadline + 5000, `still clean: ${res.message}`);
+      await new Promise((resolve) => { setTimeout(resolve, 20); });
+    }
+  })();
+  assert.match(named.message, new RegExp(`^warning: attempt .*attempt\\.lock held by pid ${monitorPid} \\(sleep 30\\), not a fgOS process nor a borrowed child`));
+  process.kill(monitorPid, 'SIGKILL');
+});
+
 test('lock-holders: a predecessor domain that is still running warns with the domain; a dead one does not', async () => {
   const root = workspace('predecessor');
   fixLockDirs(root);

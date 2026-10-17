@@ -21,7 +21,7 @@ import {
   defaultConfinementTempRoots,
   credentialScanRoots,
 } from '../../src/setup/registrations.mjs';
-import { writeOwnershipMarker, reapOrphanedConfinementResources } from '../../src/runner/dispatch/confinement/cleanup.mjs';
+import { writeOwnershipMarker, writeOwnershipMarkerV2, reapOrphanedConfinementResources } from '../../src/runner/dispatch/confinement/cleanup.mjs';
 
 function mkTempProject() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-confinement-doctor-'));
@@ -150,6 +150,31 @@ test('doctor flags empty per-dispatch shells left behind, and fix removes them',
     assert.equal(fixed.changed, true);
     assert.ok(!fs.existsSync(shell));
     assert.equal(checkConfinementOrphanedResourcesReaped().passed, true);
+  } finally {
+    if (previousTmp === undefined) delete process.env.TMPDIR; else process.env.TMPDIR = previousTmp;
+    fs.rmSync(base, { recursive: true, force: true });
+  }
+});
+
+test('doctor does not call an attempt home (version 2 marker) orphaned, and fix never removes it', () => {
+  const base = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-confinement-attempt-home-'));
+  const previousTmp = process.env.TMPDIR;
+  process.env.TMPDIR = base;
+  try {
+    const root = path.join(base, 'fgos-confinement');
+    const home = path.join(root, 'disp_attempt', 'home');
+    fs.mkdirSync(home, { recursive: true, mode: 0o700 });
+    fs.chmodSync(root, 0o700);
+    fs.writeFileSync(path.join(home, 'kept.txt'), 'x');
+    writeOwnershipMarkerV2(home, { attemptId: 'att-doctor-v2', runDir: path.join(base, 'run') });
+    const longAgo = new Date(Date.now() - 48 * 3600 * 1000);
+    fs.utimesSync(home, longAgo, longAgo);
+
+    const before = checkConfinementOrphanedResourcesReaped();
+    assert.equal(before.passed, true, before.message);
+
+    fixConfinementOrphanedResourcesReaped();
+    assert.ok(fs.existsSync(path.join(home, 'kept.txt')), 'only adopt removes an attempt home');
   } finally {
     if (previousTmp === undefined) delete process.env.TMPDIR; else process.env.TMPDIR = previousTmp;
     fs.rmSync(base, { recursive: true, force: true });
