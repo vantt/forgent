@@ -124,10 +124,11 @@ test('every lock owned by 4.2 has a fence and a v1 shape that agrees with it', (
 });
 
 test('a tombstoned lock never takes its v3 lock at the path its tombstone occupies', () => {
+  // Compare both paths in one spelling: <lockRoot> is <stateRoot>/locks and <fgosDir> is the repo's .fgos.
+  const spell = (template) => template.replace('<lockRoot>', '<stateRoot>/locks').replace('<fgosDir>', '.fgos');
   for (const lock of registry.locks.filter((row) => row.fence === 'tombstone' && typeof row.v3Path === 'string')) {
-    const v3Tail = lock.v3Path.replace(/^<[^>]+>/, '');
     for (const v1 of [lock.v1Path].flat().filter((value) => typeof value === 'string')) {
-      assert.ok(!v1.endsWith(v3Tail), `${lock.name}: v3 ${lock.v3Path} lands on the tombstone at ${v1}`);
+      assert.notEqual(spell(lock.v3Path), spell(v1), `${lock.name}: v3 ${lock.v3Path} lands on the tombstone at ${v1}`);
     }
   }
 });
