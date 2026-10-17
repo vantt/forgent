@@ -12,11 +12,26 @@ use std::os::windows::io::AsRawHandle;
 use std::path::PathBuf;
 
 use fgos_process::platform::windows_spawn::{spawn, ChildStdio, SpawnSpec};
-use windows_sys::Win32::Foundation::{GetHandleInformation, SetHandleInformation, HANDLE, HANDLE_FLAG_INHERIT};
+use windows_sys::Win32::Foundation::{SetHandleInformation, HANDLE, HANDLE_FLAG_INHERIT};
+use windows_sys::Win32::Storage::FileSystem::{GetFileInformationByHandle, BY_HANDLE_FILE_INFORMATION};
 
 const ROLE: &str = "WS_ROLE";
 const PROBE_HANDLE: &str = "WS_PROBE_HANDLE";
+const PROBE_IDENTITY: &str = "WS_PROBE_IDENTITY";
 const RESULT: &str = "WS_RESULT";
+
+/// Who a handle value names: the volume and file index of the file behind it,
+/// or `None` when the value is not a file handle of this process. A bare
+/// "is this value open" test would be wrong: handle values are per process,
+/// and the child's own handles can carry the same number.
+fn file_identity(handle: HANDLE) -> Option<String> {
+    // SAFETY: a zeroed out-structure for a handle value; a value that is not a file fails.
+    unsafe {
+        let mut info: BY_HANDLE_FILE_INFORMATION = std::mem::zeroed();
+        (GetFileInformationByHandle(handle, &mut info) != 0).then(|| format!("{}:{}:{}", info.dwVolumeSerialNumber, info.nFileIndexHigh, info.nFileIndexLow))
+    }
+}
+
 
 /// The child's side: reports on a handle value, or echoes stdin, or prints
 /// its working directory and one variable.
@@ -26,9 +41,7 @@ fn child_entry() {
     match role.as_str() {
         "probe" => {
             let value: usize = std::env::var(PROBE_HANDLE).unwrap().parse().unwrap();
-            let mut flags = 0u32;
-            // SAFETY: asking the kernel about a handle value; an invalid one fails.
-            let open = unsafe { GetHandleInformation(value as HANDLE, &mut flags) } != 0;
+            let open = file_identity(value as HANDLE).is_some_and(|id| id == std::env::var(PROBE_IDENTITY).unwrap());
             fs::write(std::env::var(RESULT).unwrap(), if open { "open" } else { "closed" }).unwrap();
         }
         "echo" => {
@@ -85,10 +98,11 @@ fn a_handle_the_parent_owns_is_not_open_in_the_child() {
     let dir = temp_dir("probe");
     let (_held, raw) = inheritable_handle_of_the_holder(&dir);
     let result = dir.join("result.txt");
-    let spec = child_spec(&[(ROLE, "probe".into()), (PROBE_HANDLE, (raw as usize).to_string()), (RESULT, result.to_string_lossy().into_owned())]);
+    let identity = file_identity(raw).expect("the holder's file has an identity");
+    let spec = child_spec(&[(ROLE, "probe".into()), (PROBE_HANDLE, (raw as usize).to_string()), (PROBE_IDENTITY, identity), (RESULT, result.to_string_lossy().into_owned())]);
     let child = spawn(spec).expect("spawn");
     assert_eq!(child.wait().unwrap(), 0);
-    assert_eq!(fs::read_to_string(&result).unwrap(), "closed", "the inheritable handle the parent owns must not reach the child");
+    assert_eq!(fs::read_to_string(&result).unwrap(), "closed", "the inheritable handle the parent owns (the same file) must not reach the child");
     let _ = fs::remove_dir_all(&dir);
 }
 
