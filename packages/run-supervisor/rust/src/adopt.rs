@@ -117,7 +117,13 @@ pub fn adopt_one(dir: &Path, args: &AdoptArgs) -> Verdict {
     }
     let binding = read_json(&dir.join("supervisor-binding.json"));
     // Lock free is not enough: the domain must be provably empty.
-    let domain_state = binding.as_ref().map_or(DomainState::Empty, domain_of);
+    // A supervisor that died between declaring the domain and binding it left only the declared record.
+    let declared = read_json(&predecessor::record_path(&lock_path));
+    let domain_state = match (&binding, &declared) {
+        (Some(binding), _) => domain_of(&json!({"v": 1, "domainKind": binding["domain"]["kind"], "domainId": binding["domain"]["id"]})),
+        (None, Some(record)) => domain_of(record),
+        (None, None) => DomainState::Empty,
+    };
     if args.probe_only {
         return match domain_state {
             DomainState::Empty => Verdict::state("needs-adopt"),
@@ -218,10 +224,9 @@ fn is_v3_envelope(path: &Path) -> bool {
     read_json(path).is_some_and(|envelope| envelope["v"] == 3)
 }
 
-/// Whether the domain the binding names is empty; an unreadable one is not.
-fn domain_of(binding: &Value) -> DomainState {
-    let record = json!({"v": 1, "domainKind": binding["domain"]["kind"], "domainId": binding["domain"]["id"]});
-    match predecessor::parse_record(&record) {
+/// Whether the domain a predecessor-style record names is empty; an unreadable one is not.
+fn domain_of(record: &Value) -> DomainState {
+    match predecessor::parse_record(record) {
         Some(domain) => domain_watch(&domain).is_empty(),
         None => DomainState::Unknown,
     }

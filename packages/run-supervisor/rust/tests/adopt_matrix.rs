@@ -199,3 +199,14 @@ fn adopt_a_domain_that_cannot_be_judged_stays_held_and_nothing_else_happens() {
     child.kill().unwrap();
     child.wait().unwrap();
 }
+
+#[test]
+fn adopt_a_declared_domain_without_a_binding_is_not_called_empty() {
+    let a = attempt("matrix-declared-only", &STEPS);
+    let (mut child, tuple) = live_process();
+    a.declare(&tuple);
+    let line = adopt(&a.dir, &["--probe-only"]);
+    assert_eq!((line["state"].as_str(), line["reason"].as_str()), (Some("running"), Some("domain-not-empty")), "{line}");
+    child.kill().unwrap();
+    child.wait().unwrap();
+}

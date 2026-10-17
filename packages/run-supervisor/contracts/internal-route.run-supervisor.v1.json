@@ -62,7 +62,7 @@
       "probeOnly": "report state only, write nothing, take no lock (LOCK_SH|LOCK_NB probe)",
       "stdout": {
         "attemptDir": "string",
-        "state": { "enum": ["running", "being-adopted", "needs-adopt", "adopted", "closed", "legacy-run", "open"] },
+        "state": { "enum": ["running", "being-adopted", "needs-adopt", "held", "adopted", "closed", "legacy-run", "open"] },
         "outcome": "receipt outcome when known",
         "pendingStep": "stepId the adopter could not finish (state open)",
         "reason": "string or absent"
@@ -72,7 +72,7 @@
         "being-adopted": "the attempt lock is held by an adopter (adopting.json present)",
         "needs-adopt": "probe-only: lock free and domain empty, not closed",
         "held": "the lock is free but the domain its holder declared could not be emptied within the kill wait (reason predecessor-domain-not-empty): nothing was done",
-    "adopted": "this call took the lock and drove the attempt to closed",
+        "adopted": "this call took the lock and drove the attempt to closed",
         "open": "this call took the lock but a step returned retry or failed; the attempt stays for a later adopt",
         "closed": "closed.json present (skipped without probing the lock)",
         "legacy-run": "no attempt.lock or no envelope v3: not this door's run (left to 6.4)"

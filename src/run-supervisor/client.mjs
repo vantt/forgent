@@ -81,7 +81,9 @@ export function listOpenAttemptDirs(assignmentsRoot) {
       if (!entry.isDirectory()) continue;
       const child = path.join(dir, entry.name);
       if (entry.name !== 'runs') { walk(child); continue; }
-      for (const attempt of fs.readdirSync(child, { withFileTypes: true })) {
+      let attempts;
+      try { attempts = fs.readdirSync(child, { withFileTypes: true }); } catch { continue; }
+      for (const attempt of attempts) {
         if (!attempt.isDirectory()) continue;
         const attemptDir = path.join(child, attempt.name);
         if (!fs.existsSync(path.join(attemptDir, 'closed.json'))) found.push(attemptDir);
