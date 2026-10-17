@@ -13,7 +13,7 @@ import { execFileSync } from 'node:child_process';
 import { listWork, addDecision, recordFriction, StoreError } from '../../state/store.mjs';
 import {
   mergeRunnerItem,
-  withMergeTargetSlot,
+  withMergeSlot,
   performCatchUp,
   buildOwnFileSet,
   isWorkingTreeClean as isMainTreeClean,
@@ -30,6 +30,7 @@ import {
 import { ironLawForItem, ironLawRefusal } from '../../runner/iron-law-gate.mjs';
 import { readIronLawLevel, recordIronLawSkip, recordIronLawAcknowledge } from './iron-law-level.mjs';
 import { withLockRetry } from '../../runner/lock-wait.mjs';
+import { createLockScope } from '../../holder-lock/index.mjs';
 
 /**
  * @param {{dir: string, repoRoot: string}} ctx - `repoRoot` follows this
@@ -102,10 +103,14 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
   // problem and stays side-effect-free.
   const timeoutMs = resolveTimeoutMs();
   const { noWait, waitMs } = resolveWaitFlags();
-  const runMerge = (mergeFn) => (noWait ? mergeFn() : withLockRetry(mergeFn, { waitMs }));
+  // Every merge into the target runs under the target's merge slot, taken
+  // through `runMerge` (a single try under --no-wait, a wait otherwise);
+  // `runAndReport` is only ever called with the slot already held in `scope`.
+  const scope = createLockScope('sync-root');
+  const runMerge = (mergeFn) => (noWait ? mergeFn({}) : withLockRetry(mergeFn, { waitMs }));
 
-  const runAndReport = async (mergeRoot, lockRoot, targetSlot = false, itemOverride = item) => {
-    const result = await runMerge(() => mergeRunnerItem(mergeRoot, itemOverride, lockRoot ? { timeoutMs, lockRoot, targetSlot } : { timeoutMs }));
+  const runAndReport = async (mergeRoot, lockRoot, itemOverride, slotWaitMs) => {
+    const result = await mergeRunnerItem(mergeRoot, itemOverride, { timeoutMs, lockRoot, scope, waitMs: slotWaitMs });
 
     if (result.outcome === 'conflict') {
       recordFriction(dir, {
@@ -204,12 +209,9 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
     // tsk-xyr (§E): same target-slot-outside-the-ephemeral-worktree
     // ordering as approve's leaf-to-root path above — the slot must be
     // held before createDetachedMergeWorktree reads the target's tip.
-    // tsk-5k4: withLockRetry must wrap the call that can actually throw
-    // lock-held (withMergeTargetSlot's own acquire) — runMerge alone
-    // around the inner mergeRunnerItem(...,{targetSlot:true}) below
-    // never catches anything, since that path skips its own lock
-    // acquire entirely once the caller already holds the target's slot.
-    return await runMerge(() => withMergeTargetSlot(repoRoot, targetBranch, async () => {
+    // The wait budget goes to the slot's own acquire, the only call here
+    // that can throw lock-held for contention on this target.
+    return await runMerge(({ waitMs: slotWaitMs }) => withMergeSlot(scope, repoRoot, targetBranch, async () => {
       // tsk-4ax (D3): same inbound-gate catchup as approve's leaf-to-root
       // path — still inside the slot, so the target provably cannot
       // move between this check and the land below.
@@ -260,8 +262,8 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
         }
         effectiveItem = { ...item, branchHeadAtReturn: catchupResult.catchupHead };
       }
-      return await withMergeEphemeralWorktree(repoRoot, item.parent, async (ephemeral) => runAndReport(ephemeral.path, repoRoot, true, effectiveItem));
-    }));
+      return await withMergeEphemeralWorktree(repoRoot, item.parent, async (ephemeral) => runAndReport(ephemeral.path, repoRoot, effectiveItem, slotWaitMs));
+    }, { waitMs: slotWaitMs }));
   }
   // tsk-66t: a root with no parent merges directly on the shared main
   // checkout (runAndReport(repoRoot) below), unlike the item.parent
@@ -275,5 +277,8 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
   if (!isMainTreeClean(repoRoot, ownFileSet)) {
     throw new StoreError('validation', `sync-root: working tree at "${repoRoot}" is not clean — commit or stash pending changes before syncing "${id}".`);
   }
-  return await runAndReport(repoRoot);
+  // The merge runs on the main checkout itself, so the slot of the trunk is
+  // what keeps two merges into it apart; the main mutex is taken inside
+  // `mergeRunnerItem` for the steps that write the checkout.
+  return await runMerge(({ waitMs: slotWaitMs }) => withMergeSlot(scope, repoRoot, targetBranch, () => runAndReport(repoRoot, repoRoot, item, slotWaitMs), { waitMs: slotWaitMs }));
 }

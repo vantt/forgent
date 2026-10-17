@@ -1,6 +1,5 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { tmpCwdFast } from '../cli/helpers/fgos-cli-harness.mjs';
 import { approveUseCase } from '../../src/verbs/merge/approve.mjs';
 import { addWork } from '../../src/state/store.mjs';
 import fs from 'node:fs';
@@ -115,9 +114,10 @@ test('root-into-main merge gate: verify sees the merged tree\'s own declared dep
   assert.notEqual(execGit(cwd, ['rev-parse', 'main']).trim(), mainBefore, 'main should advance to the merge commit');
 });
 
-test('root-into-main merge gate: verify runs without holding main-checkout.lock, so other fgos commands are not refused meanwhile', async () => {
+test('root-into-main merge gate: verify runs under the trunk\'s merge slot but without the main checkout mutex, so other fgos commands are not refused meanwhile', async () => {
   const { mergeRootIntoMainCas } = await import('../../src/runner/merge.mjs');
-  const { LOCK_FILE } = await import('../../src/runner/main-checkout-lock.mjs');
+  const { withMainCheckout } = await import('../../src/runner/repo-locks.mjs');
+  const { createLockScope, probe } = await import('../../src/holder-lock/index.mjs');
   const os = await import('node:os');
   const cwd = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'merge-gate-lock-')));
   execGit(cwd, ['init', '--initial-branch=main']);
@@ -132,14 +132,77 @@ test('root-into-main merge gate: verify runs without holding main-checkout.lock,
   execGit(cwd, ['commit', '-m', 'add feature']);
   execGit(cwd, ['checkout', 'main']);
 
-  const lockPath = path.join(cwd, '.fgos', LOCK_FILE).replaceAll('\\', '/');
-  // verify fails (exit 1) if the lock file exists while it runs.
-  const item = { id: 'tsk-lock', verify: `node -e "process.exit(require('fs').existsSync('${lockPath}') ? 1 : 0)"` };
-  const result = await mergeRootIntoMainCas(cwd, item, 'fgw/tsk-lock', { timeoutMs: 60000 });
+  const marker = path.join(cwd, '.fgos', 'verify-started').replaceAll('\\', '/');
+  const item = { id: 'tsk-lock', verify: `node -e "require('fs').writeFileSync('${marker}','1');setTimeout(()=>{},1500)"` };
+  const merging = mergeRootIntoMainCas(cwd, item, 'fgw/tsk-lock', { timeoutMs: 60000 });
+  const deadline = Date.now() + 20000;
+  while (!fs.existsSync(marker)) {
+    assert.ok(Date.now() < deadline, 'verify never started');
+    await new Promise((resolve) => setTimeout(resolve, 20));
+  }
 
+  const fgosDir = path.join(cwd, '.fgos');
+  assert.equal(probe('merge-slot', { fgosDir, ref: 'main' }).result, 'held', 'the trunk\'s slot is held while the merge verifies');
+  const entered = await withMainCheckout(createLockScope('concurrent'), 'concurrent', () => 'in', { fgosDir });
+  assert.equal(entered, 'in', 'the main mutex is free while verify runs');
+
+  const result = await merging;
   assert.equal(result.outcome, 'merged', `expected merged, got ${result.outcome}: ${result.check?.output ?? ''}`);
-  assert.equal(fs.existsSync(lockPath), false, 'the lock is released after landing');
+  assert.equal(probe('main-checkout', { fgosDir }).result, 'free', 'the main mutex is released after landing');
+  assert.equal(probe('merge-slot', { fgosDir, ref: 'main' }).result, 'free', 'the slot is released after landing');
   assert.ok(fs.existsSync(path.join(cwd, 'feature.txt')), 'main checkout working tree synced to the merge');
+});
+
+test('root-into-main merge gate: a second merge into the same trunk is refused at once (lockWaitMs 0) while the first holds the slot, and before any verify', async () => {
+  const { mergeRootIntoMainCas, MergeError } = await import('../../src/runner/merge.mjs');
+  const { holdLockInChild } = await import('../helpers/hold-lock-in-child.mjs');
+  const os = await import('node:os');
+  const cwd = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'merge-gate-slot-held-')));
+  execGit(cwd, ['init', '--initial-branch=main']);
+  execGit(cwd, ['config', 'user.name', 'Test']);
+  execGit(cwd, ['config', 'user.email', 'test@example.com']);
+  execGit(cwd, ['commit', '--allow-empty', '-m', 'initial']);
+  fs.mkdirSync(path.join(cwd, '.fgos'));
+  execGit(cwd, ['branch', 'fgw/tsk-slot', 'HEAD']);
+  const mainBefore = execGit(cwd, ['rev-parse', 'main']).trim();
+
+  const holder = await holdLockInChild('merge-slot', { fgosDir: path.join(cwd, '.fgos'), ref: 'main' });
+  try {
+    const err = await mergeRootIntoMainCas(cwd, { id: 'tsk-slot', verify: 'true' }, 'fgw/tsk-slot', { timeoutMs: 60000, lockWaitMs: 0 }).then(() => null, (e) => e);
+    assert.ok(err instanceof MergeError, `expected MergeError, got ${err}`);
+    assert.equal(err.code, 'lock-held');
+    assert.match(err.message, /merge slot of "main" is held by another process/);
+    assert.ok(err.holders.includes(holder.child.pid));
+    assert.equal(execGit(cwd, ['rev-parse', 'main']).trim(), mainBefore);
+  } finally {
+    holder.child.kill('SIGKILL');
+    await holder.exited;
+  }
+});
+
+test('root-into-main merge gate: with lockWaitMs 0 a busy main checkout refuses the merge before the verify run', async () => {
+  const { mergeRootIntoMainCas } = await import('../../src/runner/merge.mjs');
+  const { holdLockInChild } = await import('../helpers/hold-lock-in-child.mjs');
+  const os = await import('node:os');
+  const cwd = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'merge-gate-main-held-')));
+  execGit(cwd, ['init', '--initial-branch=main']);
+  execGit(cwd, ['config', 'user.name', 'Test']);
+  execGit(cwd, ['config', 'user.email', 'test@example.com']);
+  execGit(cwd, ['commit', '--allow-empty', '-m', 'initial']);
+  fs.mkdirSync(path.join(cwd, '.fgos'));
+  execGit(cwd, ['branch', 'fgw/tsk-busy', 'HEAD']);
+  const verifyRan = path.join(cwd, '.fgos', 'verify-ran').replaceAll('\\', '/');
+
+  const holder = await holdLockInChild('main-checkout', { fgosDir: path.join(cwd, '.fgos') });
+  try {
+    const err = await mergeRootIntoMainCas(cwd, { id: 'tsk-busy', verify: `node -e "require('fs').writeFileSync('${verifyRan}','1')"` }, 'fgw/tsk-busy', { timeoutMs: 60000, lockWaitMs: 0 }).then(() => null, (e) => e);
+    assert.equal(err?.code, 'lock-held');
+    assert.match(err.message, /main checkout \(precheck\) is held by another process/);
+    assert.equal(fs.existsSync(verifyRan), false, 'refused before any verify ran');
+  } finally {
+    holder.child.kill('SIGKILL');
+    await holder.exited;
+  }
 });
 
 async function casRepoWithSetup(commands) {

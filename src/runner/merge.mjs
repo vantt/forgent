@@ -44,20 +44,17 @@ import os from 'node:os';
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { AsyncLocalStorage } from 'node:async_hooks';
 import { branchNameFor, branchExists, reclaimOrphanedCheckout, detectTrunk, withMergeEphemeralWorktree } from './worktree.mjs';
 import { runGoalCheck, runInvariantChecks, invariantFailureAsCheck } from './goal-check.mjs';
 import { readInvariantCheckCommands } from '../config/shared-config-file.mjs';
 import { normalizePath } from '../util/normalize-path.mjs';
 import { nulPaths, statusPaths, nameStatusPaths, GIT_LIST_MAX_BUFFER } from '../util/git-paths.mjs';
-import { acquireMainCheckoutLock, renewMainCheckoutLockIfOwn, mergeSlotLockFile, HELD, AMBIGUOUS, DEFAULT_TTL_MS, HOLDER_PID_ENV_VAR, formatLockDurationMs, lockRefusalDetail, heldMainCheckoutWriter, acquiringMainCheckoutWriter } from './main-checkout-lock.mjs';
 import { listSessions } from './session.mjs';
 import { listWork } from '../state/store.mjs';
 import { openLeavesSharingTarget, classifyPostLandDrift } from '../state/graph-harness.mjs';
-import { runOpportunisticMainCheckoutChecks } from '../state/events-jsonl-truncation-guard.mjs';
-import { withLockRetry } from './lock-wait.mjs';
-
-const heartbeatStorage = new AsyncLocalStorage();
+import { withMainCheckout, withMergeTargetSlot, addWorktree } from './repo-locks.mjs';
+import { checkpointMainFgos } from './main-fgos-checkpoint.mjs';
+import { LockScope, runBorrowed } from '../holder-lock/index.mjs';
 
 /** Raised only for a genuinely unexpected git failure (e.g. `git merge
  * --abort` itself failing) — never for a conflict or a red verify, which are
@@ -724,124 +721,75 @@ export function autoResolveDecisionIndexCollision(repoRoot, branch, classificati
  * introduces relative to current HEAD, correct for both a root->main merge
  * and a leaf->parent merge without needing to know either branch's trunk.
  */
-// HEARTBEAT_INTERVAL_MS (tsk-4l8): this call holds `acquireMainCheckoutLock`
-// across the entire `mergeRunnerItemLocked` call below, including
-// `runGoalCheck`'s verify run — measured up to ~185s in practice, exceeding
-// `DEFAULT_TTL_MS` (180s). Without a periodic renew, a contender's own
-// acquire attempt judges this still-live holder's lock as stale once its
-// age exceeds ITS OWN `ttlMs` (main-checkout-lock.mjs's `held = pidLive &&
-// withinTtl` is evaluated with the CONTENDER's ttlMs, not this holder's),
-// regardless of who wrote the record — the exact race this item
-// investigated. Derived as a fraction of `DEFAULT_TTL_MS` (not a second
-// fixed constant) so the two stay proportional if the TTL is ever retuned
-// again; a third of the TTL leaves a comfortable margin (renews at ~60s
-// against a 180s window) even if one renew tick is delayed.
-function heartbeatIntervalMs() {
-  return Number(process.env.FGOS_HEARTBEAT_INTERVAL_MS) || Math.floor(DEFAULT_TTL_MS / 3);
+/**
+ * A lock-held answer from the repo-lock door as the MergeError every merge
+ * caller already handles (`code: 'lock-held'`); any other error passes as is.
+ * The message keeps the door's own wording: the lock's name, the holder pids
+ * the kernel shows, and how long the wait lasted.
+ */
+export function toMergeLockError(err, details = {}) {
+  if (err?.code !== 'lock-held' || err instanceof MergeError) return err;
+  const named = String(err.message).replace(/^holder-lock \(lock-held\): /, '');
+  const into = details.targetRef ? ` into "${details.targetRef}"` : '';
+  return new MergeError(`cannot merge${details.branch ? ` "${details.branch}"` : ''}${into}: ${named}.`, {
+    ...details,
+    code: 'lock-held',
+    holders: err.holders ?? [],
+    lock: err.lock ?? null,
+  });
 }
 
 /**
- * Holds a per-TARGET-REF slot (tsk-xyr, §E of the Merge Conductor design)
- * across `fn` — the mutual-exclusion boundary an ephemeral-worktree merge
- * actually needs is the target ref's own branch pointer, not the shared
- * main checkout it never touches. Reuses `main-checkout-lock.mjs`'s own
- * wx-atomic-create + stale-pid-reclaim + self-recognition lineage (via
- * `mergeSlotLockFile(targetRef)` picking a distinct, collision-free lock
- * filename per target instead of inventing a new lock primitive) — two
- * different targets' slots never contend with each other (proven directly
- * in main-checkout-lock.test.mjs), so parallelism emerges from however many
- * distinct targets currently have work, per D7 (no fixed concurrency cap).
- *
- * Mirrors `mergeRunnerItem`'s own main-checkout-lock heartbeat/release
- * shape below exactly (same `HEARTBEAT_INTERVAL_MS`, same
- * `releaseOnExit: true`, same `MergeError{code:'lock-held'}` on contention)
- * so `withLockRetry` (lock-wait.mjs), which already retries any
- * `code:'lock-held'` throw with backoff, transparently covers this too —
- * acceptance 1 (bounded wait, no crash) is inherited for free, not
- * reimplemented here.
- *
- * MUST be held around the call that reads the target's tip (this file's own
- * `withMergeEphemeralWorktree`, via `createDetachedMergeWorktree`, reads
- * `startCommit` before its own `fn` runs) — acquiring the slot INSIDE that
- * callback would leave the tip read unprotected, turning a real queue back
- * into the same race it exists to close. Call sites (`bin/fgos.mjs`) wrap
- * `withMergeEphemeralWorktree` itself in this, never the reverse.
+ * withMergeSlot(scope, lockRoot, targetRef, fn, { waitMs }) — the per-target
+ * merge slot of `repo-locks.mjs`, with a held slot reported as a MergeError.
+ * Every merge into `targetRef` runs inside it: the slot is the one thing that
+ * keeps two merges into one target apart, whether the merge runs in a
+ * disposable worktree or on the main checkout. MUST be held around the call
+ * that reads the target's tip (the ephemeral worktree reads it before its own
+ * callback runs), so call sites wrap `withMergeEphemeralWorktree` in this,
+ * never the reverse. `fn` runs with the scope that holds the slot.
  */
-export async function withMergeTargetSlot(lockRoot, targetRef, fn) {
-  const fgosDir = path.join(lockRoot, '.fgos');
-  // tsk-18k: process.pid, not resolveWriterIdentity's session id — mirrors
-  // tsk-70l's own identical fix on the sibling main-checkout.lock call site
-  // below (mergeRunnerItem). Two independent OS processes can inherit the
-  // same env session id (a subagent fanout approving sibling leaves into
-  // the same target, for example); under a string identity, one process's
-  // release/renew (releaseMainCheckoutLockIfOwn/renewMainCheckoutLockIfOwn,
-  // main-checkout-lock.mjs) can then misidentify a DIFFERENT process's live
-  // lock as its own after a TTL reclaim and delete/overwrite it — the exact
-  // bug this fix closes. A numeric pid identity has no such collision (two
-  // real OS processes never share a pid) and needs no
-  // `allowSelfRecognition: false` override to force real contention: this
-  // slot is always released in the same call that acquired it (see
-  // `finally` below), so there is no legitimate same-identity re-entry to
-  // begin with, and `main-checkout-lock.mjs`'s own numeric-identity branch
-  // already tells a live sibling apart from a crashed same-pid holder via
-  // `isPidAlive` without any extra flag.
-  const identity = process.pid;
-  const lockFile = mergeSlotLockFile(targetRef);
-  const lock = acquireMainCheckoutLock(fgosDir, { identity, ttlMs: DEFAULT_TTL_MS, releaseOnExit: true, lockFile });
-  if (lock.status === HELD) {
-    const ttlPart = lock.remainingTtlMs != null
-      ? `, expires in ${formatLockDurationMs(lock.remainingTtlMs)}`
-      : ', no TTL window known';
-    throw new MergeError(
-      `cannot merge into "${targetRef}": target's merge slot is held by another live session (${lock.holderPid}, held ${formatLockDurationMs(lock.lockAgeMs)}${ttlPart})${lockRefusalDetail(lock)}.`,
-      { targetRef, code: 'lock-held', remainingTtlMs: lock.remainingTtlMs, holderPid: lock.holderPid, lockAgeMs: lock.lockAgeMs },
-    );
-  }
-  if (lock.status === AMBIGUOUS) {
-    throw new MergeError(`cannot merge into "${targetRef}": target's merge slot lock is ambiguous (unparseable lock file) — refusing per fail-closed policy.`, { targetRef, code: 'lock-ambiguous', lockAgeMs: lock.lockAgeMs });
-  }
-
-  // This path holds only the target's slot, never main-checkout.lock: the
-  // checkpoint acquires the main mutex itself around its add -> commit ->
-  // reset and releases it right after, so it never races a land.
-  runOpportunisticMainCheckoutChecks(fgosDir, lockRoot, { mainCheckoutWriter: acquiringMainCheckoutWriter(fgosDir) });
-
-  const heartbeatStatus = {
-    status: 'renewed',
-    renew: () => renewMainCheckoutLockIfOwn(fgosDir, identity, { lockFile }),
-  };
-  const heartbeat = setInterval(() => {
-    const res = heartbeatStatus.renew();
-    if (res.status !== 'renewed') {
-      heartbeatStatus.status = res.status;
-    }
-  }, heartbeatIntervalMs());
-  heartbeat.unref();
-
+export async function withMergeSlot(scope, lockRoot, targetRef, fn, { waitMs } = {}) {
   try {
-    return await heartbeatStorage.run(heartbeatStatus, () => fn());
-  } finally {
-    clearInterval(heartbeat);
-    lock.release();
+    return await withMergeTargetSlot(scope, lockRoot, targetRef, () => fn(scope), { waitMs });
+  } catch (err) {
+    throw toMergeLockError(err, { targetRef });
   }
 }
 
-export async function mergeRunnerItem(repoRoot, item, { timeoutMs, lockRoot = repoRoot, targetSlot = false } = {}) {
+/** Commit the `.fgos` event files of the main checkout under the main
+ * mutex, so the merge below starts from a clean `.fgos`. */
+function checkpointUnderMainCheckout(scope, lockRoot, { waitMs } = {}) {
+  const fgosDir = path.join(lockRoot, '.fgos');
+  return withMainCheckout(scope, 'checkpoint', (mainHandle) => checkpointMainFgos(mainHandle, fgosDir, lockRoot), { fgosDir, waitMs });
+}
+
+/**
+ * Merge `item`'s branch into its target. The caller already holds the
+ * target's merge slot (`withMergeSlot`) and passes the scope that holds it:
+ * this function takes the main checkout mutex itself, and only for the steps
+ * that write the main checkout (the `.fgos` checkpoint, the merge commit when
+ * `repoRoot` is the main checkout). The merge and its verify run under the
+ * slot alone. `waitMs` is how long those main checkout steps wait for another
+ * holder (omitted: one try that fails at once with lock-held).
+ */
+export async function mergeRunnerItem(repoRoot, item, { timeoutMs, lockRoot = repoRoot, scope, waitMs } = {}) {
+  if (!(scope instanceof LockScope)) {
+    throw new TypeError('mergeRunnerItem needs the LockScope that holds the target merge slot');
+  }
   const branch = branchNameFor(item.id);
 
   // tsk-2ypd (D4): read the paths this branch brings BEFORE merging. Once it
   // lands, `target` contains `branch`, so `git diff target...branch` is empty
-  // and this set can no longer be recovered. Needed on BOTH paths below
-  // (targetSlot or main-checkout.lock) — post-land detection doesn't care
-  // which lock protected the merge that just landed.
+  // and this set can no longer be recovered.
   const postLandTarget = item.parent ? branchNameFor(item.parent) : detectTrunk(repoRoot);
   const postLandFiles = changedFiles(repoRoot, item, { trunk: postLandTarget });
 
-  // tsk-xyr: attaches postLand the same way regardless of which lock path
-  // below produced `result` — factored out once so the two paths can't
-  // silently drift apart on how they compute it.
-  const withPostLand = (result) => {
+  try {
+    await checkpointUnderMainCheckout(scope, lockRoot, { waitMs });
+    const result = await mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs, lockRoot, scope, waitMs });
     if (result.outcome !== 'merged') return result;
+    // Detection is read-only work and must never widen the critical section.
     return {
       ...result,
       postLand: detectPostLandDrift(repoRoot, listWork(path.join(lockRoot, '.fgos')), item, {
@@ -854,122 +802,9 @@ export async function mergeRunnerItem(repoRoot, item, { timeoutMs, lockRoot = re
         sessions: listSessions(lockRoot),
       }),
     };
-  };
-
-  // targetSlot (tsk-xyr): the caller already holds the TARGET's own slot
-  // (withMergeTargetSlot, wrapped around this whole call from bin/fgos.mjs)
-  // around an ephemeral-worktree merge that never touches the shared main
-  // checkout's `.git/index` — main-checkout.lock protects a resource this
-  // path doesn't use, so acquiring it here would only add unneeded
-  // serialization against sessions doing genuinely unrelated work. Omitted
-  // (root->main approve, top-level sync-root onto trunk): the merge DOES
-  // run on the shared checkout, so main-checkout.lock IS that target's
-  // slot — behavior below is then exactly what it was before this item.
-  if (targetSlot) {
-    return withPostLand(await mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs, lockRoot }));
+  } catch (err) {
+    throw toMergeLockError(err, { branch });
   }
-
-  // The pre-commit hook only locks the final `git commit` — everything
-  // before it (`git merge --no-commit`, the .fgos-write check, verify) ran
-  // unprotected, so a concurrent session's own merge/commit could land in
-  // that window and resolve MERGE_HEAD out from under this one (observed:
-  // "no merge to abort" on the *abort* call itself, not just the commit).
-  // Acquiring here, before the first git call, closes that gap by holding
-  // the same lock the hook already enforces for the commit alone — same
-  // identity (`resolveWriterIdentity`) as the hook resolves inside the
-  // child `git commit` process it spawns, so D6 self-recognition lets that
-  // later, in-process-tree acquisition succeed as a refresh, never a
-  // self-deadlock — true whenever an env session id resolves the identity
-  // (the primary path; every session actually contending on this checkout
-  // observed during this fix carried one). Without an env id the identity
-  // is the highest ancestor holding a terminal, else the session id
-  // (docs/platform/session-identity/spec.md); neither depends on how many
-  // hops deeper the hook's child process sits, so this call and the hook's
-  // later call land on the same id.
-  // tsk-2eq: `lockRoot` defaults to `repoRoot` (root->main approve's own
-  // call site, unaffected) but a leaf->parent approve passes the real repo
-  // root here explicitly while `repoRoot` itself stays the ephemeral
-  // worktree used as the git-op cwd below. Resolving `fgosDir` off a bare
-  // `repoRoot` would point inside that ephemeral worktree — a directory
-  // `createWorktree` (worktree.mjs) already strips `.fgos/` from per
-  // ADR0020 — so `acquireMainCheckoutLock` would silently recreate it
-  // fresh every call and never actually contend with the real
-  // `<repoRoot>/.fgos/main-checkout.lock` a concurrent leaf merge holds.
-  const fgosDir = path.join(lockRoot, '.fgos');
-  // tsk-70l: process.pid, not resolveWriterIdentity's session id. Two
-  // independent OS processes can inherit the same env session id (a
-  // subagent fanout approving sibling root items, for example) and would
-  // wrongly self-recognize each other as "the same writer" under a
-  // string identity, which has no liveness probe
-  // (main-checkout-lock.mjs's own numeric-vs-string branch). A numeric
-  // pid identity lets `isPidAlive` tell a live fanout sibling (real
-  // exclusion) apart from a crashed same-session holder (immediate
-  // reclaim, no waiting out the TTL) — mirrors claim-port.mjs's own
-  // `identity: process.pid` on this exact lock file. The nested
-  // pre-commit hook recognizes this process as its own holder via
-  // `HOLDER_PID_ENV_VAR`, set on the `git commit` call below — not by
-  // matching this identity itself.
-  const identity = process.pid;
-  // releaseOnExit (tsk-45z point 2): approve's own job is over once this
-  // process exits, so a crash/interrupt mid-merge should release the lock
-  // immediately rather than leaving the next writer to wait out the TTL —
-  // unlike `.githooks/pre-commit`'s intentional lingering acquire, this
-  // caller's `finally` below already always calls `lock.release()` itself
-  // on the happy path; releaseOnExit only adds the crash/SIGINT/SIGTERM net
-  // on top of that.
-  const lock = acquireMainCheckoutLock(fgosDir, { identity, ttlMs: DEFAULT_TTL_MS, releaseOnExit: true });
-  if (lock.status === HELD) {
-    const ttlPart = lock.remainingTtlMs != null
-      ? `, expires in ${formatLockDurationMs(lock.remainingTtlMs)}`
-      : ', no TTL window known';
-    throw new MergeError(
-      `cannot merge "${branch}": main checkout is locked by pid ${lock.holderPid} (held ${formatLockDurationMs(lock.lockAgeMs)}${ttlPart})${lockRefusalDetail(lock)}.`,
-      { branch, code: 'lock-held', remainingTtlMs: lock.remainingTtlMs, holderPid: lock.holderPid, lockAgeMs: lock.lockAgeMs },
-    );
-  }
-  if (lock.status === AMBIGUOUS) {
-    throw new MergeError(`cannot merge "${branch}": main checkout lock is ambiguous (unparseable lock file) — refusing per fail-closed policy.`, { branch, code: 'lock-ambiguous', lockAgeMs: lock.lockAgeMs });
-  }
-
-  // Already holding main-checkout.lock as `identity`: the checkpoint
-  // commits under this hold, never acquiring the mutex a second time.
-  runOpportunisticMainCheckoutChecks(fgosDir, lockRoot, { mainCheckoutWriter: heldMainCheckoutWriter(identity) });
-
-  // Heartbeat (tsk-4l8): renews the lock's timestamp every
-  // HEARTBEAT_INTERVAL_MS for as long as this call holds it, so its age
-  // never approaches DEFAULT_TTL_MS no matter how long the wrapped call
-  // (in particular runGoalCheck, called from within mergeRunnerItemLocked)
-  // actually runs. `.unref()`'d so a lingering timer never blocks process
-  // exit; `renewMainCheckoutLockIfOwn` only ever writes when this call's
-  // own `identity` still owns the record, so a lock legitimately reclaimed
-  // out from under a crashed/hung holder is never resurrected by a stray
-  // tick. Cleared in the same `finally` that already releases the lock —
-  // covers every exit path (success, verify-fail, a thrown exception)
-  // exactly like `lock.release()` already does.
-  const heartbeatStatus = {
-    status: 'renewed',
-    renew: () => renewMainCheckoutLockIfOwn(fgosDir, identity),
-  };
-  const heartbeat = setInterval(() => {
-    const res = heartbeatStatus.renew();
-    if (res.status !== 'renewed') {
-      heartbeatStatus.status = res.status;
-    }
-  }, heartbeatIntervalMs());
-  heartbeat.unref();
-
-  let result;
-  try {
-    result = await heartbeatStorage.run(heartbeatStatus, () => mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs, lockRoot }));
-  } finally {
-    clearInterval(heartbeat);
-    lock.release();
-  }
-
-  // Detection runs here, AFTER the lock is released: it is read-only work
-  // that must never widen the critical section this whole design exists to
-  // narrow. Only a landed merge can have put anything behind.
-  return withPostLand(result);
 }
 
 // tsk-3yl D1: a prior `approve` run can already have landed this branch's
@@ -1117,7 +952,7 @@ function branchContentMismatch(repoRoot, branch, ref) {
 // tsk-2j9 D1/D2: a genuine `git merge --no-commit --no-ff branch` no-op
 // (branch already an ancestor of HEAD by the time this call runs -- the
 // TOCTOU window between `isAlreadyMerged`'s pre-check above and this call,
-// e.g. a main-checkout writer that bypasses `acquireMainCheckoutLock`)
+// e.g. a main-checkout writer that bypasses the main checkout mutex)
 // exits 0 with "Already up to date." and creates no `MERGE_HEAD`. Every
 // abort call below used to run unconditionally on that path and crash with
 // "fatal: There is no merge to abort (MERGE_HEAD missing)" instead of
@@ -1142,13 +977,10 @@ export function abortMergeIfPossible(repoRoot) {
     git(repoRoot, ['merge', '--abort']);
   } catch (err) {
     // tsk-18a D2: a concurrent process resolving the SAME writer identity
-    // (main-checkout-lock.mjs's D6 self-recognition "refresh" path treats
-    // it as this call's own session, so tsk-2eq's lock never contends
-    // against it) can clear MERGE_HEAD in the window between the check
-    // above and this abort call -- empirically reproduced: two genuinely
-    // separate processes forced to share one resolved identity, real git
-    // ops racing on one shared checkout, "no merge to abort" on this exact
-    // line. If MERGE_HEAD is gone NOW, the abort's own goal -- no merge
+    // (two processes sharing one writer identity, real git ops racing on
+    // one shared checkout) can clear MERGE_HEAD in the window between the
+    // check above and this abort call -- empirically reproduced as "no
+    // merge to abort" on this exact line. If MERGE_HEAD is gone NOW, the abort's own goal -- no merge
     // left in progress -- is already satisfied, whatever cleared it;
     // treat this exactly like the up-front no-op case above, never as a
     // fatal failure. Any OTHER abort failure (MERGE_HEAD still present)
@@ -1243,7 +1075,7 @@ function resolveFgosOnlyConflict(repoRoot, keepRef) {
   return stillUnmerged.length === 0;
 }
 
-async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs, lockRoot = repoRoot } = {}) {
+async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs, lockRoot = repoRoot, scope, waitMs } = {}) {
   // tsk-3yl D1: still run the real goal-check here, even though nothing
   // will be staged/committed — every 'merged' outcome must carry a real,
   // freshly-executed verify result (both callers in bin/fgos.mjs read
@@ -1526,25 +1358,6 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs, lockRo
     }
   }
 
-  // tsk-2qp: if the lock heartbeat lapsed mid-merge (e.g. renewal returned
-  // not-owner, ambiguous, or no-lock because another session reclaimed), do
-  // NOT execute `git commit`. Also renew synchronously here: timer ticks are
-  // best-effort scheduling, and the final ownership check must not depend on
-  // a background interval firing between verify completion and commit.
-  // Return `lock-lost-mid-merge` without calling `abortMergeIfPossible` —
-  // the tree state legitimately belongs to the new lock holder, so tearing
-  // it up would cause data loss.
-  const heartbeatStatus = heartbeatStorage.getStore();
-  if (heartbeatStatus) {
-    const res = heartbeatStatus.renew();
-    if (res.status !== 'renewed') {
-      heartbeatStatus.status = res.status;
-    }
-    if (heartbeatStatus.status !== 'renewed') {
-      return { outcome: 'lock-lost-mid-merge', branch };
-    }
-  }
-
   try {
     // tsk-3tp (D2): sweep dirty/untracked files under .fgos/events/ and .fgos/events.jsonl into the staged merge commit
     //
@@ -1552,9 +1365,8 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs, lockRo
     // (ADR0020 strips it from every ephemeral worktree — see
     // `docs/explanation/why-mergerunneritem-takes-a-separate-lockroot-param.md`),
     // so both the pathspec base AND the git-command cwd below must be
-    // `lockRoot`, not `repoRoot` — mirroring `fgosDir`/
-    // `runOpportunisticMainCheckoutChecks` above, which already got this
-    // right. Resolving/running against `repoRoot` instead made this block
+    // `lockRoot`, not `repoRoot` — mirroring the checkpoint at the start of
+    // `mergeRunnerItem`, which already got this right. Resolving/running against `repoRoot` instead made this block
     // a silent no-op (git refuses an out-of-repository pathspec, swallowed
     // by the catch below) for every leaf->parent approve and promote-engine
     // merge — i.e. every merge where `lockRoot !== repoRoot`. `lockRoot`
@@ -1581,16 +1393,20 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs, lockRo
       }
     }
 
-    // HOLDER_PID_ENV_VAR (tsk-70l): scoped to this one call, not a
-    // `process.env` assignment — see `git()`'s own env passthrough
-    // above. Lets `.githooks/pre-commit`, spawned as this call's own
-    // child, recognize whichever process currently holds
-    // main-checkout.lock as its own parent (this process's pid, when the
-    // targetSlot path holds it instead — see mergeRunnerItem's own
-    // comment on `targetSlot` — the hook's own acquire simply never
-    // matches an existing main-checkout.lock record with this pid, no
-    // different from today).
-    git(repoRoot, ['commit', '--no-edit'], { env: { [HOLDER_PID_ENV_VAR]: String(process.pid) } });
+    // On the main checkout the commit writes the shared index, so it runs
+    // under the main mutex and the pre-commit hook sees a borrower. In a
+    // disposable worktree it touches nothing shared and commits directly.
+    if (path.resolve(repoRoot) === path.resolve(lockRoot)) {
+      const fgosDir = path.join(lockRoot, '.fgos');
+      await withMainCheckout(scope, 'merge-commit', (mainHandle) => {
+        const res = runBorrowed(mainHandle, { command: 'git', args: ['commit', '--no-edit'], cwd: repoRoot });
+        if (res.exit !== 0) {
+          throw Object.assign(new Error(`git commit --no-edit failed (exit ${res.exit}${res.signal ? `, ${res.signal}` : ''}): ${String(res.stderr).trim()}`), { stderr: res.stderr, status: res.exit });
+        }
+      }, { fgosDir, waitMs });
+    } else {
+      git(repoRoot, ['commit', '--no-edit']);
+    }
   } catch (err) {
     try {
       abortMergeIfPossible(repoRoot);
@@ -1751,10 +1567,11 @@ export async function performCatchUp(repoRoot, id, item, target, timeoutMs) {
 
 
 /**
- * `lockWaitMs`: how long the final land step waits for another holder of
- * main-checkout.lock (0 = fail at once with lock-held). `failFastIfLocked`
- * (approve --no-wait): check the lock read-only BEFORE doing any work, so a
- * no-wait caller is refused in milliseconds instead of after a full verify.
+ * Runs under the target's merge slot (taken here, in its own scope).
+ * `lockWaitMs`: how long the slot, the worktree-admin mutex and the final
+ * land step each wait for another holder (0 = fail at once with lock-held,
+ * checked before any work so a no-wait caller is refused in milliseconds
+ * instead of after a full verify).
  * `ownFileSet`, when given, is re-checked against repoRoot's own working
  * tree right before the land step's ref move (see `landCasMergeUnderLock`)
  * -- the caller's own pre-check (same `ownFileSet`, same
@@ -1764,24 +1581,31 @@ export async function performCatchUp(repoRoot, id, item, target, timeoutMs) {
  * `update-ref` move the trunk while the working-tree sync then silently
  * failed (D-ADR0042), leaving repoRoot's index behind the new HEAD.
  */
-export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs, lockWaitMs = CAS_LAND_LOCK_WAIT_MS, failFastIfLocked = false, ownFileSet = null } = {}) {
+export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs, lockWaitMs = CAS_LAND_LOCK_WAIT_MS, ownFileSet = null } = {}) {
+  const { detectTrunk } = await import('./worktree.mjs');
+  const scope = new LockScope('merge-root-into-main');
+  const waitMs = lockWaitMs > 0 ? lockWaitMs : undefined;
+  // The target's slot is held across merge, verify and land: it is what keeps
+  // two merges into one target apart. The main checkout mutex is taken only
+  // for the land step below. `lockWaitMs: 0` (approve --no-wait) makes both
+  // acquires a single try that fails at once, naming the lock.
+  return withMergeSlot(scope, repoRoot, detectTrunk(repoRoot), async () => {
+    if (waitMs === undefined) {
+      // No-wait: refuse in milliseconds when the main checkout is busy,
+      // instead of after a full verify run that cannot land anyway.
+      try {
+        await withMainCheckout(scope, 'precheck', () => {}, { fgosDir: path.join(repoRoot, '.fgos') });
+      } catch (err) {
+        throw toMergeLockError(err, { branch });
+      }
+    }
+    return mergeRootIntoMainCasUnderSlot(scope, repoRoot, item, branch, { timeoutMs, waitMs, ownFileSet });
+  }, { waitMs });
+}
+
+async function mergeRootIntoMainCasUnderSlot(scope, repoRoot, item, branch, { timeoutMs, waitMs, ownFileSet }) {
   const { detectTrunk, resolveRefSha, provisionDependencies, runWorktreeSetupCommands } = await import('./worktree.mjs');
   const { execFileSync } = await import('child_process');
-
-  if (failFastIfLocked) {
-    const { inspectMainCheckoutLock, formatLockDurationMs, lockRefusalDetail } = await import('./main-checkout-lock.mjs');
-    const lock = inspectMainCheckoutLock(path.join(repoRoot, '.fgos'));
-    if (lock.outcome === 'live') {
-      const ttlPart = lock.remainingTtlMs != null ? `, expires in ${formatLockDurationMs(lock.remainingTtlMs)}` : ', no TTL window known';
-      throw new MergeError(
-        `cannot merge "${branch}": main checkout is locked by pid ${lock.holderPid} (held ${formatLockDurationMs(lock.lockAgeMs)}${ttlPart})${lockRefusalDetail(lock)}.`,
-        { branch, code: 'lock-held', remainingTtlMs: lock.remainingTtlMs, holderPid: lock.holderPid, lockAgeMs: lock.lockAgeMs }
-      );
-    }
-    if (lock.outcome === 'ambiguous') {
-      throw new MergeError(`cannot merge "${branch}": main checkout lock is ambiguous.`, { branch, code: 'lock-ambiguous' });
-    }
-  }
 
   if (mergeHeadExists(repoRoot)) {
     return { outcome: 'merge-blocked-other-item', branch };
@@ -1804,7 +1628,7 @@ export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs, 
   // (claim, another approve) for the whole verify run. Only the final
   // ref move + main-checkout sync below takes the lock.
   try {
-    execFileSync('git', ['worktree', 'add', '--detach', worktreePath, targetTip], { cwd: repoRoot });
+    await addWorktree(scope, repoRoot, ['--detach', worktreePath, targetTip], { waitMs });
     fs.rmSync(path.join(worktreePath, '.fgos'), { recursive: true, force: true });
 
     try {
@@ -1862,16 +1686,15 @@ export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs, 
     } catch (e) {}
   }
 
-  const land = () => landCasMergeUnderLock(repoRoot, { branch, targetBranch, targetTip, commitSha, ownFileSet });
-  const landed = lockWaitMs > 0 ? await withLockRetry(land, { waitMs: lockWaitMs }) : await land();
+  const landed = await landCasMergeUnderLock(scope, repoRoot, { branch, targetBranch, targetTip, commitSha, ownFileSet, waitMs });
   if (landed) return landed;
   return { outcome: 'merged', branch, check };
 }
 
-// Budget for waiting on another holder of main-checkout.lock at the final
-// land step. Other holders only keep it for short git/index operations, so
-// a brief wait beats throwing lock-held -- that would make approve's
-// whole-call retry (runMerge) redo the entire verify run.
+// Budget for waiting on another holder of the main checkout mutex at the
+// steps that write it (land, merge commit). Other holders only keep it for
+// short git/index operations, so a brief wait beats throwing lock-held --
+// that would make approve's whole-call retry redo the entire verify run.
 const CAS_LAND_LOCK_WAIT_MS = 60 * 1000;
 
 /**
@@ -1880,7 +1703,7 @@ const CAS_LAND_LOCK_WAIT_MS = 60 * 1000;
  * refuses if the trunk moved since the merge started) and syncs the main
  * checkout's working tree when it has the trunk checked out. Returns null
  * on success, or an outcome object when the ref move is refused. Throws
- * MergeError code lock-held/lock-ambiguous, same contract as before.
+ * MergeError code lock-held when the main checkout mutex stays held past `waitMs`.
  *
  * `ownFileSet`, when given, is re-checked here -- under the lock, right
  * before `update-ref` -- against a fresh path this exact merge already
@@ -1889,47 +1712,35 @@ const CAS_LAND_LOCK_WAIT_MS = 60 * 1000;
  * reported as `main-checkout-dirty-mid-merge` instead of racing
  * `update-ref`/`read-tree`.
  */
-async function landCasMergeUnderLock(repoRoot, { branch, targetBranch, targetTip, commitSha, ownFileSet = null }) {
-  const { acquireMainCheckoutLock, releaseMainCheckoutLockIfOwn, DEFAULT_TTL_MS, HELD, AMBIGUOUS, formatLockDurationMs, lockRefusalDetail } = await import('./main-checkout-lock.mjs');
+async function landCasMergeUnderLock(scope, repoRoot, { branch, targetBranch, targetTip, commitSha, ownFileSet = null, waitMs }) {
   const { execFileSync } = await import('child_process');
   const fgosDir = path.join(repoRoot, '.fgos');
-  const identity = process.pid;
-  const lock = acquireMainCheckoutLock(fgosDir, { identity, ttlMs: DEFAULT_TTL_MS, releaseOnExit: true });
-  if (lock.status === HELD) {
-    const ttlPart = lock.remainingTtlMs != null ? `, expires in ${formatLockDurationMs(lock.remainingTtlMs)}` : ', no TTL window known';
-    throw new MergeError(
-      `cannot merge "${branch}": main checkout is locked by pid ${lock.holderPid} (held ${formatLockDurationMs(lock.lockAgeMs)}${ttlPart})${lockRefusalDetail(lock)}.`,
-      { branch, code: 'lock-held', remainingTtlMs: lock.remainingTtlMs, holderPid: lock.holderPid, lockAgeMs: lock.lockAgeMs }
-    );
-  }
-  if (lock.status === AMBIGUOUS) {
-    throw new MergeError(`cannot merge "${branch}": main checkout lock is ambiguous.`, { branch, code: 'lock-ambiguous' });
-  }
-
   try {
-    if (ownFileSet && !isWorkingTreeClean(repoRoot, ownFileSet)) {
-      return { outcome: 'main-checkout-dirty-mid-merge', branch };
-    }
-    try {
-      execFileSync('git', ['update-ref', `refs/heads/${targetBranch}`, commitSha, targetTip], { cwd: repoRoot, encoding: 'utf8', stdio: 'pipe' });
-    } catch (err) {
-      return {
-        outcome: 'merge-failed-unclassified',
-        branch,
-        error: { message: `update-ref failed: ${err.message}`, stderr: err.stderr ?? null, status: err.status ?? null }
-      };
-    }
-    const currentBranch = execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim();
-    if (currentBranch === targetBranch) {
-      try {
-        execFileSync('git', ['read-tree', '-m', '-u', 'HEAD'], { cwd: repoRoot, encoding: 'utf8', stdio: 'pipe' });
-      } catch (e) {
-        // Non-destructive sync aborted due to unstaged changes on non-intersecting paths.
-        // Leaving the working tree out of sync, which is acceptable under D-ADR0042.
+    return await withMainCheckout(scope, 'land', () => {
+      if (ownFileSet && !isWorkingTreeClean(repoRoot, ownFileSet)) {
+        return { outcome: 'main-checkout-dirty-mid-merge', branch };
       }
-    }
-    return null;
-  } finally {
-    releaseMainCheckoutLockIfOwn(fgosDir, identity);
+      try {
+        execFileSync('git', ['update-ref', `refs/heads/${targetBranch}`, commitSha, targetTip], { cwd: repoRoot, encoding: 'utf8', stdio: 'pipe' });
+      } catch (err) {
+        return {
+          outcome: 'merge-failed-unclassified',
+          branch,
+          error: { message: `update-ref failed: ${err.message}`, stderr: err.stderr ?? null, status: err.status ?? null }
+        };
+      }
+      const currentBranch = execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+      if (currentBranch === targetBranch) {
+        try {
+          execFileSync('git', ['read-tree', '-m', '-u', 'HEAD'], { cwd: repoRoot, encoding: 'utf8', stdio: 'pipe' });
+        } catch (e) {
+          // Non-destructive sync aborted due to unstaged changes on non-intersecting paths.
+          // Leaving the working tree out of sync, which is acceptable under D-ADR0042.
+        }
+      }
+      return null;
+    }, { fgosDir, waitMs });
+  } catch (err) {
+    throw toMergeLockError(err, { branch });
   }
 }
