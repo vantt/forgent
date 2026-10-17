@@ -68,7 +68,7 @@ invocation trong `prefer` của capability là ghim (`advise` ghim
 |---|---|---|---|---|
 | [00](phase-00-preconditions.md) | Commit config của anh; chụp baseline `bind()` | — | 1 | xong |
 | [05](phase-05-gemini-omp-tests.md) | Sửa 35 test vỡ khi gemini chuyển sang omp; thêm `--model {model}` cho gemini | 00 | 3 | xong |
-| [01](phase-01-config-one-executor-per-family.md) | Gộp `claude-herdr` vào `claude`; bỏ `glm-herdr` | 00, 05 | 4 | config và test đã sửa, chưa commit (worktree `feat/model-pool-config`) |
+| [01](phase-01-config-one-executor-per-family.md) | Gộp `claude-herdr` vào `claude`; bỏ `glm-herdr` | 00, 05 | 4 | xong |
 | [02](phase-02-tier-cell-reader.md) | Bộ đọc ô tier, validator project/global, thiếu ô thì từ chối | 05 | 5 | chờ |
 | [03](phase-03-llm-accounts-reader.md) | Bộ đọc `runner.llmAccounts` chỉ đọc, kiểm tên pool | 05 | 3 | chờ |
 | [04](phase-04-explain-and-doctor.md) | `fgos dispatch explain`, check doctor, spec, CHANGELOG | 01, 02, 03 | 6 | chờ |
