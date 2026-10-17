@@ -6,6 +6,7 @@
 #   FAKE_HERDR_PANE_GONE  set: pane commands answer pane_not_found
 #   FAKE_HERDR_ON_CLOSE   shell snippet run when `pane close` is called
 #   FAKE_HERDR_NO_WORKSPACE  set: `tab create` answers workspace_not_found, `workspace create` makes the tab
+#   FAKE_HERDR_READ_JSON     set: `pane read` answers in the JSON envelope (older herdr)
 #   FAKE_HERDR_GARBLE     set: every command answers text that is not JSON
 #   FAKE_HERDR_FDS        file that receives the list of open fds of this process
 dir=$(dirname "$0")
@@ -34,7 +35,7 @@ case "$1 $2" in
   "agent explain") cat "$dir/agent-explain.json" ;;
   "agent get"|"pane get") cat "$dir/pane-get.json" ;;
   "pane process-info") cat "$dir/pane-process-info-running.json" ;;
-  "pane read") printf 'line one\nline two\n' ;;
+  "pane read") if [ -n "$FAKE_HERDR_READ_JSON" ]; then echo '{"id":"cli:pane:read","result":{"read":{"text":"enveloped screen"}}}'; else printf 'line one\nline two\n'; fi ;;
   "pane close") [ -n "$FAKE_HERDR_ON_CLOSE" ] && sh -c "$FAKE_HERDR_ON_CLOSE"; cat "$dir/pane-close-ok.json" ;;
   *) echo '{"error":{"code":"unknown_command","message":"fake"}}' >&2; exit 2 ;;
 esac

@@ -402,3 +402,19 @@ fn a_session_without_a_workspace_gets_one_and_its_root_pane_is_the_first_pane() 
         ]
     );
 }
+
+#[test]
+fn a_screen_comes_back_as_plain_text_or_in_the_envelope_and_a_failure_is_named() {
+    let plain = Fake::new("read-plain");
+    assert_eq!(plain.driver().read_screen("wS:p59Y", Some(60), None).unwrap(), "line one\nline two\n");
+    assert!(plain.calls().iter().any(|c| c == "pane read wS:p59Y --lines 60"));
+
+    let enveloped = Fake::new("read-json").env("FAKE_HERDR_READ_JSON", "1");
+    assert_eq!(enveloped.driver().read_screen("wS:p59Y", None, None).unwrap(), "enveloped screen");
+
+    let failing = Fake::new("read-fail").env("FAKE_HERDR_PANE_GONE", "1");
+    match failing.driver().read_screen("wS:p59Y", None, None) {
+        Err(Refusal::Unknown { reason }) => assert!(reason.contains("pane_not_found"), "{reason}"),
+        other => panic!("a failed read must be a named refusal, got {other:?}"),
+    }
+}
