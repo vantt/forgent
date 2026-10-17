@@ -1416,6 +1416,8 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs, lockRo
         { branch, stderr: err.stderr ?? null, status: err.status ?? null },
       );
     }
+    // The main mutex stayed held past the wait: that is contention, not a git failure.
+    if (err?.code === 'lock-held') throw toMergeLockError(err, { branch });
     throw new MergeError(`verify passed for "${branch}" but "git commit" failed: ${err.message}`, {
       branch,
       stderr: err.stderr ?? null,
@@ -1722,15 +1724,23 @@ async function landCasMergeUnderLock(scope, repoRoot, { branch, targetBranch, ta
       }
       const currentBranch = execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim();
       const syncsWorkingTree = currentBranch === targetBranch;
+      let stagedFgos = [];
+      const isFgosPath = (p) => p === '.fgos' || p.startsWith('.fgos/');
       if (syncsWorkingTree) {
         // The working-tree sync below resets the index to the new HEAD and
         // removes staged additions from disk: a person's staged change must
         // refuse the land, never be discarded by it.
-        const stagedPaths = nulPaths(execFileSync('git', ['diff', '--name-only', '--cached', '--no-renames', '--no-relative', '-z'], { cwd: repoRoot, encoding: 'utf8', maxBuffer: GIT_LIST_MAX_BUFFER }))
-          .filter((p) => p !== '.fgos' && !p.startsWith('.fgos/'));
+        const staged = nulPaths(execFileSync('git', ['diff', '--name-only', '--cached', '--no-renames', '--no-relative', '-z'], { cwd: repoRoot, encoding: 'utf8', maxBuffer: GIT_LIST_MAX_BUFFER }));
+        const stagedPaths = staged.filter((p) => !isFgosPath(p));
         if (stagedPaths.length > 0) {
           return { outcome: 'main-checkout-dirty-mid-merge', branch, stagedPaths };
         }
+        // Staged `.fgos` event files are swept into main's index on purpose
+        // (see the sweep in mergeRunnerItemLocked) and are fgOS's own: keep
+        // them across the sync instead of refusing every land behind them.
+        stagedFgos = staged.filter(isFgosPath)
+          .filter((p) => fs.existsSync(path.join(repoRoot, p)))
+          .map((p) => ({ p, content: fs.readFileSync(path.join(repoRoot, p)) }));
       }
       try {
         execFileSync('git', ['update-ref', `refs/heads/${targetBranch}`, commitSha, targetTip], { cwd: repoRoot, encoding: 'utf8', stdio: 'pipe' });
@@ -1747,6 +1757,17 @@ async function landCasMergeUnderLock(scope, repoRoot, { branch, targetBranch, ta
         } catch (e) {
           // Non-destructive sync aborted due to unstaged changes on non-intersecting paths.
           // Leaving the working tree out of sync, which is acceptable under D-ADR0042.
+        }
+        for (const { p, content } of stagedFgos) {
+          fs.mkdirSync(path.dirname(path.join(repoRoot, p)), { recursive: true });
+          fs.writeFileSync(path.join(repoRoot, p), content);
+        }
+        if (stagedFgos.length > 0) {
+          try {
+            execFileSync('git', ['add', '--', ...stagedFgos.map(({ p }) => p)], { cwd: repoRoot, encoding: 'utf8', stdio: 'pipe' });
+          } catch {
+            // The content is back on disk; restaging is best effort after the ref already moved.
+          }
         }
       }
       return null;

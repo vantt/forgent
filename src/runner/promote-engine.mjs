@@ -80,7 +80,7 @@ export async function retargetMember(repoRoot, memberItem, rootId, opts = {}) {
   const result = await withLockRetry(
     ({ waitMs }) => withMergeSlot(scope, repoRoot, branchNameFor(rootId), () =>
       withMergeEphemeralWorktree(repoRoot, rootId, (ephemeral) =>
-        mergeRunnerItem(ephemeral.path, memberItem, { ...(opts.timeoutMs ? { timeoutMs: opts.timeoutMs } : {}), lockRoot: repoRoot, scope }),
+        mergeRunnerItem(ephemeral.path, memberItem, { ...(opts.timeoutMs ? { timeoutMs: opts.timeoutMs } : {}), lockRoot: repoRoot, scope, waitMs }),
       ), { waitMs }),
     { waitMs: undefined },
   );

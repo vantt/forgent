@@ -163,6 +163,28 @@ test('a file staged in main before the land refuses it even outside the item\'s 
   assert.equal(fs.readFileSync(path.join(repoRoot, 'staged.txt'), 'utf8'), 'staged by a person\n');
 });
 
+test('staged .fgos event files in main are fgOS\'s own: they survive the land content-intact and staged, they do not refuse it', { skip }, async () => {
+  const repoRoot = initRepo();
+  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), '{"seq":1}\n');
+  git(repoRoot, ['add', '-f', '.fgos/events.jsonl']);
+  git(repoRoot, ['commit', '-q', '-m', 'track events']);
+  addBranch(repoRoot, 'fgw/item-a', 'a.txt', 'a\n');
+  fs.appendFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), '{"seq":2}\n');
+  fs.mkdirSync(path.join(repoRoot, '.fgos', 'events'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, '.fgos', 'events', 'w1.jsonl'), '{"seq":3}\n');
+  git(repoRoot, ['add', '-f', '.fgos/events.jsonl', '.fgos/events/w1.jsonl']);
+
+  const result = await mergeRootIntoMainCas(repoRoot, item('item-a'), 'fgw/item-a', { timeoutMs: 60000, lockWaitMs: 30000, ownFileSet: new Set(['a.txt']) });
+
+  assert.equal(result.outcome, 'merged', JSON.stringify(result));
+  assert.equal(fs.readFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), 'utf8'), '{"seq":1}\n{"seq":2}\n', 'the staged edit is not reset to HEAD');
+  assert.equal(fs.readFileSync(path.join(repoRoot, '.fgos', 'events', 'w1.jsonl'), 'utf8'), '{"seq":3}\n', 'the staged new shard is not deleted');
+  const stagedNow = git(repoRoot, ['diff', '--cached', '--name-only']);
+  assert.match(stagedNow, /\.fgos\/events\.jsonl/);
+  assert.match(stagedNow, /\.fgos\/events\/w1\.jsonl/);
+});
+
 test('an unstaged edit on an unrelated path survives the land untouched', { skip }, async () => {
   const repoRoot = initRepo();
   addBranch(repoRoot, 'fgw/item-a', 'a.txt', 'a\n');
