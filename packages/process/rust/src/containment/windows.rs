@@ -55,7 +55,9 @@ impl ContainmentDriver for WindowsJobDriver {
 
     fn create(&self, attempt_id: &str) -> Result<ContainmentDomain, ContainmentError> {
         let token = random_token()?;
-        let name = format!("Local\\fgos-attempt-{}-{token}", sanitize_lock_name(attempt_id));
+        // The kernel caps an object name near MAX_PATH; the token carries the uniqueness.
+        let id: String = sanitize_lock_name(attempt_id).chars().take(64).collect();
+        let name = format!("Local\\fgos-attempt-{id}-{token}");
         let job = create_kill_job(&name)?;
         let mut domain = ContainmentDomain::new(attempt_id);
         domain.job = Some(JobHold { name, job, watch: None });
@@ -75,6 +77,11 @@ impl ContainmentDriver for WindowsJobDriver {
         let Some(session_id) = own_session() else {
             return Err(ContainmentError::DriverUnavailable("the windows session of this process is unreadable".into()));
         };
+        // A second spawn replaces the record, so the watch of the first is stale.
+        if let Some(hold) = domain.job.as_mut() {
+            hold.watch = None;
+        }
+        let hold = domain.job.as_ref().expect("job checked above");
         let pick = |file: &Option<File>| file.as_ref().and_then(|f| f.try_clone().ok()).map_or_else(Stdio::null, Stdio::from);
         let mut cmd = Command::new(program);
         cmd.args(args).env_clear().envs(&spec.env).current_dir(&spec.cwd).creation_flags(CREATE_SUSPENDED);

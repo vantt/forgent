@@ -75,6 +75,7 @@ impl ContainmentDriver for MacosTree {
         if facts::judge_here(&root.to_record()) == Verdict::Alive {
             remember_tree(&root, &mut domain.seen);
         }
+        prune_dead(&root, &mut domain.seen);
         tree_state(&root, &domain.seen)
     }
 
@@ -181,6 +182,12 @@ pub(crate) fn tree_state(root: &ProcTuple, seen: &[ProcTuple]) -> DomainState {
         return DomainState::NotEmpty;
     }
     DomainState::Empty
+}
+
+/// Forget what has died: a dead process cannot return, and every poll judges
+/// each tuple that is kept.
+fn prune_dead(root: &ProcTuple, seen: &mut Vec<ProcTuple>) {
+    seen.retain(|tuple| tuple == root || facts::judge_here(&tuple.to_record()) != Verdict::Dead);
 }
 
 /// [`tree_state`] from the record alone, as adopt asks it: an empty answer is

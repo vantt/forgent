@@ -4,6 +4,7 @@
 #![cfg(windows)]
 
 use std::collections::BTreeMap;
+use std::ffi::c_void;
 use std::fs;
 use std::os::windows::process::CommandExt;
 use std::path::{Path, PathBuf};
@@ -11,12 +12,20 @@ use std::process::{Child, Command};
 use std::thread::sleep;
 use std::time::{Duration, Instant};
 
+use windows_sys::Win32::Foundation::CloseHandle;
+use windows_sys::Win32::System::JobObjects::{
+    JobObjectExtendedLimitInformation, OpenJobObjectW, QueryInformationJobObject, JOBOBJECT_EXTENDED_LIMIT_INFORMATION, JOB_OBJECT_LIMIT_BREAKAWAY_OK, JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE,
+    JOB_OBJECT_LIMIT_SILENT_BREAKAWAY_OK,
+};
+
 use fgos_process::containment::{ContainmentDriver, GuaranteeLevel, SpawnSpec, StartMode, WindowsJobDriver};
 use fgos_process::control::{signal_by_identity, Signal};
 use fgos_process::facts::{self, Observed};
 use fgos_process::platform::windows_job::open_job;
 use fgos_process::{domain_is_empty, Domain, DomainState, ProcId};
 
+/// `JOB_OBJECT_QUERY` access right.
+const JOB_OBJECT_QUERY: u32 = 0x0004;
 const DETACHED_PROCESS: u32 = 0x0000_0008;
 const CREATE_BREAKAWAY_FROM_JOB: u32 = 0x0100_0000;
 
@@ -96,10 +105,10 @@ fn wait_dead(pid: u32, what: &str) {
     }
 }
 
+/// A helper outlives its test only by a few minutes, so a failed test leaves nothing behind.
 fn forever() -> ! {
-    loop {
-        sleep(Duration::from_secs(600));
-    }
+    sleep(Duration::from_secs(180));
+    std::process::exit(0)
 }
 
 fn write_pid(dir: &Path, name: &str, pid: u32) {
@@ -171,6 +180,20 @@ fn helper_role() {
     }
 }
 
+fn limit_flags(name: &str) -> u32 {
+    let wide: Vec<u16> = name.encode_utf16().chain(std::iter::once(0)).collect();
+    // SAFETY: a NUL-terminated name; the handle is closed below and the info block is plain data.
+    unsafe {
+        let job = OpenJobObjectW(JOB_OBJECT_QUERY, 0, wide.as_ptr());
+        assert!(!job.is_null(), "the job opens by name");
+        let mut info: JOBOBJECT_EXTENDED_LIMIT_INFORMATION = std::mem::zeroed();
+        let ok = QueryInformationJobObject(job, JobObjectExtendedLimitInformation, &mut info as *mut _ as *mut c_void, std::mem::size_of::<JOBOBJECT_EXTENDED_LIMIT_INFORMATION>() as u32, std::ptr::null_mut());
+        CloseHandle(job);
+        assert_ne!(ok, 0, "the limit block reads");
+        info.BasicLimitInformation.LimitFlags
+    }
+}
+
 fn sleeper_with_flags_result(flags: u32, dir: &Path) -> std::io::Result<Child> {
     let mut cmd = helper_command();
     cmd.env("FGOS_TEST_ROLE", "sleep").env("FGOS_TEST_DIR", dir).creation_flags(flags);
@@ -213,6 +236,10 @@ fn containment_windows_job_refuses_breakaway() {
     let mut domain = driver.create("attempt-breakaway").unwrap();
     let _spawned = driver.spawn_in(&mut domain, spec("breakaway", &dir, &[])).unwrap();
     assert_eq!(wait_for(&dir.join("breakaway.txt")).trim(), "denied");
+    // The runner's own job may also deny breakaway: read the flags of this job itself.
+    let flags = limit_flags(WindowsJobDriver::job_name(&domain).unwrap());
+    assert_ne!(flags & JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE, 0, "kill on close is set");
+    assert_eq!(flags & (JOB_OBJECT_LIMIT_BREAKAWAY_OK | JOB_OBJECT_LIMIT_SILENT_BREAKAWAY_OK), 0, "no breakaway flag is set");
     assert_eq!(driver.guarantee().level, GuaranteeLevel::Kernel);
     driver.kill_all(&mut domain, 0);
 }
