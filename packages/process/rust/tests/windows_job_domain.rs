@@ -396,7 +396,7 @@ fn a_stale_record_with_a_reused_holder_pid_is_empty_at_once() {
         let mut view = ContenderView::new(&rec);
         assert!(!view.job_opened());
         let (reached, _) = settle(&mut view, Duration::from_secs(2), &[]);
-        assert!(reached, "repeat {i}");
+        assert!(reached, "repeat {i}: not empty after {:?}; reason {:?}; job opened {}; named (pid, source) {:?}", started.elapsed(), view.reason(), view.job_opened(), view.trace());
         assert!(started.elapsed() < Duration::from_secs(2));
     }
 }
