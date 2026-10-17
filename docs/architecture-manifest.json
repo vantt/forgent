@@ -225,6 +225,7 @@
     "src/state/knowledge-registry.mjs": "domain",
     "src/report/knowledge-resolver.mjs": "domain",
     "src/report/knowledge-projection.mjs": "domain",
+    "src/run-supervisor/client.mjs": "infra",
     "src/state/fgos-file-registry.mjs": "kernel",
     "src/state/runtime-coordination.mjs": "infra",
     "src/runner/dispatch/brief.mjs": "infra",

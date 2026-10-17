@@ -4,6 +4,7 @@
 //! named skip and ends.
 #![allow(dead_code)]
 
+pub mod adopt_fixture;
 pub mod supervisor;
 
 use std::collections::BTreeMap;
