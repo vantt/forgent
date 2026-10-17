@@ -189,6 +189,20 @@ export function reclaimDeadHolder(fgosDir, resource, observed) {
   }
 }
 
+/** Remove the record a person has confirmed is dead weight (`fgos lock fence`):
+ * under the reclaim kernel lock, and only while it still holds exactly `raw`,
+ * so a holder that arrived since is never cleared. Returns whether it was removed. */
+export function clearHotRecord(fgosDir, resource, raw) {
+  const { record } = hotPaths(fgosDir, resource);
+  const attempt = acquireSync(createLockScope(`hot-clear:${resource}`), resource, { fgosDir }, { waitMs: RECLAIM_WAIT_MS });
+  if (attempt.result !== 'acquired') return false;
+  try {
+    return unlinkRecordIfUnchanged(record, raw);
+  } finally {
+    attempt.handle.release();
+  }
+}
+
 // --- acquire / release ---------------------------------------------------
 
 function sleepSync(ms) {

@@ -264,6 +264,7 @@ A hung live holder is never taken over. `fgos lock fence <name>` is the one door
 2. It asks the person to confirm.
 3. It sends SIGTERM and then SIGKILL to each by identity ([process spec](../process/spec.md)); the lock releases when they are dead. There is no path that takes a lock from a live holder.
 4. Where holders are `unlistable` (macOS, Windows) the person stops the process and runs `fgos lock fence <name> --attest-stopped`, which only re-checks by try-lock.
+5. A hot mutex (`state`, `porting-events`, section 15) is held by its record file, not by a kernel lock the holder keeps. `fgos lock fence state` reads the record: a holder it proves alive is ended like any other holder (after confirmation); a record that does not parse, or whose holder cannot be judged here (Windows, a foreign pid namespace), is removed only with `--attest-stopped`. The record is removed under the reclaim lock and only while it still holds the bytes that were read, so a holder that arrived meanwhile is never cleared.
 
 ## 18. Cutover of the main checkout and the merge slot
 

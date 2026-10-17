@@ -48,12 +48,13 @@ test('a record without a pid is unreadable', () => {
   assert.match(checkLockRecordUnreadable(root).message, /fgos lock fence state/);
 });
 
-test('an unjudgeable record warns only after the grace', { skip: process.platform === 'win32' && 'needs the unknown judge of a live pid' }, () => {
-  // A live pid with no start time and no namespace: the judge cannot prove it dead or alive-by-tuple.
-  fs.writeFileSync(recordPath('state'), JSON.stringify({ v: 1, pid: process.pid }));
+test('a record naming a live pid in a foreign namespace warns only after the grace', () => {
+  // The recorded namespace differs from ours, so the judge cannot place the live pid.
+  fs.writeFileSync(recordPath('state'), JSON.stringify({
+    v: 1, pid: process.pid, startTime: getProcessStartTime(process.pid), bootId: getBootId(), pidNs: 'pid:[0]',
+  }));
   const young = checkLockRecordUnreadable(root);
   const old = checkLockRecordUnreadable(root, { now: Date.now() + UNKNOWN_JUDGE_GRACE_MS + 60_000 });
-  if (/absent or judgeable/.test(young.message) && /absent or judgeable/.test(old.message)) return; // judge answered alive/dead here: nothing unknown to report
   assert.match(young.message, /absent or judgeable/);
   assert.match(old.message, /cannot be judged here/);
   assert.match(old.message, /fgos lock fence state/);
