@@ -22,9 +22,10 @@ import { readRunSnapshot } from './show-run.mjs';
 import { assignmentDir, findRunDir, RunLookupError } from '../../runner/dispatch/assignment-layout.mjs';
 import { fgosDirFromRoot } from '../../runner/paths.mjs';
 import { plan, checkApply, collectEvidence, RecoveryPlannerError } from '../../runner/dispatch/recovery-planner.mjs';
-import { acquireRunControl, releaseRunControl, currentGeneration, controlDirs, isProcessAlive, buildRunControlHolder } from '../../runner/dispatch/run-lock.mjs';
+import { acquireRunControl, releaseRunControl, currentGeneration, controlDirs, buildRunControlHolder } from '../../runner/dispatch/run-lock.mjs';
 import { findCoordinationSessionOwningAssignment } from '../../runner/dispatch/runtime-inspection.mjs';
 import { classifyRunOutcome } from '../../runner/dispatch/visibility-session.mjs';
+import { acquireSync, createLockScope, resolveLock } from '../../holder-lock/index.mjs';
 
 export class RecoveryError extends Error {
   constructor(code, message, details = {}) {
@@ -131,57 +132,24 @@ export function recoverObserveUseCase(ctx, { runId, intent = DEFAULT_INTENT, now
   return { runId, runDir, ...recommendation };
 }
 
-// A short, fully-synchronous exclusive-create lock scoped to one run
-// directory -- never the repo-wide main-checkout lock (that guards
-// unrelated concurrent work-item claims, a different resource entirely).
-// `fs.openSync(..., 'wx')` is atomic: exactly one caller can create the
-// file, so exactly one caller ever runs `fn`. No I/O inside `fn` is ever
+// A short, fully-synchronous kernel mutex on `<runDir>/locks/recovery.lock`
+// (src/holder-lock), scoped to one run directory -- never the repo-wide
+// main-checkout lock (that guards unrelated concurrent work-item claims, a
+// different resource entirely). Exactly one caller ever runs `fn`, and a
+// holder that crashes mid-apply releases the lock with its process, so no
+// stale file can block later recovery applies. No I/O inside `fn` is ever
 // awaited or spawned, so "acquire, compare, act, release" never spans
 // anything slow.
-function readLockHolderPid(lockPath) {
-  let raw;
-  try {
-    raw = fs.readFileSync(lockPath, 'utf8').trim();
-  } catch {
-    return null;
-  }
-  const pid = Number(raw);
-  return Number.isInteger(pid) && pid > 0 ? pid : null;
-}
-
-function withRunLock(runDir, fn) {
-  const lockPath = path.join(runDir, '.recovery.lock');
-  let fd;
-  try {
-    fd = fs.openSync(lockPath, 'wx');
-  } catch (err) {
-    if (err.code !== 'EEXIST') throw err;
-    // M1: a crash between lock-acquire and release must not block every
-    // future recovery apply forever. The lock file records its holder's
-    // own pid; only PID-dead proof (never elapsed time alone, same
-    // discipline as run-lock.mjs's own reclaim rule) authorizes reclaiming
-    // it. An unreadable/non-numeric holder pid is treated as still live --
-    // never guessing a stale lock away.
-    const holderPid = readLockHolderPid(lockPath);
-    if (holderPid === null || isProcessAlive(holderPid)) {
-      throw new RecoveryError('lock-busy', `a recovery apply is already in progress for this run (${lockPath})`, { runDir });
-    }
-    try { fs.unlinkSync(lockPath); } catch { /* raced with the dead holder's own cleanup -- fine either way */ }
-    try {
-      fd = fs.openSync(lockPath, 'wx');
-    } catch (retryErr) {
-      if (retryErr.code === 'EEXIST') {
-        throw new RecoveryError('lock-busy', `a recovery apply is already in progress for this run (${lockPath})`, { runDir });
-      }
-      throw retryErr;
-    }
+function withRunLock(repoRoot, runDir, fn) {
+  const res = acquireSync(createLockScope('recovery'), 'recovery', { runDir, fgosDir: fgosDirFromRoot(repoRoot) });
+  if (res.result !== 'acquired') {
+    const lockPath = resolveLock('recovery', { runDir }).v3Path;
+    throw new RecoveryError('lock-busy', `a recovery apply is already in progress for this run (${lockPath})`, { runDir });
   }
   try {
-    fs.writeSync(fd, String(process.pid));
     return fn();
   } finally {
-    try { fs.closeSync(fd); } catch { /* already closed is fine */ }
-    try { fs.unlinkSync(lockPath); } catch { /* already gone is fine */ }
+    res.handle.release();
   }
 }
 
@@ -299,7 +267,7 @@ export function recoverApplyUseCase(ctx, params = {}) {
     }
   }
 
-  return withRunLock(runDir, () => {
+  return withRunLock(repoRoot, runDir, () => {
     const log = readRecoveryLog(runDir);
     const already = log.find((entry) => entry.actionKey === params.actionKey);
     if (already) {
