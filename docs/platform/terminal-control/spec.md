@@ -48,7 +48,9 @@ The operation inputs and results are in [terminal-control.port.v1.json](../../..
 Two rules carry meaning beyond the field lists:
 
 - `launch` returns the identity of the process it started (pid, start time, boot id, process group), checked against the argv the caller asked for. The supervisor only releases its agent after that identity is durable.
-- A pane taken with `attach` (a pane the caller already owns, for example the one `/fgOS:terminal` runs in) is never closed by the core. `release` on it only removes the label or the binding.
+- A pane taken with `attach` (a pane the caller already owns, for example the one `/fgOS:terminal` runs in) is never closed by the core. `release` on it only removes the label or the binding. `attach` may name a `groupKey`: the pane joins that group, so the group's next pane opens beside it (`FGOS_HERDR_ANCHOR_PANE` of a dispatching caller).
+- A fresh herdr session has no workspace to hold a tab. The herdr driver then creates the session's first workspace for the group's first `allocate`; its root pane is the slot and its tab takes the group's label.
+- A slot that was `released` as `retain` refuses a later `close` by key (it closes when `until` passes). A caller that keeps a pane for a person and still wants anyone to be able to close it by key (the account probe, the reaper) leaves the slot allocated instead of retaining it; only an explicit retention window uses `retain`.
 
 ## 4. Allocation record and markers
 
@@ -144,9 +146,9 @@ Two coordinators with the same `groupKey` (only when set by hand) can create two
 
 ## 12. Migration status
 
-The Node migration is **in progress**. Today `src/runner/dispatch/herdr-round.mjs` still opens batch tabs with `createBatchTab` and `batchTabFor`, and `closeIfEmpty` and the `fgos-lead-<key>-<ts>` labels are still in the Node code. Nothing in this spec should be read as already switched.
+The dispatch path has moved: `src/runner/dispatch/herdr-round.mjs`, `herdr-reconcile.mjs`, `worker-session-boot.mjs`, the account probe and the confinement reaper reach herdr only through `fgos internal terminal-control`. `createHerdrClient`, `createBatchTab`, `batchTabFor`, `closeIfEmpty` and the `fgos-lead-*` labels are deleted; `FGOS_HERDR_ANCHOR_PANE` is an `attach` into the round's group. A round's slot key is its agent name (the normalized `fgos-<runId>-<launchCommandId>` for an assignment run); its group key is the batch key, else the unit run id. The reaper reads `terminalKey` from the home marker; a marker without one names no slot and its pane is never closed on a guess.
 
-When the migration lands: `herdr-round.mjs` calls the port instead of `createBatchTab` and `batchTabFor`; `closeIfEmpty` and the `fgos-lead-*` labels are removed; `FGOS_HERDR_ANCHOR_PANE` becomes `attach` plus a `groupKey`; `/fgOS:terminal` (`rename.sh`) becomes `attach` plus `label`. No caller ever has two copies: the Node module is deleted in the commit that moves the last caller.
+Still to move: `/fgOS:terminal` (`rename.sh`) becomes `attach` plus `label`. Starting a herdr server process for a confined worker session (`herdr --session <name> server`) stays in `worker-session-boot.mjs`: it is a server lifecycle, not a pane operation, and every question asked of a running server goes through the port.
 
 ## 13. Known limits
 
@@ -162,4 +164,4 @@ When the migration lands: `herdr-round.mjs` calls the port instead of `createBat
 - 2026-10-15 — The architecture council keeps the tab grouping and the removal of the empty root pane as rules of the core (council sections 2.3 and 2.4, measured on a real herdr with five CLIs), rejects a user verb `fgos terminal`, a layout engine by screen ratio, a layout lock file inside the repo and reading pane labels for state, and keeps the lock for terminal placement as a kind of the shared lock component if it is ever needed. Source: [council](../../../plans/reports/architecture-council-261015-1508-terminal-control-session-identity-process-supervisor.md).
 - 2026-10-15 — The owner makes terminal-control a real foundation component (package `packages/terminal-control`, crate `fgos-terminal-control`), usable outside a run, with a key-addressed upper port and a driver port with declared capabilities; supervisor → terminal-control is one way, and the supervisor never knows panes. The layout becomes measured state plus a pluggable policy. Source: [design, section 7](../../../plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md).
 - 2026-10-16 — The terminal-control plan fixes: the incarnation is checked before and after a close because herdr cannot bind a close to a server instance (D1); the route is internal only and no user verb is added (D2, standing STR40 decision); `maxPanesPerTab` is 8 (D6). Measured numbers and the Lead's chosen defaults: [measurements](../../../plans/reports/implementation-261016-1352-terminal-control-herdr-measurements.md). Plan: [terminal-control plan](../../../plans/261016-1306-terminal-control-rust-core-herdr-driver/plan.md) (decisions D1-D7, prior art).
-- Prior art removed by the migration: `createBatchTab`, `batchTabFor`, `closeIfEmpty` and the `fgos-lead-<key>-<ts>` labels in `src/runner/dispatch/herdr-round.mjs` and `herdr-agent.mjs`; `FGOS_HERDR_ANCHOR_PANE` becomes `attach` plus `groupKey`. The removal is part of the migration, not done yet.
+- Prior art removed by the dispatch migration: `createBatchTab`, `batchTabFor`, `closeIfEmpty` and the `fgos-lead-<key>-<ts>` labels in `src/runner/dispatch/herdr-round.mjs` and `herdr-agent.mjs`; `FGOS_HERDR_ANCHOR_PANE` becomes `attach` plus `groupKey`. The removal landed with the dispatch migration (2026-10-18).
