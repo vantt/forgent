@@ -7,6 +7,11 @@
 // and exits, and the lock stays with the description this process owns.
 // Release is close(fd). Nobody ever calls LOCK_UN.
 //
+// Where that is impossible (Windows: a LockFileEx lock belongs to the process
+// that took it) the transport is `hold`: one `fgos internal lock-hold` helper
+// lives as long as the lock, and release ends it (hold-transport.mjs).
+// `driver.lockTransport()` is the only place that tells the two apart.
+//
 // Callers see handles, results and named errors; never a file descriptor.
 // The descriptor lives in a module-private WeakMap, and the only operation
 // that hands it to another process is `runBorrowed`, through an explicit
@@ -32,11 +37,13 @@ import {
   runLockRoute,
   assertDriverUsable,
   guaranteeFor,
+  lockTransport,
   descriptionHolders,
   killDescriptionHoldersOnce,
   ROUTE_CALL_TIMEOUT_MS,
   ROUTE_SLACK_MS,
 } from './driver.mjs';
+import { startHold, waitReady, waitReadySync, readyBoundMs, releaseHold, removeWorkDir } from './hold-transport.mjs';
 
 export { HolderLockError, LOCK_FD_ENV, LOCK_FD_SLOT, readPredecessorKillWaitMs } from './protocol.mjs';
 export { LockScope, createLockScope, resolveLock, loadLockRegistry, lockEntry, resolveStateRoot, resolveLockRoot, guaranteeFor };
@@ -57,9 +64,10 @@ function descriptionOf(handle) {
 }
 
 /** The handle `acquire` returns. Owns one open description of the lock file
- * until `release()`; releasing twice is a no-op. */
+ * (fd transport) or one lock-hold helper (hold transport) until `release()`;
+ * releasing twice is a no-op. */
 export class LockHandle {
-  constructor({ name, path: lockPath, rank, kind, scope, projectRoot, killWaitMs, fd }) {
+  constructor({ name, path: lockPath, rank, kind, scope, projectRoot, killWaitMs, claim }) {
     this.name = name;
     this.path = lockPath;
     this.rank = rank;
@@ -67,26 +75,32 @@ export class LockHandle {
     this.scope = scope;
     this.projectRoot = projectRoot;
     this.killWaitMs = killWaitMs;
-    descriptions.set(this, { fd, borrows: 0 });
+    descriptions.set(this, { fd: claim.fd ?? null, hold: claim.hold ?? null, borrows: 0, released: false });
     Object.freeze(this);
   }
 
   get released() {
-    return descriptionOf(this).fd === null;
+    return descriptionOf(this).released;
   }
 
-  /** Close the description. The kernel drops the lock once every copy of
-   * the description is closed (a borrowing child keeps its own copy until
-   * it exits). Refused while a borrowed child is still running: a holder
-   * releases only after its domain is empty. */
+  /** Close the description (hold transport: end the helper). The kernel drops
+   * the lock once every copy of the description is closed (a borrowing child
+   * keeps its own copy until it exits). Refused while a borrowed child is
+   * still running: a holder releases only after its domain is empty. */
   release() {
     const entry = descriptionOf(this);
-    if (entry.fd === null) return false;
+    if (entry.released) return false;
     if (entry.borrows > 0) {
       throw new HolderLockError('lock-release-while-borrowed', `${this.name}: a borrowed child is still running; await its result before releasing`, { lock: this.name });
     }
-    fs.closeSync(entry.fd);
-    entry.fd = null;
+    if (entry.hold) {
+      releaseHold(entry.hold);
+      entry.hold = null;
+    } else {
+      fs.closeSync(entry.fd);
+      entry.fd = null;
+    }
+    entry.released = true;
     this.scope.untrack(this);
     return true;
   }
@@ -158,9 +172,10 @@ function routeTimeoutMs(wait, killWaitMs) {
   return (wait.kind === 'ms' ? wait.ms : 0) + killWaitMs + ROUTE_SLACK_MS;
 }
 
-function makeHandle(prepared, scope, fd) {
+/** `claim` is what the lock lives in: `{ fd }` or `{ hold }`. */
+function makeHandle(prepared, scope, claim) {
   const { lock, projectRoot, killWaitMs } = prepared;
-  const handle = new LockHandle({ name: lock.name, path: lock.v3Path, rank: lock.rank, kind: lock.kind, scope, projectRoot, killWaitMs, fd });
+  const handle = new LockHandle({ name: lock.name, path: lock.v3Path, rank: lock.rank, kind: lock.kind, scope, projectRoot, killWaitMs, claim });
   scope.track(handle);
   return handle;
 }
@@ -207,6 +222,7 @@ function settleNotAcquired(line, lock, wait, killWaitMs = null) {
 export function acquireSync(scope, name, params = {}, { waitMs } = {}) {
   const wait = normalizeWait(waitMs);
   const prepared = prepareAcquire(scope, name, params);
+  if (lockTransport() === 'hold') return acquireHoldSync(scope, prepared, wait);
   const { lock, bin, killWaitMs, env } = prepared;
   for (let attempt = 0; attempt < INODE_RETRIES; attempt += 1) {
     const fd = openLockFile(lock.v3Path);
@@ -218,7 +234,7 @@ export function acquireSync(scope, name, params = {}, { waitMs } = {}) {
       throw err;
     }
     if (line.result === 'acquired') {
-      if (sameInode(fd, lock.v3Path)) return { result: 'acquired', handle: makeHandle(prepared, scope, fd) };
+      if (sameInode(fd, lock.v3Path)) return { result: 'acquired', handle: makeHandle(prepared, scope, { fd }) };
       closeQuietly(fd);
       continue;
     }
@@ -226,6 +242,19 @@ export function acquireSync(scope, name, params = {}, { waitMs } = {}) {
     return settleNotAcquired(line, lock, wait, killWaitMs);
   }
   throw new HolderLockError('lock-inode-unstable', `${lock.name}: ${lock.v3Path} was replaced ${INODE_RETRIES} times during acquire`, { lock: lock.name, path: lock.v3Path });
+}
+
+/** One helper, the whole wait inside it (`--wait-ms`); this process polls for
+ * its answer, blocking at most wait + kill bound + slack before it ends the
+ * helper and reports `timeout`. */
+function acquireHoldSync(scope, prepared, wait) {
+  const { lock, bin, killWaitMs, env } = prepared;
+  const hold = startHold({ bin, lockPath: lock.v3Path, wait, killWaitMs, env });
+  const { line } = waitReadySync(hold, bin, readyBoundMs(wait, killWaitMs, ROUTE_SLACK_MS));
+  if (line === null) return settleNotAcquired({ result: 'killed' }, lock, wait, killWaitMs);
+  if (line.result === 'acquired') return { result: 'acquired', handle: makeHandle(prepared, scope, { hold }) };
+  removeWorkDir(hold.work);
+  return settleNotAcquired(line, lock, wait, killWaitMs);
 }
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -249,34 +278,48 @@ export async function acquire(scope, name, params = {}, { waitMs, pollMs = DEFAU
   }
 }
 
-async function acquireLoop(scope, prepared, wait, pollMs) {
+/** One `--try` on the fd transport: `{ line, claim }`; `claim` is the open
+ * description when the answer is `acquired`, else it is already closed. */
+async function attemptFd(prepared, tryOnce) {
   const { lock, bin, killWaitMs, env } = prepared;
+  for (let attempt = 0; attempt < INODE_RETRIES; attempt += 1) {
+    const fd = openLockFile(lock.v3Path);
+    let answer;
+    try {
+      answer = await runLockRoute({ bin, args: modeArgs(tryOnce, killWaitMs), fd, timeoutMs: routeTimeoutMs(tryOnce, killWaitMs), env });
+    } catch (err) {
+      closeQuietly(fd);
+      throw err;
+    }
+    if (answer.result === 'acquired' && !sameInode(fd, lock.v3Path)) {
+      closeQuietly(fd);
+      continue;
+    }
+    if (answer.result !== 'acquired') closeQuietly(fd);
+    return { line: answer, claim: { fd } };
+  }
+  throw new HolderLockError('lock-inode-unstable', `${lock.name}: ${lock.v3Path} was replaced ${INODE_RETRIES} times during acquire`, { lock: lock.name, path: lock.v3Path });
+}
+
+/** One `--try` helper on the hold transport, same shape as `attemptFd`. */
+async function attemptHold(prepared, tryOnce) {
+  const { lock, bin, killWaitMs, env } = prepared;
+  const hold = startHold({ bin, lockPath: lock.v3Path, wait: tryOnce, killWaitMs, env });
+  const { line } = await waitReady(hold, bin, readyBoundMs(tryOnce, killWaitMs, ROUTE_SLACK_MS));
+  if (line === null) return { line: { result: 'killed' }, claim: null };
+  if (line.result !== 'acquired') removeWorkDir(hold.work);
+  return { line, claim: { hold } };
+}
+
+async function acquireLoop(scope, prepared, wait, pollMs) {
+  const { lock, killWaitMs } = prepared;
+  const attemptOnce = lockTransport() === 'hold' ? attemptHold : attemptFd;
   const startedAt = Date.now();
   const deadline = wait.kind === 'ms' ? startedAt + wait.ms : null;
   const tryOnce = { kind: 'try' };
   for (;;) {
-    let line = null;
-    let fd = null;
-    for (let attempt = 0; attempt < INODE_RETRIES && line === null; attempt += 1) {
-      fd = openLockFile(lock.v3Path);
-      let answer;
-      try {
-        answer = await runLockRoute({ bin, args: modeArgs(tryOnce, killWaitMs), fd, timeoutMs: routeTimeoutMs(tryOnce, killWaitMs), env });
-      } catch (err) {
-        closeQuietly(fd);
-        throw err;
-      }
-      if (answer.result === 'acquired' && !sameInode(fd, lock.v3Path)) {
-        closeQuietly(fd);
-        continue;
-      }
-      line = answer;
-    }
-    if (line === null) {
-      throw new HolderLockError('lock-inode-unstable', `${lock.name}: ${lock.v3Path} was replaced ${INODE_RETRIES} times during acquire`, { lock: lock.name, path: lock.v3Path });
-    }
-    if (line.result === 'acquired') return { result: 'acquired', handle: makeHandle(prepared, scope, fd) };
-    closeQuietly(fd);
+    const { line, claim } = await attemptOnce(prepared, tryOnce);
+    if (line.result === 'acquired') return { result: 'acquired', handle: makeHandle(prepared, scope, claim) };
     const stillHeld = line.result === 'held' && line.reason !== 'predecessor-domain-not-empty';
     if (stillHeld && deadline !== null) {
       const now = Date.now();
@@ -301,12 +344,16 @@ export function probe(name, params = {}) {
   const bin = hostBin({ fgosDir: params.fgosDir });
   ensureLockFile(lock);
   assertDriverUsable(lock.v3Path, { fgosDir: params.fgosDir });
-  const fd = openLockFile(lock.v3Path);
   let line;
-  try {
-    line = runLockRouteSync({ bin, args: ['--shared-try'], fd, timeoutMs: ROUTE_CALL_TIMEOUT_MS });
-  } finally {
-    closeQuietly(fd);
+  if (lockTransport() === 'hold') {
+    line = runLockRouteSync({ bin, args: ['--probe', path.resolve(lock.v3Path)], timeoutMs: ROUTE_CALL_TIMEOUT_MS });
+  } else {
+    const fd = openLockFile(lock.v3Path);
+    try {
+      line = runLockRouteSync({ bin, args: ['--shared-try'], fd, timeoutMs: ROUTE_CALL_TIMEOUT_MS });
+    } finally {
+      closeQuietly(fd);
+    }
   }
   if (line.result === 'free' || line.result === 'held') return { result: line.result };
   // A probe answers free or held; a helper that hung is an error, never a
@@ -410,7 +457,8 @@ function sweepProcessGroup(childPid) {
  */
 export function runBorrowed(handle, spec, { sync = true } = {}) {
   const entry = descriptionOf(handle);
-  if (entry.fd === null) throw new HolderLockError('lock-handle-released', `${handle.name}: cannot borrow a released lock`, { lock: handle.name });
+  if (entry.released) throw new HolderLockError('lock-handle-released', `${handle.name}: cannot borrow a released lock`, { lock: handle.name });
+  if (entry.hold) throw new HolderLockError('borrow-unsupported', `${handle.name}: the lock-hold helper does not borrow yet`, { lock: handle.name });
   if (!spec || typeof spec.command !== 'string' || !spec.command) {
     throw new HolderLockError('borrow-spec-invalid', 'runBorrowed needs spec.command', {});
   }

@@ -17,6 +17,8 @@ use crate::driver;
 use crate::port::{self, BorrowedCheck, DescriptionLock, Mode, NotBorrowerReason, Wait, BORROW_SLOT, DEFAULT_KILL_WAIT_MS, LOCK_FD_ENV};
 use crate::state_root;
 
+mod hold;
+
 /// The protocol these routes speak.
 pub const PROTOCOL: u64 = 1;
 
@@ -127,7 +129,7 @@ pub fn main(args: &[OsString]) -> i32 {
         }
     }
     let Some((route, rest)) = strings.split_first() else {
-        return usage("fgos internal <lock-fd|state-root|quiesce-scan|lock-borrow-vectors> --protocol 1 ...");
+        return usage("fgos internal <lock-fd|lock-hold|state-root|quiesce-scan|lock-borrow-vectors> --protocol 1 ...");
     };
     // The protocol is checked before anything else about the call, so a
     // payload of another release always learns that first.
@@ -147,6 +149,7 @@ pub fn main(args: &[OsString]) -> i32 {
     }
     match route.as_str() {
         "lock-fd" => lock_fd(&others),
+        "lock-hold" => lock_hold(&others),
         "state-root" => state_root_route(&others),
         "quiesce-scan" => quiesce_scan(&others),
         "lock-borrow-vectors" => lock_borrow_vectors(&others),
@@ -159,13 +162,13 @@ fn take_slot3() -> std::io::Result<File> {
 }
 
 fn lock_fd(args: &[String]) -> i32 {
-    let flags = match Flags::parse(args, &["--wait-ms", "--borrowed-check", "--guarantee", "--kill-wait-ms", "--predecessor"], &["--try", "--shared-try"]) {
+    let flags = match Flags::parse(args, &["--wait-ms", "--borrowed-check", "--guarantee", "--probe", "--kill-wait-ms", "--predecessor"], &["--try", "--shared-try"]) {
         Ok(flags) => flags,
         Err(message) => return usage(&message),
     };
-    let modes: Vec<&str> = ["--try", "--wait-ms", "--shared-try", "--borrowed-check", "--guarantee"].into_iter().filter(|m| flags.has(m)).collect();
+    let modes: Vec<&str> = ["--try", "--wait-ms", "--shared-try", "--borrowed-check", "--guarantee", "--probe"].into_iter().filter(|m| flags.has(m)).collect();
     if modes.len() != 1 || flags.items.iter().filter(|(n, _)| modes.contains(&n.as_str())).count() != 1 {
-        return usage("exactly one of --try, --wait-ms N, --shared-try, --borrowed-check <path>, --guarantee <path>");
+        return usage("exactly one of --try, --wait-ms N, --shared-try, --borrowed-check <path>, --guarantee <path>, --probe <path>");
     }
     let mode = modes[0];
     if mode != "--try" && mode != "--wait-ms" && (flags.has("--kill-wait-ms") || flags.has("--predecessor")) {
@@ -187,6 +190,19 @@ fn lock_fd(args: &[String]) -> i32 {
         return emit(Some("guarantee"), json!({ "guarantee": port::guarantee(&dir).to_json() }), EXIT_OK);
     }
     let drv = driver::current();
+    if mode == "--probe" {
+        // A fresh open and a non-blocking shared try, closed at once: it
+        // never obstructs a holder and needs no descriptor from the caller.
+        if !drv.supported() {
+            return emit(Some("unavailable"), json!({ "reason": "unsupported-platform", "detail": drv.unsupported_detail() }), EXIT_UNAVAILABLE);
+        }
+        let path = PathBuf::from(flags.values("--probe")[0]);
+        return match port::probe(&port::Resource::new(path.file_stem().map(|s| s.to_string_lossy().into_owned()).unwrap_or_default(), &path)) {
+            Ok(port::Probe::Free) => emit(Some("free"), json!({}), EXIT_OK),
+            Ok(port::Probe::Held) => emit(Some("held"), json!({ "reason": "kernel-lock-held" }), EXIT_NEGATIVE),
+            Err(err) => error("io", &format!("probe {}: {err}", path.display()), EXIT_INTERNAL),
+        };
+    }
     if mode == "--borrowed-check" {
         let lock_path = PathBuf::from(flags.values("--borrowed-check")[0]);
         if !drv.supported() {
@@ -243,6 +259,50 @@ fn lock_fd(args: &[String]) -> i32 {
         crate::predecessor::Admit::NotEmpty { domain } => {
             emit(Some("held"), json!({ "reason": "predecessor-domain-not-empty", "domain": domain }), EXIT_NEGATIVE)
         }
+    }
+}
+
+/// `lock-hold --path <lockFile> --mode ex|sh --work <dir> (--try | --wait-ms N)
+/// [--kill-wait-ms K]`: the Windows helper that holds one lock for Node.
+fn lock_hold(args: &[String]) -> i32 {
+    let flags = match Flags::parse(args, &["--path", "--mode", "--work", "--wait-ms", "--kill-wait-ms"], &["--try"]) {
+        Ok(flags) => flags,
+        Err(message) => return usage(&message),
+    };
+    let parsed = (|| -> Result<hold::HoldArgs, String> {
+        let path = flags.one("--path")?.ok_or("--path <lockFile> is required")?;
+        let work = flags.one("--work")?.ok_or("--work <dir> is required")?;
+        let mode = match flags.one("--mode")?.ok_or("--mode ex|sh is required")? {
+            "ex" => Mode::Ex,
+            "sh" => Mode::Sh,
+            other => return Err(format!("--mode needs ex or sh, got {other}")),
+        };
+        let wait = match (flags.has("--try"), flags.one("--wait-ms")?) {
+            (true, None) => Wait::Try,
+            (false, Some(raw)) => Wait::Ms(positive_ms(raw, "--wait-ms", 1)?),
+            _ => return Err("exactly one of --try, --wait-ms N is required".to_string()),
+        };
+        if flags.values("--try").len() > 1 {
+            return Err("--try given more than once".to_string());
+        }
+        let kill_wait_ms = flags.one("--kill-wait-ms")?.map(|raw| positive_ms(raw, "--kill-wait-ms", 0)).transpose()?.unwrap_or(DEFAULT_KILL_WAIT_MS);
+        Ok(hold::HoldArgs { path: PathBuf::from(path), mode, wait, kill_wait_ms, work: PathBuf::from(work) })
+    })();
+    #[cfg_attr(not(windows), allow(unused_variables))]
+    let parsed = match parsed {
+        Ok(parsed) => parsed,
+        Err(message) => return usage(&message),
+    };
+    #[cfg(windows)]
+    {
+        match hold::watch_parent() {
+            Ok(parent_gone) => hold::run(&parsed, parent_gone),
+            Err(detail) => hold::parent_unopenable(&parsed, &detail),
+        }
+    }
+    #[cfg(not(windows))]
+    {
+        emit(Some("unavailable"), json!({ "reason": "unsupported-platform", "detail": "lock-hold is the Windows helper; other platforms hand a descriptor to lock-fd" }), EXIT_UNAVAILABLE)
     }
 }
 
