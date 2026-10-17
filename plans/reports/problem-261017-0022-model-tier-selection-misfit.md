@@ -4,6 +4,29 @@ Brief for an agent that will design a better selection mechanism. This file
 describes the problem, the evidence and the constraints. It does not propose a
 design.
 
+## Status (2026-10-17 19:30): open, tracked on the program board
+
+This report is not closed until waves B and C and the cost item are done. Each
+open item is a row on the [program board](../261017-1313-fgos-platform-program-board/plan.md)
+(MP-A, MP-B1, MP-B2, MP-B3, MP-C, MP-COST).
+
+| Item (section 5.3) | Status | Where |
+|---|---|---|
+| Wave A, the additive slice | **done** 10-17 16:00 on main; RUL102, RUL103 | [plan](../261017-1302-model-pool-config-additive-slice/plan.md); [machine sync guide](guide-261017-1828-sync-a-machine-after-model-pool-and-rust-callers.md) |
+| B1. Pool-keyed lease, state, quarantine; rotation by `credentialStore`; pin as `pool/account`; refuse a missing tier cell (`model-tier-missing`, moved here by the owner on 10-17) | **unblocked, not planned**: holder-lock P09 landed with 4.2 (`provider-capacity.mjs` takes kernel locks) | needs open questions 4, 5 and 6 below |
+| B2. `credentialStore {use, homeEnv, files}` in confinement and the bwrap driver | **waiting** for run supervisor 6.2 P07–P09 and terminal mode 6.3 P05–P06 | — |
+| B3. Source-fallback step (`source-rotation`) | **waiting** for controller death 6.4 P02 | — |
+| C1, C2. `prefer` names a family; accounts move to `llmAccounts`, `runner.providers` deleted, lists and `@` allowed in the global `modelPolicies` | **waiting** for a release that reads `llmAccounts` to be active in every project on every machine | each machine follows the sync guide first |
+| Cost item (the "out of scope" paragraph of 5.3) | **not planned**. Done so far: a capability's own rigor raises its ceiling (RUL103). Open: holding a capability below the global cap, escalation rules, override authority, `assignment-policy` ignoring the ceiling (needs `run.mjs` to pass the capability), in-process agent models | — |
+
+Owner answers recorded on 10-17: the 26 `claude-herdr` capabilities move to
+`claude`; a missing tier cell keeps today's fallback until B1; the `openai`
+ladder (`frontier` = `gpt-6-astra`, `flagship` = `gpt-6.1-sol`) is intended.
+Open decision D7 on the board: how the release pin in `.fgos/distribution.json`
+works when several machines build their own release.
+
+The questions at the end of this report stay open.
+
 ## 1. What happened (2026-10-16)
 
 On 2026-10-16 two 5-hour Claude subscription windows each ran out in under an hour:
