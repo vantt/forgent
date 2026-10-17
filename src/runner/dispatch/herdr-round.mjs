@@ -1947,7 +1947,9 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
         const launched = tc.launch({
           key,
           launchSpec: {
-            command: 'bash', args: [scriptPath], cwd, env: {},
+            // The pane ends in an interactive shell once the worker is gone: a pane whose root process
+            // exits closes with it, and a worker that died must leave its screen for a person to read.
+            command: 'bash', args: ['-c', 'bash "$1"; exec "${SHELL:-bash}"', 'fgos-launch', scriptPath], cwd, env: {},
             expect: { argv0: agentKindToUse, command: preparedCommand, args: preparedArgs },
           },
         });

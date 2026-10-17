@@ -168,11 +168,22 @@ if (group === 'pane' && action === 'process-info') {
   let fgPid = 100;
   const gone = scenario.agentGone || pane.exited;
   if (pane.pid && !gone && alive(pane.pid)) {
-    let argv = [];
-    try { argv = fs.readFileSync('/proc/' + pane.pid + '/cmdline', 'utf8').split('\0').filter((a, i, all) => a !== '' || i < all.length - 1); } catch {}
-    foreground.unshift({ pid: pane.pid, name: argv[0] ?? 'agent', argv });
-    fgPid = pane.pid;
-    pane.lastArgv = argv;
+    const argvOf = (pid) => {
+      try { return fs.readFileSync('/proc/' + pid + '/cmdline', 'utf8').split('\0').filter((a, i, all) => a !== '' || i < all.length - 1); } catch { return []; }
+    };
+    // What the terminal reports as the foreground: the pane's root process, and its children (a shell
+    // that runs a worker keeps running next to it).
+    const childrenOf = (pid) => fs.readdirSync('/proc').filter((d) => /^\d+$/.test(d)).filter((d) => {
+      try { return Number(fs.readFileSync('/proc/' + d + '/stat', 'utf8').replace(/^.*\) \S+ /, '').split(' ')[0]) === pid; } catch { return false; }
+    }).map(Number);
+    const kids = childrenOf(pane.pid);
+    const members = kids.length ? kids : [pane.pid];
+    for (const pid of members.slice().reverse()) {
+      const argv = argvOf(pid);
+      foreground.unshift({ pid, name: argv[0] ?? 'agent', argv });
+      pane.lastArgv = argv;
+    }
+    fgPid = members[0];
     writeState(state);
   }
   ok({ process_info: { pane_id: id, shell_pid: 100, foreground_process_group_id: fgPid, foreground_processes: foreground } });

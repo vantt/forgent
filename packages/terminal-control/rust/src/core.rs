@@ -477,7 +477,7 @@ impl<'a> Core<'a> {
         if pane != PaneState::Live {
             return Inspection { pane, foreground: None, activity: None };
         }
-        let foreground = if want.foreground && self.has("process.info") { self.foreground_identity(&record.pane_id) } else { None };
+        let foreground = if want.foreground && self.has("process.info") { self.foreground_identity(&store, key, &record.pane_id) } else { None };
         let mut activity = if want.activity && self.has("activity.state") { self.driver.activity(&record.pane_id).ok() } else { None };
         if want.detail && want.activity && self.has("activity.state") {
             // The detector may know a state the pane's own report does not.
@@ -492,10 +492,17 @@ impl<'a> Core<'a> {
         Inspection { pane, foreground, activity }
     }
 
-    fn foreground_identity(&self, pane: &str) -> Option<ProcessIdentity> {
+    fn foreground_identity(&self, store: &Store, key: &str, pane: &str) -> Option<ProcessIdentity> {
         let info = self.driver.process_info(pane).ok()?;
-        let root = identity::first_non_shell(&info)?;
-        identity::identity_of(root.pid, info.foreground_pgid)
+        if let Some(root) = identity::first_non_shell(&info) {
+            return identity::identity_of(root.pid, info.foreground_pgid);
+        }
+        // A command launched with `exec` replaced the pane's shell, so the root
+        // process carries the shell's own pid. It is the launched process when the
+        // launched marker names that pid and the start time still matches.
+        let launched = store.read_marker::<LaunchedMarker>(key, MarkerKind::Launched).ok().flatten()?;
+        info.foreground.iter().any(|p| p.pid == launched.identity.pid).then_some(())?;
+        identity::identity_of(launched.identity.pid, info.foreground_pgid).filter(|id| id.start_time == launched.identity.start_time)
     }
 
     /// Write display data to the terminal. The record is never edited.

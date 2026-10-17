@@ -99,6 +99,29 @@ fn launch_identifies_the_root_process_and_writes_the_launched_marker() {
 }
 
 #[test]
+fn a_command_that_replaced_the_shell_is_still_the_foreground_of_its_slot() {
+    // `exec` makes the launched command the pane's own root process: its pid is the shell pid.
+    let driver = MemDriver::new(352, 69);
+    let core = core(&driver, &MeasuredSplit, state_dir("exec-root"));
+    let slot = core.allocate(&request("a", "g")).unwrap().slot;
+    let mut child = spawn_sleeper();
+    driver.set_foreground(
+        &slot.pane_id,
+        child.id(),
+        vec![ForegroundProcess { pid: child.id(), argv: vec!["sleep".into(), "30".into()] }],
+        child.id(),
+    );
+    let LaunchOutcome::Launched(identity) = core.launch("a", &launch_spec()).unwrap() else { panic!("not launched") };
+    assert_eq!(identity.pid, child.id());
+    assert_eq!(core.inspect("a", false).foreground.map(|f| f.pid), Some(child.id()), "inspect finds the exec'd root through the launched marker");
+    child.kill().unwrap();
+    child.wait().unwrap();
+    // The process is gone: nothing is reported as the foreground, whatever the marker says.
+    driver.set_foreground(&slot.pane_id, 900, vec![ForegroundProcess { pid: 900, argv: vec!["bash".into()] }], 900);
+    assert_eq!(core.inspect("a", false).foreground, None);
+}
+
+#[test]
 fn a_server_restart_invalidates_old_records_and_never_closes_the_new_servers_panes() {
     let driver = MemDriver::new(352, 69);
     let root = state_dir("restart");
