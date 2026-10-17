@@ -1,7 +1,7 @@
 ---
 title: "4.4b Windows holder-lock driver: LockFileEx plus Job Object"
 description: "Give fgos-holder-lock a Windows driver (LockFileEx in the locking process, a lock-hold helper for Node, borrowing inside a named kill-on-close job with a second job owner) and give fgos-process the windows-job domain judged by the union rule, so Windows reports kernel instead of unsupported and fgos run stops refusing with lock-driver-unavailable. macOS needs no code here."
-status: pending
+status: completed
 priority: P2
 effort: 36h
 branch: plan/4.4b-windows-driver
