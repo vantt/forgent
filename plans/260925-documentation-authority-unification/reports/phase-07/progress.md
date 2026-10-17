@@ -200,7 +200,7 @@ resolved path, author, reviewer, digest and status here.
 | 5 | accepted | Review 142/143 ok + remainder 0/60; L11-17 rework re-reviewed 7/7 ok (`review-a38-step-05-bounded-rework-01.md`, at `f836da42c`) | PARK-PROTECTED-01 and P7-DOC-GAP-02 route to Step 9 | none |
 | 6 | accepted | Independent review 58/58 ok, 0 rework (`review-a38-step-06-projections-01.md`, at `66c5ff292`) | S6-UI-ROOT-02 parked (candidate UI root certification); S6-UI-DRIFT-01 to Phase 9; S6-RATCHET-03 to Step 9 | none |
 | 7 | accepted | Re-sealed after L11-19/L11-20: `review-a38-step-07-key-reseal-02.md`, sealedAt 2026-10-17T11:55:30Z, keySha256 `1568f570…4056`, commit `5d19b4940` | none | no candidate edit after seal |
-| 8 | in-progress | Readers start after 2026-10-17T11:55:30Z on an isolated docs/platform snapshot of `5d19b4940` | none | readers then scorer |
+| 8 | in-progress | Round 1 FAIL (`fresh-reader-p7-r1-score.md`): reader-1 A6/B6/C5 with one fabricated anchor (reader slug error); reader-2 6/6/6, 0 fabricated; probes 3/3 each; no candidate defect, key stays valid | none | round 2 with two new reader sessions, same sealed key |
 | 9 | not-started | A45 removes the CTR010 close blocker | none | wait for readers and final committed bytes |
 
 Allowed states are `not-started`, `ready`, `in-progress`, `parked`, `reviewing`,
