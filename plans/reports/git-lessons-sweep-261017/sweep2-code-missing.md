@@ -1,6 +1,6 @@
 # Kiểm kê vòng hai (C2) cho component git Rust duy nhất — các file mà vòng quét đầu chưa đọc
 
-Trạng thái: **done** (chỉ đọc; không đổi workspace). Ngày: 2026-10-17. Vai trò: producer, assignment `unit-run-1792199169701-38464809/producer/1`. Tham chiếu: `plans/reports/git-lessons-catalogue-261017.md` (G-001..G-182).
+Trạng thái: **done** (chỉ đọc; không đổi workspace). Ngày: 2026-10-17. Vai trò: producer, assignment `unit-run-1792199169701-38464809/producer/1`. Tham chiếu: `plans/reports/research-261017-1032-git-lessons-catalogue.md` (G-001..G-182).
 
 ## Kết quả
 
