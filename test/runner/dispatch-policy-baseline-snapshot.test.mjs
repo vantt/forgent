@@ -117,8 +117,8 @@ export function resolveNormalizedSnapshotRow(cfg, executorId, workTier, throwawa
  */
 export const CANONICAL_EXECUTOR_DESCRIPTORS = [
   { label: 'claude', executorId: 'claude', invocationId: 'claude-cli' },
-  { label: 'agy-cli', executorId: 'gemini', invocationId: 'agy-cli-mucdong' },
-  { label: 'agy-herdr', executorId: 'gemini', invocationId: 'agy-herdr-mucdong' },
+  { label: 'gemini-cli', executorId: 'gemini', invocationId: 'omp-cli-bwrap-gemini-tetcu72' },
+  { label: 'gemini-herdr', executorId: 'gemini', invocationId: 'omp-gemini-tetcu72' },
   { label: 'fgos-coding-implement', executorId: 'fgos-coding-implement' },
   { label: 'codex-cli', executorId: 'openai', invocationId: 'codex-cli-bypass-fgovn' },
   { label: 'codex-bwrap', executorId: 'openai', invocationId: 'codex-cli-bwrap' },
@@ -154,7 +154,7 @@ export function resolveSnapshotRowByLabel(cfg, label, workTier, throwawayDir) {
 /**
  * Golden fixture captured from current production resolvers and .fgos/config.json.
  * Note on matrix coverage: All 36 (executorId × workTier) pairs for the 12 executors
- * in [claude, claude-reviewer, claude-reviewer-herdr, agy-cli, agy-herdr, fgos-coding-implement,
+ * in [claude, claude-reviewer, claude-reviewer-herdr, gemini-cli, gemini-herdr, fgos-coding-implement,
  * codex-cli, codex-bwrap, codex-readonly, pi, codex-pi, glm-cli] across tiers
  * [light, standard, heavy] resolve successfully in the legacy config without errors.
  * None are skipped.
@@ -162,6 +162,8 @@ export function resolveSnapshotRowByLabel(cfg, label, workTier, throwawayDir) {
  * (plans/260917-executor-profile-schema-migration/plan.md Phase A):
  * genuinely dormant, self-described as never wired to any capability, zero
  * other reference anywhere in src/ or test/ before removal.
+ * `agy-cli`/`agy-herdr` became `gemini-cli`/`gemini-herdr` when gemini moved from
+ * the Antigravity CLI to omp's gemini-tetcu72 profile (agy is no longer installed).
  * executor-id-consolidation Step 2: each of these 12 canonical LABELS
  * (not necessarily a real, distinct executor id any more -- see
  * CANONICAL_EXECUTOR_DESCRIPTORS above) still resolves successfully.
@@ -387,109 +389,145 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     readOnlyMechanism: 'tool-allowlist-not-read-only-enforced'
   },
   {
-    selector: 'agy-cli',
+    selector: 'gemini-cli',
     workTier: 'light',
     bindingSource: 'executor-id',
     provider: 'gemini',
     model: 'gemini-3.8-flash-low',
-    command: 'agy',
+    command: 'omp',
     args: [
+      '--model',
+      'gemini-3.8-flash-low',
+      '--thinking',
+      'medium',
+      '--tools',
+      'read,write,edit,bash,grep,glob',
+      '--mode',
+      'json',
+      '--auto-approve',
       '-p',
-      '<prompt>',
-      '--mode',
-      'accept-edits',
-      '--new-project',
-      '--print-timeout',
-      '30m',
-      '--model',
-      'gemini-3.8-flash-low'
+      '<prompt>'
     ],
     envKeys: [
-      'HOME'
-    ],
-    resourceBindings: [],
-    adapter: 'cli-spawn',
-    promptDelivery: undefined,
-    confinement: 'none',
-    readOnlyMechanism: 'none'
-  },
-  {
-    selector: 'agy-cli',
-    workTier: 'standard',
-    bindingSource: 'executor-id',
-    provider: 'gemini',
-    model: 'gemini-3.8-flash-medium',
-    command: 'agy',
-    args: [
-      '-p',
-      '<prompt>',
-      '--mode',
-      'accept-edits',
-      '--new-project',
-      '--print-timeout',
-      '30m',
-      '--model',
-      'gemini-3.8-flash-medium'
-    ],
-    envKeys: [
-      'HOME'
-    ],
-    resourceBindings: [],
-    adapter: 'cli-spawn',
-    promptDelivery: undefined,
-    confinement: 'none',
-    readOnlyMechanism: 'none'
-  },
-  {
-    selector: 'agy-cli',
-    workTier: 'heavy',
-    bindingSource: 'executor-id',
-    provider: 'gemini',
-    model: 'gemini-4-argon-high',
-    command: 'agy',
-    args: [
-      '-p',
-      '<prompt>',
-      '--mode',
-      'accept-edits',
-      '--new-project',
-      '--print-timeout',
-      '30m',
-      '--model',
-      'gemini-4-argon-high'
-    ],
-    envKeys: [
-      'HOME'
-    ],
-    resourceBindings: [],
-    adapter: 'cli-spawn',
-    promptDelivery: undefined,
-    confinement: 'none',
-    readOnlyMechanism: 'none'
-  },
-  {
-    selector: 'agy-herdr',
-    workTier: 'light',
-    bindingSource: 'executor-id',
-    provider: 'gemini',
-    model: 'gemini-3.8-flash-low',
-    command: 'agy',
-    args: [
-      '--mode',
-      'accept-edits',
-      '--new-project',
-      '--model',
-      'gemini-3.8-flash-low'
-    ],
-    envKeys: [
-      'HOME'
+      'PI_CODING_AGENT_DIR',
+      'PI_CONFIG_DIR'
     ],
     resourceBindings: [
       {
         resource: 'private-home',
         target: {
           kind: 'env',
-          name: 'HOME'
+          name: 'PI_CODING_AGENT_DIR'
+        }
+      }
+    ],
+    adapter: 'cli-spawn',
+    promptDelivery: undefined,
+    confinement: 'bwrap',
+    readOnlyMechanism: 'none'
+  },
+  {
+    selector: 'gemini-cli',
+    workTier: 'standard',
+    bindingSource: 'executor-id',
+    provider: 'gemini',
+    model: 'gemini-3.8-flash-medium',
+    command: 'omp',
+    args: [
+      '--model',
+      'gemini-3.8-flash-medium',
+      '--thinking',
+      'medium',
+      '--tools',
+      'read,write,edit,bash,grep,glob',
+      '--mode',
+      'json',
+      '--auto-approve',
+      '-p',
+      '<prompt>'
+    ],
+    envKeys: [
+      'PI_CODING_AGENT_DIR',
+      'PI_CONFIG_DIR'
+    ],
+    resourceBindings: [
+      {
+        resource: 'private-home',
+        target: {
+          kind: 'env',
+          name: 'PI_CODING_AGENT_DIR'
+        }
+      }
+    ],
+    adapter: 'cli-spawn',
+    promptDelivery: undefined,
+    confinement: 'bwrap',
+    readOnlyMechanism: 'none'
+  },
+  {
+    selector: 'gemini-cli',
+    workTier: 'heavy',
+    bindingSource: 'executor-id',
+    provider: 'gemini',
+    model: 'gemini-4-argon-high',
+    command: 'omp',
+    args: [
+      '--model',
+      'gemini-4-argon-high',
+      '--thinking',
+      'medium',
+      '--tools',
+      'read,write,edit,bash,grep,glob',
+      '--mode',
+      'json',
+      '--auto-approve',
+      '-p',
+      '<prompt>'
+    ],
+    envKeys: [
+      'PI_CODING_AGENT_DIR',
+      'PI_CONFIG_DIR'
+    ],
+    resourceBindings: [
+      {
+        resource: 'private-home',
+        target: {
+          kind: 'env',
+          name: 'PI_CODING_AGENT_DIR'
+        }
+      }
+    ],
+    adapter: 'cli-spawn',
+    promptDelivery: undefined,
+    confinement: 'bwrap',
+    readOnlyMechanism: 'none'
+  },
+  {
+    selector: 'gemini-herdr',
+    workTier: 'light',
+    bindingSource: 'executor-id',
+    provider: 'gemini',
+    model: 'gemini-3.8-flash-low',
+    command: 'omp',
+    args: [
+      '--model',
+      'gemini-3.8-flash-low',
+      '--thinking',
+      'medium',
+      '--tools',
+      'read,write,edit,bash,grep,glob',
+      '--auto-approve'
+    ],
+    envKeys: [
+      'PI_CODING_AGENT_DIR',
+      'PI_CONFIG_DIR'
+    ],
+    resourceBindings: [
+      {
+        resource: 'private-home',
+        target: {
+          kind: 'env',
+          name: 'PI_CODING_AGENT_DIR'
         }
       }
     ],
@@ -499,28 +537,31 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     readOnlyMechanism: 'none'
   },
   {
-    selector: 'agy-herdr',
+    selector: 'gemini-herdr',
     workTier: 'standard',
     bindingSource: 'executor-id',
     provider: 'gemini',
     model: 'gemini-3.8-flash-medium',
-    command: 'agy',
+    command: 'omp',
     args: [
-      '--mode',
-      'accept-edits',
-      '--new-project',
       '--model',
-      'gemini-3.8-flash-medium'
+      'gemini-3.8-flash-medium',
+      '--thinking',
+      'medium',
+      '--tools',
+      'read,write,edit,bash,grep,glob',
+      '--auto-approve'
     ],
     envKeys: [
-      'HOME'
+      'PI_CODING_AGENT_DIR',
+      'PI_CONFIG_DIR'
     ],
     resourceBindings: [
       {
         resource: 'private-home',
         target: {
           kind: 'env',
-          name: 'HOME'
+          name: 'PI_CODING_AGENT_DIR'
         }
       }
     ],
@@ -530,28 +571,31 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     readOnlyMechanism: 'none'
   },
   {
-    selector: 'agy-herdr',
+    selector: 'gemini-herdr',
     workTier: 'heavy',
     bindingSource: 'executor-id',
     provider: 'gemini',
     model: 'gemini-4-argon-high',
-    command: 'agy',
+    command: 'omp',
     args: [
-      '--mode',
-      'accept-edits',
-      '--new-project',
       '--model',
-      'gemini-4-argon-high'
+      'gemini-4-argon-high',
+      '--thinking',
+      'medium',
+      '--tools',
+      'read,write,edit,bash,grep,glob',
+      '--auto-approve'
     ],
     envKeys: [
-      'HOME'
+      'PI_CODING_AGENT_DIR',
+      'PI_CONFIG_DIR'
     ],
     resourceBindings: [
       {
         resource: 'private-home',
         target: {
           kind: 'env',
-          name: 'HOME'
+          name: 'PI_CODING_AGENT_DIR'
         }
       }
     ],
@@ -566,23 +610,26 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     bindingSource: 'capability.prefer',
     provider: 'gemini',
     model: 'gemini-3.8-flash-low',
-    command: 'agy',
+    command: 'omp',
     args: [
-      '--mode',
-      'accept-edits',
-      '--new-project',
       '--model',
-      'gemini-3.8-flash-low'
+      'gemini-3.8-flash-low',
+      '--thinking',
+      'medium',
+      '--tools',
+      'read,write,edit,bash,grep,glob',
+      '--auto-approve'
     ],
     envKeys: [
-      'HOME'
+      'PI_CODING_AGENT_DIR',
+      'PI_CONFIG_DIR'
     ],
     resourceBindings: [
       {
         resource: 'private-home',
         target: {
           kind: 'env',
-          name: 'HOME'
+          name: 'PI_CODING_AGENT_DIR'
         }
       }
     ],
@@ -597,23 +644,26 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     bindingSource: 'capability.prefer',
     provider: 'gemini',
     model: 'gemini-3.8-flash-medium',
-    command: 'agy',
+    command: 'omp',
     args: [
-      '--mode',
-      'accept-edits',
-      '--new-project',
       '--model',
-      'gemini-3.8-flash-medium'
+      'gemini-3.8-flash-medium',
+      '--thinking',
+      'medium',
+      '--tools',
+      'read,write,edit,bash,grep,glob',
+      '--auto-approve'
     ],
     envKeys: [
-      'HOME'
+      'PI_CODING_AGENT_DIR',
+      'PI_CONFIG_DIR'
     ],
     resourceBindings: [
       {
         resource: 'private-home',
         target: {
           kind: 'env',
-          name: 'HOME'
+          name: 'PI_CODING_AGENT_DIR'
         }
       }
     ],
@@ -628,23 +678,26 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     bindingSource: 'capability.prefer',
     provider: 'gemini',
     model: 'gemini-4-argon-high',
-    command: 'agy',
+    command: 'omp',
     args: [
-      '--mode',
-      'accept-edits',
-      '--new-project',
       '--model',
-      'gemini-4-argon-high'
+      'gemini-4-argon-high',
+      '--thinking',
+      'medium',
+      '--tools',
+      'read,write,edit,bash,grep,glob',
+      '--auto-approve'
     ],
     envKeys: [
-      'HOME'
+      'PI_CODING_AGENT_DIR',
+      'PI_CONFIG_DIR'
     ],
     resourceBindings: [
       {
         resource: 'private-home',
         target: {
           kind: 'env',
-          name: 'HOME'
+          name: 'PI_CODING_AGENT_DIR'
         }
       }
     ],
@@ -1216,15 +1269,17 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
   });
 
   describe('named explicit baseline facts', () => {
-    // (a) raw agy-cli heavy AND agy-herdr heavy both resolve model to gemini-4-argon-high (policy tier frontier, D15)
-    test('fact (a): raw agy-cli heavy and agy-herdr heavy resolve to gemini-4-argon-high (policy tier frontier, D15)', () => {
-      const agyCliHeavy = resolveSnapshotRowByLabel(cfg, 'agy-cli', 'heavy', throwawayDir);
-      const agyHerdrHeavy = resolveSnapshotRowByLabel(cfg, 'agy-herdr', 'heavy', throwawayDir);
-
-      assert.equal(agyCliHeavy.model, 'gemini-4-argon-high', 'agy-cli heavy model must be gemini-4-argon-high');
-      assert.equal(agyHerdrHeavy.model, 'gemini-4-argon-high', 'agy-herdr heavy model must be gemini-4-argon-high');
-      assert.equal(agyCliHeavy.provider, 'gemini');
-      assert.equal(agyHerdrHeavy.provider, 'gemini');
+    // (a) gemini-cli heavy AND gemini-herdr heavy both resolve model to gemini-4-argon-high (policy tier frontier, D15),
+    // and the model reaches omp's argv: without --model omp runs its profile default whatever the tier.
+    test('fact (a): gemini-cli heavy and gemini-herdr heavy resolve to gemini-4-argon-high and pass it to omp (policy tier frontier, D15)', () => {
+      for (const label of ['gemini-cli', 'gemini-herdr']) {
+        const row = resolveSnapshotRowByLabel(cfg, label, 'heavy', throwawayDir);
+        assert.equal(row.model, 'gemini-4-argon-high', `${label} heavy model must be gemini-4-argon-high`);
+        assert.equal(row.provider, 'gemini');
+        assert.equal(row.command, 'omp');
+        const at = row.args.indexOf('--model');
+        assert.ok(at >= 0 && row.args[at + 1] === 'gemini-4-argon-high', `${label} heavy must pass --model gemini-4-argon-high, got ${JSON.stringify(row.args)}`);
+      }
     });
 
     // (b) fgos-coding-implement heavy resolves model to gemini-4-argon-high (policy tier frontier, D15)
@@ -1232,7 +1287,7 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
       const { executorId: resolvedExecutorId, invocationId: resolvedInvocationId, bindingSource } = resolveExecutorAndOverrides(cfg, 'fgos-coding-implement');
       assert.equal(bindingSource, 'capability.prefer', 'bindingSource must be capability.prefer');
       assert.equal(resolvedExecutorId, 'gemini', 'resolvedExecutorId resolves to gemini (executor-provider-naming 2026-09-17 -- was agy)');
-      assert.equal(resolvedInvocationId, 'agy-herdr-mucdong', 'resolvedInvocationId pins agy\'s herdr-mucdong invocation');
+      assert.equal(resolvedInvocationId, 'omp-gemini-tetcu72', 'resolvedInvocationId pins gemini\'s omp pane invocation');
 
       const fgosImplementHeavy = resolveSnapshotRowByLabel(cfg, 'fgos-coding-implement', 'heavy', throwawayDir);
       assert.equal(fgosImplementHeavy.model, 'gemini-4-argon-high', 'fgos-coding-implement heavy model must be gemini-4-argon-high');
@@ -1258,11 +1313,11 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
           );
         }
 
-        const unGated = resolveSnapshotRowByLabel(cfg, 'agy-cli', tier, throwawayDir);
+        const unGated = resolveSnapshotRowByLabel(cfg, 'gemini-cli', tier, throwawayDir);
         assert.equal(
           unGated.readOnlyMechanism,
           'none',
-          `agy-cli [${tier}] readOnlyMechanism must be none`
+          `gemini-cli [${tier}] readOnlyMechanism must be none`
         );
       }
     });

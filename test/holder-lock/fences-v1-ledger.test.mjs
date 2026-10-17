@@ -13,6 +13,9 @@ import { execFileSync, spawn } from 'node:child_process';
 import { extractV1Source, probeV1 } from './fixtures/extract-v1.mjs';
 import { placeFences, fenceStatus, FENCE_BY, V1_LOCK_PRESENT } from '../../src/holder-lock/fences.mjs';
 
+// The machine-scope install lock is fenced under the state root: keep it in a scratch directory, never the real one.
+process.env.FGOS_STATE_ROOT = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-fences-state-'));
+
 const PROBE_TIMEOUT_MS = 15_000;
 const PROVIDER = 'openai';
 const ACCOUNT = 'acct-a';

@@ -5,10 +5,11 @@
 Forgent (fgOS) is the platform layer for building and running agent applications — the infrastructure, skills, and automation that sit beneath every agent app, so developers can forge new agents instead of building everything from scratch.
 
 - README.md — product description + documentation index
-- docs/platform-foundations.md — L1-L8 locked design laws; L5 is this repo's definition of done (six questions, below)
+- docs/platform-foundations.md — L1-L10 locked design laws; L5 is this repo's definition of done (six questions, below)
 - docs/specs/system-overview.md — area map, shared entities, cross-area flows
 - docs/specs/reading-map.md — where every doc and source path in this repo lives
 - docs/backlog.md — product backlog (PBI rows: proposed / in-flight / done)
+- plans/261017-1313-fgos-platform-program-board/plan.md — which platform plans are running or held, what each waits for, which shared files collide; read it before starting lock/git/state/config/runner work, and update your own lane's row when you start, finish, block or land
 - docs/routing-handoff-contract.md — agent-to-agent handoff contract + trust boundary
 - docs/decisions/index.md — generated projection of platform/repo-wide decisions (`fgos decision-index`); narrative lives in docs/specs/<area>.md's own "Lịch sử quyết định" sections (tsk-1lv-4)
 - domains/<domain>/AGENTS.md — domain-specific doctrine (e.g. domains/coding/AGENTS.md for fgos-coding-* workflows), read dynamically by fgos-routing
@@ -321,7 +322,7 @@ Every question asking the owner to choose a direction carries five parts: what i
 
 # Platform Operating Laws
 
-Platform laws L1-L8 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:
+Platform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:
 
 - **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)
 - **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)
@@ -331,7 +332,49 @@ Platform laws L1-L8 are locked in `docs/platform-foundations.md` and define immu
 - **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)
 - **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)
 - **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)
+- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)
+- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)
 
 Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place.
+
+### procedure
+
+#### Design Principles
+
+- id: `design-principles`
+- source: `core/instructions/design-principles.md`
+
+# Design Principles
+
+These apply to every change. Each line says what to do; where a mechanical
+check exists it is named, otherwise the reviewer checks it.
+
+1. **One door.** Before adding a function, module, helper or mechanism, search
+   for one that already does the job (`rg` its name and the primitive it
+   touches, such as `/proc/`, `renameSync` or `.fgos` path resolution) and
+   reuse or extend it; say in the plan or commit what you reused. When you
+   replace a mechanism, move every consumer and delete the old path in the
+   same change; if you cannot, open an item for the rest (L10).
+2. **Strict bottom-up layering.** A lower layer defines its own conventions and
+   never knows the layers above it; upper layers adapt to it. Shared primitives
+   (process identity, liveness, atomic writes, path resolution) live in the
+   lowest layer that needs them, not in a feature or adapter module. When an
+   import guard blocks you, import the shared leaf module it names; never copy
+   the code. Checked by `test/architecture.test.mjs` against
+   `docs/architecture-manifest.json`.
+3. **Hexagonal and pluggable.** Keep shared logic independent of any one tool;
+   the CLI, herdr, tmux and each agent CLI are thin, replaceable drivers behind
+   a port.
+4. **Independent foundation components, Rust first.** Platform-wide foundations
+   (session identity, terminal control, and the like) are separate components,
+   built in Rust and used across the whole system.
+5. **Correctness and stability first.** Decide from the real OS and system
+   state, not from an in-memory copy that can drift; control concurrency and
+   guard every boundary.
+6. **KISS and DRY.** Keep the algorithm small, remove duplicated code, and add
+   no file or intermediate layer you do not need.
+7. **One authority, one source of truth.** Each component owns exactly one kind
+   of decision. Code and its documentation agree at one source; generated text
+   is regenerated from its source, never copied by hand.
 
 <!-- fgos:instruction-projection:end -->

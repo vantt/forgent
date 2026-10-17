@@ -2615,7 +2615,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // imports a herdr client or a dispatch adapter, so there is no path from
     // this case to sending anything into a pane.
     case 'dispatch': {
-      const sub = requireField(positional[0], 'dispatch requires a sub-verb: fgos dispatch <show-run|inspect|watch|recover|reconcile|decide|probe-account>');
+      const sub = requireField(positional[0], 'dispatch requires a sub-verb: fgos dispatch <show-run|inspect|watch|recover|reconcile|decide|explain|probe-account>');
       const retired = retiredDispatchDoorMessage(sub, positional, flags);
       if (retired) throw new StoreError('validation', retired);
       const KNOWN_DISPATCH_SUBVERBS = [
@@ -2625,6 +2625,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         'recover',
         'reconcile',
         'decide',
+        'explain',
         'probe-account',
       ];
       if (!KNOWN_DISPATCH_SUBVERBS.includes(sub)) {
@@ -2645,6 +2646,17 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         }
       }
       const repoRootForDispatch = flags.dir !== undefined ? path.dirname(dir) : process.cwd();
+      if (sub === 'explain') {
+        // Read-only: the config is loaded without filling in defaults, and nothing is leased or spawned.
+        const { explainCapability } = await import('../src/runner/execution/explain.mjs');
+        const { detectHerdrPresent } = await import('../src/runner/execution/run.mjs');
+        return explainCapability(loadRunnerConfigFromDir(repoRootForDispatch), {
+          capability: requireField(flags.for, 'dispatch explain requires --for <capability>'),
+          rigor: flags.rigor,
+          session: { headless: true, herdrPresent: detectHerdrPresent() },
+          projectConfig: readSharedConfigOrEmpty(repoRootForDispatch),
+        });
+      }
       if (sub === 'inspect') {
         return invokeDispatchInspectOperation({
           operationId: 'dispatch.runtime.inspect', effect: 'read',

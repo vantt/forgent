@@ -9,7 +9,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { extractV1Source, probeV1 } from './fixtures/extract-v1.mjs';
-import { placeFences, fenceStatus, fenceTargets, fenceBy, TOMBSTONE_FILE, V1_LOCK_PRESENT } from '../../src/holder-lock/fences.mjs';
+import { placeFences, fenceStatus, fenceTargets, TOMBSTONE_FILE, V1_LOCK_PRESENT } from '../../src/holder-lock/fences.mjs';
 
 const PROBE_TIMEOUT_MS = 15_000;
 const GIT_ENV = { ...process.env, GIT_AUTHOR_NAME: 'fences', GIT_AUTHOR_EMAIL: 'fences@test', GIT_COMMITTER_NAME: 'fences', GIT_COMMITTER_EMAIL: 'fences@test' };
@@ -47,7 +47,9 @@ function makeWorkspace(name) {
   fs.writeFileSync(path.join(runDir, 'run.json'), JSON.stringify({ runId: 'run-1', assignmentId: 'a1' }));
   // No provider ledgers in this workspace: the ledger fences have their own test.
   const providerRuntimeDir = path.join(scratch, `${name}-no-provider-capacity`);
-  return { root, worktree, fgosDir, workflowRunDir, runDir, providerRuntimeDir };
+  // The machine-scope install lock lives under the state root: one per workspace here, never the real one.
+  const stateRoot = path.join(scratch, `${name}-state`);
+  return { root, worktree, fgosDir, workflowRunDir, runDir, providerRuntimeDir, stateRoot };
 }
 
 function branchesOf(root) {
@@ -60,7 +62,7 @@ function tombstoneRecord(lockPath) {
 
 test('placeFences tombstones every old file-lock path of the workspace, in both cwd forms', () => {
   const ws = makeWorkspace('all-paths');
-  const result = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir });
+  const result = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
   assert.equal(result.ok, true, JSON.stringify(result));
   assert.deepEqual(result.skipped, []);
 
@@ -68,8 +70,10 @@ test('placeFences tombstones every old file-lock path of the workspace, in both 
     'gateway.lock', 'runner.lock', 'sessions.lock', path.join('dispatch', 'reconcile.lock'),
     path.join('workflow-runs', 'wf-1', 'advance.lock'),
     path.join('assignments', 'a1', 'runs', '01', '.recovery.lock'),
+    path.join('installation', 'activation.lock'), path.join('observe', '.lock'),
     'main-checkout.lock', ...branchesOf(ws.root).map((ref) => `merge-slot--${encodeURIComponent(ref)}.lock`),
   ].map((rel) => path.join(ws.fgosDir, rel));
+  expected.push(path.join(ws.stateRoot, 'install.lock'));
   const cwds = new Set();
   for (const dir of [ws.root, ws.worktree]) {
     cwds.add(path.resolve(dir));
@@ -78,21 +82,22 @@ test('placeFences tombstones every old file-lock path of the workspace, in both 
   for (const cwd of cwds) expected.push(path.join(ws.fgosDir, `dispatch--${encodeURIComponent(cwd)}.lock`));
   assert.deepEqual([...result.placed].sort(), [...expected].sort());
 
+  const byOwner = Object.fromEntries(fenceTargets({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot }).map((t) => [t.lock, `fgos ${t.owner}`]));
   for (const lockPath of expected) {
     assert.ok(fs.statSync(lockPath).isDirectory(), `${lockPath} is a directory`);
     const record = tombstoneRecord(lockPath);
-    assert.equal(record.by, fenceBy(['main-checkout', 'merge-slot'].includes(record.lock) ? '4.3' : '4.2'));
+    assert.equal(record.by, byOwner[record.lock], `${lockPath} names the release that fenced it`);
     assert.ok(typeof record.lock === 'string' && record.lock, 'names its lock');
     assert.ok(!Number.isNaN(Date.parse(record.at)), 'records when');
   }
-  const locks = new Set(fenceTargets({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir }).map((t) => t.lock));
-  assert.deepEqual([...locks].sort(), ['advance', 'dispatch-cwd', 'gateway', 'main-checkout', 'merge-slot', 'reconcile', 'recovery', 'runner', 'sessions']);
-  assert.equal(fenceStatus({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir }).complete, true);
+  const locks = new Set(fenceTargets({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot }).map((t) => t.lock));
+  assert.deepEqual([...locks].sort(), ['activation', 'advance', 'dispatch-cwd', 'gateway', 'install', 'main-checkout', 'merge-slot', 'observe', 'reconcile', 'recovery', 'runner', 'sessions']);
+  assert.equal(fenceStatus({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot }).complete, true);
 });
 
 test('every real v1 acquire fails loudly against the tombstones instead of taking the lock', (t) => {
   const ws = makeWorkspace('v1-acquires');
-  assert.equal(placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir }).ok, true);
+  assert.equal(placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot }).ok, true);
   const fgosDir = JSON.stringify(ws.fgosDir);
   const root = JSON.stringify(ws.root);
 
@@ -129,7 +134,7 @@ test('every real v1 acquire fails loudly against the tombstones instead of takin
   }
 
   // The tombstones are untouched by the failed acquires.
-  for (const target of fenceStatus({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir }).targets) {
+  for (const target of fenceStatus({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot }).targets) {
     assert.equal(target.fenced, true, `${target.path} still fenced`);
   }
 });
@@ -138,25 +143,25 @@ test('an old lock file still present stops the placement before anything is writ
   const ws = makeWorkspace('v1-present');
   const gatewayLock = path.join(ws.fgosDir, 'gateway.lock');
   fs.writeFileSync(gatewayLock, String(process.pid));
-  const result = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir });
+  const result = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
   assert.equal(result.ok, false);
   assert.equal(result.error, V1_LOCK_PRESENT);
   assert.deepEqual(result.paths, [gatewayLock]);
   assert.deepEqual(result.placed, []);
   assert.equal(fs.readFileSync(gatewayLock, 'utf8'), String(process.pid), 'the old lock is left as it was');
-  const status = fenceStatus({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir });
+  const status = fenceStatus({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
   assert.deepEqual(status.v1Present, [gatewayLock]);
   assert.equal(status.targets.filter((target) => target.fenced).length, 0, 'no other path was fenced half-way');
   // Once the old holder is gone the same call places everything.
   fs.unlinkSync(gatewayLock);
-  assert.equal(placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir }).ok, true);
+  assert.equal(placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot }).ok, true);
 });
 
 test('placing fences twice places nothing the second time and reports every path as skipped', () => {
   const ws = makeWorkspace('idempotent');
-  const first = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir });
+  const first = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
   const records = Object.fromEntries(first.placed.map((lockPath) => [lockPath, fs.readFileSync(path.join(lockPath, TOMBSTONE_FILE), 'utf8')]));
-  const second = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir });
+  const second = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
   assert.equal(second.ok, true);
   assert.deepEqual(second.placed, []);
   assert.deepEqual([...second.skipped].sort(), [...first.placed].sort());
@@ -169,7 +174,7 @@ test('a tombstone directory whose record was never written is completed, not ref
   const ws = makeWorkspace('half-tombstone');
   const runnerLock = path.join(ws.fgosDir, 'runner.lock');
   fs.mkdirSync(runnerLock);
-  const result = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir });
+  const result = placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
   assert.equal(result.ok, true, JSON.stringify(result));
   assert.ok(result.placed.includes(runnerLock));
   assert.equal(tombstoneRecord(runnerLock).lock, 'runner');
@@ -177,12 +182,12 @@ test('a tombstone directory whose record was never written is completed, not ref
 
 test('fenceStatus lists every missing path before placement and none after', () => {
   const ws = makeWorkspace('status');
-  const before = fenceStatus({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir });
+  const before = fenceStatus({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
   assert.equal(before.complete, false);
   assert.equal(before.missing.length, before.targets.length);
   assert.deepEqual(before.v1Present, []);
-  placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir });
-  const afterwards = fenceStatus({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir });
+  placeFences({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
+  const afterwards = fenceStatus({ fgosDir: ws.fgosDir, workspaceRoot: ws.root, providerRuntimeDir: ws.providerRuntimeDir, stateRoot: ws.stateRoot });
   assert.equal(afterwards.complete, true);
   assert.deepEqual(afterwards.missing, []);
 });
