@@ -9,6 +9,7 @@ on:
       - 'packages/process/**'
       - 'packages/run-supervisor/**'
       - 'packages/holder-lock/**'
+      - 'packages/agent-protocol/**'
       - 'Cargo.lock'
       - '.github/workflows/process-containment.yml'
   workflow_dispatch:
@@ -28,4 +29,4 @@ jobs:
       - uses: actions/checkout@v4
       - name: Test containment drivers
         shell: bash
-        run: cargo test -p fgos-process -p fgos-run-supervisor
+        run: cargo test -p fgos-process -p fgos-run-supervisor -p fgos-agent-protocol
