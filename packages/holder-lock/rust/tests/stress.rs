@@ -25,6 +25,7 @@ fn eight_processes_with_sigkills_never_overlap_and_never_stick() {
     let res = resource(&dir, "stress");
     let marker = res.path.with_extension("marker");
     let violations = res.path.with_extension("violations");
+    let killed = res.path.with_extension("killed");
     let mut spawned = 0usize;
     let mut spawn = |dir: &std::path::Path| -> Guard {
         spawned += 1;
@@ -44,6 +45,11 @@ fn eight_processes_with_sigkills_never_overlap_and_never_stick() {
             if let Ok(pid) = text.trim().parse::<u32>() {
                 if let Some(pos) = workers.iter().position(|w| w.id() == pid) {
                     let mut victim = workers.swap_remove(pos);
+                    {
+                        use std::io::Write;
+                        let mut f = fs::OpenOptions::new().create(true).append(true).open(&killed).unwrap();
+                        writeln!(f, "{pid}").unwrap();
+                    }
                     kill_and_reap(&mut victim);
                     kills += 1;
                     workers.push(spawn(&dir));
