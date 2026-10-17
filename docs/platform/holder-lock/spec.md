@@ -5,7 +5,7 @@ Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent
 Purpose: Define the single lock port for every cold fgOS lock: kernel locks on open file descriptions behind one OS-neutral port
 Design status: Accepted
-Implementation status: In progress (contracts and registry landed; crate, routes, Node facade, fences, fgctl gate and the cutover of ten locks land in parallel phases; the main checkout single door, `worktree-admin` and `fgos lock fence` are specified in sections 14, 16 and 17 and land with the main-door track; the hot state mutex is pending the event store decision, section 15)
+Implementation status: In progress (contracts and registry landed; crate, routes, Node facade, fences, fgctl gate and the cutover of ten locks land in parallel phases; the main checkout single door, `worktree-admin` and `fgos lock fence` are specified in sections 14, 16 and 17 and land with the main-door track; the hot state mutex stays with the state store pending implementation of the signed Event Store decision D-ADR0055, section 15)
 Canonical: Yes
 Owner: Holder-lock component
 Source: packages/holder-lock/rust (crate fgos-holder-lock), src/holder-lock/ (Node facade)
