@@ -18,6 +18,34 @@ created: 2026-10-16
 - Impact-analysis: GitNexus có mặt nhưng index đang cũ (hook báo `b334695`) và không index được trọn file lớn (tsk-38h). Plan dùng trích dẫn grep có số dòng ở HEAD `b9cdb2d64`; executor chạy `node .gitnexus/run.cjs analyze` rồi `impact` trên `executeAssignment`, `cliSpawnAdapter`, `reapOrphanedConfinementResources`, `finalizeConfinementResources`, `runDetachedRunSupervisor` trước khi sửa, và báo blast radius (dự kiến HIGH cho `assignment-runner.mjs`).
 - Component boundary: **có đổi** (thêm run supervisor L4, launch gate, agent-protocol L3, cổng chứa process ở L0). P11 cập nhật [`component-boundary.md`](../../docs/platform/component-boundary.md).
 
+## CẮT LẠI 2026-10-18
+
+Ghi đè các dòng cũ ở trên khi mâu thuẫn. Kiểm trên nhánh tích hợp sau khi main được merge vào (`a5ecb2fff`); P00 đã xong (`d3720fcef`, `447da6adc`): `cargo test -p fgos-process -p fgos-holder-lock -p fgos-run-supervisor -p fgos-agent-protocol` xanh (21 binary test, 0 fail), `node --test test/run-supervisor/contracts.test.mjs` 6/6.
+
+**Tiền đề đã đủ (không còn chờ):** 4.2 holder-lock; 4.4a caller Rust; 4.3-R khoá repo (`src/runner/repo-locks.mjs`: `withMainCheckout` hạng 50, `withMergeTargetSlot` 20, `withWorktreeAdmin` 40); 4.3-S hot lock (`src/state/hot-lock.mjs`, `withStateTx`, record nóng có `pidNs`) nên tiền đề `pidNs` của P09 đã thoả; 4.4b driver Windows (`LockFileEx`, route `fgos internal lock-hold`, `packages/process/rust/src/platform/windows_job.rs`, danh sách handle kế thừa `PROC_THREAD_ATTRIBUTE_HANDLE_LIST` trong `windows_spawn.rs`). Event store D-ADR0055 đã ký nhưng chưa xây: không phụ thuộc.
+
+**Thay đổi chung:**
+- D7 hết hiệu lực: Windows đã có driver lock, `fgos run` không còn `lock-driver-unavailable`. Windows end-to-end chạy được ngay khi route supervisor có; CHANGELOG và doctor không còn nói "chờ driver lock".
+- D6 (anh duyệt 2026-10-17 13:53): miền `windows-job` thuộc 4.4b (`windows_job.rs`). 6.2 P02 chỉ **gọi** `create_kill_job/open_job/job_name/assign_and_resume` và `Domain::WindowsJob`; không viết lại `domain_is_empty/kill_all` cho Windows. Gate luôn là thành viên job (spawn tạm dừng, gán job, rồi chạy), nên nhánh "root còn sống" của contender view không bao giờ đổi kết quả của attempt: `holder` = gate, `keeper` = supervisor.
+- `Domain` trong `packages/process/rust/src/lib.rs` hiện chỉ có `LinuxGate`, `WindowsJob`, `MacosTree`; **thiếu `LinuxPgroup`** (contract đã có từ P00, D5). P01 thêm biến thể này cùng `domain_is_empty/kill_all`, và cập nhật `facts`/mã đọc record predecessor nếu chúng khớp enum.
+- Contract `containment.port.v1.json` dòng `windows-job` đã sửa theo record 4.4b (job view/contender view, không còn "ActiveProcesses == 0 là rỗng").
+- Ràng buộc mới cho P09: không spawn supervisor, `fgos` hay bất kỳ child_process nào trong `withStateTx`; guard `exec-under-hot-lock` ném ngay (bọc `spawn/spawnSync/exec/execSync/execFile/execFileSync/fork`). Resolve `FGOS_HOST_BIN`/`payloadRoot` và dựng envelope **trước** mọi tx; hàm đọc `hotLockDepth()` có sẵn để assert. Thứ tự lock không đổi: `attempt` (15) → `dispatch-cwd` (30); khoá repo (20/40/50) do 4.3-R giữ qua `repo-locks.mjs`, không lồng vào attempt trước khi gate thoát.
+- Workflow CI mới theo mẫu `holder-lock-cross-platform.yml` (đã có), không phải `platform-probe.yml`.
+
+**Delta từng phase:**
+- P01: thêm `Domain::LinuxPgroup`; dùng `spawn_with_fds` + `judge` + `domain_is_empty/kill_all(LinuxGate)` đã có (không viết lại); `containment/linux.rs` đã là file rỗng có sẵn.
+- P02 (phạm vi rút gọn, đã duyệt): giữ Windows `create/spawn_in/guarantee` (gọi hàm 4.4b), toàn bộ macOS `pgroup-tree` + `domain_is_empty/kill_all` cho `macos-tree` (hiện `Unknown/Refused`), workflow CI; test (1)–(3), (7)–(8). Bỏ phần Windows của `domain_is_empty/kill_all`, test (4)–(6), sửa `platform/windows.rs`; không chạm `windows_job.rs`.
+- P03, P05: không đổi. P03 bước 10 Windows: gate mở handle job theo tên bằng `open_job`.
+- P04: không đổi; `main.rs` đã có nhánh `internal` với `lock-hold`: thêm bốn route cạnh nó, không đổi route đó. Spawn bước dùng danh sách handle kế thừa trên Windows (map rỗng = danh sách chỉ stdio).
+- P06: client Node dùng `src/holder-lock/index.mjs` (`acquire`, `lockHolders`) khi cần; adopt Windows judge miền bằng `domain_watch` (contender view), không tự viết.
+- P07, P08: không đổi.
+- P10: `cleanup.mjs`, `run.mjs`, `loop.mjs`, `dispatch/cli.mjs` còn là file chung với 6.5; giữ cả hai phía khi xung đột.
+- P09: ràng buộc `withStateTx` ở trên; tiền đề "4.3 landed" đã thoả; bỏ chờ P01+P02 của 4.3.
+- P11: bỏ câu "Windows báo `lock-driver-unavailable`" khỏi CHANGELOG/spec; `lock-holders` đã có phần Windows `windows-job` (N1 chỉ thêm quan hệ cha supervisor/gate); `CHANGELOG.md`, `registrations.mjs`, `runner.md`, `component-boundary.md`, `reading-map.md` là file chung với 6.5.
+- P12 phần A: bước 3 `cargo check` Windows/macOS chạy local khi target cài sẵn; CI chạy do lead lớn đẩy, phase lead không push.
+
+**Thứ tự chạy (hàng đợi của lead lớn, từng phase một):** P01 → P02 → P05 → P03 → P04 → P06 → P07 → P08 → P10 → P11 → P09 → P12 phần A. Giữ nguyên thứ tự merge cũ; không đổi.
+
 ## Prior art (đã kiểm `git log --follow`, `-G`)
 
 | Thứ bị thay | Vào ở | Ghi chú |

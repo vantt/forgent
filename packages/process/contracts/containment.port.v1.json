@@ -8,7 +8,7 @@
   "operations": {
     "create": {
       "input": { "attemptId": "string" },
-      "output": "a domain without processes yet; linux-gate/linux-pgroup/macos-tree: the id is completed by spawn_in (it is the root process tuple); windows-job: a named Job Object (name carries attemptId and a unique token), KILL_ON_JOB_CLOSE, no breakaway",
+      "output": "a domain without processes yet; linux-gate/linux-pgroup/macos-tree: the id is completed by spawn_in (it is the root process tuple); windows-job: a named Job Object (name carries attemptId and a unique token), KILL_ON_JOB_CLOSE, no breakaway; its id is the 4.4b record {job, sessionId, declaredAt, holder, keeper} of predecessor.v1.json (holder = the gate, keeper = the supervisor or null)",
       "errors": { "enum": ["unsupported-platform", "driver-unavailable", "io"] }
     },
     "spawn_in": {
@@ -31,7 +31,7 @@
       "drivers": {
         "linux-gate": "judge(gate hostTuple) == dead -> empty (the kernel kills and reaps every task of the namespace before init becomes a zombie); alive -> not-empty; unknown -> unknown. No ns/pid inode scan (doctor only)",
         "linux-pgroup": "no process left in the process group of the root (kill(-pgid, 0) == ESRCH) and judge(root) == dead -> empty; best-effort: a setsid descendant escapes",
-        "windows-job": "OpenJobObject by name fails (job destroyed) or ActiveProcesses == 0 -> empty",
+        "windows-job": "judged by fgos-process::domain_watch (windows_job.rs): job view and contender view of predecessor.v1.json windowsJobViews; never \"ActiveProcesses == 0\" alone, never unopenable == empty",
         "macos-tree": "no process in the pgid and none in the scanned descendant tree (proc_listchildpids) -> empty; best-effort: a double-forked setsid process reparented to launchd escapes"
       },
       "rule": "unknown is never treated as empty by a caller"
@@ -43,7 +43,7 @@
       "drivers": {
         "linux-gate": "signal the gate by identity (pidfd); the gate is pid 1 so SIGKILL of the gate kills the namespace",
         "linux-pgroup": "killpg(pgid) by identity of the root, then scan /proc for descendants of the root and signal them",
-        "windows-job": "TerminateJobObject; closing the last handle also kills (KILL_ON_JOB_CLOSE); asynchronous, so the predecessor rule 6.0.1 applies",
+        "windows-job": "domain_kill_all of windows_job.rs: TerminateJobObject plus kill by identity of tree members outside the job; asynchronous, so the predecessor rule 6.0.1 applies",
         "macos-tree": "killpg plus tree scan"
       }
     },

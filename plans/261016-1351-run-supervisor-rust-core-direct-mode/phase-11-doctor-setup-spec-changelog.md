@@ -2,6 +2,8 @@
 
 Wave 1 (docs) và wave 2 (check). Nhánh `run-supervisor/p11-doctor-docs`, worktree `.claude/worktrees/rs-p11`. Phụ thuộc: P00 (docs); P04, P06 (check); merge phần check sau P09. Chủ `src/setup/registrations.mjs`, `test/setup/checks.test.mjs`, `CHANGELOG.md`, mọi docs của plan này.
 
+> **Amendment 2026-10-18:** driver lock Windows đã land (4.4b): CHANGELOG và spec không ghi "Windows `fgos run` báo `lock-driver-unavailable`"; ghi mức chứa `windows-job` thay vào. `registrations.mjs`, `CHANGELOG.md`, `runner.md`, `component-boundary.md`, `reading-map.md` là file chung với 6.5: giữ cả hai phía khi xung đột.
+
 ## Đọc trước
 
 AGENTS.md "Install/setup/doctor gate"; [`docs/distribution-vision.md`](../../docs/distribution-vision.md), [`docs/specs/distribution.md`](../../docs/specs/distribution.md); 4.2 P11 (check `lock-holders` để sửa theo N1); [`registrations.mjs:5332-5460`](../../src/setup/registrations.mjs) (check dọn confinement hiện có, gọi reaper ở `:5450`).
