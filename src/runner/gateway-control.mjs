@@ -10,30 +10,29 @@
 // per-machine config value the Rust binary itself reads from
 // `~/.fgos/config.json`, not from anything this module owns).
 //
-// tsk-2n2 (real gap found reviewing tsk-31v): `start`/`stop` now run their
-// whole read-check-write sequence under `.fgos/gateway.lock` — two
-// concurrent `fgos gateway start` calls used to both pass the
-// not-running check before either wrote the registry, AND both appended
-// to the SAME fixed log path, so one invocation's startup-confirmation
-// poll could see the OTHER invocation's process's "listening on" line
-// and record the wrong pid. The lock is PID-liveness-based, not TTL —
-// unlike main-checkout-lock.mjs's short critical sections, a cold
-// `cargo build --release` plus startup confirmation can legitimately run
-// 60-90s, and a TTL sized for that would be the wrong tool (the exact
-// TTL-expires-mid-operation class of flake this repo has already hit
-// elsewhere). Each `start` also gets its own uniquely-named log file
-// (timestamp+pid) as a second, independent fix — no two starts ever
-// share a log file even in a hypothetical future caller that bypasses
-// the lock.
+// tsk-2n2 (real gap found reviewing tsk-31v): `start`/`stop` run their
+// whole read-check-write sequence under the `gateway` kernel lock
+// (`.fgos/locks/gateway.lock`, src/holder-lock) — two concurrent
+// `fgos gateway start` calls used to both pass the not-running check
+// before either wrote the registry, AND both appended to the SAME fixed
+// log path, so one invocation's startup-confirmation poll could see the
+// OTHER invocation's process's "listening on" line and record the wrong
+// pid. The kernel releases the lock when its holder dies, so there is no
+// TTL to size against a cold `cargo build --release` plus startup
+// confirmation (60-90s). Each `start` also gets its own uniquely-named
+// log file (timestamp+pid) as a second, independent fix — no two starts
+// ever share a log file even in a hypothetical future caller that
+// bypasses the lock.
 
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, spawn } from 'node:child_process';
 import { resolveLogsDir } from './paths.mjs';
+import { pidExists } from './dispatch/process-identity.mjs';
+import { acquireSync, createLockScope, lockHolders, resolveLock } from '../holder-lock/index.mjs';
 
 const REGISTRY_FILE = 'gateway.json';
-const LOCK_FILE = 'gateway.lock';
 const DEFAULT_PORT = 4170;
 const STARTUP_TIMEOUT_MS = 30000;
 const STARTUP_POLL_MS = 250;
@@ -54,17 +53,6 @@ export class GatewayControlError extends Error {
   }
 }
 
-/** Signal-0 liveness probe (mirrors session.mjs's isPidAlive). EPERM means
- * the pid exists under another user — still alive. */
-function isPidAlive(pid) {
-  try {
-    process.kill(pid, 0);
-    return true;
-  } catch (err) {
-    return err.code === 'EPERM';
-  }
-}
-
 /** Synchronous backoff — mirrors session.mjs's own sleepSync (no busy
  * spin, no extra dependency). */
 function sleepSync(ms) {
@@ -77,105 +65,35 @@ function sleepSync(ms) {
  * (SIGKILL) wait phases in `stopGateway` — each phase gets its OWN full
  * window, since a signal taking effect is never instantaneous. */
 function waitUntilDeadOrDeadline(pid, deadline) {
-  while (isPidAlive(pid)) {
+  while (pidExists(pid)) {
     if (Date.now() >= deadline) return false;
     sleepSync(STOP_POLL_MS);
   }
   return true;
 }
 
-// ---------------------------------------------------------------------
-// Lock (tsk-2n2): link-atomic-create, PID-liveness-based staleness —
-// the same proven technique session.mjs's tryAcquireOnce uses, ported
-// here rather than shared, since main-checkout-lock.mjs's TTL model
-// solves a different problem (short critical sections) this module's
-// long build+startup phase does not fit.
-// ---------------------------------------------------------------------
-
-let lockTmpCounter = 0;
-
-function tryAcquireLockOnce(lockPath, pid) {
-  const dir = path.dirname(lockPath);
-  lockTmpCounter += 1;
-  const tmpPath = path.join(dir, `.gateway.lock.tmp-${pid}-${Date.now()}-${lockTmpCounter}`);
-  fs.writeFileSync(tmpPath, String(pid), 'utf8');
-  try {
-    fs.linkSync(tmpPath, lockPath);
-    return { acquired: true };
-  } catch (err) {
-    if (err.code !== 'EEXIST' && !(process.platform === 'win32' && (err.code === 'EPERM' || err.code === 'EBUSY'))) throw err;
-  } finally {
-    try {
-      fs.unlinkSync(tmpPath);
-    } catch (err) {
-      if (err.code !== 'ENOENT' && !(process.platform === 'win32' && (err.code === 'EPERM' || err.code === 'EBUSY'))) throw err;
-    }
-  }
-
-  let raw;
-  try {
-    raw = fs.readFileSync(lockPath, 'utf8');
-  } catch (err) {
-    if (err.code === 'ENOENT' || err.code === 'EPERM' || err.code === 'EBUSY') return { acquired: false, holderPid: null }; // released in between — retry create
-    throw err;
-  }
-  const holderPid = parseInt(raw.trim(), 10);
-
-  if (Number.isInteger(holderPid) && holderPid > 0 && isPidAlive(holderPid)) {
-    return { acquired: false, holderPid }; // genuine live holder — back off, never touch its lock
-  }
-
-  // Stale (dead/garbage pid). Re-read right before unlinking: the
-  // liveness probe is the slow window; changed content means a fresh
-  // holder took the path and must not be touched.
-  let current;
-  try {
-    current = fs.readFileSync(lockPath, 'utf8');
-  } catch (err) {
-    if (err.code === 'ENOENT' || err.code === 'EPERM' || err.code === 'EBUSY') return { acquired: false, holderPid: null };
-    throw err;
-  }
-  if (current !== raw) {
-    const freshPid = parseInt(current.trim(), 10);
-    return { acquired: false, holderPid: Number.isInteger(freshPid) && freshPid > 0 ? freshPid : null };
-  }
-  try {
-    fs.unlinkSync(lockPath);
-  } catch (err) {
-    if (err.code !== 'ENOENT' && err.code !== 'EPERM' && err.code !== 'EBUSY') throw err;
-  }
-  return { acquired: false, holderPid: null }; // cleaned and yield; next attempt creates
+/** The first pid the kernel lists as holding `name`'s lock file, or null
+ * where holders cannot be listed. Diagnostic only, for the timeout message. */
+function lockHolderPid(name, params) {
+  const holders = lockHolders(name, params);
+  return holders.kind === 'list' && holders.pids.length > 0 ? holders.pids[0] : null;
 }
 
-/** Blocking exclusive acquire of `.fgos/gateway.lock`. Retries until it
+/** Blocking exclusive acquire of the `gateway` kernel lock. Waits until it
  * wins or `timeoutMs` elapses — generous by default, since a competing
  * `start` can legitimately hold it through a cold cargo build. Returns a
- * handle with `release()`; callers MUST release in a `finally`. */
-export function acquireGatewayLock(fgosDir, { timeoutMs = 120000, retryMs = 100 } = {}) {
-  fs.mkdirSync(fgosDir, { recursive: true });
-  const lockPath = path.join(fgosDir, LOCK_FILE);
-  const deadline = Date.now() + timeoutMs;
-  for (;;) {
-    const res = tryAcquireLockOnce(lockPath, process.pid);
-    if (res.acquired) {
-      return {
-        release() {
-          try {
-            fs.unlinkSync(lockPath);
-          } catch (err) {
-            if (err.code !== 'ENOENT' && err.code !== 'EPERM') throw err;
-          }
-        },
-      };
-    }
-    if (Date.now() >= deadline) {
-      throw new GatewayControlError(
-        `timed out acquiring gateway.lock at "${lockPath}" after ${timeoutMs}ms` + (res.holderPid ? ` (held by pid ${res.holderPid})` : ''),
-        { lockPath, holderPid: res.holderPid ?? null },
-      );
-    }
-    sleepSync(retryMs);
-  }
+ * handle with `release()`; callers MUST release in a `finally`. A holder
+ * that dies releases at once. */
+export function acquireGatewayLock(fgosDir, { timeoutMs = 120000 } = {}) {
+  const params = { fgosDir };
+  const res = acquireSync(createLockScope('gateway'), 'gateway', params, { waitMs: timeoutMs });
+  if (res.result === 'acquired') return res.handle;
+  const holderPid = lockHolderPid('gateway', params);
+  const lockPath = resolveLock('gateway', params).v3Path;
+  throw new GatewayControlError(
+    `timed out acquiring gateway.lock at "${lockPath}" after ${timeoutMs}ms` + (holderPid ? ` (held by pid ${holderPid})` : ''),
+    { lockPath, holderPid },
+  );
 }
 
 function registryPath(fgosDir) {
@@ -242,7 +160,7 @@ function releaseBinaryPath(repoRoot) {
 
 /**
  * Start the gateway as a detached background process, under
- * `.fgos/gateway.lock` for the whole check-build-spawn-confirm sequence
+ * the gateway lock for the whole check-build-spawn-confirm sequence
  * (tsk-2n2). Refuses (no process spawned) when the registry already
  * names a live pid. Builds the release binary first (`cargo build
  * --release`, synchronous — cargo's own incremental cache makes a no-op
@@ -257,7 +175,7 @@ export function startGateway(repoRoot, fgosDir) {
   const lock = acquireGatewayLock(fgosDir);
   try {
     const existing = readRegistry(fgosDir);
-    if (existing && isPidAlive(existing.pid)) {
+    if (existing && pidExists(existing.pid)) {
       throw new GatewayControlError(
         `gateway is already running (pid ${existing.pid}, port ${existing.port}) — stop it first with "fgos gateway stop" if you meant to restart it`,
         { pid: existing.pid, port: existing.port },
@@ -319,7 +237,7 @@ export function startGateway(repoRoot, fgosDir) {
     // moment later (e.g. a missing gateway.token, a port already in use).
     const deadline = Date.now() + STARTUP_TIMEOUT_MS;
     for (;;) {
-      if (!isPidAlive(child.pid)) {
+      if (!pidExists(child.pid)) {
         let tail = '';
         try {
           tail = fs.readFileSync(logPath, 'utf8').split('\n').slice(-20).join('\n');
@@ -349,7 +267,7 @@ export function startGateway(repoRoot, fgosDir) {
 }
 
 /**
- * Stop the running gateway, under `.fgos/gateway.lock` (tsk-2n2 — the
+ * Stop the running gateway, under the gateway lock (tsk-2n2 — the
  * same lock `start` uses, so a `stop` can never race a `start` that is
  * mid-registry-write). Sends SIGTERM and waits up to STOP_TIMEOUT_MS for
  * the process to actually exit (escalating to SIGKILL once, at the
@@ -367,7 +285,7 @@ export function stopGateway(fgosDir) {
     if (!entry) {
       return { alreadyStopped: true };
     }
-    if (!isPidAlive(entry.pid)) {
+    if (!pidExists(entry.pid)) {
       writeRegistry(fgosDir, null);
       return { alreadyStopped: true, pid: entry.pid };
     }
@@ -416,7 +334,7 @@ export async function gatewayStatus(fgosDir) {
   if (!entry) {
     return { running: false, reachable: false };
   }
-  const alive = isPidAlive(entry.pid);
+  const alive = pidExists(entry.pid);
   if (!alive) {
     return { running: false, reachable: false, pid: entry.pid, port: entry.port, staleRegistry: true };
   }
