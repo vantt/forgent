@@ -9,7 +9,7 @@
 
 use std::io::{BufRead, Write};
 use std::path::{Path, PathBuf};
-use std::time::{Duration, SystemTime};
+use std::time::Duration;
 
 use fgos_holder_lock::{predecessor, Acquire, HeldReason, Mode, Probe, Resource, Wait, DEFAULT_KILL_WAIT_MS};
 use fgos_process::{domain_watch, facts, DomainState};
@@ -117,7 +117,7 @@ pub fn adopt_one(dir: &Path, args: &AdoptArgs) -> Verdict {
         Err(err) => return Verdict::because("open", format!("lock probe failed: {err}")),
     }
     let binding = read_json(&dir.join("supervisor-binding.json"));
-    if binding.is_none() && !dir.join("receipt.json").exists() && still_starting(&dir.join("envelope.json"), START_GRACE) {
+    if binding.is_none() && !dir.join("receipt.json").exists() && still_starting(read_json(&dir.join("envelope.json")).as_ref(), START_GRACE) {
         return Verdict::because("running", "starting");
     }
     // Lock free is not enough: the domain must be provably empty.
@@ -234,10 +234,18 @@ const START_GRACE: Duration = Duration::from_secs(60);
 #[cfg(not(windows))]
 const START_GRACE: Duration = Duration::ZERO;
 
-/// Whether the envelope (written once, before the supervisor is spawned) is
-/// younger than `grace`: a supervisor that has not bound yet may still be starting.
-pub(crate) fn still_starting(envelope: &Path, grace: Duration) -> bool {
-    std::fs::metadata(envelope).and_then(|m| m.modified()).ok().and_then(|at| SystemTime::now().duration_since(at).ok()).is_some_and(|age| age < grace)
+/// Whether the envelope's `createdAt` (`{bootId, boottimeNs}`, written by the
+/// controller before it spawns the supervisor) is younger than `grace` on this
+/// boot: a supervisor that has not bound yet may still be starting. Another
+/// boot means the starter is gone; no `createdAt` means no grace. File times
+/// are never consulted.
+pub(crate) fn still_starting(envelope: Option<&Value>, grace: Duration) -> bool {
+    let created = envelope.map(|e| &e["createdAt"]);
+    let (Some(boot_id), Some(at)) = (created.and_then(|c| c["bootId"].as_str()), created.and_then(|c| c["boottimeNs"].as_u64())) else { return false };
+    if facts::boot_id().is_some_and(|current| current != boot_id) {
+        return false;
+    }
+    u128::from(crate::gate::boottime_ns().saturating_sub(at)) < grace.as_nanos()
 }
 
 /// Cheap check for a scan: the file is JSON with `v` 3. The digest is checked when the attempt is adopted.
@@ -262,14 +270,20 @@ mod tests {
     }
 
     #[test]
-    fn a_fresh_envelope_is_still_starting_and_an_old_or_missing_one_is_not() {
-        let dir = std::env::temp_dir().join(format!("fgos-adopt-starting-{}", std::process::id()));
-        std::fs::create_dir_all(&dir).unwrap();
-        let envelope = dir.join("envelope.json");
-        std::fs::write(&envelope, "{}").unwrap();
-        assert!(still_starting(&envelope, Duration::from_secs(60)));
-        assert!(!still_starting(&envelope, Duration::ZERO));
-        assert!(!still_starting(&dir.join("missing.json"), Duration::from_secs(60)));
+    fn a_young_envelope_of_this_boot_is_still_starting_and_anything_else_is_not() {
+        let boot = facts::boot_id().unwrap_or_else(|| "no-boot-id".into());
+        let at = |boot_id: &str, ns: u64| json!({"createdAt": {"bootId": boot_id, "boottimeNs": ns}});
+        let grace = Duration::from_secs(60);
+        let now = crate::gate::boottime_ns();
+        assert!(still_starting(Some(&at(&boot, now)), grace));
+        assert!(!still_starting(Some(&at(&boot, now)), Duration::ZERO));
+        assert!(!still_starting(Some(&at(&boot, now.saturating_sub(120_000_000_000))), grace), "an old envelope");
+        // Another boot is only knowable where the platform has a boot id.
+        if facts::boot_id().is_some() {
+            assert!(!still_starting(Some(&at("another-boot", now)), grace), "another boot: the starter is gone");
+        }
+        assert!(!still_starting(Some(&json!({"v": 3})), grace), "no createdAt, no grace");
+        assert!(!still_starting(None, grace));
     }
 
     #[test]

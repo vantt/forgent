@@ -89,6 +89,7 @@ impl Run {
         let mut value = json!({
             "v": 3,
             "attemptId": attempt_id,
+            "createdAt": {"bootId": boot_id(), "boottimeNs": boottime_ns()},
             "unitRunId": "unit-1",
             "runDir": dir,
             "mode": "direct",

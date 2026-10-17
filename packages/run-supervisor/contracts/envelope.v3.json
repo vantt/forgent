@@ -37,6 +37,10 @@
     "vector": "packages/run-supervisor/contracts/vectors/envelope-digest.v1.json; both implementations must reproduce every vector byte for byte",
     "keyRestriction": "all keys written by fgOS are ASCII, so UTF-16 order and byte order agree; a non-ASCII key is a contract violation"
   },
+  "optionalFields": {
+    "cwdLeaseFile": "string, Windows only: the dispatch-cwd lease file the supervisor takes itself (a LockFileEx lock is never inherited). A mutating Windows envelope without it is refused with exit 65; absent on Unix, where the lease arrives at fd 4",
+    "createdAt": "object {bootId, boottimeNs}: the controller's boot id and monotonic boot time (CLOCK_BOOTTIME ns; Windows GetTickCount64 ms * 1e6) when it wrote the envelope. Windows adopt gives an unbound attempt with a free lock a 60 s start grace measured from it, on the same boot only; absent or another boot means no grace. File times are never used"
+  },
   "fields": {
     "v": { "const": 3 },
     "digest": "string, see digest",
@@ -48,7 +52,7 @@
     "hostBin": "absolute path of the fgos host binary of the release that wrote the envelope; resolved once by the controller, never through PATH or a shim",
     "payloadRoot": "absolute path of the legacy-node payload root of the same release (components.legacyNode.root of the activated manifest); resolved like apps/fgos/src/legacy_exec.rs",
     "cwd": "absolute working directory of the agent",
-    "mutation": { "enum": ["mutating", "read-only"], "meaning": "mutating attempts also hold the dispatch-cwd lease (rank 30) handed to the supervisor at fd 4. Windows: a LockFileEx lock is never inherited, so the supervisor takes the attempt lock and, when mutating, the lease itself; the envelope then carries the lease file in an optional string `cwdLeaseFile` (absent on Unix; a mutating Windows envelope without it is refused with exit 65)" },
+    "mutation": { "enum": ["mutating", "read-only"], "meaning": "mutating attempts also hold the dispatch-cwd lease (rank 30) handed to the supervisor at fd 4. Windows: a LockFileEx lock is never inherited, so the supervisor takes the attempt lock and, when mutating, the lease itself; see optionalFields.cwdLeaseFile" },
     "launch": {
       "command": "string, absolute executable path of the agent CLI (resolved by resolveExecutorCommand in src/runner/dispatch/transport.mjs)",
       "args": "string[]",

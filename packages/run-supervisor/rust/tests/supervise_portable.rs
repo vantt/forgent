@@ -182,3 +182,19 @@ fn an_attempt_whose_supervisor_has_not_bound_yet_is_starting_not_abandoned() {
     }
     assert!(!run.path("receipt.json").exists() && !run.path("closed.json").exists(), "nothing was closed");
 }
+
+/// The grace belongs to the starter's boot: an envelope written on another boot
+/// has no starter left, so a lock-free unbound attempt is abandoned at once.
+#[cfg(windows)]
+#[test]
+fn an_unbound_attempt_of_another_boot_is_not_starting() {
+    let opts = Opts::agent(&["say", ""]);
+    let run = Run::new("starting-other-boot", &opts);
+    fs::write(run.path("attempt.lock"), "").unwrap();
+    let mut value: serde_json::Value = serde_json::from_str(&fs::read_to_string(&run.envelope).unwrap()).unwrap();
+    value["createdAt"]["bootId"] = json!("another-boot");
+    value["digest"] = json!(fgos_run_supervisor::envelope::digest(&value).unwrap());
+    fs::write(&run.envelope, serde_json::to_vec(&value).unwrap()).unwrap();
+    let line = run.adopt(&["--probe-only"]);
+    assert_eq!(line["state"], "needs-adopt", "{line}");
+}
