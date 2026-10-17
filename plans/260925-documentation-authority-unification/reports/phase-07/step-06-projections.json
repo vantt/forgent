@@ -1,0 +1,1421 @@
+{
+  "schemaVersion": 1,
+  "authorSession": "codex-session:fgos-run_unit-run-17922205e4d698@2026-10-17",
+  "authoredBy": "codex-session:fgos-run_unit-run-17922205e4d698@2026-10-17",
+  "headAtStart": "f836da42ca77d706fc247e45baee812df66dbd2a",
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "scope": "Step 6 only; Step 5 artifacts unchanged",
+  "groups": [
+    {
+      "rowId": "X-DUP-01",
+      "source": "docs/contracts/fgos-gateway-api-v1.yaml",
+      "target": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+      "sourceId": "src_8a16411fc0683b8e9584e5a1012e6fc0",
+      "targetId": "src_c91669cbd41a280e7c900a1f5018f1f9",
+      "sourceDigest": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+      "targetDigest": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+      "equal": true,
+      "name": "Gateway OpenAPI contract",
+      "canonicalSourcePath": "docs/contracts/fgos-gateway-api-v1.yaml",
+      "canonicalSourceId": "src_8a16411fc0683b8e9584e5a1012e6fc0",
+      "canonicalSourceDigest": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+      "targetOwnerAfterCutover": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+      "currentAuthority": "legacy source remains current; candidate remains noncanonical",
+      "manualRule": "Authored OpenAPI input, manually copied byte-for-byte to candidate; no YAML generator declared. Gateway /contract and MCP search read docs/contracts/fgos-gateway-api-v1.yaml; CTR010 remains fgos-gateway.v1 under A45.",
+      "ruleEvidence": [
+        "docs/platform/architecture-map.md",
+        "apps/fgos-gateway/src/gateway.rs",
+        "apps/fgos-gateway/src/mcp.rs"
+      ],
+      "fullRead": "All canonical content and candidate content inspected, including complete schemas/config and Gateway security, operations, refs and components; equality checked over every byte. Manifest exact nine-entry delta read before correction.",
+      "projectionDigestBefore": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+      "freshness": "fresh byte copy at HEAD",
+      "equalityMeaning": "Identical whole-file bytes preserve the input grammar and statements; does not prove current implementation truth, generator freshness, candidate promotion or consumer cutover.",
+      "disposition": "target settled; legacy source retires at Phase 9",
+      "parked": false
+    },
+    {
+      "rowId": "X-DUP-02",
+      "source": "docs/ui-spec/schema/surface-contract.schema.json",
+      "target": "docs/platform/ui-spec/history/schema/surface-contract.schema.json",
+      "sourceId": "src_d42077b2745fdf77e958dfc8ec96862f",
+      "targetId": "src_aab174cec5d324122e56dd4b57ef4378",
+      "sourceDigest": "2ce8f77f92bb0cf512f74f5eac133be50a8a0d301b3de13b82e5fbf4d950db7e",
+      "targetDigest": "2ce8f77f92bb0cf512f74f5eac133be50a8a0d301b3de13b82e5fbf4d950db7e",
+      "equal": true,
+      "name": "Surface interaction schema",
+      "canonicalSourcePath": "docs/ui-spec/schema/surface-contract.schema.json",
+      "canonicalSourceId": "src_d42077b2745fdf77e958dfc8ec96862f",
+      "canonicalSourceDigest": "2ce8f77f92bb0cf512f74f5eac133be50a8a0d301b3de13b82e5fbf4d950db7e",
+      "targetOwnerAfterCutover": "docs/platform/ui-spec/history/schema/surface-contract.schema.json",
+      "currentAuthority": "legacy source remains current; candidate remains noncanonical",
+      "manualRule": "Authored JSON Schema input, manually copied byte-for-byte. ui-tools/config.mjs resolves schema/ relative to the active root; validate.mjs reads it. It is not generated output.",
+      "ruleEvidence": [
+        "docs/ui-spec/00-overview.md",
+        "docs/platform/ui-spec/history/schema/surface-contract.schema.json.md"
+      ],
+      "fullRead": "All canonical content and candidate content inspected, including complete schemas/config and Gateway security, operations, refs and components; equality checked over every byte. Manifest exact nine-entry delta read before correction.",
+      "projectionDigestBefore": "2ce8f77f92bb0cf512f74f5eac133be50a8a0d301b3de13b82e5fbf4d950db7e",
+      "freshness": "fresh byte copy at HEAD",
+      "equalityMeaning": "Identical whole-file bytes preserve the input grammar and statements; does not prove current implementation truth, generator freshness, candidate promotion or consumer cutover.",
+      "disposition": "target settled; legacy source retires at Phase 9",
+      "parked": false
+    },
+    {
+      "rowId": "X-DUP-03",
+      "source": "docs/architecture-manifest.json",
+      "target": "docs/platform/contracts/architecture-manifest.json",
+      "sourceId": "src_d103858983b2e62ade276d1a9b958984",
+      "targetId": "src_694573f60aefd8b32f528bb6ece84c6e",
+      "sourceDigest": "b7797fea01dbd487b19d95c608c605b12e6862137d971cdc0e46d34eae5f9d4e",
+      "targetDigest": "b7797fea01dbd487b19d95c608c605b12e6862137d971cdc0e46d34eae5f9d4e",
+      "equal": true,
+      "name": "Architecture layer manifest",
+      "canonicalSourcePath": "docs/architecture-manifest.json",
+      "canonicalSourceId": "src_d103858983b2e62ade276d1a9b958984",
+      "canonicalSourceDigest": "b7797fea01dbd487b19d95c608c605b12e6862137d971cdc0e46d34eae5f9d4e",
+      "targetOwnerAfterCutover": "docs/platform/contracts/architecture-manifest.json",
+      "currentAuthority": "legacy source remains current; candidate remains noncanonical",
+      "manualRule": "Authored architecture-manifest.v1 registry, manually copied byte-for-byte. test/architecture.test.mjs reads root files/layers; no generator declared. Preserve map path until Phase 9 consumer cutover.",
+      "ruleEvidence": [
+        "test/architecture.test.mjs",
+        "docs/history/tsk-1kh-architecture-manifest-missing-row/CONTEXT.md"
+      ],
+      "fullRead": "All canonical content and candidate content inspected, including complete schemas/config and Gateway security, operations, refs and components; equality checked over every byte. Manifest exact nine-entry delta read before correction.",
+      "projectionDigestBefore": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
+      "freshness": "fresh byte copy at HEAD; corrected nine missing main-imported infra entries",
+      "equalityMeaning": "Identical whole-file bytes preserve the input grammar and statements; does not prove current implementation truth, generator freshness, candidate promotion or consumer cutover.",
+      "disposition": "candidate-copy-corrected; pending independent review and Step 9 carry",
+      "parked": false
+    },
+    {
+      "rowId": "X-DUP-04",
+      "source": "docs/ui-spec/spec.config.yaml",
+      "target": "docs/platform/ui-spec/architecture/spec.config.yaml",
+      "sourceId": "src_0cc0a2bce50729e7c745727d601b0e05",
+      "targetId": "src_bf4a7c601b6de03e5c32f0672ed15e3f",
+      "sourceDigest": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+      "targetDigest": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+      "equal": true,
+      "name": "UI compiler configuration",
+      "canonicalSourcePath": "docs/ui-spec/spec.config.yaml",
+      "canonicalSourceId": "src_0cc0a2bce50729e7c745727d601b0e05",
+      "canonicalSourceDigest": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+      "targetOwnerAfterCutover": "docs/platform/ui-spec/architecture/spec.config.yaml",
+      "currentAuthority": "legacy source remains current; candidate remains noncanonical",
+      "manualRule": "Authored spec.config.yaml input, manually copied byte-for-byte. ui-tools/config.mjs reads contract_tag, surface_dirs, cross_cutting and schema_path relative to active root. Candidate split layout is not a functioning compiler root.",
+      "ruleEvidence": [
+        "docs/ui-spec/00-overview.md",
+        "docs/platform/ui-spec/README.md",
+        "docs/platform/ui-spec/architecture/spec.config.yaml.md"
+      ],
+      "fullRead": "All canonical content and candidate content inspected, including complete schemas/config and Gateway security, operations, refs and components; equality checked over every byte. Manifest exact nine-entry delta read before correction.",
+      "projectionDigestBefore": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+      "freshness": "fresh byte copy at HEAD",
+      "equalityMeaning": "Identical whole-file bytes preserve the input grammar and statements; does not prove current implementation truth, generator freshness, candidate promotion or consumer cutover.",
+      "disposition": "target settled; legacy source retires at Phase 9",
+      "parked": false
+    }
+  ],
+  "semanticRoutes": [
+    {
+      "id": "X-SEM-29",
+      "resolvedBy": "X-DUP-04",
+      "meaning": "target settled; legacy source retires at Phase 9; compiler-root certification separately parked"
+    },
+    {
+      "id": "X-SEM-31",
+      "resolvedBy": "X-DUP-02",
+      "meaning": "target settled; legacy source retires at Phase 9; schema is authored validator input"
+    }
+  ],
+  "manifestCorrection": {
+    "addedInfraEntries": {
+      "src/holder-lock/index.mjs": "infra",
+      "src/holder-lock/registry.mjs": "infra",
+      "src/holder-lock/state-root.mjs": "infra",
+      "src/holder-lock/driver.mjs": "infra",
+      "src/holder-lock/protocol.mjs": "infra",
+      "src/holder-lock/lock-scope.mjs": "infra",
+      "src/holder-lock/fences.mjs": "infra",
+      "src/setup/holder-lock-checks.mjs": "infra",
+      "src/runner/dispatch/cwd-lock.mjs": "infra"
+    },
+    "removed": [],
+    "changedExisting": [],
+    "sourceBlob": "51593afbe4edafe87b0988dd874413790cb18bad",
+    "candidateBeforeBlob": "2ff043edb33c5b65a861aa89804c948148ccd58c",
+    "postReviewLog": "plans/260925-documentation-authority-unification/reports/phase-07/post-review-edits.md",
+    "futureRebind": "Every changed content/occurrence unit at Step 9; no approval carry"
+  },
+  "scratch": {
+    "path": "/tmp/fgos-work/phase-07-step-06/clone",
+    "materialization": "Read-only git archive HEAD docs/ui-spec extracted to an isolated source snapshot, with byte-copied compiler tools from the main checkout. No git write, shared state, working-tree generation, install or network.",
+    "declaredToolLocation": "docs/ui-spec/00-overview.md points to ~/.claude/skills/ui-spec/tools (absent); actual tools found at /home/vantt/projects/forgentX/.claude/skills/ui-spec/tools",
+    "tools": [
+      {
+        "relativePath": ".gitignore",
+        "sha256": "4d56952b0fb13bf8f9b6c13a6d4c34a075bac3af447636a1df4335d7576e2f97",
+        "bytes": 14
+      },
+      {
+        "relativePath": "build.mjs",
+        "sha256": "a68cfd1d507c0d8eb106488df3c060f6b9b1b26a4e3b269aefbd6b94267d0003",
+        "bytes": 4061
+      },
+      {
+        "relativePath": "config.mjs",
+        "sha256": "b0d0321a9cecd2583a2c74c540d13d9bc25a49ce63c4fecd8de5b56caef7571d",
+        "bytes": 2261
+      },
+      {
+        "relativePath": "extract.mjs",
+        "sha256": "7b4d776b9890c720852a7353a4a2ccd01b1aee644a70622cb1759b8226d1868f",
+        "bytes": 4084
+      },
+      {
+        "relativePath": "interpret-wireframe.mjs",
+        "sha256": "8c0fa98aa67c8634a415a95dfaa75c9162aeddeb6b1423ab6b2f9e250cfb7a38",
+        "bytes": 3584
+      },
+      {
+        "relativePath": "interpret.mjs",
+        "sha256": "c2df4cf371ca7560dd550b4347bf02eada70fdbc08c8dfc53b306453698d7360",
+        "bytes": 35609
+      },
+      {
+        "relativePath": "package-lock.json",
+        "sha256": "5f0ee14ee4b3ff0b9c629190e87facf07e03fd46af281e21b374fe7fcb88d074",
+        "bytes": 29804
+      },
+      {
+        "relativePath": "package.json",
+        "sha256": "0a42a6bd51312dd1a15683cc06b4a82c5cbdfae0c2837b3f748c4a623000da37",
+        "bytes": 726
+      },
+      {
+        "relativePath": "rename.mjs",
+        "sha256": "2ac5be25f8c9862d71132fd87a95d5cd2642973d1cb5fa19de566dfcfdedd23d",
+        "bytes": 3411
+      },
+      {
+        "relativePath": "validate.mjs",
+        "sha256": "3aad75b05175fc29da2855be2f3d5cc70948161e131b53286d4874a9ae9e969b",
+        "bytes": 11359
+      },
+      {
+        "relativePath": "wireframe/ascii-normalize.mjs",
+        "sha256": "e4b826eae06be27e2453542874696829f218910d214d8669879a1dadae25cd9b",
+        "bytes": 6624
+      },
+      {
+        "relativePath": "wireframe/client/app-chrome.js",
+        "sha256": "0af66631f1b8b55c567e757494ad2b4e115931d6d6b0b8a1822a249814e2499a",
+        "bytes": 5796
+      },
+      {
+        "relativePath": "wireframe/client/app.js",
+        "sha256": "03a0ffae79c2a6b678d78832f9ddc08ff2beb8161d30481a2680a3c03e28c50b",
+        "bytes": 9403
+      },
+      {
+        "relativePath": "wireframe/client/flow-play.js",
+        "sha256": "8a1bd380e42b13d5269826cbbe011fd66737db9a26192bccefd979da9ea688c9",
+        "bytes": 8073
+      },
+      {
+        "relativePath": "wireframe/client/graph-controls.js",
+        "sha256": "7e8ecdbfc2dcb4799e69c87bd458986d8fe41bcfb67c911081ecc8f4f4328044",
+        "bytes": 7638
+      },
+      {
+        "relativePath": "wireframe/client/graph-layout.js",
+        "sha256": "9fbdcec4807863252c5cea5664fbf1a0212c2153d309241a6c3b64b6932ae616",
+        "bytes": 3475
+      },
+      {
+        "relativePath": "wireframe/client/region-model.js",
+        "sha256": "966bb3c3c3404f546b31d366e1a716c579af79d596c82b0697aa0ea750779894",
+        "bytes": 5227
+      },
+      {
+        "relativePath": "wireframe/client/render-graph.js",
+        "sha256": "5245b1ef104aed5800d9f4a9557ace216b70a95fc217846e4c44b0040ea415bc",
+        "bytes": 7246
+      },
+      {
+        "relativePath": "wireframe/client/render-regionbox.js",
+        "sha256": "4e2f412b4ded2164ecd70c3b84585dd37208113e821743388845777375bba2d4",
+        "bytes": 5125
+      },
+      {
+        "relativePath": "wireframe/client/render-storyboard.js",
+        "sha256": "1a9e07d5af13941cf947f80668c9470f064907a884bb272c558838618d0b6691",
+        "bytes": 3609
+      },
+      {
+        "relativePath": "wireframe/extract-prose.mjs",
+        "sha256": "2c67ed531ab3a2bdfee5cec36c40b966576949210a7a7c3b4770112883a800a7",
+        "bytes": 1962
+      },
+      {
+        "relativePath": "wireframe/html-shell.mjs",
+        "sha256": "be786ba9d49df8bce5ec09cf28ee934b71785872166bd16e85cb52fa3a5fcc1b",
+        "bytes": 8196
+      },
+      {
+        "relativePath": "wireframe/styles-phase2.mjs",
+        "sha256": "c0a1b71da4898e05665c738cf59c80bf33ca735c37d17f34ed173f258c73bdc5",
+        "bytes": 4843
+      },
+      {
+        "relativePath": "wireframe/styles-phase3.mjs",
+        "sha256": "672eebd932e21fcff882529387b5e16d0b860029e4af1a84784adf4f6c5d15e8",
+        "bytes": 2612
+      },
+      {
+        "relativePath": "wireframe/styles.mjs",
+        "sha256": "ae8a007053200cf3cbd3dc589424949acd15fea7b50515551b8dae9018840eb6",
+        "bytes": 10910
+      },
+      {
+        "relativePath": "wireframe/verify-runtime.mjs",
+        "sha256": "4ccfe507ee89995f39dd6aacc368c483a1b97ac9beacd101a7c9e93d2666db78",
+        "bytes": 8671
+      }
+    ],
+    "toolAggregateSha256": "e6f580e268bd2a683b3509e888cd769b00f8d82dadde3339eb6442ab04306bd6",
+    "checkMode": "No declared --check for these authored inputs. Manual copies checked over all bytes; generator runs only against scratch legacy-root snapshot.",
+    "commands": [
+      {
+        "command": "env -u CLAUDE_CODE_SESSION_ID node <scratch>/ui-tools/validate.mjs --root <scratch>/docs/ui-spec",
+        "exit": 0,
+        "stdout": "Scanned 12 spec files, 44 actions, 10 surfaces. validation passed (0 warnings)."
+      },
+      {
+        "command": "env -u CLAUDE_CODE_SESSION_ID node <scratch>/ui-tools/build.mjs --root <scratch>/docs/ui-spec",
+        "exit": 0,
+        "stdout": "built four outputs; surfaces=12 actions=44 flows=2"
+      },
+      {
+        "command": "env -u CLAUDE_CODE_SESSION_ID node <scratch>/ui-tools/interpret-wireframe.mjs --root <scratch>/docs/ui-spec",
+        "exit": 0,
+        "stdout": "wireframe generated; optional xdg-open browser launch failed: no suitable browser. HTML output exists; generation exit was 0."
+      }
+    ],
+    "outputs": [
+      {
+        "path": "docs/ui-spec/generated/action-registry.csv",
+        "before": {
+          "path": "docs/ui-spec/generated/action-registry.csv",
+          "sha256": "9061f86a22a4aa7506e627c8bf2decf3ccdb5b75cf88f2382481851b1d5a02bc",
+          "bytes": 2078
+        },
+        "scratch": {
+          "sha256": "d3aef9df78ceb520adacf23f711b8de52e3579f101a2c9207dd2679f7a5aa8f7",
+          "bytes": 2178
+        },
+        "equal": false,
+        "diffLines": 11,
+        "boundedDiffExcerpt": "--- \n+++ \n@@ -12,6 +12,8 @@\n A-S02-009,S02,question.opened,mutate,,,\n A-S02-010,S02,gateway.unreachable,mutate,,,\n A-S02-011,S02,item.quick_action,mutate,,,\n+A-S02-012,S02,click,mutate,,,controls\n+A-S02-013,S02,drag_drop,mutate,,board.view === 'kanban',board\n A-S03-001,S03,click,open_overlay,M01,item.isParked,question\n A-S03-002,S03,click,open_overlay,M02,item.awaitingApproval && gateway.atMainWorkingTree,actions\n A-S03-003,S03,click,open_overlay,M03,,actions\n"
+      },
+      {
+        "path": "docs/ui-spec/generated/coverage-report.md",
+        "before": {
+          "path": "docs/ui-spec/generated/coverage-report.md",
+          "sha256": "738eba6ed62f160d8637e9d6b012c1c74f15cd89fe87df28a53b55e0cc41c101",
+          "bytes": 571
+        },
+        "scratch": {
+          "sha256": "583710875c0ef8eb79af88426228257d7950e6f64371abe908ff9b43f88ac6df",
+          "bytes": 571
+        },
+        "equal": false,
+        "diffLines": 11,
+        "boundedDiffExcerpt": "--- \n+++ \n@@ -2,7 +2,7 @@\n \n # Coverage Report (generated)\n \n-Surfaces: 12 · Actions: 42 · Flows: 2\n+Surfaces: 12 · Actions: 44 · Flows: 2\n \n ## Flow → Actions\n \n"
+      },
+      {
+        "path": "docs/ui-spec/generated/navigation-graph.yaml",
+        "before": {
+          "path": "docs/ui-spec/generated/navigation-graph.yaml",
+          "sha256": "0b28f3554b2a5fba6a70d8fa728742ebfdd6f3e5a9f0a2bfe1149721d40617de",
+          "bytes": 7359
+        },
+        "scratch": {
+          "sha256": "d554bc4a301d3d5e54a8917e2cb6c5908795651800c1d2ff251625920bb8d154",
+          "bytes": 7768
+        },
+        "equal": false,
+        "diffLines": 28,
+        "boundedDiffExcerpt": "--- \n+++ \n@@ -119,6 +119,25 @@\n     action: mutate\n     effects:\n       - run_one_door_write_verb\n+  - id: A-S02-012\n+    from: S02\n+    element: view_toggle_control\n+    trigger: click\n+    action: mutate\n+    effects:\n+      - switch_board_view\n+      - persist_view_state\n+    region: controls\n+  - id: A-S02-013\n+    from: S02\n+    element: kanban_card\n+    trigger: drag_drop\n+    guard: board.view === 'kanban'\n+    action: mutate\n+    effects:\n+      - run_one_door_write_verb\n+      - regroup_board\n+    region: board\n   - id: A-S03-001\n     from: S03\n"
+      },
+      {
+        "path": "docs/ui-spec/generated/surface-registry.yaml",
+        "before": {
+          "path": "docs/ui-spec/generated/surface-registry.yaml",
+          "sha256": "b066bdeb267eda13000e3c575293220faeb1864e52df716460e5439528aae909",
+          "bytes": 3197
+        },
+        "scratch": {
+          "sha256": "b066bdeb267eda13000e3c575293220faeb1864e52df716460e5439528aae909",
+          "bytes": 3197
+        },
+        "equal": true,
+        "diffLines": 0,
+        "boundedDiffExcerpt": ""
+      },
+      {
+        "path": "docs/ui-spec/generated/wireframe-v2.html",
+        "before": {
+          "path": "docs/ui-spec/generated/wireframe-v2.html",
+          "sha256": "77894fdda0966833d6d9ba595745a315db67d64feea7c9e6d5faed34a8d2ce80",
+          "bytes": 631319
+        },
+        "scratch": {
+          "sha256": "f06815ee4fc6a0c1e4abc6a3ffd657d84a7860ed25bf957524803cc1e71cd1fd",
+          "bytes": 640329
+        },
+        "equal": false,
+        "diffLines": 59,
+        "boundedDiffExcerpt": "--- \n+++ \n@@ -651,11 +651,34 @@\n           \"effects\": [\n             \"run_one_door_write_verb\"\n           ]\n+        },\n+        {\n+          \"id\": \"A-S02-012\",\n+          \"element\": \"view_toggle_control\",\n+          \"region\": \"controls\",\n+          \"trigger\": \"click\",\n+          \"action\": \"mutate\",\n+          \"effects\": [\n+            \"switch_board_view\",\n+            \"persist_view_state\"\n+          ]\n+        },\n+        {\n+          \"id\": \"A-S02-013\",\n+          \"element\": \"kanban_card\",\n+          \"region\": \"board\",\n+          \"trigger\": \"drag_drop\",\n+          \"guard\": \"board.view === 'kanban'\",\n+          \"action\": \"mutate\",\n+          \"effects\": [\n+            \"run_one_door_write_verb\",\n"
+      }
+    ],
+    "equal": 1,
+    "different": 4
+  },
+  "contextualGroups": [
+    {
+      "digest": "fd6f97edf98ce6716fa567c1af023f6149a977a91fbfff2f704119881fc938d9",
+      "owners": [
+        "docs/platform/documentation/architecture/documentation-system-design.md",
+        "docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md",
+        "docs/platform/governance.md"
+      ],
+      "occurrences": [
+        {
+          "claimId": "claim_0b2c9b14b17eb9b941ea8400621637aa",
+          "source": "docs/architect/documentation-system-design.md",
+          "target": "docs/platform/documentation/architecture/documentation-system-design.md",
+          "recordedAnchor": "unheaded-block-21",
+          "actualDigest": "fd6f97edf98ce6716fa567c1af023f6149a977a91fbfff2f704119881fc938d9",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-21"
+          ],
+          "recordedText": "```txt\ndomains/\n.agents/skills/\nplugins/fgOS/skills/\nplans/\n```"
+        },
+        {
+          "claimId": "claim_2438d9d8f14f1d26a1b27eaf1262827c",
+          "source": "docs/architect/documentation-system-discussion.md",
+          "target": "docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md",
+          "recordedAnchor": "unheaded-block-71",
+          "actualDigest": "fd6f97edf98ce6716fa567c1af023f6149a977a91fbfff2f704119881fc938d9",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-71"
+          ],
+          "recordedText": "```txt\ndomains/\n.agents/skills/\nplugins/fgOS/skills/\nplans/\n```"
+        },
+        {
+          "claimId": "claim_46a27d2400e766d10da01aa811865d7b",
+          "source": "docs/doc-governance.md",
+          "target": "docs/platform/governance.md",
+          "recordedAnchor": "unheaded-block-12",
+          "actualDigest": "fd6f97edf98ce6716fa567c1af023f6149a977a91fbfff2f704119881fc938d9",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-12"
+          ],
+          "recordedText": "```txt\ndomains/\n.agents/skills/\nplugins/fgOS/skills/\nplans/\n```"
+        }
+      ],
+      "allCurrentBindingsExact": true
+    },
+    {
+      "digest": "c0000ebfd3df6287bae1b1bdb4ce65226e2b20b6459b438f90475e8e0c3f8e07",
+      "owners": [
+        "docs/platform/documentation/architecture/documentation-system-design.md",
+        "docs/platform/governance.md"
+      ],
+      "occurrences": [
+        {
+          "claimId": "claim_32afd8895c195467bb408d10c7c943df",
+          "source": "docs/architect/documentation-system-design.md",
+          "target": "docs/platform/documentation/architecture/documentation-system-design.md",
+          "recordedAnchor": "unheaded-block-58",
+          "actualDigest": "c0000ebfd3df6287bae1b1bdb4ce65226e2b20b6459b438f90475e8e0c3f8e07",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-58"
+          ],
+          "recordedText": "Lifecycle:\n\n```txt\nOpen -> Active -> Stabilizing -> Promoting -> Drained -> Delete/Archive\n```"
+        },
+        {
+          "claimId": "claim_37b48670e7924d49eec710e08d6bcd05",
+          "source": "docs/doc-governance.md",
+          "target": "docs/platform/governance.md",
+          "recordedAnchor": "unheaded-block-29",
+          "actualDigest": "c0000ebfd3df6287bae1b1bdb4ce65226e2b20b6459b438f90475e8e0c3f8e07",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-29"
+          ],
+          "recordedText": "Lifecycle:\n\n```txt\nOpen -> Active -> Stabilizing -> Promoting -> Drained -> Delete/Archive\n```"
+        }
+      ],
+      "allCurrentBindingsExact": true
+    },
+    {
+      "digest": "024fc3239ffcd85813170a3fe2b8f39d633a70001ff9e187d55de23a2371d818",
+      "owners": [
+        "docs/platform/documentation/architecture/documentation-system-design.md",
+        "docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md"
+      ],
+      "occurrences": [
+        {
+          "claimId": "claim_aa0c35e9c2db3061764c324ad5e3fe6d",
+          "source": "docs/architect/documentation-system-design.md",
+          "target": "docs/platform/documentation/architecture/documentation-system-design.md",
+          "recordedAnchor": "unheaded-block-65",
+          "actualDigest": "024fc3239ffcd85813170a3fe2b8f39d633a70001ff9e187d55de23a2371d818",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-65"
+          ],
+          "recordedText": "```txt\nsource_of_truth\ngenerator\ngenerator_version\ngenerated_at\nfreshness_check\ndo_not_edit: true\n```"
+        },
+        {
+          "claimId": "claim_138d646a42ba17da6bfc9ab7087184f5",
+          "source": "docs/architect/documentation-system-discussion.md",
+          "target": "docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md",
+          "recordedAnchor": "unheaded-block-141",
+          "actualDigest": "024fc3239ffcd85813170a3fe2b8f39d633a70001ff9e187d55de23a2371d818",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-141"
+          ],
+          "recordedText": "```txt\nsource_of_truth\ngenerator\ngenerator_version\ngenerated_at\nfreshness_check\ndo_not_edit: true\n```"
+        }
+      ],
+      "allCurrentBindingsExact": true
+    },
+    {
+      "digest": "8763ac2ff0db101fb4b502912c8ba6e49e1974ec45d8595b72a4169f5b517080",
+      "owners": [
+        "docs/platform/documentation/architecture/documentation-system-design.md",
+        "docs/platform/governance.md"
+      ],
+      "occurrences": [
+        {
+          "claimId": "claim_0ea3afaf4956a34de3695a838a8c78e2",
+          "source": "docs/architect/documentation-system-design.md",
+          "target": "docs/platform/documentation/architecture/documentation-system-design.md",
+          "recordedAnchor": "unheaded-block-79",
+          "actualDigest": "8763ac2ff0db101fb4b502912c8ba6e49e1974ec45d8595b72a4169f5b517080",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-79"
+          ],
+          "recordedText": "```txt\ndefines\nconstrains\nimplements\nexplains\nevidenced_by\nsupersedes\nconsumes\n```"
+        },
+        {
+          "claimId": "claim_feb18e656e083a3d7e167be9c38e1464",
+          "source": "docs/doc-governance.md",
+          "target": "docs/platform/governance.md",
+          "recordedAnchor": "unheaded-block-54",
+          "actualDigest": "8763ac2ff0db101fb4b502912c8ba6e49e1974ec45d8595b72a4169f5b517080",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-54"
+          ],
+          "recordedText": "```txt\ndefines\nconstrains\nimplements\nexplains\nevidenced_by\nsupersedes\nconsumes\n```"
+        }
+      ],
+      "allCurrentBindingsExact": true
+    },
+    {
+      "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "owners": [
+        "docs/platform/architecture-map.md",
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "docs/platform/system-overview/spec.md",
+        "docs/platform/work-state/decisions/retired-decision-history.md"
+      ],
+      "occurrences": [
+        {
+          "claimId": "claim_f7e282b47557154231f0565bd30e5d7d",
+          "source": "docs/architecture-map.md",
+          "target": "docs/platform/architecture-map.md",
+          "recordedAnchor": "unheaded-block-91",
+          "actualDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-91",
+            "unheaded-block-97"
+          ],
+          "recordedText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        },
+        {
+          "claimId": "claim_15a3179944bc76f990fe1b965e40a9da",
+          "source": "docs/architecture-map.md",
+          "target": "docs/platform/architecture-map.md",
+          "recordedAnchor": "unheaded-block-97",
+          "actualDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-91",
+            "unheaded-block-97"
+          ],
+          "recordedText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        },
+        {
+          "claimId": "claim_d54ae2a76a3c4dc5d33d792dee048919",
+          "source": "docs/specs/runner.md",
+          "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "recordedAnchor": "unheaded-block-9",
+          "actualDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-9",
+            "unheaded-block-14",
+            "unheaded-block-26",
+            "unheaded-block-35",
+            "unheaded-block-100",
+            "unheaded-block-109",
+            "unheaded-block-133",
+            "unheaded-block-145"
+          ],
+          "recordedText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        },
+        {
+          "claimId": "claim_fd255b07245da5bc2437df92c1ffd15c",
+          "source": "docs/specs/runner.md",
+          "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "recordedAnchor": "unheaded-block-14",
+          "actualDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-9",
+            "unheaded-block-14",
+            "unheaded-block-26",
+            "unheaded-block-35",
+            "unheaded-block-100",
+            "unheaded-block-109",
+            "unheaded-block-133",
+            "unheaded-block-145"
+          ],
+          "recordedText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        },
+        {
+          "claimId": "claim_e4beb2d579963a35d9b26b2265967d27",
+          "source": "docs/specs/runner.md",
+          "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "recordedAnchor": "unheaded-block-26",
+          "actualDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-9",
+            "unheaded-block-14",
+            "unheaded-block-26",
+            "unheaded-block-35",
+            "unheaded-block-100",
+            "unheaded-block-109",
+            "unheaded-block-133",
+            "unheaded-block-145"
+          ],
+          "recordedText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        },
+        {
+          "claimId": "claim_acd0fb1e35440535fc61d9ee0b15864b",
+          "source": "docs/specs/runner.md",
+          "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "recordedAnchor": "unheaded-block-35",
+          "actualDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-9",
+            "unheaded-block-14",
+            "unheaded-block-26",
+            "unheaded-block-35",
+            "unheaded-block-100",
+            "unheaded-block-109",
+            "unheaded-block-133",
+            "unheaded-block-145"
+          ],
+          "recordedText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        },
+        {
+          "claimId": "claim_73ea5bccb4b67f99853a9aa0c14884fb",
+          "source": "docs/specs/runner.md",
+          "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "recordedAnchor": "unheaded-block-100",
+          "actualDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-9",
+            "unheaded-block-14",
+            "unheaded-block-26",
+            "unheaded-block-35",
+            "unheaded-block-100",
+            "unheaded-block-109",
+            "unheaded-block-133",
+            "unheaded-block-145"
+          ],
+          "recordedText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        },
+        {
+          "claimId": "claim_7f67d9c0b123003373f3df421c4140c4",
+          "source": "docs/specs/runner.md",
+          "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "recordedAnchor": "unheaded-block-109",
+          "actualDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-9",
+            "unheaded-block-14",
+            "unheaded-block-26",
+            "unheaded-block-35",
+            "unheaded-block-100",
+            "unheaded-block-109",
+            "unheaded-block-133",
+            "unheaded-block-145"
+          ],
+          "recordedText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        },
+        {
+          "claimId": "claim_825b8970950e755e43c8c1740612eac4",
+          "source": "docs/specs/runner.md",
+          "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "recordedAnchor": "unheaded-block-133",
+          "actualDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-9",
+            "unheaded-block-14",
+            "unheaded-block-26",
+            "unheaded-block-35",
+            "unheaded-block-100",
+            "unheaded-block-109",
+            "unheaded-block-133",
+            "unheaded-block-145"
+          ],
+          "recordedText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        },
+        {
+          "claimId": "claim_49d987137a47fb3d97c468550abee8dc",
+          "source": "docs/specs/runner.md",
+          "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "recordedAnchor": "unheaded-block-145",
+          "actualDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-9",
+            "unheaded-block-14",
+            "unheaded-block-26",
+            "unheaded-block-35",
+            "unheaded-block-100",
+            "unheaded-block-109",
+            "unheaded-block-133",
+            "unheaded-block-145"
+          ],
+          "recordedText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        },
+        {
+          "claimId": "claim_e4b03884bb0c50d641f173b8a74c6501",
+          "source": "docs/specs/system-overview.md",
+          "target": "docs/platform/system-overview/spec.md",
+          "recordedAnchor": "unheaded-block-28",
+          "actualDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-28",
+            "unheaded-block-37"
+          ],
+          "recordedText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        },
+        {
+          "claimId": "claim_ba26d5145625a6a74f3d1f4801c35407",
+          "source": "docs/specs/system-overview.md",
+          "target": "docs/platform/system-overview/spec.md",
+          "recordedAnchor": "unheaded-block-37",
+          "actualDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-28",
+            "unheaded-block-37"
+          ],
+          "recordedText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        },
+        {
+          "claimId": "claim_c56e0ea4200729ae5cf5542803b2fe10",
+          "source": "docs/specs/work-state.md",
+          "target": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "recordedAnchor": "unheaded-block-7",
+          "actualDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-7",
+            "unheaded-block-11",
+            "unheaded-block-16",
+            "unheaded-block-28",
+            "unheaded-block-34",
+            "unheaded-block-40",
+            "unheaded-block-64"
+          ],
+          "recordedText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        },
+        {
+          "claimId": "claim_c57c39536b983d5f172833853e8b3344",
+          "source": "docs/specs/work-state.md",
+          "target": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "recordedAnchor": "unheaded-block-11",
+          "actualDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-7",
+            "unheaded-block-11",
+            "unheaded-block-16",
+            "unheaded-block-28",
+            "unheaded-block-34",
+            "unheaded-block-40",
+            "unheaded-block-64"
+          ],
+          "recordedText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        },
+        {
+          "claimId": "claim_7bc17cd130d9b9600e3a8db9bd57ca88",
+          "source": "docs/specs/work-state.md",
+          "target": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "recordedAnchor": "unheaded-block-16",
+          "actualDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-7",
+            "unheaded-block-11",
+            "unheaded-block-16",
+            "unheaded-block-28",
+            "unheaded-block-34",
+            "unheaded-block-40",
+            "unheaded-block-64"
+          ],
+          "recordedText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        },
+        {
+          "claimId": "claim_576e295be7d60ab95a555f11ada15da5",
+          "source": "docs/specs/work-state.md",
+          "target": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "recordedAnchor": "unheaded-block-28",
+          "actualDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-7",
+            "unheaded-block-11",
+            "unheaded-block-16",
+            "unheaded-block-28",
+            "unheaded-block-34",
+            "unheaded-block-40",
+            "unheaded-block-64"
+          ],
+          "recordedText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        },
+        {
+          "claimId": "claim_08dc68ef23395b8f3f5b095508348e00",
+          "source": "docs/specs/work-state.md",
+          "target": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "recordedAnchor": "unheaded-block-34",
+          "actualDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-7",
+            "unheaded-block-11",
+            "unheaded-block-16",
+            "unheaded-block-28",
+            "unheaded-block-34",
+            "unheaded-block-40",
+            "unheaded-block-64"
+          ],
+          "recordedText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        },
+        {
+          "claimId": "claim_a7c2e1310de5bcd152e86f3833e90033",
+          "source": "docs/specs/work-state.md",
+          "target": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "recordedAnchor": "unheaded-block-40",
+          "actualDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-7",
+            "unheaded-block-11",
+            "unheaded-block-16",
+            "unheaded-block-28",
+            "unheaded-block-34",
+            "unheaded-block-40",
+            "unheaded-block-64"
+          ],
+          "recordedText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        },
+        {
+          "claimId": "claim_82f766f5320ab6bbe5174aeda52e710b",
+          "source": "docs/specs/work-state.md",
+          "target": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "recordedAnchor": "unheaded-block-64",
+          "actualDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-7",
+            "unheaded-block-11",
+            "unheaded-block-16",
+            "unheaded-block-28",
+            "unheaded-block-34",
+            "unheaded-block-40",
+            "unheaded-block-64"
+          ],
+          "recordedText": "Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ."
+        }
+      ],
+      "allCurrentBindingsExact": true
+    },
+    {
+      "digest": "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3",
+      "owners": [
+        "docs/platform/claude-plugin/spec.md",
+        "docs/platform/decision-citation-drift/spec.md",
+        "docs/platform/packaging-distribution/spec.md",
+        "docs/platform/runner/operations/h-51f5cd7279fd.md",
+        "docs/platform/work-state/spec.md"
+      ],
+      "occurrences": [
+        {
+          "claimId": "claim_293d81b12e6ce78ccc407ec7ac03faff",
+          "source": "docs/specs/decision-citation-drift.md",
+          "target": "docs/platform/decision-citation-drift/spec.md",
+          "recordedAnchor": "behaviors-operations",
+          "actualDigest": "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3",
+          "exact": true,
+          "matchingAnchors": [
+            "behaviors-operations"
+          ],
+          "recordedText": "## Behaviors & Operations"
+        },
+        {
+          "claimId": "claim_35e55882f79d7ab6b9435f03982beba3",
+          "source": "docs/specs/distribution.md",
+          "target": "docs/platform/packaging-distribution/spec.md",
+          "recordedAnchor": "behaviors-operations",
+          "actualDigest": "230097c6afa64e84d3eece3ece7407471e6a1bb0576fa4cd4dc5afe77750e6e1",
+          "exact": true,
+          "matchingAnchors": [
+            "behaviors-operations"
+          ],
+          "recordedText": "## Behaviors & Operations"
+        },
+        {
+          "claimId": "claim_3ec4250ed3c32495b43a85a96c5cff70",
+          "source": "docs/specs/fgos-plugin.md",
+          "target": "docs/platform/claude-plugin/spec.md",
+          "recordedAnchor": "behaviors-operations",
+          "actualDigest": "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3",
+          "exact": true,
+          "matchingAnchors": [
+            "behaviors-operations"
+          ],
+          "recordedText": "## Behaviors & Operations"
+        },
+        {
+          "claimId": "claim_7a21644819481756f27864ae791d992f",
+          "source": "docs/specs/runner.md",
+          "target": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+          "recordedAnchor": "behaviors-operations",
+          "actualDigest": "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3",
+          "exact": true,
+          "matchingAnchors": [
+            "behaviors-operations"
+          ],
+          "recordedText": "## Behaviors & Operations"
+        },
+        {
+          "claimId": "claim_3522d44bd7854c70b00c9d5e01f11bf4",
+          "source": "docs/specs/work-state.md",
+          "target": "docs/platform/work-state/spec.md",
+          "recordedAnchor": "9-behaviors-and-operations",
+          "actualDigest": "a68620a509501efbe707cdffef8d9e9ac2ebdac08ec6c374d1ae789f04aa549b",
+          "exact": true,
+          "matchingAnchors": [
+            "9-behaviors-and-operations"
+          ],
+          "recordedText": "## Behaviors & Operations"
+        }
+      ],
+      "allCurrentBindingsExact": true
+    },
+    {
+      "digest": "e3d926d43e2e72f2211f195fb007e887cc2dfd1d97f6819f80e5bf203d4dfd1b",
+      "owners": [
+        "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+        "docs/platform/work-state/spec.md"
+      ],
+      "occurrences": [
+        {
+          "claimId": "claim_cc1865a79db0c03c59f4bf30c7a0a97b",
+          "source": "docs/specs/runner.md",
+          "target": "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+          "recordedAnchor": "visuals",
+          "actualDigest": "e3d926d43e2e72f2211f195fb007e887cc2dfd1d97f6819f80e5bf203d4dfd1b",
+          "exact": true,
+          "matchingAnchors": [
+            "visuals"
+          ],
+          "recordedText": "## Visuals"
+        },
+        {
+          "claimId": "claim_1a9c10544a642b6001a8bacae1b6817b",
+          "source": "docs/specs/work-state.md",
+          "target": "docs/platform/work-state/spec.md",
+          "recordedAnchor": "14-presentation-surface",
+          "actualDigest": "267b58ca8eeabc14f6baf905c51e21639d5985d01e2afa253c609993d63701d0",
+          "exact": true,
+          "matchingAnchors": [
+            "14-presentation-surface"
+          ],
+          "recordedText": "## Visuals"
+        }
+      ],
+      "allCurrentBindingsExact": true
+    },
+    {
+      "digest": "b0a0db080dad061ca93e63826e562c4710807db8e6f2c8ca50dc291fc0b69e09",
+      "owners": [
+        "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+        "docs/platform/work-state/spec.md"
+      ],
+      "occurrences": [
+        {
+          "claimId": "claim_a76db7b113608c6dc589a0acf1050c58",
+          "source": "docs/specs/runner.md",
+          "target": "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+          "recordedAnchor": "unheaded-block-3",
+          "actualDigest": "b0a0db080dad061ca93e63826e562c4710807db8e6f2c8ca50dc291fc0b69e09",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-3"
+          ],
+          "recordedText": "Not applicable — không có màn hình."
+        },
+        {
+          "claimId": "claim_2cfd89083b61b2c263e84f24624a6f3c",
+          "source": "docs/specs/work-state.md",
+          "target": "docs/platform/work-state/spec.md",
+          "recordedAnchor": "unheaded-block-97",
+          "actualDigest": "b0a0db080dad061ca93e63826e562c4710807db8e6f2c8ca50dc291fc0b69e09",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-97"
+          ],
+          "recordedText": "Not applicable — không có màn hình."
+        }
+      ],
+      "allCurrentBindingsExact": true
+    },
+    {
+      "digest": "0e00c9cccba1af1ea5926f1106dd72d535b230294281707303ecd16fbc0a2bea",
+      "owners": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "docs/platform/system-overview/spec.md",
+        "docs/platform/work-state/decisions/retired-decision-history.md"
+      ],
+      "occurrences": [
+        {
+          "claimId": "claim_4060effa4f71f4e9367b0fc41af34ef0",
+          "source": "docs/specs/runner.md",
+          "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "recordedAnchor": "lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4",
+          "actualDigest": "0e00c9cccba1af1ea5926f1106dd72d535b230294281707303ecd16fbc0a2bea",
+          "exact": true,
+          "matchingAnchors": [
+            "lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4"
+          ],
+          "recordedText": "## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+        },
+        {
+          "claimId": "claim_42cce1eacf244132db046ecf3733c4fb",
+          "source": "docs/specs/system-overview.md",
+          "target": "docs/platform/system-overview/spec.md",
+          "recordedAnchor": "lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4",
+          "actualDigest": "0e00c9cccba1af1ea5926f1106dd72d535b230294281707303ecd16fbc0a2bea",
+          "exact": true,
+          "matchingAnchors": [
+            "lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4"
+          ],
+          "recordedText": "## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+        },
+        {
+          "claimId": "claim_ae1f21106b52006a2ff377f9104a1fce",
+          "source": "docs/specs/work-state.md",
+          "target": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "recordedAnchor": "1-provenance-of-retired-decisions",
+          "actualDigest": "260da5fd6eab8c113ea7e756985b782b5e45721aae8f34aab1e50389af0dff24",
+          "exact": true,
+          "matchingAnchors": [
+            "1-provenance-of-retired-decisions"
+          ],
+          "recordedText": "## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)"
+        }
+      ],
+      "allCurrentBindingsExact": true
+    },
+    {
+      "digest": "ac2b043c0d4f9fde1e7ecee60609cbe700480b9dd33105f98d30f6c6057ffb5c",
+      "owners": [
+        "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+        "docs/platform/system-overview/spec.md",
+        "docs/platform/work-state/decisions/retired-decision-history.md"
+      ],
+      "occurrences": [
+        {
+          "claimId": "claim_a9b1dd4a68565497b9bcb9120e7b9a76",
+          "source": "docs/specs/runner.md",
+          "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "recordedAnchor": "unheaded-block-3",
+          "actualDigest": "ac2b043c0d4f9fde1e7ecee60609cbe700480b9dd33105f98d30f6c6057ffb5c",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-3"
+          ],
+          "recordedText": "Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, phần narrative đầy đủ sống ở đây. Thứ tự theo số ADR gốc."
+        },
+        {
+          "claimId": "claim_1aa589b82c1b4ebf922a2ff495921ff9",
+          "source": "docs/specs/system-overview.md",
+          "target": "docs/platform/system-overview/spec.md",
+          "recordedAnchor": "unheaded-block-19",
+          "actualDigest": "ac2b043c0d4f9fde1e7ecee60609cbe700480b9dd33105f98d30f6c6057ffb5c",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-19"
+          ],
+          "recordedText": "Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, phần narrative đầy đủ sống ở đây. Thứ tự theo số ADR gốc."
+        },
+        {
+          "claimId": "claim_192ebab9dbc6cec8b8957683e3ff8c82",
+          "source": "docs/specs/work-state.md",
+          "target": "docs/platform/work-state/decisions/retired-decision-history.md",
+          "recordedAnchor": "unheaded-block-2",
+          "actualDigest": "ac2b043c0d4f9fde1e7ecee60609cbe700480b9dd33105f98d30f6c6057ffb5c",
+          "exact": true,
+          "matchingAnchors": [
+            "unheaded-block-2"
+          ],
+          "recordedText": "Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, phần narrative đầy đủ sống ở đây. Thứ tự theo số ADR gốc."
+        }
+      ],
+      "allCurrentBindingsExact": true
+    }
+  ],
+  "dispositions": [
+    {
+      "id": "GRP-LIVE-01",
+      "inventoryRow": "X-DEFECT-09",
+      "disposition": "retained contextual repetition; promotion consistency remains Phase 9",
+      "evidenceDigests": [
+        "fd6f97edf98ce6716fa567c1af023f6149a977a91fbfff2f704119881fc938d9",
+        "c0000ebfd3df6287bae1b1bdb4ce65226e2b20b6459b438f90475e8e0c3f8e07",
+        "024fc3239ffcd85813170a3fe2b8f39d633a70001ff9e187d55de23a2371d818",
+        "8763ac2ff0db101fb4b502912c8ba6e49e1974ec45d8595b72a4169f5b517080"
+      ],
+      "result": "All 9 member bindings match current native extractor text digests and target anchors. Directory list, scratchpad lifecycle, projection metadata vocabulary and relation-name list are contextual repetition in design/history/governance. No independent new source of truth and no generator output is inferred. All current memberships reviewed mechanically; independent reviewer full-reads each short block and context. No candidate defect found."
+    },
+    {
+      "id": "GRP-HEAD-02",
+      "inventoryRow": "X-DEFECT-10",
+      "disposition": "retain reviewed reworded target headings; re-key only if future promotion changes them",
+      "evidenceDigests": [
+        "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3",
+        "e3d926d43e2e72f2211f195fb007e887cc2dfd1d97f6819f80e5bf203d4dfd1b",
+        "0e00c9cccba1af1ea5926f1106dd72d535b230294281707303ecd16fbc0a2bea"
+      ],
+      "result": "Three work-state members still resolve to 9-behaviors-and-operations, 14-presentation-surface and 1-provenance-of-retired-decisions, with current digests equal the reviewed targetUnitDigest. Source heading digest need not equal target heading digest: context participates in heading identity. No forced heading restoration or group re-key now."
+    },
+    {
+      "id": "GRP-SPECS-03",
+      "inventoryRow": "X-DEFECT-11",
+      "disposition": "preserve conditional re-key obligation for Phase 9 and any new decisions",
+      "evidenceDigests": [
+        "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+        "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3",
+        "e3d926d43e2e72f2211f195fb007e887cc2dfd1d97f6819f80e5bf203d4dfd1b",
+        "b0a0db080dad061ca93e63826e562c4710807db8e6f2c8ca50dc291fc0b69e09",
+        "0e00c9cccba1af1ea5926f1106dd72d535b230294281707303ecd16fbc0a2bea",
+        "ac2b043c0d4f9fde1e7ecee60609cbe700480b9dd33105f98d30f6c6057ffb5c"
+      ],
+      "result": "All 34 bound target occurrences across six groups remain exact; current decision claims contain zero rows with sourcePath docs/specs/platform-foundations.md, docs/specs/enduser-docs-authoring.md or docs/specs/enduser-docs-index.md. No new owner set is inferred for these no-row specs. Generic local headings/footers and absent-screen wording remain contextual, not global contracts."
+    },
+    {
+      "id": "F10-11",
+      "inventoryRow": "X-DEFECT-12",
+      "disposition": "TRUTH-27 already corrected in Step 4; stale protected reading-map attribution routed to Phase 9",
+      "evidence": [
+        "docs/reading-map.md:158",
+        "src/runner/dispatch/adapters.mjs:48",
+        "docs/platform/runner/operations/h-51f5cd7279fd.md"
+      ],
+      "result": "The legacy reading-map still attributes EXECUTOR_ADAPTERS to dispatch.mjs; actual definition is adapters.mjs:48 (the historical review used :46). The named bin citation correction is already authored as 4410,4498. Broader historical citations in unrelated runner carriers are not silently recertified. No protected edit or rationale-only rework."
+    },
+    {
+      "id": "F10-12",
+      "inventoryRow": "X-DEFECT-13",
+      "disposition": "retain overlap/metadata limitation; Step 9 recomputes union and binds changed tuples; Phase 9 truth",
+      "evidence": [
+        "plans/260925-documentation-authority-unification/reports/phase-06/red-team-10-final.md",
+        "plans/260925-documentation-authority-unification/reports/phase-06/step10-package-closure-expected.json"
+      ],
+      "result": "1,305 overlapping tuples and 2,336 union are historical Phase 6 counts, not newly measured current-native results. List-local review metadata is not independent approval or current truth. Do not dedupe protected accounting or rebuild generated lists during Step 6."
+    },
+    {
+      "id": "F10-13",
+      "inventoryRow": "X-DEFECT-14",
+      "disposition": "accepted evidence limitation; explicit Step 9 scorecard obligation",
+      "evidence": [
+        "scripts/compare-doc-global-closure.mjs:34-44"
+      ],
+      "result": "Comparator equality confirms drift-free agreement since expected lists were rebuilt from E, not independent conservation proof. Step 9 still needs actual native both/each D, strict E, independent matching review and unchanged comparator; no new equality run or conservation close claimed here."
+    }
+  ],
+  "findings": [
+    {
+      "id": "S6-UI-DRIFT-01",
+      "severity": "Medium",
+      "groupIds": [
+        "X-DUP-02",
+        "X-DUP-04",
+        "X-SEM-29",
+        "X-SEM-31"
+      ],
+      "status": "routed",
+      "route": "Phase 9 pre-promotion generated-output refresh and consumer/root cutover; disclose in Step 9 scorecard",
+      "owner": "UI specification/compiler owner",
+      "reason": "Scratch validation passes but four of five output bytes differ. A-S02-012/013 in screens/S02-taskboard.md are absent from old action and navigation outputs; coverage changes 42 to 44; wireframe gains those actions and related source content. No generated files or render sources edited."
+    },
+    {
+      "id": "S6-UI-ROOT-02",
+      "severity": "Medium",
+      "groupIds": [
+        "X-DUP-02",
+        "X-DUP-04"
+      ],
+      "status": "parked-group-subproof",
+      "route": "Phase 9 before UI candidate promotion; Phase 8 consumer preparation",
+      "owner": "UI specification/compiler owner",
+      "reason": "Candidate layout separates config under architecture/ and schema under history/schema/; no root repoint/fixture change is authorized here. Legacy-root regeneration is proven; candidate-root certification remains parked and explicitly required by candidate README. Source copy equality groups are settled independently."
+    },
+    {
+      "id": "S6-RATCHET-03",
+      "severity": "Medium",
+      "groupIds": [
+        "protected-import-accounting"
+      ],
+      "status": "routed",
+      "route": "Step 9 protected-import reconciliation; protected checker/baseline changes need a separate authorized scope",
+      "owner": "Lead",
+      "reason": "Unchanged ratchet exits 1 for main-imported docs/specs/{distribution,reading-map,runner}.md exception digest mismatches. Each current file equals this turn HEAD, so zero Step 6 authorship; reading-map additionally retains PARK-PROTECTED-01 provenance mismatch. Do not rebaseline or suppress."
+    }
+  ],
+  "stopConditions": {
+    "noCanonicalSource": [],
+    "unsafeGenerator": [],
+    "outOfScopeGeneratedChange": [
+      "S6-UI-DRIFT-01: finding only, no working write"
+    ],
+    "productDecisionRequired": [],
+    "parkedSubproofs": [
+      "S6-UI-ROOT-02"
+    ],
+    "inheritedProtectedProof": [
+      "PARK-PROTECTED-01",
+      "S6-RATCHET-03"
+    ]
+  },
+  "reviewStatus": "pending-independent-review",
+  "nativeCloseClaim": false,
+  "inputPins": [
+    {
+      "path": "apps/fgos-gateway/src/gateway.rs",
+      "sha256": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6",
+      "bytes": 109927
+    },
+    {
+      "path": "apps/fgos-gateway/src/mcp.rs",
+      "sha256": "b60e289295c3daad726e988d63674e7f344d554577864b34e470d89ccad90df3",
+      "bytes": 31627
+    },
+    {
+      "path": "docs/architecture-manifest.json",
+      "sha256": "b7797fea01dbd487b19d95c608c605b12e6862137d971cdc0e46d34eae5f9d4e",
+      "bytes": 12900
+    },
+    {
+      "path": "docs/contracts/fgos-gateway-api-v1.yaml",
+      "sha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+      "bytes": 34956
+    },
+    {
+      "path": "docs/history/tsk-1kh-architecture-manifest-missing-row/CONTEXT.md",
+      "sha256": "3d508daa5362c310c3e759ca3514a2ae4d425f5043981dc73e647c17e0fe7c25",
+      "bytes": 2493
+    },
+    {
+      "path": "docs/platform/architecture-map.md",
+      "sha256": "62a92dc3cf248e02ffc6be3d341858b3351f2cc3b3c2e90fbc1b6add9099a165",
+      "bytes": 59475
+    },
+    {
+      "path": "docs/platform/claude-plugin/spec.md",
+      "sha256": "428f4043212d8b0fc7e635957f956db9be01549b6ddc9c9228cf5a79da8007bb",
+      "bytes": 11817
+    },
+    {
+      "path": "docs/platform/contracts/architecture-manifest.json",
+      "sha256": "b7797fea01dbd487b19d95c608c605b12e6862137d971cdc0e46d34eae5f9d4e",
+      "bytes": 12900
+    },
+    {
+      "path": "docs/platform/decision-citation-drift/spec.md",
+      "sha256": "43e2f1bf7f664a981125a4afe802d4abcda3621580c13c6d4e6f2f5bdb5ef2f3",
+      "bytes": 7339
+    },
+    {
+      "path": "docs/platform/documentation/architecture/documentation-system-design.md",
+      "sha256": "004bb912d6e4e132ac65a486c8b209e4b5e33c89fd19032c23738679743d842b",
+      "bytes": 20398
+    },
+    {
+      "path": "docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md",
+      "sha256": "3ef1aba54d0e3cfe7fa2d11ab8d70c7c6a4c814a636bedf21b7eb9014eca5645",
+      "bytes": 63603
+    },
+    {
+      "path": "docs/platform/governance.md",
+      "sha256": "0e7d820925c594df12b2895a18158fdb91a2e2c5cf257f5d61463b3e9f7af536",
+      "bytes": 19443
+    },
+    {
+      "path": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+      "sha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+      "bytes": 34956
+    },
+    {
+      "path": "docs/platform/packaging-distribution/spec.md",
+      "sha256": "653c795b29672a784d3c6b8e173796249a39c3486fadfe6f6c689cb95bd7be27",
+      "bytes": 85794
+    },
+    {
+      "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "sha256": "1afb7f78f6ac4a97dd2be6c2d847d5c6ab7c14cde3fd6065ac5f600fc1ff62bd",
+      "bytes": 182534
+    },
+    {
+      "path": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "sha256": "4931644a1ad0919d0a6a30f0d504ed6e21464f6eee101a9f381c583fa66a7a12",
+      "bytes": 92457
+    },
+    {
+      "path": "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+      "sha256": "903d758e17bc17334daa6eb161ea88746efcf5056c96ab11106d7fc9b24bb543",
+      "bytes": 1320
+    },
+    {
+      "path": "docs/platform/system-overview/spec.md",
+      "sha256": "b027026ae37327e96ce572c9a06fdaebf7d5146625c1abeb10b3bdcb033b0e54",
+      "bytes": 19993
+    },
+    {
+      "path": "docs/platform/ui-spec/README.md",
+      "sha256": "c2782ee6a0952a96b18abf419fb872e35cf1cb3aab98de251c67f363885f3d34",
+      "bytes": 3693
+    },
+    {
+      "path": "docs/platform/ui-spec/architecture/spec.config.yaml",
+      "sha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+      "bytes": 509
+    },
+    {
+      "path": "docs/platform/ui-spec/architecture/spec.config.yaml.md",
+      "sha256": "ca2059fa23dd34e2e1f5bd373ba7aab56842bba3e4d6a7cb2cc2221e7b78d7c9",
+      "bytes": 1328
+    },
+    {
+      "path": "docs/platform/ui-spec/history/schema/surface-contract.schema.json",
+      "sha256": "2ce8f77f92bb0cf512f74f5eac133be50a8a0d301b3de13b82e5fbf4d950db7e",
+      "bytes": 4084
+    },
+    {
+      "path": "docs/platform/ui-spec/history/schema/surface-contract.schema.json.md",
+      "sha256": "6425d6ca8812db6da84b9d8ed9f60f599d8dc3c091e1c3f66882dc50f1a14d6e",
+      "bytes": 1374
+    },
+    {
+      "path": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "sha256": "c52067753829ec020f3e536710cbc0016330fde3fadc89c4962e353e5860125f",
+      "bytes": 66707
+    },
+    {
+      "path": "docs/platform/work-state/spec.md",
+      "sha256": "bb00e9d755a3f69a8c7cf411337c644bc7193a80b254481b65ab19df96ea8caf",
+      "bytes": 217845
+    },
+    {
+      "path": "docs/reading-map.md",
+      "sha256": "f4fce87549f728da23d13a9ff8c8c85efc397956bfacf5c5cf83badf13dc5abb",
+      "bytes": 35359
+    },
+    {
+      "path": "docs/ui-spec/00-overview.md",
+      "sha256": "76af5d449a69613a2cd3871e5b898934f8b57db685d0d87d1cb4eb3375ff71d7",
+      "bytes": 3564
+    },
+    {
+      "path": "docs/ui-spec/schema/surface-contract.schema.json",
+      "sha256": "2ce8f77f92bb0cf512f74f5eac133be50a8a0d301b3de13b82e5fbf4d950db7e",
+      "bytes": 4084
+    },
+    {
+      "path": "docs/ui-spec/screens/S02-taskboard.md",
+      "sha256": "d84abd8635907d8b69402c6fc767e97479348e2c66517d38e7bb3f03b9bf800f",
+      "bytes": 11488
+    },
+    {
+      "path": "docs/ui-spec/spec.config.yaml",
+      "sha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+      "bytes": 509
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/identical-unit-exceptions.json",
+      "sha256": "e39ae47bf0eeeefa411a907589f39269f6d7c53a2da3a982fe6be4c73fe93f8f",
+      "bytes": 1045615
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
+      "sha256": "286c579dd03892910c1d8a85f1e51f8234811f3f16935e10d630acfd81eade9d",
+      "bytes": 276763
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/red-team-10-final.md",
+      "sha256": "85299db134555353b8307d0f8d6b4b1a4af020cff9eaad7e29ed1f4d5c52dab9",
+      "bytes": 18704
+    },
+    {
+      "path": "scripts/compare-doc-global-closure.mjs",
+      "sha256": "8a09e8e8078e8a16ba8a522234abef97f27fe2b5c9fcd1d827d0bb8842b7d11a",
+      "bytes": 4907
+    },
+    {
+      "path": "src/runner/dispatch/adapters.mjs",
+      "sha256": "6f4e44cbc569ad8d9e66ace8fdbc5abfa898d97a6c5702fb5b30d86e1e908f3a",
+      "bytes": 5323
+    },
+    {
+      "path": "test/architecture.test.mjs",
+      "sha256": "138f261e81166aa2e39e436f1ab425b6b13235b6b6a7a302f1061cc022561351",
+      "bytes": 65286
+    }
+  ]
+}

@@ -1,0 +1,229 @@
+{
+  "schemaVersion": 1,
+  "authorSession": "codex-session:fgos-run_unit-run-17922205e4d698@2026-10-17",
+  "authoredBy": "codex-session:fgos-run_unit-run-17922205e4d698@2026-10-17",
+  "headAtStart": "f836da42ca77d706fc247e45baee812df66dbd2a",
+  "A": {
+    "workingViolations": [],
+    "historyViolations": []
+  },
+  "B": [
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "expected": "a52981ff2862cc2c553dbb3181e4e822a26b146b",
+      "actual": "a52981ff2862cc2c553dbb3181e4e822a26b146b",
+      "equal": true
+    },
+    {
+      "path": "scripts/doc-inventory-artifact.mjs",
+      "expected": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64",
+      "actual": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64",
+      "equal": true
+    },
+    {
+      "path": "scripts/generate-shipped-path-inventory.mjs",
+      "expected": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
+      "actual": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
+      "equal": true
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.mjs",
+      "expected": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d",
+      "actual": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d",
+      "equal": true
+    },
+    {
+      "path": "scripts/lib/is-main-module.mjs",
+      "expected": "680570946fa1381474900c9192795514b5b88f48",
+      "actual": "680570946fa1381474900c9192795514b5b88f48",
+      "equal": true
+    }
+  ],
+  "C": {
+    "switchboardUnchangedFromB0": true
+  },
+  "I": {
+    "frozenBaselineUnchanged": true,
+    "baselineSha256": "7bb39c1cf3fbf49119bd5f9d05c79f210641562e2a84ff959ecb2602edefd6a1",
+    "readerFilesWorkingDrift": [],
+    "rawBaselineEquality": false,
+    "disclosedImports": [
+      "docs/platform/session-identity/spec.md",
+      "docs/platform/holder-lock/spec.md",
+      "docs/platform/process/spec.md"
+    ],
+    "posture": "Unchanged from current HEAD; frozen raw comparison remains false for disclosed imports, no early reader switch this turn."
+  },
+  "G": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID node --max-old-space-size=2048 <scratch>/g.mjs",
+    "exit": 0,
+    "result": {
+      "scope": "Fresh category validators over persisted registry and current decisions; not fresh native identity close",
+      "claimIdNotConserved": 0,
+      "runs": [
+        {
+          "prior": "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+          "findings": []
+        },
+        {
+          "prior": "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+          "findings": []
+        }
+      ],
+      "decisionSelfReview": 0,
+      "findings": [],
+      "reviewedRows": 9667,
+      "shards": 133
+    },
+    "reproductionScript": "import fs from 'node:fs';import {execFileSync} from 'node:child_process';import {pathToFileURL} from 'node:url';\nconst root=process.cwd(),P='plans/260925-documentation-authority-unification';\nconst {validateRowSetConservation,loadDecisionShards,validateManualReview}=await import(pathToFileURL(`${root}/scripts/check-doc-inventory-gates.mjs`));\nconst read=p=>JSON.parse(fs.readFileSync(p,'utf8'));\nconst registry=read(`${P}/reports/phase-06/working-identity-registry.json`);\nconst runs=[];for(const prior of [`${P}/reports/identity-registry.json`,`${P}/reports/phase-02-identity-registry.json`])runs.push({prior,findings:validateRowSetConservation(registry,read(prior),prior)});\nconst shards=[...loadDecisionShards(`${P}/pilot/decisions`),...loadDecisionShards(`${P}/ledger/decisions`)];\nconst cache=new Map();function reportOf(p,c){const k=`${c}:${p}`;if(!cache.has(k)){try{cache.set(k,execFileSync('git',['show',k],{encoding:'utf8',maxBuffer:5*1024*1024,stdio:['ignore','pipe','ignore']}))}catch{cache.set(k,null)}}return cache.get(k)}\nlet reviewedRows=0;const findings=[];for(const s of shards)for(const row of [...s.claims,...(s.registryGaps||[])]){if(row.reviewStatus==='reviewed')reviewedRows++;findings.push(...validateManualReview(row,s,reportOf).filter(f=>f.type==='decision-self-review'))}\nconsole.log(JSON.stringify({scope:'Fresh category validators over persisted registry and current decisions; not fresh native identity close',claimIdNotConserved:runs.reduce((n,r)=>n+r.findings.length,0),runs,decisionSelfReview:findings.length,findings,reviewedRows,shards:shards.length},null,2));\n",
+    "limitation": "Persisted Phase 6 identity; not a native carry or current-source conservation close. Step 9 carries changed/imported units."
+  },
+  "H": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID node scripts/check-doc-candidate-status.mjs --strict --json",
+    "exit": 0,
+    "result": {
+      "counts": {
+        "files": 611,
+        "byStatus": {
+          "promoted": 3,
+          "candidate": 214,
+          "legacy-current": 0,
+          "non-authority": 1,
+          "unrouted": 393
+        },
+        "exemptUnrouted": 302,
+        "checked": 217,
+        "findings": 0,
+        "byType": {}
+      },
+      "findings": []
+    }
+  },
+  "constitution": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID node scripts/check-doc-constitution.mjs --no-ledger --check-placement --strict-rows --json",
+    "exit": 0,
+    "result": {
+      "fatalFindings": [],
+      "ledger": null,
+      "placement": {
+        "files": 611,
+        "matched": 610,
+        "leftovers": [],
+        "exceptions": [
+          "docs/platform/migration-authoring-rules.md"
+        ],
+        "ambiguous": [],
+        "evidenceWithoutOwner": [],
+        "byKind": {
+          "platform-portal": 1,
+          "area-portal": 12,
+          "contract": 24,
+          "decision": 14,
+          "history": 124,
+          "spec": 26,
+          "collection-index": 11,
+          "architecture": 43,
+          "guide-runbook": 10,
+          "proposal": 17,
+          "evidence-payload": 302,
+          "vision": 4,
+          "vocabulary": 3,
+          "portal": 1,
+          "switchboard-doc": 1,
+          "governance": 1,
+          "intent-preservation-ledger": 2,
+          "redirect-stub": 2,
+          "roadmap": 1,
+          "verification": 9,
+          "rollout-plan": 1,
+          "platform-foundations": 1
+        }
+      },
+      "promotion": null
+    },
+    "scope": "Placement/config validity; no ledger/conservation or cutover proof"
+  },
+  "ratchet": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID node scripts/check-legacy-docs-ratchet.mjs --json",
+    "exit": 1,
+    "result": {
+      "clean": false,
+      "findings": [
+        {
+          "type": "unaccounted-edit",
+          "path": "docs/specs/distribution.md",
+          "message": "docs/specs/distribution.md: modified maintained file has exception but digest mismatch (expected 2edf4befb296c5ca466f7905bc18da5bbc7ed047f86b25b0682cc6fa833e617a, got a198dec0792bb7a432c4aaf0522cbb1d6e897edc205ce4136ee4a8c55e372a96)"
+        },
+        {
+          "type": "unaccounted-edit",
+          "path": "docs/specs/reading-map.md",
+          "message": "docs/specs/reading-map.md: modified maintained file has exception but digest mismatch (expected 22606348608523b94c6a25f1540007aec5512d340278efea1f835713a7e67250, got a8b087814ce93f289925088d38829299c75d9fe5f2f58d64c233578451494e98)"
+        },
+        {
+          "type": "unaccounted-edit",
+          "path": "docs/specs/runner.md",
+          "message": "docs/specs/runner.md: modified maintained file has exception but digest mismatch (expected 1c6c01ad2197db7ef884314de4ca40fa58fd3f9e0bfcd2953de42e100d7ea8a8, got d3e99504d1f3331fb4944c23b778da5d682505614786a5dfbf26a8fb52095d03)"
+        }
+      ],
+      "stats": {
+        "baselineFilesCount": 994,
+        "onDiskFilesCount": 995,
+        "accountedEditsCount": 23,
+        "accountedNewFilesCount": 1,
+        "findingsCount": 3
+      }
+    },
+    "eachFindingByteEqualToTurnHEAD": {
+      "docs/specs/distribution.md": true,
+      "docs/specs/reading-map.md": true,
+      "docs/specs/runner.md": true
+    },
+    "route": "S6-RATCHET-03 / Step 9; PARK-PROTECTED-01 persists"
+  },
+  "architecture": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID node --test test/architecture.test.mjs",
+    "exit": 0,
+    "tests": 27,
+    "pass": 27,
+    "fail": 0,
+    "tail": "✔ YAML bundle signature catches a pasted copy of the parser and ignores code that merely mentions it (0.093284ms)\nℹ tests 27\nℹ suites 0\nℹ pass 27\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 5363.756672"
+  },
+  "protectedWorkingDiff": [],
+  "step5WorkingDiff": [],
+  "manifestDelta": {
+    "addedInfraEntries": {
+      "src/holder-lock/index.mjs": "infra",
+      "src/holder-lock/registry.mjs": "infra",
+      "src/holder-lock/state-root.mjs": "infra",
+      "src/holder-lock/driver.mjs": "infra",
+      "src/holder-lock/protocol.mjs": "infra",
+      "src/holder-lock/lock-scope.mjs": "infra",
+      "src/holder-lock/fences.mjs": "infra",
+      "src/setup/holder-lock-checks.mjs": "infra",
+      "src/runner/dispatch/cwd-lock.mjs": "infra"
+    },
+    "removed": [],
+    "changedExisting": [],
+    "sourceBlob": "51593afbe4edafe87b0988dd874413790cb18bad",
+    "candidateBeforeBlob": "2ff043edb33c5b65a861aa89804c948148ccd58c",
+    "postReviewLog": "plans/260925-documentation-authority-unification/reports/phase-07/post-review-edits.md",
+    "futureRebind": "Every changed content/occurrence unit at Step 9; no approval carry"
+  },
+  "pairsEqual": 4,
+  "contextualBindings": 43,
+  "contextualBindingsExact": 43,
+  "diffCheck": {
+    "command": "git diff --check",
+    "exit": 0
+  },
+  "preview": {
+    "command": "mdview open <absolute step-06-projections.md>",
+    "exit": 1,
+    "error": "database error: attempt to write a readonly database",
+    "blocking": false
+  },
+  "allChecksGreen": false,
+  "authoringComplete": true,
+  "acceptance": "pending independent review; parked/routed findings remain visible",
+  "fullNpmTest": "not run; Step 9 serial closing check"
+}

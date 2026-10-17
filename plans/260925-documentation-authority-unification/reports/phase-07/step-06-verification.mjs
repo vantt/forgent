@@ -1,0 +1,32 @@
+// Read-only, bounded verification. Run from the repository root; no fgOS or global jobs.
+import fs from 'node:fs';
+import crypto from 'node:crypto';
+import {execFileSync} from 'node:child_process';
+import {pathToFileURL} from 'node:url';
+const root=process.cwd(), P='plans/260925-documentation-authority-unification', R=`${P}/reports/phase-07`;
+const {extractMarkdownConservationUnits}=await import(pathToFileURL(`${root}/scripts/generate-doc-inventory.mjs`));
+const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
+const read=p=>fs.readFileSync(p), json=p=>JSON.parse(read(p));
+const git=(...args)=>execFileSync('git',args,{encoding:'utf8',maxBuffer:20*1024*1024}).trim();
+const inventory=json(`${R}/cross-area-inventory.json`);
+const pairs=inventory.rows.filter(r=>r.rowId.startsWith('X-DUP-')).map(r=>({rowId:r.rowId,source:r.sourcePath,target:r.targetPath,sourceId:r.sourceId,targetId:r.targetId,sourceDigest:sha(read(r.sourcePath)),targetDigest:sha(read(r.targetPath)),equal:read(r.sourcePath).equals(read(r.targetPath))}));
+const prefixes=['fd6f97ed','c0000ebf','024fc323','8763ac2f','95a357e2','39a803b8','e3d926d4','b0a0db08','0e00c9cc','ac2b043c'];
+const groups=json(`${P}/reports/phase-06/identical-unit-exceptions.json`).groups.filter(g=>prefixes.some(p=>g.digest.startsWith(p)));
+const cache=new Map();const units=p=>{if(!cache.has(p))cache.set(p,extractMarkdownConservationUnits(read(p).toString()));return cache.get(p)};
+const contextual=groups.map(g=>({digest:g.digest,owners:g.owners,occurrences:(g.sourceUnits||[]).map(u=>{
+ const current=units(u.targetOwner); const found=current.find(x=>x.anchor===u.targetAnchor);
+ return {claimId:u.claimId,source:u.path,target:u.targetOwner,recordedAnchor:u.targetAnchor,actualDigest:found?.textDigest??null,exact:found?.textDigest===u.targetUnitDigest,matchingAnchors:current.filter(x=>x.textDigest===u.targetUnitDigest).map(x=>x.anchor),recordedText:u.sourceWitness?.text};
+})}));
+const B=json(`${R}/step-05-post-merge-checks.json`).B.rows.map(r=>({...r,actual:git('hash-object',r.path),equal:git('hash-object',r.path)===r.expected}));
+const baseline=`${P}/reports/phase-06/reader-links-baseline.txt`;
+const protectedWorking=git('diff','--name-only','--','AGENTS.md','CLAUDE.md','docs/transitional-switchboard.md','docs/specs','docs/architect',`${P}/transitional-switchboard.json`,`${P}/claim-and-disposition-vocabulary.json`,`${P}/minimum-constitution.json`,'scripts').split('\n').filter(Boolean);
+const step5=git('diff','--name-only','--',`${R}/step-05*`,`${R}/review-input-step-05-01`,`${R}/review-request-a38-step-05-01.md`).split('\n').filter(Boolean);
+const files=git('diff','--name-only').split('\n').filter(Boolean).concat(git('ls-files','--others','--exclude-standard').split('\n').filter(Boolean));
+const allow=json(`${R}/allowed-paths.json`);
+const history=git('log','--first-parent','--no-merges','--name-only','--format=','6f0f39ca14138c20d2ccb62063ccdf337cf6873a..HEAD').split('\n').filter(Boolean);
+const C=read(`${P}/transitional-switchboard.json`).equals(execFileSync('git',['show',`6f0f39ca14138c20d2ccb62063ccdf337cf6873a:${P}/transitional-switchboard.json`]));
+const frozen=read(baseline).equals(execFileSync('git',['show',`HEAD:${baseline}`]));
+const decisionDrift=git('diff','--name-only','HEAD','--',`${P}/pilot/decisions`,`${P}/ledger/decisions`).split('\n').filter(Boolean);
+const result={pairs,contextual,A:{workingViolations:files.filter(p=>!allow.some(a=>p===a||p.startsWith(a))),historyViolations:[...new Set(history)].filter(p=>!allow.some(a=>p===a||p.startsWith(a)))},B,C:{switchboardUnchangedFromB0:C},I:{frozenBaselineUnchanged:frozen,baselineSha256:sha(read(baseline)),readerFilesWorkingDrift:protectedWorking.filter(p=>['AGENTS.md','CLAUDE.md','docs/specs/reading-map.md','docs/transitional-switchboard.md'].includes(p)),rawBaselineEquality:false,disclosedImports:['docs/platform/session-identity/spec.md','docs/platform/holder-lock/spec.md','docs/platform/process/spec.md']},G:{decisionWorkingDrift:decisionDrift,scope:'Persisted native identity only; Step 9 must carry the corrected manifest and all other changed/imported units.'},protectedWorking,step5WorkingDrift:step5};
+console.log(JSON.stringify(result,null,2));
+if(pairs.some(p=>!p.equal)||result.A.workingViolations.length||result.A.historyViolations.length||B.some(r=>!r.equal)||!C||!frozen||protectedWorking.length||step5.length||decisionDrift.length)process.exitCode=1;

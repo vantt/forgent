@@ -1,0 +1,461 @@
+{
+  "schemaVersion": 1,
+  "requestId": "A38-Step-6-projections-01",
+  "authorSession": "codex-session:fgos-run_unit-run-17922205e4d698@2026-10-17",
+  "entries": [
+    {
+      "id": "X-DUP-01",
+      "kind": "copy-full-read",
+      "evidence": "step-06-projections.json#/groups/0",
+      "source": "docs/contracts/fgos-gateway-api-v1.yaml",
+      "target": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml"
+    },
+    {
+      "id": "X-DUP-02",
+      "kind": "copy-full-read",
+      "evidence": "step-06-projections.json#/groups/1",
+      "source": "docs/ui-spec/schema/surface-contract.schema.json",
+      "target": "docs/platform/ui-spec/history/schema/surface-contract.schema.json"
+    },
+    {
+      "id": "X-DUP-03",
+      "kind": "copy-full-read",
+      "evidence": "step-06-projections.json#/groups/2",
+      "source": "docs/architecture-manifest.json",
+      "target": "docs/platform/contracts/architecture-manifest.json"
+    },
+    {
+      "id": "X-DUP-04",
+      "kind": "copy-full-read",
+      "evidence": "step-06-projections.json#/groups/3",
+      "source": "docs/ui-spec/spec.config.yaml",
+      "target": "docs/platform/ui-spec/architecture/spec.config.yaml"
+    },
+    {
+      "id": "X-SEM-29",
+      "kind": "semantic-route",
+      "evidence": "step-06-projections.json#/semanticRoutes/0"
+    },
+    {
+      "id": "X-SEM-31",
+      "kind": "semantic-route",
+      "evidence": "step-06-projections.json#/semanticRoutes/1"
+    },
+    {
+      "id": "GRP-LIVE-01",
+      "kind": "disposition",
+      "evidence": "step-06-projections.json#/dispositions/0"
+    },
+    {
+      "id": "GRP-HEAD-02",
+      "kind": "disposition",
+      "evidence": "step-06-projections.json#/dispositions/1"
+    },
+    {
+      "id": "GRP-SPECS-03",
+      "kind": "disposition",
+      "evidence": "step-06-projections.json#/dispositions/2"
+    },
+    {
+      "id": "F10-11",
+      "kind": "disposition",
+      "evidence": "step-06-projections.json#/dispositions/3"
+    },
+    {
+      "id": "F10-12",
+      "kind": "disposition",
+      "evidence": "step-06-projections.json#/dispositions/4"
+    },
+    {
+      "id": "F10-13",
+      "kind": "disposition",
+      "evidence": "step-06-projections.json#/dispositions/5"
+    },
+    {
+      "id": "CTX-01-01",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/0/occurrences/0",
+      "target": "docs/platform/documentation/architecture/documentation-system-design.md",
+      "anchor": "unheaded-block-21",
+      "digest": "fd6f97edf98ce6716fa567c1af023f6149a977a91fbfff2f704119881fc938d9"
+    },
+    {
+      "id": "CTX-01-02",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/0/occurrences/1",
+      "target": "docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md",
+      "anchor": "unheaded-block-71",
+      "digest": "fd6f97edf98ce6716fa567c1af023f6149a977a91fbfff2f704119881fc938d9"
+    },
+    {
+      "id": "CTX-01-03",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/0/occurrences/2",
+      "target": "docs/platform/governance.md",
+      "anchor": "unheaded-block-12",
+      "digest": "fd6f97edf98ce6716fa567c1af023f6149a977a91fbfff2f704119881fc938d9"
+    },
+    {
+      "id": "CTX-02-01",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/1/occurrences/0",
+      "target": "docs/platform/documentation/architecture/documentation-system-design.md",
+      "anchor": "unheaded-block-58",
+      "digest": "c0000ebfd3df6287bae1b1bdb4ce65226e2b20b6459b438f90475e8e0c3f8e07"
+    },
+    {
+      "id": "CTX-02-02",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/1/occurrences/1",
+      "target": "docs/platform/governance.md",
+      "anchor": "unheaded-block-29",
+      "digest": "c0000ebfd3df6287bae1b1bdb4ce65226e2b20b6459b438f90475e8e0c3f8e07"
+    },
+    {
+      "id": "CTX-03-01",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/2/occurrences/0",
+      "target": "docs/platform/documentation/architecture/documentation-system-design.md",
+      "anchor": "unheaded-block-65",
+      "digest": "024fc3239ffcd85813170a3fe2b8f39d633a70001ff9e187d55de23a2371d818"
+    },
+    {
+      "id": "CTX-03-02",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/2/occurrences/1",
+      "target": "docs/platform/documentation/history/proposals-redesigns/documentation-system-discussion.md",
+      "anchor": "unheaded-block-141",
+      "digest": "024fc3239ffcd85813170a3fe2b8f39d633a70001ff9e187d55de23a2371d818"
+    },
+    {
+      "id": "CTX-04-01",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/3/occurrences/0",
+      "target": "docs/platform/documentation/architecture/documentation-system-design.md",
+      "anchor": "unheaded-block-79",
+      "digest": "8763ac2ff0db101fb4b502912c8ba6e49e1974ec45d8595b72a4169f5b517080"
+    },
+    {
+      "id": "CTX-04-02",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/3/occurrences/1",
+      "target": "docs/platform/governance.md",
+      "anchor": "unheaded-block-54",
+      "digest": "8763ac2ff0db101fb4b502912c8ba6e49e1974ec45d8595b72a4169f5b517080"
+    },
+    {
+      "id": "CTX-05-01",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/4/occurrences/0",
+      "target": "docs/platform/architecture-map.md",
+      "anchor": "unheaded-block-91",
+      "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+    },
+    {
+      "id": "CTX-05-02",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/4/occurrences/1",
+      "target": "docs/platform/architecture-map.md",
+      "anchor": "unheaded-block-97",
+      "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+    },
+    {
+      "id": "CTX-05-03",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/4/occurrences/2",
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "anchor": "unheaded-block-9",
+      "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+    },
+    {
+      "id": "CTX-05-04",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/4/occurrences/3",
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "anchor": "unheaded-block-14",
+      "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+    },
+    {
+      "id": "CTX-05-05",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/4/occurrences/4",
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "anchor": "unheaded-block-26",
+      "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+    },
+    {
+      "id": "CTX-05-06",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/4/occurrences/5",
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "anchor": "unheaded-block-35",
+      "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+    },
+    {
+      "id": "CTX-05-07",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/4/occurrences/6",
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "anchor": "unheaded-block-100",
+      "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+    },
+    {
+      "id": "CTX-05-08",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/4/occurrences/7",
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "anchor": "unheaded-block-109",
+      "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+    },
+    {
+      "id": "CTX-05-09",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/4/occurrences/8",
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "anchor": "unheaded-block-133",
+      "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+    },
+    {
+      "id": "CTX-05-10",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/4/occurrences/9",
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "anchor": "unheaded-block-145",
+      "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+    },
+    {
+      "id": "CTX-05-11",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/4/occurrences/10",
+      "target": "docs/platform/system-overview/spec.md",
+      "anchor": "unheaded-block-28",
+      "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+    },
+    {
+      "id": "CTX-05-12",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/4/occurrences/11",
+      "target": "docs/platform/system-overview/spec.md",
+      "anchor": "unheaded-block-37",
+      "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+    },
+    {
+      "id": "CTX-05-13",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/4/occurrences/12",
+      "target": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "anchor": "unheaded-block-7",
+      "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+    },
+    {
+      "id": "CTX-05-14",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/4/occurrences/13",
+      "target": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "anchor": "unheaded-block-11",
+      "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+    },
+    {
+      "id": "CTX-05-15",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/4/occurrences/14",
+      "target": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "anchor": "unheaded-block-16",
+      "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+    },
+    {
+      "id": "CTX-05-16",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/4/occurrences/15",
+      "target": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "anchor": "unheaded-block-28",
+      "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+    },
+    {
+      "id": "CTX-05-17",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/4/occurrences/16",
+      "target": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "anchor": "unheaded-block-34",
+      "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+    },
+    {
+      "id": "CTX-05-18",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/4/occurrences/17",
+      "target": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "anchor": "unheaded-block-40",
+      "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+    },
+    {
+      "id": "CTX-05-19",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/4/occurrences/18",
+      "target": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "anchor": "unheaded-block-64",
+      "digest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104"
+    },
+    {
+      "id": "CTX-06-01",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/5/occurrences/0",
+      "target": "docs/platform/decision-citation-drift/spec.md",
+      "anchor": "behaviors-operations",
+      "digest": "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3"
+    },
+    {
+      "id": "CTX-06-02",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/5/occurrences/1",
+      "target": "docs/platform/packaging-distribution/spec.md",
+      "anchor": "behaviors-operations",
+      "digest": "230097c6afa64e84d3eece3ece7407471e6a1bb0576fa4cd4dc5afe77750e6e1"
+    },
+    {
+      "id": "CTX-06-03",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/5/occurrences/2",
+      "target": "docs/platform/claude-plugin/spec.md",
+      "anchor": "behaviors-operations",
+      "digest": "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3"
+    },
+    {
+      "id": "CTX-06-04",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/5/occurrences/3",
+      "target": "docs/platform/runner/operations/h-51f5cd7279fd.md",
+      "anchor": "behaviors-operations",
+      "digest": "39a803b85af853156a7029460b132103eac8017b2b1b7eb0b82d181f699b86f3"
+    },
+    {
+      "id": "CTX-06-05",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/5/occurrences/4",
+      "target": "docs/platform/work-state/spec.md",
+      "anchor": "9-behaviors-and-operations",
+      "digest": "a68620a509501efbe707cdffef8d9e9ac2ebdac08ec6c374d1ae789f04aa549b"
+    },
+    {
+      "id": "CTX-07-01",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/6/occurrences/0",
+      "target": "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+      "anchor": "visuals",
+      "digest": "e3d926d43e2e72f2211f195fb007e887cc2dfd1d97f6819f80e5bf203d4dfd1b"
+    },
+    {
+      "id": "CTX-07-02",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/6/occurrences/1",
+      "target": "docs/platform/work-state/spec.md",
+      "anchor": "14-presentation-surface",
+      "digest": "267b58ca8eeabc14f6baf905c51e21639d5985d01e2afa253c609993d63701d0"
+    },
+    {
+      "id": "CTX-08-01",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/7/occurrences/0",
+      "target": "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+      "anchor": "unheaded-block-3",
+      "digest": "b0a0db080dad061ca93e63826e562c4710807db8e6f2c8ca50dc291fc0b69e09"
+    },
+    {
+      "id": "CTX-08-02",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/7/occurrences/1",
+      "target": "docs/platform/work-state/spec.md",
+      "anchor": "unheaded-block-97",
+      "digest": "b0a0db080dad061ca93e63826e562c4710807db8e6f2c8ca50dc291fc0b69e09"
+    },
+    {
+      "id": "CTX-09-01",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/8/occurrences/0",
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "anchor": "lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4",
+      "digest": "0e00c9cccba1af1ea5926f1106dd72d535b230294281707303ecd16fbc0a2bea"
+    },
+    {
+      "id": "CTX-09-02",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/8/occurrences/1",
+      "target": "docs/platform/system-overview/spec.md",
+      "anchor": "lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4",
+      "digest": "0e00c9cccba1af1ea5926f1106dd72d535b230294281707303ecd16fbc0a2bea"
+    },
+    {
+      "id": "CTX-09-03",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/8/occurrences/2",
+      "target": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "anchor": "1-provenance-of-retired-decisions",
+      "digest": "260da5fd6eab8c113ea7e756985b782b5e45721aae8f34aab1e50389af0dff24"
+    },
+    {
+      "id": "CTX-10-01",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/9/occurrences/0",
+      "target": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+      "anchor": "unheaded-block-3",
+      "digest": "ac2b043c0d4f9fde1e7ecee60609cbe700480b9dd33105f98d30f6c6057ffb5c"
+    },
+    {
+      "id": "CTX-10-02",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/9/occurrences/1",
+      "target": "docs/platform/system-overview/spec.md",
+      "anchor": "unheaded-block-19",
+      "digest": "ac2b043c0d4f9fde1e7ecee60609cbe700480b9dd33105f98d30f6c6057ffb5c"
+    },
+    {
+      "id": "CTX-10-03",
+      "kind": "contextual-binding",
+      "evidence": "step-06-projections.json#/contextualGroups/9/occurrences/2",
+      "target": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "anchor": "unheaded-block-2",
+      "digest": "ac2b043c0d4f9fde1e7ecee60609cbe700480b9dd33105f98d30f6c6057ffb5c"
+    },
+    {
+      "id": "CONTROL-SCRATCH",
+      "kind": "control",
+      "evidence": "step-06-projections.json#/scratch"
+    },
+    {
+      "id": "CONTROL-BOUNDARY",
+      "kind": "control",
+      "evidence": "step-06-checks.json"
+    },
+    {
+      "id": "CONTROL-EDIT",
+      "kind": "control",
+      "evidence": "post-review-edits.md"
+    }
+  ],
+  "entryCount": 58,
+  "independentReviewStatus": "pending",
+  "artifacts": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-06-projections.json",
+      "sha256": "6b82f30e15906a254799924d44998090adc2c9d93d473669685976dffa71b4a0",
+      "bytes": 66416
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-06-projections.md",
+      "sha256": "9ae0bcb9c36f967050b31c8241ab5fb02dc22c833ddba7fd97331d417c8431f8",
+      "bytes": 8195
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-06-checks.json",
+      "sha256": "3f34a9158ffce52fde3524dcdb5a55899a5c547cf1a48700c692d5bdfc98d16f",
+      "bytes": 9823
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-06-verification.mjs",
+      "sha256": "bfa1cb0967a53e2e229aefd879f6a25ce932e83603a9c105e573a20a7a2a6a6f",
+      "bytes": 4437
+    }
+  ],
+  "inputPinManifest": "step-06-projections.json#/inputPins",
+  "allDeepRead": true,
+  "sampling": "None required. Reviewer must hold and record seed before any additional discretionary sample; no author-chosen sample substitutes for the 58 required verdicts."
+}

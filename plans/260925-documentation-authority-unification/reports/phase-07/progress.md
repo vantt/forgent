@@ -198,7 +198,7 @@ resolved path, author, reviewer, digest and status here.
 | 3 | accepted | 22 rows, zero stop arrays, A45 + L11-12..L11-14 applied; bounded re-review 15/15 ok at `df3626178` | none | none |
 | 4 | accepted | 13/13 initial verdicts ok; V-05 fix confirmed by bounded re-review 15/15 ok | native rebind waits for Step 9 by L11-2 | none |
 | 5 | reviewing | Independent review 142/143 ok (parts 60/0, 59/1, 23/0; 94 deep); remainder 60-unit draw 0 substantive defects; rollup `review-a38-step-05-seed-and-rollup-01.md` | PARK-PROTECTED-01 import provenance; row-local | L11-17 applied (X-LOCK-05 deferred to P7-DOC-GAP-02; QF-01..13 and CONTROL-FRAME rebound); bounded re-review |
-| 6 | not-started | none | none | wait for Step 1 |
+| 6 | reviewing | Four fully read copy groups; two semantic routes; six dispositions; 43 contextual bindings; one 58-entry independent request | Candidate UI compiler-root certification; generated drift routed to Phase 9; inherited protected-import proof / ratchet at Step 9 | Lead dispatches the single bounded review request |
 | 7 | not-started | none | none | wait for all candidate edits in Steps 2-6 |
 | 8 | not-started | none | none | wait for sealed key |
 | 9 | not-started | A45 removes the CTR010 close blocker | none | wait for readers and final committed bytes |
@@ -245,3 +245,20 @@ Additional registered artifacts: `step-05-coordination-delta.json`, `step-05-g-c
 | `step-05-remainder-frame.json` | Doer session; compacted by Lead (L11-16) | reviewer owns seed/draw | complete frame as sorted ids, no selected sample |
 | `review-input-step-05-01/index.json` | Doer session above | per-part paths fixed there | 143 entries + 22,454 remainder units, all parts within limits |
 | `review-request-a38-step-05-01.md` | Doer session above | not started by this author | the sole Step 5 independent request |
+
+## Step 6 authoring registration
+
+Author session: `codex-session:fgos-run_unit-run-17922205e4d698@2026-10-17`. CLI prohibition keeps the established sibling naming exception. Registered before writing: `step-06-projections.json`, `step-06-projections.md`, `step-06-checks.json`, `step-06-verification.mjs`, `review-input-step-06-01.json`, `review-request-a38-step-06-01.md`. Independent reviewer pending; all artifact digests are pinned in the review input/request. Step 5 artifacts remain read-only.
+
+## Step 6 authoring result and independent handoff
+
+Author session: `codex-session:fgos-run_unit-run-17922205e4d698@2026-10-17`. Step 5 remains under Lead review; its artifacts were not edited.
+
+- X-DUP-01/02/04 are fresh byte-equal manual input copies from the live Gateway OpenAPI, UI schema and compiler config. X-SEM-31/29 resolve through X-DUP-02/04. Current authority remains with each source; one future target owner is settled.
+- X-DUP-03: root architecture-manifest is canonical current authored input. Candidate copy now includes exactly the nine missing main `infra` classifications. Only `docs/platform/contracts/architecture-manifest.json` changed; pre-edit binding/log and final digest are recorded. Step 9 must native-carry/rebind every affected unit without approval carry.
+- Scratch snapshot plus pinned unmodified UI tools: validation 0 errors/warnings, 44 actions / 10 surfaces; build and wireframe generation exit 0. Surface registry matches; four outputs differ (two new S02 actions and presentation content). S6-UI-DRIFT-01 routes refresh to Phase 9; S6-UI-ROOT-02 parks only candidate-root certification before promotion. No generated or tool bytes edited.
+- GRP-LIVE-01/GRP-HEAD-02/GRP-SPECS-03: 43/43 current target occurrence bindings exact; contextual repetition and three reworded headings preserved, conditional re-key remains. F10-11/12/13 have explicit bounded dispositions and Phase 9/Step 9 obligations; no rationale-only rework.
+- A/B/C and unchanged-reader/frozen-baseline checks pass in the declared bounded posture. Fresh G category validators: 0 claim-id-not-conserved against both priors individually and 0 decision-self-review (9,667 reviewed rows, 133 shards), persisted identity only. H: 217/611 checked, 0 findings. Strict no-ledger placement: 610 matched plus one existing exception, 0 placement findings. Architecture: 27/27; diff check clean.
+- Ratchet exits 1 for three main-imported legacy spec exception digests, all byte-equal to turn HEAD. S6-RATCHET-03 routes to Step 9; PARK-PROTECTED-01 remains. No all-green or native-close claim. Full npm test/global jobs remain Step 9.
+- One request: `review-request-a38-step-06-01.md`, 58 entries in `review-input-step-06-01.json`, below 400 KB; independent reviewer pending. Source/candidate/tool/output SHA-256 pins are in `step-06-projections.json`. No per-unit frame dump or heavy reviewer command.
+- MDView preview attempted; unavailable because its database is read-only. This does not change evidence or block review.
