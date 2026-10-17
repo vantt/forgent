@@ -510,3 +510,16 @@ remaining owner-only actions named above.
   candidates) must conserve these changes before cutover.
 - **Boundary:** documentation conservation only; a law change is never edited in place
   by this plan; no code change.
+
+### P7-DOC-GAP-04 — Candidate defects found by the fresh readers
+
+- **Status:** routed; none changed a score (`fresh-reader-p7-r2-score.md`).
+- **Step 9 (with the main-import carry):** the holder-lock rank table lacks the Event
+  Store ranks 58 and 70 declared by `event-store/spec.md` §4; `component-boundary.md` has
+  no Event Store row; the holder-lock row and holder-lock spec still say state locks wait
+  "until the event store decision" although D-ADR0055 is signed.
+- **Phase 9 (promotion):** `docs/platform/README.md` calls areas Accepted while candidate
+  headers say Candidate/Draft; L10 in `platform-foundations.md` still cites L3 rule 4,
+  which D-ADR0055 superseded (law text carried verbatim; reconcile at promotion).
+- **Boundary:** documentation only; no code change.
+

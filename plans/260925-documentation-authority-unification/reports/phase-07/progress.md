@@ -200,8 +200,8 @@ resolved path, author, reviewer, digest and status here.
 | 5 | accepted | Review 142/143 ok + remainder 0/60; L11-17 rework re-reviewed 7/7 ok (`review-a38-step-05-bounded-rework-01.md`, at `f836da42c`) | PARK-PROTECTED-01 and P7-DOC-GAP-02 route to Step 9 | none |
 | 6 | accepted | Independent review 58/58 ok, 0 rework (`review-a38-step-06-projections-01.md`, at `66c5ff292`) | S6-UI-ROOT-02 parked (candidate UI root certification); S6-UI-DRIFT-01 to Phase 9; S6-RATCHET-03 to Step 9 | none |
 | 7 | accepted | Re-sealed after L11-19/L11-20: `review-a38-step-07-key-reseal-02.md`, sealedAt 2026-10-17T11:55:30Z, keySha256 `1568f570…4056`, commit `5d19b4940` | none | no candidate edit after seal |
-| 8 | in-progress | Round 1 FAIL (`fresh-reader-p7-r1-score.md`): reader-1 A6/B6/C5 with one fabricated anchor (reader slug error); reader-2 6/6/6, 0 fabricated; probes 3/3 each; no candidate defect, key stays valid | none | round 2 with two new reader sessions, same sealed key |
-| 9 | not-started | A45 removes the CTR010 close blocker | none | wait for readers and final committed bytes |
+| 8 | accepted | Round 2 PASS (`fresh-reader-p7-r2-score.md`): reader-3 and reader-4 each A 6/6, B 6/6, C 6/6, probes 3/3, 0 fabricated anchors, 0 out-of-scope reads, 0 legacy authority; round 1 FAIL kept on record | P7-DOC-GAP-04 reader-found defects routed to Step 9 / Phase 9 | none |
+| 9 | ready | Reader gate passed; main merges after the seal need the N2 reader-staleness check | none | wait for owner go-ahead |
 
 Allowed states are `not-started`, `ready`, `in-progress`, `parked`, `reviewing`,
 `accepted`, and `rejected`. Every handoff updates this ledger with exact evidence and
