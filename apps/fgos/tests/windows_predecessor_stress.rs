@@ -267,6 +267,9 @@ fn run(name: &str, make: impl Fn(&Rig, &mut Jitter, f64) -> Scenario) {
         "violationDetails": violations,
     });
     report(name, entry);
+    if name == "dying-job-open" {
+        assert!(job_opened * 2 >= total, "{name}: the job was opened in only {job_opened} of {total} repeats, so the scenario did not exercise the job source");
+    }
     assert!(violations.is_empty(), "{name}: {} violation(s): {violations:?}", violations.len());
     let _ = fs::remove_dir_all(&rig.dir);
 }

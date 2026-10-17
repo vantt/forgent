@@ -527,6 +527,9 @@ mod os {
     #[derive(Default)]
     struct Core {
         job: Option<Owned>,
+        /// Why the last open of the job failed. Only "no such job" means the
+        /// job is gone; any other failure leaves it unjudged.
+        open_error: Option<i32>,
         tracked: BTreeMap<u32, Tracked>,
         /// Every pid any poll named, with the sources that named it, kept for
         /// the whole life of the view.
@@ -536,8 +539,21 @@ mod os {
     impl Core {
         fn try_open(&mut self, name: &str) {
             if self.job.is_none() {
-                self.job = open_job(name).ok().map(|job| Job::into_owned(job));
+                match open_job(name) {
+                    Ok(job) => {
+                        self.job = Some(Job::into_owned(job));
+                        self.open_error = None;
+                    }
+                    Err(err) => self.open_error = err.raw_os_error(),
+                }
             }
+        }
+
+        /// The job does not exist any more (as opposed to existing but not
+        /// openable, which must not read as empty).
+        fn job_gone(&self) -> bool {
+            const ERROR_FILE_NOT_FOUND: i32 = 2;
+            self.job.is_none() && self.open_error == Some(ERROR_FILE_NOT_FOUND)
         }
 
         /// One re-read of the whole union. `scan` adds every in-job process of a
@@ -755,7 +771,7 @@ mod os {
                 // The holder released through the normal rule, so its job is the
                 // whole domain; with no job there is nothing left to see.
                 if !job_open {
-                    return DomainState::Empty;
+                    return if self.core.job_gone() { DomainState::Empty } else { DomainState::NotEmpty };
                 }
                 let poll = self.core.poll(true, None);
                 return decide(poll.acct, &poll.members, &poll.unopenable, 0, true);

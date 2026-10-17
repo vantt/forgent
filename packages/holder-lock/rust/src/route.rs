@@ -294,7 +294,18 @@ fn predecessor_state(lock_file: &Path) -> i32 {
     };
     let named = crate::predecessor::domain_json(&domain);
     let mut watch = domain_watch(&domain);
-    let state = match watch.is_empty() {
+    // A dead holder whose job is gone is judged by the process tree alone, and
+    // that fallback needs two quiet polls in a row; a live member stays
+    // "not empty" through every poll.
+    let mut verdict = watch.is_empty();
+    for _ in 0..2 {
+        if verdict != DomainState::NotEmpty || watch.reason().is_some() {
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(50));
+        verdict = watch.is_empty();
+    }
+    let state = match verdict {
         DomainState::Empty => "empty",
         DomainState::NotEmpty => "not-empty",
         DomainState::Unknown => "unknown",
