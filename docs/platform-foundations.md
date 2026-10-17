@@ -98,6 +98,8 @@ engine khác mai kia, chỉ cần replay.
 thắt đo được (LadybugDB là ứng viên sống duy nhất; CozoDB dormant từ 12/2023).
 D-ID `ae461c8b`.
 
+**Đã bị thay một phần (2026-10-17, D-ADR0055, owner ký).** Điều 1 và điều 4 của luật này không còn hiệu lực: truth là changeset đã niêm phong thành git object trên ref riêng của mỗi máy `refs/fgos/events/<máy>`, xác nhận khi `fsync` vào log mở ngoài cây làm việc; mọi view là cache dựng lại được. Điều 2 và 3 giữ nguyên. Hợp đồng: [docs/platform/event-store/spec.md](platform/event-store/spec.md). Câu chữ gốc phía trên giữ nguyên làm lịch sử.
+
 **Ngưỡng xem lại (có tên, từ evidence beads 2026-07-14).**
 `beads:dolt-as-versioned-truth`: beads đã RẼ KHỎI JSONL-truth sang
 Dolt-as-truth khi **multi-agent write trở thành tải chính**. Luật L3 đứng vững

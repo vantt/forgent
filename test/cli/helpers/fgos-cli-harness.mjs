@@ -20,7 +20,6 @@ import { addOutcome, recordFriction, addDiscovery, moveWork, moveStep, addWork, 
 import { appendEvent } from '../../../src/state/events.mjs';
 import { releaseClaim } from '../../../src/state/runtime-coordination.mjs';
 import { createSession, endSession } from '../../../src/runner/session.mjs';
-import { DEFAULT_TTL_MS } from '../../../src/runner/main-checkout-lock.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../../../src/state/fgos-file-registry.mjs';
 import { writeCoexistenceManifest } from '../../../src/install/coexist.mjs';
 import { invokeHost } from '../../../src/util/host-bin.mjs';
@@ -1162,22 +1161,6 @@ function removeAdHocWorktree(cwd, worktreePath) {
   execFileSync('git', ['worktree', 'remove', '--force', worktreePath], { cwd });
 }
 
-// --- `fgos unlock` (tsk-3h4): safely clears .fgos/main-checkout.lock -------
-
-function mainCheckoutLockPath(cwd) {
-  return path.join(cwd, '.fgos', 'main-checkout.lock');
-}
-
-// --- take/pick/approve --wait/--no-wait (tsk-6c2): retry-with-backoff on
-// main-checkout-lock contention, default ON, opt-out via --no-wait --------
-
-function writeLiveLock(cwd, ageMs) {
-  fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
-  // This TEST process's own pid is genuinely alive -- reads as a real live
-  // holder, mirroring the existing "unlock: genuinely held" fixture.
-  fs.writeFileSync(mainCheckoutLockPath(cwd), JSON.stringify({ pid: process.pid, ts: Date.now() - ageMs }));
-}
-
 // --- retrospective / cleanup (work-item-status-delivered-retrospective- ---
 // --- cleanup D7/D8/D9) ------------------------------------------------
 
@@ -1187,7 +1170,6 @@ function writeCleanupTtlConfig(cwd, ttlDays) {
 }
 export {
   ADD_BAD_FLAG_CASES,
-  DEFAULT_TTL_MS,
   EDIT_BAD_FLAG_CASES,
   EDIT_PRIORITY_MATRIX_BAD_FLAG_CASES,
   FGOS,
@@ -1234,7 +1216,6 @@ export {
   initFgosFixtureInProcess,
   linkFgosBinInto,
   logPath,
-  mainCheckoutLockPath,
   makeAlreadyCaughtUpItem,
   makeBlockedBranchItem,
   makeBlockedLeafItem,
@@ -1274,7 +1255,6 @@ export {
   writeCreateFake,
   writeFakeGh,
   writeHangScript,
-  writeLiveLock,
   writeMarkerFake,
   writeMergeSuccessFake,
   writeRunnerConfig,

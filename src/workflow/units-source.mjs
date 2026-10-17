@@ -3,7 +3,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import YAML from 'yaml';
+import { parseYaml } from '../util/yaml.mjs';
 
 import { validateWorkflowChecked as validateWorkflow } from './checked.mjs';
 import { validateUnit } from '../runner/execution/unit.mjs';
@@ -34,7 +34,7 @@ export function translateUnitsToWorkflow(unitsPath) {
   }
   let doc;
   try {
-    doc = YAML.parse(text);
+    doc = parseYaml(text, { filename: resolved });
   } catch (err) {
     throw new RunnerConfigError(`units file "${resolved}" is neither YAML nor JSON: ${err.message}`);
   }

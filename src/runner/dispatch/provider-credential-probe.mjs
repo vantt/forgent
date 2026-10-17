@@ -95,10 +95,12 @@ export function judgeProbeOutput({ exitCode, timedOut, output }) {
 }
 
 /**
- * Run one planned call and judge what it printed. `spawnFn` is injectable for tests. `onSpawn(child)` is
- * told about the child as soon as it exists, so a caller can record its pid.
+ * Run one planned call and judge what it printed. `spawnFn` has `spawn`'s signature: the account lock's
+ * own `spawnHolding` lends the lock to the call, and tests inject a fake. A child that carries a `borrowed`
+ * promise (a call holding a borrowed lock) is judged only once that promise settled, so the caller's
+ * release never races the sweep of what the call left behind.
  */
-export function runCredentialProbe(plan, { spawnFn = spawn, timeoutMs = DEFAULT_CREDENTIAL_PROBE_TIMEOUT_MS, env = process.env, onSpawn } = {}) {
+export function runCredentialProbe(plan, { spawnFn = spawn, timeoutMs = DEFAULT_CREDENTIAL_PROBE_TIMEOUT_MS, env = process.env } = {}) {
   return new Promise((resolve) => {
     let output = '';
     let timedOut = false;
@@ -109,7 +111,6 @@ export function runCredentialProbe(plan, { spawnFn = spawn, timeoutMs = DEFAULT_
       resolve({ ok: false, detail: `could not start ${plan.command}: ${err.message}` });
       return;
     }
-    try { onSpawn?.(child); } catch { /* recording the pid is best effort */ }
     // The END of what the call printed is what says whether the login works: pi lists its loaded
     // skills first (tens of KB) and prints the refresh failure last, so the tail is kept.
     const collect = (chunk) => { output = (output + String(chunk)).slice(-OUTPUT_LIMIT); };
@@ -117,21 +118,35 @@ export function runCredentialProbe(plan, { spawnFn = spawn, timeoutMs = DEFAULT_
     child.stderr?.on('data', collect);
     const timer = setTimeout(() => {
       timedOut = true;
+      // A borrowed call on Windows is a job, not a process group: `kill()` cancels its job.
+      if (process.platform === 'win32') {
+        try { child.kill('SIGKILL'); } catch { /* already gone */ }
+        return;
+      }
       try { process.kill(-child.pid, 'SIGKILL'); } catch { try { child.kill('SIGKILL'); } catch { /* already gone */ } }
     }, timeoutMs);
     child.on('error', (err) => { clearTimeout(timer); resolve({ ok: false, detail: `could not run ${plan.command}: ${err.message}` }); });
-    child.on('close', (exitCode) => { clearTimeout(timer); resolve(judgeProbeOutput({ exitCode, timedOut, output })); });
+    child.on('close', (exitCode) => {
+      clearTimeout(timer);
+      const judged = judgeProbeOutput({ exitCode, timedOut, output });
+      // A sweep that could not kill what the call left behind is the lock's own report; the answer of
+      // the call itself stands either way.
+      Promise.resolve(child.borrowed).catch(() => {}).then(() => resolve(judged));
+    });
   });
 }
 
-/** A probe function for `probeQuarantinedAccounts`. `spawnFn` is injectable for tests. */
-export function createCredentialProbe({ spawnFn = spawn, timeoutMs = DEFAULT_CREDENTIAL_PROBE_TIMEOUT_MS, env = process.env } = {}) {
-  return async function probeCredential({ account, cli = null, onSpawn }) {
+/**
+ * A probe function for `probeQuarantinedAccounts`, which hands it the account lock's `spawnHolding` so the call
+ * holds the lock. `spawnFn` replaces that spawn (tests inject a fake).
+ */
+export function createCredentialProbe({ spawnFn = null, timeoutMs = DEFAULT_CREDENTIAL_PROBE_TIMEOUT_MS, env = process.env } = {}) {
+  return async function probeCredential({ account, cli = null, spawnHolding }) {
     // An account with one store per CLI is probed through the store of the CLI the dispatch runs; when
     // that CLI is not known (or has no store), through the first store it declares.
     const source = credentialSourceForCli(account, cli) ?? accountCredentialSources(account)[0] ?? null;
     const plan = withKillTimeout(credentialProbeCommand(source), timeoutMs, env);
     if (!plan) return { ok: false, detail: 'no probe exists for this credential layout' };
-    return runCredentialProbe(plan, { spawnFn, timeoutMs, env, onSpawn });
+    return runCredentialProbe(plan, { spawnFn: spawnFn ?? spawnHolding ?? spawn, timeoutMs, env });
   };
 }

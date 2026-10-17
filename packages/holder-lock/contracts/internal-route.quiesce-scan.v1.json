@@ -16,7 +16,7 @@
       "/proc/*/cmdline naming a fgOS payload (a staged release, bin/fgos.mjs, fgos-runner, fgos-gateway) or --cwd of a given root"
     ],
     "otherPlatforms": "result unavailable: a person confirms that no fgOS process is left",
-    "unreadableEntries": "an entry that cannot be read (permission, vanished) is counted in unreadable, never treated as clean"
+    "unreadableEntries": "an entry of the caller's own uid that cannot be read (permission, vanished) is counted in unreadable, never treated as clean, unless its readable argv rules it out: argv[0] names neither node (node, nodejs, node<version>), bun, deno nor a fgOS binary (fgos, fgos-runner, fgos-gateway); an unreadable argv always counts"
   },
   "stdout": {
     "v": 1,

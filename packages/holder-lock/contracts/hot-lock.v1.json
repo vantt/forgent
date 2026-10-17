@@ -1,0 +1,51 @@
+{
+  "contract": { "id": "hot-lock", "version": 1 },
+  "description": "The hot mutex of the state store: a link-created record file for the fast path, and a kernel lock (the registry row of the same name) that serialises the cleanup of a dead holder's record. Node implements it in src/state/hot-lock.mjs until the state store moves to Rust.",
+  "resources": {
+    "state": {
+      "registryLock": "state",
+      "record": "<fgosDir>/locks/state.hot",
+      "reclaimLock": "<fgosDir>/locks/state.reclaim.lock",
+      "note": "<fgosDir> is the .fgos of the checkout that owns the log"
+    },
+    "porting-events": {
+      "registryLock": "porting-events",
+      "record": "<fgosDir>/locks/porting-events.hot",
+      "reclaimLock": "<fgosDir>/locks/porting-events.reclaim.lock"
+    }
+  },
+  "record": {
+    "shape": { "v": 1, "pid": "integer", "startTime": "string, /proc/<pid>/stat field 22", "bootId": "string", "pidNs": "string, readlink /proc/self/ns/pid", "writer": "string, optional" },
+    "platforms": "without /proc the record is {v, pid, bootId?}: the judge then answers unknown for a live pid and the record is never cleaned (fail closed)",
+    "creation": "written whole to a temp file in the same directory, then link()ed onto the record path; the record path never exists half-written",
+    "release": "unlink of the record path"
+  },
+  "cleanup": {
+    "allOf": [
+      "the judge of the recorded tuple answers dead (zombie counts as dead; alive and unknown never qualify)",
+      "the cleaner holds the kernel lock <resource>.reclaim",
+      "the record is read again under that kernel lock and its bytes equal the bytes the judge saw",
+      "only then unlink the record, release the kernel lock, and try the link again"
+    ],
+    "never": [
+      "a record that does not parse is never cleaned",
+      "a record whose judge answers unknown is never cleaned (an observer outside the initial pid namespace judging a record without pidNs is unknown)"
+    ]
+  },
+  "wait": { "timeoutMs": 5000, "pollMs": 10 },
+  "criticalSection": {
+    "callback": "synchronous; a thenable result is an error",
+    "writes": "every write goes through the transaction object, which is revoked when the callback returns",
+    "transactionPaths": "only paths under <fgosDir>",
+    "prefetched": ["mainFgosDir", "head", "writer"],
+    "forbidden": ["starting a child process (any child_process export, including named ESM imports)", "acquiring a hot mutex again in the same process"]
+  },
+  "errors": {
+    "exec-under-hot-lock": { "category": "precondition", "meaning": "a child process was started inside the critical section; thrown at the call, with the stack" },
+    "hot-lock-reentry": { "category": "precondition", "meaning": "a hot mutex was acquired while this process already holds one; thrown at once, without waiting" },
+    "hot-lock-timeout": { "category": "lock-timeout", "meaning": "the record stayed held (or unjudgeable) for the whole wait; carries holder pid and, when the record could not be read, reason lock-record-unreadable" },
+    "lock-record-unreadable": { "category": "lock-timeout", "meaning": "reason on hot-lock-timeout: the record exists but does not parse; only an owner running `fgos lock fence` clears it" },
+    "state-tx-revoked": { "category": "precondition", "meaning": "a transaction object was used after its callback returned" },
+    "state-tx-async": { "category": "precondition", "meaning": "the callback returned a thenable; the lock is already released when this is thrown" }
+  }
+}

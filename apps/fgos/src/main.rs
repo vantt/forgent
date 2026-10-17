@@ -51,6 +51,43 @@ pub struct CommandRouteDescriptor {
     pub compatibility_tests: Vec<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subcommands: Option<bool>,
+    /// Flags (without `--`) a native verb without sub-commands accepts.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub accepted_flags: Option<Vec<String>>,
+    /// Flags a native verb accepts, per sub-command.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub subcommand_flags: Option<HashMap<String, Vec<String>>>,
+}
+
+/// First `--flag` token after the selector (and sub-command) that the route's
+/// registry projection does not list. Every `--`-prefixed token is a flag, as
+/// in the legacy-node parser; the native parsers also take `--flag=value`, so
+/// the name stops at `=`, and a bare `--` ends flag parsing (what follows is
+/// positional).
+fn unknown_native_flag(route: &CommandRouteDescriptor, cli_args: &[std::ffi::OsString]) -> Option<String> {
+    let sub = cli_args.get(1).and_then(|a| a.to_str()).filter(|s| !s.starts_with('-'));
+    let accepted: &Vec<String> = match (&route.subcommand_flags, &route.accepted_flags) {
+        (Some(by_sub), _) => by_sub.get(sub?)?,
+        (None, Some(flags)) => flags,
+        (None, None) => return None,
+    };
+    cli_args
+        .iter()
+        .skip(1)
+        .filter_map(|a| a.to_str())
+        .take_while(|token| *token != "--")
+        .find_map(|token| {
+            let name = token.strip_prefix("--")?.split('=').next().unwrap_or("");
+            if accepted.iter().any(|f| f == name) {
+                return None;
+            }
+            Some(format!(
+                "fgos: unknown flag \"{token}\" for \"fgos {}\". Valid flags: {}. See \"fgos {} --help\".",
+                route.selector,
+                accepted.iter().map(|f| format!("--{f}")).collect::<Vec<_>>().join(", "),
+                route.selector,
+            ))
+        })
 }
 
 static ROUTES: OnceLock<HashMap<String, CommandRouteDescriptor>> = OnceLock::new();
@@ -108,6 +145,21 @@ fn resolve_target_root(cli_args: &[std::ffi::OsString]) -> std::path::PathBuf {
 
 fn main() {
     let args: Vec<std::ffi::OsString> = std::env::args_os().collect();
+
+    // `fgos internal ...`: host routes for the Node payload (lock-fd,
+    // state-root, quiesce-scan, lock-borrow-vectors). Dispatched before the
+    // route table, composition and any spawn, so no child of this process
+    // can inherit a descriptor handed to a route; not listed in
+    // command-routes.json or help.
+    if args.get(1).is_some_and(|a| a == "internal") {
+        // `holder-lock-helper <role>`: the roles a re-executed binary plays
+        // for the holder-lock port (see `fgos_holder_lock::helper`).
+        if args.get(2).is_some_and(|a| a == "holder-lock-helper") {
+            std::process::exit(fgos_holder_lock::helper::main(&args[3..]));
+        }
+        std::process::exit(fgos_holder_lock::route::main(&args[2..]));
+    }
+
     let cli_args = if args.len() > 1 { &args[1..] } else { &[] };
 
     // R1: No host-global options are recognized in R1 -- the first positional
@@ -233,6 +285,11 @@ fn main() {
                         std::process::exit(4);
                     }
                 }
+            }
+
+            if let Some(message) = unknown_native_flag(route, cli_args) {
+                eprintln!("{message}");
+                std::process::exit(4);
             }
 
             // Only the invocations that take a payload on stdin read it, and

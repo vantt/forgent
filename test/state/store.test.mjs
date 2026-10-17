@@ -88,7 +88,7 @@ function sleepMs(ms) {
 // many child processes are synchronized to the SAME start instant at once.
 // `acquireEventsLock`'s 2s deadline (src/state/events.mjs) is computed fresh
 // per individual lock-acquisition attempt, so a test racing MANY processes
-// against the same events.lock can, under real machine load, have a single
+// against the same state lock can, under real machine load, have a single
 // attempt among hundreds land in a window where too many siblings are
 // simultaneously retrying for it to succeed inside budget — a standing flake,
 // not a regression (docs/history/tsk-4fx-concurrency-test-lock-timeout-flake/
@@ -732,7 +732,7 @@ test('editWork patch { parent: null } clears an existing parent (edit --parent "
 // "id already exists" precondition read `before` OUTSIDE any lock, so two
 // OS processes racing addWork on the SAME id could each pass the stale
 // check and each append a work.add event — two valid-but-conflicting events
-// for one id. withEventsLock now holds the SAME events.lock appendEvent
+// for one id. withStateTx now holds the SAME state lock appendEvent
 // already used across the whole check-then-append, so the second process to
 // acquire the lock re-reads with the first's event already on disk.
 test('addWork under concurrent OS processes racing the SAME id: exactly one succeeds, the rest see "already exists", and the log has exactly one work.add for that id', async () => {
@@ -763,7 +763,7 @@ test('addWork under concurrent OS processes racing the SAME id: exactly one succ
 // racing the SAME status transition on the SAME id could each pass the
 // stale CAS check and each append a work.move event. Same fix as addWork
 // above: the lookup, the CAS decision, and the append now share one held
-// events.lock critical section.
+// state lock critical section.
 test('moveWork under concurrent OS processes racing the SAME expectedStatus CAS on the SAME id: exactly one succeeds, the rest conflict, and the log has exactly one matching work.move', async () => {
   const dir = tmpDir();
   addSampleWork(dir, 'race-move');
@@ -791,19 +791,19 @@ test('moveWork under concurrent OS processes racing the SAME expectedStatus CAS 
 });
 
 // Cross-process regression (tsk-1q5): before this fix, every mutation's
-// refreshView(dir) call ran AFTER releasing withEventsLock, in its own
+// refreshView(dir) call ran AFTER releasing withStateTx, in its own
 // separate, unlocked critical section. Two processes racing DIFFERENT ids
 // (so neither hits the addWork/moveWork CAS races proven fixed above) could
 // still interleave their unlocked rebuild-and-overwrite-state.json calls:
 // whichever process's whole-file write landed last won, even if its own log
 // read was captured before the other process's append — silently
 // overwriting a fresher state.json with a staler one missing that other
-// mutation. refreshView now runs INSIDE the same held events.lock as the
-// append (withEventsLockAndRefresh), closing that window structurally.
+// mutation. refreshView now runs INSIDE the same held state lock as the
+// append (withStateAndRefresh), closing that window structurally.
 test('concurrent editWork calls on DIFFERENT ids never lose a write to state.json (tsk-1q5)', async () => {
   const dir = tmpDir();
   const N_PROC = 6;
-  const N_EDITS = 5; // per process — volume, same technique events.test.mjs's own append-race test uses (D2: back-to-back, no delay, to maximize scheduler-preemption overlap between processes' unlocked refreshView calls). Kept well under the 2s events.lock timeout (events.mjs EVENTS_LOCK_TIMEOUT_MS) — a higher N_PROC*N_EDITS was tried and caused genuine lock-timeout contention unrelated to the refreshView race this test targets, not a more reliable reproduction of it.
+  const N_EDITS = 5; // per process — volume, same technique events.test.mjs's own append-race test uses (D2: back-to-back, no delay, to maximize scheduler-preemption overlap between processes' unlocked refreshView calls). Kept well under the 2s state lock timeout (events.mjs EVENTS_LOCK_TIMEOUT_MS) — a higher N_PROC*N_EDITS was tried and caused genuine lock-timeout contention unrelated to the refreshView race this test targets, not a more reliable reproduction of it.
   for (let i = 0; i < N_PROC; i += 1) {
     addSampleWork(dir, `race-view-${i}`);
   }
@@ -816,7 +816,7 @@ for (let i = 0; i < ${N_EDITS}; i += 1) {
 }`,
     N_PROC,
     Array.from({ length: N_PROC }, (_, i) => `race-view-${i}`),
-    2, // batch to reduce peak events.lock contention under load — see raceAcrossProcesses' own comment
+    2, // batch to reduce peak state lock contention under load — see raceAcrossProcesses' own comment
   );
 
   assert.deepEqual(results, Array(N_PROC).fill({ ok: true }), 'every concurrent editWork loop on a distinct id must succeed (no CAS conflict expected across different ids)');

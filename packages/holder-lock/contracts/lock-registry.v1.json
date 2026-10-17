@@ -54,7 +54,7 @@
       "kind": "mutex",
       "scope": "run",
       "rank": 80,
-      "v3Path": "<workflowRunDir>/advance.lock",
+      "v3Path": "<workflowRunDir>/locks/advance.lock",
       "v1Shape": "file-wx",
       "v1Path": ".fgos/workflow-runs/<id>/advance.lock",
       "fence": "tombstone",
@@ -79,7 +79,7 @@
       "kind": "mutex",
       "scope": "run",
       "rank": 80,
-      "v3Path": "<runDir>/recovery.lock",
+      "v3Path": "<runDir>/locks/recovery.lock",
       "v1Shape": "file-wx",
       "v1Path": "<runDir>/.recovery.lock",
       "fence": "tombstone",
@@ -130,13 +130,13 @@
       "kind": "lease",
       "scope": "repo",
       "rank": 30,
-      "v3Path": "<fgosDir>/locks/dispatch--<encodeURIComponent(cwd)>.lock",
+      "v3Path": "<fgosDir>/locks/dispatch-cwd--<cwdDevIno>.lock",
       "v1Shape": "file-by-cwd",
       "v1Path": ".fgos/dispatch--<encodeURIComponent(cwd)>.lock",
       "fence": "tombstone",
       "fenceNote": "both the path.resolve form and the realpath form, for every worktree and claim that exists at cutover; scope stays fgosDir",
       "owner": "4.2",
-      "note": "v1 source: src/runner/main-checkout-lock.mjs dispatchLockFile"
+      "note": "v3 key <cwdDevIno> is dev-ino of the cwd after realpath, so every spelling of one directory (symlinks included) names one lock. v1 source: src/runner/main-checkout-lock.mjs dispatchLockFile"
     },
     {
       "name": "main-checkout",
@@ -147,7 +147,8 @@
       "v1Shape": "file-link",
       "v1Path": ".fgos/main-checkout.lock",
       "fence": "tombstone",
-      "owner": "4.3"
+      "owner": "4.3",
+      "note": "v1 source: src/runner/main-checkout-lock.mjs; borrowed by git children through contracts/main-checkout-borrow.v1.json"
     },
     {
       "name": "merge-slot",
@@ -158,26 +159,28 @@
       "v1Shape": "file-link",
       "v1Path": ".fgos/merge-slot--<ref>.lock",
       "fence": "tombstone",
-      "owner": "4.3"
+      "owner": "4.3",
+      "fenceNote": "a tombstone for every refs/heads/* that exists at cutover",
+      "note": "<ref> is encodeURIComponent(target ref), as v1 mergeSlotLockFile in src/runner/main-checkout-lock.mjs writes it"
     },
     {
       "name": "state",
       "kind": "hot-mutex",
       "scope": "repo",
       "rank": 60,
-      "v3Path": "<fgosDir>/locks/state.lock",
+      "v3Path": "<fgosDir>/locks/state.reclaim.lock",
       "v1Shape": "file-link",
       "v1Path": [".fgos/events.lock", ".fgos/runtime/claims.lock"],
       "fence": "tombstone",
       "owner": "4.3",
-      "note": "events and claims merge into one hot mutex"
+      "note": "events and claims merge into one hot mutex; v3Path is the kernel lock that serialises cleanup of a dead holder, the hot record itself is <fgosDir>/locks/state.hot (contracts/hot-lock.v1.json)"
     },
     {
       "name": "porting-events",
       "kind": "hot-mutex",
       "scope": "repo",
       "rank": 60,
-      "v3Path": "<fgosDir>/locks/porting-events.lock",
+      "v3Path": "<fgosDir>/locks/porting-events.reclaim.lock",
       "v1Shape": "file-link",
       "v1Path": ".fgos/porting/events.lock",
       "fence": "tombstone",
@@ -201,39 +204,36 @@
       "kind": "mutex",
       "scope": "repo",
       "rank": 80,
-      "v3Path": null,
-      "v1Shape": null,
-      "v1Path": "packages/distribution/rust/src/init.rs",
-      "fence": null,
-      "fenceNote": "per the 4.4 plan",
+      "v3Path": "<fgosDir>/locks/activation.lock",
+      "v1Shape": "file-link",
+      "v1Path": ".fgos/installation/activation.lock",
+      "fence": "tombstone",
       "owner": "4.4",
-      "note": "Rust-owned; scope and path are fixed by the 4.4 plan"
+      "note": "v1 source: packages/distribution/rust/src/init.rs ActivationLockGuard"
     },
     {
       "name": "install",
       "kind": "mutex",
       "scope": "machine",
       "rank": 80,
-      "v3Path": null,
-      "v1Shape": null,
-      "v1Path": "packages/distribution/rust/src/store.rs",
-      "fence": null,
-      "fenceNote": "per the 4.4 plan",
+      "v3Path": "<lockRoot>/install.lock",
+      "v1Shape": "file-wx",
+      "v1Path": "<stateRoot>/install.lock",
+      "fence": "tombstone",
       "owner": "4.4",
-      "note": "Rust-owned; scope and path are fixed by the 4.4 plan"
+      "note": "v1 source: packages/distribution/rust/src/store.rs InstallLockGuard; <stateRoot> is the machine release store root and <lockRoot> is <stateRoot>/locks"
     },
     {
       "name": "observe",
       "kind": "mutex",
       "scope": "repo",
       "rank": 80,
-      "v3Path": null,
-      "v1Shape": null,
-      "v1Path": "packages/observe/rust/src/store_lock.rs",
-      "fence": null,
-      "fenceNote": "per the 4.4 plan",
+      "v3Path": "<fgosDir>/locks/observe.lock",
+      "v1Shape": "file-wx",
+      "v1Path": ".fgos/observe/.lock",
+      "fence": "tombstone",
       "owner": "4.4",
-      "note": "Rust-owned; scope and path are fixed by the 4.4 plan"
+      "note": "v1 source: packages/observe/rust/src/store_lock.rs acquire_store_lock"
     },
     {
       "name": "attempt",

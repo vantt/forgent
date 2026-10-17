@@ -25,7 +25,8 @@
 
 import fs from "node:fs";
 import path from "node:path";
-import { withEventsLock } from "../src/state/events.mjs";
+import { withStateTx } from "../src/state/hot-lock.mjs";
+import { lockOfLog } from "../src/state/events.mjs";
 import { isMainModule } from "./lib/is-main-module.mjs";
 
 const OLD_VALUE = "proposed";
@@ -119,8 +120,8 @@ function assertUsableBackupPath(logPath, backupPath) {
 }
 
 /**
- * Rewrite `logPath` in place. Always runs inside events.mjs own
- * `events.lock` (derived from the log directory) -- a live holder makes this
+ * Rewrite `logPath` in place. Always runs inside the hot-lock
+ * state lock (derived from the log directory) -- a live holder makes this
  * BLOCK for events.mjs fixed timeout and then throw EventLogError, it never
  * writes over a live append. `dryRun: true` still acquires the lock (read
  * consistency against a concurrent writer) but never writes the target or a
@@ -129,7 +130,8 @@ function assertUsableBackupPath(logPath, backupPath) {
 export function migrateStatusProposedToAwaitingApproval(logPath, { backupPath, dryRun = false } = {}) {
   const resolvedBackup = assertUsableBackupPath(logPath, backupPath);
 
-  return withEventsLock(logPath, () => {
+  const { root, resource } = lockOfLog(logPath, path.dirname(logPath));
+  return withStateTx(root, (tx) => {
     const raw = fs.readFileSync(logPath, "utf8");
     const { rewritten, changed, totalLines } = migrateLogText(raw);
 
@@ -152,9 +154,9 @@ export function migrateStatusProposedToAwaitingApproval(logPath, { backupPath, d
       throw new Error(`migrate-status-proposed-to-awaiting-approval: backup verification failed at "${resolvedBackup}" -- refusing to rewrite the target without a proven-good backup.`);
     }
 
-    fs.writeFileSync(logPath, rewritten, "utf8");
+    tx.writeText(logPath, rewritten);
     return { dryRun: false, changed, totalLines, logPath, backupPath: resolvedBackup };
-  });
+  }, { resource });
 }
 
 function parseArgs(argv) {

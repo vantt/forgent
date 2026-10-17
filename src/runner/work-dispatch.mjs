@@ -11,7 +11,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { resolveTaskSpecPath, resolveContentRoot } from './paths.mjs';
-import { loadAgentDefs, readTaskSpecHeader } from './agent-roster.mjs';
+import { loadAgentRoster, readTaskSpecHeader } from './agent-roster.mjs';
 import { selectTemplate, hashTemplate } from './prompt-templates.mjs';
 import { RunnerConfigError } from './dispatch/config.mjs';
 import { resolveStrongerRigor, RIGOR_VALUES } from './rigor.mjs';
@@ -25,6 +25,16 @@ import { executorIdForWork, resolveCapabilityIdentityDetails, workCapabilityHint
 import { DOMAINS, getDomain, resolveDomainName, effectiveStep, bundleForStep, operationsForStep } from '../state/domain-registry.mjs';
 import { listWork } from '../state/store.mjs';
 
+// The lookup runs once per dispatch, so the same broken file would repeat on every one; each distinct
+// problem in a project is written once per process.
+const reportedRosterProblems = new Set();
+function warnRosterProblemOnce(cwd, problem) {
+  const key = `${path.resolve(cwd)}\0${problem}`;
+  if (reportedRosterProblems.has(key)) return;
+  reportedRosterProblems.add(key);
+  process.stderr.write(`warning: agent roster: ${problem}\n`);
+}
+
 /**
  * `spawnWorker`'s own D20/D22 wiring (review finding H1, tsk-397): the real
  * agent-type this `work` item's dispatch should resolve to, or `null` when
@@ -34,7 +44,7 @@ import { listWork } from '../state/store.mjs';
  * `bundleForStep` (the Workflow's step bundle, the same {skill,taskSpec} lookup
  * `spawnWorker` already uses for the skill half), reads its header via
  * `resolveTaskSpecPath` + `readTaskSpecHeader`, and matches it against the
- * real on-disk agent roster (`loadAgentDefs`) via `resolveAgentTypeForTaskSpec`
+ * real on-disk agent roster (`loadAgentRoster`) via `resolveAgentTypeForTaskSpec`
  * above.
  *
  * `currentAgentType` is always `null` here: nothing on a work item tracks
@@ -60,8 +70,11 @@ export function resolveAgentTypeForWork(work, cwd, stage) {
   const taskSpecPath = resolveTaskSpecPath(domainName, taskSpec, { cwd });
   const header = readTaskSpecHeader(taskSpecPath);
   if (Object.keys(header).length === 0) return null;
-  const agentDefs = loadAgentDefs(cwd);
-  return resolveAgentTypeForTaskSpec(header, agentDefs, null);
+  const { defs, problems } = loadAgentRoster(cwd);
+  // An agent file that cannot be parsed is left out of the roster; say so on stderr rather than letting
+  // the agent vanish without a trace. `fgos doctor` names it too.
+  for (const problem of problems) warnRosterProblemOnce(cwd, problem);
+  return resolveAgentTypeForTaskSpec(header, defs, null);
 }
 
 /**

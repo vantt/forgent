@@ -1,14 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { createRequire } from 'node:module';
-const require = createRequire(import.meta.url);
-let YAML = null;
-try {
-  YAML = require('yaml');
-} catch {
-  YAML = null;
-}
 
+import { parseYaml } from '../util/yaml.mjs';
 import { validateUnit } from '../runner/execution/unit.mjs';
 
 // capability-plan-lint.mjs — static/read-only harness (docs/history/
@@ -301,11 +294,7 @@ export function lintPhaseUnits(contentOrPath, { config, phase, cellId } = {}) {
     const unitText = block.lines.join('\n');
     let parsed;
     try {
-      if (YAML) {
-        parsed = YAML.parse(unitText);
-      } else {
-        parsed = JSON.parse(unitText);
-      }
+      parsed = parseYaml(unitText);
     } catch (err) {
       pushFinding({
         line: block.startLine,

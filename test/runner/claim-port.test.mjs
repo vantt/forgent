@@ -6,11 +6,14 @@ import path from 'node:path';
 import { execFileSync, fork } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { claimWork, ClaimError } from '../../src/runner/claim-port.mjs';
-import { LOCK_FILE, DEFAULT_TTL_MS } from '../../src/runner/main-checkout-lock.mjs';
 import { initStore, addWork, moveWork, settleClaim, listWork, FsmError, readRawEvents } from '../../src/state/store.mjs';
 import { acquireClaim, readClaim } from '../../src/state/runtime-coordination.mjs';
 import { writeSharedConfig } from '../../src/config/shared-config-file.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
+import { probe } from '../../src/holder-lock/index.mjs';
+import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
+import { holdStateLockInChild } from '../helpers/hold-state-lock-in-child.mjs';
+import { git, initRepoWithHook, commitCount, HOOK_TEST_SKIP } from '../helpers/main-checkout-hook-repo.mjs';
 
 const CLAIM_PORT_MJS = path.resolve(fileURLToPath(import.meta.url), '../../../src/runner/claim-port.mjs');
 const FGOS_BIN = path.resolve(fileURLToPath(import.meta.url), '../../../bin/fgos.mjs');
@@ -29,10 +32,8 @@ function runUnclaim(repoRoot, id, { sessionId } = {}) {
   }
 }
 
-// claim-port.mjs's claimWork shares main-checkout.lock with .githooks/
-// pre-commit (tsk-3w8) — the hook writes a STRING-identity record per commit
-// and never releases it (TTL-based auto-expiry is the design). Every test
-// here builds its own disposable git repo + .fgos store; nothing touches
+// claimWork takes the main checkout mutex through repo-locks.mjs; these tests
+// need a host binary (FGOS_HOST_BIN). Every test here builds its own disposable git repo + .fgos store; nothing touches
 // THIS repo's own checkout.
 
 function initTempRepo() {
@@ -70,13 +71,6 @@ function setup() {
   return { repoRoot, dir };
 }
 
-/** Mirrors the exact shape .githooks/pre-commit writes: a STRING writer
- * identity (never a numeric pid), timestamped `ageMs` in the past. */
-function writeHookStyleLock(dir, ageMs) {
-  fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(path.join(dir, LOCK_FILE), JSON.stringify({ pid: 'some-writer-session-id', ts: Date.now() - ageMs }));
-}
-
 // tsk-3jh: claimWork used to parse events.jsonl twice for the same
 // unmutated data (listWork, then readRawEvents) before moveWork/addOutcome
 // ever ran their own separate reads (CAS reread + appendEventCore's own
@@ -93,7 +87,7 @@ function writeHookStyleLock(dir, ageMs) {
 // read of EITHER the baseline file OR any file under `.fgos/events/`,
 // preserving the original intent (prove the full-log-read count stays
 // bounded) across the new multi-file shape.
-test('claimWork reads the event log fully at most 7 times per call, not 8+ (tsk-3jh dedupe + tsk-49e incremental snapshot + Tầng A multi-file + tsk-40m claim/doing split + tsk-40m TOCTOU re-fold)', () => {
+test('claimWork reads the event log fully at most 7 times per call, not 8+ (tsk-3jh dedupe + tsk-49e incremental snapshot + Tầng A multi-file + tsk-40m claim/doing split + tsk-40m TOCTOU re-fold)', async () => {
   const { repoRoot, dir } = setup();
   const eventsDir = path.join(dir, 'events');
   const baselinePath = path.join(dir, 'events.jsonl');
@@ -105,7 +99,7 @@ test('claimWork reads the event log fully at most 7 times per call, not 8+ (tsk-
     return originalReadFileSync.call(fs, target, ...rest);
   };
   try {
-    claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot });
+    await claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot });
   } finally {
     fs.readFileSync = originalReadFileSync;
   }
@@ -145,103 +139,68 @@ test('claimWork reads the event log fully at most 7 times per call, not 8+ (tsk-
   assert.ok(logReadCount >= 2 && logReadCount <= 7, `expected 2-7 full log reads, got ${logReadCount}`);
 });
 
-test('claimWork reclaims a stale hook-written (string-identity) lock past DEFAULT_TTL_MS, instead of failing lock-ambiguous forever', () => {
+test('claimWork refuses with a categorized ClaimError naming the lock and the holder pid while another process holds main, and claims nothing', { skip: HOOK_TEST_SKIP }, async () => {
   const { repoRoot, dir } = setup();
-  writeHookStyleLock(dir, DEFAULT_TTL_MS + 1000);
-
-  const claim = claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot });
-
-  assert.equal(claim.id, 'item-a');
-  assert.equal(claim.to, 'doing');
-});
-
-test('claimWork throws a categorized ClaimError (not an uncategorized crash) when a fresh hook-written lock is still within DEFAULT_TTL_MS', () => {
-  const { repoRoot, dir } = setup();
-  writeHookStyleLock(dir, 1000);
-
-  assert.throws(
-    () => claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot }),
-    (err) => {
-      assert.ok(err instanceof ClaimError);
-      assert.equal(err.code, 'lock-held');
-      assert.equal(err.category, 'lock-timeout', 'must be categorized so the runner halts gracefully instead of crashing the whole drain-run');
-      // tsk-6c2: a caller-side retry wrapper needs remainingTtlMs to bound
-      // its wait budget without parsing it back out of the message string.
-      assert.equal(typeof err.remainingTtlMs, 'number');
-      assert.equal(err.holderPid, 'some-writer-session-id');
-      return true;
-    },
-  );
-});
-
-// tsk-2l8: a lock file with unreadable/corrupt content (not a hook-shaped
-// string-identity record) used to fail closed immediately, forcing a
-// person to run `/fgOS:unlock` before retrying. claimWork now mirrors that
-// verb's own `forceReclaimAmbiguousLock` self-heal (main-checkout-lock.mjs:
-// 655-676, its own re-read-before-unlink TOCTOU guard) inline: a ONE-OFF
-// unparseable write like this never gets rewritten, so the reclaim-and-retry
-// clears it and the claim proceeds normally in the same call.
-test('claimWork self-heals a transiently-corrupt lock (unreadable content, not a hook-shaped string-identity record) instead of failing lock-ambiguous', () => {
-  const { repoRoot, dir } = setup();
-  fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(path.join(dir, LOCK_FILE), 'not valid json');
-
-  const claim = claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot });
-
-  assert.equal(claim.id, 'item-a');
-  assert.equal(claim.to, 'doing');
-});
-
-// The reclaim-and-retry above only ever gets ONE retry (mirroring `unlock`'s
-// own single forceReclaimAmbiguousLock call, never a loop) — content that is
-// STILL unparseable on that second attempt (persistently corrupt, e.g. some
-// other process keeps rewriting garbage into the lock file, not a transient
-// race with a legitimate writer) must still fail closed exactly like before
-// this item. Simulated by patching fs.linkSync so tryAcquireOnce's own
-// create-path (writeAtomicCreate) always sees the lock path as already
-// occupied — forcing it down the read-and-parse fallback on BOTH attempts —
-// and fs.readFileSync so that fallback always reads back corrupt content,
-// even after forceReclaimAmbiguousLock unlinks the real file in between.
-test('claimWork throws a categorized ClaimError when the lock content is still ambiguous after one reclaim-and-retry — genuinely ambiguous, fails closed', () => {
-  const { repoRoot, dir } = setup();
-  fs.mkdirSync(dir, { recursive: true });
-  const lockPath = path.join(dir, LOCK_FILE);
-  fs.writeFileSync(lockPath, 'not valid json');
-
-  const originalReadFileSync = fs.readFileSync;
-  const originalLinkSync = fs.linkSync;
-  fs.readFileSync = function patchedRead(target, ...rest) {
-    if (target === lockPath) return 'still not valid json';
-    return originalReadFileSync.call(fs, target, ...rest);
-  };
-  fs.linkSync = function patchedLink(existingPath, newPath, ...rest) {
-    if (newPath === lockPath) {
-      const err = new Error('EEXIST: file already exists, link');
-      err.code = 'EEXIST';
-      throw err;
-    }
-    return originalLinkSync.call(fs, existingPath, newPath, ...rest);
-  };
-
+  const holder = await holdLockInChild('main-checkout', { fgosDir: dir });
   try {
-    assert.throws(
+    await assert.rejects(
       () => claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot }),
       (err) => {
         assert.ok(err instanceof ClaimError);
-        assert.equal(err.code, 'lock-ambiguous');
-        assert.equal(err.category, 'lock-timeout');
-        // tsk-6c2: a retry wrapper checking `err.code === 'lock-held'` must
-        // never mistake this for a retryable state.
-        assert.equal(err.remainingTtlMs, undefined);
+        assert.equal(err.code, 'lock-held');
+        assert.equal(err.category, 'lock-timeout', 'must be categorized so the runner halts gracefully instead of crashing the whole drain-run');
+        assert.equal(err.lock, 'main-checkout');
+        assert.deepEqual(err.holders, [holder.child.pid]);
+        assert.match(err.message, new RegExp(`pid ${holder.child.pid}`));
         return true;
       },
     );
+    assert.equal(readClaim(dir, 'item-a'), null, 'a refused claim leaves no claim behind');
   } finally {
-    fs.readFileSync = originalReadFileSync;
-    fs.linkSync = originalLinkSync;
+    holder.child.kill('SIGKILL');
+    await holder.exited;
   }
 });
 
+test('claimWork with waitMs waits for the holder of main and then claims', { skip: HOOK_TEST_SKIP }, async () => {
+  const { repoRoot, dir } = setup();
+  const holder = await holdLockInChild('main-checkout', { fgosDir: dir });
+  setTimeout(() => holder.child.kill('SIGKILL'), 400);
+  const claim = await claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot, waitMs: 15_000 });
+  await holder.exited;
+  assert.equal(claim.id, 'item-a');
+  assert.equal(claim.to, 'doing');
+});
+
+test('claimWork checkpoints .fgos through the borrowed main mutex under the real hook, and releases main when it returns', { skip: HOOK_TEST_SKIP }, async () => {
+  delete process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
+  const repoRoot = initRepoWithHook();
+  const dir = path.join(repoRoot, '.fgos');
+  initStore(dir);
+  addWork(dir, { id: 'item-a', title: 'Item A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  fs.writeFileSync(path.join(dir, 'config.json'), JSON.stringify({ checkpoint: { fallbackIntervalSec: 0 } }));
+  const before = commitCount(repoRoot);
+
+  const claim = await claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot });
+
+  assert.equal(claim.to, 'doing');
+  assert.equal(commitCount(repoRoot), before + 1, 'the checkpoint made exactly one commit');
+  assert.match(git(repoRoot, ['log', '-1', '--format=%s']), /chore\(\.fgos\): fallback events checkpoint/);
+  assert.match(git(repoRoot, ['show', '--name-only', '--format=', 'HEAD']), /^\.fgos\/events\//m, 'the checkpoint committed the event files');
+  assert.equal(probe('main-checkout', { fgosDir: dir }).result, 'free');
+});
+
+test('claimWork releases main before it creates the worktree, and a failed worktree still frees main', { skip: HOOK_TEST_SKIP }, async () => {
+  const { repoRoot, dir } = setup();
+  const claim = await claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+  assert.ok(claim.worktree.path);
+  assert.equal(probe('main-checkout', { fgosDir: dir }).result, 'free');
+
+  addWork(dir, { id: 'item-b', title: 'Item B', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  await assert.rejects(() => claimWork(dir, { id: 'item-b', actor: 'session', isolate: true, repoRoot, worktreeDir: unusableWorktreeDir() }), (err) => err.code === 'ENOTDIR');
+  assert.equal(probe('main-checkout', { fgosDir: dir }).result, 'free');
+  assert.equal(readClaim(dir, 'item-b'), null);
+});
 // tsk-2zv: a claim-lock §3b release (originally src/intake/plan.mjs's
 // releaseClaimOnExecuting, retired to a no-op by tsk-40m D5 — simulated
 // below via a direct settleClaim call, since no live code path produces
@@ -250,10 +209,10 @@ test('claimWork throws a categorized ClaimError when the lock content is still a
 // code) must still count as real progress once the item is reclaimed for
 // `executing`. Kept as a regression test for reading this LEGACY marker
 // out of pre-migration event history.
-test('claimWork on a claim-lock §3b-marked release preserves the ORIGINAL branchHeadAtTake on reclaim, instead of recomputing to the tip that already includes the pre-release commit (tsk-2zv)', () => {
+test('claimWork on a claim-lock §3b-marked release preserves the ORIGINAL branchHeadAtTake on reclaim, instead of recomputing to the tip that already includes the pre-release commit (tsk-2zv)', async () => {
   const { repoRoot, dir } = setup();
 
-  const firstClaim = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+  const firstClaim = await claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
   assert.equal(firstClaim.source, 'branch');
   const originalBranchHeadAtTake = firstClaim.branchHeadAtTake;
 
@@ -269,7 +228,7 @@ test('claimWork on a claim-lock §3b-marked release preserves the ORIGINAL branc
 
   settleClaim(dir, { id: 'item-a', claimId: firstClaim.claimId, finalStatus: 'todo', releaseTrigger: 'claim-lock-3b' });
 
-  const reclaim = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+  const reclaim = await claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
 
   assert.equal(
     reclaim.branchHeadAtTake,
@@ -282,10 +241,10 @@ test('claimWork on a claim-lock §3b-marked release preserves the ORIGINAL branc
 // same status+branch-existence shape as a §3b release, but never carries
 // the marker — it MUST still recompute fresh, the deliberate anti-cheat
 // gate that forces new work before a retaken item can `return` again.
-test('claimWork on an UNMARKED todo-with-branch reclaim (e.g. reject) still recomputes branchHeadAtTake fresh, never preserving a stale value (tsk-2zv D3)', () => {
+test('claimWork on an UNMARKED todo-with-branch reclaim (e.g. reject) still recomputes branchHeadAtTake fresh, never preserving a stale value (tsk-2zv D3)', async () => {
   const { repoRoot, dir } = setup();
 
-  const firstClaim = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+  const firstClaim = await claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
   const originalBranchHeadAtTake = firstClaim.branchHeadAtTake;
 
   const worktreePath = firstClaim.worktree.path;
@@ -299,7 +258,7 @@ test('claimWork on an UNMARKED todo-with-branch reclaim (e.g. reject) still reco
   // alive, no marker).
   settleClaim(dir, { id: 'item-a', claimId: firstClaim.claimId, finalStatus: 'todo' });
 
-  const reclaim = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+  const reclaim = await claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
 
   assert.notEqual(reclaim.branchHeadAtTake, originalBranchHeadAtTake, 'must NOT preserve the stale pre-attempt marker');
   assert.equal(reclaim.branchHeadAtTake, tipAfterAttempt, 'must recompute fresh to the live tip, demanding new work before a future return');
@@ -309,7 +268,7 @@ test('claimWork on an UNMARKED todo-with-branch reclaim (e.g. reject) still reco
 // never had content to merge in the first place (abandoned, nothing was
 // ever built for it) — the unmergedDeps guard must not treat it as
 // "missing" content, the same as it already doesn't for 'done'.
-test('claimWork isolates a leaf whose dep is "wontfix" without throwing deps-not-merged (D1: wontfix satisfies the merge-guard, same as done)', () => {
+test('claimWork isolates a leaf whose dep is "wontfix" without throwing deps-not-merged (D1: wontfix satisfies the merge-guard, same as done)', async () => {
   const repoRoot = initTempRepo();
   const dir = path.join(repoRoot, '.fgos');
   initStore(dir);
@@ -317,13 +276,13 @@ test('claimWork isolates a leaf whose dep is "wontfix" without throwing deps-not
   addWork(dir, { id: 'dep-x', title: 'Dep', kind: 'task', status: 'wontfix', deps: [], risk: 'light', refs: [], verify: 'true' });
   addWork(dir, { id: 'leaf-x', title: 'Leaf', kind: 'task', status: 'todo', deps: ['dep-x'], risk: 'light', refs: [], verify: 'true', parent: 'root-x' });
 
-  const claim = claimWork(dir, { id: 'leaf-x', actor: 'session', isolate: true, repoRoot });
+  const claim = await claimWork(dir, { id: 'leaf-x', actor: 'session', isolate: true, repoRoot });
 
   assert.equal(claim.id, 'leaf-x');
   assert.equal(claim.to, 'doing');
 });
 
-test('claimWork still refuses to isolate a leaf whose dep is only "blocked" (D1 does not over-broaden the merge-guard past done/wontfix)', () => {
+test('claimWork still refuses to isolate a leaf whose dep is only "blocked" (D1 does not over-broaden the merge-guard past done/wontfix)', async () => {
   const repoRoot = initTempRepo();
   const dir = path.join(repoRoot, '.fgos');
   initStore(dir);
@@ -331,7 +290,7 @@ test('claimWork still refuses to isolate a leaf whose dep is only "blocked" (D1 
   addWork(dir, { id: 'dep-y', title: 'Dep', kind: 'task', status: 'blocked', deps: [], risk: 'light', refs: [], verify: 'true' });
   addWork(dir, { id: 'leaf-y', title: 'Leaf', kind: 'task', status: 'todo', deps: ['dep-y'], risk: 'light', refs: [], verify: 'true', parent: 'root-y' });
 
-  assert.throws(
+  await assert.rejects(
     () => claimWork(dir, { id: 'leaf-y', actor: 'session', isolate: true, repoRoot }),
     (err) => {
       assert.ok(err instanceof ClaimError);
@@ -348,13 +307,13 @@ test('claimWork still refuses to isolate a leaf whose dep is only "blocked" (D1 
 // THIS SAME claimWork choke point (claim-port.mjs's own module comment), so
 // exercising both actors through claimWork directly is a faithful proof of
 // the real call sites, not a stand-in for them.
-test('claimWork rejects a runner claim on an item already claimed (doing) by a live session claim, and leaves the session claim untouched (tsk-49a)', () => {
+test('claimWork rejects a runner claim on an item already claimed (doing) by a live session claim, and leaves the session claim untouched (tsk-49a)', async () => {
   const { repoRoot, dir } = setup();
 
-  const sessionClaim = claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot });
+  const sessionClaim = await claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot });
   assert.equal(sessionClaim.to, 'doing');
 
-  assert.throws(
+  await assert.rejects(
     () => claimWork(dir, { id: 'item-a', actor: 'runner', isolate: false, repoRoot }),
     (err) => {
       assert.equal(err.category, 'conflict', 'must be categorized as a conflict so the runner halts gracefully instead of overwriting the live claim');
@@ -383,10 +342,10 @@ function unusableWorktreeDir() {
 // createClaimWorktree ran, so a worktree-creation failure orphaned the item
 // in `doing` with no branch/worktree and no automatic recovery (reproduced
 // live on tsk-f31, docs/history/pick-worktree-claim-race/CONTEXT.md D1).
-test('claimWork reverts the todo->doing claim back to todo when createClaimWorktree fails, instead of orphaning the item in doing (tsk-4m0 D1)', () => {
+test('claimWork reverts the todo->doing claim back to todo when createClaimWorktree fails, instead of orphaning the item in doing (tsk-4m0 D1)', async () => {
   const { repoRoot, dir } = setup();
 
-  assert.throws(
+  await assert.rejects(
     () => claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot, worktreeDir: unusableWorktreeDir() }),
     (err) => {
       assert.equal(err.code, 'ENOTDIR');
@@ -401,15 +360,15 @@ test('claimWork reverts the todo->doing claim back to todo when createClaimWorkt
 // tsk-4m0: the branch-take path (blocked item, branch already exists) runs
 // through the identical moveWork-before-createClaimWorktree ordering, so it
 // needs the identical revert -- back to `blocked`, not `todo`.
-test('claimWork reverts a branch-take blocked->doing claim back to blocked when createClaimWorktree fails (tsk-4m0 D1)', () => {
+test('claimWork reverts a branch-take blocked->doing claim back to blocked when createClaimWorktree fails (tsk-4m0 D1)', async () => {
   const { repoRoot, dir } = setup();
 
-  const firstClaim = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+  const firstClaim = await claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
   assert.equal(firstClaim.source, 'branch');
 
   settleClaim(dir, { id: 'item-a', claimId: firstClaim.claimId, finalStatus: 'blocked' });
 
-  assert.throws(
+  await assert.rejects(
     () => claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot, worktreeDir: unusableWorktreeDir() }),
     (err) => {
       assert.equal(err.code, 'ENOTDIR');
@@ -426,7 +385,7 @@ test('claimWork reverts a branch-take blocked->doing claim back to blocked when 
 // (graph-metrics.mjs) -- D3 reuses that pair as-is.
 const HUMAN_MS = 24 * 60 * 60 * 1000;
 
-test('claimWork transparently reclaims a conclusively-quiet session doing claim via pick, reattaching to the existing branch (D2/D4/D5)', () => {
+test('claimWork transparently reclaims a conclusively-quiet session doing claim via pick, reattaching to the existing branch (D2/D4/D5)', async () => {
   const { repoRoot, dir } = setup();
 
   // The quiet claim belongs to another session: the reclaim releases a
@@ -436,14 +395,14 @@ test('claimWork transparently reclaims a conclusively-quiet session doing claim 
   let second;
   try {
     process.env.FGOS_SESSION_ID = 'session-A';
-    first = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+    first = await claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
     assert.equal(first.source, 'branch');
 
     const staleSeconds = Math.floor((Date.now() - HUMAN_MS - 1000) / 1000);
     commitAt(first.worktree.path, 'stale.txt', 'stale', staleSeconds);
 
     process.env.FGOS_SESSION_ID = 'session-B';
-    second = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+    second = await claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
   } finally {
     if (originalSessionId === undefined) delete process.env.FGOS_SESSION_ID;
     else process.env.FGOS_SESSION_ID = originalSessionId;
@@ -477,14 +436,14 @@ test('claimWork transparently reclaims a conclusively-quiet session doing claim 
 // that had never been claimed at all. It must now carry a durable
 // work.attempt(result:'reclaimed') so attemptCount/lastAttempt can tell
 // "started then reclaimed" apart from "never started".
-test('a stale-claim reclaim records a durable work.attempt(result:"reclaimed") before releasing, distinguishing "started then reclaimed" from "never started" (tsk-40m)', () => {
+test('a stale-claim reclaim records a durable work.attempt(result:"reclaimed") before releasing, distinguishing "started then reclaimed" from "never started" (tsk-40m)', async () => {
   const { repoRoot, dir } = setup();
 
-  const first = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+  const first = await claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
   const staleSeconds = Math.floor((Date.now() - HUMAN_MS - 1000) / 1000);
   commitAt(first.worktree.path, 'stale.txt', 'stale', staleSeconds);
 
-  const second = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+  const second = await claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
 
   const attempts = readRawEvents(dir).filter((e) => e.type === 'work.attempt' && e.payload?.id === 'item-a');
   assert.equal(attempts.length, 1, 'exactly one work.attempt must be recorded for the reclaimed (first) claim');
@@ -511,12 +470,12 @@ test('a stale-claim reclaim records a durable work.attempt(result:"reclaimed") b
 // exercises the real gate end-to-end via claimWork, not just
 // hasWorkerSlotRoom in isolation.
 
-test('tsk-37t: a stale-claim reclaim succeeds even when the repo is already drifted past its worker-slot ceiling', () => {
+test('tsk-37t: a stale-claim reclaim succeeds even when the repo is already drifted past its worker-slot ceiling', async () => {
   const { repoRoot, dir } = setup();
   writeSharedConfig(repoRoot, { workerSlots: { ceiling: 1 } });
 
   // item-a is claimed and its worktree goes conclusively quiet.
-  const first = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+  const first = await claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
   const staleSeconds = Math.floor((Date.now() - HUMAN_MS - 1000) / 1000);
   commitAt(first.worktree.path, 'stale.txt', 'stale', staleSeconds);
 
@@ -528,12 +487,12 @@ test('tsk-37t: a stale-claim reclaim succeeds even when the repo is already drif
   // Reclaiming item-a must succeed: it was already `doing` (occupying its
   // slot) before this call, and stays `doing` after -- no net new
   // occupancy, so the ceiling has nothing real to refuse.
-  const second = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+  const second = await claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
   assert.equal(second.to, 'doing');
   assert.equal(second.branch, 'fgw/item-a');
 });
 
-test('tsk-37t: a genuinely NEW claim still refuses when the repo is at ceiling, unchanged (the exemption never widens past reclaims)', () => {
+test('tsk-37t: a genuinely NEW claim still refuses when the repo is at ceiling, unchanged (the exemption never widens past reclaims)', async () => {
   const { repoRoot, dir } = setup();
   writeSharedConfig(repoRoot, { workerSlots: { ceiling: 1 } });
 
@@ -542,7 +501,7 @@ test('tsk-37t: a genuinely NEW claim still refuses when the repo is at ceiling, 
 
   // item-a (todo, never claimed) is a genuinely NEW claim -- not a reclaim
   // of an already-doing item -- so it must still be refused at ceiling 1.
-  assert.throws(
+  await assert.rejects(
     () => claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot }),
     (err) => {
       assert.ok(err instanceof ClaimError);
@@ -555,12 +514,12 @@ test('tsk-37t: a genuinely NEW claim still refuses when the repo is at ceiling, 
 // tsk-2ec regression: the literal shape of the bug report that started this
 // item -- a claim with real, recent activity must still refuse exactly as
 // today, unconditionally.
-test('claimWork still refuses a session doing claim with recent activity, unchanged (tsk-2ec regression)', () => {
+test('claimWork still refuses a session doing claim with recent activity, unchanged (tsk-2ec regression)', async () => {
   const { repoRoot, dir } = setup();
 
-  claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+  await claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
 
-  assert.throws(
+  await assert.rejects(
     () => claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot }),
     (err) => {
       assert.equal(err.category, 'conflict');
@@ -572,12 +531,12 @@ test('claimWork still refuses a session doing claim with recent activity, unchan
   assert.equal(after.status, 'doing', 'the recent, still-live claim must survive completely untouched');
 });
 
-test('claimWork pre-check is a no-op for a runner-claimed doing item -- stays startupReap\'s domain alone (D2 scope)', () => {
+test('claimWork pre-check is a no-op for a runner-claimed doing item -- stays startupReap\'s domain alone (D2 scope)', async () => {
   const { repoRoot, dir } = setup();
 
-  claimWork(dir, { id: 'item-a', actor: 'runner', isolate: false, repoRoot });
+  await claimWork(dir, { id: 'item-a', actor: 'runner', isolate: false, repoRoot });
 
-  assert.throws(
+  await assert.rejects(
     () => claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot }),
     (err) => {
       assert.equal(err.category, 'conflict');
@@ -589,14 +548,14 @@ test('claimWork pre-check is a no-op for a runner-claimed doing item -- stays st
   assert.equal(after.claimRole, 'runner', 'a runner claim must never be touched by this pre-check');
 });
 
-test('claimWork pre-check never fires for a runner CALLER, even against a conclusively-quiet session claim (validating finding: no back door around startupReap\'s human/session exclusion)', () => {
+test('claimWork pre-check never fires for a runner CALLER, even against a conclusively-quiet session claim (validating finding: no back door around startupReap\'s human/session exclusion)', async () => {
   const { repoRoot, dir } = setup();
 
-  const first = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+  const first = await claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
   const staleSeconds = Math.floor((Date.now() - HUMAN_MS - 1000) / 1000);
   commitAt(first.worktree.path, 'stale.txt', 'stale', staleSeconds);
 
-  assert.throws(
+  await assert.rejects(
     () => claimWork(dir, { id: 'item-a', actor: 'runner', isolate: true, repoRoot }),
     (err) => {
       assert.equal(err.category, 'conflict');
@@ -608,14 +567,14 @@ test('claimWork pre-check never fires for a runner CALLER, even against a conclu
   assert.equal(after.claimRole, 'session', 'the quiet session claim must survive -- a runner caller must never reclaim it, no matter how stale');
 });
 
-test('claimWork pre-check never fires for take (isolate:false), even against a conclusively-quiet session claim (implementation finding: take\'s own branch-reuse gap is separately scoped, tsk-65n)', () => {
+test('claimWork pre-check never fires for take (isolate:false), even against a conclusively-quiet session claim (implementation finding: take\'s own branch-reuse gap is separately scoped, tsk-65n)', async () => {
   const { repoRoot, dir } = setup();
 
-  const first = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+  const first = await claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
   const staleSeconds = Math.floor((Date.now() - HUMAN_MS - 1000) / 1000);
   commitAt(first.worktree.path, 'stale.txt', 'stale', staleSeconds);
 
-  assert.throws(
+  await assert.rejects(
     () => claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot }),
     (err) => {
       assert.equal(err.category, 'conflict');
@@ -627,7 +586,7 @@ test('claimWork pre-check never fires for take (isolate:false), even against a c
   assert.equal(after.claimRole, 'session', 'take must never reclaim, even a quiet claim -- pick is the only door (D5 scope narrowing)');
 });
 
-test('fgos unclaim on an id with no claim at all returns {released:false, reason:"no-claim"}, no error (tsk-uio)', () => {
+test('fgos unclaim on an id with no claim at all returns {released:false, reason:"no-claim"}, no error (tsk-uio)', async () => {
   const { repoRoot } = setup();
   const res = runUnclaim(repoRoot, 'item-a');
   assert.equal(res.status, 0);
@@ -646,7 +605,7 @@ function acquireClaimAs(sessionId, dir, opts) {
   }
 }
 
-test('fgos unclaim clears unconditionally with durable-status-mismatch when claim exists but durable status is todo or non-existent (tsk-uio)', () => {
+test('fgos unclaim clears unconditionally with durable-status-mismatch when claim exists but durable status is todo or non-existent (tsk-uio)', async () => {
   const { repoRoot, dir } = setup();
   acquireClaimAs('session-A', dir, { id: 'item-a', actor: 'session', force: true });
   assert.ok(readClaim(dir, 'item-a'));
@@ -673,7 +632,7 @@ test('fgos unclaim clears unconditionally with durable-status-mismatch when clai
   assert.equal(readClaim(dir, 'nonexistent-item'), null);
 });
 
-test('fgos unclaim refuses with a clear error naming holder when durable status is doing and activity is fresh (tsk-uio)', () => {
+test('fgos unclaim refuses with a clear error naming holder when durable status is doing and activity is fresh (tsk-uio)', async () => {
   const { repoRoot, dir } = setup();
   addWork(dir, { id: 'doing-item', title: 'Doing Item', kind: 'task', status: 'doing', deps: [], risk: 'light', refs: [], verify: 'true' });
   const claim = acquireClaim(dir, { id: 'doing-item', actor: 'session', claimRole: 'session', force: true });
@@ -690,7 +649,7 @@ test('fgos unclaim refuses with a clear error naming holder when durable status 
   assert.ok(readClaim(dir, 'doing-item'), 'claim must remain un-cleared');
 });
 
-test('fgos unclaim clears stale claim with {released:true, reason:"stale-liveness"} when durable status is doing and activity is stale (tsk-uio)', () => {
+test('fgos unclaim clears stale claim with {released:true, reason:"stale-liveness"} when durable status is doing and activity is stale (tsk-uio)', async () => {
   const { repoRoot, dir } = setup();
   addWork(dir, { id: 'doing-item', title: 'Doing Item', kind: 'task', status: 'doing', deps: [], risk: 'light', refs: [], verify: 'true' });
   acquireClaimAs('session-A', dir, { id: 'doing-item', actor: 'session', claimRole: 'runner', force: true });
@@ -722,7 +681,7 @@ test('fgos unclaim clears stale claim with {released:true, reason:"stale-livenes
   assert.equal(typeof audit[0].payload.admin.claimId, 'string');
 });
 
-test('fgos unclaim of another writer\'s claim on an unknown item records an id-less admin decision; the owner releasing its own claim records none', () => {
+test('fgos unclaim of another writer\'s claim on an unknown item records an id-less admin decision; the owner releasing its own claim records none', async () => {
   const { repoRoot, dir } = setup();
   acquireClaimAs('session-A', dir, { id: 'ghost-item', actor: 'session', force: true });
   const res = runUnclaim(repoRoot, 'ghost-item', { sessionId: 'session-B' });
@@ -739,7 +698,7 @@ test('fgos unclaim of another writer\'s claim on an unknown item records an id-l
   assert.equal(readRawEvents(dir).filter((e) => e.type === 'decision' && e.payload?.source === 'unclaim').length, 1);
 });
 
-test('claimWork invokes runOpportunisticMainCheckoutChecks non-blockingly and succeeds even when truncation guard detects a break', () => {
+test('claimWork invokes runOpportunisticMainCheckoutChecks non-blockingly and succeeds even when truncation guard detects a break', async () => {
   delete process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
   const { repoRoot, dir } = setup();
   const guardPath = resolveFgosFile(dir, FGOS_FILE.GUARD_MARK);
@@ -757,7 +716,7 @@ test('claimWork invokes runOpportunisticMainCheckoutChecks non-blockingly and su
   fs.writeFileSync(guardPath, JSON.stringify({ [`events/${writerFileName}`]: { seq: 9999, hash: 'badhash' } }));
 
   // claimWork should succeed normally despite truncation break, and write warning
-  const res = claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot });
+  const res = await claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot });
   assert.ok(res);
   assert.equal(fs.existsSync(warnPath), true, 'warning file must be created on truncation break during claimWork');
 });
@@ -776,8 +735,8 @@ test('claimWork invokes runOpportunisticMainCheckoutChecks non-blockingly and su
 // does its OWN manual pre-check read (the exact same
 // foldEvents(readRawEvents(dir)) claimWork's own early read does) and acks
 // it BEFORE calling the real claimWork, immediately after (same
-// synchronous tick, no yield); this test process also holds the REAL
-// events.lock claimWork's own new re-validation block needs, released
+// synchronous tick, no yield); a holder child also holds the REAL
+// state lock claimWork's own re-validation block needs, released
 // only after the racing write below is already on disk. Both narrow the
 // window a lot, but IPC delivery timing is still real OS scheduling, not
 // something this test fully controls -- empirically this fails against
@@ -787,8 +746,8 @@ test('claimWork invokes runOpportunisticMainCheckoutChecks non-blockingly and su
 test('claimWork re-validates preClaimStatus against a FRESH durable read: a durable move landing mid-flight (a different process, while THIS call is still between its own early read and its final commit) must conflict, never claim over a status it never actually saw', async () => {
   const { repoRoot, dir } = setup();
 
-  const lockPath = path.join(dir, 'events.lock');
-  fs.writeFileSync(lockPath, String(process.pid), 'utf8');
+  // A holder child sits inside the real state lock until the racing write is on disk.
+  const stateHolder = await holdStateLockInChild(dir);
 
   const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-claimwork-race-'));
   const childScript = `
@@ -799,7 +758,7 @@ const dir = ${JSON.stringify(dir)};
 const preCheck = foldEvents(readRawEvents(dir));
 process.send({ ack: true, status: preCheck.work['item-a']?.status });
 try {
-  const result = claimWork(dir, { id: 'item-a', actor: 'runner', isolate: false, repoRoot: ${JSON.stringify(repoRoot)} });
+  const result = await claimWork(dir, { id: 'item-a', actor: 'runner', isolate: false, repoRoot: ${JSON.stringify(repoRoot)} });
   process.send({ ok: true, claimId: result.claimId });
 } catch (err) {
   process.send({ ok: false, category: err.category, message: err.message });
@@ -815,12 +774,10 @@ try {
   });
   assert.equal(ack.status, 'todo', "the child's own pre-check must see 'todo' before this test's racing write lands");
 
-  // Directly append the durable move to a writer file -- this test already
-  // holds events.lock itself (above), so it cannot call the public
-  // moveWork (which would try to re-acquire the very same lock and
-  // deadlock against itself); this is the same event shape moveWork itself
-  // would append, simulating "a different process's moveWork already ran
-  // and released" without actually releasing this test's own hold early.
+  // Directly append the durable move to a writer file -- a holder child holds
+  // the state lock (above), so the public moveWork would block behind it;
+  // this is the same event shape moveWork itself would append, simulating
+  // "a different process's moveWork already ran" before the lock is released.
   const eventsDir = path.join(dir, 'events');
   fs.mkdirSync(eventsDir, { recursive: true });
   fs.writeFileSync(
@@ -828,7 +785,7 @@ try {
     `${JSON.stringify({ seq: 1, ts: new Date().toISOString(), type: 'work.move', payload: { id: 'item-a', from: 'todo', to: 'blocked' }, v: 2 })}\n`,
   );
 
-  fs.unlinkSync(lockPath);
+  await stateHolder.release();
   const result = await new Promise((resolve, reject) => {
     child.on('message', resolve);
     child.on('error', reject);

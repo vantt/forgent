@@ -1,7 +1,7 @@
 // events-compaction.mjs -- Tầng A/T6 (TA-D5/TA-D13): gộp per-writer files
 // under `.fgos/events/` whose writer has gone cold/idle into one
 // `baseline-<ts>.jsonl`, so the directory doesn't grow unbounded forever
-// (D5). Runs under the same cross-process `events.lock` every other
+// (D5). Runs under the same cross-process state lock every other
 // mutation/refresh holds (TA-D14), so a compaction can never straddle a
 // concurrent append.
 //
@@ -25,7 +25,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { readEvents, withEventsLock } from './events.mjs';
+import { readEvents } from './events.mjs';
+import { withMainState } from './runtime-coordination.mjs';
 import { foldEvents } from './replay.mjs';
 
 // D5: not yet measured against real write speed (same caveat
@@ -173,24 +174,19 @@ function readConfigThreshold(repoRoot) {
   }
 }
 
-/** `git mv` the file at `srcPath` to `destPath` (both absolute); falls back
- * to a plain rename + `git add` if the source isn't tracked yet (a cold
- * file that never got its periodic checkpoint commit, e.g. right after
- * `FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1` in a test or a very fast idle
- * window) -- the move itself must never fail just because git doesn't
- * know about the file yet. */
-function moveIntoArchive(srcPath, destPath, repoRoot) {
-  const relSrc = path.relative(repoRoot, srcPath);
-  const relDest = path.relative(repoRoot, destPath);
-  try {
-    execFileSync('git', ['mv', relSrc, relDest], { cwd: repoRoot, stdio: ['ignore', 'pipe', 'pipe'] });
-  } catch {
-    fs.renameSync(srcPath, destPath);
+/** Stage a finished move (`git add` the new path, drop the old one from the
+ * index); best-effort -- the files are already moved on disk and nothing is
+ * ever deleted, so a repo that cannot stage them loses only the staging. Runs
+ * after the state lock is released: it starts git. */
+function stageArchiveMoves(moves, repoRoot) {
+  for (const { src, dest } of moves) {
+    const relSrc = path.relative(repoRoot, src);
+    const relDest = path.relative(repoRoot, dest);
     try {
-      execFileSync('git', ['add', relDest], { cwd: repoRoot, stdio: ['ignore', 'pipe', 'pipe'] });
+      execFileSync('git', ['add', '-A', '--', relDest], { cwd: repoRoot, stdio: ['ignore', 'pipe', 'pipe'] });
+      execFileSync('git', ['rm', '--cached', '--ignore-unmatch', '-q', '--', relSrc], { cwd: repoRoot, stdio: ['ignore', 'pipe', 'pipe'] });
     } catch {
-      // best-effort -- the file is still safely moved on disk either way,
-      // never deleted, per this module's own "never deletes anything" rule
+      // best-effort, see above
     }
   }
 }
@@ -198,8 +194,8 @@ function moveIntoArchive(srcPath, destPath, repoRoot) {
 /**
  * The main entry (TA-D5/TA-D6/TA-D13). `dir` is the `.fgos` directory
  * (same convention `store.mjs`'s own `paths(dir)` uses). Runs entirely
- * under `events.lock` (anchored off `${dir}/events.jsonl`, same TA-D14
- * whole-directory scope every other critical section here shares) so a
+ * under the state lock (same whole-directory scope every other critical
+ * section here shares) so a
  * concurrent append can never land mid-compaction.
  *
  * Returns `{compacted: false, reason: 'no-cold-files' | 'below-threshold' |
@@ -214,9 +210,9 @@ export function compactColdWriterFiles(dir, { nowMs = Date.now(), idleThresholdM
   const eventsDirPath = path.join(dir, 'events');
   const archiveDirPath = path.join(eventsDirPath, 'archive');
   const realRepoRoot = repoRoot || path.dirname(dir);
-  const lockAnchor = path.join(dir, 'events.jsonl');
 
-  return withEventsLock(lockAnchor, () => {
+  const moves = [];
+  const outcome = withMainState(dir, (tx) => {
     const coldFiles = findColdWriterFiles(eventsDirPath, { nowMs, idleThresholdMs });
     if (coldFiles.length === 0) {
       return { compacted: false, reason: 'no-cold-files' };
@@ -241,14 +237,16 @@ export function compactColdWriterFiles(dir, { nowMs = Date.now(), idleThresholdM
       // Gate đỏ -- không archive gì (TA-D6): full rollback, only the
       // just-written candidate is removed; every original cold file is
       // untouched, exactly as this attempt found them.
-      fs.rmSync(baselinePath, { force: true });
+      tx.unlink(baselinePath);
       return { compacted: false, reason: 'gate-red', verify };
     }
 
     fs.mkdirSync(archiveDirPath, { recursive: true });
     const archivedNames = [];
     for (const { name, path: filePath } of coldFiles) {
-      moveIntoArchive(filePath, path.join(archiveDirPath, name), realRepoRoot);
+      const dest = path.join(archiveDirPath, name);
+      tx.rename(filePath, dest);
+      moves.push({ src: filePath, dest });
       archivedNames.push(name);
     }
 
@@ -256,8 +254,10 @@ export function compactColdWriterFiles(dir, { nowMs = Date.now(), idleThresholdM
     // past compaction retroactively -- see events-compaction-verified in
     // src/setup/registrations.mjs).
     const manifestPath = path.join(archiveDirPath, `${compactTs}.manifest.json`);
-    fs.writeFileSync(manifestPath, `${JSON.stringify({ baseline: baselineName, originals: archivedNames })}\n`, 'utf8');
+    tx.writeText(manifestPath, `${JSON.stringify({ baseline: baselineName, originals: archivedNames })}\n`);
 
     return { compacted: true, baseline: baselineName, archived: archivedNames, totalEvents: verify.totalEvents };
   });
+  if (moves.length > 0) stageArchiveMoves(moves, realRepoRoot);
+  return outcome;
 }

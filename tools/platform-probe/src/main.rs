@@ -2,7 +2,7 @@
 //! fgos-platform-probe: measures, on a real machine, the OS mechanisms the
 //! lock / run-supervisor design relies on, and writes probe-report-<os>.json.
 //!
-//! Usage: fgos-platform-probe [--out DIR] [--only name1,name2] [--list]
+//! Usage: fgos-platform-probe [--out DIR] [--only name1,name2] [--repeats N] [--list]
 //! Internal: fgos-platform-probe --role <name> <args...> (helper processes the probe re-invokes itself as).
 
 mod git;
@@ -151,9 +151,19 @@ fn main() {
                 i += 1;
                 only = args.get(i).map(|s| s.split(',').map(|x| x.to_string()).collect());
             }
+            "--repeats" => {
+                i += 1;
+                match args.get(i).and_then(|s| s.parse::<usize>().ok()).filter(|n| *n > 0) {
+                    Some(n) => set_repeats(n),
+                    None => {
+                        eprintln!("--repeats needs a positive integer");
+                        std::process::exit(2);
+                    }
+                }
+            }
             "--list" => list = true,
             "-h" | "--help" => {
-                println!("fgos-platform-probe [--out DIR] [--only a,b] [--list]");
+                println!("fgos-platform-probe [--out DIR] [--only a,b] [--repeats N] [--list]");
                 return;
             }
             other => {

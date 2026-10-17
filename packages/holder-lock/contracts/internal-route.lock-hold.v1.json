@@ -1,0 +1,53 @@
+{
+  "contract": { "id": "internal-route-lock-hold", "version": 1 },
+  "command": "fgos internal lock-hold",
+  "description": "Windows cold-path helper for Node, which cannot call LockFileEx. One helper process per held lock: it takes the lock in its own process, keeps it until Node terminates it, and runs borrowed children on request. Node and the helper talk through files in a private work directory, never through stdin, so synchronous Node code can wait without a turning event loop.",
+  "platform": "windows",
+  "argv": {
+    "required": ["--protocol 1", "--path <lockFile>", "--mode ex|sh", "--work <dir>"],
+    "wait": {
+      "exactlyOne": [
+        { "flag": "--try", "meaning": "one non-blocking attempt" },
+        { "flag": "--wait-ms N", "meaning": "attempts until N milliseconds elapsed (N integer >= 1)" }
+      ]
+    },
+    "optional": [
+      { "flag": "--kill-wait-ms K", "default": 2000, "meaning": "predecessor kill wait and the bound for emptying a borrow job on parent death; source lock.predecessorKillWaitMs" }
+    ],
+    "unknownFlag": "usage error, exit 2"
+  },
+  "workDir": {
+    "owner": "Node creates a private directory os.tmpdir()/fgos-lock-hold-<pid>-<seq>-<rand>/ and removes it after release",
+    "writeRule": "every file below is written as a temp file then renamed into place; readers never see a partial file",
+    "files": {
+      "ready.json": "written by the helper once acquire has an answer: the same result shapes as lock-fd (acquired, held, timeout, unavailable, error) plus helperPid",
+      "req-<n>.json": "written by Node: { op: \"borrow\", argv: string[], cwd: string, env: string map, stdin: \"null\" } or { op: \"cancel\", n: integer }",
+      "started-<n>.json": "written by the helper: { pid }, the borrowed child's Windows pid",
+      "out-<n>.log": "the child's stdout, appended as it writes",
+      "err-<n>.log": "the child's stderr, appended as it writes",
+      "result-<n>.json": "written by the helper after the borrow ended: { exit, leftoversKilled } or { error: <name> }, names: borrow-busy, borrow-leftover-pending (an earlier borrow left processes it could not end; its record is kept), borrow-leftover-not-killed, borrow-spawn-failed, borrow-spec-invalid, request-unknown, request-unreadable"
+    },
+    "n": "request number, an integer starting at 1; the helper handles one borrow at a time and answers a second with result { error: \"borrow-busy\" }"
+  },
+  "stdio": "stdin ignored; stdout and stderr go to files, so a held lock never keeps the caller's event loop alive",
+  "lifetime": {
+    "poll": "the helper polls req-* every 5 ms and watches its parent's handle",
+    "release": "Node terminates the helper (the lock is free right after) and waits a bounded time for its exit; the error name when that bound passes is lock-release-stuck",
+    "parentDeath": "terminate any borrow job at once, wait for the job view to be empty up to K, unlock, exit",
+    "noOtherExit": "the helper never exits on its own while it holds the lock"
+  },
+  "exitCodes": {
+    "0": "ended by parent death after a clean release of the domain",
+    "2": "usage error (result error, code usage)",
+    "3": "protocol mismatch (result error, code host-version-mismatch; --protocol absent or != 1)",
+    "10": "held",
+    "11": "timeout",
+    "12": "unavailable",
+    "70": "internal or io error (result error)"
+  },
+  "invariants": [
+    "the lock handle is never inheritable and never duplicated into the borrowed child",
+    "the helper unlocks explicitly before closing the handle",
+    "on held, timeout and unavailable the helper holds no lock when it exits"
+  ]
+}

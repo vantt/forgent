@@ -83,16 +83,7 @@ import {
   resolveHolderLiveness,
 } from './run-lock.mjs';
 import { resolveExecutorCommand, currentDispatchDepth, MAX_DISPATCH_DEPTH, DispatchError, bindConfinedHomesToSupervisor } from './transport.mjs';
-import {
-  acquireMainCheckoutLock,
-  renewMainCheckoutLockIfOwn,
-  dispatchLockFile,
-  ACQUIRED,
-  HELD,
-  AMBIGUOUS,
-  formatLockDurationMs,
-  lockRefusalDetail,
-} from '../main-checkout-lock.mjs';
+import { acquireDispatchCwdLock } from './cwd-lock.mjs';
 import { reconcileHerdrSpawnRun, isHerdrSpawnRunStillWorking } from './herdr-reconcile.mjs';
 import { prepareConfinementForLaunch, finalizeConfinementResources, bindingForPrepared } from './confinement/authority.mjs';
 import { buildConfinementRequest } from './confinement/request.mjs';
@@ -2142,36 +2133,20 @@ export async function executeAssignment(assignment, opts = {}) {
   let supervisorReceipt = null;
   let assignmentLaunchContext = null;
 
-  // S4 (dispatch-engine-liveness-hardening): cli-spawn is the one Assignment
-  // launch shape with no acquireMainCheckoutLock coverage at all -- herdr-spawn
-  // already inherits it below via its own executeExecutorCli() call, which
-  // internally acquires acquireMainCheckoutLock(fgosDir, {lockFile:
-  // dispatchLockFile(cwd)}) for the full duration of that call. Acquiring a
-  // SECOND lock here for herdr-spawn too would self-conflict against that
-  // inner acquisition (two distinct string identities from the same process
-  // racing the same lock file -- the second would see the first as HELD by
-  // "a different holder" and refuse), so this is scoped to cli-spawn only.
-  // Keyed on the SAME dispatchLockFile(cwd) name executeExecutorCli already
-  // uses, so a cli-spawn Assignment, a herdr-spawn Assignment, and a direct
-  // executeExecutorCli call all contend on ONE lock file per cwd. A per-call
-  // string identity (matching executeExecutorCli's own scheme, not a bare
-  // process.pid) is required because one long-lived process can dispatch
-  // several different Assignments in a row (or concurrently) against the
-  // same cwd -- a bare pid would self-recognize a second, unrelated dispatch
-  // as a refresh of the first instead of a genuine contender.
+  // The per-cwd dispatch lock (cwd-lock.mjs) for a cli-spawn Assignment. A
+  // herdr-spawn Assignment already holds it through its own executeExecutorCli()
+  // call for the whole of that call; taking it here too would refuse that inner
+  // acquire (two descriptions of one lock, even in one process, exclude each
+  // other), so this is scoped to cli-spawn only. Both shapes and a direct
+  // executeExecutorCli call contend on the same lock per directory.
   // `opts.forceSharedCwd` (CLI: --force-shared-cwd) is a distinct axis from
-  // `forceNewAttempt` above (that overrides the M1 same-assignment-retry
-  // check; this overrides a DIFFERENT assignment/process sharing this cwd)
-  // -- an operator who already knows concurrent mutation here is safe skips
-  // the acquisition entirely, same as never having contended for the lock.
-  // Gated on `effectiveMutation === 'mutating'`: S4's own problem statement
-  // is concurrent MUTATING Assignments racing a cwd; concurrent READ-ONLY
-  // dispatch to the SAME cwd is intentional, relied-upon behavior
-  // (assignment-cwd-mutex-concurrency.test.mjs proves both). Read-only
-  // Assignments never acquire and are therefore never blocked by, nor able
-  // to block, this lock.
-  let cwdLockRes = null;
-  let cwdLockHeartbeat = null;
+  // `forceNewAttempt` above (that overrides the same-assignment-retry check;
+  // this overrides a DIFFERENT assignment/process sharing this cwd) -- an
+  // operator who already knows concurrent mutation here is safe skips the
+  // acquisition entirely. Gated on `effectiveMutation === 'mutating'`:
+  // concurrent READ-ONLY dispatch to the SAME cwd is intentional, relied-upon
+  // behavior (assignment-cwd-mutex-concurrency.test.mjs proves both).
+  let cwdLock = null;
 
   // Opted in with a renewal function: a login close to expiry is renewed once, in a copy fgOS holds, and
   // applied to the account's real store BEFORE the private home is copied from it (so no pane has to
@@ -2216,41 +2191,7 @@ export async function executeAssignment(assignment, opts = {}) {
 
   try {
     if (useSupervisorRecovery && effectiveMutation === 'mutating' && opts.forceSharedCwd !== true) {
-      const cwdLockIdentity = `${process.pid}:${Date.now()}:${Math.random().toString(36).slice(2)}`;
-      const cwdLockFile = dispatchLockFile(cwd);
-      const cwdLockAcquired = acquireMainCheckoutLock(fgosDir, {
-        identity: cwdLockIdentity,
-        ttlMs: timeoutMs,
-        releaseOnExit: true,
-        lockFile: cwdLockFile,
-      });
-      if (cwdLockAcquired.status === HELD) {
-        throw new DispatchError(
-          'dispatch-in-flight',
-          `dispatch for cwd "${cwd}" is already in flight (held for ${formatLockDurationMs(cwdLockAcquired.lockAgeMs)})${lockRefusalDetail(cwdLockAcquired)}.`,
-          { cwd, lockAgeMs: cwdLockAcquired.lockAgeMs, remainingTtlMs: cwdLockAcquired.remainingTtlMs, holderPid: cwdLockAcquired.holderPid },
-        );
-      }
-      if (cwdLockAcquired.status === AMBIGUOUS) {
-        throw new DispatchError(
-          'dispatch-in-flight',
-          `dispatch lock for cwd "${cwd}" is ambiguous (corrupt or unparseable lock file).`,
-          { cwd, lockAgeMs: cwdLockAcquired.lockAgeMs },
-        );
-      }
-      if (cwdLockAcquired.status !== ACQUIRED) {
-        throw new DispatchError(
-          'dispatch-in-flight',
-          `dispatch lock for cwd "${cwd}" could not be acquired (status: ${cwdLockAcquired.status}).`,
-          { cwd },
-        );
-      }
-      cwdLockRes = cwdLockAcquired;
-      const cwdLockHeartbeatMs = Math.max(250, Math.floor(timeoutMs / 3));
-      cwdLockHeartbeat = setInterval(() => {
-        renewMainCheckoutLockIfOwn(fgosDir, cwdLockIdentity, { lockFile: cwdLockFile });
-      }, cwdLockHeartbeatMs);
-      cwdLockHeartbeat.unref();
+      cwdLock = acquireDispatchCwdLock(fgosDir, cwd);
     }
     if (needsAssignmentLaunchContext) {
       const depth = currentDispatchDepth();
@@ -2782,8 +2723,7 @@ export async function executeAssignment(assignment, opts = {}) {
     });
     return outcome.runResult;
   } finally {
-    if (cwdLockHeartbeat) clearInterval(cwdLockHeartbeat);
-    if (cwdLockRes) cwdLockRes.release();
+    if (cwdLock) cwdLock.release();
     if (useSupervisorRecovery && launchCommandId) {
       try {
         await finalizeConfinementResources({ runDir, launchCommandId, receipt: supervisorReceipt });

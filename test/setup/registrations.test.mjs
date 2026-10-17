@@ -576,8 +576,8 @@ test('agent-type-names-unique doctor check reports a workspace definition with t
     const entry = DOCTOR_CHECKS.find((c) => c.id === 'agent-type-names-unique');
     const result = entry.check(tempDir);
     assert.equal(result.passed, false);
-    assert.match(result.message, /fgos\/agents\/wrong-name\.yaml must declare name: wrong-name/);
-    assert.match(result.message, /fgos\/agents\/no-description\.yaml must declare a non-empty description/);
+    assert.match(result.message, /fgos\/agents\/wrong-name\.yaml: must declare name: wrong-name/);
+    assert.match(result.message, /fgos\/agents\/no-description\.yaml: must declare a non-empty description/);
     assert.match(result.message, /fgos\/agents\/typo\.yml is ignored: only \.yaml files are read/);
   } finally {
     fs.rmSync(tempDir, { recursive: true, force: true });

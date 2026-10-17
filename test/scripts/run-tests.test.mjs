@@ -274,6 +274,10 @@ function mirroredRepoRoot(prefix) {
   fs.copyFileSync(realScriptPath, path.join(root, 'scripts', 'run-tests.mjs'));
   fs.copyFileSync(realLibPath, path.join(root, 'scripts', 'lib', 'is-main-module.mjs'));
   fs.copyFileSync(realQueueLibPath, path.join(root, 'scripts', 'lib', 'full-suite-queue.mjs'));
+  // The queue lib imports the holder-lock facade (src/holder-lock), which
+  // reads the lock registry under packages/: link both trees in whole, so
+  // the mirror loads the real modules and their own imports.
+  for (const tree of ['src', 'packages']) fs.symlinkSync(path.join(REPO_ROOT, tree), path.join(root, tree), 'dir');
   return root;
 }
 
@@ -312,6 +316,12 @@ test('buildTestEnv drops an inherited NODE_TEST_CONTEXT so a nested node --test 
   assert.equal('NODE_TEST_CONTEXT' in env, false);
   assert.equal(env.KEEP, 'yes');
   assert.equal(env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS, '1');
+});
+
+test('buildTestEnv drops an inherited FGOS_STATE_ROOT so fixtures that set FGOS_STATE_HOME stay in their own state root', () => {
+  const env = buildTestEnv({ PATH: '/usr/bin', FGOS_STATE_ROOT: '/real/state/fgos', FGOS_STATE_HOME: '/fixture/state' });
+  assert.equal('FGOS_STATE_ROOT' in env, false);
+  assert.equal(env.FGOS_STATE_HOME, '/fixture/state');
 });
 
 // --- per-run temp dir: every fixture the suite mkdtemps lands under one

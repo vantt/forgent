@@ -41,6 +41,8 @@ import { initStore, addWork, listWork } from '../../src/state/store.mjs';
 import { findExecutableOnPath } from '../../src/state/tool-registry.mjs';
 import { resolveAssignmentDispatchPolicy } from '../../src/runner/dispatch/assignment-policy.mjs';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
+import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
+import { dispatchCwdHolder } from '../../src/runner/dispatch/cwd-lock.mjs';
 
 // Fake executors only — every "command" spawned here is a node script this
 // file writes to a mkdtemp directory at test time. No real agent CLI is
@@ -893,7 +895,7 @@ test('resolveExecutorCommand still enforces cross-provider governance for an inv
   );
 });
 
-test('the committed .fgos/config.json runner section declares the consolidated gemini executor (executor-provider-naming 2026-09-17, replacing the former "agy" executor id): invocations[]-shaped, kind agent, allowCrossProvider true, its "agy-cli-mucdong" invocation resolves to the real installed agy binary', () => {
+test('the committed .fgos/config.json runner section declares the consolidated gemini executor (executor-provider-naming 2026-09-17, replacing the former "agy" executor id): invocations[]-shaped, kind agent, allowCrossProvider true, run through omp with the tier model passed on every invocation', () => {
   const cfg = committedRunnerConfig();
   const executor = cfg.executors?.gemini;
   assert.ok(executor, 'executors.gemini must exist');
@@ -901,21 +903,21 @@ test('the committed .fgos/config.json runner section declares the consolidated g
   assert.equal(executor.allowCrossProvider, true);
   assert.ok(Array.isArray(executor.invocations));
   const ids = executor.invocations.map((inv) => inv.id);
-  for (const id of ['agy-cli-mucdong', 'agy-herdr-mucdong', 'agy-cli-bwrap-mucdong', 'agy-cli-tetnu']) {
+  for (const id of ['omp-gemini-tetcu72', 'omp-cli-bwrap-gemini-tetcu72']) {
     assert.ok(ids.includes(id), `gemini must declare the "${id}" invocation`);
   }
-  const invocation = executor.invocations.find((inv) => inv.id === 'agy-cli-mucdong');
-  assert.ok(invocation, 'gemini must declare an "agy-cli-mucdong" invocation');
-  assert.equal(invocation.via, 'cli');
-  assert.equal(invocation.adapter, 'cli-spawn');
-  assert.equal(invocation.command, 'agy');
-  assert.ok(invocation.args.includes('{prompt}') && invocation.args.includes('{model}'));
-  // tsk-1xm: replaced the unconditional --dangerously-skip-permissions
-  // bypass with --mode accept-edits + a settings.json command denylist
-  // (src/setup/agy-permissions.mjs) — the boundary is now capability-
-  // enforced (agy's own permission engine), not just prompt prose.
-  assert.ok(!invocation.args.includes('--dangerously-skip-permissions'));
-  assert.ok(invocation.args.includes('--mode') && invocation.args.includes('accept-edits'));
+  // The Antigravity CLI is no longer installed; nothing may still spawn it.
+  assert.ok(executor.invocations.every((inv) => inv.command === 'omp'), `gemini invocations must all run omp, got ${JSON.stringify(executor.invocations.map((inv) => inv.command))}`);
+  for (const inv of executor.invocations) {
+    // Without --model omp runs its profile default whatever the tier asked for.
+    const at = inv.args.indexOf('--model');
+    assert.ok(at >= 0 && inv.args[at + 1] === '{model}', `${inv.id} must pass --model {model}`);
+    assert.deepEqual(inv.confinement, { backend: 'bwrap' }, `${inv.id} runs confined`);
+  }
+  const headless = executor.invocations.find((inv) => inv.id === 'omp-cli-bwrap-gemini-tetcu72');
+  assert.equal(headless.via, 'cli');
+  assert.equal(headless.adapter, 'cli-spawn');
+  assert.ok(headless.args.includes('{prompt}'));
 });
 
 // Synthetic cfg, not committedRunnerConfig() (tsk-1cn): committedRunnerConfig()
@@ -1250,12 +1252,14 @@ test('the committed .fgos/config.json runner section wires the consolidated gemi
   assert.ok(cfg.modelPolicies.gemini.nano.length > 0);
 });
 
-test('the committed .fgos/config.json runner section grants the worker acceptEdits and nothing else — no tool allowlist, no git write grant (the runner commits)', () => {
+test('the committed .fgos/config.json runner section grants the worker acceptEdits plus test commands only — no git write grant (the runner commits)', () => {
   const cfg = committedRunnerConfig();
   const { args } = cfg.executor;
   assert.ok(args.includes('--permission-mode'));
   assert.equal(args[args.indexOf('--permission-mode') + 1], 'acceptEdits');
-  assert.ok(!args.includes('--allowedTools'), 'a worker holds no git grant, so no allowlist is needed');
+  const allowed = args.includes('--allowedTools') ? args[args.indexOf('--allowedTools') + 1].split(',') : [];
+  const testCommand = /^(Skill|Bash\((rtk (proxy )?)?(cargo (build|check|test|clippy|fmt)|node --test|cargo|node):\*\))$/;
+  for (const tool of allowed) assert.match(tool, testCommand, `allowlist grants only test commands, found ${tool}`);
   assert.ok(!args.some((arg) => /git (add|commit)/.test(arg)), 'no git add/commit grant on the default executor');
   assert.ok(!args.includes('--dangerously-skip-permissions'));
 });
@@ -3658,37 +3662,45 @@ test('executeExecutorCli omits lostUncommittedPaths when dispatch is clean or ad
   assert.equal(resCommit.lostUncommittedPaths, undefined);
 });
 
-test('executeExecutorCli refuses with DispatchError(dispatch-in-flight) when lock file content is corrupt/ambiguous (tsk-64hk)', async () => {
-  const { repoRoot, fgosDir } = mkTempGitRepo();
-  const dir = mkTempDir();
-  const scriptPath = writeEchoExecutor(dir);
+function cliExecutorFixture(repoRoot, scriptPath, timeoutMs = 5000) {
   writeRunnerConfigFixture(repoRoot, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { 'cli-executor': { kind: 'agent', command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true } },
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-    timeoutMs: 5000,
+    timeoutMs,
   });
+}
 
-  const testCwd = repoRoot;
-  const { dispatchLockFile } = await import('../../src/runner/main-checkout-lock.mjs');
-  const lockPath = path.join(fgosDir, dispatchLockFile(testCwd));
-  fs.writeFileSync(lockPath, 'INVALID-JSON-CORRUPT-LOCK');
-
-  let caughtError = null;
+test('executeExecutorCli refuses while a dispatch in another process holds the cwd, and goes in the moment that holder is SIGKILLed', async () => {
+  if (process.platform === 'win32') return;
+  const { repoRoot, fgosDir } = mkTempGitRepo();
+  cliExecutorFixture(repoRoot, writeEchoExecutor(mkTempDir()));
+  const { child, exited } = await holdLockInChild('dispatch-cwd', { fgosDir, cwd: repoRoot });
   try {
-    await executeExecutorCli('cli-executor', { repoRoot, cwd: testCwd, prompt: 'test' });
-  } catch (err) {
-    caughtError = err;
+    await assert.rejects(
+      () => executeExecutorCli('cli-executor', { repoRoot, cwd: repoRoot, prompt: 'test' }),
+      (err) => err instanceof DispatchError && err.errorClass === 'dispatch-in-flight' && err.holderPid === child.pid,
+    );
+  } finally {
+    child.kill('SIGKILL');
+    await exited;
   }
+  const result = await executeExecutorCli('cli-executor', { repoRoot, cwd: repoRoot, prompt: 'test' });
+  assert.equal(result.status, 0, 'a killed holder released the lock at once; no orphaned lock blocks the next dispatch');
+});
 
-  assert.ok(caughtError instanceof DispatchError, 'expected DispatchError');
-  assert.equal(caughtError.errorClass, 'dispatch-in-flight');
-  assert.ok(caughtError.message.includes('ambiguous'));
+test('executeExecutorCli refuses a cwd that does not exist with a plain DispatchError, before any lock or spawn', async () => {
+  const { repoRoot } = mkTempGitRepo();
+  cliExecutorFixture(repoRoot, writeEchoExecutor(mkTempDir()));
+  const missing = path.join(repoRoot, 'gone-worktree');
+  await assert.rejects(
+    () => executeExecutorCli('cli-executor', { repoRoot, cwd: missing, prompt: 'test' }),
+    (err) => err instanceof DispatchError && err.errorClass === 'worker-spawn-fail' && err.message.includes('does not exist'),
+  );
 });
 
 /** Write a fake executor that sleeps (real wall-clock, via setTimeout, not a
- * busy-wait) for `ms` before exiting 0 -- for proving a real out-of-process
- * dispatch stays genuinely in flight across multiple heartbeat ticks. */
+ * busy-wait) for `ms` before exiting 0. */
 function writeSleepExecutor(dir, ms) {
   const scriptPath = path.join(dir, 'sleep-executor.mjs');
   fs.writeFileSync(
@@ -3702,56 +3714,32 @@ function writeSleepExecutor(dir, ms) {
   return scriptPath;
 }
 
-test('executeExecutorCli\'s per-cwd lock heartbeat keeps a genuinely live, still-running dispatch from losing its lock to a contender once its own ttlMs elapses (S2 fix, real process)', async () => {
+test('executeExecutorCli holds the cwd lock while it runs: the same directory through a symlink is refused, a sharedCwd dispatch is not, and the lock is free when the run returns', async () => {
+  if (process.platform === 'win32') return;
   const { repoRoot, fgosDir } = mkTempGitRepo();
-  const dir = mkTempDir();
-  const holdMs = 1500;
-  const timeoutMs = 1800; // the lock's own ttlMs -- must comfortably exceed holdMs so the real subprocess is never killed early
-  const scriptPath = writeSleepExecutor(dir, holdMs);
-  writeRunnerConfigFixture(repoRoot, {
-    executor: { command: '/global/executor', args: ['{prompt}'] },
-    executors: { 'cli-executor': { kind: 'agent', command: process.execPath, args: [scriptPath], allowCrossProvider: true } },
-    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-    timeoutMs,
-  });
+  cliExecutorFixture(repoRoot, writeSleepExecutor(mkTempDir(), 1500), 4000);
+  const link = path.join(mkTempDir(), 'repo-link');
+  fs.symlinkSync(repoRoot, link);
 
-  const testCwd = repoRoot;
-  const { acquireMainCheckoutLock, dispatchLockFile, HELD } = await import('../../src/runner/main-checkout-lock.mjs');
-  const lockFile = dispatchLockFile(testCwd);
-  const lockPath = path.join(fgosDir, lockFile);
-
-  const t0 = Date.now();
-  const runPromise = executeExecutorCli('cli-executor', { repoRoot, cwd: testCwd, prompt: 'x' });
-
-  while (!fs.existsSync(lockPath)) await new Promise((r) => setTimeout(r, 15));
-  const initial = JSON.parse(fs.readFileSync(lockPath, 'utf8'));
-
-  // Wait for the heartbeat's own interval (Math.floor(timeoutMs / 3) here)
-  // to actually fire and renew the SAME lock's timestamp -- proof the
-  // wiring runs for real, not just that time passed.
-  let renewedTs;
-  while (true) {
+  const runPromise = executeExecutorCli('cli-executor', { repoRoot, cwd: repoRoot, prompt: 'x' });
+  const deadline = Date.now() + 5000;
+  while (!dispatchCwdHolder(fgosDir, repoRoot)) {
+    assert.ok(Date.now() < deadline, 'the dispatch never took its cwd lock');
     await new Promise((r) => setTimeout(r, 15));
-    const current = JSON.parse(fs.readFileSync(lockPath, 'utf8'));
-    if (current.ts > initial.ts) { renewedTs = current.ts; break; }
   }
-
-  // A contender's own ttlMs, shorter than the total elapsed time since the
-  // ORIGINAL acquisition (so a TTL-only, non-heartbeating judgment would
-  // wrongly see this as stale/free) but far longer than the time since the
-  // just-observed renewal (so the heartbeat protects it) -- proves the
-  // renewal itself, not test timing luck, is what keeps this holder HELD.
-  const elapsedSinceAcquire = Date.now() - t0;
-  const contenderTtlMs = Math.max(100, elapsedSinceAcquire - 100);
-  const contender = acquireMainCheckoutLock(fgosDir, { identity: 'contender-b', ttlMs: contenderTtlMs, lockFile });
-
-  assert.equal(contender.status, HELD, 'a genuinely live, still-running dispatch must not lose its lock to a contender once its own ttlMs elapses -- the heartbeat must have renewed it');
-  assert.ok(contender.lockAgeMs < elapsedSinceAcquire, 'the contender must see the RENEWED age, not the age since the original acquisition');
-
-  const result = await runPromise;
+  await assert.rejects(
+    () => executeExecutorCli('cli-executor', { repoRoot, cwd: link, prompt: 'y' }),
+    (err) => err instanceof DispatchError && err.errorClass === 'dispatch-in-flight' && err.holderPid === process.pid,
+    'one directory reached through a symlink is the same lock',
+  );
+  // Started while the first run still holds the lock, and finishes after it: never refused.
+  const [shared, result] = await Promise.all([
+    executeExecutorCli('cli-executor', { repoRoot, cwd: repoRoot, prompt: 'z', sharedCwd: true }),
+    runPromise,
+  ]);
+  assert.equal(shared.status, 0, 'a sharedCwd dispatch never takes nor waits for the cwd lock');
   assert.equal(result.status, 0);
-  assert.equal(fs.existsSync(lockPath), false, 'the lock is released once the dispatch completes');
-  assert.ok(renewedTs >= initial.ts);
+  assert.equal(dispatchCwdHolder(fgosDir, repoRoot), null, 'the lock is released once the dispatch completes');
 });
 
 
@@ -5039,6 +5027,24 @@ test('resolveAgentTypeForWork returns null when no real agentDefs exist to resol
   // No core/agents/ or domains/coding/agents/ written -- empty roster.
   const resolved = resolveAgentTypeForWork({ domain: 'coding', stage: 'executing' }, cwd);
   assert.equal(resolved, null);
+});
+
+test('resolveAgentTypeForWork names an unparsable agent file on stderr once per process, not on every lookup', () => {
+  const cwd = mkTempDir();
+  writeTaskSpecFixture(cwd, 'domain: coding | stage: executing | role: implementer | requires-skill: fgos-coding-implement');
+  writeAgentFixture(cwd, 'general-worker', ['fgos-coding-implement']);
+  fs.writeFileSync(path.join(cwd, 'core', 'agents', 'broken.yaml'), 'name: broken\ndescription: a: b\n');
+  const written = [];
+  const realWrite = process.stderr.write;
+  process.stderr.write = (chunk) => { written.push(String(chunk)); return true; };
+  try {
+    for (let i = 0; i < 3; i += 1) assert.equal(resolveAgentTypeForWork({ domain: 'coding', stage: 'executing' }, cwd), 'general-worker');
+  } finally {
+    process.stderr.write = realWrite;
+  }
+  const rosterWarnings = written.filter((line) => line.startsWith('warning: agent roster:'));
+  assert.equal(rosterWarnings.length, 1);
+  assert.match(rosterWarnings[0], /broken\.yaml: cannot be parsed: .*line 2/);
 });
 
 test('resolveAgentTypeForWork returns null for a stage with no registered taskSpec (bundleForStage\'s own {skill:null,taskSpec:null} case) -- nothing to resolve from', () => {

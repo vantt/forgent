@@ -123,6 +123,16 @@ test('every lock owned by 4.2 has a fence and a v1 shape that agrees with it', (
   assert.deepEqual(owned.filter((lock) => lock.fence === 'none').map((lock) => lock.name), ['full-suite']);
 });
 
+test('a tombstoned lock never takes its v3 lock at the path its tombstone occupies', () => {
+  // Compare both paths in one spelling: <lockRoot> is <stateRoot>/locks and <fgosDir> is the repo's .fgos.
+  const spell = (template) => template.replace('<lockRoot>', '<stateRoot>/locks').replace('<fgosDir>', '.fgos');
+  for (const lock of registry.locks.filter((row) => row.fence === 'tombstone' && typeof row.v3Path === 'string')) {
+    for (const v1 of [lock.v1Path].flat().filter((value) => typeof value === 'string')) {
+      assert.notEqual(spell(lock.v3Path), spell(v1), `${lock.name}: v3 ${lock.v3Path} lands on the tombstone at ${v1}`);
+    }
+  }
+});
+
 test('machine and run locks keep the scope the plan gives them', () => {
   const scopeOf = Object.fromEntries(registry.locks.map((lock) => [lock.name, lock.scope]));
   assert.equal(scopeOf['full-suite'], 'machine');
@@ -170,4 +180,106 @@ test('judge vectors include the observer-outside-init-namespace case and the zom
 test('judge vector names are unique', () => {
   const names = judge.vectors.map((vector) => vector.name);
   assert.deepEqual(names.filter((name, i) => names.indexOf(name) !== i), []);
+});
+
+test('the repo lock family keeps its ranks, v3 paths and tombstone fences', () => {
+  const byName = Object.fromEntries(registry.locks.map((lock) => [lock.name, lock]));
+  const expected = {
+    'merge-slot': { kind: 'mutex', rank: 20, v3Path: '<fgosDir>/locks/merge-slot--<ref>.lock', v1Path: '.fgos/merge-slot--<ref>.lock', fence: 'tombstone' },
+    'worktree-admin': { kind: 'mutex', rank: 40, v3Path: '<fgosDir>/locks/worktree-admin.lock', v1Path: null, fence: null },
+    'main-checkout': { kind: 'mutex', rank: 50, v3Path: '<fgosDir>/locks/main-checkout.lock', v1Path: '.fgos/main-checkout.lock', fence: 'tombstone' },
+  };
+  for (const [name, want] of Object.entries(expected)) {
+    const lock = byName[name];
+    assert.ok(lock, `${name} is missing`);
+    assert.equal(lock.owner, '4.3', `${name}: owner`);
+    assert.equal(lock.scope, 'repo', `${name}: scope`);
+    for (const [key, value] of Object.entries(want)) assert.deepEqual(lock[key], value, `${name}: ${key}`);
+  }
+});
+
+test('the Rust-owned activation, install and observe locks are leaf mutexes fenced by tombstone', () => {
+  const rustOwned = registry.locks.filter((lock) => lock.owner === '4.4');
+  assert.deepEqual(rustOwned.map((lock) => lock.name).sort(), ['activation', 'install', 'observe']);
+  const expected = {
+    activation: { scope: 'repo', v3Path: '<fgosDir>/locks/activation.lock', v1Shape: 'file-link', v1Path: '.fgos/installation/activation.lock' },
+    install: { scope: 'machine', v3Path: '<lockRoot>/install.lock', v1Shape: 'file-wx', v1Path: '<stateRoot>/install.lock' },
+    observe: { scope: 'repo', v3Path: '<fgosDir>/locks/observe.lock', v1Shape: 'file-wx', v1Path: '.fgos/observe/.lock' },
+  };
+  for (const lock of rustOwned) {
+    assert.equal(lock.kind, 'mutex', `${lock.name}: kind`);
+    assert.equal(lock.rank, 80, `${lock.name}: rank`);
+    assert.equal(lock.fence, 'tombstone', `${lock.name}: fence`);
+    const want = expected[lock.name];
+    for (const key of Object.keys(want)) assert.equal(lock[key], want[key], `${lock.name}: ${key}`);
+  }
+});
+
+const contractDir = 'packages/holder-lock/contracts';
+const portContract = readJson(`${contractDir}/holder-lock.port.v1.json`);
+const predecessorContract = readJson(`${contractDir}/predecessor.v1.json`);
+const lockFdContract = readJson(`${contractDir}/internal-route.lock-fd.v1.json`);
+const lockHoldContract = readJson(`${contractDir}/internal-route.lock-hold.v1.json`);
+const vectorsContract = readJson(`${contractDir}/internal-route.lock-borrow-vectors.v1.json`);
+
+test('the Windows guarantee is kernel exclusion with job-scoped borrowing and unlistable holders', () => {
+  const windows = portContract.guarantee.drivers.windows;
+  assert.equal(windows.driver, 'lockfileex');
+  assert.equal(windows.exclusion, 'kernel');
+  assert.equal(windows.borrow, 'job-scoped');
+  assert.equal(windows.holders, 'unsupported');
+  assert.equal(windows.holdersResult, 'unlistable');
+  assert.equal(portContract.guarantee.drivers['windows-remote-volume'].exclusion, 'none');
+  assert.ok(portContract.guarantee.level.includes(windows.borrow));
+  assert.ok(portContract.resource.windowsFileRules.some((rule) => rule.includes('UnlockFileEx')));
+});
+
+test('the Windows borrower check names its four conditions and five refusal reasons', () => {
+  const check = portContract.operations.borrowerCheck.windows;
+  assert.equal(check.passesOnlyWhenAll.length, 4);
+  assert.deepEqual(check.notBorrowerReason.enum, ['job-missing', 'record-mismatch', 'not-in-job', 'holder-not-ancestor', 'lock-not-held']);
+  assert.deepEqual(Object.keys(check.notBorrowerReason.meaning).sort(), [...check.notBorrowerReason.enum].sort());
+  assert.match(check.env, /FGOS_LOCK_JOB=<lock name>:<job name>/);
+  const lockFdReasons = lockFdContract.stdout.results['not-borrower'].reason.enum;
+  for (const reason of check.notBorrowerReason.enum) assert.ok(lockFdReasons.includes(reason), `lock-fd lacks ${reason}`);
+});
+
+test('the port contract names the new errors and the helper roles', () => {
+  assert.deepEqual(Object.keys(portContract.results['acquire-result'].errors).sort(), ['borrow-busy', 'lock-release-stuck']);
+  const roles = portContract.helperRoles;
+  assert.deepEqual(Object.keys(roles.roles).sort(), ['job-keeper', 'probe-holder']);
+  assert.equal(roles.entry.length, 2);
+  assert.match(roles.helperExe, /HelperExe/);
+});
+
+test('the windows-job record carries every key of the domain shape', () => {
+  const id = predecessorContract.record.domainId['windows-job'];
+  for (const key of ['job', 'sessionId', 'declaredAt', 'holder', 'keeper']) assert.ok(key in id, `domainId lacks ${key}`);
+  assert.deepEqual(Object.keys(id.holder).sort(), ['host', 'pid', 'startTime']);
+  assert.equal(predecessorContract.record.v, 1);
+  const views = predecessorContract.windowsJobViews;
+  assert.deepEqual(Object.keys(views.contenderView).sort(), ['failClosed', 'holderAlive', 'holderDead', 'jobNotOpenable', 'kill', 'otherSession', 'usedBy']);
+  assert.ok(views.jobView.empty);
+  assert.ok(views.keeperExit);
+});
+
+test('lock-fd adds the path probe and the read-only predecessor state', () => {
+  const flags = lockFdContract.argv.mode.exactlyOne.map((entry) => entry.flag.split(' ')[0]);
+  assert.ok(flags.includes('--probe'));
+  assert.ok(flags.includes('--predecessor-state'));
+  assert.deepEqual(lockFdContract.stdout.results.predecessor.state.enum, ['empty', 'not-empty', 'unknown', 'absent']);
+});
+
+test('lock-hold names its argv and every work-directory file', () => {
+  assert.equal(lockHoldContract.command, 'fgos internal lock-hold');
+  assert.deepEqual(lockHoldContract.argv.required, ['--protocol 1', '--path <lockFile>', '--mode ex|sh', '--work <dir>']);
+  assert.deepEqual(lockHoldContract.argv.wait.exactlyOne.map((entry) => entry.flag.split(' ')[0]), ['--try', '--wait-ms']);
+  assert.deepEqual(Object.keys(lockHoldContract.workDir.files).sort(), ['err-<n>.log', 'out-<n>.log', 'ready.json', 'req-<n>.json', 'result-<n>.json', 'started-<n>.json']);
+  assert.deepEqual(Object.keys(lockHoldContract.exitCodes), ['0', '2', '3', '10', '11', '12', '70']);
+});
+
+test('borrow vectors keep their names and state one assertion per platform', () => {
+  assert.deepEqual(vectorsContract.vectors.map((vector) => vector.name), ['shell-alias-background', 'filter-clean-smudge', 'hook-background', 'gc-auto-loose-objects']);
+  assert.deepEqual(Object.keys(vectorsContract.platformAssertions), ['posix', 'windows']);
+  assert.match(vectorsContract.platformAssertions.windows, /SYNCHRONIZE/);
 });

@@ -14,7 +14,9 @@
         "--model",
         "{model}",
         "--permission-mode",
-        "acceptEdits"
+        "acceptEdits",
+        "--allowedTools",
+        "Bash(cargo build:*),Bash(cargo check:*),Bash(cargo test:*),Bash(cargo clippy:*),Bash(cargo fmt:*),Bash(node --test:*),Bash(rtk cargo:*),Bash(rtk node:*),Bash(rtk proxy cargo:*),Bash(rtk proxy node:*),Skill"
       ]
     },
     "capabilities": {
@@ -66,12 +68,13 @@
         }
       },
       "fgos-coding-implement": {
-        "description": "code-implement work for the coding domain's executing stage -- preferred executor gemini (agy-herdr-mucdong).",
+        "description": "code-implement work for the coding domain executing stage -- preferred executor gemini through omp (omp-gemini-tetcu72), claude as fallback.",
         "prefer": [
           {
             "executor": "gemini",
-            "invocation": "agy-herdr-mucdong"
-          }
+            "invocation": "omp-gemini-tetcu72"
+          },
+          "claude"
         ]
       },
       "code:implement": {
@@ -79,7 +82,7 @@
         "prefer": [
           {
             "executor": "gemini",
-            "invocation": "agy-cli-bwrap-mucdong"
+            "invocation": "omp-gemini-tetcu72"
           },
           "claude"
         ],
@@ -146,7 +149,7 @@
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -167,7 +170,7 @@
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -188,7 +191,7 @@
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -221,7 +224,7 @@
             "executor": "deepseek"
           },
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           }
         ],
         "rigor": "high"
@@ -233,7 +236,7 @@
             "executor": "openai"
           },
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "gemini"
@@ -263,7 +266,7 @@
             "executor": "openai"
           },
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           }
         ],
         "rigor": "high"
@@ -272,7 +275,7 @@
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "gemini"
@@ -287,13 +290,13 @@
             "executor": "openai"
           }
         ],
-        "rigor": "high"
+        "rigor": "critical"
       },
       "architecture:explain": {
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -314,7 +317,7 @@
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -335,7 +338,7 @@
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -356,7 +359,7 @@
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -377,7 +380,7 @@
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -398,7 +401,7 @@
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -419,7 +422,7 @@
         "description": "Workflow unit capability \"delphi:propose\" -- declare a \"prefer\" pool to choose which executors serve it.",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -440,7 +443,7 @@
         "description": "Workflow unit capability \"delphi:synthesize\" -- declare a \"prefer\" pool to choose which executors serve it.",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -461,7 +464,7 @@
         "description": "Workflow unit capability \"group-cognition:explore\" -- declare a \"prefer\" pool to choose which executors serve it.",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -482,7 +485,7 @@
         "description": "Workflow unit capability \"group-cognition:critique\" -- declare a \"prefer\" pool to choose which executors serve it.",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -503,7 +506,7 @@
         "description": "Workflow unit capability \"group-cognition:synthesize\" -- declare a \"prefer\" pool to choose which executors serve it.",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -524,7 +527,7 @@
         "description": "Workflow unit capability \"nominal-group:generate\" -- declare a \"prefer\" pool to choose which executors serve it.",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -545,7 +548,7 @@
         "description": "Workflow unit capability \"nominal-group:share\" -- declare a \"prefer\" pool to choose which executors serve it.",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -566,7 +569,7 @@
         "description": "Workflow unit capability \"nominal-group:vote\" -- declare a \"prefer\" pool to choose which executors serve it.",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -587,7 +590,7 @@
         "description": "Workflow unit capability \"nominal-group:rank\" -- declare a \"prefer\" pool to choose which executors serve it.",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -607,7 +610,7 @@
       "coding:discover": {
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -628,7 +631,7 @@
       "coding:explore": {
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -650,7 +653,7 @@
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -670,7 +673,7 @@
       "coding:validate": {
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -692,7 +695,7 @@
         "prefer": [
           {
             "executor": "gemini",
-            "invocation": "agy-cli-bwrap-mucdong"
+            "invocation": "omp-gemini-tetcu72"
           },
           "claude"
         ],
@@ -702,7 +705,8 @@
     "executors": {
       "claude": {
         "kind": "agent",
-        "description": "Claude Code CLI -- consolidated executor (executor-id-consolidation Step 2): cli/cli-bwrap invocations, replacing the former separate claude-reviewer/claude-reviewer-herdr/claude-bwrap ids.",
+        "providerModel": "claude",
+        "description": "Claude Code CLI, the one executor of the claude family: claude-cli and claude-cli-bwrap run headless, claude-herdr-bwrap runs a claude REPL in a herdr pane under the bwrap posture. bind() picks the pane invocation inside herdr and a cli one outside, so a capability gets claude in both places.",
         "identity": {
           "principalRef": "principal://claude",
           "runtimeBackendRef": "backend://claude-cli",
@@ -745,12 +749,30 @@
               "-p",
               "{prompt}",
               "--model",
-              "{model}",
-              "--allowedTools",
-              "Read,Edit,Write,Glob,Grep,Skill,Bash(cargo build:*),Bash(cargo check:*),Bash(cargo test:*),Bash(cargo clippy:*),Bash(cargo fmt:*),Bash(node --test:*)"
+              "{model}"
             ],
             "confinement": {
               "backend": "bwrap"
+            }
+          },
+          {
+            "id": "claude-herdr-bwrap",
+            "via": "cli",
+            "adapter": "herdr-spawn",
+            "command": "claude",
+            "args": [
+              "--model",
+              "{model}"
+            ],
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "interactiveMode": {
+              "exitCommand": "/exit",
+              "kind": "claude",
+              "trustStore": {
+                "kind": "claude-json"
+              }
             }
           }
         ]
@@ -1112,112 +1134,10 @@
       },
       "gemini": {
         "kind": "agent",
-        "description": "Gemini provider via Antigravity CLI (2026-09-17 provider-naming pass, was executor id \"agy\"). Invocation id = <bin>-<mode>-<account>: agy-cli-mucdong/agy-herdr-mucdong/agy-cli-bwrap-mucdong (mucdong account) + agy-cli-tetnu (tetnu account). The account a confined (herdr or bwrap) invocation runs as is chosen per provider by the capacity layer from runner.providers.gemini.accounts (mucdong, tetcu72, tetnu), not by the invocation name.",
+        "description": "Gemini provider via omp (oh-my-pi) on the gemini-tetcu72 profile; Antigravity CLI (agy) invocations removed 2026-10-16 (agy not installed, owner chose omp). Invocations: omp-gemini-tetcu72 (herdr pane), omp-cli-bwrap-gemini-tetcu72 (headless). The confined account comes from runner.providers.gemini.accounts in the global config.",
         "allowCrossProvider": true,
         "providerModel": "gemini",
         "invocations": [
-          {
-            "id": "agy-cli-mucdong",
-            "via": "cli",
-            "adapter": "cli-spawn",
-            "command": "agy",
-            "args": [
-              "-p",
-              "{prompt}",
-              "--mode",
-              "accept-edits",
-              "--new-project",
-              "--print-timeout",
-              "30m",
-              "--model",
-              "{model}"
-            ],
-            "env": {
-              "HOME": "${HOME}/.agy-homes/mucdong"
-            }
-          },
-          {
-            "id": "agy-herdr-mucdong",
-            "via": "cli",
-            "adapter": "herdr-spawn",
-            "confinement": {
-              "backend": "bwrap"
-            },
-            "command": "agy",
-            "args": [
-              "--mode",
-              "accept-edits",
-              "--new-project",
-              "--model",
-              "{model}"
-            ],
-            "interactiveMode": {
-              "exitCommand": "/exit",
-              "kind": "agy",
-              "trustStore": {
-                "kind": "agy"
-              }
-            },
-            "env": {
-              "HOME": "${HOME}/.agy-homes/mucdong"
-            },
-            "resourceBindings": [
-              {
-                "resource": "private-home",
-                "target": {
-                  "kind": "env",
-                  "name": "HOME"
-                }
-              }
-            ]
-          },
-          {
-            "id": "agy-cli-bwrap-mucdong",
-            "via": "cli",
-            "adapter": "cli-spawn",
-            "command": "agy",
-            "args": [
-              "-p",
-              "{prompt}",
-              "--model",
-              "{model}"
-            ],
-            "confinement": {
-              "backend": "bwrap"
-            },
-            "env": {
-              "HOME": "${HOME}/.agy-homes/mucdong"
-            },
-            "resourceBindings": [
-              {
-                "resource": "private-home",
-                "target": {
-                  "kind": "env",
-                  "name": "HOME"
-                }
-              }
-            ]
-          },
-          {
-            "id": "agy-cli-tetnu",
-            "via": "cli",
-            "adapter": "cli-spawn",
-            "command": "agy",
-            "args": [
-              "-p",
-              "{prompt}",
-              "--mode",
-              "accept-edits",
-              "--new-project",
-              "--print-timeout",
-              "30m",
-              "--model",
-              "{model}"
-            ],
-            "env": {
-              "HOME": "${HOME}/.agy-homes/tetnu"
-            }
-          },
           {
             "id": "omp-gemini-tetcu72",
             "via": "cli",
@@ -1227,6 +1147,8 @@
             },
             "command": "omp",
             "args": [
+              "--model",
+              "{model}",
               "--thinking",
               "medium",
               "--tools",
@@ -1236,6 +1158,41 @@
             "interactiveMode": {
               "exitCommand": "/exit",
               "kind": "omp"
+            },
+            "env": {
+              "PI_CODING_AGENT_DIR": "${HOME}/.omp/profiles/gemini-tetcu72/agent",
+              "PI_CONFIG_DIR": "../../tmp/fgos-omp-config"
+            },
+            "resourceBindings": [
+              {
+                "resource": "private-home",
+                "target": {
+                  "kind": "env",
+                  "name": "PI_CODING_AGENT_DIR"
+                }
+              }
+            ]
+          },
+          {
+            "id": "omp-cli-bwrap-gemini-tetcu72",
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "omp",
+            "args": [
+              "--model",
+              "{model}",
+              "--thinking",
+              "medium",
+              "--tools",
+              "read,write,edit,bash,grep,glob",
+              "--mode",
+              "json",
+              "--auto-approve",
+              "-p",
+              "{prompt}"
+            ],
+            "confinement": {
+              "backend": "bwrap"
             },
             "env": {
               "PI_CODING_AGENT_DIR": "${HOME}/.omp/profiles/gemini-tetcu72/agent",
@@ -1454,77 +1411,6 @@
             ]
           }
         ]
-      },
-      "claude-herdr": {
-        "kind": "agent",
-        "description": "Claude Code REPL in a herdr pane under the bwrap posture, same provider family as `claude`. Separate id because `claude` is merged with the global default executor, which drops its own invocations.",
-        "allowCrossProvider": true,
-        "providerModel": "claude",
-        "invocations": [
-          {
-            "id": "claude-herdr-bwrap",
-            "via": "cli",
-            "adapter": "herdr-spawn",
-            "command": "claude",
-            "args": [
-              "--model",
-              "{model}"
-            ],
-            "confinement": {
-              "backend": "bwrap"
-            },
-            "interactiveMode": {
-              "exitCommand": "/exit",
-              "kind": "claude",
-              "trustStore": {
-                "kind": "claude-json"
-              }
-            }
-          }
-        ]
-      },
-      "glm-herdr": {
-        "kind": "agent",
-        "description": "GLM 5.3 (z-ai/glm-5.3) through the pi CLI and OpenRouter, in a herdr pane under the bwrap posture. Replaces the claude-CLI-through-gateway route, whose pane stopped at a /login prompt with a 401.",
-        "allowCrossProvider": true,
-        "providerModel": "z-ai",
-        "invocations": [
-          {
-            "id": "pi-herdr-openrouter",
-            "via": "cli",
-            "adapter": "herdr-spawn",
-            "confinement": {
-              "backend": "bwrap"
-            },
-            "command": "pi",
-            "args": [
-              "--model",
-              "{model}",
-              "--thinking",
-              "medium",
-              "--tools",
-              "read,write,edit,bash,grep,find,ls",
-              "--approve"
-            ],
-            "interactiveMode": {
-              "exitCommand": "/quit",
-              "kind": "pi"
-            },
-            "env": {
-              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openrouter",
-              "OPENROUTER_API_KEY": "${GLM_OPENROUTER_API_KEY}"
-            },
-            "resourceBindings": [
-              {
-                "resource": "private-home",
-                "target": {
-                  "kind": "env",
-                  "name": "PI_CODING_AGENT_DIR"
-                }
-              }
-            ]
-          }
-        ]
       }
     },
     "timeoutMs": 2100000,
@@ -1582,6 +1468,7 @@
       "high": "flagship",
       "critical": "frontier"
     },
+    "maxTier": "flagship",
     "confinement": {
       "strict": false
     },
@@ -1624,7 +1511,7 @@
         ]
       }
     ],
-    "idleTimeoutMs": 1500000
+    "idleTimeoutMs": 5400000
   },
   "gateBypass": {
     "level": "standard"

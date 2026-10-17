@@ -19,12 +19,10 @@
 // feature. The in-process write-queue (write-queue.mjs) serializes async
 // writes inside ONE Node process only and gives ZERO cross-process
 // protection, so it is deliberately NOT used here. Every registry mutation is
-// guarded by a dedicated `.fgos/sessions.lock`, an independent lock file
-// mirroring loop.mjs's `acquireRunnerLock` TOCTOU-safe algorithm (wx atomic
-// create holding this pid; on EEXIST a live holder backs off, a dead/garbage
-// pid is a crash leftover that is re-read-right-before-unlink then cleaned,
-// never delete-then-create in the same attempt). It never touches
-// `.fgos/runner.lock` — that is Epic 3's concern.
+// guarded by the `sessions` kernel lock (`.fgos/locks/sessions.lock`,
+// src/holder-lock): the kernel excludes concurrent holders and releases the
+// lock the moment its holder dies, so a crashed process never leaves a
+// record anybody has to judge. It is a different lock from the runner's.
 //
 // DIVERGENCE: a detached-HEAD worktree CAN receive commits from inside it
 // (spike-confirmed), and such a commit is genuinely dangling — reachable from
@@ -38,9 +36,11 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { fgosDirFromRoot, resolveMainCheckoutRoot } from './paths.mjs';
+import { pidExists } from './dispatch/process-identity.mjs';
+import { acquireSync, createLockScope, lockHolders, resolveLock } from '../holder-lock/index.mjs';
+import { addWorktreeSync } from './repo-locks.mjs';
 
 const SESSIONS_FILE = 'sessions.json';
-const SESSIONS_LOCK = 'sessions.lock';
 
 // Safe filesystem-path charset for a caller-supplied session id: a value
 // outside this set is rejected BEFORE it can flow into any path (the mkdtemp
@@ -62,23 +62,6 @@ export class SessionError extends Error {
 
 function gitAt(cwd, args) {
   return execFileSync('git', args, { cwd, encoding: 'utf8', shell: false });
-}
-
-/** Signal-0 liveness probe (mirrors loop.mjs's isPidAlive). EPERM means the
- * pid exists under another user — still alive. */
-function isPidAlive(pid) {
-  try {
-    process.kill(pid, 0);
-    return true;
-  } catch (err) {
-    return err.code === 'EPERM';
-  }
-}
-
-/** Synchronous backoff — keeps the whole module synchronous like worktree.mjs
- * and loop.mjs, without a busy spin. */
-function sleepSync(ms) {
-  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
 }
 
 function fgosDirOf(repoRoot) {
@@ -173,116 +156,20 @@ function restoreTrackedFgos(worktreePath) {
   }
 }
 
-let lockTmpCounter = 0;
-
-/** One attempt at the link-atomic-create lock, mirroring loop.mjs's
- * `acquireRunnerLock` shape. Returns whether the lock was taken, and — on a
- * live holder — its pid. NEVER creates the lock in the same attempt that
- * deleted a stale one (that delete-then-create was the TOCTOU loop.mjs's doc
- * comment calls out); a reclaim yields and the next attempt does the bare
- * create.
- *
- * Creation writes the pid to a per-attempt temp file THEN `fs.linkSync`s it
- * onto `lockPath` (tsk-1u7, porting the fix `events.mjs`'s
- * `tryAcquireEventsLockOnce` already proved at tsk-3ld): the earlier
- * `fs.openSync(lockPath, 'wx')` + separate `fs.writeSync` created a window
- * where the lock file existed but was still empty, so a competing process
- * reading it mid-write saw unparseable (NaN) content, fell through to the
- * "dead/garbage holder" branch, and unlinked a lock a live process
- * legitimately held — letting two processes both believe they held it
- * (reproduced directly in this module: ~27% of runs at 50 concurrent
- * processes with a synchronized start barrier, see
- * `docs/history/tsk-1u7-session-lock-contention-flake/plan.md`). `link()`
- * only ever exposes `lockPath` fully-written or not-yet-existing — never
- * partially written — so that window is closed structurally, not papered
- * over with a retry. */
-function tryAcquireOnce(lockPath, pid) {
-  const dir = path.dirname(lockPath);
-  lockTmpCounter += 1;
-  const tmpPath = path.join(dir, `.sessions.lock.tmp-${pid}-${Date.now()}-${lockTmpCounter}`);
-  fs.writeFileSync(tmpPath, String(pid), 'utf8');
-  try {
-    fs.linkSync(tmpPath, lockPath);
-    return { acquired: true };
-  } catch (err) {
-    if (err.code !== 'EEXIST') throw err;
-  } finally {
-    try {
-      fs.unlinkSync(tmpPath);
-    } catch (err) {
-      if (err.code !== 'ENOENT' && err.code !== 'EPERM') throw err;
-    }
-  }
-
-  let raw;
-  try {
-    raw = fs.readFileSync(lockPath, 'utf8');
-  } catch (err) {
-    if (err.code === 'ENOENT' || err.code === 'EPERM' || err.code === 'EBUSY') return { acquired: false, holderPid: null }; // released in between — retry create
-    throw err;
-  }
-  const holderPid = parseInt(raw.trim(), 10);
-
-  // A positive-integer pid that is alive is a genuine holder — back off,
-  // never touch its lock.
-  if (Number.isInteger(holderPid) && holderPid > 0 && isPidAlive(holderPid)) {
-    return { acquired: false, holderPid };
-  }
-
-  // Stale (dead/garbage pid). Re-read right before the unlink: the liveness
-  // probe is the slow window; changed content means a fresh holder took the
-  // path and must not be touched.
-  let current;
-  try {
-    current = fs.readFileSync(lockPath, 'utf8');
-  } catch (err) {
-    if (err.code === 'ENOENT' || err.code === 'EPERM' || err.code === 'EBUSY') return { acquired: false, holderPid: null }; // already cleaned
-    throw err;
-  }
-  if (current !== raw) {
-    const freshPid = parseInt(current.trim(), 10);
-    return { acquired: false, holderPid: Number.isInteger(freshPid) && freshPid > 0 ? freshPid : null };
-  }
-  try {
-    fs.unlinkSync(lockPath);
-  } catch (err) {
-    if (err.code !== 'ENOENT' && err.code !== 'EPERM' && err.code !== 'EBUSY') throw err;
-  }
-  return { acquired: false, holderPid: null }; // cleaned and yield; next attempt creates
-}
-
-/** Blocking exclusive acquire of `.fgos/sessions.lock`. Retries the
- * single-attempt primitive with a synchronous backoff until it wins or the
- * timeout elapses. Returns a handle with `release()`; callers MUST release in
- * a finally. */
-export function acquireSessionsLock(fgosDir, { pid = process.pid, timeoutMs = 10000, retryMs = 20 } = {}) {
-  fs.mkdirSync(fgosDir, { recursive: true });
-  const lockPath = path.join(fgosDir, SESSIONS_LOCK);
-  const deadline = Date.now() + timeoutMs;
-
-  for (;;) {
-    const res = tryAcquireOnce(lockPath, pid);
-    if (res.acquired) {
-      return {
-        lockPath,
-        release() {
-          try {
-            fs.unlinkSync(lockPath);
-          } catch (err) {
-            if (err.code !== 'ENOENT' && err.code !== 'EPERM') throw err;
-          }
-        },
-      };
-    }
-    if (Date.now() >= deadline) {
-      throw new SessionError(
-        `timed out acquiring sessions.lock at "${lockPath}" after ${timeoutMs}ms` +
-          (res.holderPid ? ` (held by pid ${res.holderPid})` : ''),
-        { lockPath, holderPid: res.holderPid ?? null },
-      );
-    }
-    sleepSync(retryMs);
-  }
+/** Blocking exclusive acquire of the `sessions` kernel lock. Waits until it
+ * wins or the timeout elapses. Returns a handle with `release()`; callers
+ * MUST release in a finally. A holder that dies releases at once. */
+export function acquireSessionsLock(fgosDir, { timeoutMs = 10000 } = {}) {
+  const params = { fgosDir };
+  const res = acquireSync(createLockScope('sessions'), 'sessions', params, { waitMs: timeoutMs });
+  if (res.result === 'acquired') return res.handle;
+  const holders = lockHolders('sessions', params);
+  const holderPid = holders.kind === 'list' && holders.pids.length > 0 ? holders.pids[0] : null;
+  const lockPath = resolveLock('sessions', params).v3Path;
+  throw new SessionError(
+    `timed out acquiring sessions.lock at "${lockPath}" after ${timeoutMs}ms` + (holderPid ? ` (held by pid ${holderPid})` : ''),
+    { lockPath, holderPid },
+  );
 }
 
 /** Read the registry. A missing file is an empty registry (fresh repo). A
@@ -420,7 +307,7 @@ export function createSession(repoRoot, opts = {}) {
 
     try {
       // --detach: zero new branches, genuinely detached HEAD (spike-proven).
-      gitAt(repoRoot, ['worktree', 'add', '--detach', worktreePath, currentHeadSha]);
+      addWorktreeSync(createLockScope('session-worktree'), repoRoot, ['--detach', worktreePath, currentHeadSha]);
     } catch (err) {
       try {
         fs.rmSync(worktreePath, { recursive: true, force: true });
@@ -615,7 +502,7 @@ export function reclaimOrphanedSessions(repoRoot) {
           break;
         }
       }
-      const pidDead = !(Number.isInteger(entry.pid) && entry.pid > 0 && isPidAlive(entry.pid));
+      const pidDead = !pidExists(entry.pid);
       if (!missingFromGit && !pidDead) {
         kept.push(entry); // a live, still-registered session — never touched
         continue;

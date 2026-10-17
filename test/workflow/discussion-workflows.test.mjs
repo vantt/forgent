@@ -7,7 +7,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { execFileSync } from 'node:child_process';
 import { withProviderFamilies } from '../helpers/provider-families.mjs';
-import YAML from 'yaml';
+import { parseYaml } from '../../src/util/yaml.mjs';
 
 import {
   validateWorkflow,
@@ -100,7 +100,7 @@ test('delphi.yaml schema validation & discovery', () => {
   assert.ok(fs.existsSync(filePath), 'core/workflows/delphi.yaml must exist');
 
   const content = fs.readFileSync(filePath, 'utf8');
-  const raw = YAML.parse(content);
+  const raw = parseYaml(content);
   const wf = validateWorkflow(raw);
 
   assert.equal(wf.id, 'delphi');
@@ -152,7 +152,7 @@ test('nominal-group.yaml schema validation & discovery', () => {
   assert.ok(fs.existsSync(filePath), 'core/workflows/nominal-group.yaml must exist');
 
   const content = fs.readFileSync(filePath, 'utf8');
-  const raw = YAML.parse(content);
+  const raw = parseYaml(content);
   const wf = validateWorkflow(raw);
 
   assert.equal(wf.id, 'nominal-group');
@@ -200,7 +200,7 @@ test('group-cognition.yaml schema validation & discovery', () => {
   assert.ok(fs.existsSync(filePath), 'core/workflows/group-cognition.yaml must exist');
 
   const content = fs.readFileSync(filePath, 'utf8');
-  const raw = YAML.parse(content);
+  const raw = parseYaml(content);
   const wf = validateWorkflow(raw);
 
   assert.equal(wf.id, 'group-cognition');

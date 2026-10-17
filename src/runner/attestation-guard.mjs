@@ -10,7 +10,7 @@
 
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { readEvents } from '../state/events.mjs';
+import { readEvents } from '../state/event-log.mjs';
 
 function gitAt(repoRoot, args) {
   return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false });

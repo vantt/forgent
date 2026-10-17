@@ -1075,7 +1075,9 @@ async function renewInScratch({ layout, layoutName, provider, credentialSource, 
 
   const plan = withKillTimeout(credentialProbeCommand({ ...credentialSource, home: scratch }), probeTimeoutMs, env);
   const probe = plan
-    ? await runCredentialProbe(plan, { spawnFn, timeoutMs: probeTimeoutMs, env, onSpawn: (child) => lock.recordChild(child?.pid) })
+    // The call holds the account lock with this holder: if this process dies mid-call, nobody else
+    // redeems the same single-use refresh token until the call has ended too.
+    ? await runCredentialProbe(plan, { spawnFn: spawnFn ?? lock.spawnHolding, timeoutMs: probeTimeoutMs, env })
     : { ok: false, detail: 'no probe exists for this credential layout' };
 
   // Applied even when the call was judged a failure: a call killed at its time limit may already have
