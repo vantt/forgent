@@ -301,6 +301,13 @@ Mỗi bước ở nhóm A ghi ước lượng trọng lượng (số dòng, số
 
 Vì vậy nhóm A nên được đóng khung là **lát cắt đầu tiên của Agent Context Engine theo đúng thiết kế đó**, không phải một cơ chế riêng: giữ L0 trong `AGENTS.md` nhỏ (chỉ câu chỉ đường và luật thật sự luôn cần), đưa L1 vào brief và worker contract theo phạm vi việc, thêm ngân sách theo host vào bộ chiếu với quy tắc giảm theo độ sâu thay vì cắt, và dùng tiêu chí fail closed khi tập luật bắt buộc vượt ngân sách. Làm như vậy vẫn khớp với ranh giới của plan document-unification (không âm thầm mở rộng sang engine đầy đủ), vì chỉ chạm phần đã có mầm trong `src/setup/`.
 
+**Quyền ghép luật: một chủ (RUL102, chốt 2026-10-17).** Trước đó contract packaging-distribution §2 giao "composition engine, registry shape" cho packaging-distribution, còn proposal §4.7.2-4.7.3 giao Instruction Composer cho Agent Context Engine; contract không nhắc tới engine này. Để nguyên thì engine tương lai sẽ được dựng cạnh `src/setup/instruction-composition.mjs`, thành hai composer. Chủ repo chọn: **Agent Context Engine sở hữu việc ghép và chọn luật** (thứ tự theo loại, override, xung đột, chọn theo việc, ngân sách theo host, nạp theo tầng); **packaging-distribution giữ phần giao hàng** (tìm và cài nguồn luật, adapter render theo host, ledger, doctor sửa chữa). Lý do: ngân sách cần biết loại và hiệu lực của luật, nên composer và budgeter phải cùng chủ; packaging-distribution là component cài đặt và giao hàng, để nó quyết nội dung là đặt quyền sai chỗ. Có hai lúc giao luật:
+
+- *Giao tĩnh (ghi file):* khi nguồn luật đổi hoặc lúc setup, cài, nâng cấp, packaging-distribution hỏi engine effective set cho từng host rồi render ra `AGENTS.md` và các file host khác.
+- *Giao động (theo việc):* runner hỏi engine một gói context L1/L2 cho việc cụ thể và chèn vào brief của worker; không ghi file, packaging-distribution không tham gia.
+
+Engine không biết host hay file. Chặn trọng lượng: chưa dựng component mới; code trong `src/setup/instruction-registry.mjs` và `instruction-composition.mjs` là mầm của engine và chỉ chuyển sang module riêng khi lát cắt ngân sách và chia tầng đầu tiên được làm, trong cùng thay đổi, không giữ hai nơi. Đã ghi vào `docs/specs/distribution.md` (RUL102) và sửa contract §2.
+
 **Hệ quả cho nhóm A: không dựng mới, mở rộng cái đã có.** Cơ chế sổ luật, thứ tự và bộ chiếu đã có từ P3-P5; chỗ hở là gần như không dùng: `core/instructions/` mới có 2 đơn vị luật (`decision-question.md`, `platform-laws.md`), còn phần lớn luật vẫn viết tay trong `AGENTS.md` ngoài registry. Vì vậy:
 
 - *Sổ luật:* chuyển dần các luật viết tay trong `AGENTS.md` thành đơn vị luật trong `core/instructions/` (theo mẫu của plan 261008), để registry có kind, scope và id cho từng luật; không dựng sổ thứ hai.
@@ -354,4 +361,5 @@ Hai lần điều tra trước đã hỏi đúng câu hỏi của báo cáo này
 - **Q4.** 7 nguyên tắc nên chốt thành luật khoá mới (L11+, có decision ID) hay đưa vào spec dưới dạng guideline không khoá?
 - **Q5.** Xử lý giới hạn 32 KiB của codex thế nào: rút `AGENTS.md` xuống dưới 32 KiB (đề xuất), sắp lại để luật quan trọng nằm trong 32 KiB đầu, hay tăng `project_doc_max_bytes` trên mọi home codex?
 - **Q6.** P5: sinh danh sách luật thành fragment trong `core/instructions/` kèm test chống lệch (đề xuất, khớp contract mục 4), hay sửa contract để cho phép đọc từ `docs/platform-foundations.md`?
+- **Q8.** ~~Quyền ghép luật thuộc Agent Context Engine hay packaging-distribution?~~ Đã chốt 2026-10-17: Agent Context Engine ghép và chọn luật, packaging-distribution giao hàng (RUL102, mục 6).
 - **Q7.** Quyết định ngày 2026-10-06 ("ak và ck là ràng buộc môi trường, không sửa, xoá hay dedupe") còn hiệu lực không? Nếu còn, phía fgOS chỉ chọn cách đặt luật để tránh trùng, và các bước động vào cấu hình cài của ak (P5, `p-7eb9e65b`) thành đề xuất gửi ak. Nếu thay, ghi một quyết định mới có ID cho phép fgOS cấu hình đích cài của ak trong repo này.
