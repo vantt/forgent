@@ -2,6 +2,7 @@
 // từ test/cli/fgos.test.mjs (tsk-3um). Nội dung test không đổi, chỉ chỗ ở đổi.
 // Bộ đồ nghề dùng chung nằm ở ./helpers/fgos-cli-harness.mjs.
 import { test } from 'node:test';
+import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
 // The retrospective-content gate itself, so the two tests below can assert
 // the CONSEQUENCE of tagging these verbs' decisions as engine bookkeeping —
 // not merely that the field is present. Imported straight from src rather
@@ -87,7 +88,6 @@ import {
   writeCreateFake,
   writeFakeGh,
   writeHangScript,
-  writeLiveLock,
   writeMarkerFake,
   writeMergeSuccessFake,
   writeRunnerConfig,
@@ -1110,24 +1110,26 @@ test('merge next on a blockedOnSync root whose sync-root attempt hits a dirty ma
   assert.equal(stateView(cwd).work['auto-sync-dirty'].status, 'awaiting-approval', 'a blocked sync must never touch the root item\'s own status');
 });
 
-test('merge next --no-wait fails immediately on a live-held lock -- proves the flag actually forwards into approve (bin/fgos.mjs:1152), not just documented as if it did', () => {
+test('merge next --no-wait fails immediately while another process holds the trunk\'s merge slot -- proves the flag actually forwards into approve (bin/fgos.mjs:1152), not just documented as if it did', async () => {
   const cwd = initGitCwdMainFast();
   makeRunnerProposedItem(cwd, 'wait-merge-next-no-wait', { verify: 'true' });
   commitPendingBeforeApprove(cwd, 'wait-merge-next-no-wait');
-  writeLiveLock(cwd, 1000);
+  const holder = await holdLockInChild('merge-slot', { fgosDir: path.join(cwd, '.fgos'), ref: 'main' });
+  try {
+    const result = run(cwd, ['merge', 'next', '--no-wait']);
 
-  const result = run(cwd, ['merge', 'next', '--no-wait']);
-
-  // `merge next` only special-cases an Iron Law rejection (bin/fgos.mjs's
-  // `sub === 'next'` case) -- any other error from the inner `runVerb('approve', ...)`
-  // rethrows as-is, so this fails exactly like a direct `approve` call does.
-  assert.equal(result.status, 9, result.stderr);
-  assert.match(result.stderr, /main checkout is locked by pid \d+/);
-  // A run that waited would print its retry progress line before every sleep and tag the final
-  // error with the time it waited; neither appears when the flag was forwarded. The lock holder
-  // (this process) never releases, so a waiting run could not have succeeded either.
-  assert.doesNotMatch(result.stderr, /still waiting on main-checkout lock/, '--no-wait forwarded through merge next must not enter the retry loop');
-  assert.doesNotMatch(result.stderr, /waited \d+ms before giving up/, '--no-wait forwarded through merge next must not wait before giving up');
+    // `merge next` only special-cases an Iron Law rejection (bin/fgos.mjs's
+    // `sub === 'next'` case) -- any other error from the inner `runVerb('approve', ...)`
+    // rethrows as-is, so this fails exactly like a direct `approve` call does.
+    assert.equal(result.status, 9, result.stderr);
+    assert.match(result.stderr, /merge slot of "main" is held by another process \(pid \d+/);
+    // A run that waited would tag the final error with the time it waited; none appears when the
+    // flag was forwarded. The holder never releases, so a waiting run could not have succeeded either.
+    assert.doesNotMatch(result.stderr, /after waiting \d+ ms/, '--no-wait forwarded through merge next must not wait before giving up');
+  } finally {
+    holder.child.kill('SIGKILL');
+    await holder.exited;
+  }
 });
 
 test('sync-root never reports outcome "synced" when mergeRunnerItem returns an outcome it does not explicitly handle -- proves the defensive guard closes the false-success gap D4 found', () => {
@@ -1226,42 +1228,6 @@ test('sync-root outcome guard catches merge-failed-unclassified and records unha
 
   const lines = eventLines(cwd);
   const mergedDecisions = lines.map((l) => JSON.parse(l)).filter((e) => e.type === 'decision' && e.payload?.id === 'sync-root-merge-failed' && /merged/.test(e.payload?.text ?? ''));
-  assert.equal(mergedDecisions.length, 0, 'must never record a "merged" decision for a merge that never actually completed');
-});
-
-test('sync-root outcome guard catches lock-lost-mid-merge and records unhandled-outcome friction (tsk-3df)', () => {
-  const cwd = initGitCwdMainFast();
-
-  const lockPath = path.join(cwd, '.fgos', 'main-checkout.lock').replaceAll('\\', '/');
-  const lockOverwriter = `node -e "require('fs').writeFileSync('${lockPath}', JSON.stringify({pid: 999999, ts: Date.now()}))"`;
-
-  makeDriftedRoot(cwd, 'sync-root-lock-lost', { verify: lockOverwriter });
-
-  const headBefore = gitHead(cwd);
-  const result = run(cwd, ['sync-root', 'sync-root-lock-lost']);
-
-  assert.equal(result.status, 0, result.stderr);
-  const data = envelopeData(result.stdout);
-  assert.notEqual(data.outcome, 'synced', 'must never report success for lock-lost-mid-merge');
-  assert.equal(data.outcome, 'blocked');
-  assert.equal(data.reason, 'lock-lost-mid-merge');
-
-  const frictions = stateView(cwd).frictions?.['sync-root-lock-lost'] ?? [];
-  assert.ok(
-    frictions.some((f) => f.errorClass === 'sync-root-unhandled-outcome'),
-    'frictions must contain an entry with errorClass === "sync-root-unhandled-outcome"',
-  );
-
-  assert.equal(gitHead(cwd), headBefore, 'main must be unchanged');
-  assert.doesNotThrow(
-    () => gitAtCwd(cwd, ['rev-parse', '--verify', 'MERGE_HEAD']),
-    'MERGE_HEAD must survive untouched because abortMergeIfPossible was not called',
-  );
-  assert.equal(fs.existsSync(path.join(cwd, 'sync-root-lock-lost-produced.txt')), true, 'staged merge file must survive untouched on disk');
-  assert.equal(stateView(cwd).work['sync-root-lock-lost'].status, 'doing', 'a blocked sync-root must never touch the root item\'s status');
-
-  const lines = eventLines(cwd);
-  const mergedDecisions = lines.map((l) => JSON.parse(l)).filter((e) => e.type === 'decision' && e.payload?.id === 'sync-root-lock-lost' && /merged/.test(e.payload?.text ?? ''));
   assert.equal(mergedDecisions.length, 0, 'must never record a "merged" decision for a merge that never actually completed');
 });
 

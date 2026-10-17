@@ -1720,6 +1720,18 @@ async function landCasMergeUnderLock(scope, repoRoot, { branch, targetBranch, ta
       if (ownFileSet && !isWorkingTreeClean(repoRoot, ownFileSet)) {
         return { outcome: 'main-checkout-dirty-mid-merge', branch };
       }
+      const currentBranch = execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+      const syncsWorkingTree = currentBranch === targetBranch;
+      if (syncsWorkingTree) {
+        // The working-tree sync below resets the index to the new HEAD and
+        // removes staged additions from disk: a person's staged change must
+        // refuse the land, never be discarded by it.
+        const stagedPaths = nulPaths(execFileSync('git', ['diff', '--name-only', '--cached', '--no-renames', '--no-relative', '-z'], { cwd: repoRoot, encoding: 'utf8', maxBuffer: GIT_LIST_MAX_BUFFER }))
+          .filter((p) => p !== '.fgos' && !p.startsWith('.fgos/'));
+        if (stagedPaths.length > 0) {
+          return { outcome: 'main-checkout-dirty-mid-merge', branch, stagedPaths };
+        }
+      }
       try {
         execFileSync('git', ['update-ref', `refs/heads/${targetBranch}`, commitSha, targetTip], { cwd: repoRoot, encoding: 'utf8', stdio: 'pipe' });
       } catch (err) {
@@ -1729,8 +1741,7 @@ async function landCasMergeUnderLock(scope, repoRoot, { branch, targetBranch, ta
           error: { message: `update-ref failed: ${err.message}`, stderr: err.stderr ?? null, status: err.status ?? null }
         };
       }
-      const currentBranch = execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim();
-      if (currentBranch === targetBranch) {
+      if (syncsWorkingTree) {
         try {
           execFileSync('git', ['read-tree', '-m', '-u', 'HEAD'], { cwd: repoRoot, encoding: 'utf8', stdio: 'pipe' });
         } catch (e) {

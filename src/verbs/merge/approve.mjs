@@ -780,9 +780,12 @@ export async function approveUseCase(
       // main-checkout.lock, right before update-ref -- the exact same
       // real-conflict shape the pre-check refuses, just caught later.
       // Nothing was moved: no ref update, no working-tree sync attempted.
+      const dirtied = result.stagedPaths
+        ? `staged changes on the main checkout (${result.stagedPaths.join(', ')}) would be discarded by the working-tree sync`
+        : 'a path in this item\'s own file set was dirtied on the main checkout between the pre-merge check and the land step';
       const detail = hadChildren
-        ? `cross-root integration attempt at main@${currentHead(repoRoot)}; a path in this item's own file set was dirtied on the main checkout between the pre-merge check and the land step; merge of ${result.branch} was stopped before update-ref`
-        : `a path in this item's own file set was dirtied on the main checkout between the pre-merge check and the land step; merge of ${result.branch} was stopped before update-ref`;
+        ? `cross-root integration attempt at main@${currentHead(repoRoot)}; ${dirtied}; merge of ${result.branch} was stopped before update-ref`
+        : `${dirtied}; merge of ${result.branch} was stopped before update-ref`;
       const conflict = moveBlockedOrConflict(dir, { id, reason: 'main-checkout-dirty-mid-merge', role: 'system' });
       if (conflict) return conflict;
       recordFriction(dir, {
