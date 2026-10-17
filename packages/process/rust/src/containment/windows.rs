@@ -19,7 +19,6 @@ use crate::platform::windows_job::{assign_and_resume, create_kill_job, filetime_
 use crate::{domain_watch, Domain, DomainState, DomainWatch, KillOutcome, ProcId, WindowsJob};
 
 /// The longest wait for the job to be provably empty after it was ended.
-const EMPTY_WAIT: Duration = Duration::from_secs(5);
 const POLL: Duration = Duration::from_millis(10);
 
 /// The job an attempt runs in, and the watch that judges it. Dropping it closes
@@ -119,6 +118,7 @@ impl ContainmentDriver for WindowsJobDriver {
         let Some(record @ Domain::WindowsJob(_)) = domain.domain().cloned() else {
             return KillOutcome::Refused;
         };
+        let empty_wait = domain.empty_wait();
         let Some(hold) = domain.job.as_mut() else {
             return crate::domain_kill_all(&record);
         };
@@ -132,7 +132,7 @@ impl ContainmentDriver for WindowsJobDriver {
             if watch.is_empty() == DomainState::Empty {
                 return KillOutcome::Ok;
             }
-            if start.elapsed() >= EMPTY_WAIT {
+            if start.elapsed() >= empty_wait {
                 return KillOutcome::Refused;
             }
             std::thread::sleep(POLL);

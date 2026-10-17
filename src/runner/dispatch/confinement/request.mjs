@@ -38,6 +38,10 @@ const ALLOWED_REQUEST_KEYS = new Set([
   "authorityScope",
   "assignmentLaunchContext",
   "providerCapacity",
+  "attemptId",
+  "launchMode",
+  "gateCommand",
+  "attemptBinds",
 ]);
 
 export function crossCheckAssignmentLaunchContext(launchContext, context = null) {
@@ -282,6 +286,10 @@ export function buildConfinementRequest({
   assignmentLaunchContext = null,
   providerCapacity = null,
   dispatchId = null,
+  attemptId = null,
+  launchMode = null,
+  gateCommand = null,
+  attemptBinds = null,
 } = {}) {
   const cap = capability || executorId || "(unknown-capability)";
   const execId = executorId || cap;
@@ -449,6 +457,9 @@ export function buildConfinementRequest({
     backendId: backendId ?? cfg?.executors?.[execId]?.confinement?.backend ?? null,
     ...(authorityScope ? { authorityScope } : {}),
     ...(assignmentLaunchContext ? { assignmentLaunchContext } : {}),
+    // A supervised attempt: the driver names the gate as the command the sandbox runs and returns the
+    // prefix and the agent argv instead of a worker command line.
+    ...(attemptId ? { attemptId, launchMode: launchMode ?? 'direct', ...(Array.isArray(gateCommand) ? { gateCommand } : {}), ...(Array.isArray(attemptBinds) ? { attemptBinds } : {}) } : {}),
     // The account leased for this launch hands over the login store of the CLI this invocation runs
     // (an account may keep one per CLI); private-home provisioning, write-back and trust seeding read it.
     ...(providerCapacity ? { providerCapacity: providerCapacityForCommand(providerCapacity, invocation?.command) } : {}),

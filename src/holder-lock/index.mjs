@@ -579,6 +579,33 @@ export function runBorrowed(handle, spec, { sync = true } = {}) {
 }
 
 /**
+ * spawnWithLocks(handles, spec) -- start one detached child that keeps the locks alive on its own.
+ * `spec = { command, args, cwd, env, stdout, stderr }` (`stdout`/`stderr` are open file descriptors
+ * or omitted for the null device). The child leads its own session, has no IPC channel, and receives
+ * the description of `handles[i]` at descriptor `3 + i`; every other descriptor of this process stays
+ * closed in it. Returns the ChildProcess, already unreferenced; the caller still owns every handle and
+ * releases them (closing its own copies) once the child has taken over.
+ *
+ * Only the descriptor transport can hand a lock over: where a lock lives in a helper process (Windows)
+ * the call throws `lock-transport-hold` and the child takes the lock itself.
+ */
+export function spawnWithLocks(handles, spec) {
+  if (!Array.isArray(handles) || handles.length === 0 || !spec || typeof spec.command !== 'string' || !spec.command) {
+    throw new HolderLockError('spawn-spec-invalid', 'spawnWithLocks needs handles and spec.command', {});
+  }
+  const fds = handles.map((handle) => {
+    const entry = descriptionOf(handle);
+    if (entry.released) throw new HolderLockError('lock-handle-released', `${handle.name}: cannot hand over a released lock`, { lock: handle.name });
+    if (entry.fd === null) throw new HolderLockError('lock-transport-hold', `${handle.name}: this platform keeps the lock in a helper; the child must take it itself`, { lock: handle.name });
+    return entry.fd;
+  });
+  const stdio = ['ignore', spec.stdout ?? 'ignore', spec.stderr ?? 'ignore', ...fds];
+  const child = spawn(spec.command, spec.args ?? [], { cwd: spec.cwd, env: spec.env ?? process.env, stdio, detached: true, windowsHide: true });
+  child.unref();
+  return child;
+}
+
+/**
  * checkBorrowedDescription(lockPath, { env }) ->
  *   { result: 'borrower', name } | { result: 'not-borrower', reason, name }
  *

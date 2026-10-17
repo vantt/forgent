@@ -29,13 +29,21 @@ function holderPidOf(params) {
  * `cwd` does not exist.
  */
 export function acquireDispatchCwdLock(fgosDir, cwd) {
+  return acquireDispatchCwdLockIn(createLockScope(LOCK_NAME), fgosDir, cwd);
+}
+
+/**
+ * The same acquire inside a scope the caller already holds locks in, so the order check
+ * (attempt before dispatch-cwd) covers it.
+ */
+export function acquireDispatchCwdLockIn(scope, fgosDir, cwd) {
   // The lock is keyed by the directory itself, so a directory that is not
   // there cannot be dispatched into: say so plainly, as the spawn would.
   if (!fs.existsSync(cwd)) {
     throw new DispatchError('worker-spawn-fail', `dispatch cwd "${cwd}" does not exist.`, { cwd });
   }
   const params = lockParams(fgosDir, cwd);
-  const res = acquireSync(createLockScope(LOCK_NAME), LOCK_NAME, params);
+  const res = acquireSync(scope, LOCK_NAME, params);
   if (res.result === 'acquired') return res.handle;
   const holderPid = holderPidOf(params);
   const holder = holderPid ? ` by process ${holderPid}` : '';

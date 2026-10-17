@@ -10,6 +10,7 @@ import { interpretRunResult } from '../../runner/dispatch/run-result.mjs';
 import { computeSha256Digest } from '../../runner/dispatch/proof-helpers.mjs';
 import { acquireRunControl, buildRunControlHolder } from '../../runner/dispatch/run-lock.mjs';
 import { resolveWorkerArtifactPath } from '../../runner/dispatch/worker-artifacts.mjs';
+import { collectModelWarnings } from '../../runner/dispatch/provider-adapter.mjs';
 import { readSideFile, StepError } from '../step-support.mjs';
 
 const CAPTURE_TAIL_BYTES = 64 * 1024 * 1024;
@@ -107,6 +108,12 @@ export async function settleAttempt({ runDir, envelope }) {
   const outboxClaim = resolveWorkerArtifactPath(runDir, /^result-(\d+)\.json$/, 'agent-result.json');
   const raw = rawResultOf(receipt, fs.existsSync(outboxClaim));
   const { capture } = envelope.launch;
+  // What the launching controller knew and no file of the attempt carries (policy, provider account,
+  // fallback). Absent for an attempt whose controller died before it wrote it: the settlement then
+  // simply has less provenance, never a different outcome.
+  const context = readJson(path.join(runDir, 'controller', 'settle-context.json')) ?? {};
+  const stdoutText = readTail(capture.stdout);
+  const stderrText = readTail(capture.stderr);
 
   try {
     const settled = await settleRunOutcome({
@@ -120,15 +127,31 @@ export async function settleAttempt({ runDir, envelope }) {
       isTimeout: raw.isTimeout,
       durationMs: null,
       settledAt: raw.settledAt,
-      stdoutText: readTail(capture.stdout),
-      stderrText: readTail(capture.stderr),
+      stdoutText,
+      stderrText,
       executionError: raw.executionError,
       effectiveCwd: envelope.cwd,
       gitBefore: baseline?.gitBefore ?? null,
       gitBeforeSource: baseline?.gitBeforeSource ?? 'pre-launch',
       dirtyBefore: baseline?.dirtyBefore ?? [],
       dirtyBeforeSnapshots: baseline?.dirtyBeforeSnapshots ?? null,
-      opts: { cwd: envelope.cwd, repoRoot: envelope.cwd, updateRunJson: 'settled', ...(envelope.mode === 'direct' ? { adapter: 'cli-spawn' } : {}) },
+      launchCommandId: envelope.attemptId,
+      inputDigests: context.inputDigests,
+      resolvedExecutorId: context.resolvedExecutorId,
+      effectivePolicy: context.effectivePolicy,
+      executorRedirected: context.executorRedirected ?? false,
+      reasoningEffort: context.reasoningEffort,
+      modelWarnings: context.modelCheck ? collectModelWarnings(context.modelCheck, { stdout: stdoutText, stderr: stderrText }) : [],
+      providerCapacitySelection: context.providerCapacitySelection ?? null,
+      providerCapacityEvidence: context.providerCapacityEvidence ?? null,
+      fallbackEvidence: context.fallbackEvidence ?? null,
+      opts: {
+        cwd: envelope.cwd,
+        repoRoot: context.repoRoot ?? envelope.cwd,
+        updateRunJson: 'settled',
+        ...(context.providerCapacityRuntimeDir ? { providerCapacityRuntimeDir: context.providerCapacityRuntimeDir } : {}),
+        ...(envelope.mode === 'direct' ? { adapter: 'cli-spawn' } : {}),
+      },
     });
     return { result: 'done', detail: { settled: 'now', runId: runMeta.runId, status: settled.status } };
   } catch (err) {

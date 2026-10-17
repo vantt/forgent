@@ -535,8 +535,15 @@ export function prepareBwrapSync(plan, request, backend) {
 
     // Materialize mounts ONLY from plan.resources (R4)
     const mounts = resources.filter((r) => r.resource !== 'hidden-root' && r.resource !== 'own-assignment');
+    // Files of the attempt the gate must write from inside the sandbox (its exit record and the capture
+    // files). The controller creates them empty beforehand; the attempt directory itself stays read-only.
+    const bindAttemptFiles = () => {
+      if (!attemptId) return;
+      for (const file of request.attemptBinds ?? []) bwrapArgs.push('--bind', file, file);
+    };
     if (!blind) {
       mounts.forEach(materialize);
+      bindAttemptFiles();
     } else {
       // A later mount over a parent hides an earlier one beneath it, so the order is the
       // contract: mounts that do not sit inside a hidden root (a workspace may contain one),
@@ -547,6 +554,7 @@ export function prepareBwrapSync(plan, request, backend) {
       for (const h of hidden) bwrapArgs.push('--tmpfs', h.executionTarget.path);
       bwrapArgs.push('--ro-bind', own.hostTarget, own.executionTarget.path);
       mounts.filter(insideMasked).forEach(materialize);
+      bindAttemptFiles();
       for (const h of hidden) bwrapArgs.push('--remount-ro', h.executionTarget.path);
     }
 

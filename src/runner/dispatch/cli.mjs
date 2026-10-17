@@ -33,7 +33,8 @@ import { markRunSettled } from './visibility-session.mjs';
 import { compileDispatchPlan } from './plan.mjs';
 import { buildDispatchResult } from './result-ladder.mjs';
 import { collectModelWarnings } from './provider-adapter.mjs';
-import { executeAssignment, reconcileCliSpawnRun } from './assignment-runner.mjs';
+import { executeAssignment } from './assignment-runner.mjs';
+import { adoptRun } from '../../run-supervisor/client.mjs';
 import { runAccountProbe } from './provider-account-probe.mjs';
 import { resolveConfinementTempRoot, createConfinementCredentialRenewal, paneOpenUnlessClosed } from './confinement/cleanup.mjs';
 import { sweepAttempts } from '../../run-supervisor/sweep.mjs';
@@ -41,7 +42,6 @@ import { defaultConfinementTempRoots } from './confinement/backend-registry.mjs'
 import { createRoundTerminalControl } from './terminal-slot.mjs';
 import { envForSession } from './worker-session.mjs';
 import { resolveHerdrBin } from './transport.mjs';
-export { reconcileCliSpawnRun };
 import { buildAssignment, claimAssignmentId } from './assignment.mjs';
 import { resolveWriterIdentity } from '../../util/session-identity.mjs';
 
@@ -1200,10 +1200,9 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
         break;
       }
       try {
-        const result = await reconcileCliSpawnRun(runDir, {
-          controlEpoch: flagValue('--control-epoch') ? Number(flagValue('--control-epoch')) : undefined,
-          controlToken: flagValue('--control-token'),
-        });
+        // The adopt door judges the attempt and finishes what its supervisor left; a run from before the
+        // supervisor answers `legacy-run`.
+        const result = adoptRun(path.resolve(runDir));
         if (returnResult) return result;
         process.stdout.write(`${JSON.stringify(result)}\n`);
       } catch (err) {
@@ -1214,7 +1213,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
       break;
     }
     default: {
-      const msg = `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --needs-soul [--has-live-task-access] | reconcile <runDir> [--control-epoch <n>] [--control-token <t>] | probe-account --provider <provider> --account <accountId> [--executor <id>] [--invocation <id,...>] [--timeout-ms <ms>]. To run a task: fgos run "<prompt>"; decide --work: fgos dispatch decide --work <workId>\n`;
+      const msg = `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --needs-soul [--has-live-task-access] | reconcile <runDir> | probe-account --provider <provider> --account <accountId> [--executor <id>] [--invocation <id,...>] [--timeout-ms <ms>]. To run a task: fgos run "<prompt>"; decide --work: fgos dispatch decide --work <workId>\n`;
       if (returnResult) throw new StoreError('validation', msg.trim());
       process.stderr.write(msg);
       process.exitCode = 1;

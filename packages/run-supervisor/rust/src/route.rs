@@ -8,6 +8,8 @@ pub const EXIT_VERSION_MISMATCH: i32 = 3;
 pub const EXIT_ENVELOPE_INVALID: i32 = 65;
 pub const EXIT_PAYLOAD_MISSING: i32 = 66;
 pub const EXIT_INTERNAL: i32 = 70;
+/// `supervise` refused because the attempt was already handed to a supervisor.
+pub const EXIT_ATTEMPT_BOUND: i32 = 71;
 
 /// Why argv was refused; `exit_code` says which code the route ends with.
 #[derive(Debug, PartialEq, Eq)]

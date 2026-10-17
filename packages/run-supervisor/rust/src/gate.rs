@@ -295,6 +295,13 @@ pub(crate) fn publish_gate_exit(config: &Config, exit_code: Value, signal: Value
         "exitedAt": iso_utc_now(),
     });
     let bytes = serde_json::to_vec(&exit).map_err(|e| e.to_string())?;
+    let target = config.run_dir.join("gate-exit.json");
+    // A sandbox whose root is read-only takes no new file in the attempt directory. The controller then
+    // leaves an empty `gate-exit.json` bound into it and the gate fills it in place. No process of the
+    // agent exists any more at this point, so nothing else can write it: the gate has the last word.
+    if fs::symlink_metadata(&target).is_ok_and(|meta| meta.is_file()) {
+        return write_in_place(&target, &bytes).map_err(|e| format!("gate-exit.json not written: {e}"));
+    }
     publish_once(&config.run_dir, "gate-exit.json", &bytes).map_err(|e| format!("gate-exit.json not published: {e}"))?;
     Ok(())
 }
@@ -321,4 +328,19 @@ mod tests {
         assert!(matches!(parse_args(&argv(&["--protocol", "1", "--envelope", "/e"])), Err(ArgsError::Usage(_))));
         assert!(matches!(parse_args(&argv(&["--protocol", "1", "--envelope", "/e", "--go-fd", "5", "--go-socket", "p"])), Err(ArgsError::Usage(_))));
     }
+}
+
+/// Replace the content of an existing regular file, never through a symlink, and make it durable.
+fn write_in_place(target: &Path, bytes: &[u8]) -> std::io::Result<()> {
+    use std::io::Write;
+    let mut options = fs::OpenOptions::new();
+    options.write(true).truncate(true);
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::OpenOptionsExt;
+        options.custom_flags(libc::O_NOFOLLOW);
+    }
+    let mut file = options.open(target)?;
+    file.write_all(bytes)?;
+    file.sync_all()
 }

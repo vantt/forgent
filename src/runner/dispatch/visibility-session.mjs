@@ -295,13 +295,10 @@ export function reconcileRun(runDir, { liveness = 'unknown' } = {}) {
       }
     } catch {}
 
+    // Only the herdr door keeps a command record; an attempt of the run supervisor is judged by the adopt door.
     if (isHerdrSpawn) {
       spawnPromise = import('./herdr-round.mjs')
         .then(({ reconcileHerdrSpawnRun }) => reconcileHerdrSpawnRun(dir))
-        .catch(() => {});
-    } else {
-      spawnPromise = import('./assignment-runner.mjs')
-        .then(({ reconcileCliSpawnRun }) => reconcileCliSpawnRun(dir))
         .catch(() => {});
     }
   }

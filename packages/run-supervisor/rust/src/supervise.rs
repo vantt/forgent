@@ -29,7 +29,7 @@ use crate::envelope;
 use crate::gate::boottime_ns;
 use crate::go_channel::{read_frame, write_frame};
 use crate::publish::{iso_utc_now, publish_once};
-use crate::route::{emit, refuse, report, Flags, EXIT_ENVELOPE_INVALID, EXIT_INTERNAL, EXIT_VERSION_MISMATCH};
+use crate::route::{emit, refuse, report, Flags, EXIT_ATTEMPT_BOUND, EXIT_ENVELOPE_INVALID, EXIT_INTERNAL, EXIT_VERSION_MISMATCH};
 
 #[cfg(unix)]
 mod unix;
@@ -236,7 +236,9 @@ pub fn run(args: &[String]) -> i32 {
     match supervise(&args) {
         Ok(code) => code,
         Err(refusal) => {
-            record_start_refusal(&args.envelope, &refusal);
+            if refusal.code != "attempt-already-bound" {
+                record_start_refusal(&args.envelope, &refusal);
+            }
             report("supervise", refusal.code, &refusal.why);
             refusal.exit
         }
@@ -278,11 +280,19 @@ fn supervise(args: &SuperviseArgs) -> Result<i32, Refusal> {
     if envelope["mode"] != "direct" {
         return Err(Refusal::internal("only the direct mode is supervised by this route"));
     }
+    // A supervisor already ran this attempt (or its receipt exists): a second one would take the lock and,
+    // by the predecessor rule, end the live domain the first one left running. Leave the attempt to adopt.
+    if run_dir.join("supervisor-binding.json").exists() || run_dir.join("receipt.json").exists() {
+        return Err(Refusal { exit: EXIT_ATTEMPT_BOUND, code: "attempt-already-bound", why: "the attempt directory already has a supervisor binding or a receipt".into() });
+    }
     locks.complete(&envelope, &run_dir)?;
     let watch = Watch::from(&envelope, &run_dir).map_err(|why| Refusal { exit: EXIT_ENVELOPE_INVALID, code: "envelope-invalid", why })?;
 
     let driver = open_driver(&envelope).map_err(Refusal::internal)?;
     let mut domain = driver.create(&watch.attempt_id).map_err(|why| Refusal::internal(why.to_string()))?;
+    if let Some(ms) = envelope["deadlines"]["killWaitMs"].as_u64() {
+        domain.set_empty_wait(Duration::from_millis(ms));
+    }
     let mut link = os::GoLink::new(&domain).map_err(Refusal::internal)?;
     let spec = os::gate_spec(&envelope, &run_dir, &locks, &mut link, &domain).map_err(Refusal::internal)?;
     let mut spawned = driver.spawn_in(&mut domain, spec).map_err(|why| Refusal::internal(format!("gate did not start: {why}")))?;
