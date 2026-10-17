@@ -51,14 +51,15 @@ jobs:
       - name: Build the host binary
         run: cargo build -p fgos
 
-      # The Node tests for the Windows facade land with the facade; until
+      # The Node tests count helper processes of the whole machine, so test
+      # files run one at a time. Until
       # then the glob matches nothing. A failing test still fails the step.
       - name: Node Windows facade tests
         run: |
           host=target/debug/fgos
           if [ "$RUNNER_OS" = "Windows" ]; then host="$host.exe"; fi
           if compgen -G 'test/holder-lock/windows-*.test.mjs' >/dev/null; then
-            FGOS_HOST_BIN="$PWD/$host" node --test test/holder-lock/windows-*.test.mjs
+            FGOS_HOST_BIN="$PWD/$host" node --test --test-concurrency=1 test/holder-lock/windows-*.test.mjs
           else
             echo "no Windows facade tests yet"
           fi
