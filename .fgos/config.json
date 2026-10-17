@@ -68,12 +68,13 @@
         }
       },
       "fgos-coding-implement": {
-        "description": "code-implement work for the coding domain's executing stage -- preferred executor gemini (agy-herdr-mucdong).",
+        "description": "code-implement work for the coding domain executing stage -- preferred executor gemini through omp (omp-gemini-tetcu72), claude as fallback.",
         "prefer": [
           {
             "executor": "gemini",
-            "invocation": "agy-herdr-mucdong"
-          }
+            "invocation": "omp-gemini-tetcu72"
+          },
+          "claude"
         ]
       },
       "code:implement": {
@@ -81,7 +82,7 @@
         "prefer": [
           {
             "executor": "gemini",
-            "invocation": "agy-cli-bwrap-mucdong"
+            "invocation": "omp-gemini-tetcu72"
           },
           "claude"
         ],
@@ -289,7 +290,7 @@
             "executor": "openai"
           }
         ],
-        "rigor": "high"
+        "rigor": "critical"
       },
       "architecture:explain": {
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
@@ -694,7 +695,7 @@
         "prefer": [
           {
             "executor": "gemini",
-            "invocation": "agy-cli-bwrap-mucdong"
+            "invocation": "omp-gemini-tetcu72"
           },
           "claude"
         ],
@@ -1112,112 +1113,10 @@
       },
       "gemini": {
         "kind": "agent",
-        "description": "Gemini provider via Antigravity CLI (2026-09-17 provider-naming pass, was executor id \"agy\"). Invocation id = <bin>-<mode>-<account>: agy-cli-mucdong/agy-herdr-mucdong/agy-cli-bwrap-mucdong (mucdong account) + agy-cli-tetnu (tetnu account). The account a confined (herdr or bwrap) invocation runs as is chosen per provider by the capacity layer from runner.providers.gemini.accounts (mucdong, tetcu72, tetnu), not by the invocation name.",
+        "description": "Gemini provider via omp (oh-my-pi) on the gemini-tetcu72 profile; Antigravity CLI (agy) invocations removed 2026-10-16 (agy not installed, owner chose omp). Invocations: omp-gemini-tetcu72 (herdr pane), omp-cli-bwrap-gemini-tetcu72 (headless). The confined account comes from runner.providers.gemini.accounts in the global config.",
         "allowCrossProvider": true,
         "providerModel": "gemini",
         "invocations": [
-          {
-            "id": "agy-cli-mucdong",
-            "via": "cli",
-            "adapter": "cli-spawn",
-            "command": "agy",
-            "args": [
-              "-p",
-              "{prompt}",
-              "--mode",
-              "accept-edits",
-              "--new-project",
-              "--print-timeout",
-              "30m",
-              "--model",
-              "{model}"
-            ],
-            "env": {
-              "HOME": "${HOME}/.agy-homes/mucdong"
-            }
-          },
-          {
-            "id": "agy-herdr-mucdong",
-            "via": "cli",
-            "adapter": "herdr-spawn",
-            "confinement": {
-              "backend": "bwrap"
-            },
-            "command": "agy",
-            "args": [
-              "--mode",
-              "accept-edits",
-              "--new-project",
-              "--model",
-              "{model}"
-            ],
-            "interactiveMode": {
-              "exitCommand": "/exit",
-              "kind": "agy",
-              "trustStore": {
-                "kind": "agy"
-              }
-            },
-            "env": {
-              "HOME": "${HOME}/.agy-homes/mucdong"
-            },
-            "resourceBindings": [
-              {
-                "resource": "private-home",
-                "target": {
-                  "kind": "env",
-                  "name": "HOME"
-                }
-              }
-            ]
-          },
-          {
-            "id": "agy-cli-bwrap-mucdong",
-            "via": "cli",
-            "adapter": "cli-spawn",
-            "command": "agy",
-            "args": [
-              "-p",
-              "{prompt}",
-              "--model",
-              "{model}"
-            ],
-            "confinement": {
-              "backend": "bwrap"
-            },
-            "env": {
-              "HOME": "${HOME}/.agy-homes/mucdong"
-            },
-            "resourceBindings": [
-              {
-                "resource": "private-home",
-                "target": {
-                  "kind": "env",
-                  "name": "HOME"
-                }
-              }
-            ]
-          },
-          {
-            "id": "agy-cli-tetnu",
-            "via": "cli",
-            "adapter": "cli-spawn",
-            "command": "agy",
-            "args": [
-              "-p",
-              "{prompt}",
-              "--mode",
-              "accept-edits",
-              "--new-project",
-              "--print-timeout",
-              "30m",
-              "--model",
-              "{model}"
-            ],
-            "env": {
-              "HOME": "${HOME}/.agy-homes/tetnu"
-            }
-          },
           {
             "id": "omp-gemini-tetcu72",
             "via": "cli",
@@ -1236,6 +1135,39 @@
             "interactiveMode": {
               "exitCommand": "/exit",
               "kind": "omp"
+            },
+            "env": {
+              "PI_CODING_AGENT_DIR": "${HOME}/.omp/profiles/gemini-tetcu72/agent",
+              "PI_CONFIG_DIR": "../../tmp/fgos-omp-config"
+            },
+            "resourceBindings": [
+              {
+                "resource": "private-home",
+                "target": {
+                  "kind": "env",
+                  "name": "PI_CODING_AGENT_DIR"
+                }
+              }
+            ]
+          },
+          {
+            "id": "omp-cli-bwrap-gemini-tetcu72",
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "omp",
+            "args": [
+              "--thinking",
+              "medium",
+              "--tools",
+              "read,write,edit,bash,grep,glob",
+              "--mode",
+              "json",
+              "--auto-approve",
+              "-p",
+              "{prompt}"
+            ],
+            "confinement": {
+              "backend": "bwrap"
             },
             "env": {
               "PI_CODING_AGENT_DIR": "${HOME}/.omp/profiles/gemini-tetcu72/agent",
@@ -1582,7 +1514,7 @@
       "high": "flagship",
       "critical": "frontier"
     },
-    "maxTier": "advanced",
+    "maxTier": "frontier",
     "confinement": {
       "strict": false
     },
