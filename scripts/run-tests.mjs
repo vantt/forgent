@@ -432,8 +432,24 @@ export function runTests({
   }
 }
 
+/**
+ * The CLI door's queue: the full-suite queue is a kernel lock and needs the
+ * host binary, so resolve (or build) it first and export it on this
+ * process's env, where the lock driver looks. A fresh clone or CI with no
+ * activation and no FGOS_HOST_BIN then queues too.
+ */
+export function queueWithHostBin(options, { ensure = ensureHostBin, queue = acquireFullSuiteQueue, log = (msg) => console.error(msg) } = {}) {
+  try {
+    const hostBin = ensure(process.env, REPO_ROOT);
+    if (hostBin) process.env.FGOS_HOST_BIN = hostBin;
+  } catch (err) {
+    log(`run-tests: warning: failed to ensure host binary: ${err.message}`);
+  }
+  return queue(options);
+}
+
 if (isMainModule(import.meta.url)) {
-  const { status, message } = runTests({ forwardedArgs: process.argv.slice(2), queue: acquireFullSuiteQueue });
+  const { status, message } = runTests({ forwardedArgs: process.argv.slice(2), queue: queueWithHostBin });
   if (message) console.error(message);
   process.exitCode = status;
 }

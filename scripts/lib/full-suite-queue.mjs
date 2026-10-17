@@ -13,9 +13,11 @@
 // QUEUE_HELD_ENV instead, so a test that itself spawns the full-suite door
 // never waits on the lock its own parent run holds.
 //
-// Run from a checkout, the lock needs a host binary: FGOS_HOST_BIN, or the
-// activation above the checkout. Without one the run stops with the named
-// error and the way to run unqueued.
+// Run from a checkout, the lock needs a host binary: FGOS_HOST_BIN (the
+// run-tests door builds one first), or the activation above the checkout.
+// Without one the run stops with the named error and the way to run
+// unqueued. On a platform with no holder-lock driver yet (Windows) the run
+// warns and goes on unqueued: the queue only spreads load on one machine.
 
 import { acquireSync, createLockScope, HolderLockError, lockHolders, resolveLockRoot } from '../../src/holder-lock/index.mjs';
 
@@ -75,6 +77,10 @@ export function acquireFullSuiteQueue({
       sleep(POLL_MS);
     }
   } catch (err) {
+    if (err instanceof HolderLockError && err.code === 'lock-driver-unavailable' && err.reason === 'unsupported-platform') {
+      log(`run-tests: warning: no full-suite queue on this platform (${err.message}) -- running unqueued.`);
+      return () => {};
+    }
     throw withQueueHint(err);
   }
   if (announced !== null) log(`run-tests: queue acquired after ${Math.round((now() - waitStart) / 1000)}s.`);

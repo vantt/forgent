@@ -16,7 +16,7 @@ import {
   QUEUE_HELD_ENV,
   QUEUE_SWITCH_ENV,
 } from '../../scripts/lib/full-suite-queue.mjs';
-import { runTests } from '../../scripts/run-tests.mjs';
+import { queueWithHostBin, runTests } from '../../scripts/run-tests.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const QUEUE_URL = pathToFileURL(path.join(root, 'scripts', 'lib', 'full-suite-queue.mjs')).href;
@@ -188,4 +188,42 @@ test('runTests takes the queue only when there are files to run, marks the child
   assert.equal(acquired, 1);
   assert.equal(released, 1);
   assert.equal(childEnvSeen[QUEUE_HELD_ENV], '1');
+});
+
+test('the CLI door resolves the host binary onto its own env before it takes the queue', () => {
+  const saved = process.env.FGOS_HOST_BIN;
+  delete process.env.FGOS_HOST_BIN;
+  try {
+    let seen;
+    const release = queueWithHostBin({ env: {} }, {
+      ensure: () => '/built/by/cargo/fgos',
+      queue: () => {
+        seen = process.env.FGOS_HOST_BIN;
+        return () => {};
+      },
+    });
+    release();
+    assert.equal(seen, '/built/by/cargo/fgos', 'the lock driver reads FGOS_HOST_BIN from this process, so it is set before the queue');
+
+    const warnings = [];
+    let queued = false;
+    queueWithHostBin({ env: {} }, {
+      ensure: () => { throw new Error('cargo is required'); },
+      queue: () => { queued = true; return () => {}; },
+      log: (msg) => warnings.push(msg),
+    });
+    assert.equal(queued, true, 'a failed build still reaches the queue, which then names what is missing');
+    assert.match(warnings.join('\n'), /failed to ensure host binary: cargo is required/);
+  } finally {
+    if (saved === undefined) delete process.env.FGOS_HOST_BIN;
+    else process.env.FGOS_HOST_BIN = saved;
+  }
+});
+
+test('on a platform with no holder-lock driver the queue warns and runs unqueued', { skip: process.platform !== 'win32' && 'only Windows has no holder-lock driver yet' }, () => {
+  const lockRoot = tmpDir('full-suite-queue-unsupported-');
+  const warnings = [];
+  const release = acquireFullSuiteQueue({ env: {}, lockRoot, log: (msg) => warnings.push(msg), sleep: () => assert.fail('must not wait') });
+  release();
+  assert.match(warnings.join('\n'), /running unqueued/);
 });
