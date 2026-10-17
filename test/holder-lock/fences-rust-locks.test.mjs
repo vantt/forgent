@@ -143,8 +143,8 @@ test('doctor names the three locks: lock-fences before the fences, lock-holders 
   };
 
   // `fgctl init` ends in `doctor --fix`, which fences the workspace whenever no other fgOS process is running on the machine.
-  // Put the workspace in the state under test either way: the Node locks fenced, the three the Rust callers take missing.
-  assert.equal(placeFences(options(ws, { owners: ['4.2'], stateRoot: ownState })).ok, true);
+  // Put the workspace in the state under test either way: the Node and main door locks fenced, the three the Rust callers take missing.
+  assert.equal(placeFences(options(ws, { owners: ['4.2', '4.3'], stateRoot: ownState })).ok, true);
   const paths = rustLockPaths(ws, ownState);
   for (const lockPath of Object.values(paths)) fs.rmSync(lockPath, { recursive: true, force: true });
   const fences = doctor()['lock-fences'];

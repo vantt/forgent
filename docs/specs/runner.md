@@ -904,7 +904,7 @@ mà rủi ro-còn-lại ở trên nêu tên.
   bị từ chối không để lại đèn. Hook KHÔNG lấy khóa `main-checkout`: đó là mutex kernel của
   writer fgOS, claim/land/approve/`fgctl init` không bao giờ đọc đèn, nên một commit ở
   main không chặn ai. Không đụng sổ đăng ký phiên, không đụng
-  `sessions.lock`/`runner.lock`/`events.lock`. `fgos return`/`cleanup`/`compound` xoá
+  `sessions.lock`/`runner.lock`/mutex nóng `state`. `fgos return`/`cleanup`/`compound` xoá
   đèn của chính phiên (chỉ khi đúng writer); `fgos lock-status` hiện đèn ở trường
   `activity`.
 - **Afterwards:** một commit bị từ chối in thông điệp giải thích bằng thời gian ("một
@@ -2020,8 +2020,8 @@ candidate sau nằm trong 4 gợi ý gốc của description nhưng khi đọc c
   khác nhau theo verb — khác message, không khác LOGIC kiểm tra, nên
   không tính là lặp thật.
 - **Ghi `.fgos/events.jsonl`/`state.json` ở tầng thấp**: đã có 1 cửa ghi
-  duy nhất có khóa, `withEventsLock`/`appendEventLocked`
-  (`src/state/events.mjs`, dùng bởi mọi hàm ghi trong `store.mjs`) — tầng
+  duy nhất có khóa, `withStateTx`
+  (`src/state/hot-lock.mjs`, dùng bởi mọi hàm ghi trong `store.mjs`) — tầng
   append-event tự nó KHÔNG hở, đúng như comment `store.mjs:24` tự nhận
   ("single-write-door scope stays exactly events.jsonl + state.json").
 

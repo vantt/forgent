@@ -69,6 +69,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'lock-borrow-vectors',
       'lock-holders',
       'lock-fences',
+      'lock-record-unreadable',
       'lock-predecessor-kill-wait',
       'state-root',
       'credential-copies-retained',

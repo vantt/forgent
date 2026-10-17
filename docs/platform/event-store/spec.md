@@ -382,7 +382,7 @@ Today every Work mutation runs read, precondition and append as one critical sec
 | `settleClaim`: `claims.lock` inside `events.lock`, re-read of the claim | `src/state/store.mjs:1147-1170` |
 | Registry: `state` hot-mutex, rank 60, replacing `events.lock` and `claims.lock` | `lock-registry.v1.json:164-170` |
 
-This spec keeps that serialization and moves only the append target. The gate is Work's, not the store's: plan 4.3-S's `withStateTx` on the `state` hot-mutex (rank 60, one per clone, `<fgosDir>/locks/state.lock`) is the Work gate. A Work mutation becomes:
+This spec keeps that serialization and moves only the append target. The gate is Work's, not the store's: plan 4.3-S's `withStateTx` on the `state` hot-mutex (rank 60, one per clone, `<fgosDir>/locks/state.hot`, cleanup lock `state.reclaim.lock`) is the Work gate. A Work mutation becomes:
 
 1. Before the gate: resolve writer id and anything that needs a child process; catch the view up with the full reader (section 11, steps 1-3), replaying or rebuilding when a mirror or legacy tip changed or a deferred event became ready (section 15).
 2. Inside `withStateTx(state)`:
