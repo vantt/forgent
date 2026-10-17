@@ -214,6 +214,7 @@ version = "0.2.0"
 dependencies = [
  "fgos-holder-lock",
  "fgos-process",
+ "libc",
  "serde",
  "serde_json",
 ]

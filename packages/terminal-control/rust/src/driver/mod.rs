@@ -2,6 +2,8 @@
 //! (`driver-capabilities.v1.json`). A driver error is `Unknown`, never
 //! closed or gone.
 
+pub mod herdr;
+
 use crate::port::{Refusal, ServerIncarnation};
 use serde::{Deserialize, Serialize};
 
