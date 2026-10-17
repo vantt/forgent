@@ -983,7 +983,7 @@
         "statement": "Recorded routing decision for owner-family-01: Step 5 sample; Step 9 affected; Phase 9 promotion truth and 12-row residual re-home",
         "statementPath": "plans/260925-documentation-authority-unification/reports/phase-07/owner-answers.md",
         "anchor": null,
-        "statementFileSha256": "2ffde3b32824895dbf5ac2cf5644d279d0f8eeecc276b0a7039ff66b33c73da8",
+        "statementFileSha256": "2f865e2eb5c7818eb1e0d4356ed8d93b606e7cffdcb15ea7f8875e4f632bb1f7",
         "alignment": "deferred",
         "alignmentMeaning": "Routing is control evidence, not a claim that a proposed capability is implemented.",
         "evidence": [
@@ -1023,7 +1023,7 @@
         "statement": "Recorded routing decision for owner-family-02: Step 5 bounded; Phase 9 full",
         "statementPath": "plans/260925-documentation-authority-unification/reports/phase-07/owner-answers.md",
         "anchor": null,
-        "statementFileSha256": "2ffde3b32824895dbf5ac2cf5644d279d0f8eeecc276b0a7039ff66b33c73da8",
+        "statementFileSha256": "2f865e2eb5c7818eb1e0d4356ed8d93b606e7cffdcb15ea7f8875e4f632bb1f7",
         "alignment": "deferred",
         "alignmentMeaning": "Routing is control evidence, not a claim that a proposed capability is implemented.",
         "evidence": [
@@ -1063,7 +1063,7 @@
         "statement": "Recorded routing decision for owner-family-03: Steps 4-6 candidate defects; Phase 9 rationale-only",
         "statementPath": "plans/260925-documentation-authority-unification/reports/phase-07/owner-answers.md",
         "anchor": null,
-        "statementFileSha256": "2ffde3b32824895dbf5ac2cf5644d279d0f8eeecc276b0a7039ff66b33c73da8",
+        "statementFileSha256": "2f865e2eb5c7818eb1e0d4356ed8d93b606e7cffdcb15ea7f8875e4f632bb1f7",
         "alignment": "deferred",
         "alignmentMeaning": "Routing is control evidence, not a claim that a proposed capability is implemented.",
         "evidence": [
@@ -1103,7 +1103,7 @@
         "statement": "Recorded routing decision for owner-family-04: Step 2 semantic; Step 6 duplicate; Phase 8 alias mechanics",
         "statementPath": "plans/260925-documentation-authority-unification/reports/phase-07/owner-answers.md",
         "anchor": null,
-        "statementFileSha256": "2ffde3b32824895dbf5ac2cf5644d279d0f8eeecc276b0a7039ff66b33c73da8",
+        "statementFileSha256": "2f865e2eb5c7818eb1e0d4356ed8d93b606e7cffdcb15ea7f8875e4f632bb1f7",
         "alignment": "deferred",
         "alignmentMeaning": "Routing is control evidence, not a claim that a proposed capability is implemented.",
         "evidence": [
@@ -1143,7 +1143,7 @@
         "statement": "Recorded routing decision for owner-family-05: Phase 9",
         "statementPath": "plans/260925-documentation-authority-unification/reports/phase-07/owner-answers.md",
         "anchor": null,
-        "statementFileSha256": "2ffde3b32824895dbf5ac2cf5644d279d0f8eeecc276b0a7039ff66b33c73da8",
+        "statementFileSha256": "2f865e2eb5c7818eb1e0d4356ed8d93b606e7cffdcb15ea7f8875e4f632bb1f7",
         "alignment": "deferred",
         "alignmentMeaning": "Routing is control evidence, not a claim that a proposed capability is implemented.",
         "evidence": [
@@ -1183,7 +1183,7 @@
         "statement": "Recorded routing decision for owner-family-06: Phase 8",
         "statementPath": "plans/260925-documentation-authority-unification/reports/phase-07/owner-answers.md",
         "anchor": null,
-        "statementFileSha256": "2ffde3b32824895dbf5ac2cf5644d279d0f8eeecc276b0a7039ff66b33c73da8",
+        "statementFileSha256": "2f865e2eb5c7818eb1e0d4356ed8d93b606e7cffdcb15ea7f8875e4f632bb1f7",
         "alignment": "deferred",
         "alignmentMeaning": "Routing is control evidence, not a claim that a proposed capability is implemented.",
         "evidence": [
@@ -1223,7 +1223,7 @@
         "statement": "Recorded routing decision for owner-family-07: Phase 8/9",
         "statementPath": "plans/260925-documentation-authority-unification/reports/phase-07/owner-answers.md",
         "anchor": null,
-        "statementFileSha256": "2ffde3b32824895dbf5ac2cf5644d279d0f8eeecc276b0a7039ff66b33c73da8",
+        "statementFileSha256": "2f865e2eb5c7818eb1e0d4356ed8d93b606e7cffdcb15ea7f8875e4f632bb1f7",
         "alignment": "deferred",
         "alignmentMeaning": "Routing is control evidence, not a claim that a proposed capability is implemented.",
         "evidence": [
@@ -1263,7 +1263,7 @@
         "statement": "Recorded routing decision for owner-family-08: Phase 8 preparation; Phase 9 adoption",
         "statementPath": "plans/260925-documentation-authority-unification/reports/phase-07/owner-answers.md",
         "anchor": null,
-        "statementFileSha256": "2ffde3b32824895dbf5ac2cf5644d279d0f8eeecc276b0a7039ff66b33c73da8",
+        "statementFileSha256": "2f865e2eb5c7818eb1e0d4356ed8d93b606e7cffdcb15ea7f8875e4f632bb1f7",
         "alignment": "deferred",
         "alignmentMeaning": "Routing is control evidence, not a claim that a proposed capability is implemented.",
         "evidence": [
@@ -1303,7 +1303,7 @@
         "statement": "Recorded routing decision for owner-family-09: preserve; Step 9 affected rebind",
         "statementPath": "plans/260925-documentation-authority-unification/reports/phase-07/owner-answers.md",
         "anchor": null,
-        "statementFileSha256": "2ffde3b32824895dbf5ac2cf5644d279d0f8eeecc276b0a7039ff66b33c73da8",
+        "statementFileSha256": "2f865e2eb5c7818eb1e0d4356ed8d93b606e7cffdcb15ea7f8875e4f632bb1f7",
         "alignment": "deferred",
         "alignmentMeaning": "Routing is control evidence, not a claim that a proposed capability is implemented.",
         "evidence": [
@@ -1343,7 +1343,7 @@
         "statement": "Recorded routing decision for owner-family-10: owner-only carry",
         "statementPath": "plans/260925-documentation-authority-unification/reports/phase-07/owner-answers.md",
         "anchor": null,
-        "statementFileSha256": "2ffde3b32824895dbf5ac2cf5644d279d0f8eeecc276b0a7039ff66b33c73da8",
+        "statementFileSha256": "2f865e2eb5c7818eb1e0d4356ed8d93b606e7cffdcb15ea7f8875e4f632bb1f7",
         "alignment": "deferred",
         "alignmentMeaning": "Routing is control evidence, not a claim that a proposed capability is implemented.",
         "evidence": [
@@ -1383,7 +1383,7 @@
         "statement": "Recorded routing decision for owner-family-11: owner at Phase 9",
         "statementPath": "plans/260925-documentation-authority-unification/reports/phase-07/owner-answers.md",
         "anchor": null,
-        "statementFileSha256": "2ffde3b32824895dbf5ac2cf5644d279d0f8eeecc276b0a7039ff66b33c73da8",
+        "statementFileSha256": "2f865e2eb5c7818eb1e0d4356ed8d93b606e7cffdcb15ea7f8875e4f632bb1f7",
         "alignment": "deferred",
         "alignmentMeaning": "Routing is control evidence, not a claim that a proposed capability is implemented.",
         "evidence": [
@@ -1423,7 +1423,7 @@
         "statement": "Recorded routing decision for owner-family-12: Steps 4-6 named; Phase 9 remaining truth",
         "statementPath": "plans/260925-documentation-authority-unification/reports/phase-07/owner-answers.md",
         "anchor": null,
-        "statementFileSha256": "2ffde3b32824895dbf5ac2cf5644d279d0f8eeecc276b0a7039ff66b33c73da8",
+        "statementFileSha256": "2f865e2eb5c7818eb1e0d4356ed8d93b606e7cffdcb15ea7f8875e4f632bb1f7",
         "alignment": "deferred",
         "alignmentMeaning": "Routing is control evidence, not a claim that a proposed capability is implemented.",
         "evidence": [
@@ -1463,7 +1463,7 @@
         "statement": "Recorded routing decision for owner-family-13: separate main-owned item",
         "statementPath": "plans/260925-documentation-authority-unification/reports/phase-07/owner-answers.md",
         "anchor": null,
-        "statementFileSha256": "2ffde3b32824895dbf5ac2cf5644d279d0f8eeecc276b0a7039ff66b33c73da8",
+        "statementFileSha256": "2f865e2eb5c7818eb1e0d4356ed8d93b606e7cffdcb15ea7f8875e4f632bb1f7",
         "alignment": "deferred",
         "alignmentMeaning": "Routing is control evidence, not a claim that a proposed capability is implemented.",
         "evidence": [
@@ -1814,8 +1814,8 @@
         "statementPath": "docs/platform/packaging-distribution/spec.md",
         "anchor": null,
         "statementFileSha256": "653c795b29672a784d3c6b8e173796249a39c3486fadfe6f6c689cb95bd7be27",
-        "alignment": "aligned",
-        "alignmentMeaning": "L11-15 main-import ownership/contract seam verified against present code/config/schema; Step 6 checks source/projection and Step 9 carries native identities. Whole-document full truth is not claimed.",
+        "alignment": "deferred",
+        "alignmentMeaning": "Code evidence holds, but the cited candidate successor lacks the lock check/fix rows main added only to legacy docs/specs/distribution.md; conservation is owed in the Step 9 closing carry (P7-DOC-GAP-02, L11-17). Not an implementation gap.",
         "evidence": [
           {
             "ref": "src/setup/registrations.mjs:2223-2258",
@@ -1834,7 +1834,7 @@
         "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
         "risk": "high",
         "owner": "docs/platform/holder-lock/spec.md",
-        "route": "Step 5; Step 6; Step 9",
+        "route": "Step 9 (P7-DOC-GAP-02)",
         "parkedReason": null,
         "reviewerVerdict": "pending",
         "deepReadRequired": true,

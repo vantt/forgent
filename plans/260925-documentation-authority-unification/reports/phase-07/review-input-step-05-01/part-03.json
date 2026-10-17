@@ -675,8 +675,8 @@
       "entryId": "CONTROL-FRAME",
       "kind": "control-proof",
       "statement": "Remainder covers all 22457 production units minus exactly three bounded units; 22454 eligible stable ids. No seed/draw in author output. Author did not reduce the frame by path, risk, authority kind or file.",
-      "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-remainder-frame/index.json",
-      "sha256": "4ae2e89ceec2e325362cffcfb786a5ecc7492aec75279afc866b2b97395bfaf1",
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-remainder-frame.json",
+      "sha256": "f83d0b4ab9fe1010c8615a1172cde169d5c9b00fc94fafc1d6c4d2a8834f1775",
       "deepReadRequired": false
     }
   ]

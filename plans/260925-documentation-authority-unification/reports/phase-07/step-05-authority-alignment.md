@@ -20,8 +20,8 @@ Status: authored; independent review and reviewer-held A36 draw pending. Steps 3
 
 | Alignment | Rows |
 |---|---:|
-| aligned | 13 |
-| deferred | 89 |
+| aligned | 12 |
+| deferred | 90 |
 | doc-fix | 7 |
 | implementation-gap | 0 |
 
@@ -170,7 +170,7 @@ The JSON companion holds exact pins, authority scope, proof commands, risk, owne
 | X-LOCK-02 | architecture | aligned | `docs/platform/session-identity/spec.md` | Step 5; Step 6; Step 9 |
 | X-LOCK-03 | contract | aligned | `docs/platform/holder-lock/spec.md` | Step 5; Step 6; Step 9 |
 | X-LOCK-04 | contract | aligned | `docs/platform/holder-lock/spec.md` | Step 5; Step 6; Step 9 |
-| X-LOCK-05 | specification | aligned | `docs/platform/packaging-distribution/spec.md` | Step 5; Step 6; Step 9 |
+| X-LOCK-05 | specification | deferred | `docs/platform/packaging-distribution/spec.md` | Step 9 (P7-DOC-GAP-02, L11-17) |
 | X-LOCK-06 | contract | aligned | `docs/platform/process/spec.md` | Step 5; Step 6; Step 9 |
 | X-LOCK-07 | specification | deferred | `docs/platform/process/spec.md` | Step 5; Step 6; Step 9 |
 | S3-01 | proposal | doc-fix | `docs/platform/component-boundary.md` | Step 5 independent review; Step 9 rebind |

@@ -374,6 +374,23 @@ the independent findings without authorizing promotion, cutover or retirement.
   otherwise unchanged.
 - **Affected rows/steps:** Step 5 review; L11-6 scope wording is unchanged.
 
+### L11-17 — Settle the Step 5 review rework and rebinds
+
+- **Date:** 2026-10-17
+- **Status:** decided (Lead under A42; owner said go ahead)
+- **What is happening:** the Step 5 review returned 142/143 ok; X-LOCK-05 was labelled
+  `aligned` although its statement file, candidate `packaging-distribution/spec.md`,
+  lacks the lock check/fix rows that main added only to legacy `docs/specs/distribution.md`.
+  QF-01..13 and CONTROL-FRAME carried digests or paths from before L11-16.
+- **Decision:** X-LOCK-05 becomes `deferred`: code evidence holds, but the candidate
+  successor must gain the lock rows (P7-DOC-GAP-02) in the Step 9 closing carry of
+  main imports; no candidate edit now. QF-01..13 rebind to the current
+  `owner-answers.md` digest; CONTROL-FRAME repoints to `step-05-remainder-frame.json`.
+  One bounded re-review checks exactly these rows.
+- **Evidence:** `review-a38-step-05-bounded-part-02.md` R1/G1/G2;
+  `review-a38-step-05-seed-and-rollup-01.md`.
+- **Affected rows/steps:** X-LOCK-05, QF-01..13, CONTROL-FRAME; Steps 5 and 9.
+
 ## Resolved owner question — CTR010 (A45)
 
 - **Question:** Which contract keeps CTR010, and which verified-free identity should
@@ -419,3 +436,13 @@ remaining owner-only actions named above.
   `src/workflow/runner.mjs:83-97,164-166`.
 - **Boundary:** document the mapping in its owner document; do not mint another
   contract or imply the Run Result Evaluator mutates Work.
+
+### P7-DOC-GAP-02 — Carry main's lock setup/doctor rows into the candidate distribution spec
+
+- **Status:** routed to the Step 9 closing carry of main imports.
+- **Gap:** main `0d6da9033` added lock check/fix rows (5g, 7, 7b) to legacy
+  `docs/specs/distribution.md`; candidate `docs/platform/packaging-distribution/spec.md`
+  does not carry them yet.
+- **Evidence:** X-LOCK-05; `src/setup/registrations.mjs:2223-2258`;
+  `src/setup/holder-lock-checks.mjs`.
+- **Boundary:** documentation conservation only; no code change.

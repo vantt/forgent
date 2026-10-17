@@ -20,15 +20,15 @@
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-07/review-input-step-05-01/part-02.json",
       "entries": 60,
-      "bytes": 168591,
-      "sha256": "6fee227c256ad8250dc7f66d7cf50cff53f757b3729595ab4153aa3f01fbc588",
+      "bytes": 168632,
+      "sha256": "cf6e46909318a70c0d3a04640b69ec9495bd5e1b848947a6e537d25f843e4247",
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-07/review-a38-step-05-bounded-part-02.md"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-07/review-input-step-05-01/part-03.json",
       "entries": 23,
-      "bytes": 83541,
-      "sha256": "e5bc747acdc9659b67a8214815e596d7decddc8cc561ea13c1c715ec42b21bd7",
+      "bytes": 83535,
+      "sha256": "35fdbebe878e4b9077a5435e4a19709baf16e68e11a0968d5fc2223097579167",
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-07/review-a38-step-05-bounded-part-03.md"
     }
   ],
@@ -36,13 +36,13 @@
   "pins": [
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-authority-alignment.json",
-      "bytes": 249809,
-      "sha256": "f52cfa0b0b221c9c7de747ce93d598e9c32717572412090d51aa6ad5c6c54ad1"
+      "bytes": 249850,
+      "sha256": "41f0800b259425dd477e13f1fbfd33298a0e43dbad7dc33f73b0e4046ee470c4"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-authority-alignment.md",
-      "bytes": 21970,
-      "sha256": "1b82a40753e6a9283d7b439f77a65c773c32aee2455b53bb2aa3de8ecf530d65"
+      "bytes": 21979,
+      "sha256": "6951ee2633e193df8988a4d7f9e6742be38d82f2f771f5b8153c5ef48bad9f46"
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-a34-preservation.json",
@@ -81,8 +81,8 @@
     },
     {
       "path": "plans/260925-documentation-authority-unification/reports/phase-07/owner-answers.md",
-      "bytes": 24502,
-      "sha256": "c88919116ecbeebdf3fc40d766ac15c51e0299f083037690c70a603e0ce288da"
+      "bytes": 26080,
+      "sha256": "2f865e2eb5c7818eb1e0d4356ed8d93b606e7cffdcb15ea7f8875e4f632bb1f7"
     },
     {
       "path": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
@@ -126,5 +126,5 @@
     "maxActualBytes": 168591
   },
   "remainderSampleRule": "L11-16: reviewer-held seed, exactly 60 ids drawn without replacement from the sorted frame; deep-read each; >10% substantive candidate-content defects -> stop and escalate to the owner (no full read; full current truth stays Phase 9 under A28 3(b))",
-  "leadEdit": "2026-10-17 Lead replaced the 375-part remainder frame with one compact frame file and set the remainder draw to 60 under L11-16; owner-answers.md repinned after L11-16 was appended"
+  "leadEdit": "2026-10-17 Lead replaced the 375-part remainder frame with one compact frame file and set the remainder draw to 60 under L11-16; owner-answers.md repinned after L11-16 was appended; L11-17 rework X-LOCK-05 deferred, QF-01..13 and CONTROL-FRAME rebound, pins refreshed"
 }
