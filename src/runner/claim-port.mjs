@@ -337,7 +337,7 @@ export async function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoo
   if (!isolate) return held.claim;
   let worktree;
   try {
-    worktree = createClaimWorktree(repoRoot, id, { worktreeDir, baseRef: held.baseRef, scope });
+    worktree = createClaimWorktree(repoRoot, id, { worktreeDir, baseRef: held.baseRef, startSha: held.claim.headAtTake, scope });
   } catch (err) {
     releaseClaim(dir, { id, claimId: held.claimId });
     throw err;

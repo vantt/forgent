@@ -38,6 +38,7 @@ import { execFileSync } from 'node:child_process';
 import { fgosDirFromRoot, resolveMainCheckoutRoot } from './paths.mjs';
 import { pidExists } from './dispatch/process-identity.mjs';
 import { acquireSync, createLockScope, lockHolders, resolveLock } from '../holder-lock/index.mjs';
+import { addWorktreeSync } from './repo-locks.mjs';
 
 const SESSIONS_FILE = 'sessions.json';
 
@@ -306,7 +307,7 @@ export function createSession(repoRoot, opts = {}) {
 
     try {
       // --detach: zero new branches, genuinely detached HEAD (spike-proven).
-      gitAt(repoRoot, ['worktree', 'add', '--detach', worktreePath, currentHeadSha]);
+      addWorktreeSync(createLockScope('session-worktree'), repoRoot, ['--detach', worktreePath, currentHeadSha]);
     } catch (err) {
       try {
         fs.rmSync(worktreePath, { recursive: true, force: true });

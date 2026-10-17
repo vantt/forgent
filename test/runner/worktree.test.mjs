@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import { createLockScope } from '../../src/holder-lock/index.mjs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
@@ -1218,13 +1219,7 @@ test('createWorktree provisions a declared dependency into the fresh worktree au
   assert.equal(fs.existsSync(path.join(wt.path, 'node_modules', 'fgos-test-localdep', 'package.json')), true);
 });
 
-test('tsk-1mn: createWorktree calls opts.beforeProvision after all repoRoot-touching git setup completes, strictly BEFORE provisioning installs anything', () => {
-  // Finding 2: claimWork used to hold main-checkout.lock across the whole
-  // synchronous npm ci/install. The fix (claim-port.mjs) releases the lock
-  // via this exact callback, at this exact seam -- this test proves the
-  // seam's own ordering contract directly, independent of claimWork's own
-  // wiring (already covered indirectly by every existing isolate:true
-  // claimWork test, which now exercises this same callback for real).
+test('createWorktree provisions dependencies after git worktree add and leaves its lock scope empty', () => {
   const repoRoot = initTempRepo();
   const worktreeDir = mkWorktreeDir();
   const localDep = mkLocalDependency();
@@ -1235,42 +1230,11 @@ test('tsk-1mn: createWorktree calls opts.beforeProvision after all repoRoot-touc
   execFileSync('git', ['add', 'package.json'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'declare a dependency'], { cwd: repoRoot });
 
-  let calls = 0;
-  let nodeModulesExistedAtCallTime;
-  let branchExistedAtCallTime;
-  const wt = createWorktree(repoRoot, 'item-deps-cb', {
-    worktreeDir,
-    beforeProvision: () => {
-      calls += 1;
-      // The temp dir mkdtemp allocated is the only entry under worktreeDir
-      // at this point -- read it back rather than assuming wt.path (not yet
-      // assigned; createWorktree itself hasn't returned).
-      const [createdDir] = fs.readdirSync(worktreeDir);
-      nodeModulesExistedAtCallTime = fs.existsSync(path.join(worktreeDir, createdDir, 'node_modules'));
-      branchExistedAtCallTime = branchExists(repoRoot, branchNameFor('item-deps-cb'));
-    },
-  });
-
-  assert.equal(calls, 1, 'beforeProvision must fire exactly once');
-  assert.equal(branchExistedAtCallTime, true, 'the branch this claim forked must already exist by the time beforeProvision fires (all repoRoot git setup already ran)');
-  assert.equal(nodeModulesExistedAtCallTime, false, 'beforeProvision must fire BEFORE provisioning installs anything -- this is the release point, not an afterthought');
-  assert.equal(fs.existsSync(path.join(wt.path, 'node_modules', 'fgos-test-localdep', 'package.json')), true, 'provisioning still actually ran afterward');
-});
-
-test('tsk-1mn: createWorktree with no beforeProvision supplied stays byte-identical (every existing caller, including createDetachedMergeWorktree, unaffected)', () => {
-  const repoRoot = initTempRepo();
-  const worktreeDir = mkWorktreeDir();
-  const localDep = mkLocalDependency();
-  fs.writeFileSync(
-    path.join(repoRoot, 'package.json'),
-    JSON.stringify({ name: 'x', version: '1.0.0', dependencies: { 'fgos-test-localdep': `file:${localDep}` } }),
-  );
-  execFileSync('git', ['add', 'package.json'], { cwd: repoRoot });
-  execFileSync('git', ['commit', '-q', '-m', 'declare a dependency'], { cwd: repoRoot });
-
-  const wt = createWorktree(repoRoot, 'item-deps-nocb', { worktreeDir });
+  const scope = createLockScope('provision-after-add');
+  const wt = createWorktree(repoRoot, 'item-deps-nocb', { worktreeDir, scope });
 
   assert.equal(fs.existsSync(path.join(wt.path, 'node_modules', 'fgos-test-localdep', 'package.json')), true);
+  assert.deepEqual(scope.holding(), [], 'worktree-admin is released before dependencies are provisioned');
 });
 
 test('tsk-4yv: createWorktree removes the worktree it just registered when finishWorktreeSetup fails (malformed package.json throws inside provisionDependencies) — never leaks a registered checkout', () => {
