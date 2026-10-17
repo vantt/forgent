@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "authorSession": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+  "command": "env -u CLAUDE_CODE_SESSION_ID node --max-old-space-size=2048 /tmp/fgos-work/phase-07-step-05/g.mjs",
+  "gateExports": [
+    "validateRowSetConservation",
+    "loadDecisionShards",
+    "validateManualReview"
+  ],
+  "gateSha256": "b4a0532f0ee5e83dbe8db7159673fa1133f4b48c89545a4d2972ca2748df78b6",
+  "registryPath": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+  "registrySha256": "7b03045ad1d6332a2c0075548a9ae5ee61c998a475693380a6831c47b8053b60",
+  "runs": [
+    {
+      "prior": "plans/260925-documentation-authority-unification/reports/identity-registry.json",
+      "priorSha256": "7b03045ad1d6332a2c0075548a9ae5ee61c998a475693380a6831c47b8053b60",
+      "findings": [],
+      "claimIdNotConserved": 0
+    },
+    {
+      "prior": "plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json",
+      "priorSha256": "7e08a97664314189d1bdfc494924e5b2a14b0c1f221df90258855944b8b34730",
+      "findings": [],
+      "claimIdNotConserved": 0
+    }
+  ],
+  "reviewedRows": 9667,
+  "shards": 133,
+  "decisionSelfReviewFindings": [],
+  "claimIdNotConserved": 0,
+  "decisionSelfReview": 0,
+  "bindingScope": "Fresh execution of the unchanged G category validators over the persisted Phase 6 registry and current decision shards. Not a fresh native carry or a working-tree identity/conservation close. All main/import and candidate-unit drift remains scheduled for Step 9 per L11-2/L11-15.",
+  "okForBoundedAuthoring": true
+}

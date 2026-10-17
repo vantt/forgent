@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "requestId": "a38-step-05-01",
+  "authorSession": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+  "status": "ready for independent review; no reviewer verdict or seed supplied",
+  "snapshotCommitBeforeAuthoring": "21555f026",
+  "runnerCommit": "reviewer records the later runner commit; file hashes bind final author bytes now",
+  "boundedEntries": 143,
+  "boundedRows": 109,
+  "A34PreservationEntries": 28,
+  "controlEntries": 6,
+  "parts": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/review-input-step-05-01/part-01.json",
+      "entries": 60,
+      "bytes": 149144,
+      "sha256": "fcba605cec92f58b6373c6b1ffd9fe23e1f7a7c421ff46de3b908da728ee97f4",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-07/review-a38-step-05-bounded-part-01.md"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/review-input-step-05-01/part-02.json",
+      "entries": 60,
+      "bytes": 168591,
+      "sha256": "6fee227c256ad8250dc7f66d7cf50cff53f757b3729595ab4153aa3f01fbc588",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-07/review-a38-step-05-bounded-part-02.md"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/review-input-step-05-01/part-03.json",
+      "entries": 23,
+      "bytes": 83541,
+      "sha256": "e5bc747acdc9659b67a8214815e596d7decddc8cc561ea13c1c715ec42b21bd7",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-07/review-a38-step-05-bounded-part-03.md"
+    }
+  ],
+  "remainderFrameIndex": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-remainder-frame.json",
+  "pins": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-authority-alignment.json",
+      "bytes": 249809,
+      "sha256": "f52cfa0b0b221c9c7de747ce93d598e9c32717572412090d51aa6ad5c6c54ad1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-authority-alignment.md",
+      "bytes": 21970,
+      "sha256": "1b82a40753e6a9283d7b439f77a65c773c32aee2455b53bb2aa3de8ecf530d65"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-a34-preservation.json",
+      "bytes": 128844,
+      "sha256": "eda5d2a14486e59b02d19e4dfd3471e907ce59bd5528d5e3e1a9a318be28ce8b"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-coordination-delta.json",
+      "bytes": 11294,
+      "sha256": "4ef997fe91b64b83439da47d987fa2e677f3237abd1830f96d8d271180e36fc8"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-post-merge-checks.json",
+      "bytes": 7034,
+      "sha256": "e02fbe619c2c6395debfb7beca42fd95aa4d0ac002c33addc8f67088eefd278c"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-final-checks.json",
+      "bytes": 51555,
+      "sha256": "7f9210001f60bb98743e86635c6e0cfa5794fdc1a9f7f2244c3ddaf0dc424c93"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-g-current.json",
+      "bytes": 1618,
+      "sha256": "da0f805fda1a162c6b8d2a1bf18a6c1fc6baae27c661dcc2461810d7388256be"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/post-review-edits.md",
+      "bytes": 5720,
+      "sha256": "dbde1cfffbc8a377f77de1a17749c201a23dfd1387469890a69b4bba3dafa4dc"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/cross-area-inventory.json",
+      "bytes": 111644,
+      "sha256": "871ae023f9e5523f754d25fdbaae4bd4023fa0bd244deea0bbce905b35b7dd78"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/owner-answers.md",
+      "bytes": 24502,
+      "sha256": "c88919116ecbeebdf3fc40d766ac15c51e0299f083037690c70a603e0ce288da"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
+      "bytes": 33056,
+      "sha256": "4ea0bafcb855d1b7426d69deb5e85d87dab4c12fb3125dee983b56b7b1adc7fc"
+    },
+    {
+      "path": "docs/platform/component-boundary.md",
+      "bytes": 91248,
+      "sha256": "65c27c782a9323f723307f2a449ebf0b41efa18a7a341a7e308735296b272871"
+    },
+    {
+      "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+      "bytes": 41130,
+      "sha256": "82b51061421d4995781ac999111d8a1bb4479f0b1b6180afabcdbf2928d928c2"
+    },
+    {
+      "path": "docs/platform/holder-lock/spec.md",
+      "bytes": 42415,
+      "sha256": "e600666ed6bec9809ec377f0254c7c3e2ef5dd1b07e6b5933a7a1fba8bd0b1b7"
+    },
+    {
+      "path": "docs/platform/process/spec.md",
+      "bytes": 12118,
+      "sha256": "dbca061feff054beb0141739936b2e91a127805b80afdf040ba8ec2bd983c28e"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-remainder-frame.json",
+      "bytes": 950963,
+      "sha256": "f83d0b4ab9fe1010c8615a1172cde169d5c9b00fc94fafc1d6c4d2a8834f1775"
+    }
+  ],
+  "seedOwner": "independent reviewer; never Doer",
+  "minimumSeededRemainderDraw": 60,
+  "reviewerSeedReport": "plans/260925-documentation-authority-unification/reports/phase-07/review-a38-step-05-seed-and-rollup-01.md",
+  "reworkThreshold": "bounded statements and A34 bindings: substantive rework / deep-read entries > 0.03 -> full deep read of that population; remainder sample: see remainderSampleRule; rationale-only wording is excluded (L10-37)",
+  "limits": {
+    "entriesPerPart": 60,
+    "bytesPerPart": 400000,
+    "maxActualEntries": 60,
+    "maxActualBytes": 168591
+  },
+  "remainderSampleRule": "L11-16: reviewer-held seed, exactly 60 ids drawn without replacement from the sorted frame; deep-read each; >10% substantive candidate-content defects -> stop and escalate to the owner (no full read; full current truth stays Phase 9 under A28 3(b))",
+  "leadEdit": "2026-10-17 Lead replaced the 375-part remainder frame with one compact frame file and set the remainder draw to 60 under L11-16; owner-answers.md repinned after L11-16 was appended"
+}

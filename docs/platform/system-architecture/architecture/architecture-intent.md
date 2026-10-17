@@ -406,25 +406,26 @@ Plain-English meaning:
 
 ## 11. Current System Fit And Conflicts
 
-The current system does not perfectly match the proposed V1. There is no fatal
-contradiction with existing accepted contracts, but there are real gaps to
-resolve before implementation.
+This table separates the retired coordination design from current owners. The
+coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`;
+see [the current-owner map](../../agent-coordination/spec.md#current-summary).
+The proposed V1 remains discussion intent, not an accepted runtime contract.
 
 | Area | Current system | Conflict / gap for V1 |
 |---|---|---|
 | `FlowDefinition` topology | In the retired coordination engine, edges connected SessionActors. | An artifact/diff is not a SessionActor, so initial review must be modeled as root operations with explicit context refs, not `artifact-source -> reviewer`. |
-| Declared operation dispatch | Runtime has declared-operation dispatch paths today. | A new primitive must explain how it differs from simply calling existing dispatch again. The missing piece is authorization/provenance for optional rounds. |
-| Runtime graph shape | Existing protocol graph is static. | V1 should avoid topology mutation and only schedule declared optional operations. This avoids weakening isolation fixtures. |
-| Round counting | Existing hard cap is Assignment-count-like. | Good as conservative budget enforcement, but not precise enough as the conceptual model for "review round." |
+| Declared operation dispatch | Historical: the retired engine dispatched declared operations. Current executable Workflow steps project task specs into the Unit execution core (`src/workflow/steps.mjs`, `src/workflow/runner.mjs`). | The proposed `requestRound` / `authorizeDeclaredOperation` surface below belongs to the retired design; it is not a prerequisite for current Workflow or CollaborationPattern execution. |
+| Runtime graph shape | Historical: the retired protocol graph was static. Current Workflow definitions validate step dependencies; CollaborationPattern selects `solo`, `reviewed` or `panel` (`src/workflow/definition.mjs`, `src/runner/execution/patterns/index.mjs`). | Preserve the proposal to bound topology changes as deferred design intent; it does not introduce a live FlowDefinition or a new graph-mutation contract. |
+| Round counting | Current `reviewed` uses an explicit `maxRounds` loop, with precedence preset parameters → configured pattern → default 2 (`src/runner/execution/patterns/reviewed.mjs`). The former Assignment-count description is historical. | Any richer conceptual round model remains a proposal; current bounded review does not require a new retired-engine round counter. |
 | Retry/replacement | In the retired coordination engine, `retrySessionTask` superseded a run for the same Assignment. | Recheck must not be modeled as retry. Recheck is a new judgment that preserves previous verdicts. |
-| Context visibility | Existing tests prove sibling leakage can be rejected for isolation cases. | V1 needs a named milestone such as `first-independent-verdicts-linked`, including behavior for failed/late/replaced actors. |
-| Driver authority | Agent-led session already behaves like the persistent overseer. | Contract still needs to name driver identity, authorization, event trail, and race handling for two attempted authorizations. |
-| Mutation | Standalone CoordinationSession is read-only with respect to Work. | V1 cannot honestly include protocol-owned Doer/Fixer mutation. Fix/owner action must remain outside protocol or wait for a separate Work-attached design. |
+| Context visibility | Current reviewed checkers receive the producer result with `readOnly: true` and `independentOf: ['producer']`; panel synthesis receives all settled panel results (`src/runner/execution/patterns/reviewed.mjs`, `panel.mjs`). | The retired fixture's isolation proof does not establish current sibling isolation. Named visibility milestones remain deferred proposal intent, not a claimed current guarantee. |
+| Driver authority | Current sequencing is owned by the Workflow runner and collaboration loops by CollaborationPattern; `bind()` owns executor/mechanism selection (`src/workflow/runner.mjs`, `src/runner/execution/patterns/index.mjs`, `src/runner/execution/bind.mjs`). | The proposed external-session-driver authorization/event surface is historical/deferred design. It grants no current Team Cognition or CoordinationSession authority. |
+| Mutation | Historical: standalone CoordinationSession had no Work-write authority. Current Unit producers may mutate declared `writes` in a linked worktree; the runner commits scoped changes and reviewed checkers are read-only (`src/runner/execution/run.mjs`, `src/runner/execution/patterns/reviewed.mjs`). | Preserve the proposal's Work-lifecycle boundary; it is not a blanket prohibition on current Unit mutation and does not reinstate a CoordinationSession runtime. |
 | Synthesis | The retired coordination engine used `completion.mode: synthesize`. | V1 needs a stricter output contract so synthesis cannot hide failed actors, unresolved dissent, unsupported claims, or stale artifact revisions. |
 
-So the answer is: **there is no reason to change the isolation fixture, but
-the current system is not ready to express the bounded review loop cleanly
-without one small new authorization/event surface.**
+The isolation fixture and its proposed authorization/event surface remain
+preserved design intent. Current bounded review is implemented by the `reviewed`
+CollaborationPattern; adopting a different surface needs a separate accepted design.
 
 ## 12. Architecture Change Size
 

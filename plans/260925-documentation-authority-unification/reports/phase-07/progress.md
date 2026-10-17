@@ -11,13 +11,12 @@
   is complete and no candidate content changed.
 - Completed steps: Steps 1 and 2; the independent bounded review returned 39/39 ok
   at commit `1d78440f9`, with zero rework and two non-blocking housekeeping notes.
-- Current steps: the two-part Steps 3-4 review is complete (architecture 20 ok /
-  2 classification rework; vocabulary 13/13 ok). A45 and Lead decisions
-  L11-12..L11-14 have been applied. Step 3 has no remaining stop condition and
-  is accepted-pending-review; Step 4's reviewer notes are applied.
+- Steps 3 and 4: accepted after the bounded independent 15/15 re-review; A45 and L11-12..L11-14 are applied.
 - Bounded re-review (Lead note): 15/15 ok, 0 rework, pins match, at `df3626178`;
   report `review-a38-step-03-step-04-bounded-rework-01.md`. Steps 3 and 4 accepted.
-- Next action: Step 5, held until the owner says to continue.
+- Current action: Step 5 bounded authoring complete; one independent review request prepared, including the reviewer-held seeded remainder draw. Step 5 remains reviewing.
+- L11-15: main `0d6da9033` landed through merge `21555f026`. The holder-lock and process specs and component-boundary merge edit join Step 5/6 inventory. All eight main-imported identity-scope changes ride the Step 9 native carry; unsynced identity before that carry is expected.
+- Assignment override: no `fgos` CLI may run this turn. New evidence artifacts use the established `reports/phase-07/` sibling naming pattern; convention resolution cannot be rerun under this explicit restriction. No generated naming policy is changed.
 - Final turn verification: changed JSON parses; matrix/stop and unpark assertions
   pass; strict candidate-status checks 217 documents with zero findings;
   `git diff --check` passes; all changed paths remain inside the assignment scope.
@@ -43,7 +42,7 @@ carry. Main-imported bytes are accounted but are not Phase 7-authored edits.
 
 A45 selected L11-7 option A: Gateway keeps CTR010, confinement takes verified-free
 CTR011, and the candidate registry gains the missing Gateway REST row. The bounded
-application is complete and awaits re-review; this does not authorize any remaining
+application was accepted by the independent 15/15 re-review; this does not authorize any remaining
 owner-only action.
 
 ## Evidence pins
@@ -198,7 +197,7 @@ resolved path, author, reviewer, digest and status here.
 | 2 | accepted | 28/28 independent semantic verdicts ok at `1d78440f9` | X-SEM-29/31 route to Step 6 duplicate handling | none |
 | 3 | accepted | 22 rows, zero stop arrays, A45 + L11-12..L11-14 applied; bounded re-review 15/15 ok at `df3626178` | none | none |
 | 4 | accepted | 13/13 initial verdicts ok; V-05 fix confirmed by bounded re-review 15/15 ok | native rebind waits for Step 9 by L11-2 | none |
-| 5 | ready | none | none | wait for owner go-ahead |
+| 5 | reviewing | 109 statements; 28 A34 preservation bindings; 143-entry review plus compact remainder frame (60-unit draw, L11-16) | PARK-PROTECTED-01 import provenance; row-local | Lead starts the one independent request; reviewer chooses/holds seed and draw |
 | 6 | not-started | none | none | wait for Step 1 |
 | 7 | not-started | none | none | wait for all candidate edits in Steps 2-6 |
 | 8 | not-started | none | none | wait for sealed key |
@@ -207,3 +206,42 @@ resolved path, author, reviewer, digest and status here.
 Allowed states are `not-started`, `ready`, `in-progress`, `parked`, `reviewing`,
 `accepted`, and `rejected`. Every handoff updates this ledger with exact evidence and
 the smallest next action; a parked row does not block unrelated rows.
+
+## Step 5 authoring start and L11-15 housekeeping
+
+- Inventory now has 108 rows: the unchanged 98-row Step 1 population plus X-MAIN-01..03 and X-LOCK-01..07. The three imported documents are classified and seven dependency/contract seams route explicitly through Steps 5/6/9.
+- Post-merge A/B/C/H/I pass; H inspects 611 files, checks 217, zero findings. G retains the accepted bounded-authoring posture: historical zero target findings, unchanged decision scope, fresh native G pending Step 9 for all imported/corrected units.
+- Protected-boundary raw proof has one imported discrepancy: reading-map differs from main parent because the merge retains pre-existing branch material. No protected working edit exists. Park only this provenance proof for Lead/Step 9; do not rewrite the protected source. Exact blobs and raw false verdict are in `step-05-post-merge-checks.json`.
+- Registered artifacts (author `codex-session:fgos-run_unit-run-17922161b19023@2026-10-17`, reviewer pending): `step-05-post-merge-checks.json`, `step-05-final-checks.json`, `step-05-authority-alignment.json`, `step-05-authority-alignment.md`, `step-05-a34-preservation.json`, `step-05-remainder-frame.json` (compact, L11-16), `review-input-step-05-01/` (≤60 entries per part), and `review-request-a38-step-05-01.md`. All reside under this established report directory; CLI prohibition prevents convention resolution this turn.
+
+- Additional registered artifact: `step-05-coordination-delta.json`, exact six-row before/after proof with section and whole-file digests. Authority-separation authored; implementation-alignment now reads the final bytes.
+
+## Step 5 authoring result and independent handoff
+
+Author session: `codex-session:fgos-run_unit-run-17922161b19023@2026-10-17`.
+
+- Housekeeping: X-MAIN-01..03 account holder-lock/spec, process/spec and the merged component-boundary; X-LOCK-01..07 account Process/lock/identity/host/facade/registry/distribution/supervisor seams. Inventory is 108 rows (98 B0 + 10 new); all eight identity imports from main ride Step 9. Their native identities staying unsynced is expected, not a stop.
+- Bounded population: 108 inventory statements plus S3-01 = 109. Authority kinds: architecture 20, contract 7, decision history 46, generated projection 12, proposal 1, specification 23, vision 0. Alignment: aligned 13, doc-fix 7, deferred 89, implementation-gap 0. Counts label the exact statements, never their entire owning files.
+- Six coordination rows X-STALE-01..06: the authority-separation pass corrects graph shape, round count, context visibility, driver authority, mutation and declared-operation dispatch in architecture-intent §11. The alignment pass reads the final bytes with code/config/schema evidence and makes no second rewrite. S3-01 adds historical/deferred labels at component-boundary §3/§13; no new producer or contract id.
+- Candidate edits this turn: exactly `docs/platform/system-architecture/architecture/architecture-intent.md` and `docs/platform/component-boundary.md`. Both final digests and affected anchors are in post-review-edits; all affected units wait for native carry/rebind and fresh independent matching review at Step 9. Existing imported holder-lock/process spec bytes remain unchanged.
+- A34: 28/28 residual files byte-identical to B0; all declared payload hashes match. Owner and activation conditions recorded individually. Thirteen retiring-legacy successor rows are named (01 and 17..28); the inherited “12” prose count is retained under L10-37. Current source/target file drift is disclosed separately (13/11), without carrying approval or claiming native rebind.
+- Implementation gaps found against the bounded current seams: none. Process non-linux-gate domains, full containment/gate primitives and retired coordination proposals stay explicitly deferred. P7-DOC-GAP-01 remains the inherited runner-policy documentation route. No implementation is repaired.
+- Checks A/B/C/H/I: pass in the declared bounded posture; H checks 217/611 docs with zero findings, and I keeps frozen baseline bytes while disclosing imported holder-lock/process plus historical session-identity reader-route deltas. G freshly reruns unchanged category validators over persisted native identity and current decisions: zero claim-id-not-conserved against each prior, zero decision-self-review over 9,667 reviewed rows/133 shards. This is not fresh native close proof.
+- PARK-PROTECTED-01 remains: raw protected-import equality is false only for `docs/specs/reading-map.md`, which retains pre-existing branch bytes versus main parent. No protected working changes and no Phase 7 first-parent non-merge protected authoring. The raw failure is not waived or called green; Lead/Step 9 owns provenance acceptance. Only that proof row is parked; unrelated work continues.
+- Author structure/pin verification: 396 pins, 109 required-field-complete statements, valid changed anchors, 28 residual bindings, no remainder omissions/overlap, max 60 entries / 168,591 bytes per part. `git diff --check` passes. No heavy inventory/sync/comparator/test job ran; full `npm test` and native close remain Step 9.
+- ONE independent request: `review-request-a38-step-05-01.md`; pinned index `review-input-step-05-01/index.json`. Three bounded parts contain 143 distinct entries (60/60/23); the remainder frame holds all 22,454 eligible extractor units from 611 Markdown docs, after exactly three fully bounded unit exclusions. Reviewer alone chooses and holds seed and algorithm, adds every high-risk/parked row and mismatch, and expands the bounded sets to full deep read if substantive deep-read rework exceeds 3%. Lead edit under L11-16: the frame is the single file `step-05-remainder-frame.json`, and the remainder draw is exactly 60 units with a >10% owner-escalation stop. No author seed, sample or sample verdict exists.
+- Step 5 acceptance is pending that independent review/draw. This author handoff neither starts a reviewer nor approves Step 5.
+
+Additional registered artifacts: `step-05-coordination-delta.json`, `step-05-g-current.json`, `step-05-structure-verification.json`, the remainder frame (files/exclusions inline) and the bounded part index above. Authored-by/header identities match. New names follow the established report pattern under the explicit no-CLI assignment override.
+
+| Artifact | Author | Independent reviewer | State / binding |
+|---|---|---|---|
+| `step-05-authority-alignment.json` and `.md` | Doer session above | pending | 109 exact statements; snapshot pins in review index |
+| `step-05-a34-preservation.json` | Doer session above | pending | 28 verbatim, digest-bound residual representations |
+| `step-05-coordination-delta.json` | Doer session above | pending | exact six-row section before/after |
+| `step-05-post-merge-checks.json` / `step-05-final-checks.json` | Doer session above | pending | raw checks, including parked protected result |
+| `step-05-g-current.json` | Doer session above | pending | fresh category validators, persisted identity only |
+| `step-05-structure-verification.json` | Doer session above | pending | structural proof only, no semantic reviewer verdict |
+| `step-05-remainder-frame.json` | Doer session; compacted by Lead (L11-16) | reviewer owns seed/draw | complete frame as sorted ids, no selected sample |
+| `review-input-step-05-01/index.json` | Doer session above | per-part paths fixed there | 143 entries + 22,454 remainder units, all parts within limits |
+| `review-request-a38-step-05-01.md` | Doer session above | not started by this author | the sole Step 5 independent request |

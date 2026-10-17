@@ -178,6 +178,12 @@ harder to introduce safely.
 
 #### 3. Recommended Responsibility Chain
 
+> Historical/deferred advisory: the Team Cognition → Protocol part of the chain
+> below is superseded as a current-runtime description by CollaborationPattern
+> and Workflow. No Team Cognition producer or contract id is claimed. The
+> surviving Assignment/Dispatch/Runtime/Evidence/Work boundaries retain their
+> respective owners; see [current execution owners](agent-coordination/spec.md#current-summary).
+
 The clean boundary chain is:
 
 ```txt
@@ -764,6 +770,12 @@ sets per-Assignment policy inputs. Dispatch still governs each Assignment one at
 a time and remains the final egress/policy gate.
 
 #### 13. Team Cognition And Protocol Packages
+
+> Historical/deferred proposal, preserved for intent. The reusable Team Cognition
+> Engine described below is not a current runtime module: the coordination
+> engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`. Current owners
+> are [CollaborationPattern and Workflow](agent-coordination/spec.md#current-summary);
+> this passage allocates no contract id and authorizes no implementation.
 
 Consult, research, debate, brainstorm, leader-worker, and peer review should be
 treated as cognition/protocol capability on top of the foundation, not as the

@@ -1,0 +1,188 @@
+{
+  "schemaVersion": 1,
+  "authorSession": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+  "B0": "6f0f39ca14138c20d2ccb62063ccdf337cf6873a",
+  "SYNC": "21555f026c1ad9d17b590030db3df9b7068995b2",
+  "HEAD": "21555f026c1ad9d17b590030db3df9b7068995b2",
+  "stage": "post-merge",
+  "A": {
+    "command": "git log --first-parent --no-merges --name-only --format= 6f0f39ca14138c20d2ccb62063ccdf337cf6873a..HEAD | sort -u | node -e 'const ok=JSON.parse(require(\"fs\").readFileSync(process.argv[1],\"utf8\"));const bad=require(\"fs\").readFileSync(0,\"utf8\").split(\"\\n\").filter(Boolean).filter(p=>!ok.some(x=>p===x||p.startsWith(x)));console.log(bad.join(\"\\n\"));process.exit(bad.length?1:0)' plans/260925-documentation-authority-unification/reports/phase-07/allowed-paths.json",
+    "exit": 0,
+    "stdout": "\n",
+    "stderr": "",
+    "working": [
+      "plans/260925-documentation-authority-unification/reports/phase-07/progress.md"
+    ],
+    "workingViolations": [],
+    "ok": true
+  },
+  "B": {
+    "command": "git hash-object <each path in reports/phase-06/extractor-blobs.txt>",
+    "rows": [
+      {
+        "path": "scripts/generate-doc-inventory.mjs",
+        "expected": "a52981ff2862cc2c553dbb3181e4e822a26b146b",
+        "actual": "a52981ff2862cc2c553dbb3181e4e822a26b146b",
+        "equal": true
+      },
+      {
+        "path": "scripts/doc-inventory-artifact.mjs",
+        "expected": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64",
+        "actual": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64",
+        "equal": true
+      },
+      {
+        "path": "scripts/generate-shipped-path-inventory.mjs",
+        "expected": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
+        "actual": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
+        "equal": true
+      },
+      {
+        "path": "scripts/check-legacy-docs-ratchet.mjs",
+        "expected": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d",
+        "actual": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d",
+        "equal": true
+      },
+      {
+        "path": "scripts/lib/is-main-module.mjs",
+        "expected": "680570946fa1381474900c9192795514b5b88f48",
+        "actual": "680570946fa1381474900c9192795514b5b88f48",
+        "equal": true
+      }
+    ],
+    "ok": true
+  },
+  "C": {
+    "command": "git show B0:transitional-switchboard.json; recursive area-status comparison with working bytes",
+    "changedAreaStatuses": {},
+    "switchboardSha256": "a43e5a3547df5323a3e2209ae4f18833a8085108ff1da9031022534e496833fa",
+    "ok": true
+  },
+  "G": {
+    "baseGate": "plans/260925-documentation-authority-unification/reports/phase-06/step10-final-close-both.json",
+    "baseGateSha256": "cfde9071cd4a8b003ea0c241ed7f43b403d6ddee7e177a2cef362ec0c63683dc",
+    "baseClaimIdNotConserved": 0,
+    "baseDecisionSelfReview": 0,
+    "decisionScopeDrift": [],
+    "mainIdentityImports": [
+      "docs/architecture-manifest.json",
+      "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+      "docs/platform/component-boundary.md",
+      "docs/platform/holder-lock/spec.md",
+      "docs/platform/process/spec.md",
+      "docs/specs/distribution.md",
+      "docs/specs/reading-map.md",
+      "docs/specs/runner.md"
+    ],
+    "okForBoundedAuthoring": true,
+    "freshNativeCloseClaim": false,
+    "reason": "L11-2/L11-15: imported and corrected identity units stay unsynced until Step 9; no fresh global G or approval carry claimed",
+    "currentCategoryProof": "plans/260925-documentation-authority-unification/reports/phase-07/step-05-g-current.json",
+    "currentCategoryProofSha256": "da0f805fda1a162c6b8d2a1bf18a6c1fc6baae27c661dcc2461810d7388256be",
+    "currentClaimIdNotConserved": 0,
+    "currentDecisionSelfReview": 0,
+    "currentReviewedRows": 9667,
+    "currentShards": 133
+  },
+  "H": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID node scripts/check-doc-candidate-status.mjs --strict --json",
+    "exit": 0,
+    "result": {
+      "counts": {
+        "files": 611,
+        "byStatus": {
+          "promoted": 3,
+          "candidate": 214,
+          "legacy-current": 0,
+          "non-authority": 1,
+          "unrouted": 393
+        },
+        "exemptUnrouted": 302,
+        "checked": 217,
+        "findings": 0,
+        "byType": {}
+      },
+      "findings": []
+    },
+    "stderr": "",
+    "ok": true
+  },
+  "I": {
+    "command": "Phase 6 checks.mjs reader regex over six readers; compare HEAD and frozen baseline",
+    "links": [
+      "docs/platform/**",
+      "docs/platform/<area",
+      "docs/platform/README.md",
+      "docs/platform/holder-lock/spec.md",
+      "docs/platform/packaging-distribution/README.md",
+      "docs/platform/packaging-distribution/vision.md",
+      "docs/platform/process/spec.md",
+      "docs/platform/session-identity/spec.md"
+    ],
+    "headLinks": [
+      "docs/platform/**",
+      "docs/platform/<area",
+      "docs/platform/README.md",
+      "docs/platform/holder-lock/spec.md",
+      "docs/platform/packaging-distribution/README.md",
+      "docs/platform/packaging-distribution/vision.md",
+      "docs/platform/process/spec.md",
+      "docs/platform/session-identity/spec.md"
+    ],
+    "baseline": [
+      "docs/platform/**",
+      "docs/platform/<area",
+      "docs/platform/README.md",
+      "docs/platform/packaging-distribution/README.md",
+      "docs/platform/packaging-distribution/vision.md"
+    ],
+    "equal": false,
+    "equalToHEAD": true,
+    "frozenBaselineUnchanged": true,
+    "baselineSha256": "7bb39c1cf3fbf49119bd5f9d05c79f210641562e2a84ff959ecb2602edefd6a1",
+    "mainImportedDelta": [
+      "docs/platform/holder-lock/spec.md",
+      "docs/platform/process/spec.md",
+      "docs/platform/session-identity/spec.md"
+    ],
+    "ok": true
+  },
+  "protectedBoundary": {
+    "workingChanges": [],
+    "imported": [
+      {
+        "path": "docs/specs/distribution.md",
+        "mergeBlob": "b749adb446c61ea5ff8d25b38c3d6feae61d188f",
+        "mainBlob": "b749adb446c61ea5ff8d25b38c3d6feae61d188f",
+        "currentBlob": "b749adb446c61ea5ff8d25b38c3d6feae61d188f"
+      },
+      {
+        "path": "docs/specs/reading-map.md",
+        "mergeBlob": "f4f36b52be7a99073c0f6eb6a8decc8fa97e5844",
+        "mainBlob": "b306e3a3193e221154c5871b51fdcca13e573042",
+        "currentBlob": "f4f36b52be7a99073c0f6eb6a8decc8fa97e5844"
+      },
+      {
+        "path": "docs/specs/runner.md",
+        "mergeBlob": "e402db57c2beee6854da73f88eb9316a94a0aa7c",
+        "mainBlob": "e402db57c2beee6854da73f88eb9316a94a0aa7c",
+        "currentBlob": "e402db57c2beee6854da73f88eb9316a94a0aa7c"
+      }
+    ],
+    "ok": false,
+    "parkedReason": "docs/specs/reading-map.md merge result retains existing branch edits; differs from main-parent blob. This proof alone is parked for Lead/Step 9; no protected writing this turn."
+  },
+  "diffCheck": {
+    "command": "git diff --check",
+    "exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "ok": true
+  },
+  "okForBoundedAuthoring": false,
+  "parkedRows": [
+    "PARK-PROTECTED-01"
+  ],
+  "continuedUnderRowLocalStopRule": true,
+  "allMechanicalProofsGreen": false
+}

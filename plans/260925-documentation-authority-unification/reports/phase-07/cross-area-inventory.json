@@ -18,13 +18,15 @@
     "candidate-wording": 3,
     "contract-collision": 1,
     "duplicate-group": 4,
+    "main-import-cross-area": 7,
+    "main-import-document": 3,
     "owner-queue-family": 13,
     "projection-staleness": 6,
     "reader-navigation-gap": 4,
     "semantic-group": 28,
     "stale-coordination-row": 6
   },
-  "totalRows": 98,
+  "totalRows": 108,
   "rows": [
     {
       "rowId": "X-DUP-01",
@@ -2009,6 +2011,329 @@
       "disposition": "separate main-owned item",
       "blockedDecision": null,
       "targetStep": "separate main-owned item"
+    },
+    {
+      "rowId": "X-MAIN-01",
+      "kind": "main-import-document",
+      "groupId": "L11-15-holder-lock-main-import",
+      "owner": "docs/platform/holder-lock/spec.md",
+      "consumers": [
+        "Step 5",
+        "Step 6",
+        "Step 9"
+      ],
+      "authorityKind": "specification",
+      "sourcePath": "docs/platform/holder-lock/spec.md",
+      "sourceId": "report-path:docs/platform/holder-lock/spec.md",
+      "sourceDigest": "e600666ed6bec9809ec377f0254c7c3e2ef5dd1b07e6b5933a7a1fba8bd0b1b7",
+      "targetPath": "docs/platform/holder-lock/spec.md",
+      "targetId": "report-path:docs/platform/holder-lock/spec.md",
+      "targetDigest": "e600666ed6bec9809ec377f0254c7c3e2ef5dd1b07e6b5933a7a1fba8bd0b1b7",
+      "implementationEvidence": [
+        "packages/holder-lock/rust/src/port.rs",
+        "src/holder-lock/index.mjs",
+        "packages/holder-lock/contracts/lock-registry.v1.json"
+      ],
+      "readerGapId": null,
+      "disposition": "Step 5 authority/alignment; Step 6 source/projection; Step 9 native carry",
+      "blockedDecision": null,
+      "targetStep": "Step 5; Step 6; Step 9",
+      "scopedStatement": "Holder-lock owns kernel resource exclusion, cold-lock registry and its internal routes; hot state/main-checkout remain next-track work.",
+      "importCommit": "0d6da9033",
+      "mergeCommit": "21555f026",
+      "identityStatus": "main-import pending Step 9 native carry; no native identity minted here"
+    },
+    {
+      "rowId": "X-MAIN-02",
+      "kind": "main-import-document",
+      "groupId": "L11-15-holder-lock-main-import",
+      "owner": "docs/platform/process/spec.md",
+      "consumers": [
+        "Step 5",
+        "Step 6",
+        "Step 9"
+      ],
+      "authorityKind": "specification",
+      "sourcePath": "docs/platform/process/spec.md",
+      "sourceId": "report-path:docs/platform/process/spec.md",
+      "sourceDigest": "dbca061feff054beb0141739936b2e91a127805b80afdf040ba8ec2bd983c28e",
+      "targetPath": "docs/platform/process/spec.md",
+      "targetId": "report-path:docs/platform/process/spec.md",
+      "targetDigest": "dbca061feff054beb0141739936b2e91a127805b80afdf040ba8ec2bd983c28e",
+      "implementationEvidence": [
+        "packages/process/rust/src/facts.rs",
+        "packages/process/rust/src/lib.rs",
+        "src/runner/dispatch/process-identity.mjs"
+      ],
+      "readerGapId": null,
+      "disposition": "Step 5 authority/alignment; Step 6 source/projection; Step 9 native carry",
+      "blockedDecision": null,
+      "targetStep": "Step 5; Step 6; Step 9",
+      "scopedStatement": "Process owns tuple facts and identity-safe control; unsupported domain kinds stay Unknown/Refused.",
+      "importCommit": "0d6da9033",
+      "mergeCommit": "21555f026",
+      "identityStatus": "main-import pending Step 9 native carry; no native identity minted here"
+    },
+    {
+      "rowId": "X-MAIN-03",
+      "kind": "main-import-document",
+      "groupId": "L11-15-holder-lock-main-import",
+      "owner": "docs/platform/component-boundary.md",
+      "consumers": [
+        "Step 5",
+        "Step 6",
+        "Step 9"
+      ],
+      "authorityKind": "architecture",
+      "sourcePath": "docs/platform/component-boundary.md",
+      "sourceId": "report-path:docs/platform/component-boundary.md",
+      "sourceDigest": "eda5dbf9c824fb48a5160e839d4d1740e5871c787387697e6d2573065fc2a1ed",
+      "targetPath": "docs/platform/component-boundary.md",
+      "targetId": "report-path:docs/platform/component-boundary.md",
+      "targetDigest": "eda5dbf9c824fb48a5160e839d4d1740e5871c787387697e6d2573065fc2a1ed",
+      "implementationEvidence": [
+        "packages/holder-lock/rust/Cargo.toml",
+        "packages/process/rust/Cargo.toml"
+      ],
+      "readerGapId": null,
+      "disposition": "Step 5 authority/alignment; Step 6 source/projection; Step 9 native carry",
+      "blockedDecision": null,
+      "targetStep": "Step 5; Step 6; Step 9",
+      "scopedStatement": "Merge adds Process L0 and Holder-lock L1 and their routes, preserving the candidate Observe route and carriage.",
+      "importCommit": "0d6da9033",
+      "mergeCommit": "21555f026",
+      "identityStatus": "main-import pending Step 9 native carry; no native identity minted here"
+    },
+    {
+      "rowId": "X-LOCK-01",
+      "kind": "main-import-cross-area",
+      "groupId": "L11-15-holder-lock-main-import",
+      "owner": "docs/platform/holder-lock/spec.md",
+      "consumers": [
+        "holder-lock",
+        "process"
+      ],
+      "authorityKind": "architecture",
+      "sourcePath": "docs/platform/holder-lock/spec.md",
+      "sourceId": "report-path:docs/platform/holder-lock/spec.md",
+      "sourceDigest": "e600666ed6bec9809ec377f0254c7c3e2ef5dd1b07e6b5933a7a1fba8bd0b1b7",
+      "targetPath": "docs/platform/process/spec.md",
+      "targetId": "report-path:docs/platform/process/spec.md",
+      "targetDigest": "dbca061feff054beb0141739936b2e91a127805b80afdf040ba8ec2bd983c28e",
+      "implementationEvidence": [
+        "packages/holder-lock/rust/Cargo.toml",
+        "packages/holder-lock/rust/src/predecessor.rs"
+      ],
+      "readerGapId": null,
+      "disposition": "Step 5 authority/alignment; Step 6 source/projection; Step 9 native carry",
+      "blockedDecision": null,
+      "targetStep": "Step 5; Step 6; Step 9",
+      "scopedStatement": "Holder-lock depends on Process facts/control; kernel exclusion never becomes a PID/TTL takeover decision.",
+      "importCommit": "0d6da9033",
+      "mergeCommit": "21555f026",
+      "identityStatus": "main-import pending Step 9 native carry; no native identity minted here"
+    },
+    {
+      "rowId": "X-LOCK-02",
+      "kind": "main-import-cross-area",
+      "groupId": "L11-15-holder-lock-main-import",
+      "owner": "docs/platform/holder-lock/spec.md",
+      "consumers": [
+        "session-identity",
+        "holder-lock"
+      ],
+      "authorityKind": "architecture",
+      "sourcePath": "docs/platform/holder-lock/spec.md",
+      "sourceId": "report-path:docs/platform/holder-lock/spec.md",
+      "sourceDigest": "e600666ed6bec9809ec377f0254c7c3e2ef5dd1b07e6b5933a7a1fba8bd0b1b7",
+      "targetPath": "docs/platform/session-identity/spec.md",
+      "targetId": "report-path:docs/platform/session-identity/spec.md",
+      "targetDigest": "b3dfd588a2535949d4396a3c4afc20e15508c6af57f278be4154533e7cd2621a",
+      "implementationEvidence": [
+        "packages/holder-lock/rust/Cargo.toml",
+        "src/holder-lock/index.mjs"
+      ],
+      "readerGapId": null,
+      "disposition": "Step 5 authority/alignment; Step 6 source/projection; Step 9 native carry",
+      "blockedDecision": null,
+      "targetStep": "Step 5; Step 6; Step 9",
+      "scopedStatement": "Writer identity supplies attribution, never lock authority; holder-lock has no session-identity dependency.",
+      "importCommit": "0d6da9033",
+      "mergeCommit": "21555f026",
+      "identityStatus": "main-import pending Step 9 native carry; no native identity minted here"
+    },
+    {
+      "rowId": "X-LOCK-03",
+      "kind": "main-import-cross-area",
+      "groupId": "L11-15-holder-lock-main-import",
+      "owner": "docs/platform/holder-lock/spec.md",
+      "consumers": [
+        "host invocation",
+        "Node facade",
+        "Rust routes"
+      ],
+      "authorityKind": "contract",
+      "sourcePath": "docs/platform/holder-lock/spec.md",
+      "sourceId": "report-path:docs/platform/holder-lock/spec.md",
+      "sourceDigest": "e600666ed6bec9809ec377f0254c7c3e2ef5dd1b07e6b5933a7a1fba8bd0b1b7",
+      "targetPath": "docs/platform/holder-lock/spec.md",
+      "targetId": "report-path:docs/platform/holder-lock/spec.md",
+      "targetDigest": "e600666ed6bec9809ec377f0254c7c3e2ef5dd1b07e6b5933a7a1fba8bd0b1b7",
+      "implementationEvidence": [
+        "packages/holder-lock/contracts/internal-route.lock-fd.v1.json",
+        "packages/holder-lock/rust/src/route.rs",
+        "src/holder-lock/driver.mjs",
+        "src/holder-lock/index.mjs"
+      ],
+      "readerGapId": null,
+      "disposition": "Step 5 authority/alignment; Step 6 source/projection; Step 9 native carry",
+      "blockedDecision": null,
+      "targetStep": "Step 5; Step 6; Step 9",
+      "scopedStatement": "Node facade hands one inherited description through versioned internal lock-fd routes; callers see an opaque handle.",
+      "importCommit": "0d6da9033",
+      "mergeCommit": "21555f026",
+      "identityStatus": "main-import pending Step 9 native carry; no native identity minted here"
+    },
+    {
+      "rowId": "X-LOCK-04",
+      "kind": "main-import-cross-area",
+      "groupId": "L11-15-holder-lock-main-import",
+      "owner": "docs/platform/holder-lock/spec.md",
+      "consumers": [
+        "gateway",
+        "runner",
+        "dispatch",
+        "provider capacity",
+        "sessions"
+      ],
+      "authorityKind": "contract",
+      "sourcePath": "docs/platform/holder-lock/spec.md",
+      "sourceId": "report-path:docs/platform/holder-lock/spec.md",
+      "sourceDigest": "e600666ed6bec9809ec377f0254c7c3e2ef5dd1b07e6b5933a7a1fba8bd0b1b7",
+      "targetPath": "docs/platform/holder-lock/spec.md",
+      "targetId": "report-path:docs/platform/holder-lock/spec.md",
+      "targetDigest": "e600666ed6bec9809ec377f0254c7c3e2ef5dd1b07e6b5933a7a1fba8bd0b1b7",
+      "implementationEvidence": [
+        "packages/holder-lock/contracts/lock-registry.v1.json",
+        "src/holder-lock/registry.mjs",
+        "src/holder-lock/lock-scope.mjs"
+      ],
+      "readerGapId": null,
+      "disposition": "Step 5 authority/alignment; Step 6 source/projection; Step 9 native carry",
+      "blockedDecision": null,
+      "targetStep": "Step 5; Step 6; Step 9",
+      "scopedStatement": "Cold-lock names, rank, scope, paths and fences come from one registry; main-checkout/hot-state are not cut over in this track.",
+      "importCommit": "0d6da9033",
+      "mergeCommit": "21555f026",
+      "identityStatus": "main-import pending Step 9 native carry; no native identity minted here"
+    },
+    {
+      "rowId": "X-LOCK-05",
+      "kind": "main-import-cross-area",
+      "groupId": "L11-15-holder-lock-main-import",
+      "owner": "docs/platform/holder-lock/spec.md",
+      "consumers": [
+        "distribution",
+        "setup",
+        "doctor"
+      ],
+      "authorityKind": "specification",
+      "sourcePath": "docs/platform/holder-lock/spec.md",
+      "sourceId": "report-path:docs/platform/holder-lock/spec.md",
+      "sourceDigest": "e600666ed6bec9809ec377f0254c7c3e2ef5dd1b07e6b5933a7a1fba8bd0b1b7",
+      "targetPath": "docs/platform/packaging-distribution/spec.md",
+      "targetId": "report-path:docs/platform/packaging-distribution/spec.md",
+      "targetDigest": "653c795b29672a784d3c6b8e173796249a39c3486fadfe6f6c689cb95bd7be27",
+      "implementationEvidence": [
+        "src/setup/registrations.mjs",
+        "src/setup/holder-lock-checks.mjs"
+      ],
+      "readerGapId": null,
+      "disposition": "Step 5 authority/alignment; Step 6 source/projection; Step 9 native carry",
+      "blockedDecision": null,
+      "targetStep": "Step 5; Step 6; Step 9",
+      "scopedStatement": "Setup/doctor owns discoverability of lock defaults, directories, fences and probes; activation validation gates release readiness.",
+      "importCommit": "0d6da9033",
+      "mergeCommit": "21555f026",
+      "identityStatus": "main-import pending Step 9 native carry; no native identity minted here"
+    },
+    {
+      "rowId": "X-LOCK-06",
+      "kind": "main-import-cross-area",
+      "groupId": "L11-15-holder-lock-main-import",
+      "owner": "docs/platform/process/spec.md",
+      "consumers": [
+        "Rust process",
+        "Node dispatch/reconcile"
+      ],
+      "authorityKind": "contract",
+      "sourcePath": "docs/platform/process/spec.md",
+      "sourceId": "report-path:docs/platform/process/spec.md",
+      "sourceDigest": "dbca061feff054beb0141739936b2e91a127805b80afdf040ba8ec2bd983c28e",
+      "targetPath": "docs/platform/process/spec.md",
+      "targetId": "report-path:docs/platform/process/spec.md",
+      "targetDigest": "dbca061feff054beb0141739936b2e91a127805b80afdf040ba8ec2bd983c28e",
+      "implementationEvidence": [
+        "packages/process/contracts/process-facts.judge.v1.json",
+        "packages/process/rust/src/facts.rs",
+        "src/runner/dispatch/process-identity.mjs"
+      ],
+      "readerGapId": null,
+      "disposition": "Step 5 authority/alignment; Step 6 source/projection; Step 9 native carry",
+      "blockedDecision": null,
+      "targetStep": "Step 5; Step 6; Step 9",
+      "scopedStatement": "Process judge and Node leaf use shared judge vectors; no PID means unknown, zombie means dead, unseen namespace remains unknown.",
+      "importCommit": "0d6da9033",
+      "mergeCommit": "21555f026",
+      "identityStatus": "main-import pending Step 9 native carry; no native identity minted here"
+    },
+    {
+      "rowId": "X-LOCK-07",
+      "kind": "main-import-cross-area",
+      "groupId": "L11-15-holder-lock-main-import",
+      "owner": "docs/platform/process/spec.md",
+      "consumers": [
+        "holder-lock predecessor",
+        "future run supervisor"
+      ],
+      "authorityKind": "specification",
+      "sourcePath": "docs/platform/process/spec.md",
+      "sourceId": "report-path:docs/platform/process/spec.md",
+      "sourceDigest": "dbca061feff054beb0141739936b2e91a127805b80afdf040ba8ec2bd983c28e",
+      "targetPath": "docs/platform/process/spec.md",
+      "targetId": "report-path:docs/platform/process/spec.md",
+      "targetDigest": "dbca061feff054beb0141739936b2e91a127805b80afdf040ba8ec2bd983c28e",
+      "implementationEvidence": [
+        "packages/process/rust/src/lib.rs",
+        "packages/process/rust/src/control.rs"
+      ],
+      "readerGapId": null,
+      "disposition": "Step 5 authority/alignment; Step 6 source/projection; Step 9 native carry",
+      "blockedDecision": null,
+      "targetStep": "Step 5; Step 6; Step 9",
+      "scopedStatement": "Only linux-gate domain primitives ship; Windows/macOS domains and full containment/gate primitives remain run-supervisor work.",
+      "importCommit": "0d6da9033",
+      "mergeCommit": "21555f026",
+      "identityStatus": "main-import pending Step 9 native carry; no native identity minted here"
     }
-  ]
+  ],
+  "mainImportSupplement": {
+    "decision": "L11-15",
+    "merge": "21555f026",
+    "addedRows": [
+      "X-MAIN-01",
+      "X-MAIN-02",
+      "X-MAIN-03",
+      "X-LOCK-01",
+      "X-LOCK-02",
+      "X-LOCK-03",
+      "X-LOCK-04",
+      "X-LOCK-05",
+      "X-LOCK-06",
+      "X-LOCK-07"
+    ],
+    "historicalB0RowCount": 98,
+    "newRowCount": 10,
+    "scope": "Step 5/6 with Step 9 native carry; not part of the B0 fresh inventory derivation"
+  }
 }

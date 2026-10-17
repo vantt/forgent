@@ -1,0 +1,2496 @@
+{
+  "schemaVersion": 1,
+  "authorSession": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+  "entries": [
+    {
+      "entryId": "X-DUP-01",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-DUP-01",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "duplicate-group",
+        "authorityKind": "generated projection",
+        "statement": "Preserve canonical/projection distinction for the duplicate pair 11684583c2ac84357168e237f3ac045201377712",
+        "statementPath": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+        "anchor": null,
+        "statementFileSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+        "alignment": "deferred",
+        "alignmentMeaning": "Step 6 owns equality, generator/manual rule and freshness. No generator run or output repair in Step 5.",
+        "evidence": [
+          {
+            "ref": "docs/contracts/fgos-gateway-api-v1.yaml",
+            "fileSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+            "fileSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum docs/contracts/fgos-gateway-api-v1.yaml docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
+        "route": "Step 6",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "9f200578ea39b4b465fcdccdc76d842ab31ac85079bfba6eca90b97ff077c09f",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-DUP-02",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-DUP-02",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "duplicate-group",
+        "authorityKind": "generated projection",
+        "statement": "Preserve canonical/projection distinction for the duplicate pair 2f163ff6092e16b1cb619c7dcc0765f316af1753",
+        "statementPath": "docs/platform/ui-spec/history/schema/surface-contract.schema.json",
+        "anchor": null,
+        "statementFileSha256": "2ce8f77f92bb0cf512f74f5eac133be50a8a0d301b3de13b82e5fbf4d950db7e",
+        "alignment": "deferred",
+        "alignmentMeaning": "Step 6 owns equality, generator/manual rule and freshness. No generator run or output repair in Step 5.",
+        "evidence": [
+          {
+            "ref": "docs/ui-spec/schema/surface-contract.schema.json",
+            "fileSha256": "2ce8f77f92bb0cf512f74f5eac133be50a8a0d301b3de13b82e5fbf4d950db7e",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "docs/platform/ui-spec/history/schema/surface-contract.schema.json",
+            "fileSha256": "2ce8f77f92bb0cf512f74f5eac133be50a8a0d301b3de13b82e5fbf4d950db7e",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/ui-spec/history/schema/surface-contract.schema.json docs/ui-spec/schema/surface-contract.schema.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/ui-spec/history/schema/surface-contract.schema.json",
+        "route": "Step 6",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "2ce8f77f92bb0cf512f74f5eac133be50a8a0d301b3de13b82e5fbf4d950db7e",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-DUP-03",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-DUP-03",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "duplicate-group",
+        "authorityKind": "generated projection",
+        "statement": "Preserve canonical/projection distinction for the duplicate pair paths:docs/architecture-manifest.json::docs/platform/contracts/architecture-manifest.json",
+        "statementPath": "docs/platform/contracts/architecture-manifest.json",
+        "anchor": null,
+        "statementFileSha256": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
+        "alignment": "deferred",
+        "alignmentMeaning": "Step 6 owns equality, generator/manual rule and freshness. No generator run or output repair in Step 5.",
+        "evidence": [
+          {
+            "ref": "docs/architecture-manifest.json",
+            "fileSha256": "b7797fea01dbd487b19d95c608c605b12e6862137d971cdc0e46d34eae5f9d4e",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "docs/platform/contracts/architecture-manifest.json",
+            "fileSha256": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum docs/architecture-manifest.json docs/platform/contracts/architecture-manifest.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/contracts/architecture-manifest.json",
+        "route": "Step 6",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "b7797fea01dbd487b19d95c608c605b12e6862137d971cdc0e46d34eae5f9d4e",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-DUP-04",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-DUP-04",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "duplicate-group",
+        "authorityKind": "generated projection",
+        "statement": "Preserve canonical/projection distinction for the duplicate pair c51d822673e66f5012eab484c0974f57dd21a2ae",
+        "statementPath": "docs/platform/ui-spec/architecture/spec.config.yaml",
+        "anchor": null,
+        "statementFileSha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+        "alignment": "deferred",
+        "alignmentMeaning": "Step 6 owns equality, generator/manual rule and freshness. No generator run or output repair in Step 5.",
+        "evidence": [
+          {
+            "ref": "docs/ui-spec/spec.config.yaml",
+            "fileSha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "docs/platform/ui-spec/architecture/spec.config.yaml",
+            "fileSha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/ui-spec/architecture/spec.config.yaml docs/ui-spec/spec.config.yaml",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/ui-spec/architecture/spec.config.yaml",
+        "route": "Step 6",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-SEM-05",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-SEM-05",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "specification",
+        "statement": "Single settled target for agent-confinement:spec-agent-confinement-authority; live legacy source remains until Phase 9.",
+        "statementPath": "docs/platform/agent-confinement/spec.md",
+        "anchor": null,
+        "statementFileSha256": "36c3552767fdf9acd5748cf5d85861091cdb48688fc9ee8cbe1117a2995b38b9",
+        "alignment": "deferred",
+        "alignmentMeaning": "Accepted Step 2 settles meaning/ownership, not whole-file implementation truth. Step 5 labels the carried statement; Phase 9 owns full current truth.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json",
+            "fileSha256": "e5675f484781da04ab54d08316656642ba2dad2cf2ad2fd7bf7e08fba9525270",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "src/runner/dispatch/confinement/authority.mjs",
+            "fileSha256": "3f127d8753c9c7cce876139bcc5f790740af73a40a6532192f48dc1a1b9fa9b7",
+            "kind": "code/config/schema",
+            "role": "current implementation evidence"
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/agent-confinement/spec.md plans/260925-documentation-authority-unification/ledger/decisions/s8-agent-confinement-01.json src/runner/dispatch/confinement/authority.mjs; sed -n '1,180p' src/runner/dispatch/confinement/authority.mjs",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/agent-confinement/spec.md",
+        "route": "Step 2",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "98f10ba191b729edbe2bfbec7a6ade8047466146ef470345688e6f9f6b9456d6",
+        "implementationEvidenceScope": "current code/config/schema read at cited spans; no whole-file behavior claim"
+      }
+    },
+    {
+      "entryId": "X-SEM-06",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-SEM-06",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "specification",
+        "statement": "Single settled target for claude-plugin-surface:spec-fgos-plugin-claude-code-slash-command-surface; live legacy source remains until Phase 9.",
+        "statementPath": "docs/platform/claude-plugin/spec.md",
+        "anchor": null,
+        "statementFileSha256": "428f4043212d8b0fc7e635957f956db9be01549b6ddc9c9228cf5a79da8007bb",
+        "alignment": "deferred",
+        "alignmentMeaning": "Accepted Step 2 settles meaning/ownership, not whole-file implementation truth. Step 5 labels the carried statement; Phase 9 owns full current truth.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json",
+            "fileSha256": "a9f1005810e5170d22a81bbd1201eea7be2a1a0be02818f4072efc65a8ea2d9b",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "core/skills/fgos-run/SKILL.md",
+            "fileSha256": "86c845f1de4bf6e48e1d7eacef215243def612d9bf79f52ba02fb2096b162c47",
+            "kind": "code/config/schema",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum core/skills/fgos-run/SKILL.md docs/platform/claude-plugin/spec.md plans/260925-documentation-authority-unification/ledger/decisions/s8-claude-plugin-01.json; sed -n '1,180p' core/skills/fgos-run/SKILL.md",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/claude-plugin/spec.md",
+        "route": "Step 2",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "2e7632ffbcbaae5c7ba4e3c7d6e0a3e7fe888ee278b5bc0bf9039f3ff276b687",
+        "implementationEvidenceScope": "current code/config/schema read at cited spans; no whole-file behavior claim"
+      }
+    },
+    {
+      "entryId": "X-SEM-07",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-SEM-07",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "specification",
+        "statement": "Single settled target for decision-citation-drift:spec-decision-citation-drift-check; live legacy source remains until Phase 9.",
+        "statementPath": "docs/platform/decision-citation-drift/spec.md",
+        "anchor": null,
+        "statementFileSha256": "43e2f1bf7f664a981125a4afe802d4abcda3621580c13c6d4e6f2f5bdb5ef2f3",
+        "alignment": "deferred",
+        "alignmentMeaning": "Accepted Step 2 settles meaning/ownership, not whole-file implementation truth. Step 5 labels the carried statement; Phase 9 owns full current truth.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s8-decision-citation-drift-01.json",
+            "fileSha256": "1ac888483caa650440161c8a4730368fd9266a9e39403aa8f320eaaa07aa74a3",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/decision-citation-drift/spec.md plans/260925-documentation-authority-unification/ledger/decisions/s8-decision-citation-drift-01.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/decision-citation-drift/spec.md",
+        "route": "Step 2",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "4774f723f8d3ab5e4a753cd2b74919f27c62c2c7857644606337def5bd922cff",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-SEM-08",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-SEM-08",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "specification",
+        "statement": "Single settled target for distillery-reference-learning:distillery-porting-lifecycle; live legacy source remains until Phase 9.",
+        "statementPath": "docs/platform/distillery/spec.md",
+        "anchor": null,
+        "statementFileSha256": "2a208ae64a9fc79022a1afd30c3fa525367ea2a9374aed6a2fb5680a58e4b166",
+        "alignment": "deferred",
+        "alignmentMeaning": "Accepted Step 2 settles meaning/ownership, not whole-file implementation truth. Step 5 labels the carried statement; Phase 9 owns full current truth.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json",
+            "fileSha256": "1f80b605a771905fb376ec351cf6fea90aa31647fe58c1a4aa5c8512fc755182",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/distillery/spec.md plans/260925-documentation-authority-unification/ledger/decisions/s8-distillery-01.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/distillery/spec.md",
+        "route": "Step 2",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "518accb5c959ac5dc42b154cb735f3f3af962a51afca4a4976972d059d0c7196",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-SEM-09",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-SEM-09",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "architecture",
+        "statement": "Single settled target for documentation-system:transitional-documentation-authority-switchboard; live legacy source remains until Phase 9.",
+        "statementPath": "docs/platform/documentation/switchboard.md",
+        "anchor": null,
+        "statementFileSha256": "f58542c47377976500986df9364802e7c4d58709467c93775dff1cb8fd2e9886",
+        "alignment": "deferred",
+        "alignmentMeaning": "Accepted Step 2 settles meaning/ownership, not whole-file implementation truth. Step 5 labels the carried statement; Phase 9 owns full current truth.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-mapped-conservation.json",
+            "fileSha256": "21624bacd888fbcd3b52c628c47ba4c1d7bdb630d26119db0f17e64532de454b",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "scripts/check-doc-candidate-status.mjs",
+            "fileSha256": "f06732e0f838efe638a4df8372cd3d934e4b61dfcea0ec69cb129b94c556ab94",
+            "kind": "code/config/schema",
+            "role": "current implementation evidence"
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/documentation/switchboard.md plans/260925-documentation-authority-unification/ledger/decisions/s5-root-mapped-conservation.json scripts/check-doc-candidate-status.mjs; sed -n '1,180p' scripts/check-doc-candidate-status.mjs",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/documentation/switchboard.md",
+        "route": "Step 2",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "b058029179bae791d084a6881660adc3f64da7537d4880cd51421158f8e2b752",
+        "implementationEvidenceScope": "current code/config/schema read at cited spans; no whole-file behavior claim"
+      }
+    },
+    {
+      "entryId": "X-SEM-10",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-SEM-10",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "specification",
+        "statement": "Single settled target for herdr-gateway-and-web-dashboard:spec-herdr-web-dashboard-browser-surface-for-fgos-work; live legacy source remains until Phase 9.",
+        "statementPath": "docs/platform/herdr-web-dashboard/spec.md",
+        "anchor": null,
+        "statementFileSha256": "7b5fe48ff585963bfbfc903ac1aa840fa7db58a80a51d72d8cbf73008d9cff80",
+        "alignment": "deferred",
+        "alignmentMeaning": "Accepted Step 2 settles meaning/ownership, not whole-file implementation truth. Step 5 labels the carried statement; Phase 9 owns full current truth.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json",
+            "fileSha256": "71be6a83fcc8247f2647847facc1fd88b2b52f49ca146afc040fad077c92baef",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "apps/fgos-gateway/src/gateway.rs",
+            "fileSha256": "253a0c81ea6298c51e0ff3e264a351150904dfc77cd81b4363e0aaffa93301d6",
+            "kind": "code/config/schema",
+            "role": "current implementation evidence"
+          }
+        ],
+        "proofCommand": "sha256sum apps/fgos-gateway/src/gateway.rs docs/platform/herdr-web-dashboard/spec.md plans/260925-documentation-authority-unification/ledger/decisions/s8-herdr-web-dashboard-01.json; sed -n '1,180p' apps/fgos-gateway/src/gateway.rs",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/herdr-web-dashboard/spec.md",
+        "route": "Step 2",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "a1c2c500b8cbd573b965fc94ee80d3730237a07ac8f83547d0eda8a5c2e66a1d",
+        "implementationEvidenceScope": "current code/config/schema read at cited spans; no whole-file behavior claim"
+      }
+    },
+    {
+      "entryId": "X-SEM-11",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-SEM-11",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "specification",
+        "statement": "Single settled target for observe-metrics-and-friction:observe-component-specification; live legacy source remains until Phase 9.",
+        "statementPath": "docs/platform/observe/spec.md",
+        "anchor": null,
+        "statementFileSha256": "a3f8d1ff084fc88ea632e8eaff6da19a384a381eb57d7d77a6e7a420a2018ce5",
+        "alignment": "deferred",
+        "alignmentMeaning": "Accepted Step 2 settles meaning/ownership, not whole-file implementation truth. Step 5 labels the carried statement; Phase 9 owns full current truth.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+            "fileSha256": "8b2d2afa5ecafd6944cee3f17503d176864a6ff98fbc9aee4bab642e26aaa8b2",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "packages/observe/rust/src/lib.rs",
+            "fileSha256": "39543968157a27e5d7c8ac9c48f8ce8cd7becfbb0b924583dd3ac5a9356743b3",
+            "kind": "code/config/schema",
+            "role": "current implementation evidence"
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/observe/spec.md packages/observe/rust/src/lib.rs plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json; sed -n '1,180p' packages/observe/rust/src/lib.rs",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/observe/spec.md",
+        "route": "Step 2",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "7918a2eb8f0fe301a065431023603cb887519212389c527e03ea3d1df71379c4",
+        "implementationEvidenceScope": "current code/config/schema read at cited spans; no whole-file behavior claim"
+      }
+    },
+    {
+      "entryId": "X-SEM-12",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-SEM-12",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "architecture",
+        "statement": "Single settled target for packaging-distribution:runtime-identity-and-activation; live legacy source remains until Phase 9.",
+        "statementPath": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+        "anchor": null,
+        "statementFileSha256": "a8246d7c962bff0f4a2cbaa27526a42715fdf20a65504b6b92112e02f1a5056d",
+        "alignment": "deferred",
+        "alignmentMeaning": "Accepted Step 2 settles meaning/ownership, not whole-file implementation truth. Step 5 labels the carried statement; Phase 9 owns full current truth.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+            "fileSha256": "098f63cdbc57c9bfe314fb76a911c11167107a4c11c1ba755567aacf441dd35d",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "apps/fgctl/src",
+            "fileSha256": null,
+            "kind": "code/config/schema",
+            "role": "current implementation evidence"
+          },
+          {
+            "ref": "packages/distribution",
+            "fileSha256": null,
+            "kind": "code/config/schema",
+            "role": "current implementation evidence"
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+        "route": "Step 2",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "a35f8902db9fe0de4f770a8a4f236bf5d2b0867503fd69e90da5914e4f52b6d6",
+        "implementationEvidenceScope": "current code/config/schema read at cited spans; no whole-file behavior claim"
+      }
+    },
+    {
+      "entryId": "X-SEM-13",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-SEM-13",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "architecture",
+        "statement": "Single settled target for platform-documentation-unmapped-candidate:historical-file-prior-navigation-before-whole-file-historical-relocation; live legacy source remains until Phase 9.",
+        "statementPath": "docs/specs/runner.md",
+        "anchor": null,
+        "statementFileSha256": "d3e99504d1f3331fb4944c23b778da5d682505614786a5dfbf26a8fb52095d03",
+        "alignment": "deferred",
+        "alignmentMeaning": "Accepted Step 2 settles meaning/ownership, not whole-file implementation truth. Step 5 labels the carried statement; Phase 9 owns full current truth.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+            "fileSha256": "e854db5a1e1ee3d727e58477290e02fec780f640b46afaeadf9dd51c20d9f30e",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum docs/specs/runner.md plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-classifications.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/agent-coordination/history/retired-engine/inbound/agent-coordination/history/documentation-migration/migration-status.md",
+        "route": "Step 2",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "4a5cbc0c2be348d6ed60be11afb1a1ed17c9300226c63bcb276a49d85015aa6b",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-SEM-14",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-SEM-14",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "specification",
+        "statement": "Single settled target for runner-dispatch-merge-lifecycle:spec-runner-vòng-tự-hành; live legacy source remains until Phase 9.",
+        "statementPath": "docs/platform/runner/spec.md",
+        "anchor": null,
+        "statementFileSha256": "afefc6dc31cf1e4de2f25fb165e74ebafa14e8962000726f8dfa5c4fb8a15a14",
+        "alignment": "deferred",
+        "alignmentMeaning": "Accepted Step 2 settles meaning/ownership, not whole-file implementation truth. Step 5 labels the carried statement; Phase 9 owns full current truth.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "fileSha256": "d88fca5cc1e51c124e0a86d292afaca6044c4ea3ae7251cd6b56e1967501e855",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "src/runner/execution/run.mjs",
+            "fileSha256": "26a4da1545011b427859dcaf05a8203b90fd3749de1fda35f2384ccbecbcd779",
+            "kind": "code/config/schema",
+            "role": "current implementation evidence"
+          },
+          {
+            "ref": "src/workflow/runner.mjs",
+            "fileSha256": "89ee9d6fcda52096f87c0397a0e1de34447a6f40a3a71e662b57a092aba3ba65",
+            "kind": "code/config/schema",
+            "role": "current implementation evidence"
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/runner/spec.md plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json src/runner/execution/run.mjs src/workflow/runner.mjs; sed -n '1,180p' src/runner/execution/run.mjs; sed -n '1,180p' src/workflow/runner.mjs",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/runner/spec.md",
+        "route": "Step 2",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "d3e99504d1f3331fb4944c23b778da5d682505614786a5dfbf26a8fb52095d03",
+        "implementationEvidenceScope": "current code/config/schema read at cited spans; no whole-file behavior claim"
+      }
+    },
+    {
+      "entryId": "X-SEM-15",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-SEM-15",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "architecture",
+        "statement": "Single settled target for skills-and-domainization:fgos-domainization-architecture; live legacy source remains until Phase 9.",
+        "statementPath": "docs/platform/domainization/architecture/domainization.md",
+        "anchor": null,
+        "statementFileSha256": "286644bd4a86e60c872cb890bb73d3aa05da605364e0dfc4c87831a79e9fd1cb",
+        "alignment": "deferred",
+        "alignmentMeaning": "Accepted Step 2 settles meaning/ownership, not whole-file implementation truth. Step 5 labels the carried statement; Phase 9 owns full current truth.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-05-readme.json",
+            "fileSha256": "881254d7b3bc34b74e89c278b14690de459a232c5dbd6d1ed5058748330f17f6",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/domainization/architecture/domainization.md plans/260925-documentation-authority-unification/ledger/decisions/s7-proposals-redesigns-05-readme.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/domainization/architecture/domainization.md",
+        "route": "Step 2",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "bf4126c6b5fa6cc77d983800e778e669e0d8a664709df5ef8e89b2f73c013de0",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-SEM-16",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-SEM-16",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "specification",
+        "statement": "Single settled target for system-overview:spec-system-overview; live legacy source remains until Phase 9.",
+        "statementPath": "docs/platform/system-overview/spec.md",
+        "anchor": null,
+        "statementFileSha256": "b027026ae37327e96ce572c9a06fdaebf7d5146625c1abeb10b3bdcb033b0e54",
+        "alignment": "deferred",
+        "alignmentMeaning": "Accepted Step 2 settles meaning/ownership, not whole-file implementation truth. Step 5 labels the carried statement; Phase 9 owns full current truth.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-system-overview.json",
+            "fileSha256": "ab9453214632535fc96d6e375b68e93b29e8af422d7dc9e3e6bc0fc7d1c70aeb",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "src/runner/execution/run.mjs",
+            "fileSha256": "26a4da1545011b427859dcaf05a8203b90fd3749de1fda35f2384ccbecbcd779",
+            "kind": "code/config/schema",
+            "role": "current implementation evidence"
+          },
+          {
+            "ref": "src/state/store.mjs",
+            "fileSha256": "f75e0d41308794beb94d5a4513af3bc10aa368699f96b84a056b04a844620ef7",
+            "kind": "code/config/schema",
+            "role": "current implementation evidence"
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/system-overview/spec.md plans/260925-documentation-authority-unification/ledger/decisions/s6-whole-system-system-overview.json src/runner/execution/run.mjs src/state/store.mjs; sed -n '1,180p' src/runner/execution/run.mjs; sed -n '1,180p' src/state/store.mjs",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/system-overview/spec.md",
+        "route": "Step 2",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "214c64c60cc3b3d2dfaeb6550b2ebbe6c38a4c759104086d238e96223895c7a8",
+        "implementationEvidenceScope": "current code/config/schema read at cited spans; no whole-file behavior claim"
+      }
+    },
+    {
+      "entryId": "X-SEM-17",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-SEM-17",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "specification",
+        "statement": "Single settled target for ui-specification:c01-item-card-status-pill-quick-actions; live legacy source remains until Phase 9.",
+        "statementPath": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+        "anchor": null,
+        "statementFileSha256": "23ff53b38e19a4560db14acd42183d23e792c6228221e7d066fd053e51e4a988",
+        "alignment": "deferred",
+        "alignmentMeaning": "Accepted Step 2 settles meaning/ownership, not whole-file implementation truth. Step 5 labels the carried statement; Phase 9 owns full current truth.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+            "fileSha256": "c53ba4064e7a5b229ca832d23be831b64b91bd26986d50a21b3933d46adde3d2",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "apps/fgos-gateway/web",
+            "fileSha256": null,
+            "kind": "code/config/schema",
+            "role": "current implementation evidence"
+          },
+          {
+            "ref": "docs/platform/ui-spec/architecture/spec.config.yaml",
+            "fileSha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/ui-spec/architecture/components/C01-item-card.md docs/platform/ui-spec/architecture/spec.config.yaml plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/ui-spec/architecture/components/C01-item-card.md",
+        "route": "Step 2",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "3c31c82cef06bb6f819b4bf8a37fe8f7afa2991daff0a180f827f8b66641ab0a",
+        "implementationEvidenceScope": "current code/config/schema read at cited spans; no whole-file behavior claim"
+      }
+    },
+    {
+      "entryId": "X-SEM-18",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-SEM-18",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "contract",
+        "statement": "Single settled target for ui-specification:domain-rules; live legacy source remains until Phase 9.",
+        "statementPath": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+        "anchor": null,
+        "statementFileSha256": "adadb49a002cad09d4df9541f9907cab8bb0a28655ac25eea7389c76e2636e1f",
+        "alignment": "deferred",
+        "alignmentMeaning": "Accepted Step 2 settles meaning/ownership, not whole-file implementation truth. Step 5 labels the carried statement; Phase 9 owns full current truth.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+            "fileSha256": "c53ba4064e7a5b229ca832d23be831b64b91bd26986d50a21b3933d46adde3d2",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "apps/fgos-gateway/web",
+            "fileSha256": null,
+            "kind": "code/config/schema",
+            "role": "current implementation evidence"
+          },
+          {
+            "ref": "docs/platform/ui-spec/architecture/spec.config.yaml",
+            "fileSha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/ui-spec/architecture/spec.config.yaml docs/platform/ui-spec/contracts/20-domain-rules.md plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/ui-spec/contracts/20-domain-rules.md",
+        "route": "Step 2",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "cefbf0207b8492ffaffff1f23e13494e94f1343cd9ae4ae1fd82a187dc212e32",
+        "implementationEvidenceScope": "current code/config/schema read at cited spans; no whole-file behavior claim"
+      }
+    },
+    {
+      "entryId": "X-SEM-19",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-SEM-19",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "specification",
+        "statement": "Single settled target for ui-specification:f01-answer-a-parked-question-end-to-end; live legacy source remains until Phase 9.",
+        "statementPath": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+        "anchor": null,
+        "statementFileSha256": "961ac9ca0a055a4d389c1454d0b184132231222a7f72bef86ebe3da747af7b13",
+        "alignment": "deferred",
+        "alignmentMeaning": "Accepted Step 2 settles meaning/ownership, not whole-file implementation truth. Step 5 labels the carried statement; Phase 9 owns full current truth.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+            "fileSha256": "c53ba4064e7a5b229ca832d23be831b64b91bd26986d50a21b3933d46adde3d2",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "apps/fgos-gateway/web",
+            "fileSha256": null,
+            "kind": "code/config/schema",
+            "role": "current implementation evidence"
+          },
+          {
+            "ref": "docs/platform/ui-spec/architecture/spec.config.yaml",
+            "fileSha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/ui-spec/architecture/spec.config.yaml docs/platform/ui-spec/operations/F01-answer-a-parked-question.md plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/ui-spec/operations/F01-answer-a-parked-question.md",
+        "route": "Step 2",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "dfbc24dda82d286ae4934255d0dbe56fe58b92012048cddca56ffc70a47c6b28",
+        "implementationEvidenceScope": "current code/config/schema read at cited spans; no whole-file behavior claim"
+      }
+    },
+    {
+      "entryId": "X-SEM-20",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-SEM-20",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "specification",
+        "statement": "Single settled target for ui-specification:f02-approve-a-merge-end-to-end; live legacy source remains until Phase 9.",
+        "statementPath": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+        "anchor": null,
+        "statementFileSha256": "f21c7e948d0a6223c351316c38515db1daf89f28388c1c6bb5b3d92360f9937b",
+        "alignment": "deferred",
+        "alignmentMeaning": "Accepted Step 2 settles meaning/ownership, not whole-file implementation truth. Step 5 labels the carried statement; Phase 9 owns full current truth.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+            "fileSha256": "c53ba4064e7a5b229ca832d23be831b64b91bd26986d50a21b3933d46adde3d2",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "apps/fgos-gateway/web",
+            "fileSha256": null,
+            "kind": "code/config/schema",
+            "role": "current implementation evidence"
+          },
+          {
+            "ref": "docs/platform/ui-spec/architecture/spec.config.yaml",
+            "fileSha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/ui-spec/architecture/spec.config.yaml docs/platform/ui-spec/operations/F02-approve-a-merge.md plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/ui-spec/operations/F02-approve-a-merge.md",
+        "route": "Step 2",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "0ee36f45917952bebc2eb4c95f00c770e4514b8e029ce120c761a45d0ed8ca1d",
+        "implementationEvidenceScope": "current code/config/schema read at cited spans; no whole-file behavior claim"
+      }
+    },
+    {
+      "entryId": "X-SEM-21",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-SEM-21",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "specification",
+        "statement": "Single settled target for ui-specification:herdr-web-dashboard-ui-spec-overview; live legacy source remains until Phase 9.",
+        "statementPath": "docs/platform/ui-spec/spec.md",
+        "anchor": null,
+        "statementFileSha256": "436782fa67de9576dd20c28c7f2b960a4a5c11316689afbd81ad7bdc0c6880d6",
+        "alignment": "deferred",
+        "alignmentMeaning": "Accepted Step 2 settles meaning/ownership, not whole-file implementation truth. Step 5 labels the carried statement; Phase 9 owns full current truth.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+            "fileSha256": "c53ba4064e7a5b229ca832d23be831b64b91bd26986d50a21b3933d46adde3d2",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "apps/fgos-gateway/web",
+            "fileSha256": null,
+            "kind": "code/config/schema",
+            "role": "current implementation evidence"
+          },
+          {
+            "ref": "docs/platform/ui-spec/architecture/spec.config.yaml",
+            "fileSha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/ui-spec/architecture/spec.config.yaml docs/platform/ui-spec/spec.md plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/ui-spec/spec.md",
+        "route": "Step 2",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "76af5d449a69613a2cd3871e5b898934f8b57db685d0d87d1cb4eb3375ff71d7",
+        "implementationEvidenceScope": "current code/config/schema read at cited spans; no whole-file behavior claim"
+      }
+    },
+    {
+      "entryId": "X-SEM-22",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-SEM-22",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "specification",
+        "statement": "Single settled target for ui-specification:m01-answer-a-parked-question; live legacy source remains until Phase 9.",
+        "statementPath": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+        "anchor": null,
+        "statementFileSha256": "ebd9cab58f559b5052bfdc73328dd398d3b8940826eb1a49503bf71508a7bdbf",
+        "alignment": "deferred",
+        "alignmentMeaning": "Accepted Step 2 settles meaning/ownership, not whole-file implementation truth. Step 5 labels the carried statement; Phase 9 owns full current truth.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+            "fileSha256": "c53ba4064e7a5b229ca832d23be831b64b91bd26986d50a21b3933d46adde3d2",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "apps/fgos-gateway/web",
+            "fileSha256": null,
+            "kind": "code/config/schema",
+            "role": "current implementation evidence"
+          },
+          {
+            "ref": "docs/platform/ui-spec/architecture/spec.config.yaml",
+            "fileSha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/ui-spec/architecture/modals/M01-answer-question.md docs/platform/ui-spec/architecture/spec.config.yaml plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/ui-spec/architecture/modals/M01-answer-question.md",
+        "route": "Step 2",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "6c459c08d0ad35c362181fac748b68c765c60441597049e3e3c00c8485a61f23",
+        "implementationEvidenceScope": "current code/config/schema read at cited spans; no whole-file behavior claim"
+      }
+    },
+    {
+      "entryId": "X-SEM-23",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-SEM-23",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "specification",
+        "statement": "Single settled target for ui-specification:m02-approve-a-merge; live legacy source remains until Phase 9.",
+        "statementPath": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+        "anchor": null,
+        "statementFileSha256": "02a74857d6f7a0cd1f69e4ec38c54489d3b918e110764edb267306e250b4a6cf",
+        "alignment": "deferred",
+        "alignmentMeaning": "Accepted Step 2 settles meaning/ownership, not whole-file implementation truth. Step 5 labels the carried statement; Phase 9 owns full current truth.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+            "fileSha256": "c53ba4064e7a5b229ca832d23be831b64b91bd26986d50a21b3933d46adde3d2",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "apps/fgos-gateway/web",
+            "fileSha256": null,
+            "kind": "code/config/schema",
+            "role": "current implementation evidence"
+          },
+          {
+            "ref": "docs/platform/ui-spec/architecture/spec.config.yaml",
+            "fileSha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/ui-spec/architecture/modals/M02-approve-merge.md docs/platform/ui-spec/architecture/spec.config.yaml plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/ui-spec/architecture/modals/M02-approve-merge.md",
+        "route": "Step 2",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "f52cb369e8ec0039fa64b0f4a7ca3bbf9ccfd37b3fe2fc342a410d59c5bb23b8",
+        "implementationEvidenceScope": "current code/config/schema read at cited spans; no whole-file behavior claim"
+      }
+    },
+    {
+      "entryId": "X-SEM-24",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-SEM-24",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "specification",
+        "statement": "Single settled target for ui-specification:m03-add-or-edit-a-work-item; live legacy source remains until Phase 9.",
+        "statementPath": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+        "anchor": null,
+        "statementFileSha256": "56968d7d764d9519bd62f61a20b975dcd3a38407c092c55a684095ab97f87b81",
+        "alignment": "deferred",
+        "alignmentMeaning": "Accepted Step 2 settles meaning/ownership, not whole-file implementation truth. Step 5 labels the carried statement; Phase 9 owns full current truth.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+            "fileSha256": "c53ba4064e7a5b229ca832d23be831b64b91bd26986d50a21b3933d46adde3d2",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "apps/fgos-gateway/web",
+            "fileSha256": null,
+            "kind": "code/config/schema",
+            "role": "current implementation evidence"
+          },
+          {
+            "ref": "docs/platform/ui-spec/architecture/spec.config.yaml",
+            "fileSha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md docs/platform/ui-spec/architecture/spec.config.yaml plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md",
+        "route": "Step 2",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "b0a16742180949c5a1b6836690c67c74c9dbd7f0ebf400d3c26eb7a4d18fe3d1",
+        "implementationEvidenceScope": "current code/config/schema read at cited spans; no whole-file behavior claim"
+      }
+    },
+    {
+      "entryId": "X-SEM-25",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-SEM-25",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "specification",
+        "statement": "Single settled target for ui-specification:s01-sign-in; live legacy source remains until Phase 9.",
+        "statementPath": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+        "anchor": null,
+        "statementFileSha256": "5942bed6b8819ac41f02afcf5d1a7978f30078c5e602a6e1fb9307669d82968a",
+        "alignment": "deferred",
+        "alignmentMeaning": "Accepted Step 2 settles meaning/ownership, not whole-file implementation truth. Step 5 labels the carried statement; Phase 9 owns full current truth.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+            "fileSha256": "c53ba4064e7a5b229ca832d23be831b64b91bd26986d50a21b3933d46adde3d2",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "apps/fgos-gateway/web",
+            "fileSha256": null,
+            "kind": "code/config/schema",
+            "role": "current implementation evidence"
+          },
+          {
+            "ref": "docs/platform/ui-spec/architecture/spec.config.yaml",
+            "fileSha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/ui-spec/architecture/screens/S01-sign-in.md docs/platform/ui-spec/architecture/spec.config.yaml plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/ui-spec/architecture/screens/S01-sign-in.md",
+        "route": "Step 2",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "725f76c4946a2c051770d59891b395eb194003cbb916a5731945ee5e22ac3eff",
+        "implementationEvidenceScope": "current code/config/schema read at cited spans; no whole-file behavior claim"
+      }
+    },
+    {
+      "entryId": "X-SEM-26",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-SEM-26",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "specification",
+        "statement": "Single settled target for ui-specification:s02-taskboard; live legacy source remains until Phase 9.",
+        "statementPath": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+        "anchor": null,
+        "statementFileSha256": "66c29168cf76703b4d80e331b134233e2c6585a77a942cd0689eee6881e5deaa",
+        "alignment": "deferred",
+        "alignmentMeaning": "Accepted Step 2 settles meaning/ownership, not whole-file implementation truth. Step 5 labels the carried statement; Phase 9 owns full current truth.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+            "fileSha256": "c53ba4064e7a5b229ca832d23be831b64b91bd26986d50a21b3933d46adde3d2",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "apps/fgos-gateway/web",
+            "fileSha256": null,
+            "kind": "code/config/schema",
+            "role": "current implementation evidence"
+          },
+          {
+            "ref": "docs/platform/ui-spec/architecture/spec.config.yaml",
+            "fileSha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/ui-spec/architecture/screens/S02-taskboard.md docs/platform/ui-spec/architecture/spec.config.yaml plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/ui-spec/architecture/screens/S02-taskboard.md",
+        "route": "Step 2",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "d84abd8635907d8b69402c6fc767e97479348e2c66517d38e7bb3f03b9bf800f",
+        "implementationEvidenceScope": "current code/config/schema read at cited spans; no whole-file behavior claim"
+      }
+    },
+    {
+      "entryId": "X-SEM-27",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-SEM-27",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "specification",
+        "statement": "Single settled target for ui-specification:s03-task-detail; live legacy source remains until Phase 9.",
+        "statementPath": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+        "anchor": null,
+        "statementFileSha256": "7d6b64b8f5572c88fd034272101c35f9f4824008bacbcae94f9bd72ef2b55cf9",
+        "alignment": "deferred",
+        "alignmentMeaning": "Accepted Step 2 settles meaning/ownership, not whole-file implementation truth. Step 5 labels the carried statement; Phase 9 owns full current truth.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+            "fileSha256": "c53ba4064e7a5b229ca832d23be831b64b91bd26986d50a21b3933d46adde3d2",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "apps/fgos-gateway/web",
+            "fileSha256": null,
+            "kind": "code/config/schema",
+            "role": "current implementation evidence"
+          },
+          {
+            "ref": "docs/platform/ui-spec/architecture/spec.config.yaml",
+            "fileSha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/ui-spec/architecture/screens/S03-task-detail.md docs/platform/ui-spec/architecture/spec.config.yaml plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/ui-spec/architecture/screens/S03-task-detail.md",
+        "route": "Step 2",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "df9faacc4ec5e989f935d7e7a3ef327ba751e7271f6e55be7d9891cb0f7b52b3",
+        "implementationEvidenceScope": "current code/config/schema read at cited spans; no whole-file behavior claim"
+      }
+    },
+    {
+      "entryId": "X-SEM-28",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-SEM-28",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "specification",
+        "statement": "Single settled target for ui-specification:s04-questions-needing-answer; live legacy source remains until Phase 9.",
+        "statementPath": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+        "anchor": null,
+        "statementFileSha256": "4b3ffdbdb28fba7323c9361ac0b7f61646fc2f67a3a504dce7cbdddcdc59caf1",
+        "alignment": "deferred",
+        "alignmentMeaning": "Accepted Step 2 settles meaning/ownership, not whole-file implementation truth. Step 5 labels the carried statement; Phase 9 owns full current truth.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+            "fileSha256": "c53ba4064e7a5b229ca832d23be831b64b91bd26986d50a21b3933d46adde3d2",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "apps/fgos-gateway/web",
+            "fileSha256": null,
+            "kind": "code/config/schema",
+            "role": "current implementation evidence"
+          },
+          {
+            "ref": "docs/platform/ui-spec/architecture/spec.config.yaml",
+            "fileSha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md docs/platform/ui-spec/architecture/spec.config.yaml plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md",
+        "route": "Step 2",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "0f358fadb71d6aa504c26c7e8f851c911e4feee10b5ef102456df0007da5ab7b",
+        "implementationEvidenceScope": "current code/config/schema read at cited spans; no whole-file behavior claim"
+      }
+    },
+    {
+      "entryId": "X-SEM-29",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-SEM-29",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "generated projection",
+        "statement": "Single settled target for ui-specification:specconfig; live legacy source remains until Phase 9.",
+        "statementPath": "docs/platform/ui-spec/architecture/spec.config.yaml",
+        "anchor": null,
+        "statementFileSha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+        "alignment": "deferred",
+        "alignmentMeaning": "Same copy group as X-DUP-04/02; generator/source alignment remains Step 6.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+            "fileSha256": "c53ba4064e7a5b229ca832d23be831b64b91bd26986d50a21b3933d46adde3d2",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "apps/fgos-gateway/web",
+            "fileSha256": null,
+            "kind": "code/config/schema",
+            "role": "current implementation evidence"
+          },
+          {
+            "ref": "docs/platform/ui-spec/architecture/spec.config.yaml",
+            "fileSha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/ui-spec/architecture/spec.config.yaml plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/ui-spec/architecture/spec.config.yaml",
+        "route": "Step 6",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+        "implementationEvidenceScope": "current code/config/schema read at cited spans; no whole-file behavior claim"
+      }
+    },
+    {
+      "entryId": "X-SEM-30",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-SEM-30",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "contract",
+        "statement": "Single settled target for ui-specification:states-and-errors; live legacy source remains until Phase 9.",
+        "statementPath": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+        "anchor": null,
+        "statementFileSha256": "ba00ae2b6fabb389308c763efe779c577d33532afee5bea1c693cba5517c2f04",
+        "alignment": "deferred",
+        "alignmentMeaning": "Accepted Step 2 settles meaning/ownership, not whole-file implementation truth. Step 5 labels the carried statement; Phase 9 owns full current truth.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+            "fileSha256": "c53ba4064e7a5b229ca832d23be831b64b91bd26986d50a21b3933d46adde3d2",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "apps/fgos-gateway/web",
+            "fileSha256": null,
+            "kind": "code/config/schema",
+            "role": "current implementation evidence"
+          },
+          {
+            "ref": "docs/platform/ui-spec/architecture/spec.config.yaml",
+            "fileSha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/ui-spec/architecture/spec.config.yaml docs/platform/ui-spec/contracts/30-states-and-errors.md plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/ui-spec/contracts/30-states-and-errors.md",
+        "route": "Step 2",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "5fe51d275b13c958c865da6c8a0bf60142506e1c5c637829afa23e9b0579736e",
+        "implementationEvidenceScope": "current code/config/schema read at cited spans; no whole-file behavior claim"
+      }
+    },
+    {
+      "entryId": "X-SEM-31",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-SEM-31",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "generated projection",
+        "statement": "Single settled target for ui-specification:surface-contractschema; live legacy source remains until Phase 9.",
+        "statementPath": "docs/platform/ui-spec/history/schema/surface-contract.schema.json",
+        "anchor": null,
+        "statementFileSha256": "2ce8f77f92bb0cf512f74f5eac133be50a8a0d301b3de13b82e5fbf4d950db7e",
+        "alignment": "deferred",
+        "alignmentMeaning": "Same copy group as X-DUP-04/02; generator/source alignment remains Step 6.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+            "fileSha256": "c53ba4064e7a5b229ca832d23be831b64b91bd26986d50a21b3933d46adde3d2",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "apps/fgos-gateway/web",
+            "fileSha256": null,
+            "kind": "code/config/schema",
+            "role": "current implementation evidence"
+          },
+          {
+            "ref": "docs/platform/ui-spec/architecture/spec.config.yaml",
+            "fileSha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/ui-spec/architecture/spec.config.yaml docs/platform/ui-spec/history/schema/surface-contract.schema.json plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/ui-spec/history/schema/surface-contract.schema.json",
+        "route": "Step 6",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "2ce8f77f92bb0cf512f74f5eac133be50a8a0d301b3de13b82e5fbf4d950db7e",
+        "implementationEvidenceScope": "current code/config/schema read at cited spans; no whole-file behavior claim"
+      }
+    },
+    {
+      "entryId": "X-SEM-32",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-SEM-32",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "semantic-group",
+        "authorityKind": "contract",
+        "statement": "Single settled target for ui-specification:system-events; live legacy source remains until Phase 9.",
+        "statementPath": "docs/platform/ui-spec/contracts/15-system-events.md",
+        "anchor": null,
+        "statementFileSha256": "85044a1bcbeea7c3687205669a62bcce0aaa8550c1eabb526abb304f12904e59",
+        "alignment": "deferred",
+        "alignmentMeaning": "Accepted Step 2 settles meaning/ownership, not whole-file implementation truth. Step 5 labels the carried statement; Phase 9 owns full current truth.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+            "fileSha256": "c53ba4064e7a5b229ca832d23be831b64b91bd26986d50a21b3933d46adde3d2",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "apps/fgos-gateway/web",
+            "fileSha256": null,
+            "kind": "code/config/schema",
+            "role": "current implementation evidence"
+          },
+          {
+            "ref": "docs/platform/ui-spec/architecture/spec.config.yaml",
+            "fileSha256": "b18be20aa14e89f79e80cd3017c3bc240d51dd0851c583be1154eb427e7444eb",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum docs/platform/ui-spec/architecture/spec.config.yaml docs/platform/ui-spec/contracts/15-system-events.md plans/260925-documentation-authority-unification/ledger/decisions/s8-ui-spec-01.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/ui-spec/contracts/15-system-events.md",
+        "route": "Step 2",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "c0cd51f52e54872823d6f683bc25ff396df706712ef76b57794de5e0fcca75a9",
+        "implementationEvidenceScope": "current code/config/schema read at cited spans; no whole-file behavior claim"
+      }
+    },
+    {
+      "entryId": "X-A34-01",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-A34-01",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json",
+        "anchor": null,
+        "statementFileSha256": "bd9b6665e2dff46e6361df6059a046c2d76dc78b163a28489d813ea4db474365",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json",
+            "fileSha256": "7963a5befc441a7ab77015407557d66c1a58851ddd540ecc71ba22ff57e46b13",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json",
+            "fileSha256": "bd9b6665e2dff46e6361df6059a046c2d76dc78b163a28489d813ea4db474365",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/pilot/decisions/b-io-contract.json plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "high",
+        "owner": "docs/io-contract.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": true,
+        "legacySourceSha256": "bf227cc516b22f8fa4af84bb83429dec615e82bcd5efdb1c54c1656eac7b5616",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-A34-02",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-A34-02",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+        "anchor": null,
+        "statementFileSha256": "d47aec29839ff7bbdc9ba291890aa6478a0c4a654e55d0e096c64a7afdd4cb49",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+            "fileSha256": "a5e80935be494d842305ff814398613c8f45cd7091786c38aa0ebdaeccd2fb0e",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+            "fileSha256": "d47aec29839ff7bbdc9ba291890aa6478a0c4a654e55d0e096c64a7afdd4cb49",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "eb969b8dbb4520b4794887ee98da6c0aa6ab8b799d30647720cfe2ab0b0a260d",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-A34-03",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-A34-03",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+        "anchor": null,
+        "statementFileSha256": "d47aec29839ff7bbdc9ba291890aa6478a0c4a654e55d0e096c64a7afdd4cb49",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+            "fileSha256": "a5e80935be494d842305ff814398613c8f45cd7091786c38aa0ebdaeccd2fb0e",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+            "fileSha256": "d47aec29839ff7bbdc9ba291890aa6478a0c4a654e55d0e096c64a7afdd4cb49",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "eb969b8dbb4520b4794887ee98da6c0aa6ab8b799d30647720cfe2ab0b0a260d",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-A34-04",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-A34-04",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+        "anchor": null,
+        "statementFileSha256": "d47aec29839ff7bbdc9ba291890aa6478a0c4a654e55d0e096c64a7afdd4cb49",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+            "fileSha256": "a5e80935be494d842305ff814398613c8f45cd7091786c38aa0ebdaeccd2fb0e",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+            "fileSha256": "d47aec29839ff7bbdc9ba291890aa6478a0c4a654e55d0e096c64a7afdd4cb49",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "eb969b8dbb4520b4794887ee98da6c0aa6ab8b799d30647720cfe2ab0b0a260d",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-A34-05",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-A34-05",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+        "anchor": null,
+        "statementFileSha256": "d47aec29839ff7bbdc9ba291890aa6478a0c4a654e55d0e096c64a7afdd4cb49",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+            "fileSha256": "a5e80935be494d842305ff814398613c8f45cd7091786c38aa0ebdaeccd2fb0e",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+            "fileSha256": "d47aec29839ff7bbdc9ba291890aa6478a0c4a654e55d0e096c64a7afdd4cb49",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "eb969b8dbb4520b4794887ee98da6c0aa6ab8b799d30647720cfe2ab0b0a260d",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-A34-06",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-A34-06",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+        "anchor": null,
+        "statementFileSha256": "d47aec29839ff7bbdc9ba291890aa6478a0c4a654e55d0e096c64a7afdd4cb49",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+            "fileSha256": "a5e80935be494d842305ff814398613c8f45cd7091786c38aa0ebdaeccd2fb0e",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+            "fileSha256": "d47aec29839ff7bbdc9ba291890aa6478a0c4a654e55d0e096c64a7afdd4cb49",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/host-invocation-routing/spec.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "ffa08f6390701e71020110249c3ef7d2888831cee01cfedae28fe4f77ee98cb6",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-A34-07",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-A34-07",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+        "anchor": null,
+        "statementFileSha256": "d47aec29839ff7bbdc9ba291890aa6478a0c4a654e55d0e096c64a7afdd4cb49",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+            "fileSha256": "a5e80935be494d842305ff814398613c8f45cd7091786c38aa0ebdaeccd2fb0e",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+            "fileSha256": "d47aec29839ff7bbdc9ba291890aa6478a0c4a654e55d0e096c64a7afdd4cb49",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/host-invocation-routing/spec.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "ffa08f6390701e71020110249c3ef7d2888831cee01cfedae28fe4f77ee98cb6",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-A34-08",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-A34-08",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+        "anchor": null,
+        "statementFileSha256": "d47aec29839ff7bbdc9ba291890aa6478a0c4a654e55d0e096c64a7afdd4cb49",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+            "fileSha256": "a5e80935be494d842305ff814398613c8f45cd7091786c38aa0ebdaeccd2fb0e",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+            "fileSha256": "d47aec29839ff7bbdc9ba291890aa6478a0c4a654e55d0e096c64a7afdd4cb49",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/host-invocation-routing/spec.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "ffa08f6390701e71020110249c3ef7d2888831cee01cfedae28fe4f77ee98cb6",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-A34-09",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-A34-09",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+        "anchor": null,
+        "statementFileSha256": "d47aec29839ff7bbdc9ba291890aa6478a0c4a654e55d0e096c64a7afdd4cb49",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+            "fileSha256": "a5e80935be494d842305ff814398613c8f45cd7091786c38aa0ebdaeccd2fb0e",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+            "fileSha256": "d47aec29839ff7bbdc9ba291890aa6478a0c4a654e55d0e096c64a7afdd4cb49",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "90e6dcd22a5729f513b3104b5f2113d9fad57e677a8485b6b2452183b8f97a67",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-A34-10",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-A34-10",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/packaging-f6-host-partial-carry-residual.json",
+        "anchor": null,
+        "statementFileSha256": "61c3263ca987046effa1f7615eaaa3bc9599f0acaca8785c86139a1518e13342",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+            "fileSha256": "a5e80935be494d842305ff814398613c8f45cd7091786c38aa0ebdaeccd2fb0e",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/packaging-f6-host-partial-carry-residual.json",
+            "fileSha256": "61c3263ca987046effa1f7615eaaa3bc9599f0acaca8785c86139a1518e13342",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json plans/260925-documentation-authority-unification/reports/phase-06/packaging-f6-host-partial-carry-residual.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "90e6dcd22a5729f513b3104b5f2113d9fad57e677a8485b6b2452183b8f97a67",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-A34-11",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-A34-11",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+        "anchor": null,
+        "statementFileSha256": "d47aec29839ff7bbdc9ba291890aa6478a0c4a654e55d0e096c64a7afdd4cb49",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+            "fileSha256": "a5e80935be494d842305ff814398613c8f45cd7091786c38aa0ebdaeccd2fb0e",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+            "fileSha256": "d47aec29839ff7bbdc9ba291890aa6478a0c4a654e55d0e096c64a7afdd4cb49",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "17103ea9eeaf6ca68869a37e44dca6cb8cc128ae315ef914bde71950f05d20b7",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-A34-12",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-A34-12",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+        "anchor": null,
+        "statementFileSha256": "d47aec29839ff7bbdc9ba291890aa6478a0c4a654e55d0e096c64a7afdd4cb49",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+            "fileSha256": "a5e80935be494d842305ff814398613c8f45cd7091786c38aa0ebdaeccd2fb0e",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+            "fileSha256": "d47aec29839ff7bbdc9ba291890aa6478a0c4a654e55d0e096c64a7afdd4cb49",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "17103ea9eeaf6ca68869a37e44dca6cb8cc128ae315ef914bde71950f05d20b7",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-A34-13",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-A34-13",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+        "anchor": null,
+        "statementFileSha256": "d47aec29839ff7bbdc9ba291890aa6478a0c4a654e55d0e096c64a7afdd4cb49",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json",
+            "fileSha256": "a5e80935be494d842305ff814398613c8f45cd7091786c38aa0ebdaeccd2fb0e",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+            "fileSha256": "d47aec29839ff7bbdc9ba291890aa6478a0c4a654e55d0e096c64a7afdd4cb49",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s3-host-invocation-checkpoint.json plans/260925-documentation-authority-unification/reports/phase-06/host-invocation-partial-carry-residual.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "17103ea9eeaf6ca68869a37e44dca6cb8cc128ae315ef914bde71950f05d20b7",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-A34-14",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-A34-14",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/packaging-partial-carry-residual.json",
+        "anchor": null,
+        "statementFileSha256": "064d821db2dc6079b72323900f75c2a1870f25e7649210df9f129243bd9b5a29",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json",
+            "fileSha256": "098f63cdbc57c9bfe314fb76a911c11167107a4c11c1ba755567aacf441dd35d",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/packaging-partial-carry-residual.json",
+            "fileSha256": "064d821db2dc6079b72323900f75c2a1870f25e7649210df9f129243bd9b5a29",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-architecture.json plans/260925-documentation-authority-unification/reports/phase-06/packaging-partial-carry-residual.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "a35f8902db9fe0de4f770a8a4f236bf5d2b0867503fd69e90da5914e4f52b6d6",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-A34-15",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-A34-15",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-l9-9-partial-carry-residual.json",
+        "anchor": null,
+        "statementFileSha256": "2cd7eb5b8a07e891d20bcd680ea83362c768566120f9b656d34d81559b63ad6c",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json",
+            "fileSha256": "c874aacff8b374238b03f56c0e102ab635b3df2656112d6cd9310625a7d89e40",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/step9-l9-9-partial-carry-residual.json",
+            "fileSha256": "2cd7eb5b8a07e891d20bcd680ea83362c768566120f9b656d34d81559b63ad6c",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s4-packaging-distribution-successors.json plans/260925-documentation-authority-unification/reports/phase-06/step9-l9-9-partial-carry-residual.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "d3e99504d1f3331fb4944c23b778da5d682505614786a5dfbf26a8fb52095d03",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-A34-16",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-A34-16",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-l9-9-partial-carry-residual.json",
+        "anchor": null,
+        "statementFileSha256": "2cd7eb5b8a07e891d20bcd680ea83362c768566120f9b656d34d81559b63ad6c",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json",
+            "fileSha256": "3b681e0a9b10fca21522fb80202850ecf8809656288fd49dc2247aa7dcf22dd4",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/step9-l9-9-partial-carry-residual.json",
+            "fileSha256": "2cd7eb5b8a07e891d20bcd680ea83362c768566120f9b656d34d81559b63ad6c",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s5-root-authorities-boundary-gaps.json plans/260925-documentation-authority-unification/reports/phase-06/step9-l9-9-partial-carry-residual.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "medium",
+        "owner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": false,
+        "legacySourceSha256": "d3e99504d1f3331fb4944c23b778da5d682505614786a5dfbf26a8fb52095d03",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-A34-17",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-A34-17",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json",
+        "anchor": null,
+        "statementFileSha256": "bd9b6665e2dff46e6361df6059a046c2d76dc78b163a28489d813ea4db474365",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json",
+            "fileSha256": "8b2d2afa5ecafd6944cee3f17503d176864a6ff98fbc9aee4bab642e26aaa8b2",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json",
+            "fileSha256": "bd9b6665e2dff46e6361df6059a046c2d76dc78b163a28489d813ea4db474365",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s8-observe-01.json plans/260925-documentation-authority-unification/reports/phase-06/step10-sync19-predecessor-residuals.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "high",
+        "owner": "docs/specs/observe.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": true,
+        "legacySourceSha256": "7918a2eb8f0fe301a065431023603cb887519212389c527e03ea3d1df71379c4",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-A34-18",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-A34-18",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+        "anchor": null,
+        "statementFileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "fileSha256": "d88fca5cc1e51c124e0a86d292afaca6044c4ea3ae7251cd6b56e1967501e855",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+            "fileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "high",
+        "owner": "docs/specs/runner.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": true,
+        "legacySourceSha256": "d3e99504d1f3331fb4944c23b778da5d682505614786a5dfbf26a8fb52095d03",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-A34-19",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-A34-19",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+        "anchor": null,
+        "statementFileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "fileSha256": "d88fca5cc1e51c124e0a86d292afaca6044c4ea3ae7251cd6b56e1967501e855",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+            "fileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "high",
+        "owner": "docs/specs/runner.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": true,
+        "legacySourceSha256": "d3e99504d1f3331fb4944c23b778da5d682505614786a5dfbf26a8fb52095d03",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-A34-20",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-A34-20",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+        "anchor": null,
+        "statementFileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "fileSha256": "d88fca5cc1e51c124e0a86d292afaca6044c4ea3ae7251cd6b56e1967501e855",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+            "fileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "high",
+        "owner": "docs/specs/runner.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": true,
+        "legacySourceSha256": "d3e99504d1f3331fb4944c23b778da5d682505614786a5dfbf26a8fb52095d03",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-A34-21",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-A34-21",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+        "anchor": null,
+        "statementFileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "fileSha256": "d88fca5cc1e51c124e0a86d292afaca6044c4ea3ae7251cd6b56e1967501e855",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+            "fileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "high",
+        "owner": "docs/specs/runner.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": true,
+        "legacySourceSha256": "d3e99504d1f3331fb4944c23b778da5d682505614786a5dfbf26a8fb52095d03",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-A34-22",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-A34-22",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+        "anchor": null,
+        "statementFileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "fileSha256": "d88fca5cc1e51c124e0a86d292afaca6044c4ea3ae7251cd6b56e1967501e855",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+            "fileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "high",
+        "owner": "docs/specs/runner.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": true,
+        "legacySourceSha256": "d3e99504d1f3331fb4944c23b778da5d682505614786a5dfbf26a8fb52095d03",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-A34-23",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-A34-23",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+        "anchor": null,
+        "statementFileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "fileSha256": "d88fca5cc1e51c124e0a86d292afaca6044c4ea3ae7251cd6b56e1967501e855",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+            "fileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "high",
+        "owner": "docs/specs/runner.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": true,
+        "legacySourceSha256": "d3e99504d1f3331fb4944c23b778da5d682505614786a5dfbf26a8fb52095d03",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-A34-24",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-A34-24",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+        "anchor": null,
+        "statementFileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "fileSha256": "d88fca5cc1e51c124e0a86d292afaca6044c4ea3ae7251cd6b56e1967501e855",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+            "fileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "high",
+        "owner": "docs/specs/runner.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": true,
+        "legacySourceSha256": "d3e99504d1f3331fb4944c23b778da5d682505614786a5dfbf26a8fb52095d03",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-A34-25",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-A34-25",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+        "anchor": null,
+        "statementFileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "fileSha256": "d88fca5cc1e51c124e0a86d292afaca6044c4ea3ae7251cd6b56e1967501e855",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+            "fileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "high",
+        "owner": "docs/specs/runner.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": true,
+        "legacySourceSha256": "d3e99504d1f3331fb4944c23b778da5d682505614786a5dfbf26a8fb52095d03",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-A34-26",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-A34-26",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+        "anchor": null,
+        "statementFileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "fileSha256": "d88fca5cc1e51c124e0a86d292afaca6044c4ea3ae7251cd6b56e1967501e855",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+            "fileSha256": "4be07f52fd5557aff9e7f8635365904db945bffc5400c481f191fdfe85652c9f",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json plans/260925-documentation-authority-unification/reports/phase-06/step9-a42-predecessor-residuals.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "high",
+        "owner": "docs/specs/runner.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": true,
+        "legacySourceSha256": "d3e99504d1f3331fb4944c23b778da5d682505614786a5dfbf26a8fb52095d03",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-A34-27",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-A34-27",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync2300-predecessor-residuals.json",
+        "anchor": null,
+        "statementFileSha256": "69c36aaa9da6dba4accb7795c09b45b60456e1d01a25953d18d2483dff848173",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "fileSha256": "d88fca5cc1e51c124e0a86d292afaca6044c4ea3ae7251cd6b56e1967501e855",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync2300-predecessor-residuals.json",
+            "fileSha256": "69c36aaa9da6dba4accb7795c09b45b60456e1d01a25953d18d2483dff848173",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json plans/260925-documentation-authority-unification/reports/phase-06/step10-sync2300-predecessor-residuals.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "high",
+        "owner": "docs/specs/runner.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": true,
+        "legacySourceSha256": "d3e99504d1f3331fb4944c23b778da5d682505614786a5dfbf26a8fb52095d03",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    },
+    {
+      "entryId": "X-A34-28",
+      "kind": "bounded-authority-alignment",
+      "row": {
+        "id": "X-A34-28",
+        "authoredBy": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+        "inventoryKind": "a34-residual",
+        "authorityKind": "decision history",
+        "statement": "Preserve verbatim A34 historical residual, owner and cutover activation obligations.",
+        "statementPath": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync2300-predecessor-residuals.json",
+        "anchor": null,
+        "statementFileSha256": "69c36aaa9da6dba4accb7795c09b45b60456e1d01a25953d18d2483dff848173",
+        "alignment": "deferred",
+        "alignmentMeaning": "Historical evidence is preserved, not a present implementation assertion. Independent acceptance and native rebind never carry through drift.",
+        "evidence": [
+          {
+            "ref": "plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json",
+            "fileSha256": "d88fca5cc1e51c124e0a86d292afaca6044c4ea3ae7251cd6b56e1967501e855",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          },
+          {
+            "ref": "plans/260925-documentation-authority-unification/reports/phase-06/step10-sync2300-predecessor-residuals.json",
+            "fileSha256": "69c36aaa9da6dba4accb7795c09b45b60456e1d01a25953d18d2483dff848173",
+            "kind": "document/provenance",
+            "role": "bounded binding or contract evidence"
+          }
+        ],
+        "proofCommand": "sha256sum plans/260925-documentation-authority-unification/ledger/decisions/s9-runner-01.json plans/260925-documentation-authority-unification/reports/phase-06/step10-sync2300-predecessor-residuals.json",
+        "proofExpected": "Matches the pinned file hashes; read cited spans for semantics. A digest proves binding only, never current truth by itself.",
+        "risk": "high",
+        "owner": "docs/specs/runner.md",
+        "route": "Step 5 sample; Step 9 all affected",
+        "parkedReason": null,
+        "reviewerVerdict": "pending",
+        "deepReadRequired": true,
+        "legacySourceSha256": "d3e99504d1f3331fb4944c23b778da5d682505614786a5dfbf26a8fb52095d03",
+        "implementationEvidenceScope": "not an operative present implementation claim: historical/proposal/routing/ownership or Step 6/7/9 deferred; evidence is the recorded boundary, no fabricated code proof"
+      }
+    }
+  ]
+}

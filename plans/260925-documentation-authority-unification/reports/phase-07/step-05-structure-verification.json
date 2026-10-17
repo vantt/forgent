@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "authorSession": "codex-session:fgos-run_unit-run-17922161b19023@2026-10-17",
+  "pinsChecked": 396,
+  "boundedRows": 109,
+  "requiredFields": [
+    "id",
+    "authoredBy",
+    "authorityKind",
+    "statement",
+    "statementPath",
+    "statementFileSha256",
+    "alignment",
+    "evidence",
+    "proofCommand",
+    "risk",
+    "owner",
+    "route",
+    "implementationEvidenceScope"
+  ],
+  "classificationCounts": {
+    "rows": 109,
+    "byAuthorityKind": {
+      "architecture": 20,
+      "contract": 7,
+      "decision history": 46,
+      "generated projection": 12,
+      "proposal": 1,
+      "specification": 23,
+      "vision": 0
+    },
+    "byAlignment": {
+      "aligned": 13,
+      "deferred": 89,
+      "doc-fix": 7,
+      "implementation-gap": 0
+    }
+  },
+  "reviewEntries": 143,
+  "frame": {
+    "files": 611,
+    "totalUnits": 22457,
+    "eligibleUnits": 22454,
+    "excludedUnits": 3,
+    "uniqueIds": 22454,
+    "missingUnits": 0,
+    "overlap": 0,
+    "minimumReviewerDraw": 3369,
+    "seedChosenByAuthor": false,
+    "drawChosenByAuthor": false
+  },
+  "A34": {
+    "rows": 28,
+    "unchangedResidualFiles": 28,
+    "payloadHashesVerified": 28,
+    "legacySuccessorRows": 13,
+    "currentSourceFileDriftsFromB0": 13,
+    "currentTargetFileDriftsFromB0": 11
+  },
+  "anchorAndCitationFilePins": "pass",
+  "partLimits": {
+    "maxEntries": 60,
+    "maxBytes": 168591
+  },
+  "status": "author structure/pins passed; independent semantic review/draw pending",
+  "ok": true
+}

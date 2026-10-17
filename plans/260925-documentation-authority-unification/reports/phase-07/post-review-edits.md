@@ -15,3 +15,12 @@
 The five C1 observations in X-DEFECT-01..05 concern rationale/accounting text,
 not candidate source wording. They remain routed to Phase 9 under L10-37 and are
 not edited in Step 4.
+
+## Step 5 digest-bound candidate corrections
+
+Author session: `codex-session:fgos-run_unit-run-17922161b19023@2026-10-17`. All affected native units return to pending at Step 9; no approval is carried. The alignment subpass reads these final bytes and makes no second edit.
+
+| Candidate and anchors | Change and affected rows | Final whole-file SHA-256 | Drift / review route |
+|---|---|---|---|
+| `docs/platform/system-architecture/architecture/architecture-intent.md#11-current-system-fit-and-conflicts` | Authority-separation correction of X-STALE-01..06: present owners separated from retired/proposed graph, dispatch, rounds, visibility, driver and mutation claims. Original legacy remains unchanged; exact table before/after and digests in `step-05-coordination-delta.json`. | `82b51061421d4995781ac999111d8a1bb4479f0b1b6180afabcdbf2928d928c2` | Step 5 independent review; Step 9 native carry/rebind all affected heading/context units. |
+| `docs/platform/component-boundary.md#3-recommended-responsibility-chain` and `#13-team-cognition-and-protocol-packages` | L11-12 / S3-01: visible historical/deferred labels on the Team Cognition/Protocol proposal. Existing chain and all proposal text preserved; surviving dispatch/evidence/Work authority unchanged. | `65c27c782a9323f723307f2a449ebf0b41efa18a7a341a7e308735296b272871` | Step 5 independent review; Step 9 native carry/rebind, including L11-15 merge edits. |

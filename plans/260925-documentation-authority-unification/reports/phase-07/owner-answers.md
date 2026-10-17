@@ -353,6 +353,27 @@ the independent findings without authorizing promotion, cutover or retirement.
   Step 9 native carry.
 - **Affected rows/steps:** Steps 5, 6, 9.
 
+### L11-16 — Bound the Step 5 remainder draw and keep the frame compact
+
+- **Date:** 2026-10-17
+- **Status:** decided (Lead under A42); owner approved the history rewrite ("ok làm tiếp")
+- **What is happening:** the Step 5 author read "A36 seeded sample of the remainder"
+  as 15% of all 22,454 `docs/platform` units (3,369 deep reads, full read above 3%)
+  and committed the frame as 375 part files (about 18 MB).
+- **Cause:** A36's 15% rule was written for conservation packs; applied to the whole
+  corpus it becomes the full current-truth sweep L11-6 assigned to Phase 9.
+- **Options and costs:** keep it (a whole-corpus truth sweep inside Phase 7 and 18 MB
+  carried into main history); bound the draw and compact the frame.
+- **Decision:** the remainder draw is a reviewer-seeded sensitivity sample of exactly
+  60 units; more than 10% substantive candidate-content defects stops and escalates
+  to the owner (as A37). Bounded statements and A34 bindings keep A36's 15%/3% rule.
+  The frame is one file of sorted stable ids plus file digests, exclusions and a
+  sorted-id digest; the reviewer recomputes membership from the extractor.
+- **History:** the unpushed author commit was rewritten once (soft reset and
+  recommit) so the 18 MB part files never enter branch history; author content is
+  otherwise unchanged.
+- **Affected rows/steps:** Step 5 review; L11-6 scope wording is unchanged.
+
 ## Resolved owner question — CTR010 (A45)
 
 - **Question:** Which contract keeps CTR010, and which verified-free identity should

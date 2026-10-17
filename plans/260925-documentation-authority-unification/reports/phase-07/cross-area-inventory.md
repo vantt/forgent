@@ -1,6 +1,6 @@
 # Step 1 cross-area inventory
 
-B0: `6f0f39ca14138c20d2ccb62063ccdf337cf6873a`. Machine rows: **98**.
+B0: `6f0f39ca14138c20d2ccb62063ccdf337cf6873a`. B0 rows: **98**; with the L11-15 supplement: **108**.
 
 ## Counts by kind
 
@@ -39,3 +39,20 @@ X-A34-17..X-A34-28, whose current successor is the legacy source that retires th
 The 14 DEFECT, four NAV and 13 QF rows whose present digest hashes a note id, target
 path or route placeholder must bind real unit digests in the Step 9 proof.
 
+
+## L11-15 main-import supplement
+
+Main `0d6da9033` merged at `21555f026`. Ten added rows are a post-B0 supplement, not a rerun or rewrite of the accepted Step 1 derivation. All eight imported identity-scope paths ride the Step 9 native carry. Native ids above remain pending; `report-path:` identifies a report binding only.
+
+| Row | Authority kind | Statement / source | Route |
+|---|---|---|---|
+| X-MAIN-01 | specification | `docs/platform/holder-lock/spec.md` — Holder-lock owns kernel resource exclusion, cold-lock registry and its internal routes; hot state/main-checkout remain next-track work. | Step 5; Step 6; Step 9 |
+| X-MAIN-02 | specification | `docs/platform/process/spec.md` — Process owns tuple facts and identity-safe control; unsupported domain kinds stay Unknown/Refused. | Step 5; Step 6; Step 9 |
+| X-MAIN-03 | architecture | `docs/platform/component-boundary.md` — Merge adds Process L0 and Holder-lock L1 and their routes, preserving the candidate Observe route and carriage. | Step 5; Step 6; Step 9 |
+| X-LOCK-01 | architecture | `docs/platform/holder-lock/spec.md` — Holder-lock depends on Process facts/control; kernel exclusion never becomes a PID/TTL takeover decision. | Step 5; Step 6; Step 9 |
+| X-LOCK-02 | architecture | `docs/platform/holder-lock/spec.md` — Writer identity supplies attribution, never lock authority; holder-lock has no session-identity dependency. | Step 5; Step 6; Step 9 |
+| X-LOCK-03 | contract | `docs/platform/holder-lock/spec.md` — Node facade hands one inherited description through versioned internal lock-fd routes; callers see an opaque handle. | Step 5; Step 6; Step 9 |
+| X-LOCK-04 | contract | `docs/platform/holder-lock/spec.md` — Cold-lock names, rank, scope, paths and fences come from one registry; main-checkout/hot-state are not cut over in this track. | Step 5; Step 6; Step 9 |
+| X-LOCK-05 | specification | `docs/platform/holder-lock/spec.md` — Setup/doctor owns discoverability of lock defaults, directories, fences and probes; activation validation gates release readiness. | Step 5; Step 6; Step 9 |
+| X-LOCK-06 | contract | `docs/platform/process/spec.md` — Process judge and Node leaf use shared judge vectors; no PID means unknown, zombie means dead, unseen namespace remains unknown. | Step 5; Step 6; Step 9 |
+| X-LOCK-07 | specification | `docs/platform/process/spec.md` — Only linux-gate domain primitives ship; Windows/macOS domains and full containment/gate primitives remain run-supervisor work. | Step 5; Step 6; Step 9 |
