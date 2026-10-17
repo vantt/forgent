@@ -152,6 +152,11 @@ fn main() {
     // can inherit a descriptor handed to a route; not listed in
     // command-routes.json or help.
     if args.get(1).is_some_and(|a| a == "internal") {
+        // `holder-lock-helper <role>`: the roles a re-executed binary plays
+        // for the holder-lock port (see `fgos_holder_lock::helper`).
+        if args.get(2).is_some_and(|a| a == "holder-lock-helper") {
+            std::process::exit(fgos_holder_lock::helper::main(&args[3..]));
+        }
         std::process::exit(fgos_holder_lock::route::main(&args[2..]));
     }
 

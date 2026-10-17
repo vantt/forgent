@@ -200,6 +200,16 @@ impl LockDriver for FlockDriver {
         }
     }
 
+    fn before_close(&self, _file: &File) {}
+
+    fn same_file(&self, file: &File, path: &Path) -> bool {
+        use std::os::unix::fs::MetadataExt;
+        match (fgos_process::facts::file_key(file), std::fs::metadata(path)) {
+            (Ok(key), Ok(meta)) => key == (meta.dev(), meta.ino()),
+            _ => false,
+        }
+    }
+
     fn prepare_borrow(&self, cmd: &mut Command) {
         // macOS cannot list holders, so what a borrowing child leaves behind
         // is found through its own process group instead.

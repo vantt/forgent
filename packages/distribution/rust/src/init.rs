@@ -979,7 +979,9 @@ pub fn holder_lock_gate(workspace_root: &Path, lock_root: &Path, git: &Path) -> 
                 guarantee.notes.join("; ")
             )));
         }
-        fgos_holder_lock::semantics::two_process_probe(dir)
+        fgos_holder_lock::HelperExe::current()
+            .map_err(|err| format!("the running executable is unknown: {err}"))
+            .and_then(|helper| fgos_holder_lock::semantics::two_process_probe(dir, &helper))
             .map_err(|detail| InitError::LockKernelSemanticsFailed(format!("{}: {detail}", dir.display())))?;
     }
     let report = borrow_vectors::run(git, &[], false).map_err(|err| {

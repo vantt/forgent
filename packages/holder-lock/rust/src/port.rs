@@ -5,8 +5,10 @@
 //! [`run_borrowed`] live in this core, never in a driver.
 //!
 //! A [`Handle`] owns the open file description that carries the lock.
-//! Releasing it closes the description; nothing here ever calls `LOCK_UN`
-//! and the handle has no `Drop` of its own beyond closing the file.
+//! Releasing it closes the description. On POSIX nothing here ever calls
+//! `LOCK_UN`: a borrowed copy of the description may share the lock. On
+//! Windows no other process can share a lock, so every successful lock is
+//! undone explicitly through [`LockDriver::before_close`] (see [`Locked`]).
 
 use std::collections::BTreeMap;
 use std::fs::{File, OpenOptions};
@@ -48,6 +50,26 @@ pub enum Wait {
     Try,
     /// Attempts until this many milliseconds elapsed.
     Ms(u64),
+}
+
+/// The executable that plays a helper role (`probe-holder`, `job-keeper`):
+/// it runs `internal holder-lock-helper <role> ...` and hands control to
+/// [`crate::helper::main`]. Production passes the current executable; tests
+/// of a binary crate pass that crate's own binary, because inside a test
+/// harness the current executable knows no roles.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct HelperExe(pub PathBuf);
+
+impl HelperExe {
+    /// This process's own executable.
+    pub fn current() -> io::Result<Self> {
+        std::env::current_exe().map(HelperExe)
+    }
+
+    /// The argv prefix to which a role and its arguments are appended.
+    pub fn argv(&self) -> Vec<std::ffi::OsString> {
+        vec![self.0.clone().into_os_string(), "internal".into(), "holder-lock-helper".into()]
+    }
 }
 
 /// A lock resource: its registry name and the absolute path of its lock file.
@@ -143,6 +165,12 @@ pub struct Handle {
     resource: Resource,
     mode: Mode,
     kill_wait_ms: u64,
+}
+
+impl Drop for Handle {
+    fn drop(&mut self) {
+        driver::current().before_close(&self.file);
+    }
 }
 
 impl Handle {
@@ -335,6 +363,36 @@ pub enum DescriptionLock {
     },
 }
 
+/// A lock this port took on `file` and has not handed on yet. Dropping it
+/// calls [`LockDriver::before_close`], so a lock taken for a short check, or
+/// abandoned on an early return, never lingers. Explicit unlock is safe on
+/// Windows only, where a lock cannot be shared with another process; on
+/// POSIX `before_close` does nothing and the close alone releases it. Call
+/// [`Locked::keep`] when the lock stays with the file (a held [`Handle`]).
+struct Locked<'a> {
+    drv: &'a dyn LockDriver,
+    file: Option<&'a File>,
+}
+
+impl<'a> Locked<'a> {
+    fn new(drv: &'a dyn LockDriver, file: &'a File) -> Self {
+        Locked { drv, file: Some(file) }
+    }
+
+    /// The lock now belongs to whoever owns the file.
+    fn keep(mut self) {
+        self.file = None;
+    }
+}
+
+impl Drop for Locked<'_> {
+    fn drop(&mut self) {
+        if let Some(file) = self.file {
+            self.drv.before_close(file);
+        }
+    }
+}
+
 /// Lock the description `file` in `mode`, polling non-blocking attempts for
 /// [`Wait::Ms`]. Never blocks in the kernel, so a caller's own deadline is
 /// always honored.
@@ -379,17 +437,6 @@ pub fn admit_after_lock(lock_path: &Path, kill_wait_ms: u64) -> Option<Value> {
     match predecessor::admit(&predecessor::record_path(lock_path), Duration::from_millis(kill_wait_ms)) {
         Admit::Proceed => None,
         Admit::NotEmpty { domain } => Some(domain),
-    }
-}
-
-fn same_file(file: &File, path: &Path) -> bool {
-    match (fgos_process::facts::file_key(file), std::fs::metadata(path)) {
-        #[cfg(unix)]
-        (Ok(key), Ok(meta)) => {
-            use std::os::unix::fs::MetadataExt;
-            key == (meta.dev(), meta.ino())
-        }
-        _ => false,
     }
 }
 
@@ -440,7 +487,9 @@ pub fn acquire(resource: &Resource, mode: Mode, wait: Wait, kill_wait_ms: u64) -
             }
             Err(err) => return Acquire::Unavailable { reason: UnavailableReason::IoError, detail: format!("flock {}: {err}", resource.path.display()) },
         }
-        if !same_file(&file, &resource.path) {
+        let locked = Locked::new(drv, &file);
+        if !drv.same_file(&file, &resource.path) {
+            drop(locked);
             drop(file);
             replaced += 1;
             if replaced > 8 || (wait != Wait::Try && Instant::now() >= deadline) {
@@ -449,14 +498,17 @@ pub fn acquire(resource: &Resource, mode: Mode, wait: Wait, kill_wait_ms: u64) -
             continue;
         }
         if let Some(domain) = admit_after_lock(&resource.path, kill_wait_ms) {
+            drop(locked);
             drop(file);
             return Acquire::Held { reason: HeldReason::PredecessorDomainNotEmpty, domain: Some(domain) };
         }
+        locked.keep();
         return Acquire::Acquired(Handle { file, resource: resource.clone(), mode, kill_wait_ms });
     }
 }
 
-/// Release a held lock: close the description. Never `LOCK_UN`.
+/// Release a held lock: close the description (see the module note on
+/// unlock).
 pub fn release(handle: Handle) {
     drop(handle);
 }
@@ -617,23 +669,30 @@ pub fn borrowed_check(slot_file: &File, lock_path: &Path, fgos_lock_fd: Option<&
         Ok(meta) => meta,
         Err(_) => return BorrowedCheck::NotBorrower(NotBorrowerReason::NotALockFile),
     };
-    let key = match fgos_process::facts::file_key(slot_file) {
-        Ok(key) => key,
-        Err(_) => return BorrowedCheck::NotBorrower(NotBorrowerReason::FdMissing),
-    };
+    let drv = driver::current();
     #[cfg(unix)]
     {
         use std::os::unix::fs::MetadataExt;
+        let key = match fgos_process::facts::file_key(slot_file) {
+            Ok(key) => key,
+            Err(_) => return BorrowedCheck::NotBorrower(NotBorrowerReason::FdMissing),
+        };
         if key != (meta.dev(), meta.ino()) {
             return BorrowedCheck::NotBorrower(NotBorrowerReason::InodeMismatch);
         }
     }
     #[cfg(not(unix))]
     {
-        let _ = (key, meta);
+        let _ = meta;
+        if !drv.same_file(slot_file, lock_path) {
+            return BorrowedCheck::NotBorrower(NotBorrowerReason::InodeMismatch);
+        }
     }
-    match driver::current().try_lock(slot_file, Mode::Ex) {
-        Ok(TryLock::Locked) => BorrowedCheck::Borrower,
+    match drv.try_lock(slot_file, Mode::Ex) {
+        Ok(TryLock::Locked) => {
+            drop(Locked::new(drv, slot_file));
+            BorrowedCheck::Borrower
+        }
         Ok(TryLock::WouldBlock) => BorrowedCheck::NotBorrower(NotBorrowerReason::LockNotHeldByDescription),
         Err(_) => BorrowedCheck::NotBorrower(NotBorrowerReason::FdMissing),
     }
@@ -653,7 +712,10 @@ pub fn probe(resource: &Resource) -> io::Result<Probe> {
         Err(err) => return Err(err),
     };
     let answer = match drv.try_lock(&file, Mode::Sh)? {
-        TryLock::Locked => Probe::Free,
+        TryLock::Locked => {
+            drop(Locked::new(drv, &file));
+            Probe::Free
+        }
         TryLock::WouldBlock => Probe::Held,
     };
     drop(file);
