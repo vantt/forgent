@@ -56,7 +56,7 @@ Vùng doctrine của forgent: 8 luật thiết kế đã khóa, đứng trên m�
 |---|---|---|---|
 | Khóa / supersede luật | ✓ | — | — |
 | Đọc và tuân thủ luật | ✓ | ✓ | ✓ |
-| Trích luật theo ID (L1–L8) khi thẩm định | — | ✓ | ✓ |
+| Trích luật theo ID (L1–L10) khi thẩm định | — | ✓ | ✓ |
 | Tuyên bố bậc F-ladder (kèm bằng chứng) | ✓ (chốt) | đề xuất | đề xuất |
 
 ## Business Rules
