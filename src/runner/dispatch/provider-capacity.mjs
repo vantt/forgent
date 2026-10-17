@@ -338,21 +338,33 @@ function firstHolderPid(name, params) {
   return holders.kind === 'list' && holders.pids.length > 0 ? holders.pids[0] : null;
 }
 
+// The lock's own answers that mean "not yours yet" become the caller-facing ProviderCapacityLockError:
+// a wait that ran out, and a previous holder whose children are still dying after the kill wait.
+function lockBusyError(name, params, message) {
+  const lockPath = resolveLock(name, params).v3Path;
+  const holderPid = firstHolderPid(name, params);
+  return new ProviderCapacityLockError(`${message.replace('%s', lockPath)}${holderPid ? ` (pid ${holderPid})` : ''}.`, { lockPath, holderPid });
+}
+
+function isPredecessorNotEmpty(err) {
+  return err?.code === 'lock-predecessor-domain-not-empty';
+}
+
 // The wait is thirty seconds because the holder flushes to disk (fsync) inside the critical section:
 // on a busy disk a live holder can take well over the old five seconds, and giving up then fails a
 // caller for no wrong done. A holder that has died releases at once, so a longer wait only costs time
 // when a live holder is really slow.
 export function withProviderStateLock(fn, { waitMs = 30_000 } = {}) {
   const params = lockParams();
-  const res = acquireSync(createLockScope('provider-state'), 'provider-state', params, { waitMs });
-  if (res.result !== 'acquired') {
-    const lockPath = resolveLock('provider-state', params).v3Path;
-    const holderPid = firstHolderPid('provider-state', params);
-    throw new ProviderCapacityLockError(
-      `provider-capacity lock at "${lockPath}" is still held by a live process${holderPid ? ` (pid ${holderPid})` : ''} after waiting ${waitMs}ms.`,
-      { lockPath, holderPid },
-    );
+  const busy = () => lockBusyError('provider-state', params, `provider-capacity lock at "%s" is still held by a live process after waiting ${waitMs}ms`);
+  let res;
+  try {
+    res = acquireSync(createLockScope('provider-state'), 'provider-state', params, { waitMs });
+  } catch (err) {
+    if (isPredecessorNotEmpty(err)) throw busy();
+    throw err;
   }
+  if (res.result !== 'acquired') throw busy();
   try {
     return fn();
   } finally {
@@ -390,11 +402,12 @@ export function credentialStoreDir(runtimeDir, provider, accountId, cli = null) 
 function accountLockTarget(runtimeDir, provider, accountId) {
   const dir = providerAccountDir(runtimeDir, provider, accountId);
   if (dir === null) throw new ProviderCapacityConfigError(`provider-capacity account lock refused: unsafe provider/account ${JSON.stringify(provider)}/${JSON.stringify(accountId)}`);
+  // Made before the lock is taken: a failure here must never leave a held lock behind.
+  fs.mkdirSync(dir, { recursive: true });
   return { dir, params: lockParams({ provider, account: accountId }) };
 }
 
 function accountLockHandle(dir, kernelHandle) {
-  fs.mkdirSync(dir, { recursive: true });
   return {
     dir,
     /**
@@ -423,7 +436,7 @@ export function tryAcquireAccountLock({ runtimeDir, provider, accountId } = {}) 
     res = acquireSync(createLockScope('provider-account'), 'provider-account', params);
   } catch (err) {
     // The last holder's children are still dying: as busy as a live holder.
-    if (err?.code === 'lock-predecessor-domain-not-empty') return null;
+    if (isPredecessorNotEmpty(err)) return null;
     throw err;
   }
   return res.result === 'acquired' ? accountLockHandle(dir, res.handle) : null;
@@ -435,13 +448,16 @@ export function tryAcquireAccountLock({ runtimeDir, provider, accountId } = {}) 
  */
 export async function acquireAccountLock({ runtimeDir, provider, accountId, waitMs = 30_000 } = {}) {
   const { dir, params } = accountLockTarget(runtimeDir, provider, accountId);
-  const res = await acquire(createLockScope('provider-account'), 'provider-account', params, { waitMs });
+  const busy = () => lockBusyError('provider-account', params, 'provider-capacity account lock at "%s" is still held by a live process after waiting');
+  let res;
+  try {
+    res = await acquire(createLockScope('provider-account'), 'provider-account', params, { waitMs });
+  } catch (err) {
+    if (isPredecessorNotEmpty(err)) throw busy();
+    throw err;
+  }
   if (res.result === 'acquired') return accountLockHandle(dir, res.handle);
-  const lockPath = resolveLock('provider-account', params).v3Path;
-  throw new ProviderCapacityLockError(
-    `provider-capacity account lock at "${lockPath}" is still held by a live process after waiting.`,
-    { lockPath, holderPid: firstHolderPid('provider-account', params) },
-  );
+  throw busy();
 }
 
 export function stableHash(seed, accountId) {

@@ -242,6 +242,21 @@ test('reconcile use-case + reconciliation-planner transitive import graph exclud
     assert.equal(seen.has(banned), false, `reconcile's real import graph must never reach ${path.relative(root, banned)}`);
   }
   assert.deepEqual([...seen].sort(), EXPECTED_CLOSURE);
+  // The lock door is in the closure only to guard the state file: no file of the closure besides the
+  // door itself and provider-capacity.mjs (which defines the account lock) names a call that lends a
+  // lock to a child, and reconcile's own files never take an account lock.
+  const BORROWING = /\b(?:runBorrowed|spawnHolding)\b/;
+  const ACCOUNT_LOCK = /\b(?:acquireAccountLock|tryAcquireAccountLock)\b/;
+  const providerCapacity = path.join(root, 'src/runner/dispatch/provider-capacity.mjs');
+  for (const file of seen) {
+    if (LOCK_DOOR_FILES.has(file) || file === providerCapacity) continue;
+    const { code } = lexSource(fs.readFileSync(file, 'utf8'));
+    assert.equal(BORROWING.test(code), false, `${path.relative(root, file)} names a lock-borrowing call`);
+  }
+  for (const entry of ENTRY_POINTS) {
+    const { code } = lexSource(fs.readFileSync(entry, 'utf8'));
+    assert.equal(ACCOUNT_LOCK.test(code), false, `${path.relative(root, entry)} takes an account lock`);
+  }
   assert.deepEqual([...lazy].sort(), EXPECTED_LAZY_EDGES,
     'a dynamic import() in the reconcile closure changed; review whether reconcile can now reach it and update EXPECTED_LAZY_EDGES');
 });

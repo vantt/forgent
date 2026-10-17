@@ -124,7 +124,9 @@ export function runCredentialProbe(plan, { spawnFn = spawn, timeoutMs = DEFAULT_
     child.on('close', (exitCode) => {
       clearTimeout(timer);
       const judged = judgeProbeOutput({ exitCode, timedOut, output });
-      Promise.resolve(child.borrowed).then(() => resolve(judged), (err) => resolve({ ok: false, detail: `the call left processes holding the account lock: ${err.message}` }));
+      // A sweep that could not kill what the call left behind is the lock's own report; the answer of
+      // the call itself stands either way.
+      Promise.resolve(child.borrowed).catch(() => {}).then(() => resolve(judged));
     });
   });
 }
