@@ -52,6 +52,7 @@ pub fn domain_json(domain: &Domain) -> Value {
     }
     match domain {
         Domain::LinuxGate(t) => json!({ "domainKind": "linux-gate", "domainId": tuple(t, true) }),
+        Domain::LinuxPgroup(t) => json!({ "domainKind": "linux-pgroup", "domainId": tuple(t, true) }),
         Domain::WindowsJob(job) => json!({
             "domainKind": "windows-job",
             "domainId": {
@@ -109,6 +110,7 @@ pub fn parse_record(record: &Value) -> Option<Domain> {
     let id = record.get("domainId")?;
     match record.get("domainKind")?.as_str()? {
         "linux-gate" => tuple_from(id, true).map(Domain::LinuxGate),
+        "linux-pgroup" => tuple_from(id, true).map(Domain::LinuxPgroup),
         "windows-job" => windows_job_from(id).map(Domain::WindowsJob),
         "macos-tree" => tuple_from(id, false).map(Domain::MacosTree),
         _ => None,

@@ -42,6 +42,10 @@ pub enum Domain {
     /// when the gate is dead (the kernel kills and reaps the whole PID
     /// namespace before its init becomes a zombie).
     LinuxGate(ProcTuple),
+    /// The leader of a process group on Linux without a usable pid namespace;
+    /// best-effort, judged by the `linux-pgroup` containment driver. The pgid
+    /// is the leader's pid.
+    LinuxPgroup(ProcTuple),
     /// A named kill-on-close Windows Job Object plus the process tuples that
     /// bound the holder's process tree; judged by the Windows driver
     /// ([`platform::windows_job`]), `Unknown` / `Refused` on other platforms.
@@ -97,7 +101,7 @@ pub struct DomainWatch {
 }
 
 enum Watch {
-    /// `linux-gate` here, or a kind this platform has no driver for.
+    /// `linux-gate` or `linux-pgroup` here, or a kind this platform has no driver for.
     Direct(Domain),
     #[cfg(windows)]
     Job(platform::windows_job::ContenderView),
@@ -133,7 +137,7 @@ pub(crate) fn signal_settled(outcome: &control::SignalOutcome) -> bool {
 }
 
 impl DomainWatch {
-    /// Is the domain empty, as the current platform sees it? Only `linux-gate`
+    /// Is the domain empty, as the current platform sees it? Only `linux-gate` and `linux-pgroup`
     /// on Linux and `windows-job` on Windows have a real answer.
     pub fn is_empty(&mut self) -> DomainState {
         match &mut self.inner {
@@ -144,6 +148,7 @@ impl DomainWatch {
                 Verdict::Alive => DomainState::NotEmpty,
                 Verdict::Unknown => DomainState::Unknown,
             },
+            Watch::Direct(Domain::LinuxPgroup(leader)) => containment::pgroup_state(leader),
             Watch::Direct(_) => DomainState::Unknown,
         }
     }
@@ -162,6 +167,7 @@ impl DomainWatch {
                     KillOutcome::Refused
                 }
             }
+            Watch::Direct(Domain::LinuxPgroup(leader)) => containment::pgroup_kill(leader),
             Watch::Direct(_) => KillOutcome::Refused,
         }
     }
