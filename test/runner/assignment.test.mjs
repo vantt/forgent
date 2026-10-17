@@ -497,3 +497,94 @@ test('buildAssignment({ stage: "decompose", operation: "decompose" }) refuses mi
     'buildAssignment must refuse missing taskSpec operation even without explicit options',
   );
 });
+
+// ─── persona text is read as YAML ────────────────────────────────────────────
+
+function personaPrompt(personaYaml, { pinned } = {}) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-persona-render-'));
+  try {
+    fs.mkdirSync(path.join(root, 'core', 'agents'), { recursive: true });
+    if (personaYaml !== null) fs.writeFileSync(path.join(root, 'core', 'agents', 'critic.yaml'), personaYaml);
+    const assignment = buildAssignment({ workId: 'tsk-persona', stage: 'planning', operation: 'validate-plan' });
+    return renderAssignmentPrompt(assignment, {
+      repoRoot: root,
+      persona: { value: 'critic', source: { scope: 'default', id: 'reviewer' }, ...(pinned === undefined ? {} : { pinnedText: pinned }) },
+    });
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+}
+
+const LEGACY_ONLY_TEXT = 'name: critic\ndescription: Blunt reviewer\npersona:\n  voice: direct: no hedging\n  style: short\n';
+
+test('a persona file is read with the YAML parser: block scalars in full, comments stripped, lists rendered', () => {
+  const prompt = personaPrompt([
+    'name: critic',
+    'description: >',
+    '  Blunt reviewer who',
+    '  reads the whole diff.',
+    'persona:',
+    '  voice: plain # inline comment',
+    '  archetype: 1e3',
+    'decision_boundary:',
+    '  can_decide:',
+    '    - wording',
+    '  must_escalate: [scope, budget]',
+    '',
+  ].join('\n'));
+  assert.match(prompt, /^Description: Blunt reviewer who reads the whole diff\.$/m);
+  assert.match(prompt, /^Voice: plain$/m);
+  assert.match(prompt, /^Archetype: 1000$/m);
+  assert.match(prompt, /Can decide:\n- wording\nMust escalate:\n- scope\n- budget/);
+});
+
+test('a persona file that is not valid YAML renders one visible could-not-parse line and no half-read fields', () => {
+  const prompt = personaPrompt(LEGACY_ONLY_TEXT);
+  assert.match(prompt, /^Persona "critic" could not be parsed: .* \(line 4, column \d+\)$/m);
+  assert.doesNotMatch(prompt, /Voice:|Style:|Description:|Decision Boundaries/);
+});
+
+test('persona text pinned by an earlier release that the parser rejects still renders as it did', () => {
+  const prompt = personaPrompt(null, { pinned: LEGACY_ONLY_TEXT });
+  assert.match(prompt, /^Description: Blunt reviewer$/m);
+  assert.match(prompt, /^Voice: direct: no hedging$/m);
+  assert.match(prompt, /^Style: short$/m);
+  assert.doesNotMatch(prompt, /could not be parsed/);
+});
+
+const MAPPING_ITEM_TEXT = [
+  'name: critic',
+  'description: Blunt reviewer',
+  'persona:',
+  '  voice: calm',
+  'decision_boundary:',
+  '  must_escalate:',
+  '    - Escalate when: budget exceeded',
+  '    - plain item',
+  '',
+].join('\n');
+
+test('pinned persona text with a list item that reads as a mapping renders through the legacy projection', () => {
+  const prompt = personaPrompt(null, { pinned: MAPPING_ITEM_TEXT });
+  assert.match(prompt, /^Voice: calm$/m);
+  assert.match(prompt, /Must escalate:\n- Escalate when: budget exceeded\n- plain item/);
+});
+
+test('pinned persona text with a mapping under voice renders through the legacy projection, not as nothing', () => {
+  const prompt = personaPrompt(null, { pinned: 'name: critic\ndescription: Blunt reviewer\npersona:\n  voice:\n    tone: calm\n  style: short\n' });
+  assert.match(prompt, /^Description: Blunt reviewer$/m);
+  assert.match(prompt, /^Style: short$/m);
+});
+
+test('a persona file whose list item reads as a mapping renders one visible line, not a silent drop', () => {
+  const prompt = personaPrompt(MAPPING_ITEM_TEXT);
+  assert.match(prompt, /^Persona "critic" cannot be rendered: decision_boundary\.must_escalate\[0\] is a mapping/m);
+  assert.doesNotMatch(prompt, /Voice:|Must escalate:/);
+});
+
+test('pinned persona text that parses is read by the parser, and wins over the file', () => {
+  const prompt = personaPrompt('name: critic\ndescription: from the file\n', { pinned: 'name: critic\ndescription: pinned one\npersona:\n  voice: calm\n' });
+  assert.match(prompt, /^Description: pinned one$/m);
+  assert.match(prompt, /^Voice: calm$/m);
+  assert.doesNotMatch(prompt, /from the file/);
+});

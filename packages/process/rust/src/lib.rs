@@ -42,10 +42,29 @@ pub enum Domain {
     /// when the gate is dead (the kernel kills and reaps the whole PID
     /// namespace before its init becomes a zombie).
     LinuxGate(ProcTuple),
-    /// A named Windows Job Object. No driver yet: always `Unknown` / `Refused`.
-    WindowsJob(String),
+    /// A named kill-on-close Windows Job Object plus the process tuples that
+    /// bound the holder's process tree; judged by the Windows driver
+    /// ([`platform::windows_job`]), `Unknown` / `Refused` on other platforms.
+    WindowsJob(WindowsJob),
     /// The root of a macOS process tree. No driver yet: always `Unknown` / `Refused`.
     MacosTree(ProcTuple),
+}
+
+/// The record of a `windows-job` domain
+/// (`packages/holder-lock/contracts/predecessor.v1.json`).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct WindowsJob {
+    /// The job's name, `Local\fgos-borrow-<lock>-<pid>-<creation>-<counter>`.
+    pub job: String,
+    /// The Windows session of the holder; a contender in another session never
+    /// judges the domain empty.
+    pub session_id: u32,
+    /// FILETIME at declare: a process created earlier is not part of the domain.
+    pub declared_at: u64,
+    /// The locking process (`startTime` is its creation FILETIME, decimal).
+    pub holder: ProcTuple,
+    /// The second job owner, once it has acked; it is never a member.
+    pub keeper: Option<ProcTuple>,
 }
 
 /// Whether a domain still has processes in it.
@@ -70,34 +89,110 @@ pub enum KillOutcome {
     Refused,
 }
 
-/// Is `domain` empty, as the current platform sees it? Only `linux-gate` on
-/// Linux has a real answer today.
-pub fn domain_is_empty(domain: &Domain) -> DomainState {
-    match domain {
-        Domain::LinuxGate(gate) if cfg!(target_os = "linux") => match facts::judge_here(&gate.to_record()) {
-            Verdict::Dead => DomainState::Empty,
-            Verdict::Alive => DomainState::NotEmpty,
-            Verdict::Unknown => DomainState::Unknown,
-        },
-        Domain::LinuxGate(_) | Domain::WindowsJob(_) | Domain::MacosTree(_) => DomainState::Unknown,
+/// A domain being waited on. One value serves one wait: on Windows it keeps
+/// the handles of every member it has seen, so each poll re-reads the sources
+/// but never forgets a process.
+pub struct DomainWatch {
+    inner: Watch,
+}
+
+enum Watch {
+    /// `linux-gate` here, or a kind this platform has no driver for.
+    Direct(Domain),
+    #[cfg(windows)]
+    Job(platform::windows_job::ContenderView),
+}
+
+/// Start watching `domain` with the current platform's driver.
+pub fn domain_watch(domain: &Domain) -> DomainWatch {
+    #[cfg(windows)]
+    if let Domain::WindowsJob(record) = domain {
+        return DomainWatch { inner: Watch::Job(platform::windows_job::ContenderView::new(record)) };
+    }
+    DomainWatch { inner: Watch::Direct(domain.clone()) }
+}
+
+/// The job view of the named Windows job, for the release rule and the keeper.
+#[cfg(windows)]
+pub use platform::windows_job::{job_view, NamedBy};
+
+/// What a watch saw while it judged a domain: whether the job could be opened
+/// and, per pid, which sources named it. Empty off Windows.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct WatchTrace {
+    /// The job opened by name (not the fallback over the tree).
+    pub job_opened: bool,
+    /// `(pid, listed, scanned, in tree)` for every pid any poll named.
+    pub named: Vec<(u32, bool, bool, bool)>,
+}
+
+/// Is the signal outcome one that leaves nothing to end: sent, or the process
+/// was already gone or is no longer the recorded one.
+pub(crate) fn signal_settled(outcome: &control::SignalOutcome) -> bool {
+    matches!(outcome, control::SignalOutcome::Sent | control::SignalOutcome::NotFound | control::SignalOutcome::IdentityMismatch)
+}
+
+impl DomainWatch {
+    /// Is the domain empty, as the current platform sees it? Only `linux-gate`
+    /// on Linux and `windows-job` on Windows have a real answer.
+    pub fn is_empty(&mut self) -> DomainState {
+        match &mut self.inner {
+            #[cfg(windows)]
+            Watch::Job(view) => view.is_empty(),
+            Watch::Direct(Domain::LinuxGate(gate)) if cfg!(target_os = "linux") => match facts::judge_here(&gate.to_record()) {
+                Verdict::Dead => DomainState::Empty,
+                Verdict::Alive => DomainState::NotEmpty,
+                Verdict::Unknown => DomainState::Unknown,
+            },
+            Watch::Direct(_) => DomainState::Unknown,
+        }
+    }
+
+    /// End every process of the domain at once. For `linux-gate` this is
+    /// SIGKILL sent to the gate by identity; a gate that is already gone
+    /// counts as done.
+    pub fn kill_all(&mut self) -> KillOutcome {
+        match &mut self.inner {
+            #[cfg(windows)]
+            Watch::Job(view) => view.kill_all(),
+            Watch::Direct(Domain::LinuxGate(gate)) if cfg!(target_os = "linux") => {
+                if signal_settled(&control::signal_by_identity(gate, control::Signal::Kill)) {
+                    KillOutcome::Ok
+                } else {
+                    KillOutcome::Refused
+                }
+            }
+            Watch::Direct(_) => KillOutcome::Refused,
+        }
+    }
+
+    /// What this watch saw so far (see [`WatchTrace`]).
+    pub fn trace(&self) -> WatchTrace {
+        match &self.inner {
+            #[cfg(windows)]
+            Watch::Job(view) => WatchTrace { job_opened: view.job_opened(), named: view.trace().into_iter().map(|(pid, by)| (pid, by.list, by.scan, by.tree)).collect() },
+            Watch::Direct(_) => WatchTrace::default(),
+        }
+    }
+
+    /// Why the last answer was "not empty" when it is a refusal to judge, not a
+    /// live process: `predecessor-other-session`.
+    pub fn reason(&self) -> Option<&'static str> {
+        match &self.inner {
+            #[cfg(windows)]
+            Watch::Job(view) => view.reason(),
+            Watch::Direct(_) => None,
+        }
     }
 }
 
-/// End every process of `domain` at once. For `linux-gate` this is SIGKILL
-/// sent to the gate by identity; a gate that is already gone counts as done.
+/// One-shot [`DomainWatch::is_empty`]. A wait that polls more than once uses
+/// [`domain_watch`], so a Windows watch keeps its member handles.
+pub fn domain_is_empty(domain: &Domain) -> DomainState {
+    domain_watch(domain).is_empty()
+}
+
+/// One-shot [`DomainWatch::kill_all`].
 pub fn domain_kill_all(domain: &Domain) -> KillOutcome {
-    match domain {
-        Domain::LinuxGate(gate) if cfg!(target_os = "linux") => {
-            match control::signal_by_identity(gate, control::Signal::Kill) {
-                control::SignalOutcome::Sent
-                | control::SignalOutcome::NotFound
-                | control::SignalOutcome::IdentityMismatch => KillOutcome::Ok,
-                control::SignalOutcome::IdentityUnknown
-                | control::SignalOutcome::Denied
-                | control::SignalOutcome::Unsupported
-                | control::SignalOutcome::Failed(_) => KillOutcome::Refused,
-            }
-        }
-        Domain::LinuxGate(_) | Domain::WindowsJob(_) | Domain::MacosTree(_) => KillOutcome::Refused,
-    }
+    domain_watch(domain).kill_all()
 }

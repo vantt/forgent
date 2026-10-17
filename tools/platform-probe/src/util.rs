@@ -4,6 +4,7 @@ use serde_json::Value;
 use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Stdio};
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
 
@@ -208,4 +209,43 @@ pub fn which(name: &str) -> bool {
     };
     let path = std::env::var_os("PATH").unwrap_or_default();
     std::env::split_paths(&path).any(|d| exts.iter().any(|e| d.join(format!("{name}{e}")).is_file()))
+}
+
+/// Repeat count for the repeated predecessor tests (`--repeats N`).
+pub const DEFAULT_REPEATS: usize = 500;
+static REPEATS: AtomicUsize = AtomicUsize::new(DEFAULT_REPEATS);
+
+pub fn set_repeats(n: usize) {
+    REPEATS.store(n.max(1), Ordering::Relaxed);
+}
+
+pub fn repeats() -> usize {
+    REPEATS.load(Ordering::Relaxed)
+}
+
+/// Which of the three sources named a process of the predecessor domain.
+#[derive(Clone, Copy, Default)]
+pub struct Sources {
+    /// `JobObjectBasicProcessIdList`.
+    pub list: bool,
+    /// A process-snapshot scan with `IsProcessInJob(proc, job)` true.
+    pub scan: bool,
+    /// The recorded holder's process tree.
+    pub tree: bool,
+}
+
+impl Sources {
+    pub fn json(self) -> Value {
+        serde_json::json!({"list": self.list, "inJobScan": self.scan, "holderTree": self.tree})
+    }
+}
+
+/// A deterministic-free jitter source: 0..bound from the clock and a salt (no rng dependency).
+pub fn jitter(salt: u64, bound: u64) -> u64 {
+    let nanos = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_nanos() as u64).unwrap_or(0);
+    let mut x = nanos ^ salt.wrapping_mul(0x9E37_79B9_7F4A_7C15);
+    x ^= x >> 33;
+    x = x.wrapping_mul(0xFF51_AFD7_ED55_8CCD);
+    x ^= x >> 33;
+    x % bound.max(1)
 }

@@ -66,7 +66,9 @@ Ngoài: cách `terminal`, gate trong pane, adapter interactive, mint writer id (
 
 ## Phase và phụ thuộc
 
-Tiền đề: **4.2 đã land** (bắt đầu P00). **4.3 đã land** trước khi merge P09 (r6 §11 đường găng 4.3 → 6.2: từ 6.2 mọi agent chạy trong PID namespace, record nóng phải có `pidNs`, luật N4).
+Tiền đề: **4.2 đã land** (bắt đầu P00). **4.3 P01 (hot-lock core) + P02 (claims gộp vào `state`) đã land** trước khi merge P09 (phần repo-lock P03–P08 của 4.3 đang tạm giữ chờ component Git, không chặn P09) (r6 §11 đường găng 4.3 → 6.2: từ 6.2 mọi agent chạy trong PID namespace, record nóng phải có `pidNs`, luật N4).
+
+> **Ghi chú 2026-10-17 10:55:** phần state của 4.3 (P01, P02) đang tạm giữ chờ hội đồng event store (luật L3 chạm ngưỡng xem lại). Khi có kết luận, 4.3 cắt lại các phase đó một lần và sắp thứ tự để P01 + P02 merge được vào main sớm, không để nhánh tích hợp đỏ. Phần khoá repo của 4.3 làm theo plan cũ ngay khi 4.2 land. Tiền đề của P09 ở trên không đổi; nếu hội đồng đổi hình dạng `events.lock`/`claims.lock`, tiền đề `pidNs` trong bản ghi nóng vẫn phải được giữ.
 
 | Phase | Nội dung | Phụ thuộc | Wave | Giờ |
 |---|---|---|---|---|

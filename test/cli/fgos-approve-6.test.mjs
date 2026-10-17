@@ -2,9 +2,9 @@
 // từ test/cli/fgos.test.mjs (tsk-3um). Nội dung test không đổi, chỉ chỗ ở đổi.
 // Bộ đồ nghề dùng chung nằm ở ./helpers/fgos-cli-harness.mjs.
 import { test } from 'node:test';
+import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
 import {
   ADD_BAD_FLAG_CASES,
-  DEFAULT_TTL_MS,
   EDIT_BAD_FLAG_CASES,
   EDIT_PRIORITY_MATRIX_BAD_FLAG_CASES,
   FGOS,
@@ -46,7 +46,6 @@ import {
   initSessionSafeCwd,
   linkFgosBinInto,
   logPath,
-  mainCheckoutLockPath,
   makeAlreadyCaughtUpItem,
   makeBlockedBranchItem,
   makeBlockedLeafItem,
@@ -81,7 +80,6 @@ import {
   writeCreateFake,
   writeFakeGh,
   writeHangScript,
-  writeLiveLock,
   writeMarkerFake,
   writeMergeSuccessFake,
   writeRunnerConfig,
@@ -206,26 +204,28 @@ test('approve (pull-door/verify-only): with no simulated failure, the same item 
 });
 
 
-test('approve --no-wait fails immediately on a live-held lock, main left untouched -- merge next inherits the same flag by forwarding, per bin/fgos.mjs:1152', () => {
+test('approve --no-wait fails immediately while another process holds the trunk\'s merge slot, main left untouched -- merge next inherits the same flag by forwarding, per bin/fgos.mjs:1152', async () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'wait-no-wait-approve', { verify: 'true' });
   commitPendingBeforeApprove(cwd, 'wait-no-wait-approve');
-  writeLiveLock(cwd, 1000);
+  const holder = await holdLockInChild('merge-slot', { fgosDir: path.join(cwd, '.fgos'), ref: 'main' });
+  try {
+    const result = run(cwd, ['approve', 'wait-no-wait-approve', '--no-wait']);
 
-  const result = run(cwd, ['approve', 'wait-no-wait-approve', '--no-wait']);
-
-  // 9 ('merge-fail'), not 7 ('lock-timeout') -- MergeError's category is
-  // unconditionally 'merge-fail' for every failure mode (pre-existing,
-  // unrelated to this item's own `code` discriminator addition).
-  assert.equal(result.status, 9, result.stderr);
-  assert.match(result.stderr, /main checkout is locked by pid \d+/);
-  // A run that waited would print its retry progress line before every sleep and tag the final
-  // error with the time it waited; neither appears when the flag skipped the wait. The lock holder
-  // (this process) never releases, so a waiting run could not have succeeded either.
-  assert.doesNotMatch(result.stderr, /still waiting on main-checkout lock/, '--no-wait must not enter the retry loop');
-  assert.doesNotMatch(result.stderr, /waited \d+ms before giving up/, '--no-wait must not wait before giving up');
-  assert.equal(stateView(cwd).work['wait-no-wait-approve'].status, 'awaiting-approval', 'a refused-before-merge attempt must leave the item exactly where it was');
+    // 9 ('merge-fail'), not 7 ('lock-timeout') -- MergeError's category is
+    // unconditionally 'merge-fail' for every failure mode.
+    assert.equal(result.status, 9, result.stderr);
+    assert.match(result.stderr, /merge slot of "main" is held by another process \(pid \d+/);
+    // A run that waited would tag the final error with the time it waited; none appears
+    // when the flag skipped the wait. The holder never releases, so a waiting run could not
+    // have succeeded either.
+    assert.doesNotMatch(result.stderr, /after waiting \d+ ms/, '--no-wait must not wait before giving up');
+    assert.equal(stateView(cwd).work['wait-no-wait-approve'].status, 'awaiting-approval', 'a refused-before-merge attempt must leave the item exactly where it was');
+  } finally {
+    holder.child.kill('SIGKILL');
+    await holder.exited;
+  }
 });
 
 

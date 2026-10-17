@@ -13,7 +13,7 @@ Observe được chuyển trọn gói sang Rust trong kế hoạch `plans/260929
 - Quản lý nhật ký và vòng đời case đo lường (`fgos metrics case`).
 - Thu thập và tính toán scorecard tầng nền (`fgos metrics harness`, `fgos metrics runs`, `fgos metrics coverage`, `fgos metrics outcomes`, `fgos metrics entropy`, `fgos metrics snapshot`).
 - Quản lý kho lưu trữ friction độc lập, phi tập trung (`fgos friction record`, `fgos friction resolve`, `fgos friction list`, `fgos friction show`, `fgos friction rank`).
-- Quản lý store lock (`.fgos/observe/.lock`) và phân mảnh writer shard (`.fgos/observe/<store>/<writerId>.jsonl`). `writerId` lấy từ crate Session Identity ([spec](../platform/session-identity/spec.md)): chính session id khi `source` là `env`/`registry` (gồm `CLAUDE_CODE_SESSION_ID`, `CODEX_THREAD_ID`), `pid-<id>` khi `pid`/`unresolved` (gốc terminal hoặc session, không còn pid của chính process). `sessionId` của friction cũng lấy từ đó. Observe không tự đọc biến env identity.
+- Quản lý store lock (`<fgosDir>/locks/observe.lock`, kernel lock của holder-lock) và phân mảnh writer shard (`.fgos/observe/<store>/<writerId>.jsonl`). `writerId` lấy từ crate Session Identity ([spec](../platform/session-identity/spec.md)): chính session id khi `source` là `env`/`registry` (gồm `CLAUDE_CODE_SESSION_ID`, `CODEX_THREAD_ID`), `pid-<id>` khi `pid`/`unresolved` (gốc terminal hoặc session, không còn pid của chính process). `sessionId` của friction cũng lấy từ đó. Observe không tự đọc biến env identity.
 - Khai báo traits `ObservationSource` và `LegacyFrictionSource` cho các crate khác triển khai.
 
 ### Must Not Own
@@ -36,7 +36,7 @@ Observe được chuyển trọn gói sang Rust trong kế hoạch `plans/260929
 ## 3. Storage Model
 
 - **Tracked Shard theo Writer**: mọi thao tác ghi đều ghi vào `.fgos/observe/<store>/<writerId>.jsonl`.
-- **Store Lock**: `.fgos/observe/.lock` sử dụng cờ `O_CREAT | O_EXCL`, lưu `{ "pid": u32, "startTime": Option<String>, "ts": String }`. Tự động thu hồi khi holder đã chết hoặc quá TTL 30 giây.
+- **Store Lock**: `<fgosDir>/locks/observe.lock` là kernel lock trên open file description của holder-lock (`docs/platform/holder-lock/spec.md`, khoá `observe`, mutex, scope repo, rank 80, lá). Chờ tối đa 5 giây, không có TTL, không ghi pid/startTime/ts vào file và không có thu hồi stale: holder bị giết thì kernel nhả lock ngay. Snapshot shard được ghi dưới lock. Đường cũ `.fgos/observe/.lock` (`O_CREAT | O_EXCL`, thu hồi theo pid hoặc TTL 30 giây) đã thành thư mục tombstone sau cutover; fgos cũ chạm vào đó dừng với lỗi.
 - **Envelope chuẩn**: CLI native luôn trả về envelope `fgos.v1`.
 
 ## 4. Commands & Routing
@@ -74,6 +74,10 @@ Dành cho Phase F8: khoá ranh giới contracts, golden fixtures và decision re
 - Doctor checks: `observe-dir-writable`, `observe-friction-migrated`, `observe-host-resolvable`, `observe-run-coverage` (`src/setup/registrations.mjs`). Coverage check gọi host `metrics coverage` qua helper với main-checkout dir, kiểm tra `v2` + accounting rồi so `runDirsSeen` với Node directory-only `scanAssignmentLayout` (gồm symlink/depth barriers). Tolerance là max(Node recent result files, host `recentRuns`) trong cửa sổ 60 giây. Chỉ positive unknown subcommand hoặc payload thiếu `layoutRule` được degraded/pass vì old host; malformed coverage và các lỗi khác fail.
 
 ## 6. Lịch sử quyết định
+
+### 2026-10-16 — Store lock chuyển sang kernel lock
+
+Store lock đổi từ file `O_EXCL` có pid/TTL sang kernel lock `<fgosDir>/locks/observe.lock` của holder-lock: chờ 5 giây, không TTL, snapshot shard ghi dưới lock, holder chết thì lock nhả ngay. Đường cũ `.fgos/observe/.lock` thành thư mục tombstone. Quyết định gốc và bằng chứng: `docs/platform/holder-lock/spec.md` §15.
 
 ### D-ADR0037 (Observe Component Architecture)
 

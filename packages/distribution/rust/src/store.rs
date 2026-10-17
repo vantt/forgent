@@ -9,7 +9,6 @@ use crate::verify::{
     recompute_artifact_digest, verify_legacy_node, verify_release_files, VerificationError,
 };
 use serde::{Deserialize, Serialize};
-use std::fs::OpenOptions;
 use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -17,62 +16,58 @@ use std::time::{SystemTime, UNIX_EPOCH};
 pub enum LockError {
     #[error("stage already in progress")]
     AlreadyInProgress,
+    #[error("lock-driver-unavailable: {0}")]
+    DriverUnavailable(String),
     #[error("io error acquiring lock: {0}")]
     Io(#[from] std::io::Error),
 }
 
-/// RAII lock guard for `install.lock` create-exclusive file.
+/// Holds the machine-wide `install.lock`: a kernel lock on
+/// `<stateRoot>/locks/install.lock` taken through `fgos-holder-lock`.
+///
+/// One attempt, never a wait. The lock lives on an open file description, so
+/// a killed holder frees it at once and there is nothing to clean up; `Drop`
+/// closes the description and never unlocks explicitly.
 pub struct InstallLockGuard {
-    lock_path: PathBuf,
+    _handle: fgos_holder_lock::Handle,
+}
+
+/// `<store_root>/locks/install.lock`. `store_root` is the fgOS state root, so
+/// this is the crate's `lock_root()` joined with the lock name.
+pub fn install_lock_path(store_root: &Path) -> PathBuf {
+    store_root.join("locks").join("install.lock")
 }
 
 impl InstallLockGuard {
     pub fn acquire(store_root: &Path) -> Result<Self, LockError> {
-        let lock_path = store_root.join("install.lock");
+        let lock_path = install_lock_path(store_root);
         if let Some(parent) = lock_path.parent() {
             std::fs::create_dir_all(parent)?;
         }
-
-        match OpenOptions::new()
-            .write(true)
-            .create_new(true)
-            .open(&lock_path)
-        {
-            Ok(file) => {
-                drop(file);
-                Ok(Self { lock_path })
-            }
-            Err(err) if err.kind() == std::io::ErrorKind::AlreadyExists => {
+        let resource = fgos_holder_lock::Resource::new("install", lock_path);
+        match fgos_holder_lock::acquire(
+            &resource,
+            fgos_holder_lock::Mode::Ex,
+            fgos_holder_lock::Wait::Try,
+            fgos_holder_lock::DEFAULT_KILL_WAIT_MS,
+        ) {
+            fgos_holder_lock::Acquire::Acquired(handle) => Ok(Self { _handle: handle }),
+            // A single try never times out; treat it as held if a driver ever reports it.
+            fgos_holder_lock::Acquire::Held { .. } | fgos_holder_lock::Acquire::Timeout { .. } => {
                 Err(LockError::AlreadyInProgress)
             }
-            Err(err) => Err(LockError::Io(err)),
+            fgos_holder_lock::Acquire::Unavailable { reason, detail } => {
+                Err(LockError::DriverUnavailable(format!("{}: {detail}", reason.as_str())))
+            }
         }
     }
 }
 
-impl Drop for InstallLockGuard {
-    fn drop(&mut self) {
-        let _ = std::fs::remove_file(&self.lock_path);
-    }
-}
-
-/// Resolves the machine release store root per R5:
-/// `${FGOS_STATE_HOME:-${XDG_STATE_HOME:-$HOME/.local/state}/fgos}/`
+/// Resolves the machine release store root: the fgOS state root, from the
+/// one resolution in `fgos_holder_lock::state_root` (`FGOS_STATE_ROOT`
+/// pinned, else `${FGOS_STATE_HOME:-${XDG_STATE_HOME:-$HOME/.local/state}/fgos}`).
 pub fn resolve_machine_release_store_root() -> PathBuf {
-    if let Ok(val) = std::env::var("FGOS_STATE_HOME") {
-        if !val.trim().is_empty() {
-            return PathBuf::from(val);
-        }
-    }
-    if let Ok(val) = std::env::var("XDG_STATE_HOME") {
-        if !val.trim().is_empty() {
-            return PathBuf::from(val).join("fgos");
-        }
-    }
-    if let Ok(home) = std::env::var("HOME").or_else(|_| std::env::var("USERPROFILE")) {
-        return PathBuf::from(home).join(".local/state/fgos");
-    }
-    PathBuf::from(".local/state/fgos")
+    fgos_holder_lock::state_root::state_root().0
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -134,7 +129,7 @@ pub fn now_millis() -> u128 {
 /// Stages a candidate release into the machine release store.
 ///
 /// Implements R6 and R7:
-/// - Acquires create-exclusive `install.lock` (never retries).
+/// - Takes the kernel `install.lock` (one attempt, never retries).
 /// - If `.tar.gz`, extracts to a temp directory with pure Rust flate2+tar.
 /// - Verifies manifest (R2-R4).
 /// - If `releases/<digest>/` already exists, treats as no-op success.
@@ -149,7 +144,7 @@ pub fn stage_release(store_root: &Path, from_path: &Path) -> Result<StageOutcome
 
     std::fs::create_dir_all(store_root)?;
 
-    // 1. Acquire create-exclusive install.lock
+    // 1. Take the kernel install.lock
     let _lock = InstallLockGuard::acquire(store_root)?;
 
     let timestamp = now_millis();
@@ -353,6 +348,7 @@ mod tests {
 
     #[test]
     fn test_resolve_store_root_precedence() {
+        std::env::remove_var("FGOS_STATE_ROOT");
         std::env::set_var("FGOS_STATE_HOME", "/custom/fgos/state");
         std::env::set_var("XDG_STATE_HOME", "/custom/xdg/state");
         let resolved = resolve_machine_release_store_root();

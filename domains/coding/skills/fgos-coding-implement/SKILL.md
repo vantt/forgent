@@ -72,6 +72,14 @@ on how you got here:
   never reopen or reinterpret a locked decision here — that is
   `fgos-coding-exploring`'s and `fgos-coding-planning`'s job, not this
   skill's).
+- Reuse before you add; retire what you replace. Before writing a new
+  function, helper, module or mechanism, search the whole repository (not
+  only the touched files) for one that already does the job, by name and by
+  the primitive it touches; reuse or extend it, and import the shared module
+  an import guard names instead of copying code. A change that replaces a
+  mechanism moves its consumers and deletes the old path in the same change.
+  Record what you searched and reused in the return note. Same rule as rule 5
+  of `../_shared/coding-worker-contract.md` and AGENTS.md "Design principles".
 - Do not classify the item's domain or re-derive its stage.
   `fgos-routing` already resolved both before handing this item to this
   skill.
@@ -166,6 +174,9 @@ do for it here).
 
 - a stub, TODO, or "should work" accepted in place of a real
   implementation
+- a new helper or module written without first searching for one that
+  already does the job, or an old path left alive after its replacement
+  landed
 - editing outside what the item actually describes
 - redesigning scope or architecture inside an `executing` item instead
   of parking it

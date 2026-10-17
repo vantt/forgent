@@ -12,8 +12,9 @@
 // which is `tsk-3gx-3`'s (the CLI action layer's) job, "chỉ khi git thành
 // công thật mới set field parent" (the item's own description).
 
-import { createBranchRef, withMergeEphemeralWorktree, detectTrunk, isMainWorktree } from './worktree.mjs';
-import { mergeRunnerItem } from './merge.mjs';
+import { createBranchRef, withMergeEphemeralWorktree, detectTrunk, isMainWorktree, branchNameFor } from './worktree.mjs';
+import { mergeRunnerItem, withMergeSlot } from './merge.mjs';
+import { createLockScope } from '../holder-lock/index.mjs';
 import { preflightRetarget } from './promote-preflight.mjs';
 import { withLockRetry } from './lock-wait.mjs';
 
@@ -70,11 +71,18 @@ export async function retargetMember(repoRoot, memberItem, rootId, opts = {}) {
     return { id: memberItem.id, outcome: 'bailed', reason: preflight.reason, detail: preflight.detail };
   }
 
-  const result = await withMergeEphemeralWorktree(repoRoot, rootId, (ephemeral) =>
-    withLockRetry(
-      () => mergeRunnerItem(ephemeral.path, memberItem, opts.timeoutMs ? { timeoutMs: opts.timeoutMs, lockRoot: repoRoot } : { lockRoot: repoRoot }),
-      { waitMs: undefined },
-    ),
+  // The integration branch's merge slot is held OUTSIDE the ephemeral
+  // worktree: the worktree reads the branch tip when it is created, so the
+  // slot must already be held by then. The main checkout mutex is taken
+  // inside `mergeRunnerItem` only for the steps that write the main checkout,
+  // never across the merge and its verify.
+  const scope = createLockScope('promote-member');
+  const result = await withLockRetry(
+    ({ waitMs }) => withMergeSlot(scope, repoRoot, branchNameFor(rootId), () =>
+      withMergeEphemeralWorktree(repoRoot, rootId, (ephemeral) =>
+        mergeRunnerItem(ephemeral.path, memberItem, { ...(opts.timeoutMs ? { timeoutMs: opts.timeoutMs } : {}), lockRoot: repoRoot, scope, waitMs }),
+      ), { waitMs }),
+    { waitMs: undefined },
   );
 
   if (result.outcome !== 'merged') {

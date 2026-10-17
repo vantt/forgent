@@ -12,7 +12,7 @@ import { execFileSync } from 'node:child_process';
 
 import { runUnit } from '../../../src/runner/execution/run.mjs';
 import { withRunDirReadAccess } from '../../../src/runner/dispatch/cli.mjs';
-import { acquireMainCheckoutLock, dispatchLockFile, ACQUIRED } from '../../../src/runner/main-checkout-lock.mjs';
+import { acquireSync, createLockScope } from '../../../src/holder-lock/index.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
 import { createFakeHerdr, SANDBOXED_AGENT_SOURCE } from '../../helpers/fake-herdr-pane.mjs';
 
@@ -388,12 +388,8 @@ test('a codex-style pane trusts its workspace in the private home and leaves the
 test('a read-only pane shares its checkout with another dispatch in flight; a writing one is still refused', { skip: SKIP }, async () => {
   const { repoRoot, worktreeDir, signalDir } = setup(['alpha']);
   // Another dispatch (a sibling panelist, say) holds this checkout right now.
-  const held = acquireMainCheckoutLock(path.join(repoRoot, '.fgos'), {
-    identity: `${process.pid}:test-holder`,
-    ttlMs: 600000,
-    lockFile: dispatchLockFile(path.resolve(worktreeDir)),
-  });
-  assert.equal(held.status, ACQUIRED);
+  const held = acquireSync(createLockScope('test'), 'dispatch-cwd', { fgosDir: path.join(repoRoot, '.fgos'), cwd: worktreeDir });
+  assert.equal(held.result, 'acquired');
   try {
     const fake = useFakeHerdr({ signalDir, panes: [{ awaitProbe: true }, { awaitProbe: true }] });
     const readOnly = await withHerdrBin(fake.herdrBin, () => runUnit({
@@ -415,7 +411,7 @@ test('a read-only pane shares its checkout with another dispatch in flight; a wr
     assert.notEqual(writing.outcome, 'pass', 'a writer must not share the checkout with a dispatch in flight');
     assert.match(JSON.stringify(writing.results[0]), /already in flight/);
   } finally {
-    held.release();
+    held.handle.release();
   }
 });
 

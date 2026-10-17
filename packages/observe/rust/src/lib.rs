@@ -22,4 +22,4 @@ pub use provider::{
     OBSERVE_METRICS_DESCRIPTOR,
 };
 pub use shard::{read_all_json, shard_path, writer_shard_name};
-pub use store_lock::{acquire_store_lock, ObserveLockError, StoreLockGuard};
+pub use store_lock::{acquire_store_lock, acquire_store_lock_within, ObserveLockError, StoreLockGuard};

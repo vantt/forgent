@@ -6,6 +6,8 @@ import path from 'node:path';
 import os from 'node:os';
 import { execFileSync } from 'node:child_process';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
+import { createLockScope } from '../holder-lock/index.mjs';
+import { addWorktreeSync } from '../runner/repo-locks.mjs';
 
 function git(cwd, args) {
   try {
@@ -28,9 +30,10 @@ function git(cwd, args) {
  * @param {string} params.branch
  * @param {string} [params.baseRef]
  * @param {string} [params.worktreeDir]
+ * @param {object} [params.scope] lock scope of the caller; a fresh one when absent
  * @returns {{ worktreePath: string, branch: string }}
  */
-export function createWorkflowWorktree({ repoRoot, branch, baseRef = 'HEAD', worktreeDir }) {
+export function createWorkflowWorktree({ repoRoot, branch, baseRef = 'HEAD', worktreeDir, scope = createLockScope('workflow-worktree') }) {
   if (!repoRoot || !branch) {
     throw new RunnerConfigError('createWorkflowWorktree requires repoRoot and branch');
   }
@@ -51,9 +54,9 @@ export function createWorkflowWorktree({ repoRoot, branch, baseRef = 'HEAD', wor
   }
 
   if (branchExists) {
-    git(repoRoot, ['worktree', 'add', worktreePath, branch]);
+    addWorktreeSync(scope, repoRoot, [worktreePath, branch]);
   } else {
-    git(repoRoot, ['worktree', 'add', '-b', branch, worktreePath, baseRef]);
+    addWorktreeSync(scope, repoRoot, ['-b', branch, worktreePath, baseRef]);
   }
 
   return {
@@ -96,7 +99,7 @@ export function resolveIntegrationTarget({ repoRoot, workflow } = {}) {
  * @param {boolean} [params.squash]
  * @returns {{ merged: boolean, sourceBranch: string, targetBranch: string }}
  */
-export function mergeWorkflowBranch({ repoRoot, sourceBranch, targetBranch, commitMessage, squash = false }) {
+export function mergeWorkflowBranch({ repoRoot, sourceBranch, targetBranch, commitMessage, squash = false, scope = createLockScope('workflow-merge') }) {
   if (!repoRoot || !sourceBranch || !targetBranch) {
     throw new RunnerConfigError('mergeWorkflowBranch requires repoRoot, sourceBranch and targetBranch');
   }
@@ -115,7 +118,7 @@ export function mergeWorkflowBranch({ repoRoot, sourceBranch, targetBranch, comm
     // Perform in temporary worktree on targetBranch
     const tempWt = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-wf-merge-'));
     try {
-      git(repoRoot, ['worktree', 'add', tempWt, targetBranch]);
+      addWorktreeSync(scope, repoRoot, [tempWt, targetBranch]);
       git(tempWt, mergeArgs);
     } finally {
       try {

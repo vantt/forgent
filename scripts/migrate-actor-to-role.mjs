@@ -21,7 +21,8 @@
 
 import fs from "node:fs";
 import path from "node:path";
-import { withEventsLock } from "../src/state/events.mjs";
+import { withStateTx } from "../src/state/hot-lock.mjs";
+import { lockOfLog } from "../src/state/events.mjs";
 import { isMainModule } from "./lib/is-main-module.mjs";
 
 const TARGET_SCHEMA_VERSION = 3; // D19
@@ -111,8 +112,8 @@ function assertUsableBackupPath(logPath, backupPath) {
 }
 
 /**
- * Rewrite `logPath` in place. Always runs inside events.mjs own
- * `events.lock` (derived from the log directory, per D31/CONTEXT.md safety
+ * Rewrite `logPath` in place. Always runs inside the hot-lock
+ * state lock (derived from the log directory, per D31/CONTEXT.md safety
  * constraint) -- a live holder makes this BLOCK for events.mjs fixed ~2s
  * timeout and then throw EventLogError("lock-timeout"); it never writes
  * over a live append. `dryRun: true` still acquires the lock (read
@@ -122,7 +123,8 @@ function assertUsableBackupPath(logPath, backupPath) {
 export function migrateActorToRole(logPath, { backupPath, dryRun = false } = {}) {
   const resolvedBackup = assertUsableBackupPath(logPath, backupPath);
 
-  return withEventsLock(logPath, () => {
+  const { root, resource } = lockOfLog(logPath, path.dirname(logPath));
+  return withStateTx(root, (tx) => {
     const raw = fs.readFileSync(logPath, "utf8");
     const { rewritten, changed, totalLines } = migrateLogText(raw);
 
@@ -145,9 +147,9 @@ export function migrateActorToRole(logPath, { backupPath, dryRun = false } = {})
       throw new Error(`migrate-actor-to-role: backup verification failed at "${resolvedBackup}" -- refusing to rewrite the target without a proven-good backup.`);
     }
 
-    fs.writeFileSync(logPath, rewritten, "utf8");
+    tx.writeText(logPath, rewritten);
     return { dryRun: false, changed, totalLines, logPath, backupPath: resolvedBackup };
-  });
+  }, { resource });
 }
 
 function parseArgs(argv) {

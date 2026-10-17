@@ -6,7 +6,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { acquireMainCheckoutLock, releaseMainCheckoutLock } from '../../src/runner/main-checkout-lock.mjs';
+import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
+import { installHook, HOOK_TEST_SKIP } from '../helpers/main-checkout-hook-repo.mjs';
 
 // tsk-sir -- reproduces the bug this item was filed against: a real linked
 // worktree's `git commit` gets refused by the SAME main-checkout.lock a
@@ -30,13 +31,7 @@ import { acquireMainCheckoutLock, releaseMainCheckoutLock } from '../../src/runn
 // reproducing the real hazard.
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const REAL_HOOK = path.resolve(__dirname, '../../.githooks/pre-commit');
-const REAL_LOCK_MODULE = path.resolve(__dirname, '../../src/runner/main-checkout-lock.mjs');
-const REAL_ACTIVITY_MODULE = path.resolve(__dirname, '../../src/runner/main-checkout-activity.mjs');
-const REAL_PROCESS_IDENTITY_MODULE = path.resolve(__dirname, '../../src/runner/dispatch/process-identity.mjs');
-// The lock module also reads the run-timeout ceiling from this import-free leaf.
-const REAL_RUN_TIMEOUT_MODULE = path.resolve(__dirname, '../../src/runner/dispatch/run-timeout.mjs');
-const REAL_IDENTITY_MODULE = path.resolve(__dirname, '../../src/util/session-identity.mjs');
+const skip = HOOK_TEST_SKIP;
 
 function mkTempDir(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
@@ -66,24 +61,9 @@ function initSharedAbsoluteHooksPathFixture() {
   execFileSync('git', ['add', 'seed.txt', '.fgos/cache/state.json'], { cwd: mainRoot });
   execFileSync('git', ['commit', '-q', '-m', 'root commit'], { cwd: mainRoot });
 
-  const hooksDir = path.join(mainRoot, '.githooks');
-  const runnerDir = path.join(mainRoot, 'src', 'runner');
-  const dispatchDir = path.join(runnerDir, 'dispatch');
-  const utilDir = path.join(mainRoot, 'src', 'util');
-  fs.mkdirSync(hooksDir, { recursive: true });
-  fs.mkdirSync(dispatchDir, { recursive: true });
-  fs.mkdirSync(utilDir, { recursive: true });
-  fs.copyFileSync(REAL_HOOK, path.join(hooksDir, 'pre-commit'));
-  fs.copyFileSync(REAL_LOCK_MODULE, path.join(runnerDir, 'main-checkout-lock.mjs'));
-  fs.copyFileSync(REAL_ACTIVITY_MODULE, path.join(runnerDir, 'main-checkout-activity.mjs'));
-  fs.copyFileSync(REAL_PROCESS_IDENTITY_MODULE, path.join(dispatchDir, 'process-identity.mjs'));
-  fs.copyFileSync(REAL_RUN_TIMEOUT_MODULE, path.join(dispatchDir, 'run-timeout.mjs'));
-  fs.copyFileSync(REAL_IDENTITY_MODULE, path.join(utilDir, 'session-identity.mjs'));
-  fs.copyFileSync(path.join(path.dirname(REAL_IDENTITY_MODULE), 'host-bin-path.mjs'), path.join(utilDir, 'host-bin-path.mjs'));
-  fs.chmodSync(path.join(hooksDir, 'pre-commit'), 0o755);
   // Absolute, not relative -- this is the load-bearing difference from
   // installGitHooks's own '.githooks' write (see file header).
-  execFileSync('git', ['config', 'core.hooksPath', hooksDir], { cwd: mainRoot });
+  installHook(mainRoot, { absolute: true });
 
   const worktreeParent = mkTempDir('fgos-tsk-sir-repro-worktree-parent-');
   const worktreeRoot = path.join(worktreeParent, 'worktree');
@@ -121,13 +101,9 @@ function commitAsSession(repoRoot, envOverlay) {
 // Today it does not: it is refused by the same lock, because the hook has
 // no worktree-vs-main distinction on its lock-acquire guard (tsk-sir D2).
 
-test('tsk-sir: a worktree commit is wrongly refused while another session holds the main-checkout lock', () => {
+test('tsk-sir: a worktree commit is not refused while another process holds the main-checkout lock', { skip }, async () => {
   const { mainRoot, worktreeRoot } = initSharedAbsoluteHooksPathFixture();
-  const fgosDir = path.join(mainRoot, '.fgos');
-
-  const lockResult = acquireMainCheckoutLock(fgosDir, { identity: 'other-live-session', ttlMs: 60_000 });
-  assert.equal(lockResult.status, 'acquired', 'setup: the lock must actually be held for this repro to be meaningful');
-
+  const holder = await holdLockInChild('main-checkout', { fgosDir: path.join(mainRoot, '.fgos') });
   try {
     const result = commitAsSession(worktreeRoot, { FGOS_SESSION_ID: 'session-in-worktree' });
     assert.equal(
@@ -137,7 +113,8 @@ test('tsk-sir: a worktree commit is wrongly refused while another session holds 
       `(tsk-sir) -- got refused: ${result.stderr}`,
     );
   } finally {
-    releaseMainCheckoutLock(fgosDir);
+    holder.child.kill('SIGKILL');
+    await holder.exited;
   }
 });
 

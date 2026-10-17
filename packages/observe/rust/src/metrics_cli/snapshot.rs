@@ -8,6 +8,7 @@ use crate::case_journal;
 use crate::contract::{ObserveRequest, WorkObservationSource};
 use crate::metrics_cli::entropy::calculate_entropy_score_and_parts;
 use crate::shard;
+use crate::store_lock::acquire_store_lock;
 use fgos_host_runtime::civil_time::format_system_time_utc;
 use serde_json::json;
 use std::fs::OpenOptions;
@@ -62,6 +63,9 @@ pub fn dispatch_snapshot(
         }),
     );
 
+    // Two processes sharing a writer id share a shard; the append is one
+    // observe-lock critical section so their lines cannot interleave.
+    let _lock = acquire_store_lock(&req.root).map_err(|e| e.to_string())?;
     let shard_file = shard::shard_path(&req.root, "snapshots").map_err(|e| e.to_string())?;
     let mut file = OpenOptions::new()
         .create(true)

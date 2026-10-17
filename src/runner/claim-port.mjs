@@ -1,42 +1,30 @@
 // claim-port.mjs — single choke-point for all claim flows (tsk-53f D1).
 //
 // Every claim (CLI take, CLI pick, runner claimItem) goes through this module.
-// Centralizes: main-checkout-lock acquire/release, acquireClaim (runtime
-// claim only — tsk-40m retired the durable moveWork(to:'doing') claim-time
-// write entirely; doing is derived purely from the active-claim overlay),
-// optional worktree creation with correct baseRef for leaf items.
+// Centralizes: main checkout mutex around the .fgos checkpoint only
+// (repo-locks.mjs), the worker-slot ceiling check + acquireClaim in one state
+// transaction (runtime claim only — tsk-40m retired the durable
+// moveWork(to:'doing') claim-time write entirely; doing is derived purely from
+// the active-claim overlay), optional worktree creation with correct baseRef for leaf items.
 //
 // This is the "one door" for claiming work — no direct acquireClaim call
 // outside this module except for FSM-internal transitions.
 
 import { moveWork, addOutcome, addDecision, recordClaimAttempt, readRawEvents, FsmError } from '../state/store.mjs';
-import { withEventsLock } from '../state/events.mjs';
 import { foldEvents } from '../state/replay.mjs';
 import { isResolvedStatus, resolveRoot } from '../state/frontier.mjs';
 import { getDomain, stepForPhase, effectiveStep } from '../state/domain-registry.mjs';
 import { visitCount } from './anti-loop.mjs';
-import { acquireMainCheckoutLock, forceReclaimAmbiguousLock, HELD, AMBIGUOUS, DEFAULT_TTL_MS, formatLockDurationMs, lockRefusalDetail, heldMainCheckoutWriter } from './main-checkout-lock.mjs';
-import { createClaimWorktree, branchNameFor, branchExists } from './worktree.mjs';
+import { withMainCheckout } from './repo-locks.mjs';
+import { checkpointMainFgos } from './main-fgos-checkpoint.mjs';
+import { LockScope, HolderLockError } from '../holder-lock/index.mjs';
+import { createClaimWorktree, branchNameFor, branchExists, currentHead, resolveRefSha } from './worktree.mjs';
 import { lastActivityAt, isReclaimEligible } from './claim-liveness.mjs';
 import { hasWorkerSlotRoom } from '../state/worker-slots.mjs';
 import { readSharedConfigOrEmpty } from '../config/shared-config-file.mjs';
-import { runOpportunisticMainCheckoutChecks } from '../state/events-jsonl-truncation-guard.mjs';
-import { acquireClaim, releaseClaim, readClaims, readClaim, buildEffectiveView, getItemDurableRevision, getMainFgosDir } from '../state/runtime-coordination.mjs';
-import { resolveWriterIdentity } from '../util/session-identity.mjs';
+import { acquireClaimTx, releaseClaim, readClaims, readClaim, buildEffectiveView, getItemDurableRevision, withMainState } from '../state/runtime-coordination.mjs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
 
-function git(repoRoot, args) {
-  return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false });
-}
-
-function currentHead(repoRoot) {
-  return git(repoRoot, ['rev-parse', 'HEAD']).trim();
-}
-
-function gitAt(repoRoot, args) {
-  return git(repoRoot, args);
-}
 import { DEFAULTS } from '../state/work.mjs';
 
 /**
@@ -63,8 +51,8 @@ function latestTodoReleaseTrigger(events, id) {
 }
 
 // category (R4, store.mjs's categoryOf contract): 'not-found' mirrors
-// StoreError's own not-found convention ('validation'); 'lock-held'/
-// 'lock-ambiguous' reuse 'lock-timeout' (events.mjs's own category for the
+// StoreError's own not-found convention ('validation'); 'lock-held'
+// reuses 'lock-timeout' (events.mjs's own category for the
 // same "couldn't get exclusive access" class) — without this, an uncategorized
 // ClaimError falls through categoryOf to 'unexpected' and crashes the whole
 // runOnce drain-run instead of a graceful per-item halt (same failure mode
@@ -72,7 +60,6 @@ function latestTodoReleaseTrigger(events, id) {
 const CLAIM_ERROR_CATEGORY = Object.freeze({
   'not-found': 'validation',
   'lock-held': 'lock-timeout',
-  'lock-ambiguous': 'lock-timeout',
   'deps-not-merged': 'validation',
   // Same reasoning as 'deps-not-merged': a refused claim is an ordinary,
   // expected outcome, so the runner must halt this one item gracefully
@@ -108,272 +95,219 @@ export class ClaimError extends Error {
  * @param {string} [opts.worktreeDir] - custom worktree directory (for runner)
  * @returns {Object} claim result with worktree info if isolated
  */
-export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = process.cwd(), worktreeDir, skipOutcome = false } = {}) {
-  // Acquire main-checkout-lock before any state mutation. ttlMs is the
-  // window this claim records for itself; a contender judges it by that.
-  // The pre-commit hook no longer writes this lock (it leaves a beacon in
-  // its own file), so a commit on main never blocks a claim here.
-  let lockResult = acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS, releaseOnExit: true });
-  if (lockResult.status === AMBIGUOUS) {
-    // tsk-2l8: AMBIGUOUS means the lock file's content is unparseable, not
-    // that a live holder disagrees -- the same shape verb `unlock` already
-    // self-heals via forceReclaimAmbiguousLock (its own re-read-before-unlink
-    // TOCTOU guard, main-checkout-lock.mjs:655-676), just as a separate
-    // manual command. Mirror that single reclaim-and-retry here so pick/take
-    // recovers in the same call instead of requiring a person to run
-    // `/fgOS:unlock` before retrying. A transient race (a live holder wrote a
-    // valid record between the first read and this call) surfaces below as
-    // whatever that fresh content actually is (HELD/ACQUIRED); only a
-    // SECOND consecutive AMBIGUOUS (content persistently unparseable) still
-    // fails closed.
-    forceReclaimAmbiguousLock(dir);
-    lockResult = acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS, releaseOnExit: true });
-  }
-  if (lockResult.status === HELD) {
-    const ttlPart = lockResult.remainingTtlMs != null
-      ? `, expires in ${formatLockDurationMs(lockResult.remainingTtlMs)}`
-      : ', no TTL window known';
-    throw new ClaimError(
-      'lock-held',
-      lockResult.reason
-        ? `claimWork: main checkout lock refused${lockRefusalDetail(lockResult)}`
-        : `claimWork: main checkout locked by pid ${lockResult.holderPid} (held ${formatLockDurationMs(lockResult.lockAgeMs)}${ttlPart})`,
-      { remainingTtlMs: lockResult.remainingTtlMs, holderPid: lockResult.holderPid, lockAgeMs: lockResult.lockAgeMs, ...(lockResult.reason ? { reason: lockResult.reason } : {}) },
-    );
-  }
-  if (lockResult.status === AMBIGUOUS) {
-    const agePart = lockResult.lockAgeMs != null ? ` (lock age ${formatLockDurationMs(lockResult.lockAgeMs)})` : '';
-    throw new ClaimError('lock-ambiguous', `claimWork: main checkout lock state ambiguous${agePart}`, { lockAgeMs: lockResult.lockAgeMs });
-  }
+export async function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = process.cwd(), worktreeDir, skipOutcome = false, waitMs } = {}) {
+  // Everything that needs a child process happens before the state lock: the
+  // checkout's HEAD is read once, here, and that one answer is both the commit
+  // a fresh worktree forks from and the commit recorded on the claim.
+  const head = currentHead(repoRoot);
+  const scope = new LockScope('claim');
 
+  // The main checkout mutex (rank 50) is held only for the `.fgos` checkpoint.
+  // The ceiling check below no longer leans on it: it runs inside the `state`
+  // transaction, so two claims for the last slot still cannot both pass.
   try {
-    // Tầng A (T2/T3): events now live under baseline-0 (.fgos/events.jsonl)
-    // PLUS every per-writer file under .fgos/events/ -- readRawEvents(dir)
-    // is the one door that reads all of it, merged/deduped (TA-D7/TA-D13).
-    // Passing a single-file `rawLog` override into the checks call below
-    // (the old shape, back when there was only ever one file to read) would
-    // scope the truncation guard to baseline-0 only and silently skip every
-    // per-writer file (T5's own multi-file guard never sees rawLog !== null
-    // as anything but a deliberate single-file test injection) -- so this
-    // no longer passes one at all, letting the checks do their own real
-    // multi-file discovery from disk.
-    const rawEvents = readRawEvents(dir);
-    // heldMainCheckoutWriter: this call already holds main-checkout.lock (identity
-    // process.pid, acquired above), so the checkpoint commits under that
-    // same hold instead of acquiring the mutex again; its git commit carries
-    // the pid so .githooks/pre-commit recognizes fgOS's own commit (tsk-32v).
-    runOpportunisticMainCheckoutChecks(dir, repoRoot, { mainCheckoutWriter: heldMainCheckoutWriter(process.pid) });
-    const durableView = foldEvents(rawEvents);
-    const claims = readClaims(dir);
-    const view = buildEffectiveView(durableView, claims);
-    const item = view.work[id];
-
-    if (!item) {
-      throw new ClaimError('not-found', `claimWork: work "${id}" not found.`);
+    await withMainCheckout(scope, 'claim', (mainHandle) => checkpointMainFgos(mainHandle, dir, repoRoot), { fgosDir: dir, waitMs });
+  } catch (err) {
+    if (err instanceof HolderLockError && err.code === 'lock-held') {
+      throw new ClaimError('lock-held', `claimWork: ${err.message}`, { holders: err.holders, lock: err.lock, timedOut: err.timedOut });
     }
+    throw err;
+  }
 
-    const priorVisits = visitCount(rawEvents, id);
-    const branch = branchNameFor(id);
-    const branchAlreadyExists = branchExists(repoRoot, branch);
+  // Tầng A (T2/T3): events now live under baseline-0 (.fgos/events.jsonl)
+  // PLUS every per-writer file under .fgos/events/ -- readRawEvents(dir)
+  // is the one door that reads all of it, merged/deduped (TA-D7/TA-D13).
+  const rawEvents = readRawEvents(dir);
+  const durableView = foldEvents(rawEvents);
+  const claims = readClaims(dir);
+  const view = buildEffectiveView(durableView, claims);
+  const item = view.work[id];
 
-    const rootId = resolveRoot(view, id);
-    const isLeaf = rootId !== id;
-    const rootBranch = isLeaf ? branchNameFor(rootId) : undefined;
-    const rootBranchExists = isLeaf && branchExists(repoRoot, rootBranch);
-    const baseRef = rootBranchExists ? rootBranch : undefined;
+  if (!item) {
+    throw new ClaimError('not-found', `claimWork: work "${id}" not found.`);
+  }
 
-    if (isolate && isLeaf) {
-      const unmergedDeps = (item.deps ?? []).filter((dep) => !isResolvedStatus(view.work[dep]));
-      if (unmergedDeps.length > 0) {
-        throw new ClaimError(
-          'deps-not-merged',
-          `claimWork: leaf "${id}" has dep(s) not yet status:done — ${unmergedDeps.join(', ')} — forking from "${rootBranch}" now risks missing their content; approve/merge them into "${rootBranch}" first.`,
-        );
-      }
-    }
+  const priorVisits = visitCount(rawEvents, id);
+  const branch = branchNameFor(id);
+  const branchAlreadyExists = branchExists(repoRoot, branch);
 
-    const activeClaim = claims[id];
-    const effectiveClaimRole = item.claimRole || activeClaim?.claimRole;
+  const rootId = resolveRoot(view, id);
+  const isLeaf = rootId !== id;
+  const rootBranch = isLeaf ? branchNameFor(rootId) : undefined;
+  const rootBranchExists = isLeaf && branchExists(repoRoot, rootBranch);
+  const baseRef = rootBranchExists ? rootBranch : undefined;
 
-    const isPotentialStaleClaimReclaim = isolate
-      && (activeClaim || item.status === 'doing')
-      && (effectiveClaimRole === 'human' || effectiveClaimRole === 'session')
-      && (actor === 'session' || actor === 'human')
-      && isReclaimEligible(repoRoot, id, effectiveClaimRole);
-
-    const room = hasWorkerSlotRoom(view, {
-      ceiling: readSharedConfigOrEmpty(path.dirname(dir))?.workerSlots?.ceiling,
-      excludeId: id,
-    });
-    if (!room.allowed && !isPotentialStaleClaimReclaim) {
+  if (isolate && isLeaf) {
+    const unmergedDeps = (item.deps ?? []).filter((dep) => !isResolvedStatus(view.work[dep]));
+    if (unmergedDeps.length > 0) {
       throw new ClaimError(
-        'worker-slot-ceiling',
-        `claimWork: worker-slot ceiling reached — ${room.occupied} of ${room.ceiling} slots in use; finish or park a running item before claiming "${id}".`,
-        { occupied: room.occupied, ceiling: room.ceiling },
+        'deps-not-merged',
+        `claimWork: leaf "${id}" has dep(s) not yet status:done — ${unmergedDeps.join(', ')} — forking from "${rootBranch}" now risks missing their content; approve/merge them into "${rootBranch}" first.`,
       );
     }
+  }
 
-    // tsk-40m (docs/architect/doing-coordination-redesign.md): claim time no
-    // longer writes a durable work.move(->doing), so the ORIGINAL claim's
-    // branchHeadAtTake no longer lands on the item's own sticky top-level
-    // field (that field is only ever set by a work.move payload) — it now
-    // lives on the settle's own work.attempt, folded into item.lastAttempt.
-    const priorBranchHeadAtTake = item.lastAttempt?.branchHeadAtTake;
-    const isClaimLockReclaim = branchAlreadyExists
-      && typeof priorBranchHeadAtTake === 'string'
-      && priorBranchHeadAtTake
-      && latestTodoReleaseTrigger(rawEvents, id) === 'claim-lock-3b';
+  const activeClaim = claims[id];
+  const effectiveClaimRole = item.claimRole || activeClaim?.claimRole;
 
-    let branchHeadAtTake;
-    if (isClaimLockReclaim) {
-      branchHeadAtTake = priorBranchHeadAtTake;
-    } else if (branchAlreadyExists) {
-      branchHeadAtTake = gitAt(repoRoot, ['rev-parse', branch]).trim();
-    } else if (rootBranchExists) {
-      branchHeadAtTake = gitAt(repoRoot, ['rev-parse', rootBranch]).trim();
-    } else {
-      branchHeadAtTake = currentHead(repoRoot);
-    }
+  const isPotentialStaleClaimReclaim = isolate
+    && (activeClaim || item.status === 'doing')
+    && (effectiveClaimRole === 'human' || effectiveClaimRole === 'session')
+    && (actor === 'session' || actor === 'human')
+    && isReclaimEligible(repoRoot, id, effectiveClaimRole);
 
-    const isBranchTake = item.status === 'blocked' && branchAlreadyExists;
-    const expectedStatus = isBranchTake ? 'blocked' : 'todo';
-    const useBranchSource = isolate || isBranchTake;
+  const ceiling = readSharedConfigOrEmpty(path.dirname(dir))?.workerSlots?.ceiling;
 
-    if (
-      isolate
-      && !isBranchTake
-      && (activeClaim || item.status === 'doing')
-      && (effectiveClaimRole === 'human' || effectiveClaimRole === 'session')
-      && (actor === 'session' || actor === 'human')
-      && isReclaimEligible(repoRoot, id, effectiveClaimRole)
-    ) {
-      try {
-        let adminRelease = null;
-        if (activeClaim) {
-          // tsk-40m code-review finding (high, D4/D8): releasing a claim
-          // used to just delete the runtime claim file, with no durable
-          // trace — a reclaimed item read identical to one that never
-          // started. Record the attempt first so attemptCount/lastAttempt
-          // (replay.mjs) can tell "started then reclaimed" apart from
-          // "never started". `phase` mirrors anti-loop.mjs's own
-          // executing-stage check (claim-lock) so a reclaim of a clarify/
-          // decompose-phase claim never inflates the execute-phase budget.
-          const claimDomain = getDomain(item.domain);
-          const claimPhase = effectiveStep(item, claimDomain) === stepForPhase(claimDomain, 'execute', item.kind)
-            ? 'execute'
-            : (item.workflowStep || 'unknown');
-          recordClaimAttempt(dir, { id, phase: claimPhase, result: 'reclaimed', claimId: activeClaim.claimId, actor: activeClaim.actor });
-          // Another session's claim, past its liveness threshold: released
-          // through the named admin path, never the owner-only default.
-          const rel = releaseClaim(dir, { id, claimId: activeClaim.claimId, adminReason: 'stale-claim-reclaim' });
-          if (rel.admin) adminRelease = { ...rel.admin, claimId: activeClaim.claimId };
-        } else if (item.status === 'doing') {
-          moveWork(dir, { id, to: 'todo', expectedStatus: 'doing' });
-        }
-        const activityAt = lastActivityAt(repoRoot, id);
-        addDecision(dir, {
-          id,
-          text: `stale-claim-reclaim: released ${effectiveClaimRole} claim (last activity ${activityAt === null ? 'unknown' : new Date(activityAt).toISOString()})`,
-          source: 'claimWork',
-          kind: 'engine',
-          rationale: `docs/history/session-claim-liveness/CONTEXT.md D2/D4/D5 — worktree activity signal past the ${effectiveClaimRole === 'runner' ? 'agentMs' : 'humanMs'} threshold, reclaimed by a live ${actor} claim attempt`,
-          // Another writer's claim was released: keep who owned it and who released it.
-          ...(adminRelease ? { admin: adminRelease } : {}),
-        });
-      } catch (err) {
-        if (!(err instanceof FsmError) || err.category !== 'conflict') throw err;
+  // tsk-40m (docs/architect/doing-coordination-redesign.md): claim time no
+  // longer writes a durable work.move(->doing), so the ORIGINAL claim's
+  // branchHeadAtTake no longer lands on the item's own sticky top-level
+  // field (that field is only ever set by a work.move payload) — it now
+  // lives on the settle's own work.attempt, folded into item.lastAttempt.
+  const priorBranchHeadAtTake = item.lastAttempt?.branchHeadAtTake;
+  const isClaimLockReclaim = branchAlreadyExists
+    && typeof priorBranchHeadAtTake === 'string'
+    && priorBranchHeadAtTake
+    && latestTodoReleaseTrigger(rawEvents, id) === 'claim-lock-3b';
+
+  let branchHeadAtTake;
+  if (isClaimLockReclaim) {
+    branchHeadAtTake = priorBranchHeadAtTake;
+  } else if (branchAlreadyExists) {
+    branchHeadAtTake = resolveRefSha(repoRoot, branch);
+  } else if (rootBranchExists) {
+    branchHeadAtTake = resolveRefSha(repoRoot, rootBranch);
+  } else {
+    branchHeadAtTake = head;
+  }
+
+  const isBranchTake = item.status === 'blocked' && branchAlreadyExists;
+  const expectedStatus = isBranchTake ? 'blocked' : 'todo';
+  const useBranchSource = isolate || isBranchTake;
+
+  if (
+    isolate
+    && !isBranchTake
+    && (activeClaim || item.status === 'doing')
+    && (effectiveClaimRole === 'human' || effectiveClaimRole === 'session')
+    && (actor === 'session' || actor === 'human')
+    && isReclaimEligible(repoRoot, id, effectiveClaimRole)
+  ) {
+    try {
+      let adminRelease = null;
+      if (activeClaim) {
+        // tsk-40m code-review finding (high, D4/D8): releasing a claim
+        // used to just delete the runtime claim file, with no durable
+        // trace — a reclaimed item read identical to one that never
+        // started. Record the attempt first so attemptCount/lastAttempt
+        // (replay.mjs) can tell "started then reclaimed" apart from
+        // "never started". `phase` mirrors anti-loop.mjs's own
+        // executing-stage check (claim-lock) so a reclaim of a clarify/
+        // decompose-phase claim never inflates the execute-phase budget.
+        const claimDomain = getDomain(item.domain);
+        const claimPhase = effectiveStep(item, claimDomain) === stepForPhase(claimDomain, 'execute', item.kind)
+          ? 'execute'
+          : (item.workflowStep || 'unknown');
+        recordClaimAttempt(dir, { id, phase: claimPhase, result: 'reclaimed', claimId: activeClaim.claimId, actor: activeClaim.actor });
+        // Another session's claim, past its liveness threshold: released
+        // through the named admin path, never the owner-only default.
+        const rel = releaseClaim(dir, { id, claimId: activeClaim.claimId, adminReason: 'stale-claim-reclaim' });
+        if (rel.admin) adminRelease = { ...rel.admin, claimId: activeClaim.claimId };
+      } else if (item.status === 'doing') {
+        moveWork(dir, { id, to: 'todo', expectedStatus: 'doing' });
       }
+      const activityAt = lastActivityAt(repoRoot, id);
+      addDecision(dir, {
+        id,
+        text: `stale-claim-reclaim: released ${effectiveClaimRole} claim (last activity ${activityAt === null ? 'unknown' : new Date(activityAt).toISOString()})`,
+        source: 'claimWork',
+        kind: 'engine',
+        rationale: `docs/history/session-claim-liveness/CONTEXT.md D2/D4/D5 — worktree activity signal past the ${effectiveClaimRole === 'runner' ? 'agentMs' : 'humanMs'} threshold, reclaimed by a live ${actor} claim attempt`,
+        // Another writer's claim was released: keep who owned it and who released it.
+        ...(adminRelease ? { admin: adminRelease } : {}),
+      });
+    } catch (err) {
+      if (!(err instanceof FsmError) || err.category !== 'conflict') throw err;
     }
+  }
 
-    // tsk-40m code-review finding (blocker, TOCTOU): re-read the durable
-    // view FRESH here, ALWAYS — not only when this call's own reclaim
-    // block wrote something. Everything between the `durableView` snapshot
-    // read at the top of this call and this point (worker-slot check,
-    // branch/rev-parse git calls, the stale-claim-reclaim block's own
-    // liveness check) takes real wall-clock time with no lock held — long
-    // enough for a genuinely DIFFERENT process's moveWork/settleClaim to
-    // durably move this item without this call ever seeing it. Wrapped in
-    // the SAME events.lock every durable writer serializes on (even though
-    // acquireClaim itself never appends an event) so no other durable
-    // write can land between this read and the runtime claim actually
-    // being written — the read-validate-write sequence is now atomic with
-    // respect to every other writer, not just this call's own prior
-    // reclaim.
-    // acquireClaim takes claims.lock inside events.lock, for the main
-    // checkout's .fgos: resolve that identity now, before either lock.
-    resolveWriterIdentity(getMainFgosDir(dir));
-    const runtimeClaim = withEventsLock(path.join(dir, 'events.jsonl'), () => {
-      const freshDurableView = foldEvents(readRawEvents(dir));
-      const freshStatus = freshDurableView.work[id]?.status;
-      if (freshStatus !== expectedStatus) {
+  // tsk-40m code-review finding (blocker, TOCTOU): everything above took real
+  // wall-clock time with no lock held, long enough for a genuinely DIFFERENT
+  // process to durably move this item or take the last worker slot. So the
+  // fresh read, the status check, the worker-slot ceiling check and the
+  // claim write are one `state` transaction: no other durable write or claim
+  // can land between the read and the claim file being written.
+  const runtimeClaim = withMainState(dir, (tx) => {
+    const freshDurableView = foldEvents(readRawEvents(dir));
+    const freshStatus = freshDurableView.work[id]?.status;
+    if (freshStatus !== expectedStatus) {
+      throw new ClaimError(
+        'conflict',
+        `claimWork: expected "${id}" durable status "${expectedStatus}" but found "${freshStatus}" (durable state changed since read)`,
+      );
+    }
+    const freshRevision = getItemDurableRevision(freshDurableView, id);
+
+    if (!isPotentialStaleClaimReclaim) {
+      const room = hasWorkerSlotRoom(buildEffectiveView(freshDurableView, readClaims(dir)), { ceiling, excludeId: id });
+      if (!room.allowed) {
         throw new ClaimError(
-          'conflict',
-          `claimWork: expected "${id}" durable status "${expectedStatus}" but found "${freshStatus}" (durable state changed since read)`,
+          'worker-slot-ceiling',
+          `claimWork: worker-slot ceiling reached — ${room.occupied} of ${room.ceiling} slots in use; finish or park a running item before claiming "${id}".`,
+          { occupied: room.occupied, ceiling: room.ceiling },
         );
       }
-      const freshRevision = getItemDurableRevision(freshDurableView, id);
-
-      return acquireClaim(dir, {
-        id,
-        actor,
-        source: useBranchSource ? 'branch' : 'main',
-        branch: useBranchSource ? branch : undefined,
-        branchHeadAtTake: useBranchSource ? branchHeadAtTake : undefined,
-        headAtTake: useBranchSource ? undefined : currentHead(repoRoot),
-        claimTrigger,
-        preClaimStatus: freshStatus,
-        preClaimRevision: freshRevision,
-        claimRole: actor,
-      });
-    }, dir);
-
-    if (!skipOutcome) {
-      addOutcome(dir, {
-        id,
-        predicted: {
-          size: item.size ?? DEFAULTS.size,
-          deps: item.deps?.length ?? 0,
-          priorVisits,
-          role: actor,
-          branchHeadAtTake: useBranchSource ? branchHeadAtTake : undefined,
-          headAtTake: useBranchSource ? undefined : currentHead(repoRoot),
-        },
-      });
     }
 
-    const claim = {
+    return acquireClaimTx(tx, {
       id,
-      claimId: runtimeClaim.claimId,
-      from: expectedStatus,
-      to: 'doing',
-      role: actor,
-      seq: runtimeClaim.claimId,
+      actor,
       source: useBranchSource ? 'branch' : 'main',
       branch: useBranchSource ? branch : undefined,
       branchHeadAtTake: useBranchSource ? branchHeadAtTake : undefined,
-      headAtTake: useBranchSource ? undefined : currentHead(repoRoot),
-    };
+      headAtTake: useBranchSource ? undefined : head,
+      claimTrigger,
+      preClaimStatus: freshStatus,
+      preClaimRevision: freshRevision,
+      claimRole: actor,
+    });
+  });
 
-    if (isolate) {
-      let worktree;
-      try {
-        worktree = createClaimWorktree(repoRoot, id, { worktreeDir, baseRef, beforeProvision: () => lockResult.release() });
-      } catch (err) {
-        releaseClaim(dir, { id, claimId: runtimeClaim.claimId });
-        throw err;
-      }
-      return { ...claim, worktree };
-    }
-
-    return claim;
-  } finally {
-    // Always release lock after claim completes (success or failure). Goes
-    // through lockResult.release() (tsk-45z), not the raw
-    // releaseMainCheckoutLock -- the ACQUIRED result's release() is also
-    // what un-registers the releaseOnExit crash-safety listeners above;
-    // calling the raw function directly would leave those listeners
-    // attached for the rest of this process's life, leaking 3 per call in
-    // a long-running runner that claims many items in sequence.
-    lockResult.release();
+  if (!skipOutcome) {
+    addOutcome(dir, {
+      id,
+      predicted: {
+        size: item.size ?? DEFAULTS.size,
+        deps: item.deps?.length ?? 0,
+        priorVisits,
+        role: actor,
+        branchHeadAtTake: useBranchSource ? branchHeadAtTake : undefined,
+        headAtTake: useBranchSource ? undefined : head,
+      },
+    });
   }
+
+  const claim = {
+    id,
+    claimId: runtimeClaim.claimId,
+    from: expectedStatus,
+    to: 'doing',
+    role: actor,
+    seq: runtimeClaim.claimId,
+    source: useBranchSource ? 'branch' : 'main',
+    branch: useBranchSource ? branch : undefined,
+    branchHeadAtTake: useBranchSource ? branchHeadAtTake : undefined,
+    headAtTake: useBranchSource ? undefined : head,
+  };
+
+  if (!isolate) return claim;
+  let worktree;
+  try {
+    // A fresh branch forks from the same commit the claim recorded; the
+    // worktree-admin mutex (rank 40) is taken here, with no other lock held.
+    worktree = createClaimWorktree(repoRoot, id, { worktreeDir, baseRef, startSha: head, scope });
+  } catch (err) {
+    releaseClaim(dir, { id, claimId: runtimeClaim.claimId });
+    throw err;
+  }
+  return { ...claim, worktree };
 }

@@ -170,9 +170,13 @@ machineReleaseStore:
       docs/
   installs/
     <activationId>.json
-  install.lock
+  locks/
+    install.lock            # kernel lock (holder-lock), machine scope
   quarantine/
 ```
+
+The workspace activation lock is the kernel lock `.fgos/locks/activation.lock`; the legacy
+`.fgos/installation/activation.lock` and `<store>/install.lock` are tombstone directories.
 
 The separation is architectural:
 
@@ -465,10 +469,13 @@ Publishing must be atomic from the perspective of invocations. A project
 command must see either the previous ready workspace binding or the new ready
 workspace binding, never a half-prepared runtime.
 
-`fgctl` must hold the release store `install.lock` before staging, verifying,
-repairing, upgrading, rolling back, or quarantining release content. It must
-also hold a workspace activation lock before writing that workspace's
-`activation.json`. Projection writes are not part of the activation publish;
+`fgctl` must hold the release store install lock (kernel lock
+`<store>/locks/install.lock`) before staging, verifying, repairing, upgrading,
+rolling back, or quarantining release content. It must also hold the workspace
+activation lock (kernel lock `.fgos/locks/activation.lock`) before writing that
+workspace's `activation.json`. Both are kernel locks without TTL or stale
+reclaim: a killed holder frees the lock at once. On Windows the same
+locks work through the Windows lock driver (`LockFileEx`). Projection writes are not part of the activation publish;
 they belong to local `fgos init` / `fgos doctor --fix` under projection locks
 defined by workspace topology.
 
@@ -1027,7 +1034,7 @@ fgctl resolves TopologyContext:
   repositoryId, workspaceId, workStateId,
   machineReleaseStore, workHistoryRoot, runtimeCoordinationRoot,
   workspace installation root
-fgctl acquires install.lock
+fgctl acquires the install lock (<store>/locks/install.lock)
 fgctl obtains a release payload
 fgctl stages release under machineReleaseStore/releases/<artifactDigest>/
 fgctl verifies ReleaseManifest

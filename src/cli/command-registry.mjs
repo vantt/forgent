@@ -84,8 +84,14 @@ export const COMMAND_REGISTRY = [
     name: 'version',
     invoke: 'fgos version',
     description: 'Report this build\'s own package version, git commit (when resolvable), and the full verb set it dispatches -- the hook-safe, scriptable way to tell an old install apart from a current checkout without reading node_modules directly (tsk-2ej). Works with no .fgos/ store present.',
-    parameters: { type: 'object', properties: {}, required: [] },
-    examples: ['fgos version'],
+    parameters: {
+      type: 'object',
+      properties: {
+        'runtime-json': { type: 'boolean', description: 'Also report the running release (host, artifact digest) next to the package version.' },
+      },
+      required: [],
+    },
+    examples: ['fgos version', 'fgos version --runtime-json'],
     touchesState: false,
     requiresExistingStore: false,
     externalEffect: false,
@@ -393,9 +399,12 @@ export const COMMAND_REGISTRY = [
     name: 'add',
     invoke: 'fgos add',
     description: 'Add a work item directly with explicit fields (title/kind/risk/verify/description required). Omit id to auto-generate a collision-free "tsk-<hash>" id from title, same generator submit uses.',
+    retiredFlags: ['tier'],
     parameters: {
       type: 'object',
       properties: {
+        step: { type: 'string', description: "Workflow step the item enters at (e.g. discovery/planning/executing); omit for the default entry step." },
+        'domain-fields': { type: 'string', description: "JSON-encoded object ({ [domainName]: {...} }) of domain-specific fields." },
         id: { type: 'string', description: 'Optional work item id (positional or --id); omit to auto-generate one from --title.' },
         title: { type: 'string', description: 'Work item title.' },
         kind: { type: 'string', description: 'Work item kind.' },
@@ -441,9 +450,17 @@ export const COMMAND_REGISTRY = [
     name: 'submit',
     invoke: 'fgos submit',
     description: 'Intake a free-text description: derives the title, classifies tier/kind/risk, auto-generates an id, and adds the item.',
+    retiredFlags: ['tier'],
     parameters: {
       type: 'object',
       properties: {
+        unattended: { type: 'boolean', description: "Synonym of --async: do not wait for the discovery/planning run." },
+        refs: { type: 'string', description: "Comma-separated reference ids/links." },
+        parent: { type: 'string', description: "Lineage parent id." },
+        footprint: { type: 'string', description: "Comma-separated file paths the item is expected to touch." },
+        targets: { type: 'string', description: "Comma-separated target ids." },
+        urgent: { type: 'string', description: "Urgency: low/medium/high/critical." },
+        'goal-tier': { type: 'string', description: "Goal tier: mvp or milestone." },
         text: { type: 'string', description: 'Free-text description of the work (positional).' },
         async: { type: 'boolean', description: 'Mark as async/unattended (submitter does not stay to collaborate). Alias: --unattended.' },
         backlog: { type: 'boolean', description: 'Create the item directly at status "backlog" (an idea not yet committed to) instead of the default "todo". Promoting it to todo later is a human-only decision.' },
@@ -472,9 +489,11 @@ export const COMMAND_REGISTRY = [
     name: 'discover',
     invoke: 'fgos discover',
     description: 'Run context-discovery for an item at stage discovery or exploring, or query/advance its Workflow run if bound to one. A clear verdict moves the item forward to planning; an unclear verdict at discovery moves it on to exploring and parks it in awaiting-human. When bound to a workflow run, delegates to or reports workflow step status with clear guidance on the unified "fgos workflow" door. Errors if the item is at any other stage -- use "plan" for a planning-stage item. --verdict lets a caller that already reasoned about clarity supply its own verdict directly.',
+    retiredFlags: ['tier'],
     parameters: {
       type: 'object',
       properties: {
+        worktree: { type: 'string', description: "Worktree path when resuming an existing discovery run." },
         id: { type: 'string', description: 'Work item id (positional or --id).' },
         config: { type: 'string', description: 'Path to the runner config (default .fgos/config.json in cwd).' },
         verdict: { type: 'string', description: 'Optional caller-supplied verdict: "clear" or "unclear". Omit it only when the item already carries a committed, non-empty CONTEXT.md under its docsRef -- that readLockedContext trust signal advances the item without a verdict. With neither, the call refuses: no subprocess judge stands behind this verb anymore.' },
@@ -504,6 +523,7 @@ export const COMMAND_REGISTRY = [
     parameters: {
       type: 'object',
       properties: {
+        worktree: { type: 'string', description: "Worktree path when resuming an existing planning run." },
         id: { type: 'string', description: 'Work item id (positional or --id).' },
         config: { type: 'string', description: 'Path to the runner config (default .fgos/config.json in cwd).' },
         verdict: { type: 'string', description: 'Optional caller-supplied verdict: "pass-through", "need-human", or "decompose" (this value name is unchanged, tsk-403 D11 -- it names an outcome, not a stage). Omit it only when the item\'s plan.md declares tiny/small mode -- that skip-and-advance trust signal passes the item through without a verdict. With neither, the call refuses: no subprocess judge stands behind this verb anymore.' },
@@ -531,6 +551,7 @@ export const COMMAND_REGISTRY = [
     parameters: {
       type: 'object',
       properties: {
+        'override-reason': { type: 'string', description: "Reason recorded when moving to delivered over an unmet gate." },
         id: { type: 'string', description: 'Work item id (positional or --id).' },
         to: { type: 'string', description: 'Target status to move to.' },
         expect: { type: 'string', description: 'Optional CAS guard: the expected current status.' },
@@ -610,9 +631,17 @@ export const COMMAND_REGISTRY = [
     name: 'edit',
     invoke: 'fgos edit',
     description: 'Patch fields on an existing item (title/description/kind/risk/verify/tier/refs/deps/footprint/action/acceptance/priority/intent/docs-ref/parent/urgent/impact/effort/merge-after). At least one field must be given.',
+    retiredFlags: ['tier'],
     parameters: {
       type: 'object',
       properties: {
+        role: { type: 'string', description: "Acting role: human (default) or session." },
+        duplicates: { type: 'string', description: "Comma-separated ids this item duplicates (empty string clears)." },
+        'domain-fields': { type: 'string', description: "JSON-encoded object ({ [domainName]: {...} }) of domain-specific fields." },
+        'goal-tier': { type: 'string', description: "Goal tier: mvp or milestone." },
+        'superseded-by': { type: 'string', description: "Id of the item that supersedes this one (empty string clears)." },
+        'verify-from-children': { type: 'boolean', description: "Derive the verify command from the children items." },
+        'verify-from-targets': { type: 'boolean', description: "Derive the verify command from the item targets." },
         id: { type: 'string', description: 'Work item id (positional or --id).' },
         title: { type: 'string', description: 'New title.' },
         description: { type: 'string', description: 'New full-text intake description. Must be a non-empty string when present -- unlike refs/deps/footprint, an empty value is rejected as validation rather than clearing the field.' },
@@ -652,6 +681,7 @@ export const COMMAND_REGISTRY = [
     parameters: {
       type: 'object',
       properties: {
+        role: { type: 'string', description: "Acting role: human (default) or session." },
         id: { type: 'string', description: 'Work item id (positional or --id).' },
         note: { type: 'string', description: 'Human-confirmed rationale/note for clearing the stale reason (required).' },
       },
@@ -672,6 +702,7 @@ export const COMMAND_REGISTRY = [
     parameters: {
       type: 'object',
       properties: {
+        source: { type: 'string', description: "Where the question came from." },
         id: { type: 'string', description: 'Work item id (positional or --id).' },
         text: { type: 'string', description: 'The question text.' },
         expect: { type: 'string', description: 'Optional CAS guard: the expected current status.' },
@@ -693,6 +724,9 @@ export const COMMAND_REGISTRY = [
     parameters: {
       type: 'object',
       properties: {
+        rationale: { type: 'string', description: "Why this answer." },
+        alternatives: { type: 'string', description: "Alternatives that were considered." },
+        source: { type: 'string', description: "Where the answer came from." },
         id: { type: 'string', description: 'Work item id (positional or --id).' },
         text: { type: 'string', description: 'The answer text.' },
         approve: { type: 'boolean', description: 'The owner explicitly approves what the question proposed; only this releases a consent gate. Without it the answer is a clarification and the item is asked again.' },
@@ -715,6 +749,7 @@ export const COMMAND_REGISTRY = [
     parameters: {
       type: 'object',
       properties: {
+        'open-sync-depth': { type: 'integer', description: "Non-negative depth of open-sync context to include." },
         id: { type: 'string', description: 'Work item id (positional or --id).' },
         to: { type: 'string', description: 'The role being called (must have a legal edge from the item\'s current holder at its current stage).' },
         reason: { type: 'string', description: 'One of advise/assist/review/consult — must match the registered edge\'s own reason.' },
@@ -786,6 +821,7 @@ export const COMMAND_REGISTRY = [
     parameters: {
       type: 'object',
       properties: {
+        kind: { type: 'string', description: "Decision kind (default design)." },
         text: { type: 'string', description: 'Decision text (or pass as positional words, joined with spaces).' },
         rationale: { type: 'string', description: 'Why this decision was made (required, mirrors bee\'s decisions.jsonl).' },
         alternatives: { type: 'string', description: 'What was considered and rejected, and why (optional).' },
@@ -877,6 +913,8 @@ export const COMMAND_REGISTRY = [
     parameters: {
       type: 'object',
       properties: {
+        id: { type: 'string', description: "Work item id to list." },
+        fields: { type: 'string', description: "Comma-separated fields to project." },
         all: { type: 'boolean', description: 'Include done/wontfix items too (default: open-only, status not "done"/"wontfix").' },
         cursor: { type: 'string', description: 'Opaque pagination cursor from a prior call\'s nextCursor; omit to start from the beginning.' },
         limit: { type: 'integer', description: 'Max items per page (default 50 when cursor/limit is used); omit both flags to get the unpaginated full map.' },
@@ -897,6 +935,7 @@ export const COMMAND_REGISTRY = [
     parameters: {
       type: 'object',
       properties: {
+        phase: { type: 'string', description: "Restrict to one phase." },
         cursor: { type: 'string', description: 'Opaque pagination cursor from a prior call\'s nextCursor; omit to start from the beginning.' },
         limit: { type: 'integer', description: 'Max items per page (default 50 when cursor/limit is used); omit both flags to get the unpaginated full array.' },
       },
@@ -1061,7 +1100,13 @@ export const COMMAND_REGISTRY = [
     name: 'schedule',
     invoke: 'fgos schedule',
     description: 'Read-only computed-parallel-wave-schedule (tsk-3c7): which frontier items can dispatch in parallel right now, packed into waves by declared-footprint conflict (a conflicting item is deferred to a later wave, never refused — same advisory stance `fgos conflicts` already has), plus `cycles` — a dep-graph cycle check over the whole work map regardless of status. Derived-never-stored, same discipline `fgos graph`/`fgos conflicts` already use.',
-    parameters: { type: 'object', properties: {}, required: [] },
+    parameters: {
+      type: 'object',
+      properties: {
+        candidates: { type: 'string', description: "Comma-separated candidate item ids." },
+      },
+      required: [],
+    },
     examples: ['fgos schedule'],
     touchesState: false,
     requiresExistingStore: false,
@@ -1134,8 +1179,8 @@ export const COMMAND_REGISTRY = [
   }),
   withSubcommands({
     name: 'dispatch',
-    invoke: 'fgos dispatch <show-run|inspect|watch|recover|reconcile|decide|probe-account> [args]',
-    description: 'Dispatch-owned reads and repairs; it runs no work itself (one task runs through `fgos run`, planned work through `fgos workflow start`). "decide" answers which mechanism and executor a dispatch resolves to; "show-run"/"watch"/"inspect" read Run state; "recover" observes or applies recovery of a STANDALONE Run; "reconcile" is a narrow, local CAS-guarded guard repair plus provider-capacity quarantine door that never recovers, launches, signals, or controls a Run; "probe-account" is a diagnostic over one provider account.',
+    invoke: 'fgos dispatch <show-run|inspect|watch|recover|reconcile|decide|explain|probe-account> [args]',
+    description: 'Dispatch-owned reads and repairs; it runs no work itself (one task runs through `fgos run`, planned work through `fgos workflow start`). "decide" answers which mechanism and executor a dispatch resolves to; "explain" lays out why a capability binds to its family, tier, model and invocation; "show-run"/"watch"/"inspect" read Run state; "recover" observes or applies recovery of a STANDALONE Run; "reconcile" is a narrow, local CAS-guarded guard repair plus provider-capacity quarantine door that never recovers, launches, signals, or controls a Run; "probe-account" is a diagnostic over one provider account.',
     subcommands: {
       'show-run': {
         description: 'Read one Run\'s recorded state.',
@@ -1217,7 +1262,7 @@ export const COMMAND_REGISTRY = [
             action: { type: 'string', description: '"plan" only: the action kind to plan, one of "clear-cwd-lock" (default), "collect-result" (requires --run), or "repair-projection" (requires --run).' },
             run: { type: 'string', description: '"plan" only: target runId for collect-result or repair-projection.' },
             'run-id': { type: 'string', description: '"plan" only: same as --run.' },
-            cwd: { type: 'string', description: '"plan" only: the working directory whose per-cwd dispatch lock clear-cwd-lock targets (default: the current directory).' },
+            cwd: { type: 'string', description: '"plan" only: the working directory whose per-cwd dispatch lock clear-cwd-lock reports on (default: the current directory).' },
             plan: { type: 'string', description: '"apply" only: JSON-encoded plan returned by `dispatch reconcile plan`.' },
             provider: { type: 'string', description: 'provider-capacity: provider id as `inspect --provider-capacity` lists it, e.g. openai-codex.' },
             account: { type: 'string', description: 'provider-capacity: account id from ~/.fgos/config.json.' },
@@ -1260,6 +1305,18 @@ export const COMMAND_REGISTRY = [
           'fgos dispatch decide --work tsk-abc --stage planning',
         ],
       },
+      explain: {
+        description: 'Why a capability binds where it does, read-only: binds it as a run would (bind()), then reports the family and the prefer entry that chose it, the tier, its source (rigor, override) and its ceiling (runner.maxTier, or the capability\'s own rigor when that is higher), the whole tier cell with the entry that runs (used, fallback-same-pool, or pending-pool-routing for an entry served by another pool), the executor and invocation, and the accounts of the family\'s pool in the provider account inventory and in runner.llmAccounts. Leases, spawns and writes nothing.',
+        parameters: {
+          type: 'object',
+          properties: {
+            for: { type: 'string', description: 'The capability to explain.' },
+            rigor: { type: 'string', description: 'The unit rigor to bind with (low, standard, high, critical); omitted, the capability\'s own rigor applies.' },
+          },
+          required: ['for'],
+        },
+        examples: ['fgos dispatch explain --for code:implement', 'fgos dispatch explain --for architecture:synthesize --rigor critical'],
+      },
       'probe-account': {
         description: 'Diagnostic: start every CLI configured for one provider account at the same moment through the real dispatch door (confinement, leased login, herdr pane) with a read-only prompt; report per CLI an outcome class (ok, blocked-trust-prompt, auth, quota, sandbox, timeout, other) with its evidence line and run/pane refs plus an account-fault vs cli-fault verdict, and close the panes it opened. Selects and schedules nothing.',
         parameters: {
@@ -1301,6 +1358,7 @@ export const COMMAND_REGISTRY = [
       type: 'object',
       positional: ['prompt'],
       properties: {
+        'stance-options': { type: 'string', description: "Pipe-separated stance options for a council run." },
         prompt: { type: 'string', description: 'One-liner: the objective of a Unit built from the flags below (id adhoc-<slug>-<hex>). Use instead of --unit.' },
         provider: { type: 'string', description: 'One-liner: comma-separated executor ids the Unit prefers, ahead of the capability\'s pool; still filtered like the pool (governance, independence, posture), and an --override executor still pins.' },
         persona: { type: 'string', description: 'One-liner: persona name for the Unit; must resolve (fgos/agents, domains/*/agents, core/agents) before the run starts.' },
@@ -1434,6 +1492,7 @@ export const COMMAND_REGISTRY = [
     parameters: {
       type: 'object',
       properties: {
+        via: { type: 'string', description: "Trigger stamped as the claim trigger." },
         id: { type: 'string', description: 'Optional work item id (positional or --id); omit to pick the frontier head.' },
         wait: { type: 'number', description: 'Retry-with-backoff on lock contention is on by default (bounded by the lock\'s own remaining TTL); pass a millisecond value to tighten that wait budget.' },
         'no-wait': { type: 'boolean', description: 'Disable the default retry-with-backoff and fail immediately on lock contention instead of waiting.' },
@@ -1455,6 +1514,9 @@ export const COMMAND_REGISTRY = [
     parameters: {
       type: 'object',
       properties: {
+        'no-new-commits-ok': { type: 'boolean', description: "Accept a branch with no new commits." },
+        'worker-verified-sha': { type: 'string', description: "Commit the worker verified." },
+        'no-timeout': { type: 'boolean', description: "Run the verify command without a time limit." },
         id: { type: 'string', description: 'Work item id (positional or --id).' },
         timeout: { type: 'number', description: 'Optional verify timeout in milliseconds.' },
         to: { type: 'string', description: 'Target status (e.g. "blocked"). When set to "blocked", settles the claim into blocked without requiring branch progress or running verify.' },
@@ -1499,6 +1561,8 @@ export const COMMAND_REGISTRY = [
     parameters: {
       type: 'object',
       properties: {
+        'trust-dir': { type: 'boolean', description: "Derive the repo root from --dir instead of the cwd." },
+        'no-timeout': { type: 'boolean', description: "Run the verify command without a time limit." },
         id: { type: 'string', description: 'Work item id (positional or --id).' },
         timeout: { type: 'number', description: 'Optional verify timeout in milliseconds.' },
         github: { type: 'boolean', description: 'Merge a prior review --github PR through GitHub instead of a local git merge.' },
@@ -1525,6 +1589,11 @@ export const COMMAND_REGISTRY = [
     parameters: {
       type: 'object',
       properties: {
+        'trust-dir': { type: 'boolean', description: "Derive the repo root from --dir instead of the cwd." },
+        github: { type: 'boolean', description: "Use the PR flow." },
+        pr: { type: 'string', description: "PR number for the PR flow." },
+        'acknowledge-drift': { type: 'boolean', description: "Proceed despite root drift." },
+        'no-timeout': { type: 'boolean', description: "Run the verify command without a time limit." },
         id: { type: 'string', description: 'Root work item id (positional or --id).' },
         timeout: { type: 'number', description: 'Optional verify timeout in milliseconds.' },
         'acknowledge-iron-law': { type: 'boolean', description: 'Acknowledge the Iron Law gate for a self-modifying runner diff before merging.' },
@@ -1548,6 +1617,7 @@ export const COMMAND_REGISTRY = [
     parameters: {
       type: 'object',
       properties: {
+        'trust-dir': { type: 'boolean', description: "Derive the repo root from --dir instead of the cwd." },
         ids: { type: 'string', description: 'Comma-separated list of at least 2 flat sibling item ids (or pass them as positional args).' },
         'root-id': { type: 'string', description: 'Promote this existing member to root instead of creating a new item (D1 reuse-member path).' },
         'root-title': { type: 'string', description: 'Title for a freshly created root item (D1 new-item path) — required when --root-id is omitted.' },
@@ -1593,6 +1663,7 @@ export const COMMAND_REGISTRY = [
     parameters: {
       type: 'object',
       properties: {
+        'no-timeout': { type: 'boolean', description: "Run the verify command without a time limit." },
         id: { type: 'string', description: 'Work item id (positional or --id).' },
         timeout: { type: 'number', description: 'Optional verify timeout in milliseconds.' },
       },
@@ -1684,7 +1755,22 @@ export const COMMAND_REGISTRY = [
     name: 'topic',
     invoke: 'fgos topic <subcommand>',
     description: 'Manage knowledge topics (register, split, merge, rename, retire).',
-    parameters: { type: 'object', properties: {}, required: [] },
+    parameters: {
+      type: 'object',
+      properties: {
+        entities: { type: 'string', description: "Comma-separated entity names." },
+        into: { type: 'string', description: "JSON array of target topics (split)." },
+        sources: { type: 'string', description: "Comma-separated source topic ids (merge)." },
+        'topic-id': { type: 'string', description: "Topic id." },
+        'purpose-slug': { type: 'string', description: "Purpose slug." },
+        'purpose-title': { type: 'string', description: "Purpose title." },
+        'new-purpose-slug': { type: 'string', description: "New purpose slug (rename)." },
+        'new-purpose-title': { type: 'string', description: "New purpose title (rename)." },
+        'new-topics': { type: 'string', description: "JSON array of new topics (split), alias of --into." },
+        'target-topic': { type: 'string', description: "Topic id receiving a merge or retirement." },
+      },
+      required: [],
+    },
     examples: [
       'fgos topic register worktree-reclaim --purpose-slug worktree-reclaim',
       'fgos topic rename worktree-reclaim --new-purpose-slug worktree-management',
@@ -1699,7 +1785,23 @@ export const COMMAND_REGISTRY = [
     name: 'doc',
     invoke: 'fgos doc <subcommand>',
     description: 'Manage knowledge doc slots and lifecycles (reserve, register, mark-rendered, move-path, promote, demote, supersede, retire).',
-    parameters: { type: 'object', properties: {}, required: [] },
+    parameters: {
+      type: 'object',
+      properties: {
+        role: { type: 'string', description: "Doc role (also accepted as positional)." },
+        framework: { type: 'string', description: "Doc framework (default diataxis)." },
+        mode: { type: 'string', description: "Doc mode (default explanation)." },
+        lifecycle: { type: 'string', description: "Doc lifecycle (default provisional)." },
+        aliases: { type: 'string', description: "Comma-separated aliases." },
+        'topic-id': { type: 'string', description: "Topic id." },
+        'doc-path': { type: 'string', description: "Doc path." },
+        'doc-id': { type: 'string', description: "Doc id." },
+        'source-captures': { type: 'string', description: "Comma-separated source capture ids." },
+        'new-path': { type: 'string', description: "New path (move)." },
+        'superseded-by': { type: 'string', description: "Doc id that supersedes this one." },
+      },
+      required: [],
+    },
     examples: [
       'fgos doc reserve worktree-reclaim guide docs/worktree-reclaim/guide.md',
       'fgos doc promote worktree-reclaim guide',
@@ -1714,7 +1816,14 @@ export const COMMAND_REGISTRY = [
     name: 'knowledge',
     invoke: 'fgos knowledge <subcommand>',
     description: 'Knowledge ecosystem verbs: status (view summary) and attest (validate a doc path and record the required --capture-id linkage).',
-    parameters: { type: 'object', properties: {}, required: [] },
+    parameters: {
+      type: 'object',
+      properties: {
+        'doc-path': { type: 'string', description: "Doc path." },
+        'capture-id': { type: 'string', description: "Capture id (attest)." },
+      },
+      required: [],
+    },
     examples: ['fgos knowledge status', 'fgos knowledge attest --doc-path docs/worktree/guide.md --capture-id tsk-123'],
     // tsk-28x code review finding: `status`/`attest` both call `rebuild(dir)`,
     // which requires a real `.fgos` store -- `requiresExistingStore: false`
@@ -1992,26 +2101,38 @@ export const COMMAND_REGISTRY = [
     paginated: false,
     deprecated: null,
   },
-  {
-    name: 'unlock',
-    invoke: 'fgos unlock',
-    description: 'Safely clears .fgos/main-checkout.lock (the STR65 concurrent-writer guard) when it is stale or corrupt. Never force-deletes: refuses and reports the holder identity when a different session genuinely still holds it live.',
-    parameters: {
-      type: 'object',
-      properties: {},
-      required: [],
+  withSubcommands({
+    name: 'lock',
+    invoke: 'fgos lock fence <name>',
+    description: 'Stop the process that holds a registry lock so the lock can be taken again. Lists the holders (pid, start time, command line), asks for confirmation (--yes skips it), sends SIGTERM by identity, waits 5 s, sends SIGKILL, then asks the kernel with a probe whether the lock is free. A lock is never taken from a live holder: with no listable holder (a platform without /proc) the caller stops it, then --attest-stopped only re-checks the lock. Lock names: fgos lock-status.',
+    subcommands: {
+      fence: {
+        description: 'Fence the holder(s) of one registry lock. Reports free (exit 0) when nobody holds it.',
+        parameters: {
+          type: 'object',
+          properties: {
+            name: { type: 'string', description: 'Positional: the registry lock name (e.g. main-checkout, merge-slot, worktree-admin, gateway).' },
+            param: { type: 'string', description: 'Repeatable key=value for a lock path parameter the verb cannot know (e.g. --param ref=main for merge-slot, --param provider=codex --param account=a1 for provider-account). fgosDir and lockRoot default to this checkout / this machine.' },
+            yes: { type: 'boolean', description: 'Skip the confirmation prompt. Without it and without a terminal, nothing is signalled.' },
+            'attest-stopped': { type: 'boolean', description: 'Only where holders cannot be listed: say the holder is already stopped; the lock is then only re-checked with a probe, never signalled.' },
+          },
+          positional: ['name'],
+          required: ['name'],
+        },
+        examples: ['fgos lock fence main-checkout', 'fgos lock fence merge-slot --param ref=main --yes'],
+      },
     },
-    examples: ['fgos unlock'],
+    examples: ['fgos lock fence main-checkout', 'fgos lock fence merge-slot --param ref=main --yes'],
     touchesState: true,
     requiresExistingStore: true,
-    externalEffect: false,
+    externalEffect: true,
     paginated: false,
     deprecated: null,
-  },
+  }),
   {
     name: 'lock-status',
     invoke: 'fgos lock-status',
-    description: 'Read-only report on .fgos/main-checkout.lock: whether it is free, live (genuinely held), stale (reclaimable), or ambiguous (corrupt/undecidable), plus holder identity, lock age, and remaining TTL, and separately the pre-commit hook\'s commit-activity beacon (.fgos/runtime/main-checkout-activity.json). Never creates, refreshes, or deletes either file.',
+    description: 'Read-only report on every repo- and machine-scoped registry lock (main-checkout, merge-slot, worktree-admin, gateway, ...): free or held, the holder pids the kernel shows, and the guarantee of the filesystem the lock file lives in; plus, separately, the pre-commit hook\'s commit-activity beacon (.fgos/runtime/main-checkout-activity.json). Top-level keys: mainCheckout, locks, beacon. Never creates, refreshes, or deletes a lock file or the beacon.',
     parameters: {
       type: 'object',
       properties: {},
@@ -2046,7 +2167,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'main-checkout-reset',
     invoke: 'fgos main-checkout-reset',
-    description: 'The safe path for a destructive `git reset --hard` on the main checkout (tsk-3au). Refuses when the whole-repo tree is dirty unless --confirm is passed after reviewing the full git status printed in the refusal — closes the failure mode where a session checked only its own files and reset away another in-flight session\'s uncommitted work.',
+    description: 'The safe path for a destructive `git reset --hard` on the main checkout (tsk-3au). Runs while holding the main checkout mutex, so no other fgOS writer touches the checkout meanwhile; when another process holds it the verb refuses at once (lock-timeout), naming the lock and the holder pid, and touches nothing. Refuses when the whole-repo tree is dirty unless --confirm is passed after reviewing the full git status printed in the refusal — closes the failure mode where a session checked only its own files and reset away another in-flight session\'s uncommitted work.',
     parameters: {
       type: 'object',
       properties: {

@@ -20,6 +20,7 @@
 import { RIGOR_VALUES } from '../rigor.mjs';
 import { canonicalizeWriteEntry } from './write-scope.mjs';
 import { RUN_TIMEOUT_MIN_MS, RUN_TIMEOUT_MAX_MS, runTimeoutProblem } from './run-timeout.mjs';
+import { parseTierCell, isExtendedTierCell } from './tier-cell.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { mergeConfigDefaults } from '../../setup/config-merge.mjs';
@@ -264,7 +265,15 @@ export const SUPPORTED_EXECUTOR_TEMPLATES = { claude: DEFAULT_RUNNER_CONFIG.exec
  * global config in memory on every read; it never rewrites
  * `~/.fgos/config.json` itself, so a stale key already on disk stays there
  * (harmless once filtered) until something else cleans the file.
+ *
+ * It also drops a cell written as a list or as `model@pool`. The global config
+ * is read by every fgOS release on the machine, and an older release fails
+ * config load on a list and passes `model@pool` to the CLI as a model id, so
+ * these forms belong in a project config until every release reads them. The
+ * dropped cell is named once per process on stderr.
  */
+const warnedGlobalExtendedCells = new Set();
+
 function sanitizeGlobalModelPolicies(globalConfig) {
   const modelPolicies = globalConfig?.runner?.modelPolicies;
   if (!modelPolicies || typeof modelPolicies !== 'object' || Array.isArray(modelPolicies)) {
@@ -279,10 +288,19 @@ function sanitizeGlobalModelPolicies(globalConfig) {
     }
     const sanitizedTierMap = {};
     for (const [policyTier, model] of Object.entries(tierMap)) {
-      if (MODEL_POLICY_TIERS.includes(policyTier)) {
-        sanitizedTierMap[policyTier] = model;
-      } else {
+      if (!MODEL_POLICY_TIERS.includes(policyTier)) {
         changed = true;
+      } else if (isExtendedTierCell(model)) {
+        changed = true;
+        const cellName = `modelPolicies.${providerModel}.${policyTier}`;
+        if (!warnedGlobalExtendedCells.has(cellName)) {
+          warnedGlobalExtendedCells.add(cellName);
+          process.stderr.write(
+            `fgos: ignoring ~/.fgos/config.json runner.${cellName}: a list or "model@pool" cell belongs in the project config (older fgOS releases on this machine cannot read it)\n`,
+          );
+        }
+      } else {
+        sanitizedTierMap[policyTier] = model;
       }
     }
     sanitized[providerModel] = sanitizedTierMap;
@@ -1409,8 +1427,8 @@ export function validateRunnerPatternsShape(patterns, label) {
 /**
  * Shape-check `cfg.modelPolicies` (tsk-5tm-5 D9): an object mapping an
  * arbitrary provider name (`"claude"`, `"gemini"`, ...) to a tier map,
- * each tier map's keys drawn from `MODEL_POLICY_TIERS` and values
- * non-empty model-name strings. Partial coverage (a provider naming fewer
+ * each tier map's keys drawn from `MODEL_POLICY_TIERS` and values tier
+ * cells: a model, `model@pool`, or a non-empty list of those (`parseTierCell`). Partial coverage (a provider naming fewer
  * than all 6 tiers) is valid at load time, same lenient-at-load/strict-
  * at-resolve philosophy (per `resolveTierModel`'s own doc comment) — a missing tier only throws once
  * something actually asks for it.
@@ -1429,8 +1447,12 @@ function validateModelPoliciesShape(modelPolicies, label) {
           `runner config (${label}.${providerModel}) tier key must be one of ${MODEL_POLICY_TIERS.join('/')}, got: ${JSON.stringify(policyTier)}.`,
         );
       }
-      if (typeof model !== 'string' || !model.trim()) {
-        throw new RunnerConfigError(`runner config (${label}.${providerModel}.${policyTier}) must be a non-empty string.`);
+      try {
+        parseTierCell(model, providerModel);
+      } catch (err) {
+        throw new RunnerConfigError(
+          `runner config (${label}.${providerModel}.${policyTier}) must be a model, "model@pool", or a non-empty list of those: ${err.message}.`,
+        );
       }
     }
   }
@@ -1471,13 +1493,20 @@ function validateRigorToTierShape(rigorToTier, label) {
  * `policyTier`? No I/O, no credential probing, no "is the executable on
  * PATH" check — a provider table naming fewer than all 5
  * `MODEL_POLICY_TIERS` (valid per `validateModelPoliciesShape` above) simply
- * answers `false` for the tiers it omits. Read by `resolve.mjs`'s
- * `resolveTierModel` and available to a future Cohort-Planner-facing
- * caller that needs to exclude an executor for an activity's tier floor
- * without triggering the resolver's own throw.
+ * answers `false` for the tiers it omits. Available to a future
+ * Cohort-Planner-facing caller that needs to exclude an executor for an
+ * activity's tier floor without triggering `resolveTierModel`'s throw, so a
+ * cell declares the tier only when one of its entries is served by the
+ * family's own pool, the entry `resolveTierModel` returns.
  */
 export function supportsPolicyTier(cfg, providerModel, policyTier) {
-  return typeof cfg?.modelPolicies?.[providerModel]?.[policyTier] === 'string';
+  const cell = cfg?.modelPolicies?.[providerModel]?.[policyTier];
+  if (cell === undefined) return false;
+  try {
+    return parseTierCell(cell, providerModel).some((entry) => entry.pool === providerModel);
+  } catch {
+    return false;
+  }
 }
 
 const GENERATED_PATH_KEYS = ['from', 'also'];
@@ -1621,7 +1650,7 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
     throw new RunnerConfigError(`runner config (${sourceLabel}) must declare a positive numeric "timeoutMs".`);
   }
   // The default run timeout obeys the same ceiling as one run's own: the confinement reaper keeps a
-  // live run's private home and a contender honours a dispatch lock's ttl only up to it.
+  // live run's private home only up to it.
   if (cfg.timeoutMs > RUN_TIMEOUT_MAX_MS) {
     throw new RunnerConfigError(`runner config (${sourceLabel}) "timeoutMs" must be at most ${RUN_TIMEOUT_MAX_MS / 3600000}h, got ${cfg.timeoutMs}ms.`);
   }

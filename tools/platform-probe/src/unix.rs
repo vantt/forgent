@@ -83,9 +83,27 @@ pub fn try_acquire(path: &Path) -> Option<Guard> {
 pub struct Dom(u32);
 
 /// None when the domain no longer exists, which means empty.
-pub fn domain_open(id: &str) -> Option<Dom> {
+pub fn domain_open(id: &str, _holder: Option<(u32, u64)>) -> Option<Dom> {
     let pid: u32 = id.parse().ok()?;
     if pid_alive(pid) { Some(Dom(pid)) } else { None }
+}
+
+/// The domain is the previous holder's process: its "member list" is that one pid.
+pub fn domain_open_view(d: &Dom) -> (Option<u32>, Vec<u32>) {
+    (Some(u32::from(pid_alive(d.0))), vec![d.0])
+}
+
+/// The one-pid domain: the previous holder's process is its whole membership, and no scan or tree exists.
+pub fn domain_open_sources(d: &Dom, pid: u32) -> Sources {
+    Sources { list: d.0 == pid, scan: false, tree: false }
+}
+
+pub fn domain_ever_sources(d: &Dom, pid: u32) -> Sources {
+    domain_open_sources(d, pid)
+}
+
+pub fn domain_in_job(_d: &Dom, _pid: u32) -> Option<bool> {
+    None
 }
 
 pub fn domain_active(d: &mut Dom) -> Option<u32> {

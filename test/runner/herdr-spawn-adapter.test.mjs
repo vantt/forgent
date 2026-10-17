@@ -1338,21 +1338,37 @@ test('isDraftStillInComposer detects TUI paste chips and modal menus in composer
   );
 });
 
-test('buildLauncherScriptContent and workerBaseEnv preserve pane terminal/session identity and strip parent OMP profile vars', () => {
-  const cleaned = workerBaseEnv({
-    PATH: '/usr/bin',
-    FGOS_RUST_HOST_RECURSION_GUARD: '1',
-    OMPCODE: '1',
-    OMP_PROFILE: 'gemini-tetcu72',
-    PI_PROFILE: 'gemini-tetcu72',
-    PI_CONFIG_FILES: '/tmp/overlay.yml',
-  });
+test('buildLauncherScriptContent and workerBaseEnv preserve pane terminal/session identity, strip parent OMP profile and lock vars, and pin the parent state root', () => {
+  // The parent's own resolved state root is what gets pinned, never what the
+  // caller's env happened to carry.
+  const savedStateRoot = process.env.FGOS_STATE_ROOT;
+  process.env.FGOS_STATE_ROOT = '/parent/state/fgos';
+  let cleaned;
+  try {
+    cleaned = workerBaseEnv({
+      PATH: '/usr/bin',
+      FGOS_RUST_HOST_RECURSION_GUARD: '1',
+      OMPCODE: '1',
+      OMP_PROFILE: 'gemini-tetcu72',
+      PI_PROFILE: 'gemini-tetcu72',
+      PI_CONFIG_FILES: '/tmp/overlay.yml',
+      FGOS_LOCK_FD: 'main-checkout:3',
+      FGOS_MAIN_LOCK_HOLDER_PID: '4242',
+      FGOS_STATE_ROOT: '/sandbox/home/.local/state/fgos',
+    });
+  } finally {
+    if (savedStateRoot === undefined) delete process.env.FGOS_STATE_ROOT;
+    else process.env.FGOS_STATE_ROOT = savedStateRoot;
+  }
   assert.equal(cleaned.PATH, '/usr/bin');
   assert.equal(cleaned.FGOS_RUST_HOST_RECURSION_GUARD, undefined);
   assert.equal(cleaned.OMPCODE, undefined);
   assert.equal(cleaned.OMP_PROFILE, undefined);
   assert.equal(cleaned.PI_PROFILE, undefined);
   assert.equal(cleaned.PI_CONFIG_FILES, undefined);
+  assert.equal(cleaned.FGOS_LOCK_FD, undefined, 'a borrowed description slot never crosses into a worker');
+  assert.equal(cleaned.FGOS_MAIN_LOCK_HOLDER_PID, undefined, 'the retired holder-pid channel is scrubbed');
+  assert.equal(cleaned.FGOS_STATE_ROOT, '/parent/state/fgos', 'the worker is pinned to the parent process\'s state root');
 
   const script = buildLauncherScriptContent({
     argv0: 'codex',

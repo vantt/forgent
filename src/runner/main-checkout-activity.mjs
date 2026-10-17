@@ -2,7 +2,7 @@
 // pre-commit hook leaves on the main checkout.
 //
 // A beacon is a hint, not a lock. It lives in its own file, apart from
-// `.fgos/main-checkout.lock` (the mutex fgOS writers hold around claim,
+// the main-checkout mutex (the kernel lock fgOS writers hold around claim,
 // checkpoint and land), so a commit no longer blocks the next claim, land or
 // `fgctl init` of any session for the reader's own TTL. Only the hook reads
 // it (to refuse a second session's commit inside the window) and only the
@@ -19,6 +19,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 export const BEACON_SCHEMA = 1;
+/** The activity window the pre-commit hook writes unless
+ * FGOS_MAIN_CHECKOUT_LOCK_TTL_MS overrides it: long enough to cover a commit
+ * burst, short enough not to hold other sessions off after a pause. */
+export const DEFAULT_BEACON_WINDOW_MS = 20 * 1000;
 export const BEACON_RELATIVE_PATH = path.join('runtime', 'main-checkout-activity.json');
 
 export function beaconPath(fgosDir) {

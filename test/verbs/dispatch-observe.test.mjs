@@ -95,7 +95,7 @@ test('no observe door binds a name that could write, anywhere on its import path
   const contactRoutes = ['herdr-agent.mjs', 'herdr-round.mjs', 'transport.mjs', 'dispatch/cli.mjs'];
   for (const file of closure.modules.keys()) {
     for (const route of contactRoutes) {
-      assert.ok(!file.endsWith(route), `an observe door reaches ${route}`);
+      assert.ok(!file.endsWith(`/${route}`), `an observe door reaches ${route}`);
     }
   }
 

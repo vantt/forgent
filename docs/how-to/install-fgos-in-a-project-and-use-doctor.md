@@ -235,6 +235,12 @@ file or key in their message; the message always names the exact target.
 | `runner-generated-paths` | `runner.generatedPaths` maps a generated source to its render targets with well-formed write-scope entries | `runner.generatedPaths missing -- write scopes are not widened to generated trees` | setup | `fgos setup` |
 | `tier-vocabulary-dead-keys` | No retired tier keys (`runner.models`, `minTier`, `rigorOverrides`) | names the dead key | you | Delete or migrate the named key |
 | `model-policy-tier-coverage` | `runner.modelPolicies` has a model for every tier `rigorToTier` produces, for every provider | `global provider "openai" missing model for tier "standard"` | you | Add the model for that provider and tier under `runner.modelPolicies` in the named config file |
+| `executor-family-unique` | Each agent family has one executor | `one family, several executors: claude (claude, claude-herdr)` | you | Merge them: keep one executor and move the other's transports into it as invocations |
+| `model-policy-pools` | Every pool a tier cell names (`model@pool`) has accounts in `runner.llmAccounts` | `warning: tier cells name pools runner.llmAccounts does not declare: deepseek.standard@openrouter` | you | Declare the pool's accounts under `runner.llmAccounts` in `~/.fgos/config.json` |
+| `llm-accounts-shape` | `runner.llmAccounts` is in the global config only and well formed | `runner.llmAccounts.codex: "codex" is another spelling of the family "openai"` | you | Fix the named key in `~/.fgos/config.json` |
+| `llm-accounts-vs-legacy` | `runner.llmAccounts` and `runner.providers` list the same accounts and login directories | `warning: the lease still reads runner.providers; only in runner.providers: gemini/tetcu72` | you | Add the missing account to the side that lacks it |
+| `capability-rigor-ceiling` | Which capabilities run above `runner.maxTier` because they declare a higher `rigor` themselves (informational) | `above runner.maxTier flagship by their own rigor: architecture:synthesize (rigor critical) runs at frontier: claude fable` | you | Lower that capability's `rigor` if the cost is not wanted |
+| `global-model-policies-portable` | Global `runner.modelPolicies` uses plain model names | `~/.fgos/config.json runner.modelPolicies has list or "model@pool" cells (deepseek.standard)` | you | Move those cells to the project config |
 | `advise-execute-capabilities-configured` | `runner.capabilities` declares `advise`, `execute`, `code:implement` | `runner.capabilities section missing -- run fgos setup` | setup | `fgos setup` |
 | `workflow-capabilities-configured` | Every capability a Workflow unit names is declared, and has a `prefer` pool | `no entry for Workflow capabilities: ...`; `warning: ... no "prefer" pool, so a headless run of those units is refused` | setup, you | `fgos setup` declares the capabilities. The `prefer` pool is yours to fill (section 5.2) |
 | `capability-serves-valid` | The `serves` sets are well formed, distinct and include `review` | `runner.capabilities section missing -- run fgos setup` | setup | `fgos setup` |
@@ -268,7 +274,12 @@ manual step.
 | `agy-sub-homes-configured` | Each agy sub-HOME named by an executor has `toolPermission: always-proceed` | names the sub-HOME | tool, you | Re-run `fgos doctor --fix`; if it persists, edit that sub-HOME's `settings.json` |
 | `tool-registry-configured` | Declared tool providers (such as an impact-analysis tool) are present on this machine | `degraded -- 1/2 registered tool(s) present (1 missing, ...) run fgos tool check` | you | Install the missing tool, then `fgos tool check` to refresh the local overlay |
 | `provider-capacity-state` | Provider account leases and quarantine are reportable. Doctor never clears quarantine | `provider-capacity quarantine present (acct:quota-limit:until=...)` | you | Inspect with `fgos dispatch inspect --provider-capacity`, fix the cause, then `fgos dispatch reconcile provider-capacity clear-quarantine` |
-| `provider-capacity-lock-stale` | The provider-capacity lock file is not held by a dead process | `provider-capacity lock at <path> is held by dead pid <n>` | you | No fix is registered: confirm the pid is gone (`kill -0 <pid>`), then remove the lock file named in the message |
+| `lock-kernel-semantics` | Both lock directories (`.fgos/locks`, `~/.local/state/fgos/locks`) give kernel lock exclusion, proven by a two-process probe | `... does not exist yet, not measured` (warning) or `... the filesystem gives no lock exclusion` | you | Run `fgos setup` for a missing directory; move the workspace or state root off a network filesystem |
+| `lock-borrow-vectors` | A lock lent to a git child never leaks to a background process git starts | `borrowed lock leaks (git version ...): <vector>: <detail>` | you | Report it: activation refuses the same release; do not work around it |
+| `lock-holders` | Every holder of an fgOS lock is an fgOS process or a borrowed child, and no previous holder's processes are left | `warning: gateway <path> held by pid <n> (<cmdline>), not a fgOS process ...` | you | Stop the named process; for a `predecessor.json` warning, confirm the domain is gone, then remove that record |
+| `lock-fences` | Every legacy lock path carries its cutover fence, so an older fgOS binary fails loudly | `warning: N of M legacy lock path(s) not fenced ...` | tool | After activating this release, stop every fgOS process of the workspace and run `fgos doctor --fix` |
+| `lock-predecessor-kill-wait` | `lock.predecessorKillWaitMs` is an integer from 1 to 60000 | `lock.predecessorKillWaitMs = "2000" (project) must be an integer from 1 to 60000` | you | Fix the value in `.fgos/config.json` or `~/.fgos/config.json` |
+| `state-root` | Node and the Rust host resolve the same state root | `Node and the host disagree: ...` | you | Run through the `fgos` command, or set `FGOS_HOST_BIN` to a host of the same release |
 | `herdr-available` | `herdr` is on `PATH` and reports a version (the interactive dispatch transport) | `herdr is not usable on PATH (herdr): ...` | you | Install herdr |
 | `herdr-executor-kinds` | Every executor dispatched through a herdr pane names a supported agent kind and no outdated integration hook | names the executor | you | Fix the executor's kind in the config |
 | `executor-profile-warnings` | Legacy executor entries hardcoding policy-shaped flags or account-pool env | `9 legacy executor-profile warning(s) (informational, not blocking)` | info | Migrate when convenient; each item names the target |
@@ -369,7 +380,7 @@ runner picks executors from that capability's pool in
 ```json
 "runner": { "capabilities": { "nominal-group:generate": {
   "prefer": [
-    { "executor": "claude-herdr" },
+    { "executor": "claude" },
     { "executor": "xai", "invocation": "pi-herdr-vantt" },
     { "executor": "openai" },
     { "executor": "glm", "invocation": "pi-cli-bwrap-openrouter" }

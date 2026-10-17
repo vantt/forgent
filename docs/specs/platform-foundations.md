@@ -56,14 +56,14 @@ Vùng doctrine của forgent: 8 luật thiết kế đã khóa, đứng trên m�
 |---|---|---|---|
 | Khóa / supersede luật | ✓ | — | — |
 | Đọc và tuân thủ luật | ✓ | ✓ | ✓ |
-| Trích luật theo ID (L1–L8) khi thẩm định | — | ✓ | ✓ |
+| Trích luật theo ID (L1–L10) khi thẩm định | — | ✓ | ✓ |
 | Tuyên bố bậc F-ladder (kèm bằng chứng) | ✓ (chốt) | đề xuất | đề xuất |
 
 ## Business Rules
 
 - **RUL1 (Log hay State ngay lúc thiết kế).** Mọi mẩu dữ liệu bền khai là Log hoặc State ngay lúc thiết kế; không khai được là lỗi thiết kế (L1, per ca7de3cf).
 - **RUL2 (memory hai tầng — lower hai-physics, higher 4-loại + consolidation).** Memory chạy đồng thời hai tầng: lower chỉ dùng hai-physics; higher dùng 4 loại memory + consolidation human-gated — hai mô hình không phủ định nhau (L2, per ca7de3cf).
-- **RUL3 (truth = changeset append-only committed; database là view).** Truth của mọi database tương lai là changeset append-only được commit; database là view dựng lại được từ zero; graph store là view cấp 2 không bao giờ ghi ngược; mọi ghi qua MỘT cửa (L3, per ae461c8b).
+- **RUL3 (truth = changeset append-only committed; database là view).** Truth của mọi database tương lai là changeset append-only được commit; database là view dựng lại được từ zero; graph store là view cấp 2 không bao giờ ghi ngược; mọi ghi qua MỘT cửa (L3, per ae461c8b; truth-ở-git-tree và một-cửa-CLI đã bị D-ADR0055 (nhật ký sự kiện là changeset niêm phong trên ref mỗi máy) thay ngày 2026-10-17: truth là changeset niêm phong trên ref mỗi máy, xem docs/platform/event-store/spec.md).
 - **RUL4 (không routing toàn cục — mỗi interface chọn theo audience).** Không có mô hình routing toàn cục — mỗi interface chọn theo audience: prose-handoff cho agent↔agent trong chain; kỷ luật data (branch theo exit-code, decision-table, rediscover trước retry) cho consumer không-chắc-là-agent (L4, per 14ebeea9).
 - **RUL5 (việc kế tiếp luôn là truy vấn dẫn xuất từ state).** Việc kế tiếp luôn là truy vấn dẫn xuất từ state, không bao giờ là danh sách tay (L4, per 14ebeea9).
 - **RUL6 (agent lạ trả lời được sáu câu hỏi).** Platform "có harness" chỉ khi agent lạ không chat history trả lời được sáu câu: đọc gì trước / việc loại gì / chạm contract nào / rủi ro bao nhiêu / proof gì thì xong / bài học nào để lại — mọi phase nghiệm thu bằng sáu câu này (L5).
