@@ -254,12 +254,33 @@ fn is_v3_envelope(path: &Path) -> bool {
     read_json(path).is_some_and(|envelope| envelope["v"] == 3)
 }
 
+/// The longest a probe polls a Windows domain whose job is already gone.
+#[cfg(windows)]
+const FALLBACK_SETTLE: Duration = Duration::from_millis(1500);
+
 /// Whether the domain a predecessor-style record names is empty; an unreadable one is not.
+///
+/// On Windows a job that no longer opens (every handle closed) is judged by
+/// the process tree, which needs consecutive quiet polls of one watch and the
+/// short orphan window to close: a single poll can never say `Empty`. So a
+/// watch is polled again, bounded, while the job could not be opened; a job
+/// that opens, or a record of another session, answers at once.
 fn domain_of(record: &Value) -> DomainState {
-    match predecessor::parse_record(record) {
-        Some(domain) => domain_watch(&domain).is_empty(),
-        None => DomainState::Unknown,
+    let Some(domain) = predecessor::parse_record(record) else { return DomainState::Unknown };
+    let mut watch = domain_watch(&domain);
+    #[cfg(windows)]
+    {
+        let started = std::time::Instant::now();
+        loop {
+            let state = watch.is_empty();
+            if state == DomainState::Empty || watch.trace().job_opened || watch.reason().is_some() || started.elapsed() >= FALLBACK_SETTLE {
+                return state;
+            }
+            std::thread::sleep(Duration::from_millis(25));
+        }
     }
+    #[cfg(not(windows))]
+    watch.is_empty()
 }
 
 #[cfg(test)]
