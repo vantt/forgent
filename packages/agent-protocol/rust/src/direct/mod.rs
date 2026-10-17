@@ -117,7 +117,7 @@ fn blocked_reason(capture_tail: &str) -> Option<BlockedReason> {
 
 fn is_auth_failure(line: &str) -> bool {
     let line = line.to_lowercase();
-    const SUBSTRINGS: [&str; 8] = [
+    const SUBSTRINGS: [&str; 9] = [
         "oauth refresh failed",
         "oauth token refresh failed",
         "invalid_grant",
@@ -126,6 +126,7 @@ fn is_auth_failure(line: &str) -> bool {
         "authentication required",
         "login required",
         "not logged in",
+        "no default model selected",
     ];
     if SUBSTRINGS.iter().any(|needle| line.contains(needle)) {
         return true;

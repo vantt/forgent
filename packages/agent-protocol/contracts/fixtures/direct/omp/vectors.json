@@ -1,7 +1,7 @@
 {
   "cli": "omp",
   "stdinPolicy": "null-device",
-  "source": "pi-family wording, not yet measured on omp",
+  "source": "pi-family wording; the logged-out vector is the real tail of `omp -p` run with an empty HOME (2026-10-18)",
   "vectors": [
     {
       "name": "completed-with-outbox",
@@ -67,6 +67,17 @@
       "expect": {
         "kind": "blocked",
         "reason": "usage-limit"
+      }
+    },
+    {
+      "name": "blocked-login-no-default-model-measured",
+      "cli": "omp",
+      "exitCode": 1,
+      "captureTail": "No default model selected. Use /login, set an API key environment variable, or select a local model with /model or --model.\n\nSet an API key environment variable:\n  ANTHROPIC_API_KEY, OPENAI_API_KEY, GEMINI_API_KEY, etc.\n\nOr create /home/x/.omp/agent/models.yml\n",
+      "resultFile": null,
+      "expect": {
+        "kind": "blocked",
+        "reason": "login"
       }
     }
   ]

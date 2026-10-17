@@ -1,7 +1,7 @@
 {
   "cli": "claude",
   "stdinPolicy": "null-device",
-  "source": "standard login prompt wording",
+  "source": "standard login prompt wording; the logged-out vector is the real tail of `claude -p` run with an empty HOME (2026-10-18)",
   "vectors": [
     {
       "name": "completed-with-outbox",
@@ -67,6 +67,17 @@
       "expect": {
         "kind": "blocked",
         "reason": "usage-limit"
+      }
+    },
+    {
+      "name": "blocked-login-logged-out-measured",
+      "cli": "claude",
+      "exitCode": 1,
+      "captureTail": "Not logged in · Please run /login\n",
+      "resultFile": null,
+      "expect": {
+        "kind": "blocked",
+        "reason": "login"
       }
     }
   ]
