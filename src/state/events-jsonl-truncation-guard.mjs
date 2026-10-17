@@ -34,20 +34,12 @@ import { execFileSync } from "node:child_process";
 import { recordMainCheckoutGuardWarning } from "./main-checkout-guard-warnings.mjs";
 import { resolveFgosFile, FGOS_FILE } from "./fgos-file-registry.mjs";
 /**
- * The checkpoint writes the main checkout's index, so its whole add ->
- * commit -> reset-on-error runs only inside the main-checkout mutex, which
- * the runner layer owns. The caller passes `mainCheckoutWriter(txn)`: it
- * runs `txn(commitEnv)` while holding the mutex (or skips it when the mutex
- * is held elsewhere), and `commitEnv` is what the commit needs so the
- * pre-commit hook recognizes fgOS's own commit (see
- * src/runner/main-checkout-lock.mjs: heldMainCheckoutWriter,
- * acquiringMainCheckoutWriter). Without a writer the checkpoint never
- * commits: an unguarded commit would race a land.
+ * The checkpoint writes the main checkout's index, so the caller runs it
+ * while holding the main checkout mutex and passes `commit(args)`: it runs
+ * one git command with that mutex borrowed (add, commit and the reset after
+ * a failed commit all go through it) and throws on a non-zero exit. Without
+ * `commit` the checkpoint never commits: an unguarded commit would race a land.
  */
-function runUnderMainCheckoutWriter(mainCheckoutWriter, txn) {
-  if (typeof mainCheckoutWriter !== "function") return;
-  mainCheckoutWriter(txn);
-}
 
 function lastNonEmptyLine(raw) {
   const lines = raw.split("\n");
@@ -357,10 +349,9 @@ export function getUncommittedEventCount(fgosDir, repoRoot) {
  * @param {number} [opts.nowSec] - mock current timestamp (unix seconds)
  * @param {number} [opts.fallbackIntervalSec] - override fallback threshold seconds (default 3600)
  * @param {string} [opts.rawLog] - mock raw log text for testing
- * @param {Function} [opts.mainCheckoutWriter] - `(txn) => void`, runs
- *   `txn(commitEnv)` inside the main-checkout mutex (see
- *   runUnderMainCheckoutWriter). Omitted, the fallback checkpoint never
- *   commits.
+ * @param {Function} [opts.commit] - `(gitArgs) => void`, runs one git command
+ *   under the borrowed main-checkout mutex, throwing on failure. Omitted, the
+ *   fallback checkpoint never commits.
  */
 export function runOpportunisticMainCheckoutChecks(
   dir,
@@ -369,7 +360,7 @@ export function runOpportunisticMainCheckoutChecks(
     nowSec = null,
     fallbackIntervalSec = null,
     rawLog = null,
-    mainCheckoutWriter = null,
+    commit = null,
   } = {}
 ) {
   if (process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS === "1") return;
@@ -505,26 +496,19 @@ export function runOpportunisticMainCheckoutChecks(
           currentTimeSec - refSec >= effectiveFallbackIntervalSec;
 
         if (fallbackIntervalMet) {
-          runUnderMainCheckoutWriter(mainCheckoutWriter, (commitEnv) => {
-            execFileSync("git", ["add", ...pathspecs], {
-              cwd: realRepoRoot,
-              stdio: ["ignore", "pipe", "ignore"],
-            });
+          if (typeof commit === "function") {
+            commit(["add", ...pathspecs]);
             try {
-              execFileSync("git", ["commit", "-m", "chore(.fgos): fallback events checkpoint", "--", ...pathspecs], {
-                cwd: realRepoRoot,
-                stdio: ["ignore", "pipe", "ignore"],
-                env: { ...process.env, ...commitEnv },
-              });
+              commit(["commit", "-m", "chore(.fgos): fallback events checkpoint", "--", ...pathspecs]);
             } catch (commitErr) {
               try {
-                execFileSync("git", ["reset", "--", ...pathspecs], { cwd: realRepoRoot, stdio: ["ignore", "pipe", "ignore"] });
+                commit(["reset", "--", ...pathspecs]);
               } catch {
                 // best-effort
               }
               throw commitErr;
             }
-          });
+          }
         }
       }
     }
