@@ -88,6 +88,11 @@ pub fn domain_open(id: &str) -> Option<Dom> {
     if pid_alive(pid) { Some(Dom(pid)) } else { None }
 }
 
+/// The domain is the previous holder's process: its "member list" is that one pid.
+pub fn domain_open_view(d: &Dom) -> (Option<u32>, Vec<u32>) {
+    (Some(u32::from(pid_alive(d.0))), vec![d.0])
+}
+
 pub fn domain_active(d: &mut Dom) -> Option<u32> {
     Some(u32::from(pid_alive(d.0)))
 }
@@ -137,6 +142,7 @@ pub fn fresh_domain_name() -> String {
 pub struct Fallback {
     pub empty: bool,
     pub chain_at_first_snapshot: Vec<u32>,
+    pub live_at_first_snapshot: Vec<u32>,
 }
 
 /// Unix has no job to lose: the lock itself outlives every orphan, so no fallback exists or is needed.

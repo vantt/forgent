@@ -19,6 +19,16 @@ pub struct Enter {
     pub domain_opened: bool,
     pub terminated: bool,
     pub fallback_used: bool,
+    /// Job accounting (`ActiveProcesses`) when the domain was opened.
+    pub open_active: Option<u32>,
+    /// Member list size when the domain was opened (None: the domain could not be opened).
+    pub open_list_len: Option<usize>,
+    /// Per watched pid: was it in the member list at open.
+    pub watch_in_open_list: Vec<Value>,
+    /// The extra check ran: domain opened with count 0 and an empty list, so the recorded holder's tree was checked.
+    pub toolhelp_checked: bool,
+    /// That check found live descendants of the recorded holder (None: not run).
+    pub toolhelp_live_descendants: Option<Vec<u32>>,
     pub alive_at_proceed: Vec<u32>,
     /// Per watched pid at the decision: state, and how long after the decision it was still running.
     pub diag: Vec<Value>,
@@ -31,13 +41,15 @@ pub struct Rule {
     pub kill_wait: Duration,
     /// Use the process-tree fallback when the domain cannot be opened and the record names a holder.
     pub fallback: bool,
+    /// When the domain opens with count 0 and an empty member list, also check the recorded holder's process tree.
+    pub toolhelp_on_empty_list: bool,
 }
 
 /// Takes the lock (polling), applies the predecessor rule, and reports which watched
 /// processes were still alive at the moment it decided to proceed.
 ///
-/// Rule: open the domain; if it is not empty, kill it at once (the holder is dead because we hold
-/// the lock) and wait up to `kill_wait` for the killed processes to be signaled. If the domain cannot
+/// Rule: open the domain; if it is not empty (accounting 0 AND every listed member signaled), kill it at
+/// once (the holder is dead because we hold the lock) and wait up to `kill_wait` for the same condition. If the domain cannot
 /// be opened, optionally wait on the recorded holder's process tree instead.
 pub fn enter(lock: &Path, record: &Path, rule: Rule, watch: &[u32], wait_lock: Duration) -> Result<Enter, String> {
     let t_start = Instant::now();
@@ -57,6 +69,11 @@ pub fn enter(lock: &Path, record: &Path, rule: Rule, watch: &[u32], wait_lock: D
         domain_opened: false,
         terminated: false,
         fallback_used: false,
+        open_active: None,
+        open_list_len: None,
+        watch_in_open_list: vec![],
+        toolhelp_checked: false,
+        toolhelp_live_descendants: None,
         alive_at_proceed: vec![],
         diag: vec![],
     };
@@ -69,7 +86,23 @@ pub fn enter(lock: &Path, record: &Path, rule: Rule, watch: &[u32], wait_lock: D
     if let Some(id) = id {
         if let Some(mut dom) = plat::domain_open(&id) {
             e.domain_opened = true;
+            let (open_active, open_list) = plat::domain_open_view(&dom);
+            e.open_active = open_active;
+            e.open_list_len = Some(open_list.len());
+            e.watch_in_open_list = watch.iter().map(|p| json!({"pid": p, "inListAtOpen": open_list.contains(p)})).collect();
+            // Full rule: accounting is 0 and every listed member is signaled; the list is re-read on each query,
+            // including when accounting is already 0 at open.
             empty = plat::domain_active(&mut dom) == Some(0);
+            if empty && rule.toolhelp_on_empty_list && open_active == Some(0) && open_list.is_empty() {
+                if let Some((hp, hc)) = holder {
+                    if let Some(f) = plat::fallback_wait(hp, hc, rule.kill_wait) {
+                        e.toolhelp_checked = true;
+                        e.toolhelp_live_descendants = Some(f.live_at_first_snapshot);
+                        empty = f.empty;
+                        chain_first = f.chain_at_first_snapshot;
+                    }
+                }
+            }
             if !empty {
                 plat::domain_kill(&mut dom);
                 e.terminated = true;
@@ -125,21 +158,27 @@ pub fn tests() -> Vec<Def> {
     vec![
         Def {
             name: "git-borrow-blocking-hook-predecessor-check",
-            expect: "50 repeats, job kept by a second owner: the contender kills the predecessor domain at once and never proceeds while git or its hook children are alive (0 violations); extra wait is a few ms, not a drain window",
-            timeout_s: 420,
+            expect: "repeated, job kept by a second owner: the contender kills the predecessor domain at once and never proceeds while git or its hook children are alive (0 violations); extra wait is a few ms, not a drain window",
+            timeout_s: 3600,
             f: |c| repeated_check(c, Mode::Supervisor),
         },
         Def {
             name: "git-borrow-blocking-hook-predecessor-check-holder-owned",
             expect: "documents the hazard of the first rule: when only the holder owns the job its name vanishes (open fails = looks empty) while members are still terminating; no fallback is applied; informational, never fails",
-            timeout_s: 420,
+            timeout_s: 3600,
             f: |c| repeated_check(c, Mode::HolderOnlyNoFallback),
         },
         Def {
             name: "predecessor-all-owners-dead",
-            expect: "holder and job keeper both killed while git is blocked in a hook: the job cannot be opened, the contender falls back to the recorded holder's process tree and never proceeds while a member is unsignaled (0 violations in 50 repeats)",
-            timeout_s: 420,
+            expect: "full rule (accounting 0 and every listed member signaled, list re-read on every query, also when the count is 0 at open): holder and job keeper both killed while git is blocked in a hook; a job that cannot be opened falls back to the recorded holder's process tree; the contender never proceeds while git or a hook child is alive (0 violations)",
+            timeout_s: 3600,
             f: |c| repeated_check(c, Mode::AllOwnersDead),
+        },
+        Def {
+            name: "predecessor-all-owners-dead-list-empty-toolhelp",
+            expect: "same as predecessor-all-owners-dead, plus: when the job opens with count 0 and an empty member list, the recorded holder's process tree is also checked before proceeding; a run of both tests shows whether that extra clause is needed (0 violations here, violations in the plain test)",
+            timeout_s: 3600,
+            f: |c| repeated_check(c, Mode::AllOwnersDeadListEmptyToolhelp),
         },
         Def {
             name: "predecessor-record-stale",
@@ -164,6 +203,14 @@ enum Mode {
     HolderOnlyNoFallback,
     /// Holder and a separate job keeper are both killed; the contender must use the process-tree fallback.
     AllOwnersDead,
+    /// As `AllOwnersDead`, plus the process-tree check when the job opens with count 0 and an empty list.
+    AllOwnersDeadListEmptyToolhelp,
+}
+
+impl Mode {
+    fn owners_dead(self) -> bool {
+        matches!(self, Mode::AllOwnersDead | Mode::AllOwnersDeadListEmptyToolhelp)
+    }
 }
 
 fn repeated_check(ctx: &Ctx, mode: Mode) -> TestResult {
@@ -173,21 +220,25 @@ fn repeated_check(ctx: &Ctx, mode: Mode) -> TestResult {
     if !which("git") {
         return skip("git is not on PATH");
     }
-    const REPEATS: usize = 50;
+    let repeats = repeats();
     let repo = crate::git::setup_repo(ctx, true)?;
     let lock = ctx.p("lock");
     let record = ctx.p("predecessor.json");
     let mut extra = vec![];
     let mut lock_wait = vec![];
     let (mut violations, mut held, mut terminated, mut opened, mut fallbacks) = (0, 0, 0, 0, 0);
+    // Opened-job evidence: what the member list looked like, and whether the extra tree check mattered.
+    let (mut open_count_zero, mut open_list_empty, mut open_zero_and_empty, mut git_in_list) = (0, 0, 0, 0);
+    let (mut toolhelp_runs, mut toolhelp_live) = (0, 0);
+    let mut open_samples: Vec<Value> = vec![];
     let mut events: Vec<Value> = vec![];
-    for i in 0..REPEATS {
+    for i in 0..repeats {
         for f in ["holder.ready", "fg.pid", "bg.pid", "predecessor.json"] {
             let _ = std::fs::remove_file(ctx.p(f));
         }
         let sup = if supervisor_owned { Some(plat::Sup::new()?) } else { None };
         let mut keeper = None;
-        let keeper_job = if mode == Mode::AllOwnersDead { plat::fresh_domain_name() } else { String::new() };
+        let keeper_job = if mode.owners_dead() { plat::fresh_domain_name() } else { String::new() };
         if !keeper_job.is_empty() {
             let (name, ready) = (keeper_job.clone(), ctx.s("keeper.ready"));
             let _ = std::fs::remove_file(ctx.p("keeper.ready"));
@@ -225,7 +276,7 @@ fn repeated_check(ctx: &Ctx, mode: Mode) -> TestResult {
             .filter_map(|(role, p)| p.map(|p| json!({"role": role, "pid": p, "inSupervisorJobBeforeKill": sup.as_ref().and_then(|s| s.contains(p))})))
             .collect();
         let (l, r, w) = (lock.clone(), record.clone(), watch.clone());
-        let rule = Rule { kill_wait: secs(2), fallback: mode != Mode::HolderOnlyNoFallback };
+        let rule = Rule { kill_wait: secs(2), fallback: mode != Mode::HolderOnlyNoFallback, toolhelp_on_empty_list: mode == Mode::AllOwnersDeadListEmptyToolhelp };
         let contender: std::thread::JoinHandle<Result<Enter, String>> = std::thread::spawn(move || enter(&l, &r, rule, &w, secs(30)));
         std::thread::sleep(Duration::from_millis(20)); // contender is polling for the lock
         let t_kill = Instant::now();
@@ -250,10 +301,40 @@ fn repeated_check(ctx: &Ctx, mode: Mode) -> TestResult {
         if violated {
             violations += 1;
         }
-        if (violated || !e.proceeded) && events.len() < 12 {
-            events.push(json!({
+        let git_pid = named[0].1;
+        let git_listed = git_pid.is_some_and(|g| e.watch_in_open_list.iter().any(|w| w["pid"] == g && w["inListAtOpen"] == true));
+        if e.domain_opened {
+            open_count_zero += usize::from(e.open_active == Some(0));
+            open_list_empty += usize::from(e.open_list_len == Some(0));
+            open_zero_and_empty += usize::from(e.open_active == Some(0) && e.open_list_len == Some(0));
+            git_in_list += usize::from(git_listed);
+        }
+        toolhelp_runs += usize::from(e.toolhelp_checked);
+        toolhelp_live += usize::from(e.toolhelp_live_descendants.as_ref().is_some_and(|v| !v.is_empty()));
+        let per_event = |ev: &Enter| {
+            json!({
                 "repeat": i,
-                "domainOpenedWhenChecked": e.domain_opened,
+                "domainOpenedWhenChecked": ev.domain_opened,
+                "activeProcessesAtOpen": ev.open_active,
+                "memberListSizeAtOpen": ev.open_list_len,
+                "gitPidInListAtOpen": git_listed,
+                "watchedPidsInListAtOpen": ev.watch_in_open_list,
+                "toolhelpCheckRan": ev.toolhelp_checked,
+                "toolhelpFoundLiveDescendants": ev.toolhelp_live_descendants.as_ref().map(|v| !v.is_empty()),
+                "toolhelpLiveDescendantPids": ev.toolhelp_live_descendants,
+            })
+        };
+        if e.domain_opened && open_samples.len() < 12 {
+            open_samples.push(per_event(&e));
+        }
+        if (violated || !e.proceeded) && events.len() < 12 {
+            let mut ev = per_event(&e);
+            ev.as_object_mut().into_iter().for_each(|o| {
+                o.insert("violated".into(), json!(violated));
+            });
+            events.push(json!({
+                "open": ev,
+                "repeat": i,
                 "contenderTerminated": e.terminated,
                 "fallbackUsed": e.fallback_used,
                 "lockWaitMs": e.lock_wait_ms,
@@ -277,8 +358,16 @@ fn repeated_check(ctx: &Ctx, mode: Mode) -> TestResult {
             Mode::Supervisor => "second owner (probe holds a handle)",
             Mode::HolderOnlyNoFallback => "holder only, no fallback",
             Mode::AllOwnersDead => "holder and keeper process, both killed, process-tree fallback",
+            Mode::AllOwnersDeadListEmptyToolhelp => "holder and keeper process, both killed, process-tree fallback and tree check on count 0 with empty list",
         },
-        "repeats": REPEATS,
+        "repeats": repeats,
+        "openedWithActiveCountZero": open_count_zero,
+        "openedWithEmptyMemberList": open_list_empty,
+        "openedWithCountZeroAndEmptyList": open_zero_and_empty,
+        "gitPidInListAtOpen": git_in_list,
+        "toolhelpCheckRuns": toolhelp_runs,
+        "toolhelpFoundLiveDescendants": toolhelp_live,
+        "openedSamples": open_samples,
         "violationsProceededWithLiveProcesses": violations,
         "heldReturned": held,
         "contenderTerminatedDomain": terminated,
@@ -292,7 +381,7 @@ fn repeated_check(ctx: &Ctx, mode: Mode) -> TestResult {
     });
     if !strict {
         // Hazard documentation: with a holder-owned job the name can vanish before the members are dead.
-        let note = format!("holder-only job, no fallback: {violations}/{REPEATS} repeats proceeded while members were still dying (job name already gone in {} of them)", REPEATS - opened);
+        let note = format!("holder-only job, no fallback: {violations}/{repeats} repeats proceeded while members were still dying (job name already gone in {} of them)", repeats - opened);
         return pass(&note, data);
     }
     let p95 = pct(&extra, 0.95);
@@ -300,7 +389,7 @@ fn repeated_check(ctx: &Ctx, mode: Mode) -> TestResult {
         fail("contender proceeded while git or a child was still alive", data)
     } else if held > 0 {
         fail("contender returned held (domain never emptied after kill)", data)
-    } else if mode == Mode::AllOwnersDead && cfg!(windows) && fallbacks == 0 {
+    } else if mode.owners_dead() && cfg!(windows) && fallbacks == 0 && toolhelp_runs == 0 {
         fail("the process-tree fallback was never exercised (the job stayed openable)", data)
     } else if p95 > 500.0 {
         fail("extra wait p95 above 500 ms: the domain is not being killed at once", data)
@@ -319,7 +408,7 @@ fn record_stale(ctx: &Ctx) -> TestResult {
     let mut bad = 0;
     for _ in 0..20 {
         let id = plat::make_stale_domain(ctx)?;
-        let e = contender_run(ctx, &id, Rule { kill_wait: secs(2), fallback: true }, &[])?;
+        let e = contender_run(ctx, &id, Rule { kill_wait: secs(2), fallback: true, toolhelp_on_empty_list: false }, &[])?;
         if !e.proceeded || e.domain_opened || e.terminated {
             bad += 1;
         }
@@ -338,7 +427,7 @@ fn kill_wait(ctx: &Ctx) -> TestResult {
     if wait_until(secs(10), || pids.iter().all(|p| plat::pid_alive(*p))).is_none() {
         return Err("stubborn member did not start".into());
     }
-    let e = contender_run(ctx, &id, Rule { kill_wait: secs(2), fallback: true }, &pids)?;
+    let e = contender_run(ctx, &id, Rule { kill_wait: secs(2), fallback: true, toolhelp_on_empty_list: false }, &pids)?;
     let dead = wait_until(secs(5), || pids.iter().all(|p| !plat::pid_alive(*p))).is_some();
     let data = json!({
         "killWaitMs": 2000,
