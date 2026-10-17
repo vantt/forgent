@@ -5,6 +5,7 @@
 mod support;
 
 use std::fs;
+#[cfg(target_os = "linux")]
 use std::os::fd::AsRawFd;
 use std::path::Path;
 use std::time::{Duration, Instant};
@@ -84,6 +85,8 @@ fn a_step_past_its_timeout_is_killed_with_its_descendants_and_leaves_no_receipt(
     }
 }
 
+// Lists /proc/<pid>/fd, which only Linux has.
+#[cfg(target_os = "linux")]
 #[test]
 fn a_step_holds_no_lock_description() {
     let (dir, mut envelope) = attempt("fds", Vec::new());
