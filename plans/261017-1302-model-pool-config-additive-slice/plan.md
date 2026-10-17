@@ -1,7 +1,7 @@
 ---
 title: "Đợt A: lát bổ sung cho hình dạng config model/pool/account"
 description: "Sửa test vỡ khi gemini chuyển sang omp; dọn config để mỗi họ một executor; đọc ô tier dạng model hoặc model@pool; đọc runner.llmAccounts chỉ để kiểm tra; thêm dispatch explain và các check doctor chỉ đọc; rigor do capability khai thì nâng trần tier. Không đổi lease, confinement hay prefer."
-status: pending
+status: done
 priority: P1
 effort: 33h
 branch: plan/model-pool-config-additive-slice
@@ -72,7 +72,7 @@ invocation trong `prefer` của capability là ghim (`advise` ghim
 | [02](phase-02-tier-cell-reader.md) | Bộ đọc ô tier, validator project/global, thiếu ô thì từ chối | 05 | 5 | xong (bước từ chối chờ anh) |
 | [03](phase-03-llm-accounts-reader.md) | Bộ đọc `runner.llmAccounts` chỉ đọc, kiểm tên pool | 05 | 3 | xong |
 | [04](phase-04-explain-and-doctor.md) | `fgos dispatch explain`, check doctor, spec, CHANGELOG | 01, 02, 03 | 6 | xong |
-| [06](phase-06-capability-tier-cap.md) | Rigor của capability nâng trần tier; kiểm hai bộ tính tier | 02, 04 | 5 | chờ |
+| [06](phase-06-capability-tier-cap.md) | Rigor của capability nâng trần tier; kiểm hai bộ tính tier | 02, 04 | 5 | xong |
 
 Thứ tự: 05 trước tiên, để main xanh lại; rồi commit 01; 02 và 03 song song;
 04; cuối cùng 06, vì 06 sửa đoạn tính tier ngay trên đoạn chọn model của 02 và
@@ -108,6 +108,23 @@ dùng `explain` của 04.
   chối vì `claude-herdr` chỉ có invocation herdr; sau phase 01 chúng chạy
   claude headless. Không ghim invocation herdr cho chúng.
 
+## Việc tách ra sau đợt A
+
+- **Provenance tier của assignment policy có thể ghi cao hơn tier đã chạy.**
+  `resolveAssignmentDispatchPolicy` chỉ nâng tier `bind()` đưa vào và không áp
+  trần; `run.mjs` không truyền capability cho assignment, nên sửa gọn trong hàm
+  không được. Model luôn là của `bind()`; chỉ bản ghi tier lệch khi `bind()` kẹp.
+  Sửa cần `run.mjs` truyền capability và policy dùng `resolveTierCeiling`
+  (ghi trong RUL103).
+- **Pin invocation của capability-prefer bị bỏ qua khi chọn transport:**
+  `fgos-coding-implement` headless vẫn ghim `omp-gemini-tetcu72` (pane) với
+  transport `cli`; `fgos dispatch explain` cho thấy rõ (đã ghi ngoài phạm vi).
+- Ladder `openai`: `frontier` là `gpt-6-astra`, `flagship` là `gpt-6.1-sol`;
+  ba capability `critical` có `openai` trong pool sẽ chạy `gpt-6-astra`.
+
 ## Outstanding questions
 
-None
+1. **Thiếu ô tier thì từ chối hay rơi về như hôm nay?** (phase 02 bước 5, chưa
+   làm). 89 test và hai check doctor dựa vào lối rơi về
+   `executor.model ?? "default"`; project khác dùng fgOS mà khai thiếu ô sẽ bị
+   từ chối nếu đổi.

@@ -1,7 +1,7 @@
 ---
 phase: 6
 title: "Rigor do capability khai thì nâng trần tier của capability đó"
-status: pending
+status: done
 effort: 5h
 ---
 
@@ -99,6 +99,26 @@ Hiện không có trường hợp thật nào cần; khi có thì mới thêm.
 - `bind-committed-config.test.mjs` xanh; so với baseline phase 00, chỉ 3
   capability rigor `critical` đổi tier.
 - `npm test` không thêm test hỏng nào so với phase 05.
+
+## Kết quả (2026-10-17)
+
+- `resolveTierCeiling` export từ `bind.mjs`; `bind()` và check doctor
+  `capability-rigor-ceiling` (`src/setup/model-pool-checks.mjs`) dùng chung.
+  Provenance: `tier.ceiling = { value, source }`, kẹp ghi
+  `clamped:maxTier(<tier>, global | capability-rigor(<cap>, <rigor>))`.
+- Test trong `bind.test.mjs`: 7 test, 6 đỏ trước khi sửa (test "không có
+  maxTier" xanh sẵn). Test 7 của plan (dry-bind) thay bằng test "rigor thấp
+  hơn trần không hạ trần", vì `simulateUnitBindings` gọi thẳng `bind()` và
+  không ghi tier.
+- Trên config đã commit (`maxTier: flagship`): 48/608 dòng baseline đổi, chỉ
+  `architecture:shape`, `architecture:synthesize`, `architecture:explain`
+  (`flagship` thành `frontier`: claude `fable`, openai `gpt-6-astra`).
+- **Hai bộ tính tier:** `assignment-policy` không áp trần và thường không biết
+  capability (`run.mjs` không truyền); model thật luôn là của `bind()`
+  (`cliOverride.model`), chỉ bản ghi tier lệch khi `bind()` kẹp. Sửa cần
+  `run.mjs`, nên tách thành việc riêng (`plan.md`).
+- `fgos dispatch decide` không trả tier, nên trần chỉ hiện ở `explain`.
+- Spec RUL103 (lần đầu spec mô tả `runner.maxTier`); CHANGELOG mục Changed.
 
 ## Rủi ro
 
