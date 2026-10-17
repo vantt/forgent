@@ -26,7 +26,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
-import { HolderLockError, LOCK_FD_ENV, LOCK_FD_SLOT, readPredecessorKillWaitMs } from './protocol.mjs';
+import { HolderLockError, LOCK_FD_ENV, LOCK_FD_SLOT, LOCK_JOB_ENV, readPredecessorKillWaitMs } from './protocol.mjs';
 import { resolveLock, loadLockRegistry, lockEntry } from './registry.mjs';
 import { LockScope, createLockScope, assertLockScope } from './lock-scope.mjs';
 import { resolveStateRoot, resolveLockRoot } from './state-root.mjs';
@@ -38,14 +38,16 @@ import {
   assertDriverUsable,
   guaranteeFor,
   lockTransport,
+  leftoverSweep,
+  borrowLeadsGroup,
   descriptionHolders,
   killDescriptionHoldersOnce,
   ROUTE_CALL_TIMEOUT_MS,
   ROUTE_SLACK_MS,
 } from './driver.mjs';
-import { startHold, waitReady, waitReadySync, readyBoundMs, releaseHold, removeWorkDir } from './hold-transport.mjs';
+import { startHold, waitReady, waitReadySync, readyBoundMs, releaseHold, removeWorkDir, borrowSync, borrowAsync } from './hold-transport.mjs';
 
-export { HolderLockError, LOCK_FD_ENV, LOCK_FD_SLOT, readPredecessorKillWaitMs } from './protocol.mjs';
+export { HolderLockError, LOCK_FD_ENV, LOCK_FD_SLOT, LOCK_JOB_ENV, readPredecessorKillWaitMs } from './protocol.mjs';
 export { LockScope, createLockScope, resolveLock, loadLockRegistry, lockEntry, resolveStateRoot, resolveLockRoot, guaranteeFor };
 
 /** How many times an acquire re-opens the file when the inode it locked is
@@ -403,7 +405,7 @@ function leftoverError(handle, remaining, extra) {
  * most `killWaitMs`. Linux lists holders through /proc; elsewhere the
  * child's process group is signalled instead (best effort, uncounted). */
 function sweepLeftoversSync(handle, childPid) {
-  if (process.platform !== 'linux') return sweepProcessGroup(childPid);
+  if (leftoverSweep() !== 'holders') return sweepProcessGroup(childPid);
   const deadline = Date.now() + handle.killWaitMs;
   const killed = new Set();
   for (;;) {
@@ -417,7 +419,7 @@ function sweepLeftoversSync(handle, childPid) {
 }
 
 async function sweepLeftovers(handle, childPid) {
-  if (process.platform !== 'linux') return sweepProcessGroup(childPid);
+  if (leftoverSweep() !== 'holders') return sweepProcessGroup(childPid);
   const deadline = Date.now() + handle.killWaitMs;
   const killed = new Set();
   for (;;) {
@@ -441,6 +443,58 @@ function sweepProcessGroup(childPid) {
   return { leftoversKilled: 0, remaining: [] };
 }
 
+/** The named error for a helper answer that is not a clean result. */
+function borrowError(handle, spec, result) {
+  switch (result.error) {
+    case 'borrow-leftover-not-killed':
+      return leftoverError(handle, Array.isArray(result.pids) ? result.pids : [], { exit: result.exit ?? null, signal: null });
+    case 'borrow-spawn-failed':
+      return new HolderLockError('borrow-spawn-failed', `${handle.name}: cannot run ${spec.command}: ${result.message ?? 'spawn failed'}`, { lock: handle.name, cause: null });
+    default:
+      return new HolderLockError(result.error, `${handle.name}: ${result.message ?? result.error}`, { lock: handle.name });
+  }
+}
+
+/** runBorrowed on the hold transport: the helper runs the child in a job and
+ * ends the job (the release rule) before it answers, so there is no sweep here. */
+function runBorrowedHold(handle, entry, spec, sync) {
+  if (spec.stdin !== undefined && spec.stdin !== 'ignore') {
+    throw new HolderLockError('borrow-spec-invalid', `${handle.name}: a borrowed child's stdin is always null on this platform, got ${JSON.stringify(spec.stdin)}`, { lock: handle.name });
+  }
+  entry.borrows += 1;
+  if (sync) {
+    let answer;
+    try {
+      answer = borrowSync(entry.hold, spec, { killWaitMs: handle.killWaitMs });
+    } finally {
+      entry.borrows -= 1;
+    }
+    if (answer.result.error) throw borrowError(handle, spec, answer.result);
+    return { exit: answer.result.exit ?? null, signal: null, stdout: answer.stdout, stderr: answer.stderr, leftoversKilled: answer.result.leftoversKilled ?? 0 };
+  }
+  let settle;
+  const borrowed = new Promise((resolve, reject) => {
+    settle = { resolve, reject };
+  });
+  borrowed.catch(() => {});
+  let child;
+  try {
+    child = borrowAsync(entry.hold, spec, {
+      killWaitMs: handle.killWaitMs,
+      onResult: (result) => {
+        entry.borrows -= 1;
+        if (result.error) settle.reject(borrowError(handle, spec, result));
+        else settle.resolve({ exit: result.exit ?? null, signal: null, leftoversKilled: result.leftoversKilled ?? 0 });
+      },
+    });
+  } catch (err) {
+    entry.borrows -= 1;
+    throw err;
+  }
+  child.borrowed = borrowed;
+  return child;
+}
+
 /**
  * runBorrowed(handle, spec, { sync }) -- the one way a child command runs
  * with the holder's authority. `spec = { command, args, cwd, env, stdin, detached }`.
@@ -458,16 +512,16 @@ function sweepProcessGroup(childPid) {
 export function runBorrowed(handle, spec, { sync = true } = {}) {
   const entry = descriptionOf(handle);
   if (entry.released) throw new HolderLockError('lock-handle-released', `${handle.name}: cannot borrow a released lock`, { lock: handle.name });
-  if (entry.hold) throw new HolderLockError('borrow-unsupported', `${handle.name}: the lock-hold helper does not borrow yet`, { lock: handle.name });
   if (!spec || typeof spec.command !== 'string' || !spec.command) {
     throw new HolderLockError('borrow-spec-invalid', 'runBorrowed needs spec.command', {});
   }
+  if (entry.hold) return runBorrowedHold(handle, entry, spec, sync);
   const argv = borrowedArgv(spec.command, spec.args);
   const childEnv = { ...(spec.env ?? process.env), [LOCK_FD_ENV]: `${handle.name}:${LOCK_FD_SLOT}` };
   const stdio = [spec.stdin ?? 'ignore', 'pipe', 'pipe', entry.fd];
-  // Off Linux the leftovers are the child's process group, so it must lead one;
-  // a caller that signals the child's group itself asks for one everywhere.
-  const detached = spec.detached === true || (process.platform !== 'linux' && process.platform !== 'win32');
+  // The group sweep needs the child to lead a process group; a caller that
+  // signals the child's group itself asks for one everywhere.
+  const detached = borrowLeadsGroup(spec);
 
   if (sync) {
     entry.borrows += 1;
@@ -534,6 +588,7 @@ export function runBorrowed(handle, spec, { sync = true } = {}) {
  * borrower, no route call.
  */
 export function checkBorrowedDescription(lockPath, { env = process.env, fgosDir } = {}) {
+  if (lockTransport() === 'hold') return checkBorrowedJob(lockPath, { env, fgosDir });
   const raw = env[LOCK_FD_ENV];
   const match = typeof raw === 'string' ? /^([^:]+):(\d+)$/.exec(raw) : null;
   if (!match) return { result: 'not-borrower', reason: 'fd-missing', name: null };
@@ -544,10 +599,29 @@ export function checkBorrowedDescription(lockPath, { env = process.env, fgosDir 
   // that slot, whatever number the caller's process gave the descriptor.
   const childEnv = routeEnv({ ...process.env, [LOCK_FD_ENV]: `${name}:${LOCK_FD_SLOT}` });
   const line = runLockRouteSync({ bin, args: ['--borrowed-check', path.resolve(lockPath)], fd: slot, timeoutMs: ROUTE_CALL_TIMEOUT_MS, env: childEnv });
+  return borrowedAnswer(line, name);
+}
+
+/** The route's answer to a borrower check, as the facade reports it. */
+function borrowedAnswer(line, name) {
   if (line.result === 'borrower') return { result: 'borrower', name };
   if (line.result === 'not-borrower') return { result: 'not-borrower', reason: line.reason ?? 'lock-not-held-by-description', name };
   if (line.result === 'unavailable') {
     throw new HolderLockError('lock-driver-unavailable', `${name}: ${line.detail}`, { reason: line.reason, lock: name });
   }
   throw new HolderLockError('lock-route-bad-output', `${name}: unexpected borrowed-check answer ${JSON.stringify(line.result)}`, { lock: name, line });
+}
+
+/** The hold transport's borrower check: no descriptor exists, so the route
+ * judges the process by the job named in `FGOS_LOCK_JOB` (membership, the
+ * predecessor record, the holder among its ancestors). The caller's own
+ * environment reaches the route, because membership is the process's own. */
+function checkBorrowedJob(lockPath, { env, fgosDir }) {
+  const raw = env[LOCK_JOB_ENV];
+  const match = typeof raw === 'string' ? /^([^:]+):(.+)$/.exec(raw) : null;
+  if (!match) return { result: 'not-borrower', reason: 'job-missing', name: null };
+  const name = match[1];
+  const bin = hostBin({ fgosDir });
+  const line = runLockRouteSync({ bin, args: ['--borrowed-check', path.resolve(lockPath)], timeoutMs: ROUTE_CALL_TIMEOUT_MS, env: routeEnv({ ...process.env, ...env }) });
+  return borrowedAnswer(line, name);
 }

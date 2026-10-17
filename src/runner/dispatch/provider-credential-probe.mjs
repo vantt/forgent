@@ -118,6 +118,11 @@ export function runCredentialProbe(plan, { spawnFn = spawn, timeoutMs = DEFAULT_
     child.stderr?.on('data', collect);
     const timer = setTimeout(() => {
       timedOut = true;
+      // A borrowed call on Windows is a job, not a process group: `kill()` cancels its job.
+      if (process.platform === 'win32') {
+        try { child.kill('SIGKILL'); } catch { /* already gone */ }
+        return;
+      }
       try { process.kill(-child.pid, 'SIGKILL'); } catch { try { child.kill('SIGKILL'); } catch { /* already gone */ } }
     }, timeoutMs);
     child.on('error', (err) => { clearTimeout(timer); resolve({ ok: false, detail: `could not run ${plan.command}: ${err.message}` }); });

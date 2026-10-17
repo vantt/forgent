@@ -9,6 +9,9 @@
 // is unref'd, so a held lock never keeps a CLI's event loop alive; libuv's
 // kill-on-close job ends it when Node dies, and it also waits on its parent.
 //
+// A borrowed child runs inside a job the helper creates (`borrow` request);
+// its output goes to files the facade reads or tails, `cancel` ends its job.
+//
 // Release is TerminateProcess on the helper: the kernel frees the lock at
 // once. `process.kill(pid, 0)` then tells when the helper is gone; the pid
 // cannot be reused while libuv still holds the unreaped child handle.
@@ -16,6 +19,8 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { EventEmitter } from 'node:events';
+import { Readable } from 'node:stream';
 import { spawn } from 'node:child_process';
 import { HolderLockError, PROTOCOL, parseRouteLine } from './protocol.mjs';
 import { routeLineOrThrow } from './driver.mjs';
@@ -27,6 +32,12 @@ const EXIT_POLL_MS = 1;
 export const HELPER_EXIT_BOUND_MS = 2000;
 const STALE_WORK_AGE_MS = 60 * 60 * 1000;
 const STALE_WORK_MAX_PER_CALL = 50;
+const RESULT_POLL_MS = 2;
+/** How long an async borrow may take to report its child's pid. */
+const STARTED_BOUND_MS = 2000;
+/** Extra time past a cancel and the kill wait before a borrow counts as stuck. */
+const BORROW_SLACK_MS = 1000;
+const TAIL_POLL_MS = 20;
 
 let sequence = 0;
 
@@ -107,7 +118,7 @@ export function startHold({ bin, lockPath, wait, killWaitMs, env }) {
     throw new HolderLockError('lock-driver-unavailable', `cannot run ${bin}`, { reason: 'no-host-binary', tried: [bin] });
   }
   child.unref();
-  return { child, pid: child.pid, work };
+  return { child, pid: child.pid, work, requests: 0 };
 }
 
 /** The helper's answer once `ready.json` exists, else null. */
@@ -212,4 +223,246 @@ export function terminateSync(hold) {
 export function releaseHold(hold) {
   terminateSync(hold);
   removeWorkDir(hold.work);
+}
+
+// ---------------------------------------------------------------------------
+// borrowing
+// ---------------------------------------------------------------------------
+
+/** Write `req-<n>.json` (temp file, then rename) and return `n`. */
+function writeRequest(hold, body) {
+  hold.requests += 1;
+  const n = hold.requests;
+  const tmp = path.join(hold.work, `req-${n}.json.tmp`);
+  fs.writeFileSync(tmp, JSON.stringify(body));
+  fs.renameSync(tmp, path.join(hold.work, `req-${n}.json`));
+  return n;
+}
+
+function readJsonIfPresent(file) {
+  let text;
+  try {
+    text = fs.readFileSync(file, 'utf8');
+  } catch (err) {
+    if (err.code === 'ENOENT') return null;
+    throw err;
+  }
+  return JSON.parse(text);
+}
+
+const resultOf = (hold, n) => readJsonIfPresent(path.join(hold.work, `result-${n}.json`));
+const startedOf = (hold, n) => readJsonIfPresent(path.join(hold.work, `started-${n}.json`));
+
+function forget(hold, n, names) {
+  for (const name of names) {
+    try {
+      fs.rmSync(path.join(hold.work, name.replace('<n>', String(n))), { force: true });
+    } catch {
+      // swept with the work directory
+    }
+  }
+}
+
+const BORROW_FILES = ['req-<n>.json', 'started-<n>.json', 'out-<n>.log', 'err-<n>.log', 'result-<n>.json'];
+
+function readLog(hold, name) {
+  try {
+    return fs.readFileSync(path.join(hold.work, name), 'utf8');
+  } catch {
+    return '';
+  }
+}
+
+/** The request that runs `spec` (`{ command, args, cwd, env }`) in a borrow
+ * job. The helper adds git's `gc.auto` flags itself, so `args` stays as the
+ * caller gave them; `env` replaces the child's environment entirely. */
+function borrowRequest(spec) {
+  const env = {};
+  for (const [key, value] of Object.entries(spec.env ?? process.env)) {
+    if (value !== undefined && value !== null) env[key] = String(value);
+  }
+  return { op: 'borrow', argv: [spec.command, ...(Array.isArray(spec.args) ? spec.args.map(String) : [])], cwd: spec.cwd ?? null, env, stdin: 'null' };
+}
+
+/** The helper ended while a borrow was in flight: nothing will answer. */
+function helperGone(hold, n) {
+  return new HolderLockError('borrow-helper-gone', `lock-hold helper ${hold.pid} ended before it answered borrow ${n}`, { pid: hold.pid });
+}
+
+/** Run one borrow and wait for its result, blocking. `spec.timeoutMs`, when
+ * given, ends the child's job through a `cancel` request once it passes; the
+ * call then waits up to `killWaitMs` more (plus slack) for the helper's
+ * answer. Returns `{ result, stdout, stderr }`; the caller maps `result`. */
+export function borrowSync(hold, spec, { killWaitMs }) {
+  const n = writeRequest(hold, borrowRequest(spec));
+  const startedAt = Date.now();
+  let hardDeadline = null;
+  for (;;) {
+    const result = resultOf(hold, n);
+    if (result) {
+      const answer = { result, stdout: readLog(hold, `out-${n}.log`), stderr: readLog(hold, `err-${n}.log`) };
+      forget(hold, n, BORROW_FILES);
+      return answer;
+    }
+    if (!helperAlive(hold)) {
+      // It may have answered and ended between the two looks.
+      const last = resultOf(hold, n);
+      if (last) continue;
+      throw helperGone(hold, n);
+    }
+    const now = Date.now();
+    if (hardDeadline === null && Number.isInteger(spec.timeoutMs) && now - startedAt >= spec.timeoutMs) {
+      writeRequest(hold, { op: 'cancel', n });
+      hardDeadline = now + killWaitMs + BORROW_SLACK_MS;
+    }
+    if (hardDeadline !== null && now >= hardDeadline) {
+      throw new HolderLockError('borrow-stuck', `lock-hold helper ${hold.pid} did not answer borrow ${n} after a cancel`, { pid: hold.pid });
+    }
+    sleepSync(RESULT_POLL_MS);
+  }
+}
+
+/** A `Readable` that follows one file as the helper's child appends to it. */
+class Tail extends Readable {
+  constructor(file) {
+    super();
+    this.file = file;
+    this.offset = 0;
+  }
+
+  _read() {}
+
+  /** Push what was appended since the last drain. */
+  drain() {
+    let fd;
+    try {
+      fd = fs.openSync(this.file, 'r');
+    } catch {
+      return;
+    }
+    try {
+      const size = fs.fstatSync(fd).size;
+      if (size > this.offset) {
+        const buffer = Buffer.alloc(size - this.offset);
+        const read = fs.readSync(fd, buffer, 0, buffer.length, this.offset);
+        this.offset += read;
+        if (read > 0) this.push(buffer.subarray(0, read));
+      }
+    } finally {
+      fs.closeSync(fd);
+    }
+  }
+}
+
+/** The ChildProcess-shaped object of an async borrow: `pid`, `stdout` and
+ * `stderr` streams, `'spawn'`, `'exit'`, `'close'` and `'error'` events,
+ * `kill()` (a cancel request), `exitCode`, `signalCode`. It follows the
+ * helper's files, so it works while the event loop turns. The pid is read
+ * before this returns (within `STARTED_BOUND_MS`); `onResult(result)` is
+ * called once with the helper's answer, after the final drain of the
+ * streams, before `'exit'` is emitted. */
+export function borrowAsync(hold, spec, { killWaitMs, onResult }) {
+  const n = writeRequest(hold, borrowRequest(spec));
+  const child = new EventEmitter();
+  child.stdout = new Tail(path.join(hold.work, `out-${n}.log`));
+  child.stderr = new Tail(path.join(hold.work, `err-${n}.log`));
+  child.stdin = null;
+  child.exitCode = null;
+  child.signalCode = null;
+  child.killed = false;
+  child.pid = undefined;
+  let finished = false;
+  child.kill = () => {
+    if (finished) return false;
+    child.killed = true;
+    try {
+      writeRequest(hold, { op: 'cancel', n });
+    } catch {
+      return false;
+    }
+    return true;
+  };
+
+  const finish = (result) => {
+    if (finished) return;
+    finished = true;
+    clearInterval(timer);
+    child.stdout.drain();
+    child.stderr.drain();
+    child.stdout.push(null);
+    child.stderr.push(null);
+    forget(hold, n, ['req-<n>.json', 'started-<n>.json', 'result-<n>.json']);
+    const code = Number.isInteger(result.exit) ? result.exit : null;
+    child.exitCode = code;
+    onResult(result);
+    child.emit('exit', code, null);
+    let open = 2;
+    const ended = () => {
+      open -= 1;
+      if (open === 0) {
+        forget(hold, n, ['out-<n>.log', 'err-<n>.log']);
+        child.emit('close', code, null);
+      }
+    };
+    child.stdout.once('end', ended);
+    child.stderr.once('end', ended);
+    // A stream nobody reads would never end: let it flow.
+    child.stdout.resume();
+    child.stderr.resume();
+  };
+  const fail = (result) => {
+    // No child ever ran: report through the events, like a failed spawn.
+    finished = true;
+    clearInterval(timer);
+    onResult(result);
+    process.nextTick(() => child.emit('error', Object.assign(new Error(result.message ?? result.error), { code: result.error })));
+  };
+
+  // The pid: the helper writes started-<n>.json once the child runs in its job.
+  const startBound = Date.now() + STARTED_BOUND_MS;
+  let timer = null;
+  for (;;) {
+    const started = startedOf(hold, n);
+    if (started && Number.isInteger(started.pid)) {
+      child.pid = started.pid;
+      break;
+    }
+    const result = resultOf(hold, n);
+    if (result) {
+      // No child ever ran: report it like a failed spawn. Otherwise it ran to
+      // the end already, and the first tick below reports that.
+      if (result.error && !Number.isInteger(result.exit)) {
+        fail(result);
+        return child;
+      }
+      break;
+    }
+    if (!helperAlive(hold)) throw helperGone(hold, n);
+    if (Date.now() >= startBound) {
+      writeRequest(hold, { op: 'cancel', n });
+      throw new HolderLockError('borrow-start-timeout', `lock-hold helper ${hold.pid} did not start borrow ${n} within ${STARTED_BOUND_MS} ms`, { pid: hold.pid });
+    }
+    sleepSync(RESULT_POLL_MS);
+  }
+  const hardMs = killWaitMs + BORROW_SLACK_MS;
+  let cancelledAt = null;
+  timer = setInterval(() => {
+    child.stdout.drain();
+    child.stderr.drain();
+    const result = resultOf(hold, n);
+    if (result) {
+      finish(result);
+      return;
+    }
+    if (!helperAlive(hold)) {
+      finish({ error: 'borrow-helper-gone', message: `lock-hold helper ${hold.pid} ended before it answered borrow ${n}` });
+      return;
+    }
+    if (child.killed && cancelledAt === null) cancelledAt = Date.now();
+    if (cancelledAt !== null && Date.now() - cancelledAt > hardMs) {
+      finish({ error: 'borrow-stuck', message: `lock-hold helper ${hold.pid} did not answer borrow ${n} after a cancel` });
+    }
+  }, TAIL_POLL_MS);
+  process.nextTick(() => child.emit('spawn'));
+  return child;
 }
