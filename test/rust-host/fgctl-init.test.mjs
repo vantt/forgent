@@ -454,9 +454,11 @@ test('Item 1: Concurrent fgctl init invocations against pre-staged pinned worksp
     const txFiles = fs.readdirSync(installsDir).filter((f) => f.endsWith('.json'));
     assert.equal(txFiles.length, 1, 'Release store must contain exactly one completed install transaction');
 
-    // activation.json exists, activation.lock is removed
+    // activation.json exists; the old lock file path holds no file (a fence tombstone directory
+    // placed by the init's own doctor fix is fine)
     assert.ok(fs.existsSync(path.join(tempProj, '.fgos', 'installation', 'activation.json')));
-    assert.ok(!fs.existsSync(path.join(tempProj, '.fgos', 'installation', 'activation.lock')));
+    const oldLock = path.join(tempProj, '.fgos', 'installation', 'activation.lock');
+    assert.ok(!fs.existsSync(oldLock) || fs.statSync(oldLock).isDirectory());
   } finally {
     fs.rmSync(tempHome, { recursive: true, force: true });
     fs.rmSync(tempState, { recursive: true, force: true });
