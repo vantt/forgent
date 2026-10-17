@@ -441,6 +441,8 @@ function parentPidOf(pid) {
  * left behind after both are gone is still named.
  */
 function isAttemptMember(pid, holderPids, lockName) {
+  // Only the bwrap monitor qualifies: a leaked lock fd in the agent or its descendants must still be named.
+  if (String(readProc(pid, 'comm') ?? '').trim() !== 'bwrap') return false;
   const parent = parentPidOf(pid);
   return parent !== null && holderPids.includes(parent) && holderOrigin(parent, lockName) !== null;
 }

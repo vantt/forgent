@@ -143,6 +143,15 @@ test('runtime-socket-dir: something that is not a directory fails and the fix le
   assert.equal(fs.readFileSync(path.join(xdg, 'fgos'), 'utf8'), 'in the way');
 });
 
+test('runtime-socket-dir: a directory too long for a socket name fails and is not called fixable', { skip: UID === undefined && 'no uid on this platform' }, () => {
+  const xdg = path.join(scratch, 'x'.repeat(90));
+  fs.mkdirSync(xdg, { mode: 0o700 });
+  const res = checkRuntimeSocketDir({ env: { XDG_RUNTIME_DIR: xdg } });
+  assert.equal(res.passed, false);
+  assert.match(res.message, /leaves no room for a socket name/);
+  assert.ok(!res.message.includes('--fix"'), res.message);
+});
+
 // ─── gate-kill-grace ────────────────────────────────────────────────────
 
 test('gate-kill-grace: absent is the default, project overrides global, below 1000 or not an integer fails', () => {

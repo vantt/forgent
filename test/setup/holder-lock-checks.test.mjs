@@ -252,9 +252,13 @@ test('lock-holders: a monitor whose parent is the supervisor of the attempt is a
   const lock = path.join(dir, 'attempt.lock');
   fs.writeFileSync(lock, '');
 
+  // The monitor is a copy of sleep named bwrap: only a process of that name can be a member.
+  const bwrap = path.join(scratch, 'bwrap');
+  fs.copyFileSync(execFileSync('sh', ['-c', 'command -v sleep'], { encoding: 'utf8' }).trim(), bwrap);
+  fs.chmodSync(bwrap, 0o755);
   // The parent plays the supervisor (it carries the lock marker); its child keeps the same description
   // with no marker at all, as the bwrap monitor does.
-  const supervisor = spawn('sh', ['-c', 'exec 9>>"$1"; flock -x 9; env -i PATH="$PATH" sleep 30 & wait', 'sh', lock], { env: foreignEnv({ FGOS_LOCK_FD: 'attempt:9' }), stdio: 'ignore' });
+  const supervisor = spawn('sh', ['-c', 'exec 9>>"$1"; flock -x 9; env -i "$2" 30 & wait', 'sh', lock, bwrap], { env: foreignEnv({ FGOS_LOCK_FD: 'attempt:9' }), stdio: 'ignore' });
   children.add(supervisor);
   let monitorPid;
   const deadline = Date.now() + 5000;
@@ -279,7 +283,7 @@ test('lock-holders: a monitor whose parent is the supervisor of the attempt is a
       await new Promise((resolve) => { setTimeout(resolve, 20); });
     }
   })();
-  assert.match(named.message, new RegExp(`^warning: attempt .*attempt\\.lock held by pid ${monitorPid} \\(sleep 30\\), not a fgOS process nor a borrowed child`));
+  assert.match(named.message, new RegExp(`^warning: attempt .*attempt\\.lock held by pid ${monitorPid} \\(${bwrap.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')} 30\\), not a fgOS process nor a borrowed child`));
   process.kill(monitorPid, 'SIGKILL');
 });
 
