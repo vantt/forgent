@@ -11,11 +11,14 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import * as cleanup from '../cleanup.mjs';
 import { cleanupConfinementResource, writeOwnershipMarker, extendOwnershipMarker, ensurePrivateDir, markResourceRetained, bindOwnershipMarker, markOwnershipLaunched } from '../cleanup.mjs';
 import { copyCredentialFiles, credentialWriteBackMarker } from '../../provider-credential-renewal.mjs';
 import { expandCredentialHome } from '../../provider-credential-probe.mjs';
 import { resolveConfinementResources, isInsideRoot, requestIsBlind } from '../resources.mjs';
 import { assertAttestationStoreIsolated } from '../attestation-store.mjs';
+import { computeSha256Digest } from '../../proof-helpers.mjs';
+import { ensureRuntimeSocketDir } from '../../../../run-supervisor/runtime-dir.mjs';
 
 export const BWRAP_DRIVER_TYPE = 'bwrap';
 export const BWRAP_DRIVER_VERSION = 'local-bwrap-v1';
@@ -431,6 +434,23 @@ export function assessBwrap(request, backend) {
   };
 }
 
+function writeAttemptMarker(dir, fields) {
+  if (typeof cleanup.writeOwnershipMarkerV2 !== 'function') {
+    const err = new Error('attempt home markers need writeOwnershipMarkerV2 from confinement/cleanup.mjs');
+    err.code = 'marker-v2-writer-missing';
+    throw err;
+  }
+  cleanup.writeOwnershipMarkerV2(dir, fields);
+}
+
+/**
+ * Digest of what a supervised attempt really runs: the bwrap prefix, the gate command that follows
+ * it, and the agent argv the gate execs. Changing any of them changes the digest.
+ */
+export function computeLaunchDigest({ bwrapPrefix, gateCommand, agentArgv }) {
+  return computeSha256Digest({ bwrapPrefix, gateCommand, agentArgv });
+}
+
 /**
  * Prepare sandbox invocation strictly from RESOLVED resources (spec §6.5, R4).
  * Never branches on executorId, providerModel, or agent type to decide any
@@ -463,7 +483,18 @@ export function prepareBwrapSync(plan, request, backend) {
       '--dev', '/dev',
       '--proc', '/proc',
       '--tmpfs', '/tmp',
+      // Every launch gets its own pid namespace with the launched command as pid 1, so the
+      // namespace is empty exactly when that command's tree is gone.
+      '--unshare-pid', '--as-pid-1',
     ];
+    // Only a terminal-mode launch is tied to its launcher's lifetime. A direct attempt must
+    // outlive a dead supervisor, so it never gets --die-with-parent.
+    const terminal = request.launchMode === 'terminal';
+    if (terminal) {
+      const socketDir = ensureRuntimeSocketDir();
+      bwrapArgs.push('--die-with-parent', '--bind', socketDir, socketDir);
+    }
+    const attemptId = typeof request.attemptId === 'string' && request.attemptId !== '' ? request.attemptId : null;
 
     const resources = plan.resources || [];
     const blind = requestIsBlind(request);
@@ -481,7 +512,11 @@ export function prepareBwrapSync(plan, request, backend) {
         // root, the per-dispatch parent and the home all end up owner-only -- the
         // home receives a login copy. Nothing above the named root is touched.
         ensurePrivateDir(res.hostTarget, { root: res.tempRoot ?? res.hostTarget });
-        writeOwnershipMarker(res.hostTarget, { dispatchId: request.dispatchId, resource: res.resource, timeoutMs: request.context?.timeoutMs });
+        if (attemptId) {
+          writeAttemptMarker(res.hostTarget, { attemptId, runDir: request.context?.runDir, dispatchId: request.dispatchId, resource: res.resource });
+        } else {
+          writeOwnershipMarker(res.hostTarget, { dispatchId: request.dispatchId, resource: res.resource, timeoutMs: request.context?.timeoutMs });
+        }
         allocatedPaths.push(res.hostTarget);
         if (res.resource === 'private-home') {
           const provisioned = provisionSelectedCredential(res.hostTarget, request);
@@ -508,7 +543,6 @@ export function prepareBwrapSync(plan, request, backend) {
       // then the masks, then the dispatch's own directory read-only, then the mounts inside
       // a hidden root (its outbox, its private home), and last the masks made read-only.
       const insideMasked = (res) => [...hidden, own].some((h) => res.executionTarget?.path && isInsideRoot(res.executionTarget.path, h.executionTarget.path));
-      bwrapArgs.push('--unshare-pid');
       mounts.filter((r) => !insideMasked(r)).forEach(materialize);
       for (const h of hidden) bwrapArgs.push('--tmpfs', h.executionTarget.path);
       bwrapArgs.push('--ro-bind', own.hostTarget, own.executionTarget.path);
@@ -537,15 +571,14 @@ export function prepareBwrapSync(plan, request, backend) {
     const fdCloserScript = 'for f in $(ls /proc/$$/fd 2>/dev/null); do if [ "$f" -ge 3 ] 2>/dev/null; then eval "exec $f>&-" 2>/dev/null || true; fi; done; exec "$@"';
 
     const originalCmd = request.invocation.command;
-    bwrapArgs.push(
-      '--',
-      'bash',
-      '-c',
-      fdCloserScript,
-      'bwrap-launch',
-      originalCmd,
-      ...finalArgs,
-    );
+    const agentArgv = [originalCmd, ...finalArgs];
+    // A supervised attempt hands the prefix to the envelope and the gate is the command, so the
+    // worker argv is not appended here.
+    if (attemptId) {
+      bwrapArgs.push('--');
+    } else {
+      bwrapArgs.push('--', 'bash', '-c', fdCloserScript, 'bwrap-launch', ...agentArgv);
+    }
 
     const preparedInvocation = {
       ...request.invocation,
@@ -578,6 +611,7 @@ export function prepareBwrapSync(plan, request, backend) {
     return {
       invocation: preparedInvocation,
       claims: { ...plan.coverage },
+      ...(attemptId ? { bwrapPrefix: [...bwrapArgs], agentArgv, ...(Array.isArray(request.gateCommand) ? { launchDigest: computeLaunchDigest({ bwrapPrefix: bwrapArgs, gateCommand: request.gateCommand, agentArgv }) } : {}) } : {}),
       providerCapacity: credentialProvisioned ? { credentialProvisioned: true } : undefined,
       cleanup,
       retain,
