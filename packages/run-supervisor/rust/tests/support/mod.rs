@@ -76,6 +76,8 @@ pub struct Options {
     pub ceiling: Option<(String, u64)>,
     pub grace_ms: u64,
     pub side_env: BTreeMap<String, String>,
+    /// `containment.preferred` of the envelope.
+    pub preferred: String,
 }
 
 impl Options {
@@ -87,6 +89,7 @@ impl Options {
             ceiling: None,
             grace_ms: 10_000,
             side_env: BTreeMap::new(),
+            preferred: "linux-gate".into(),
         }
     }
 }
@@ -137,7 +140,7 @@ impl Attempt {
                 "outboxDir": outbox,
                 "capture": {"stdout": stdout, "stderr": stderr},
             },
-            "containment": {"preferred": "linux-gate"},
+            "containment": {"preferred": options.preferred},
             "deadlines": {
                 "softAt": {"bootId": "x", "boottimeNs": null},
                 "idleMs": null,

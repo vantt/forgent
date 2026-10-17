@@ -4,6 +4,8 @@
 
 use std::fs::{self, File, OpenOptions};
 use std::io::{self, Write};
+#[cfg(unix)]
+use std::os::unix::fs::OpenOptionsExt;
 use std::path::Path;
 
 /// Who won the link.
@@ -17,14 +19,22 @@ pub enum Published {
 
 /// Publish `bytes` as `<dir>/<name>` exactly once.
 pub fn publish_once(dir: &Path, name: &str, bytes: &[u8]) -> io::Result<Published> {
-    let temp = dir.join(format!(".{name}.tmp.{}", std::process::id()));
+    // The pid alone repeats (a gate is always pid 1 in its namespace), so the
+    // name carries the clock too; the file is created exclusively below.
+    let nanos = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_nanos();
+    let temp = dir.join(format!(".{name}.tmp.{}.{nanos}", std::process::id()));
     let result = write_and_link(dir, name, &temp, bytes);
     let _ = fs::remove_file(&temp);
     result
 }
 
 fn write_and_link(dir: &Path, name: &str, temp: &Path, bytes: &[u8]) -> io::Result<Published> {
-    let mut file = OpenOptions::new().write(true).create(true).truncate(true).open(temp)?;
+    // Exclusive and never through a symlink: a pre-planted path must fail, not be written.
+    let mut options = OpenOptions::new();
+    options.write(true).create_new(true);
+    #[cfg(unix)]
+    options.custom_flags(libc::O_NOFOLLOW).mode(0o600);
+    let mut file = options.open(temp)?;
     file.write_all(bytes)?;
     file.sync_all()?;
     drop(file);
@@ -33,8 +43,11 @@ fn write_and_link(dir: &Path, name: &str, temp: &Path, bytes: &[u8]) -> io::Resu
         Err(err) if err.kind() == io::ErrorKind::AlreadyExists => Published::AlreadyPublished,
         Err(err) => return Err(err),
     };
-    // Make the new directory entry durable.
-    File::open(dir)?.sync_all()?;
+    // Make the new directory entry durable; the link already happened, so a
+    // failure here must not report the publish as failed.
+    if let Ok(handle) = File::open(dir) {
+        let _ = handle.sync_all();
+    }
     Ok(outcome)
 }
 

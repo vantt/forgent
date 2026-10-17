@@ -17,7 +17,7 @@ use support::*;
 fn noisy(extra: &[&str]) -> Options {
     let mut args = vec![fixture("noisy-agent.mjs")];
     args.extend(extra.iter().map(|a| a.to_string()));
-    Options { command: node(), args, stdin_brief: None, ceiling: None, grace_ms: 10_000, side_env: BTreeMap::new() }
+    Options { command: node(), args, stdin_brief: None, ceiling: None, grace_ms: 10_000, side_env: BTreeMap::new(), preferred: "linux-gate".into() }
 }
 
 fn nspid(host_pid: u32) -> Vec<u32> {
@@ -215,4 +215,44 @@ fn no_process_of_the_attempt_but_the_gate_holds_the_lock() {
     }
     signal_by_identity(&gate.spawned.root, Signal::Term);
     wait_exit(&mut gate.spawned, Duration::from_secs(10));
+}
+
+/// Without a namespace (`linux-pgroup`) the gate is an ordinary process: it
+/// adopts orphans as a subreaper and must still end every one of them, and it
+/// must never signal anything outside its own tree.
+#[test]
+fn a_gate_that_is_not_pid_1_ends_the_orphans_it_adopted() {
+    use std::os::fd::OwnedFd;
+    use std::os::unix::net::UnixStream;
+    use std::process::{Command, Stdio};
+
+    use fgos_process::control::spawn_with_fds;
+    use fgos_process::FdSlot;
+    use fgos_run_supervisor::go_channel::{read_frame, write_frame};
+
+    let token = format!("298.{}", std::process::id());
+    let mut options = Options::new("/bin/sh", &["-c", &format!("(sleep {token} &); exit 0")]);
+    options.preferred = "linux-pgroup".into();
+    let attempt = Attempt::new("not-pid1", &options);
+    let (mine, theirs) = UnixStream::pair().unwrap();
+    let mut cmd = Command::new(harness());
+    cmd.args(["--protocol", "1", "--envelope", &attempt.envelope.to_string_lossy(), "--go-fd", "5"]).stdin(Stdio::null());
+    let theirs = std::fs::File::from(OwnedFd::from(theirs));
+    let child = spawn_with_fds(cmd, &[(FdSlot(5), &theirs)]).unwrap();
+    drop(theirs);
+    let mut go = mine;
+    let hello = read_frame(&mut go).unwrap();
+    assert_eq!(hello["type"], "HELLO");
+    write_frame(&mut go, &serde_json::json!({"type": "GO", "attemptId": attempt.attempt_id, "envelopeDigest": attempt.digest, "gateHostTuple": null})).unwrap();
+    let mut child = child;
+    let status = loop {
+        if let Some(status) = child.try_wait().unwrap() {
+            break status;
+        }
+        sleep(Duration::from_millis(20));
+    };
+    assert!(status.success(), "gate exit: {status:?}");
+    assert_eq!(attempt.gate_exit().unwrap()["stoppedBy"], "agent");
+    let survivors: Vec<String> = fs::read_dir("/proc").unwrap().flatten().filter_map(|e| fs::read(e.path().join("cmdline")).ok()).map(|c| String::from_utf8_lossy(&c).into_owned()).filter(|c| c.contains(&token)).collect();
+    assert!(survivors.is_empty(), "the adopted orphan must be dead: {survivors:?}");
 }

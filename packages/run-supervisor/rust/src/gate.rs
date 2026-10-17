@@ -70,8 +70,10 @@ fn parse_fd(text: &str) -> Result<u32, ArgsError> {
 
 /// Machine output of a failed gate: one JSON object on stdout.
 fn report(code: &str, why: &str) {
-    println!("{}", serde_json::json!({"v": 1, "protocol": 1, "result": "error", "code": code}));
-    eprintln!("fgos internal gate: {code}: {why}");
+    use std::io::Write;
+    // A closed stdout or stderr must not turn the named exit code into a panic.
+    let _ = writeln!(std::io::stdout(), "{}", serde_json::json!({"v": 1, "protocol": 1, "result": "error", "code": code}));
+    let _ = writeln!(std::io::stderr(), "fgos internal gate: {code}: {why}");
 }
 
 /// Run the gate; the return value is the process exit code.
@@ -103,7 +105,7 @@ pub fn run(args: &[String]) -> i32 {
 mod unix {
     use std::collections::BTreeMap;
     use std::fs::{self, File, OpenOptions};
-    use std::io;
+    use std::io::{self, Read};
     use std::os::fd::{AsRawFd, FromRawFd};
     use std::os::unix::fs::OpenOptionsExt;
     use std::os::unix::net::UnixStream;
@@ -143,6 +145,8 @@ mod unix {
         /// `(bootId, CLOCK_BOOTTIME ns)` of the hard ceiling.
         ceiling: Option<(String, u64)>,
         grace: Duration,
+        /// The current boot, read once.
+        boot_id: Option<String>,
     }
 
     /// Why the agent is being stopped.
@@ -174,11 +178,13 @@ mod unix {
             }
         };
         // SAFETY: getpid has no preconditions.
-        let pid1 = unsafe { libc::getpid() } == 1;
-        if config.preferred == "linux-gate" && !pid1 {
+        let is_init = unsafe { libc::getpid() } == 1;
+        if config.preferred == "linux-gate" && !is_init {
             report("not-pid-1", "the envelope names linux-gate but this process is not pid 1 of its namespace");
             return EXIT_INTERNAL;
         }
+        // `kill(-1)` is armed only for the driver whose domain is the namespace.
+        let pid1 = is_init && config.preferred == "linux-gate";
         #[cfg(target_os = "linux")]
         if !pid1 {
             // Without a namespace the gate adopts orphans itself so the sweep
@@ -300,7 +306,11 @@ mod unix {
     }
 
     /// Wait for the GO frame. `None`: EOF, a protocol error, or a stop signal.
+    /// The frame is accumulated without blocking, so a signal is seen even
+    /// while the supervisor has sent only part of it.
     fn wait_for_go(go: &mut UnixStream, pipe: libc::c_int) -> Option<Value> {
+        go.set_nonblocking(true).ok()?;
+        let mut buf: Vec<u8> = Vec::new();
         loop {
             let mut fds = [
                 libc::pollfd { fd: go.as_raw_fd(), events: libc::POLLIN, revents: 0 },
@@ -310,8 +320,27 @@ mod unix {
             if fds[1].revents != 0 && drain_signals(pipe).iter().any(|s| *s == libc::SIGTERM || *s == libc::SIGINT) {
                 return None;
             }
-            if fds[0].revents != 0 {
-                return read_frame(go).ok();
+            if fds[0].revents == 0 {
+                continue;
+            }
+            let mut chunk = [0u8; 4096];
+            match go.read(&mut chunk) {
+                Ok(0) => return None,
+                Ok(n) => buf.extend_from_slice(&chunk[..n]),
+                Err(err) if matches!(err.kind(), io::ErrorKind::WouldBlock | io::ErrorKind::Interrupted) => continue,
+                Err(_) => return None,
+            }
+            if buf.len() >= 4 {
+                let len = u32::from_be_bytes([buf[0], buf[1], buf[2], buf[3]]) as usize;
+                if len > crate::go_channel::MAX_FRAME_BYTES {
+                    return None;
+                }
+                if buf.len() >= 4 + len {
+                    let frame = read_frame(&mut buf.as_slice()).ok();
+                    // Back to blocking writes for the AGENT frame.
+                    go.set_nonblocking(false).ok()?;
+                    return frame;
+                }
             }
         }
     }
@@ -357,6 +386,7 @@ mod unix {
             side_file: text_of(&value["sideFile"], "sideFile")?.into(),
             preferred: text_of(&value["containment"]["preferred"], "containment.preferred")?,
             ceiling,
+            boot_id: facts::boot_id(),
             grace: Duration::from_millis(value["deadlines"]["gateKillGraceMs"].as_u64().ok_or("envelope field deadlines.gateKillGraceMs missing")?),
         })
     }
@@ -384,7 +414,7 @@ mod unix {
     /// Time left to the ceiling, `Some(ZERO)` when it passed or the boot differs.
     fn ceiling_left(config: &Config) -> Option<Duration> {
         let (boot_id, at) = config.ceiling.as_ref()?;
-        if facts::boot_id().is_some_and(|current| current != *boot_id) {
+        if config.boot_id.as_ref().is_some_and(|current| current != boot_id) {
             return Some(Duration::ZERO);
         }
         Some(Duration::from_nanos(at.saturating_sub(boottime_ns())))
@@ -458,8 +488,7 @@ mod unix {
             status = reap_all(agent_pid);
         }
 
-        kill_everything(agent_pid, agent_tuple.as_ref(), pid1);
-        reap_until_none(pid1);
+        end_domain(agent_pid, agent_tuple.as_ref(), pid1);
 
         let (exit_code, signal) = match status {
             Some(s) if s.code().is_some() => (s.code().map(Value::from).unwrap_or(Value::Null), Value::Null),
@@ -583,25 +612,41 @@ mod unix {
         }
     }
 
-    /// Reap until `ECHILD`. In a namespace the gate kills again after every
-    /// reaped child, so a process that was forking when the first kill landed
-    /// cannot outlive it.
-    fn reap_until_none(pid1: bool) {
-        loop {
-            let mut raw: libc::c_int = 0;
-            // SAFETY: waitpid with a valid out pointer.
-            let pid = unsafe { libc::waitpid(-1, &mut raw, 0) };
-            if pid > 0 {
-                if pid1 {
+    /// End every process of the domain and reap until `ECHILD`. The kill is
+    /// repeated: in a namespace after every reaped child (a process that was
+    /// forking when the first kill landed cannot outlive it); without one,
+    /// until a scan of the gate's tree finds nothing, because an orphan
+    /// adopted by the gate after the first scan is still a member.
+    fn end_domain(agent: Option<libc::pid_t>, tuple: Option<&facts::ProcTuple>, pid1: bool) {
+        kill_everything(agent, tuple, pid1);
+        if pid1 {
+            loop {
+                let mut raw: libc::c_int = 0;
+                // SAFETY: waitpid with a valid out pointer.
+                let pid = unsafe { libc::waitpid(-1, &mut raw, 0) };
+                if pid > 0 {
                     // SAFETY: as in kill_everything.
                     unsafe { libc::kill(-1, libc::SIGKILL) };
+                    continue;
                 }
-                continue;
+                if io::Error::last_os_error().raw_os_error() != Some(libc::EINTR) {
+                    return;
+                }
             }
-            match io::Error::last_os_error().raw_os_error() {
-                Some(libc::EINTR) => continue,
-                _ => return,
+        }
+        loop {
+            reap_all(None);
+            // SAFETY: waitpid with a valid out pointer; WNOHANG never blocks.
+            let none_left = unsafe { libc::waitpid(-1, std::ptr::null_mut(), libc::WNOHANG) } < 0 && io::Error::last_os_error().raw_os_error() == Some(libc::ECHILD);
+            #[cfg(target_os = "linux")]
+            let tree_empty = descendants_of_self().is_empty();
+            #[cfg(not(target_os = "linux"))]
+            let tree_empty = true;
+            if none_left && tree_empty {
+                return;
             }
+            kill_everything(agent, tuple, pid1);
+            std::thread::sleep(Duration::from_millis(5));
         }
     }
 
