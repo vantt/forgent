@@ -13,6 +13,7 @@ fgos-session-identity = { path = "../../packages/session-identity/rust" }
 fgos-run-result = { path = "../../packages/run-result/rust" }
 fgos-holder-lock = { path = "../../packages/holder-lock/rust" }
 fgos-run-supervisor = { path = "../../packages/run-supervisor/rust" }
+fgos-terminal-control = { path = "../../packages/terminal-control/rust" }
 tokio = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true, features = ["preserve_order", "arbitrary_precision"] }

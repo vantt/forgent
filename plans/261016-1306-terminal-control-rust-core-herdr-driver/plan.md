@@ -1,7 +1,7 @@
 ---
 title: "6.5 terminal-control: lõi Rust, driver herdr, layout đo thật + policy cắm được"
 description: "Component nền terminal-control (packages/terminal-control, crate fgos-terminal-control) gọi theo key/attempt id, giữ map key↔pane, driver herdr có khai báo khả năng, hình học đo thật và cổng placement policy; mọi lời gọi herdr của đường chạy đi qua một cửa; xoá createBatchTab, batchTabFor, closeIfEmpty, nhãn tự chế"
-status: pending
+status: completed
 priority: P1
 effort: 52h
 branch: worktree-agent-ae86665b911b82fc1

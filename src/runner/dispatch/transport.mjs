@@ -49,6 +49,7 @@ import { RunnerConfigError, assertReasoningEffort } from './config.mjs';
 import { resolveExecutorConfig } from './resolve.mjs';
 import { resolveVerifiedProviderArgs, recordShadowBinderDivergence, renderReasoningEffortArgs, checkLaunchedModel } from './provider-adapter.mjs';
 import { runHerdrRound } from './herdr-round.mjs';
+import { resolveHerdrBin } from './terminal-slot.mjs';
 import { DispatchError } from './dispatch-error.mjs';
 import { startDetachedRunSupervisorProcess } from './detached-run-supervisor.mjs';
 import { resolveWriterIdentity } from '../../util/session-identity.mjs';
@@ -84,9 +85,7 @@ export {
   resolveExecutorEnv,
 };
 
-export function resolveHerdrBin(optsHerdrBin) {
-  return optsHerdrBin?.trim() || process.env.FGOS_HERDR_BIN?.trim() || 'herdr';
-}
+export { resolveHerdrBin };
 
 /**
  * Substitute `{prompt}` and `{model}` into the resolved executor's `args` —
@@ -829,8 +828,9 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
     closeAlways = false,
     // A pane already sitting in the caller's own tab (one lead's coding panel
     // or fanout batch), so this round's fresh pane lands beside it instead of
-    // wherever the operator happens to be focused. Absent for a standalone
-    // dispatch -- today's implicit-focus behaviour is unchanged.
+    // wherever the operator happens to be focused. terminal-control takes it
+    // as an attached pane of the round's group (never closed by the round).
+    // Absent for a standalone dispatch: the group opens its own tab.
     //
     // Deliberately NOT threaded through `cli.mjs`/`assignment-runner.mjs`:
     // "pane" is herdr's own vocabulary, and neither of those is herdr-aware
@@ -845,11 +845,10 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
     // instead, which IS threaded through both -- a plain string is not
     // herdr's vocabulary the way an explicit pane id is.
     anchorPaneId = process.env.FGOS_HERDR_ANCHOR_PANE?.trim() || undefined,
-    // A caller-supplied batch key (see `batchTabFor` in herdr-round.mjs), for
-    // a batch whose first round doesn't yet know an explicit anchor pane.
-    // Plain data, in-process only -- the batch tab itself is created and
-    // looked up from inside the round that first needs it, never passed as
-    // a live value, so there is no environment-variable equivalent.
+    // A caller-supplied batch key: the group key of the round's panes, so
+    // every round of one batch shares a tab. Plain data, in-process only --
+    // the tab itself is owned by terminal-control, never passed as a live
+    // value, so there is no environment-variable equivalent.
     dispatchBatchKey,
   } = opts;
 

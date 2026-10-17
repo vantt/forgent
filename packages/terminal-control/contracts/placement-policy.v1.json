@@ -1,0 +1,36 @@
+{
+  "contract": { "id": "terminal-control-placement-policy", "version": 1 },
+  "description": "Pluggable placement policy. The core measures (layout.geometry), asks the policy where to put the next pane, applies the decision, then measures again. The policy is a pure deterministic function tested with geometry fixtures; it never changes ownership or lifecycle and never closes a pane.",
+  "registry": {
+    "config": "terminal.layout.policy",
+    "default": "measured-split",
+    "names": ["measured-split"]
+  },
+  "input": {
+    "groupKey": "groupKey",
+    "tabs": [
+      {
+        "tabId": "string",
+        "area": { "x": "integer", "y": "integer", "width": "integer", "height": "integer" },
+        "panes": [{ "paneId": "string", "rect": { "x": "integer", "y": "integer", "width": "integer", "height": "integer" } }]
+      }
+    ],
+    "groupPanes": [{ "key": "key", "tabId": "string", "paneId": "string", "rect": "rect", "roleHint": "optional string" }],
+    "request": { "display": "display", "roleHint": "optional string" },
+    "limits": { "minCols": "integer >= 1", "minRows": "integer >= 1", "maxPanesPerTab": "integer >= 1" }
+  },
+  "output": {
+    "oneOf": [
+      { "split": { "anchorKey": "key of a live group pane", "direction": { "enum": ["right", "down"] }, "ratio": "number in (0, 1)" } },
+      { "newTab": {} },
+      { "unsupported": { "reason": "string" } }
+    ]
+  },
+  "measuredSplit": {
+    "rule": "for every live group pane and each direction (right, down) compute both children from the measured rect at ratio 0.5; keep the candidate whose smaller child is largest, compared as the ratio to minCols for right and minRows for down; no candidate reaches the minimum, or the tab already holds maxPanesPerTab panes -> newTab",
+    "tieBreak": "smaller child score, then direction right before down, then the anchor that comes first in groupPanes order",
+    "childSizes": "right: floor(width*0.5) and width-floor(width*0.5); down: floor(height*0.5) and height-floor(height*0.5); measured on herdr: 352 -> 176+176, 69 -> 35+34"
+  },
+  "noGeometry": "when the driver lacks layout.geometry no policy runs: the core splits the newest live group pane down at 0.3 and opens a new tab at maxPanesPerTab panes",
+  "fixtures": "policy-fixtures/*.json: {name, input, expected}"
+}

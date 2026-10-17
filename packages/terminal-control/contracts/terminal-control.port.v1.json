@@ -1,0 +1,137 @@
+{
+  "contract": { "id": "terminal-control-port", "version": 1 },
+  "description": "Upper port of terminal-control, addressed by key. Callers (the Node client behind the internal route, /fgOS:terminal) see only these operations; the multiplexer lives behind a driver (driver-capabilities.v1.json). terminal-control knows nothing about runs, deadlines, receipts or work items.",
+  "key": {
+    "meaning": "caller-chosen id of one slot: today the round's launchCommandId or ad-hoc round id, later the attempt id. One key names at most one pane for its whole life.",
+    "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+  },
+  "groupKey": {
+    "meaning": "panes of one group share a tab: unit run id, or workflow run id when there is one. Display only for herdr; never a lock.",
+    "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+  },
+  "display": {
+    "fields": {
+      "label": "string; tab label for the group and pane label for the slot",
+      "role": "optional string",
+      "agent": "optional string",
+      "model": "optional string"
+    },
+    "rule": "display is written to the terminal and the record only; no code reads it back to decide anything"
+  },
+  "operations": {
+    "allocate": {
+      "input": { "key": "key", "groupKey": "groupKey", "display": "display", "roleHint": "optional string; structured data for the placement policy only", "cwd": "optional absolute path: working directory of the new pane's shell", "env": "optional object of string: environment of the new pane's shell" },
+      "results": ["slot", "unsupported", "unknown"],
+      "effects": [
+        "places a new pane through the placement policy (placement-policy.v1.json) when the driver has layout.geometry, otherwise splits the newest live group pane down at 0.3 and applies maxPanesPerTab by pane count",
+        "a group with no live pane gets a new tab whose first pane is the slot itself (no empty root pane)",
+        "publishes the allocation record (allocation-record.v1.json) once, with link(2)",
+        "an allocate for a key that already has a record returns that record's slot when the pane is live, unknown otherwise; it never allocates a second pane for one key"
+      ]
+    },
+    "attach": {
+      "input": { "key": "key", "pane": "driver pane id", "groupKey": "optional groupKey: the pane joins that group so its next pane opens beside it; defaults to the key", "display": "optional display" },
+      "results": ["slot", "unsupported", "unknown"],
+      "effects": ["records origin attached; core never closes an attached pane, release only removes its label and link"]
+    },
+    "launch": {
+      "input": {
+        "key": "key",
+        "launchSpec": {
+          "command": "string",
+          "args": "string[]",
+          "cwd": "absolute path",
+          "env": "object of string",
+          "activity": "optional {kind, args, timeoutMs}: start through the driver's agent support (activity.state) instead of a plain pane.run; timeoutMs bounds how long the driver may take to bring the agent to ready",
+          "expect": "optional {argv0, command, args}: the foreground process the launch becomes when it is not the command itself (a launcher script that execs the real one); identity is taken from the process matching it"
+        }
+      },
+      "results": ["launched", "not-started", "unsupported", "unknown"],
+      "effects": [
+        "writes marker launch-requested before the driver runs anything",
+        "writes marker launched{identity} after the root process of the pane command is identified (argv checked like verifyForegroundProcessArgv)",
+        "never launches into a slot that already has launch-requested"
+      ]
+    },
+    "send": {
+      "input": { "key": "key", "text": "optional string", "keys": "optional string[]", "submit": "optional boolean" },
+      "results": ["ok", "unsupported", "unknown"],
+      "rule": "exactly one of text or keys"
+    },
+    "read": {
+      "input": { "key": "key", "lines": "optional integer >= 1", "source": { "enum": ["visible", "recent", "recent-unwrapped", "detection"], "default": "recent" } },
+      "results": ["screen", "unsupported", "unknown"]
+    },
+    "inspect": {
+      "input": { "key": "key", "detail": "optional boolean: add the driver's detector verdict to activity.detail", "foreground": "optional boolean, default true: false skips reading the foreground process", "activity": "optional boolean, default true: false skips reading the agent state" },
+      "results": ["inspection"]
+    },
+    "release": {
+      "input": {
+        "key": "key",
+        "disposition": { "enum": ["close", "retain"] },
+        "until": "retain only: epoch ms, or null for kept until a person closes it",
+        "callerPane": "optional driver pane id: the pane the caller itself runs in; only a close of an attached slot whose pane equals it closes the pane"
+      },
+      "results": ["released", "kept-unknown", "unsupported"],
+      "effects": [
+        "close: closes only the pane this key allocated, only when the server incarnation matches right before and right after the close; never closes a tab",
+        "retain: records released{retain, until}; a later reconcile closes only past until, same incarnation, foreground not foreign",
+        "attached slots: release removes label and link only, except a close whose callerPane is the slot's own pane (a person closing their own pane through /fgOS:terminal-close), which closes it like an allocated pane (same incarnation checks); the only exception"
+      ]
+    },
+    "label": {
+      "input": { "key": "key", "display": "display", "reportState": "optional string: also tell the driver which agent (display.agent) runs in the pane, for a process it does not recognise on its own; the reported state becomes the pane's status authority" },
+      "results": ["ok", "unsupported", "unknown"]
+    },
+    "capabilities": {
+      "input": {},
+      "results": ["capabilities"],
+      "meaning": "driver name, declared capability list (driver-capabilities.v1.json) and current server incarnation or unknown; doctor reads this"
+    },
+    "reconcile-scan": {
+      "input": { "olderThanMs": "integer >= 0" },
+      "results": ["scan"],
+      "rule": "reports only; never closes anything because time passed (except retain past until under the release rule)"
+    }
+  },
+  "results": {
+    "slot": { "result": "slot", "slot": { "tabId": "string", "paneId": "string" }, "origin": { "enum": ["allocated", "attached"] } },
+    "launched": { "result": "launched", "identity": "identity" },
+    "not-started": { "result": "not-started", "reason": "string" },
+    "ok": { "result": "ok" },
+    "screen": { "result": "screen", "screen": "string" },
+    "inspection": {
+      "result": "inspection",
+      "pane": { "enum": ["live", "gone", "unknown"] },
+      "foreground": "optional identity of the foreground process",
+      "activity": "optional {state, agent, session, detail}; present only when the driver declares activity.state; detail = {state, visibleBlocker, visibleIdle, visibleWorking, matchedRule, promptText} only when asked for"
+    },
+    "released": { "result": "released", "disposition": { "enum": ["close", "retain"] } },
+    "kept-unknown": { "result": "kept-unknown", "reason": "string; the pane is kept because the core could not prove it may close it" },
+    "capabilities": { "result": "capabilities", "driver": "string", "capabilities": "string[]", "serverIncarnation": "serverIncarnation | null" },
+    "scan": {
+      "result": "scan",
+      "findings": [
+        {
+          "key": "key",
+          "kind": { "enum": ["allocated-not-launched-bare-shell", "retain-expired", "stale-incarnation", "unknown"] },
+          "detail": "string"
+        }
+      ]
+    },
+    "unsupported": { "result": "unsupported", "capability": "the missing capability name, or driver-absent", "detail": "string" },
+    "unknown": { "result": "unknown", "reason": "string; driver timeout, unreadable output, incarnation mismatch, or missing record" }
+  },
+  "types": {
+    "identity": { "pid": "integer", "startTime": "string (clock ticks since boot on Linux)", "bootId": "string", "pgid": "integer" },
+    "serverIncarnation": { "host": "string", "bootId": "string", "pidNs": "string", "pid": "integer", "startTime": "string", "endpoint": "socket path" }
+  },
+  "invariants": [
+    "every operation has explicit unsupported and unknown results; the core never guesses",
+    "unknown is never turned into gone or closed",
+    "the core closes only panes it allocated, by key, and never closes a tab",
+    "labels are display only; no code reads a label to decide",
+    "a pane taken with attach is never closed by the core, except on a close that names that pane as the caller's own (callerPane)"
+  ]
+}

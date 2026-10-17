@@ -596,13 +596,13 @@ export function prepareBwrapSync(plan, request, backend) {
     // The worker's pane was left open after a failed run: keep the homes, tag
     // them with the pane, and hand back where they are so the failure record
     // can say. They are reaped once the pane is gone.
-    const retain = ({ paneId, herdrSession } = {}) => allocatedPaths.filter((p) => markResourceRetained(p, { paneId, herdrSession }));
+    const retain = ({ paneId, terminalKey, herdrSession } = {}) => allocatedPaths.filter((p) => markResourceRetained(p, { paneId, terminalKey, herdrSession }));
 
     // Bind every allocated home to the process its worker runs under (and the pane plus herdr endpoint
     // for a herdr round), so the orphan reaper keeps it while that binder lives. Throws on the first
     // home that cannot be bound: the caller fails the round closed. The adapter never sees the paths.
-    const bind = ({ paneId, herdrEndpoint, herdrSession, binderPid, binderStartTime } = {}) => {
-      for (const p of allocatedPaths) bindOwnershipMarker(p, { paneId, herdrEndpoint, herdrSession, binderPid, binderStartTime });
+    const bind = ({ paneId, terminalKey, herdrEndpoint, herdrSession, binderPid, binderStartTime } = {}) => {
+      for (const p of allocatedPaths) bindOwnershipMarker(p, { paneId, terminalKey, herdrEndpoint, herdrSession, binderPid, binderStartTime });
     };
     const markLaunched = () => {
       for (const p of allocatedPaths) markOwnershipLaunched(p);

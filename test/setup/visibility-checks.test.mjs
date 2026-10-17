@@ -4,7 +4,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import {
-  checkHerdrAvailable,
   checkTrustStoreWritable,
   checkExecutorConfinement,
   checkInvocationGitWriteGrants,
@@ -23,12 +22,6 @@ import {
 // a fresh worktree stops at a folder dialog; and a bypass executor missing its
 // confinement is the one configuration this phase refuses outright, so doctor
 // should say so on a machine where it slipped in some other way.
-
-test('checkHerdrAvailable reports a structured pass or fail, never throws', () => {
-  const r = checkHerdrAvailable();
-  assert.equal(typeof r.passed, 'boolean');
-  assert.ok(typeof r.message === 'string' && r.message.length > 0);
-});
 
 test('checkTrustStoreWritable passes for a readable store and fails by name for a broken one', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-doctor-trust-'));
@@ -174,83 +167,6 @@ test('when herdr cannot be asked, kinds are not evaluated rather than guessed', 
   const r = checkHerdrExecutorKinds({ executors: herdrExecutor('claude-herdr', { kind: 'claude' }) }, { kinds: null });
   assert.equal(r.passed, true);
   assert.match(r.message, /not evaluated/);
-});
-
-test('checkHerdrAvailable respects FGOS_HERDR_BIN override (R6)', () => {
-  const oldBin = process.env.FGOS_HERDR_BIN;
-  try {
-    process.env.FGOS_HERDR_BIN = '/no/such/custom-herdr-bin';
-    const r = checkHerdrAvailable();
-    assert.equal(r.passed, false);
-    assert.match(r.message, /\/no\/such\/custom-herdr-bin/);
-  } finally {
-    if (oldBin === undefined) delete process.env.FGOS_HERDR_BIN;
-    else process.env.FGOS_HERDR_BIN = oldBin;
-  }
-});
-
-test('checkHerdrAvailable diagnoses empty FGOS_HERDR_ANCHOR_PANE (R6)', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX script -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, () => {
-  // A bare 'herdr' is never guaranteed to be on PATH (it isn't in CI, which
-  // never installs the compiled binary there) -- mock FGOS_HERDR_BIN the
-  // same way the neighboring F5 test does, so this test exercises the
-  // empty-anchor-pane diagnostic itself rather than the host's PATH.
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-mock-'));
-  const mockScript = path.join(tmp, 'mock-herdr.mjs');
-  fs.writeFileSync(mockScript, `#!/usr/bin/env node
-if (process.argv[2] === '--version') {
-  process.stdout.write('herdr 0.8.0\\n');
-  process.exit(0);
-}
-process.exit(0);
-`, { mode: 0o755 });
-
-  const oldBin = process.env.FGOS_HERDR_BIN;
-  const oldPane = process.env.FGOS_HERDR_ANCHOR_PANE;
-  try {
-    process.env.FGOS_HERDR_BIN = mockScript;
-    process.env.FGOS_HERDR_ANCHOR_PANE = '   ';
-    const r = checkHerdrAvailable();
-    assert.equal(r.passed, false);
-    assert.match(r.message, /FGOS_HERDR_ANCHOR_PANE is empty/);
-  } finally {
-    if (oldBin === undefined) delete process.env.FGOS_HERDR_BIN;
-    else process.env.FGOS_HERDR_BIN = oldBin;
-    if (oldPane === undefined) delete process.env.FGOS_HERDR_ANCHOR_PANE;
-    else process.env.FGOS_HERDR_ANCHOR_PANE = oldPane;
-    fs.rmSync(tmp, { recursive: true, force: true });
-  }
-});
-
-test('checkHerdrAvailable fails closed when FGOS_HERDR_ANCHOR_PANE cannot be resolved (F5)', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX script -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-mock-'));
-  const mockScript = path.join(tmp, 'mock-herdr.mjs');
-  fs.writeFileSync(mockScript, `#!/usr/bin/env node
-if (process.argv[2] === '--version') {
-  process.stdout.write('herdr 0.8.0\\n');
-  process.exit(0);
-}
-if (process.argv[2] === 'pane' && process.argv[3] === 'get') {
-  process.stderr.write('error: pane not found\\n');
-  process.exit(1);
-}
-process.exit(0);
-`, { mode: 0o755 });
-
-  const oldBin = process.env.FGOS_HERDR_BIN;
-  const oldPane = process.env.FGOS_HERDR_ANCHOR_PANE;
-  try {
-    process.env.FGOS_HERDR_BIN = mockScript;
-    process.env.FGOS_HERDR_ANCHOR_PANE = 'non-existent-pane-12345';
-    const r = checkHerdrAvailable();
-    assert.equal(r.passed, false);
-    assert.match(r.message, /cannot be resolved/);
-  } finally {
-    if (oldBin === undefined) delete process.env.FGOS_HERDR_BIN;
-    else process.env.FGOS_HERDR_BIN = oldBin;
-    if (oldPane === undefined) delete process.env.FGOS_HERDR_ANCHOR_PANE;
-    else process.env.FGOS_HERDR_ANCHOR_PANE = oldPane;
-    fs.rmSync(tmp, { recursive: true, force: true });
-  }
 });
 
 // A confined pane that binds a private home gets its login only from the global provider account

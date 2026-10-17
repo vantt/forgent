@@ -1,4 +1,4 @@
-import { test } from 'node:test';
+import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -11,6 +11,8 @@ import { findExecutableOnPath } from '../../src/state/tool-registry.mjs';
 import { readVisibility } from '../../src/runner/dispatch/visibility-session.mjs';
 import { isDraftStillInComposer, buildLauncherScriptContent } from '../../src/runner/dispatch/herdr-round.mjs';
 import { workerBaseEnv } from '../../src/runner/dispatch/adapters.mjs';
+import { paneModelSource } from '../helpers/herdr-pane-model.mjs';
+import { startTerminalHarness } from '../helpers/terminal-host-harness.mjs';
 
 function writeRunnerConfigFixture(root, cfg) {
   fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
@@ -28,6 +30,22 @@ const WIN32_MOCK_HERDR_SKIP =
   process.platform === 'win32'
     ? 'mockHerdr is a POSIX shebang wrapper -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract'
     : false;
+
+let harness;
+let agentPidLog;
+before(async () => {
+  harness = await startTerminalHarness();
+  agentPidLog = path.join(harness.stateRoot, '..', 'mock-agent-pids.log');
+});
+after(() => {
+  // A kept pane keeps its agent process; none of them may outlive the run.
+  try {
+    for (const pid of fs.readFileSync(agentPidLog, 'utf8').split('\n').filter(Boolean)) {
+      try { process.kill(Number(pid), 'SIGKILL'); } catch { /* already gone */ }
+    }
+  } catch { /* no agent was ever started */ }
+  harness?.stop();
+});
 
 test('herdr-spawn adapter rejects invocation missing interactiveMode', async () => {
   const herdrSpawn = EXECUTOR_ADAPTERS['herdr-spawn'];
@@ -53,7 +71,9 @@ test('herdr-spawn adapter rejects invocation missing interactiveMode', async () 
 // `scenario` decides what goes wrong, if anything:
 //   startError   -- herdr refuses to bring an agent to ready
 //   promptError  -- the first submission fails with this code
-//   screen       -- what `agent read` shows (used to explain a blocked agent)
+//   workerLagMs  -- the worker's files land this long after the brief was typed
+//   agentGone    -- the agent process ends right after the brief is typed, without a result
+//   screen       -- what `pane read` shows (used to explain a blocked agent)
 //   statuses     -- what successive `agent get` calls report
 //   worker       -- 'ack-then-result' | 'result-only' | 'silent'
 //   workerOnPrompt -- which brief submission the worker finally responds to
@@ -63,8 +83,9 @@ function createMockHerdr(tmpDir, scenario = {}) {
   const statePath = path.join(tmpDir, 'mock-state.json');
   const logPath = path.join(tmpDir, 'mock-log.jsonl');
   const scenarioPath = path.join(tmpDir, 'mock-scenario.json');
+  const paneStatePath = path.join(tmpDir, 'mock-panes.json');
 
-  fs.writeFileSync(statePath, JSON.stringify({ prompts: 0, gets: 0, exited: false }));
+  fs.writeFileSync(statePath, JSON.stringify({ prompts: 0, gets: 0 }));
   fs.writeFileSync(logPath, '');
   fs.writeFileSync(scenarioPath, JSON.stringify({
     worker: 'ack-then-result',
@@ -77,12 +98,24 @@ function createMockHerdr(tmpDir, scenario = {}) {
   fs.writeFileSync(scriptPath, `
 import fs from 'node:fs';
 import path from 'node:path';
+import { spawn } from 'node:child_process';
 
 const statePath = ${JSON.stringify(statePath)};
 const logPath = ${JSON.stringify(logPath)};
 const scenario = JSON.parse(fs.readFileSync(${JSON.stringify(scenarioPath)}, 'utf8'));
 
 const args = process.argv.slice(2);
+
+// Rounds of one batch may run side by side: one herdr call at a time reads and
+// writes the mock's state, like a real herdr server answering one at a time.
+const lockDir = statePath + '.lock';
+for (;;) {
+  try { fs.mkdirSync(lockDir); break; } catch {
+    try { if (Date.now() - fs.statSync(lockDir).mtimeMs > 10000) fs.rmdirSync(lockDir); } catch {}
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 15);
+  }
+}
+process.on('exit', () => { try { fs.rmdirSync(lockDir); } catch {} });
 fs.appendFileSync(logPath, JSON.stringify(args) + '\\n');
 
 const readState = () => JSON.parse(fs.readFileSync(statePath, 'utf8'));
@@ -91,17 +124,6 @@ const ok = (result) => { console.log(JSON.stringify({ id: 'cli:mock', result }))
 const fail = (code, message) => { console.log(JSON.stringify({ error: { code, message: message ?? code }, id: 'cli:mock' })); process.exit(1); };
 
 const [group, action] = args;
-
-if (group === 'pane' && action === 'split') {
-  const paneFlagIdx = args.indexOf('--pane');
-  const targetPane = paneFlagIdx >= 0 ? args[paneFlagIdx + 1] : null;
-  if (scenario.deadAnchorPane && targetPane === scenario.deadAnchorPane) {
-    fail('pane_not_found', 'no such pane');
-  }
-  ok({ pane: { pane_id: 'mock-pane-1' } });
-}
-if (group === 'tab' && action === 'create') ok({ tab: { tab_id: 'mock-tab-1' }, root_pane: { pane_id: 'mock-tab-root-pane' } });
-if (group === 'pane' && action === 'close') ok({ closed: true });
 if (group === 'pane' && action === 'run') {
   if (scenario.runError) fail(scenario.runError, 'pane run failed');
   ok({ type: 'ok' });
@@ -112,29 +134,20 @@ if (group === 'pane' && (action === 'report-agent' || action === 'report-agent-s
 // The pane was closed after the brief went in: herdr no longer knows the pane
 // or the agent in it, and says so with its own not-found codes.
 const paneVanished = scenario.paneVanishesAfterBrief && readState().prompts >= 1;
-if (paneVanished && group === 'pane' && action === 'process-info') fail('pane_not_found', 'pane not found');
+if (paneVanished && group === 'pane' && (action === 'process-info' || action === 'get')) fail('pane_not_found', 'pane not found');
 if (paneVanished && group === 'agent' && action === 'get') fail('agent_not_found', 'agent target mock-pane-1 not found');
-if (group === 'pane' && action === 'process-info') {
-  // A real pane always lists its own shell. "The agent is there" means a
-  // foreground process that is NOT the shell -- so an agent that exited, or
-  // one the scenario says never survived, leaves the shell alone.
-  const gone = scenario.agentGone || readState().exited;
-  const foreground = gone
-    ? [{ pid: 100, name: 'zsh' }]
-    : [{ pid: 200, name: 'agy' }, { pid: 100, name: 'zsh' }];
-  ok({ process_info: { pane_id: 'mock-pane-1', shell_pid: 100, foreground_process_group_id: gone ? 100 : 200, foreground_processes: foreground } });
-}
-if (group === 'agent' && action === 'start') {
-  if (scenario.startError) fail(scenario.startError, 'agent never reached a ready state');
-  ok({ agent: { agent_status: 'idle' } });
-}
-if (group === 'agent' && action === 'read') {
-  if (!scenario.changingScreen) ok({ read: { text: scenario.screen ?? '' } });
+if (group === 'agent' && action === 'start' && scenario.startError) fail(scenario.startError, 'agent never reached a ready state');
+${paneModelSource({ statePath: paneStatePath, agentPidLog, knownPanes: scenario.knownPanes })}
+if (group === 'pane' && action === 'read') {
+  // herdr prints a screen as plain text, not in the JSON envelope.
+  if (!scenario.changingScreen) { console.log(scenario.screen ?? ''); process.exit(0); }
   const s = readState();
   const reads = (s.reads ?? 0) + 1;
   writeState({ ...s, reads });
-  ok({ read: { text: (scenario.screen ?? '') + ' ' + reads } });
+  console.log((scenario.screen ?? '') + ' ' + reads);
+  process.exit(0);
 }
+if (group === 'pane' && (action === 'send-keys' || action === 'send-text')) ok({});
 if (group === 'agent' && action === 'get') {
   // A herdr that will not answer at all -- the outage case. The pane and the
   // worker are both fine; only the status read is unavailable.
@@ -149,7 +162,7 @@ if (group === 'agent' && action === 'prompt') {
   // A slash command is the exit sequence, not a brief -- it neither counts as
   // a delivery attempt nor makes the worker do anything.
   if (text.startsWith('/')) {
-    writeState({ ...readState(), exited: true });
+    endAgent(args[2]);
     ok({ agent: { agent_status: 'idle' } });
   }
 
@@ -158,6 +171,8 @@ if (group === 'agent' && action === 'prompt') {
   writeState({ ...state, prompts: attempt });
 
   if (scenario.promptError && attempt === 1) fail(scenario.promptError, 'submission was not accepted');
+  // The agent process ends right after it is briefed, without writing a result.
+  if (scenario.agentGone) endAgent(args[2]);
 
   if (scenario.worker !== 'silent' && attempt >= (scenario.workerOnPrompt ?? 1)) {
     // Play the worker: find the brief, then write exactly what it asked for.
@@ -167,15 +182,25 @@ if (group === 'agent' && action === 'prompt') {
     const ackMatch = briefText.match(/(\\/\\S+\\/outbox\\/ack-1\\.json)/);
     if (ackMatch) {
       const outbox = path.dirname(ackMatch[1]);
-      const atomicWrite = (file, body) => {
-        fs.writeFileSync(file + '.tmp', body);
-        fs.renameSync(file + '.tmp', file);
+      const writeWorkerFiles = (outbox, withAck, fs, path) => {
+        const atomicWrite = (file, body) => {
+          fs.writeFileSync(file + '.tmp', body);
+          fs.renameSync(file + '.tmp', file);
+        };
+        if (withAck) {
+          atomicWrite(path.join(outbox, 'ack-1.json'), JSON.stringify({ round: 1, receivedAt: new Date().toISOString() }));
+        }
+        atomicWrite(path.join(outbox, 'report-1.md'), 'the worker wrote this report');
+        atomicWrite(path.join(outbox, 'result-1.json'), JSON.stringify({ status: 'settled', summary: 'done', findings: [], evidenceRefs: [] }));
       };
-      if (scenario.worker !== 'result-only') {
-        atomicWrite(path.join(outbox, 'ack-1.json'), JSON.stringify({ round: 1, receivedAt: new Date().toISOString() }));
+      const withAck = scenario.worker !== 'result-only';
+      if (scenario.workerLagMs) {
+        // A worker that takes its time: the files land after the lag, from a process of its own.
+        const code = "const fs = require('node:fs'); const path = require('node:path'); setTimeout(() => (" + writeWorkerFiles.toString() + ')(' + JSON.stringify(outbox) + ', ' + withAck + ', fs, path), ' + scenario.workerLagMs + ')';
+        spawn(process.execPath, ['-e', code], { detached: true, stdio: 'ignore' }).unref();
+      } else {
+        writeWorkerFiles(outbox, withAck, fs, path);
       }
-      atomicWrite(path.join(outbox, 'report-1.md'), 'the worker wrote this report');
-      atomicWrite(path.join(outbox, 'result-1.json'), JSON.stringify({ status: 'settled', summary: 'done', findings: [], evidenceRefs: [] }));
     }
   }
   ok({ agent: { agent_status: 'working' } });
@@ -206,12 +231,17 @@ function dispatchThroughMock(tmpDir, mock, { prompt, interactiveMode, promptDeli
       effectiveContract,
       interactiveMode: { exitCommand: '/exit', ...interactiveMode },
     },
+    // The work id is the pane group when no batch key is given, and groups persist in the
+    // terminal-control state root: a work id per test keeps one test's panes out of another's group.
     // Transport deadlines are not executor config any more; this is the seam
     // that keeps a mock round short, and production never sets it.
-    { cwd: tmpDir, timeoutMs, idleTimeoutMs, workId: 'w1', tier: 'standard', model: 'sonnet', herdrBin: mock.herdrBin, runDir,
+    { cwd: tmpDir, timeoutMs, idleTimeoutMs, workId: `w1-${path.basename(tmpDir)}`, tier: 'standard', model: 'sonnet', herdrBin: mock.herdrBin, runDir,
       transportDeadlines: { resendAfterMs: 200, ...transportDeadlines }, anchorPaneId, dispatchBatchKey, effectiveContract },
   );
 }
+
+const paneCreations = (mock) => mock.calls().filter((c) => (c[0] === 'tab' || c[0] === 'workspace') && c[1] === 'create');
+const paneSplits = (mock) => mock.calls().filter((c) => c[0] === 'pane' && c[1] === 'split');
 
 const MULTILINE_PROMPT = [
   '# Implement the thing',
@@ -364,31 +394,41 @@ test('F3 / N4 / M15 lock: runHerdrRound fails closed and propagates error when p
 });
 
 
-test('an anchor pane id lands the split in the caller batch tab instead of leaving it implicit', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
+test('an anchor pane id lands the round beside it in the caller tab instead of opening a tab', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-anchor-pane-'));
-  const mock = createMockHerdr(tmpDir);
-  await dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing', anchorPaneId: 'w9:p1' });
+  const mock = createMockHerdr(tmpDir, { knownPanes: ['w9:p1'] });
+  const res = await dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing', anchorPaneId: 'w9:p1' });
 
-  const split = mock.calls().find((c) => c[0] === 'pane' && c[1] === 'split');
-  assert.deepEqual(split, ['pane', 'split', '--pane', 'w9:p1', '--direction', 'right', '--no-focus', '--cwd', tmpDir]);
+  assert.equal(res.status, 0);
+  assert.equal(paneCreations(mock).length, 0, 'the group joins the caller tab, it opens none');
+  const [split] = paneSplits(mock);
+  assert.deepEqual(split.slice(0, 4), ['pane', 'split', '--pane', 'w9:p1']);
+  assert.ok(split.includes('--no-focus'), 'a split never takes focus from the person');
+  assert.equal(split[split.indexOf('--cwd') + 1], tmpDir);
 
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('a standalone dispatch with no anchor pane keeps the old implicit-focus split', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
+test('a standalone dispatch with no anchor pane opens its own tab and the round runs in its root pane', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-no-anchor-pane-'));
   const mock = createMockHerdr(tmpDir);
   const savedEnv = process.env.FGOS_HERDR_ANCHOR_PANE;
   delete process.env.FGOS_HERDR_ANCHOR_PANE;
   try {
-    await dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing' });
+    const res = await dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing' });
+    assert.equal(res.status, 0);
   } finally {
     if (savedEnv === undefined) delete process.env.FGOS_HERDR_ANCHOR_PANE;
     else process.env.FGOS_HERDR_ANCHOR_PANE = savedEnv;
   }
 
-  const split = mock.calls().find((c) => c[0] === 'pane' && c[1] === 'split');
-  assert.deepEqual(split, ['pane', 'split', '--direction', 'right', '--no-focus', '--cwd', tmpDir]);
+  const [create] = paneCreations(mock);
+  assert.deepEqual([create[0], create[1]], ['tab', 'create']);
+  assert.ok(create.includes('--no-focus'), 'a tab never takes focus from the person');
+  assert.equal(create[create.indexOf('--cwd') + 1], tmpDir);
+  assert.equal(paneSplits(mock).length, 0, 'the first pane of a group is the tab\'s own root pane, never a split');
+  const start = mock.calls().find((c) => c[0] === 'agent' && c[1] === 'start');
+  assert.equal(start[start.indexOf('--pane') + 1], 'mock-pane-1', 'the agent starts in the root pane the tab came with');
 
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
@@ -400,7 +440,7 @@ test('a cross-process caller groups its batch by setting FGOS_HERDR_ANCHOR_PANE,
   // a caller that only has a real CLI invocation (fanout's independently
   // launched children) actually uses, mirroring FGOS_HERDR_BIN/FGOS_HERDR_MODEL.
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-env-anchor-pane-'));
-  const mock = createMockHerdr(tmpDir);
+  const mock = createMockHerdr(tmpDir, { knownPanes: ['w9:p5'] });
   const savedEnv = process.env.FGOS_HERDR_ANCHOR_PANE;
   process.env.FGOS_HERDR_ANCHOR_PANE = 'w9:p5';
   try {
@@ -410,34 +450,47 @@ test('a cross-process caller groups its batch by setting FGOS_HERDR_ANCHOR_PANE,
     else process.env.FGOS_HERDR_ANCHOR_PANE = savedEnv;
   }
 
-  const split = mock.calls().find((c) => c[0] === 'pane' && c[1] === 'split');
-  assert.deepEqual(split, ['pane', 'split', '--pane', 'w9:p5', '--direction', 'right', '--no-focus', '--cwd', tmpDir]);
+  const [split] = paneSplits(mock);
+  assert.deepEqual(split.slice(0, 4), ['pane', 'split', '--pane', 'w9:p5']);
+  assert.equal(paneCreations(mock).length, 0);
 
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('a dispatchBatchKey opens its tab once and every round of the batch splits into it', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
-  // Two separate rounds of one batch -- each gets its own run directory (a
-  // real coordination round always does), sharing only the mock herdr
-  // backend and the batch key. The registry itself is module-level state in
-  // herdr-round.mjs, so the key must be unique to this test run.
+/** Resolves once the mock has seen a non-exit brief typed, i.e. a round is under way with its pane open. */
+async function untilBriefTyped(mock, timeoutMs = 15000) {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    if (mock.calls().some((c) => c[0] === 'agent' && c[1] === 'prompt' && !c[3].startsWith('/'))) return;
+    await new Promise((resolve) => setTimeout(resolve, 25));
+  }
+  throw new Error('no brief was typed in time');
+}
+
+test('a dispatchBatchKey opens its tab once and every later round of the batch splits into it', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
+  // Two rounds of one batch -- each gets its own run directory (a real
+  // coordination round always does), sharing only the mock herdr backend and
+  // the batch key. The second round starts while the first still holds its pane
+  // (the worker is slow), as the rounds of one batch do. The group lives in the
+  // terminal-control state root, so the key must be unique to this test run.
   const rootDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-batch-tab-'));
   const round1Dir = fs.mkdtempSync(path.join(rootDir, 'r1-'));
   const round2Dir = fs.mkdtempSync(path.join(rootDir, 'r2-'));
-  const mock = createMockHerdr(rootDir);
+  const mock = createMockHerdr(rootDir, { workerLagMs: 1500 });
   const dispatchBatchKey = `test-batch-${path.basename(rootDir)}`;
 
-  await dispatchThroughMock(round1Dir, mock, { prompt: 'round one', dispatchBatchKey });
-  await dispatchThroughMock(round2Dir, mock, { prompt: 'round two', dispatchBatchKey });
+  const first = dispatchThroughMock(round1Dir, mock, { prompt: 'round one', dispatchBatchKey });
+  await untilBriefTyped(mock);
+  const second = dispatchThroughMock(round2Dir, mock, { prompt: 'round two', dispatchBatchKey });
+  const results = await Promise.all([first, second]);
+  assert.deepEqual(results.map((r) => r.status), [0, 0]);
 
-  const tabCreates = mock.calls().filter((c) => c[0] === 'tab' && c[1] === 'create');
-  const splits = mock.calls().filter((c) => c[0] === 'pane' && c[1] === 'split');
-  assert.equal(tabCreates.length, 1, 'two rounds of one batch must open exactly one tab');
-  assert.ok(tabCreates[0].includes('--label'), 'the tab is labeled at creation, never renamed after');
-  assert.equal(splits.length, 2);
-  for (const split of splits) {
-    assert.deepEqual(split.slice(0, 4), ['pane', 'split', '--pane', 'mock-tab-root-pane']);
-  }
+  const creates = paneCreations(mock);
+  const splits = paneSplits(mock);
+  assert.equal(creates.length, 1, 'two rounds of one batch must open exactly one tab');
+  assert.ok(creates[0].includes('--label'), 'the tab is labeled at creation, never renamed after');
+  assert.equal(splits.length, 1, 'the first pane is the tab\'s root pane; the second round splits from it');
+  assert.deepEqual(splits[0].slice(0, 4), ['pane', 'split', '--pane', 'mock-pane-1']);
 
   fs.rmSync(rootDir, { recursive: true, force: true });
 });
@@ -452,21 +505,19 @@ test('two different batch keys never share a tab, even from the same process', {
   await dispatchThroughMock(dirA, mock, { prompt: 'batch a', dispatchBatchKey: `batch-a-${suffix}` });
   await dispatchThroughMock(dirB, mock, { prompt: 'batch b', dispatchBatchKey: `batch-b-${suffix}` });
 
-  const tabCreates = mock.calls().filter((c) => c[0] === 'tab' && c[1] === 'create');
-  assert.equal(tabCreates.length, 2, 'two distinct batches must never share a tab');
+  assert.equal(paneCreations(mock).length, 2, 'two distinct batches must never share a tab');
+  assert.equal(paneSplits(mock).length, 0);
 
   fs.rmSync(rootDir, { recursive: true, force: true });
 });
 
-test('a dead anchor pane retries unanchored instead of failing the round', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
+test('a dead anchor pane opens the round its own tab instead of failing it', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-dead-anchor-'));
-  const mock = createMockHerdr(tmpDir, { deadAnchorPane: 'w9:gone' });
+  const mock = createMockHerdr(tmpDir);
   const res = await dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing', anchorPaneId: 'w9:gone' });
 
-  const splits = mock.calls().filter((c) => c[0] === 'pane' && c[1] === 'split');
-  assert.equal(splits.length, 2, 'the first (anchored) attempt fails, the retry (unanchored) succeeds');
-  assert.deepEqual(splits[0].slice(0, 4), ['pane', 'split', '--pane', 'w9:gone']);
-  assert.ok(!splits[1].includes('--pane'), 'the retry drops the dead anchor rather than repeating it');
+  assert.equal(paneSplits(mock).length, 0, 'a pane that is not live is no anchor to split from');
+  assert.equal(paneCreations(mock).length, 1, 'the round opens its own tab');
   // Grouping is a visibility nicety: a closed anchor pane must never fail a
   // round that would otherwise succeed on its own.
   assert.equal(res.status, 0);
@@ -520,10 +571,10 @@ test('dispatchBatchKey survives the real executeExecutorCli door, not just a dir
   }
 
   assert.equal(result.status, 0);
-  const tabCreate = mock.calls().find((c) => c[0] === 'tab' && c[1] === 'create');
+  const [tabCreate] = paneCreations(mock);
   assert.ok(tabCreate, 'a tab create call must have happened -- dispatchBatchKey must reach the round through the real executeExecutorCli door');
-  const split = mock.calls().find((c) => c[0] === 'pane' && c[1] === 'split');
-  assert.deepEqual(split.slice(0, 4), ['pane', 'split', '--pane', 'mock-tab-root-pane']);
+  // The tab is labelled with the group it opens for: the batch key, not a run id.
+  assert.equal(tabCreate[tabCreate.indexOf('--label') + 1], `test-batch-${path.basename(tmpDir)}`.slice(0, 40));
 
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
@@ -896,16 +947,19 @@ test('an agent that keeps reporting working while its screen is parked on "model
     screen: '• Ran out=/work/outbox\n■ Selected model is at capacity. Please try a different model.\n• Reconnected. No input was resent.\n── ⠋ Working ──',
   });
 
+  // The stall probe settles within a few probe ticks (about 3 s here, measured on a quiet machine); the
+  // round has to be over before the idle ceiling could have ended it, so the bound is the ceiling itself.
+  const idleCeilingMs = 15000;
   const started = Date.now();
   await assert.rejects(
-    () => dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing', timeoutMs: 20000, idleTimeoutMs: 15000, transportDeadlines: { stallProbeMs: 300 } }),
+    () => dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing', timeoutMs: idleCeilingMs + 5000, idleTimeoutMs: idleCeilingMs, transportDeadlines: { stallProbeMs: 300 } }),
     (err) => {
       assert.equal(err.outcome, 'provider-limit');
       assert.match(err.screen, /model is at capacity/i);
       return true;
     },
   );
-  assert.ok(Date.now() - started < 10000, 'concluded long before the absolute ceiling');
+  assert.ok(Date.now() - started < idleCeilingMs, 'concluded before the idle ceiling could end the round');
 
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
@@ -1093,8 +1147,8 @@ test('an executor that declares no confinement keeps exactly the old behaviour',
   const res = await dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing' });
 
   assert.equal(res.outcome, 'settled');
-  const split = mock.calls().find((c) => c[0] === 'pane' && c[1] === 'split');
-  assert.ok(!split.some((a) => a.startsWith('HOME=')), 'no private HOME is injected when none was declared');
+  const [create] = paneCreations(mock);
+  assert.ok(!create.some((a) => a.startsWith('HOME=')), 'no private HOME is injected when none was declared');
   assert.ok(
     !mock.calls().some((c) => c[0] === 'workspace'),
     'and no worker session is bootstrapped behind the caller\'s back',
@@ -1128,10 +1182,7 @@ test('confinement that cannot be established is refused, never quietly downgrade
       return true;
     },
   );
-  assert.ok(
-    !mock.calls().some((c) => c[0] === 'pane' && c[1] === 'split'),
-    'and nothing was launched before the refusal',
-  );
+  assert.equal(paneCreations(mock).length + paneSplits(mock).length, 0, 'and no pane was opened before the refusal');
 
   fs.rmSync(tmpDir, { recursive: true, force: true });
   fs.rmSync(fakeHome, { recursive: true, force: true });
@@ -1245,8 +1296,7 @@ test('ownWorktree is enforced, not merely declared', { skip: WIN32_MOCK_HERDR_SK
     (err) => {
       assert.equal(err.errorClass, 'invalid-config');
       assert.equal(err.reason, 'own-worktree-unavailable');
-      assert.ok(!mock.calls().some((c) => c[0] === 'pane' && c[1] === 'split'),
-        'refused before anything was launched');
+      assert.equal(paneCreations(mock).length + paneSplits(mock).length, 0, 'refused before any pane was opened');
       return true;
     },
   ).finally(() => fs.rmSync(tmpDir, { recursive: true, force: true }));
@@ -1408,7 +1458,9 @@ test('an agent herdr reports idle whose screen keeps changing is not ended as id
   // omp reports idle to herdr while its model generates and its tools run; only the screen moves.
   const mock = createMockHerdr(tmpDir, { worker: 'silent', statuses: ['idle'], screen: '⠴ working on it', changingScreen: true });
   await assert.rejects(
-    () => dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing', timeoutMs: 3000, idleTimeoutMs: 900 }),
+    // Every herdr call is a host round trip, so a poll tick takes a good fraction of a second: the idle
+    // window has to span several ticks for a moving screen to be seen moving.
+    () => dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing', timeoutMs: 6500, idleTimeoutMs: 2500 }),
     (err) => {
       assert.equal(err.outcome, 'timed-out-ceiling', 'a moving screen is progress; only the round ceiling ends it');
       return true;

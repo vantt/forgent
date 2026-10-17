@@ -82,7 +82,7 @@ test('no observe door binds a name that could write, anywhere on its import path
   // these may be in scope on any module it can reach.
   const writers = [
     'writeVisibility', 'markDetached', 'markRunSettled', 'reconcileRun',
-    'createHerdrClient', 'EXECUTOR_ADAPTERS', 'runHerdrRound', 'spawnWorker',
+    'createTerminalControl', 'createRoundTerminalControl', 'createSlotIo', 'EXECUTOR_ADAPTERS', 'runHerdrRound', 'spawnWorker',
   ];
   for (const name of writers) {
     assert.ok(!closure.bindings.has(name),
@@ -90,9 +90,9 @@ test('no observe door binds a name that could write, anywhere on its import path
   }
 
   // No route to herdr, at any depth. This is the one that matters: contacting
-  // a worker means going through a herdr client or a dispatch adapter, and
+  // a worker means going through a terminal-control client or a dispatch adapter, and
   // neither may be reachable from a door that only observes.
-  const contactRoutes = ['herdr-agent.mjs', 'herdr-round.mjs', 'transport.mjs', 'dispatch/cli.mjs'];
+  const contactRoutes = ['terminal-slot.mjs', 'terminal-control/client.mjs', 'herdr-round.mjs', 'transport.mjs', 'dispatch/cli.mjs'];
   for (const file of closure.modules.keys()) {
     for (const route of contactRoutes) {
       assert.ok(!file.endsWith(`/${route}`), `an observe door reaches ${route}`);

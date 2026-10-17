@@ -151,7 +151,7 @@ test('every CLI starts before any finishes, each under a read-only posture bindi
     const dir = runDirOf(assignment.assignmentId);
     const runtime = { stdoutLog: path.relative(repoRoot, path.join(dir, 'stdout.log')) };
     if (assignment.binding.invocation === 'codex-herdr-static') {
-      fs.writeFileSync(path.join(dir, 'visibility.json'), JSON.stringify({ paneId: 'p-1', herdrSession: 'fgos-workers' }));
+      fs.writeFileSync(path.join(dir, 'visibility.json'), JSON.stringify({ paneId: 'p-1', terminalKey: 'k-1', herdrSession: 'fgos-workers' }));
       fs.writeFileSync(path.join(dir, 'herdr-diagnosis.json'), JSON.stringify({ explain: { matchedRule: 'trust_directory', promptText: 'Trust this folder?' } }));
       return record(`run_${assignment.assignmentId}`, runtime, {
         execution: { status: 'failed', exitCode: null },
@@ -185,7 +185,7 @@ test('every CLI starts before any finishes, each under a read-only posture bindi
     assert.equal(assignment.provenance.contract.mutation, 'read-only');
     assert.deepEqual(Object.keys(runnerConfig.providers.openai.accounts), ['acct']);
   }
-  assert.deepEqual(closed, [{ paneId: 'p-1', herdrSession: 'fgos-workers' }]);
+  assert.deepEqual(closed, [{ paneId: 'p-1', herdrSession: 'fgos-workers', terminalKey: 'k-1' }]);
   const row = report.results.find((r) => r.invocationId === 'codex-herdr-static');
   assert.equal(row.outcome, 'blocked-trust-prompt');
   assert.equal(row.pane, 'closed-by-probe');

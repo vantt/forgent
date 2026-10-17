@@ -53,7 +53,7 @@ import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { bind } from '../execution/bind.mjs';
 import { credentialFaultFamilies } from '../execution/account-rotation.mjs';
-import { RunnerConfigError, ensureRunnerConfigForDir } from './config.mjs';
+import { RunnerConfigError, ensureRunnerConfigForDir, withDefaultExecutor } from './config.mjs';
 import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot } from '../paths.mjs';
 import { renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim } from './assignment.mjs';
 import { resolveAndRenderOperationPrompt, TemplateResolutionError } from './operation-prompt-templates.mjs';
@@ -1278,16 +1278,7 @@ export async function executeAssignment(assignment, opts = {}) {
   const cwd = opts.cwd ?? process.cwd();
   const root = opts.repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);
   const rawCfg = opts.runnerConfig ?? ensureRunnerConfigForDir(root);
-  const cfg = { ...rawCfg };
-  if (rawCfg.executor) {
-    const defaultExec = { ...rawCfg.executor };
-    cfg.executor = defaultExec;
-    cfg.executors = {
-      ...(rawCfg.executors || {}),
-      claude: { ...(rawCfg.executors?.claude || {}), ...rawCfg.executor },
-      ...(rawCfg.executor.command ? { [rawCfg.executor.command]: defaultExec } : {}),
-    };
-  }
+  const cfg = withDefaultExecutor(rawCfg);
 
   // Storage setup under .fgos/assignments/<assignmentId>/
   const fgosDir = fgosDirFromRoot(root);
@@ -2383,7 +2374,11 @@ export async function executeAssignment(assignment, opts = {}) {
             workId: resolvedExecutorId,
             tier: effectivePolicy.tier,
             model: effectivePolicy.model,
-            dispatchBatchKey: opts.dispatchBatchKey,
+            // The panes of one unit run share a tab: its attempts and rounds are one group.
+            dispatchBatchKey: opts.dispatchBatchKey
+              ?? effectiveAssignment.unitRunId
+              ?? effectiveAssignment.provenance?.unitRunId
+              ?? (effectiveAssignment.provenance?.kind === 'unit-run' ? effectiveAssignment.assignmentId?.split('/')[0] : undefined),
             controlToken,
             controlEpoch,
             launchCommandId,

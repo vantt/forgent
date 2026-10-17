@@ -12,9 +12,13 @@ description: >-
 # fgOS terminal-close
 
 Closes the current herdr pane, when the session is running inside one.
-Pure herdr chrome (`herdr pane close`, sibling to `/fgOS:terminal`'s own
-`herdr pane rename`): it never reads or writes `.fgos/` state, so it needs
-no `fgos` CLI verb and no one-door-write path. Full decision record:
+Pure herdr chrome, through the terminal-control port like `/fgOS:terminal`:
+it attaches the pane under this session's key (idempotent) and releases it
+with `disposition: close` naming that pane as the caller's own
+(`callerPane`). The port closes an attached pane only for exactly that
+request; it is the one exception to "the core never closes an attached
+pane", because a person is closing their own pane. It never reads or writes
+`.fgos/` work state, so it needs no user-facing `fgos` verb. Full decision record:
 `docs/history/fgos-terminal-close-autoclose/CONTEXT.md`.
 
 ## Steps

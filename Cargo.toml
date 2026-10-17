@@ -14,6 +14,7 @@ members = [
     "packages/holder-lock/rust",
     "packages/run-supervisor/rust",
     "packages/agent-protocol/rust",
+    "packages/terminal-control/rust",
 ]
 exclude = [
     "herdr-dashboard",

@@ -66,6 +66,28 @@ export {
 } from './confinement/backend-registry.mjs';
 
 
+/** Layer the legacy default `runner.executor` ({command, args}) onto the
+ * executor registry. The default fills `claude` and the entry named by its
+ * command. When the default runs the same program as the registered entry
+ * (command basename equals the executor id), the entry keeps its
+ * `invocations`, `identity`, `supports` and the rest, and only
+ * `command`/`args` come from the default; when it runs another program, the
+ * entry's invocations describe a different CLI and the default replaces it. */
+export function withDefaultExecutor(rawCfg) {
+  const cfg = { ...rawCfg };
+  const defaultExec = rawCfg.executor;
+  if (!defaultExec) return cfg;
+  const executors = { ...(rawCfg.executors || {}) };
+  const ids = new Set(['claude', ...(defaultExec.command ? [defaultExec.command] : [])]);
+  const program = defaultExec.command ? path.basename(String(defaultExec.command)) : null;
+  for (const id of ids) {
+    executors[id] = program === id ? { ...(executors[id] || {}), ...defaultExec } : { ...defaultExec };
+  }
+  cfg.executor = { ...defaultExec };
+  cfg.executors = executors;
+  return cfg;
+}
+
 /** Raised for malformed runner config or an unresolvable tier -> model
  * lookup. `category` follows the same CLI-facing vocabulary as
  * WorkValidationError/StoreError (R4) — this is an input-shape problem, not

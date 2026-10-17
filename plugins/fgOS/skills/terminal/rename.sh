@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# fgOS terminal rename -- best-effort herdr pane label. Chrome-only (D2,
+# fgOS terminal rename -- best-effort herdr pane label, through the
+# terminal-control port (attach, then label). Chrome-only (D2,
 # docs/history/fgos-terminal-pane-rename/CONTEXT.md): never touches .fgos/
 # state, never blocks the caller. Any missing precondition -- including the
 # pane-labeling capability not being registered at all -- is a silent no-op,
@@ -63,10 +64,12 @@ fi
 # herdr-managed pane, or herdr unavailable: no-op.
 [ "${HERDR_ENV:-}" = "1" ] || exit 0
 command -v herdr >/dev/null 2>&1 || exit 0
+command -v fgos >/dev/null 2>&1 || exit 0
 [ -n "${HERDR_PANE_ID:-}" ] || exit 0
 # HERDR_PANE_ID can be inherited from a shared agent daemon and name a dead
 # pane or another session's pane: act only on this caller's own live pane.
 . "$(dirname "$0")/pane-owned.sh"
+. "$(dirname "$0")/terminal-port.sh"
 fgos_pane_owned "$HERDR_PANE_ID" || exit 0
 
 # fg.ssid (D1): fgOS's own session id. FGOS_SESSION_ID first, else
@@ -100,5 +103,10 @@ label="$task_id"
 [ -n "$fg_ssid" ] && label="$label | fg.ssid:$fg_ssid"
 [ -n "$a_ssid" ] && label="$label | a.ssid:$a_ssid"
 
-herdr pane rename "$HERDR_PANE_ID" "$label" >/dev/null 2>&1 || true
+# The terminal-control port takes the pane (attach, keyed by this session's
+# writer id; idempotent) and then writes the label. Either step failing is
+# the same silent no-op as every guard above.
+key=$(fgos_terminal_key "$project_root")
+fgos_terminal_attach "$key" "$HERDR_PANE_ID" || exit 0
+fgos_terminal_call label "{\"key\":$(fgos_json_str "$key"),\"display\":{\"label\":$(fgos_json_str "$label")}}" >/dev/null || true
 exit 0

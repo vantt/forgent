@@ -105,6 +105,7 @@ dependencies = [
  "fgos-run-result",
  "fgos-run-supervisor",
  "fgos-session-identity",
+ "fgos-terminal-control",
  "fgos-work-state",
  "libc",
  "serde",
@@ -224,6 +225,17 @@ name = "fgos-session-identity"
 version = "0.2.0"
 dependencies = [
  "fgos-host-runtime",
+ "libc",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "fgos-terminal-control"
+version = "0.2.0"
+dependencies = [
+ "fgos-holder-lock",
+ "fgos-process",
  "libc",
  "serde",
  "serde_json",
