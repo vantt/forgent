@@ -7,7 +7,7 @@ import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { createLockScope, probe } from '../../src/holder-lock/index.mjs';
 import { withMainCheckout, addWorktree, addWorktreeSync } from '../../src/runner/repo-locks.mjs';
-import { createClaimWorktree, removeWorktree } from '../../src/runner/worktree.mjs';
+import { createClaimWorktree, createWorktree, removeWorktree } from '../../src/runner/worktree.mjs';
 import { createWorkflowWorktree } from '../../src/workflow/integrate.mjs';
 import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
 import { HOOK_TEST_SKIP } from '../helpers/main-checkout-hook-repo.mjs';
@@ -133,4 +133,20 @@ test('createWorkflowWorktree adds through the lock and releases it', { skip }, (
   const wt = createWorkflowWorktree({ repoRoot: root, branch: 'wf/one', worktreeDir: path.join(root, 'wf-one') });
   assert.equal(fs.existsSync(wt.worktreePath), true);
   assert.equal(probe('worktree-admin', { fgosDir }).result, 'free');
+});
+
+test('createWorktree surfaces a held worktree-admin as lock-held, not a generic worktree failure', { skip }, async () => {
+  const { root, fgosDir } = tempRepo();
+  const holder = await holdLockInChild('worktree-admin', { fgosDir });
+  try {
+    const worktreeDir = path.join(root, 'claims');
+    const scope = createLockScope('blocked-claim');
+    assert.throws(
+      () => createWorktree(root, 'tsk-blocked', { worktreeDir, scope, waitMs: 150 }),
+      (err) => err.code === 'lock-held' && err.holders.includes(holder.child.pid),
+    );
+  } finally {
+    holder.child.kill('SIGKILL');
+    await holder.exited;
+  }
 });

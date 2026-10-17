@@ -58,7 +58,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { StoreError } from '../state/store.mjs';
-import { createLockScope } from '../holder-lock/index.mjs';
+import { createLockScope, HolderLockError } from '../holder-lock/index.mjs';
 import { addWorktreeSync } from './repo-locks.mjs';
 import { readWorktreeSetupCommands } from '../config/shared-config-file.mjs';
 import { statusPaths, GIT_LIST_MAX_BUFFER } from '../util/git-paths.mjs';
@@ -688,7 +688,7 @@ function finishWorktreeSetup(repoRoot, worktreePath, branch) {
 /**
  * Create (or reuse, see module doc) an isolated worktree for work item `id`
  * inside `repoRoot`. `opts.scope` (a lock scope) carries the caller's held
- * locks into the worktree-admin acquire; a fresh scope when absent.
+ * locks into the worktree-admin acquire; a fresh scope when absent; `opts.waitMs` bounds the wait for it.
  * `opts.startSha` forks a new branch from that commit instead of reading
  * HEAD again (ignored when `opts.baseRef` is set or the branch exists).
  *
@@ -736,13 +736,13 @@ export function createWorktree(repoRoot, id, opts = {}) {
   if (!relocated) {
     try {
       if (reused) {
-        addWorktreeSync(scope, repoRoot, [worktreePath, branch]);
+        addWorktreeSync(scope, repoRoot, [worktreePath, branch], { waitMs: opts.waitMs });
       } else if (opts.baseRef) {
-        addWorktreeSync(scope, repoRoot, ['-b', branch, worktreePath, opts.baseRef]);
+        addWorktreeSync(scope, repoRoot, ['-b', branch, worktreePath, opts.baseRef], { waitMs: opts.waitMs });
       } else if (opts.startSha) {
-        addWorktreeSync(scope, repoRoot, ['-b', branch, worktreePath, opts.startSha]);
+        addWorktreeSync(scope, repoRoot, ['-b', branch, worktreePath, opts.startSha], { waitMs: opts.waitMs });
       } else {
-        addWorktreeSync(scope, repoRoot, ['-b', branch, worktreePath]);
+        addWorktreeSync(scope, repoRoot, ['-b', branch, worktreePath], { waitMs: opts.waitMs });
       }
     } catch (err) {
       try {
@@ -751,6 +751,7 @@ export function createWorktree(repoRoot, id, opts = {}) {
         // best-effort cleanup of the empty dir mkdtemp created; the real
         // failure below is what the caller needs to see.
       }
+      if (err instanceof HolderLockError) throw err;
       throw new WorktreeError(`git worktree add failed for branch "${branch}": ${err.message}`, {
         branch,
         worktreePath,
@@ -1273,7 +1274,8 @@ export function refreshUnstartedBranch(repoRoot, branch, targetRef, checkoutPath
  * hardcoded `'main'` — a host repo whose trunk is `master` would otherwise
  * fail this exact fallback outright.
  */
-function createDetachedMergeWorktree(repoRoot, id, scope = createLockScope('worktree')) {
+function createDetachedMergeWorktree(repoRoot, id) {
+  const scope = createLockScope('worktree');
   const branch = branchNameFor(id);
   if (!branchExists(repoRoot, branch)) {
     createBranchRef(repoRoot, id);
@@ -1292,6 +1294,7 @@ function createDetachedMergeWorktree(repoRoot, id, scope = createLockScope('work
       // best-effort cleanup of the empty dir mkdtemp created; the real
       // failure below is what the caller needs to see.
     }
+    if (err instanceof HolderLockError) throw err;
     throw new WorktreeError(`git worktree add --detach failed for "${branch}" at ${startCommit}: ${err.message}`, {
       branch,
       worktreePath,
@@ -1324,9 +1327,9 @@ function createDetachedMergeWorktree(repoRoot, id, scope = createLockScope('work
   return { path: worktreePath, branch, startCommit };
 }
 
-export async function withMergeEphemeralWorktree(repoRoot, id, fn, { scope } = {}) {
+export async function withMergeEphemeralWorktree(repoRoot, id, fn) {
   const branch = branchNameFor(id);
-  const worktree = createDetachedMergeWorktree(repoRoot, id, scope);
+  const worktree = createDetachedMergeWorktree(repoRoot, id);
   try {
     const result = await fn(worktree);
     // fn committed on top of startCommit (a successful merge) -- land it on
