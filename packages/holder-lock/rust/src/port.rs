@@ -444,16 +444,6 @@ fn lock_until(drv: &dyn LockDriver, file: &File, mode: Mode, started: Instant, d
     }
 }
 
-/// Apply the predecessor-domain rule to a description that just took the
-/// kernel lock on the file at `lock_path`. `Ok(None)`: proceed. `Ok(Some)`:
-/// the domain could not be emptied; the caller must close the description.
-pub fn admit_after_lock(lock_path: &Path, kill_wait_ms: u64) -> Option<Value> {
-    match predecessor::admit(&predecessor::record_path(lock_path), Duration::from_millis(kill_wait_ms)) {
-        Admit::Proceed => None,
-        Admit::NotEmpty { domain } => Some(domain),
-    }
-}
-
 fn open_lock_file(path: &Path) -> io::Result<File> {
     // std opens with O_CLOEXEC on every unix; O_RDWR because NFSv4 and BSD
     // refuse an exclusive lock on a read-only descriptor.

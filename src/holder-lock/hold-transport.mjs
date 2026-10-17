@@ -33,8 +33,10 @@ export const HELPER_EXIT_BOUND_MS = 2000;
 const STALE_WORK_AGE_MS = 60 * 60 * 1000;
 const STALE_WORK_MAX_PER_CALL = 50;
 const RESULT_POLL_MS = 2;
-/** How long an async borrow may take to report its child's pid. */
-const STARTED_BOUND_MS = 2000;
+/** Time the helper may spend before the child runs, beyond the kill wait: the
+ * keeper's acknowledgement (2 s) and spawn slack. */
+const STARTED_BASE_MS = 3000;
+const MAX_LOG_BYTES = 16 * 1024 * 1024;
 /** Extra time past a cancel and the kill wait before a borrow counts as stuck. */
 const BORROW_SLACK_MS = 1000;
 const TAIL_POLL_MS = 20;
@@ -265,11 +267,19 @@ function forget(hold, n, names) {
 
 const BORROW_FILES = ['req-<n>.json', 'started-<n>.json', 'out-<n>.log', 'err-<n>.log', 'result-<n>.json'];
 
+/** A log as text, at most `MAX_LOG_BYTES` of it, like the POSIX output cap. */
 function readLog(hold, name) {
+  let fd;
   try {
-    return fs.readFileSync(path.join(hold.work, name), 'utf8');
+    fd = fs.openSync(path.join(hold.work, name), 'r');
+    const size = Math.min(fs.fstatSync(fd).size, MAX_LOG_BYTES);
+    const buffer = Buffer.alloc(size);
+    fs.readSync(fd, buffer, 0, size, 0);
+    return buffer.toString('utf8');
   } catch {
     return '';
+  } finally {
+    if (fd !== undefined) fs.closeSync(fd);
   }
 }
 
@@ -414,12 +424,16 @@ export function borrowAsync(hold, spec, { killWaitMs, onResult }) {
     // No child ever ran: report through the events, like a failed spawn.
     finished = true;
     clearInterval(timer);
+    child.stdout.destroy();
+    child.stderr.destroy();
+    forget(hold, n, BORROW_FILES);
     onResult(result);
     process.nextTick(() => child.emit('error', Object.assign(new Error(result.message ?? result.error), { code: result.error })));
   };
 
   // The pid: the helper writes started-<n>.json once the child runs in its job.
-  const startBound = Date.now() + STARTED_BOUND_MS;
+  const startBoundMs = STARTED_BASE_MS + killWaitMs;
+  const startBound = Date.now() + startBoundMs;
   let timer = null;
   for (;;) {
     const started = startedOf(hold, n);
@@ -435,12 +449,20 @@ export function borrowAsync(hold, spec, { killWaitMs, onResult }) {
         fail(result);
         return child;
       }
+      // A fast child can have written both files between the two looks.
+      const late = startedOf(hold, n);
+      if (late && Number.isInteger(late.pid)) child.pid = late.pid;
       break;
     }
     if (!helperAlive(hold)) throw helperGone(hold, n);
     if (Date.now() >= startBound) {
+      // The borrow may still be starting: end it and wait for the helper's
+      // answer, so the caller never frees the lock under a running child.
       writeRequest(hold, { op: 'cancel', n });
-      throw new HolderLockError('borrow-start-timeout', `lock-hold helper ${hold.pid} did not start borrow ${n} within ${STARTED_BOUND_MS} ms`, { pid: hold.pid });
+      const settleBy = Date.now() + killWaitMs + BORROW_SLACK_MS;
+      while (!resultOf(hold, n) && helperAlive(hold) && Date.now() < settleBy) sleepSync(RESULT_POLL_MS);
+      forget(hold, n, BORROW_FILES);
+      throw new HolderLockError('borrow-start-timeout', `lock-hold helper ${hold.pid} did not start borrow ${n} within ${startBoundMs} ms`, { pid: hold.pid });
     }
     sleepSync(RESULT_POLL_MS);
   }

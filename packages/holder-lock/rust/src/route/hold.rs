@@ -139,11 +139,14 @@ mod borrow {
     /// its thread sets when it has written its result.
     pub(in crate::route) struct Flight {
         running: Option<(u64, Arc<AtomicBool>, Arc<AtomicBool>)>,
+        /// A borrow ended with processes it could not end: its record still
+        /// names them, so no new borrow may overwrite that record.
+        unemptied: Arc<AtomicBool>,
     }
 
     impl Flight {
         pub(in crate::route) fn none() -> Self {
-            Flight { running: None }
+            Flight { running: None, unemptied: Arc::new(AtomicBool::new(false)) }
         }
 
         /// End the running borrow's job at once (parent death, `cancel`).
@@ -220,6 +223,10 @@ mod borrow {
                         answer(work, n, json!({ "error": "borrow-busy" }));
                         continue;
                     }
+                    if flight.unemptied.load(Ordering::SeqCst) {
+                        answer(work, n, json!({ "error": "borrow-leftover-pending", "message": "an earlier borrow left processes the helper could not end" }));
+                        continue;
+                    }
                     let spec = match parse_borrow(&request, work, n) {
                         Ok(spec) => spec,
                         Err(message) => {
@@ -237,12 +244,16 @@ mod borrow {
                     let cancel = Arc::new(AtomicBool::new(false));
                     let done = Arc::new(AtomicBool::new(false));
                     flight.running = Some((n, cancel.clone(), done.clone()));
+                    let unemptied = flight.unemptied.clone();
                     scope.spawn(move || {
                         let started = |pid: u32| {
                             let _ = write_atomic(work, &format!("started-{n}.json"), &json!({ "pid": pid }).to_string());
                         };
                         let control = BorrowControl { cancel: Some(&cancel), on_started: Some(&started) };
                         let outcome = borrow_windows::run(handle, &spec, &helper, &control);
+                        if matches!(outcome, Err(BorrowError::LeftoverNotKilled { .. })) {
+                            unemptied.store(true, Ordering::SeqCst);
+                        }
                         answer(work, n, result_of(outcome));
                         done.store(true, Ordering::SeqCst);
                     });
