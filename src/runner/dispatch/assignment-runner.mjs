@@ -2565,18 +2565,17 @@ export async function executeAssignment(assignment, opts = {}) {
           effectiveContract: effectiveContract
             ? { ...effectiveContract, assignment: { role: effectiveAssignment.role, operation: effectiveAssignment.operation } }
             : effectiveContract,
-          // needsAssignmentLaunchContext (herdr-spawn, and any other
-          // out-of-process adapter besides cli-spawn) reuses the SAME
-          // assignmentLaunchContext identity built above -- executeExecutorCli
+          // needsAssignmentLaunchContext (this branch only ever runs it for
+          // herdr-spawn; cli-spawn goes through the run supervisor above)
+          // reuses the SAME assignmentLaunchContext identity built above -- executeExecutorCli
           // already accepts and threads these through buildConfinementRequest
           // -> executeThroughConfinement -> confinement/authority.mjs, which
           // resolves 'herdr-spawn' onto `herdrSpawnInteractiveAdapter`
           // (transport.mjs) -> `runHerdrRound` (herdr-round.mjs), the real
           // worker-command seam that publishes a receipt to
-          // runDir/protected/adapter-receipts/<launchCommandId>.json. A plain
-          // `opts.legacySpawn`/unrecognized-adapter caller never sets
-          // `needsAssignmentLaunchContext`, so `assignmentLaunchContext` stays
-          // null here and this call is byte-identical to before this fix.
+          // runDir/protected/adapter-receipts/<launchCommandId>.json. An
+          // adapter with no launch context never sets `needsAssignmentLaunchContext`,
+          // so `assignmentLaunchContext` stays null here.
           ...(needsAssignmentLaunchContext ? { assignmentLaunchContext, launchCommandId, controlEpoch, controlToken } : {}),
           ...(providerCapacityForLaunch ? { providerCapacity: providerCapacityForLaunch } : {}),
           // Read-only Assignments never take the per-cwd lock on the supervisor path above; the
