@@ -1,0 +1,801 @@
+{
+  "candidateSnapshot": [
+    {
+      "path": "docs/platform/README.md",
+      "sha256": "e684084bd7f480ceaec329e2bbcee9da6f55db9755436305f7e8619d3b6b63ee"
+    },
+    {
+      "path": "docs/platform/architecture-map.md",
+      "sha256": "62a92dc3cf248e02ffc6be3d341858b3351f2cc3b3c2e90fbc1b6add9099a165"
+    },
+    {
+      "path": "docs/platform/component-boundary.md",
+      "sha256": "65c27c782a9323f723307f2a449ebf0b41efa18a7a341a7e308735296b272871"
+    },
+    {
+      "path": "docs/platform/event-store/spec.md",
+      "sha256": "4348ba168489493017e0c95bfbee0c44fe511f7522d4aeed1d54310aff9ce472"
+    },
+    {
+      "path": "docs/platform/governance.md",
+      "sha256": "0e7d820925c594df12b2895a18158fdb91a2e2c5cf257f5d61463b3e9f7af536"
+    },
+    {
+      "path": "docs/platform/holder-lock/spec.md",
+      "sha256": "e600666ed6bec9809ec377f0254c7c3e2ef5dd1b07e6b5933a7a1fba8bd0b1b7"
+    },
+    {
+      "path": "docs/platform/platform-foundations.md",
+      "sha256": "1cfda337e23e4b5f8a5f1a6cf65346f553a1668c49888ab7b44df02595412223"
+    },
+    {
+      "path": "docs/platform/process/spec.md",
+      "sha256": "dbca061feff054beb0141739936b2e91a127805b80afdf040ba8ec2bd983c28e"
+    }
+  ],
+  "inputHashes": [
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-07-reader-brief.md",
+      "sha256": "55abc55f0bd8190420c817b0a93c4c2cdfd1bfd0f8a15e1b8903161f735f9607"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-07-reader-key.md",
+      "sha256": "b7abe144cd2deaf1b8ba166838ebb6bd568cd50f8640b9a7df83ca4b981e6287"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-07/step-07-reader-gap-map.md",
+      "sha256": "bb89f34e808c6f64162c9cbda8767bf7dba9df8c55675ab29fc1883c23f656c4"
+    }
+  ],
+  "authoredBy": "codex-session:fgos-run_unit-run-17922255a98df5@2026-10-17",
+  "head": "bfca3d5165fb8de8444e2ae0af0c92831bc8a33b",
+  "keySeal": null,
+  "readersStarted": false,
+  "anchors": [
+    {
+      "ref": "docs/platform/platform-foundations.md#l5-definition-of-done-sáu-câu-hỏi",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/governance.md#5-metadata",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/governance.md#11-linking-discipline",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/README.md#2-area-registry",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/holder-lock/spec.md#2-ownership-boundary",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/process/spec.md#3-facts-the-judge-table",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/holder-lock/spec.md#1-purpose",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/process/spec.md#2-ownership-boundary",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/holder-lock/spec.md#3-the-port",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/holder-lock/spec.md#8-the-predecessor-domain-rule",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/holder-lock/spec.md#16-related-files",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/process/spec.md#4-control",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/process/spec.md#7-known-limits",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/holder-lock/spec.md#4-drivers-and-guarantee-levels",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/holder-lock/spec.md#13-setup-doctor-and-activation",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/holder-lock/spec.md#15-lịch-sử-quyết-định",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/architecture-map.md#9-luật-vận-hành-bản-đồ",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/process/spec.md#8-lịch-sử-quyết-định",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/governance.md#4-authority-matrix",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/governance.md#3-document-types",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/event-store/spec.md#3-ownership-boundary",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/platform-foundations.md#l3-luật-store-truth-ở-jsonl-db-là-view",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/holder-lock/spec.md#9-node-facade-and-lockscope",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/event-store/spec.md#event-store-component-specification",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/event-store/spec.md#26-decision-record",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/platform-foundations.md#2-authority",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/event-store/spec.md#4-layering-and-locks",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/event-store/spec.md#6-envelope",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/event-store/spec.md#7-streams-scopes-and-refs",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/event-store/spec.md#17-node-to-rust-route-and-latency-budget",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/event-store/spec.md#23-proof-required-before-acceptance-of-the-implementation",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/event-store/spec.md#24-evidence-and-its-limits",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/README.md#1-platform-wide-anchors",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/architecture-map.md#2-reading-model",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/component-boundary.md#4-current-high-level-components",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/process/spec.md#1-purpose",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/architecture-map.md#7-sổ-đăng-ký-contract",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/component-boundary.md#15-run-result-evaluator-boundary",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/platform-foundations.md#l10-add-through-not-alongside-mở-rộng-qua-cửa-không-đắp-cạnh-cửa",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/platform-foundations.md#l9-thang-hoàn-tất-của-một-việc-run-merge-durable",
+      "exists": true
+    },
+    {
+      "ref": "docs/platform/component-boundary.md#5-how-to-change",
+      "exists": true
+    }
+  ],
+  "scenarios": {
+    "A": {
+      "cells": 7,
+      "files": [
+        "docs/platform/README.md",
+        "docs/platform/architecture-map.md",
+        "docs/platform/governance.md",
+        "docs/platform/holder-lock/spec.md",
+        "docs/platform/platform-foundations.md",
+        "docs/platform/process/spec.md"
+      ]
+    },
+    "B": {
+      "cells": 7,
+      "files": [
+        "docs/platform/README.md",
+        "docs/platform/event-store/spec.md",
+        "docs/platform/governance.md",
+        "docs/platform/holder-lock/spec.md",
+        "docs/platform/platform-foundations.md"
+      ]
+    },
+    "C": {
+      "cells": 7,
+      "files": [
+        "docs/platform/README.md",
+        "docs/platform/architecture-map.md",
+        "docs/platform/component-boundary.md",
+        "docs/platform/governance.md",
+        "docs/platform/platform-foundations.md",
+        "docs/platform/process/spec.md"
+      ]
+    }
+  },
+  "wholeRunFiles": [
+    "docs/platform/README.md",
+    "docs/platform/architecture-map.md",
+    "docs/platform/component-boundary.md",
+    "docs/platform/event-store/spec.md",
+    "docs/platform/governance.md",
+    "docs/platform/holder-lock/spec.md",
+    "docs/platform/platform-foundations.md",
+    "docs/platform/process/spec.md"
+  ],
+  "wholeRunCount": 8,
+  "routes": [
+    {
+      "path": "docs/platform/architecture-map.md",
+      "linked": true
+    },
+    {
+      "path": "docs/platform/component-boundary.md",
+      "linked": true
+    },
+    {
+      "path": "docs/platform/event-store/spec.md",
+      "linked": true
+    },
+    {
+      "path": "docs/platform/governance.md",
+      "linked": true
+    },
+    {
+      "path": "docs/platform/holder-lock/spec.md",
+      "linked": true
+    },
+    {
+      "path": "docs/platform/platform-foundations.md",
+      "linked": true
+    },
+    {
+      "path": "docs/platform/process/spec.md",
+      "linked": true
+    }
+  ],
+  "newLinks": [
+    {
+      "from": "docs/platform/README.md",
+      "destination": "runner/README.md",
+      "path": "docs/platform/runner/README.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "../specs/runner.md",
+      "path": "docs/specs/runner.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "work-state/README.md",
+      "path": "docs/platform/work-state/README.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "../specs/work-state.md",
+      "path": "docs/specs/work-state.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "system-architecture/architecture/architecture-intent.md",
+      "path": "docs/platform/system-architecture/architecture/architecture-intent.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "system-architecture/architecture/roadmap.md",
+      "path": "docs/platform/system-architecture/architecture/roadmap.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "system-architecture/architecture/workspace-topology.md",
+      "path": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "system-architecture/architecture/workspace-topology-audit.md",
+      "path": "docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "system-architecture/architecture/workspace-topology-roadmap.md",
+      "path": "docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "path": "docs/platform/system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "system-overview/spec.md",
+      "path": "docs/platform/system-overview/spec.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "component-boundary.md#4-current-high-level-components",
+      "path": "docs/platform/component-boundary.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "holder-lock/spec.md",
+      "path": "docs/platform/holder-lock/spec.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "process/spec.md",
+      "path": "docs/platform/process/spec.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "event-store/spec.md",
+      "path": "docs/platform/event-store/spec.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "event-store/spec.md#26-decision-record",
+      "path": "docs/platform/event-store/spec.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "event-store/spec.md#23-proof-required-before-acceptance-of-the-implementation",
+      "path": "docs/platform/event-store/spec.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "agent-confinement/README.md",
+      "path": "docs/platform/agent-confinement/README.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "claude-plugin/README.md",
+      "path": "docs/platform/claude-plugin/README.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "decision-citation-drift/README.md",
+      "path": "docs/platform/decision-citation-drift/README.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "distillery/README.md",
+      "path": "docs/platform/distillery/README.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "herdr-web-dashboard/README.md",
+      "path": "docs/platform/herdr-web-dashboard/README.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "observe/README.md",
+      "path": "docs/platform/observe/README.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "ui-spec/README.md",
+      "path": "docs/platform/ui-spec/README.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "../ui-spec/",
+      "path": "docs/ui-spec/",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "governance.md",
+      "path": "docs/platform/governance.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "architecture-map.md#9-luật-vận-hành-bản-đồ",
+      "path": "docs/platform/architecture-map.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "component-boundary.md#5-how-to-change",
+      "path": "docs/platform/component-boundary.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "platform-foundations.md#l5-definition-of-done-sáu-câu-hỏi",
+      "path": "docs/platform/platform-foundations.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "governance.md#3-document-types",
+      "path": "docs/platform/governance.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "governance.md#5-metadata",
+      "path": "docs/platform/governance.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "governance.md#11-linking-discipline",
+      "path": "docs/platform/governance.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "proposals/README.md",
+      "path": "docs/platform/proposals/README.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/README.md",
+      "destination": "documentation/architecture/documentation-system-design.md#67-proposal",
+      "path": "docs/platform/documentation/architecture/documentation-system-design.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/runner/README.md",
+      "destination": "../component-boundary.md#5-how-to-change",
+      "path": "docs/platform/component-boundary.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/runner/README.md",
+      "destination": "../governance.md#5-metadata",
+      "path": "docs/platform/governance.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/runner/README.md",
+      "destination": "../platform-foundations.md#l5-definition-of-done-sáu-câu-hỏi",
+      "path": "docs/platform/platform-foundations.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/work-state/README.md",
+      "destination": "decisions/retired-decision-history.md#6-adr-0007-schema-and-event-evolution",
+      "path": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/ui-spec/README.md",
+      "destination": "../component-boundary.md#5-how-to-change",
+      "path": "docs/platform/component-boundary.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/ui-spec/README.md",
+      "destination": "../governance.md#3-document-types",
+      "path": "docs/platform/governance.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/ui-spec/README.md",
+      "destination": "../governance.md#5-metadata",
+      "path": "docs/platform/governance.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/ui-spec/README.md",
+      "destination": "../governance.md#11-linking-discipline",
+      "path": "docs/platform/governance.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/ui-spec/README.md",
+      "destination": "../platform-foundations.md#l5-definition-of-done-sáu-câu-hỏi",
+      "path": "docs/platform/platform-foundations.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/proposals/README.md",
+      "destination": "architecture-advisory-panel.md",
+      "path": "docs/platform/proposals/architecture-advisory-panel.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/proposals/README.md",
+      "destination": "component-authority-boundary-map.md",
+      "path": "docs/platform/proposals/component-authority-boundary-map.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/proposals/README.md",
+      "destination": "coordination-capability-envelope.md",
+      "path": "docs/platform/proposals/coordination-capability-envelope.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/proposals/README.md",
+      "destination": "coordination-dispatch-contract.md",
+      "path": "docs/platform/proposals/coordination-dispatch-contract.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/proposals/README.md",
+      "destination": "coordination-envelope-probe-contract.md",
+      "path": "docs/platform/proposals/coordination-envelope-probe-contract.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/proposals/README.md",
+      "destination": "coordination-worker-provider-boundary.md",
+      "path": "docs/platform/proposals/coordination-worker-provider-boundary.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/proposals/README.md",
+      "destination": "dispatch-control-plane-redesign.md",
+      "path": "docs/platform/proposals/dispatch-control-plane-redesign.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/proposals/README.md",
+      "destination": "documentation-system-unification.md",
+      "path": "docs/platform/proposals/documentation-system-unification.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/proposals/README.md",
+      "destination": "doing-coordination-redesign.md",
+      "path": "docs/platform/proposals/doing-coordination-redesign.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/proposals/README.md",
+      "destination": "knowledge-registry-redesign.md",
+      "path": "docs/platform/proposals/knowledge-registry-redesign.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/proposals/README.md",
+      "destination": "step-09-group-thinking-substrate.md",
+      "path": "docs/platform/proposals/step-09-group-thinking-substrate.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/proposals/README.md",
+      "destination": "step-10-a0-coding-domain-boundary-facade-plan.md",
+      "path": "docs/platform/proposals/step-10-a0-coding-domain-boundary-facade-plan.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/proposals/README.md",
+      "destination": "step-10-coding-domain-adoption.md",
+      "path": "docs/platform/proposals/step-10-coding-domain-adoption.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/proposals/README.md",
+      "destination": "visibility-and-interactive-contact-herdr-spawn.md",
+      "path": "docs/platform/proposals/visibility-and-interactive-contact-herdr-spawn.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/proposals/README.md",
+      "destination": "../governance.md#3-document-types",
+      "path": "docs/platform/governance.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/proposals/README.md",
+      "destination": "../governance.md#5-metadata",
+      "path": "docs/platform/governance.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/proposals/README.md",
+      "destination": "../governance.md#11-linking-discipline",
+      "path": "docs/platform/governance.md",
+      "exists": true
+    },
+    {
+      "from": "docs/platform/proposals/README.md",
+      "destination": "../documentation/architecture/documentation-system-design.md#67-proposal",
+      "path": "docs/platform/documentation/architecture/documentation-system-design.md",
+      "exists": true
+    }
+  ],
+  "edits": [
+    {
+      "path": "docs/platform/README.md",
+      "sourceId": "src_66097db12621997618b0dcc8f5968a02",
+      "anchors": "2-area-registry; 4-how-to-change-platform-docs",
+      "context": "X-NAV-01..04; L11-10/L11-18; root-5, whole-2/4/6, ui-1/11, proposals-4/6",
+      "beforeSha256": "6e743173617ff1ea81a23cc3fe9af065ebf1f21624b7d61529906c54b33ef7f5",
+      "afterSha256": "e684084bd7f480ceaec329e2bbcee9da6f55db9755436305f7e8619d3b6b63ee"
+    },
+    {
+      "path": "docs/platform/runner/README.md",
+      "sourceId": "src_6c435a33567677f9f35d97dff39424e8",
+      "anchors": "added-in-candidate-cross-area-reading-links",
+      "context": "runner-4; ui-11",
+      "beforeSha256": "5f6c334a23962f7963eff2f61f1ce1f2a768bf5739c3df36ac48ad44a6cf8896",
+      "afterSha256": "de2ca5469f6e10eaf508433a0907f63f1c3e8bc11644cf77dd61f685cb6361f6"
+    },
+    {
+      "path": "docs/platform/work-state/README.md",
+      "sourceId": "src_f7d1178b6e3401fb3620f6484ac4b1b0",
+      "anchors": "2-read-first",
+      "context": "root-4",
+      "beforeSha256": "e8a20f75d1f5b625bb78842bf80dc804af65d1458468e46d579a28c50de2afb7",
+      "afterSha256": "373bf70738ba1b7e63404e09ade9802f92c95d6ebf1e64e2823564ae67225667"
+    },
+    {
+      "path": "docs/platform/ui-spec/README.md",
+      "sourceId": "src_975961f2cc021843a2c3d67b353696c4",
+      "anchors": "added-in-candidate-cross-area-reading-links",
+      "context": "ui-10/11",
+      "beforeSha256": "c2782ee6a0952a96b18abf419fb872e35cf1cb3aab98de251c67f363885f3d34",
+      "afterSha256": "648877eba79e0875045a0f145314d9805f2a61cd007c57ccfc5ac1f27a7336b0"
+    },
+    {
+      "path": "docs/platform/proposals/README.md",
+      "sourceId": "src_eed5fd6d71161c7d17d8eee57fc08ea6",
+      "anchors": "added-in-candidate-candidate-collection-routes",
+      "context": "proposals-2/4/6",
+      "beforeSha256": "3c9606e1c79b0f12aa9cf68ce736cf386eaf302448cc7847f8d15dda335a2d0b",
+      "afterSha256": "be7220ab0032530d7f3913a59c2393318e94d5be4cc6f4408d3a2464e0dfca90"
+    }
+  ],
+  "A": {
+    "workingViolations": [],
+    "historyViolations": [],
+    "commitsChecked": 15
+  },
+  "B": [
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "expected": "a52981ff2862cc2c553dbb3181e4e822a26b146b",
+      "actual": "a52981ff2862cc2c553dbb3181e4e822a26b146b",
+      "equal": true
+    },
+    {
+      "path": "scripts/doc-inventory-artifact.mjs",
+      "expected": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64",
+      "actual": "1e6b7bdad954fad1f7c67a4ba6c850c02304ac64",
+      "equal": true
+    },
+    {
+      "path": "scripts/generate-shipped-path-inventory.mjs",
+      "expected": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
+      "actual": "0f1cd7e1cee308772c0b56c37f3190333039cfb3",
+      "equal": true
+    },
+    {
+      "path": "scripts/check-legacy-docs-ratchet.mjs",
+      "expected": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d",
+      "actual": "8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d",
+      "equal": true
+    },
+    {
+      "path": "scripts/lib/is-main-module.mjs",
+      "expected": "680570946fa1381474900c9192795514b5b88f48",
+      "actual": "680570946fa1381474900c9192795514b5b88f48",
+      "equal": true
+    }
+  ],
+  "C": {
+    "authorityStatusesUnchangedFromB0": true
+  },
+  "H": {
+    "command": "env -u CLAUDE_CODE_SESSION_ID node scripts/check-doc-candidate-status.mjs --strict --json",
+    "exit": 0,
+    "result": {
+      "counts": {
+        "files": 612,
+        "byStatus": {
+          "promoted": 3,
+          "candidate": 214,
+          "legacy-current": 0,
+          "non-authority": 1,
+          "unrouted": 394
+        },
+        "exemptUnrouted": 302,
+        "checked": 217,
+        "findings": 0,
+        "byType": {}
+      },
+      "findings": []
+    }
+  },
+  "I": {
+    "frozenBaselineUnchanged": true,
+    "readerFilesWorkingDrift": [],
+    "rawBaselineEquality": false,
+    "disclosedImports": [
+      "docs/platform/session-identity/spec.md",
+      "docs/platform/holder-lock/spec.md",
+      "docs/platform/process/spec.md",
+      "docs/platform/event-store/spec.md"
+    ],
+    "posture": "Accepted Phase 6 close posture: frozen baseline untouched; reader/instruction paths byte-equal turn HEAD, imported routes explicitly disclosed. Not a rebaseline or frozen-I-green claim."
+  },
+  "diffCheck": {
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "fullNpmTest": "Not run: documentation navigation only; full suite remains Step 9 serial closing proof.",
+  "reproduction": {
+    "anchors": "For each anchors[].ref: env -u CLAUDE_CODE_SESSION_ID node scripts/list-doc-anchors.mjs --check <ref>; require exit 0. Rebuild the ref set from every backtick docs/platform/path#anchor in the key, never trust this list alone.",
+    "budgets": "Parse A1-A7, B1-B7, C1-C7 rows; union cited paths with README/governance/platform-foundations common files. Require 7 rows each, <=8 distinct files for the union, subset of brief allowlist.",
+    "routes": "Resolve markdown destinations relative to each edited portal; require file and anchor existence for every added destination. All eight answer files must be directly linked by README.",
+    "A": "Compare git diff --name-only HEAD and git ls-files --others --exclude-standard against allowed-paths.json; also diff-tree each first-parent non-merge commit from B0 to HEAD.",
+    "B": "git hash-object each file from reports/phase-06/extractor-blobs.txt; require identical hash.",
+    "C": "Compare entire transitional-switchboard.json against B0; stronger than status-only equality.",
+    "I": "Compare frozen baseline bytes with turn HEAD; ensure no working change in AGENTS.md, CLAUDE.md, docs/specs/reading-map.md, docs/transitional-switchboard.md, transitional-switchboard.json. Raw frozen equality remains false for disclosed imports, accepted posture not a rebaseline.",
+    "H": "env -u CLAUDE_CODE_SESSION_ID node scripts/check-doc-candidate-status.mjs --strict --json",
+    "diff": "git diff --check"
+  },
+  "limitations": [
+    "Not a native carry/rebind, approval carry or Phase 7 close; Step 9 still required.",
+    "Strict H checks 217 routed candidate/promoted docs, not every imported draft; Event Store remains unrouted by protected switchboard and is independently included in anchor/status/budget checks.",
+    "No MDView MCP available; preview not invoked because the fallback registers/writes outside the assignment write scope.",
+    "Distinct A38 review and seal pending; no reader has started."
+  ]
+}

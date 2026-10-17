@@ -60,3 +60,11 @@ These are reading cautions from the fresh-reader key, not current behavior proof
 5. Deleted ranking/entropy pointers and the literal-main Open Gap were stale code claims. Candidate corrections are labelled in [Pointers](subcomponents/h-f34e0d170d89/spec.md), [Open Gaps](subcomponents/h-2e032393add1/spec.md) and [Gate A](operations/h-51f5cd7279fd.md); remaining carried claims are unverified.
 6. The [vocabulary table](architecture/h-7af1f0242611.md) keeps stale `runner.md:<line>` self-citations with a label; those numbers are not navigable candidate evidence.
 7. RUL76 already names `--idle-timeout-ms` and `runner.idleTimeoutMs` in the [carried rules](subcomponents/h-6979005beaf7/spec.md). Check its partial supersession and implementation before proposing a new idle-timeout rule.
+
+## Added in candidate: Cross-area reading links
+
+- [Component boundary and change check](../component-boundary.md#5-how-to-change).
+- [Documentation metadata and implementation evidence](../governance.md#5-metadata).
+- [Six-question acceptance](../platform-foundations.md#l5-definition-of-done-sáu-câu-hỏi).
+
+These links supplement the known-conflicts routes above; they certify no carried claim.

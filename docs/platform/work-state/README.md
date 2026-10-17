@@ -38,6 +38,7 @@ The documents listed here are candidate material. No reader reads them yet. The 
 | Reader goal | Read |
 | --- | --- |
 | Find the canonical text today | [docs/specs/work-state.md](../../specs/work-state.md), [docs/io-contract.md](../../io-contract.md) |
+| Review schema/event evolution before changing a field or verb | [ADR 0007](decisions/retired-decision-history.md#6-adr-0007-schema-and-event-evolution) |
 | Open the candidate spec | [spec.md](spec.md) |
 | Open the candidate CLI input/output contract | [contracts/cli-io-contract.md](contracts/cli-io-contract.md) |
 | Open the candidate implementation pointers | [architecture/implementation-pointers.md](architecture/implementation-pointers.md) |

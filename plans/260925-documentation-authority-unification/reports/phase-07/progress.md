@@ -199,7 +199,7 @@ resolved path, author, reviewer, digest and status here.
 | 4 | accepted | 13/13 initial verdicts ok; V-05 fix confirmed by bounded re-review 15/15 ok | native rebind waits for Step 9 by L11-2 | none |
 | 5 | accepted | Review 142/143 ok + remainder 0/60; L11-17 rework re-reviewed 7/7 ok (`review-a38-step-05-bounded-rework-01.md`, at `f836da42c`) | PARK-PROTECTED-01 and P7-DOC-GAP-02 route to Step 9 | none |
 | 6 | accepted | Independent review 58/58 ok, 0 rework (`review-a38-step-06-projections-01.md`, at `66c5ff292`) | S6-UI-ROOT-02 parked (candidate UI root certification); S6-UI-DRIFT-01 to Phase 9; S6-RATCHET-03 to Step 9 | none |
-| 7 | ready | none | none | wait for owner go-ahead |
+| 7 | reviewing | step-07-reader-brief/key, gap-map, proof and A38 request | no content blocker; independent seal pending | Lead dispatches distinct A38 key reviewer; no readers |
 | 8 | not-started | none | none | wait for sealed key |
 | 9 | not-started | A45 removes the CTR010 close blocker | none | wait for readers and final committed bytes |
 
@@ -262,3 +262,46 @@ Author session: `codex-session:fgos-run_unit-run-17922205e4d698@2026-10-17`. Ste
 - Ratchet exits 1 for three main-imported legacy spec exception digests, all byte-equal to turn HEAD. S6-RATCHET-03 routes to Step 9; PARK-PROTECTED-01 remains. No all-green or native-close claim. Full npm test/global jobs remain Step 9.
 - One request: `review-request-a38-step-06-01.md`, 58 entries in `review-input-step-06-01.json`, below 400 KB; independent reviewer pending. Source/candidate/tool/output SHA-256 pins are in `step-06-projections.json`. No per-unit frame dump or heavy reviewer command.
 - MDView preview attempted; unavailable because its database is read-only. This does not change evidence or block review.
+
+## Step 7 artifact registration
+
+Author session: `codex-session:fgos-run_unit-run-17922255a98df5@2026-10-17`.
+The assignment prohibits the fgOS CLI; reuse the established sibling naming pattern
+under this report directory (same explicit override as earlier turns).
+Registered before writing: `step-07-reader-gap-map.md` (all Phase 6 reader gaps),
+`step-07-reader-brief.md` (reader-only input), `step-07-reader-key.md` (private,
+unsealed intended answers), `step-07-proof.json` (anchors, routes, budget and light
+checks), `review-request-a38-step-07-key-01.md` (distinct reviewer handoff).
+All are authored by the session above; reviewer and seal remain pending.
+
+## Step 7 authoring result — key review pending
+
+- Five navigation-only candidate edits: platform portal, runner/work-state/UI area
+  portals and proposals collection. L11-10 system-architecture row links all four
+  affected files (plus related roadmap/vision); holder-lock, Process and Event Store
+  now have direct portal routes. All edits have before/after hashes and native
+  source ids in post-review-edits; Step 9 carry/rebind/review still required.
+- Gap map: 51 source dispositions plus key/raw-reader cautions. Content/policy,
+  protected switchboard and full-truth gaps have explicit Phase 8/9 reasons;
+  P7-DOC-GAP-02/03 remain Step 9, not repaired here.
+- Three scenarios: cold-lock takeover / process judgment; Event Store ack, lock
+  order and replay truth; dashboard execution/completion authority. Each has six
+  L5 questions and an authoring probe. Separate reader brief and private key.
+- Proof: 41/41 key anchors; 61/61 added links; all eight answer files reachable
+  directly from portal. A/B/C scenario unions 6/5/6; whole-run union eight.
+  Light A/B/C/H pass; I retains accepted imported-route posture (frozen baseline
+  unchanged, no working reader/instruction drift; raw baseline equality remains
+  false, no rebaseline). H checks 217 routed docs with zero findings; imported
+  Event Store draft is not certified by H and is separately checked by the key.
+  `git diff --check` green. Full npm test/native carry remain Step 9 closing work.
+- New registered output for the distinct reviewer: `review-a38-step-07-key-01.md`;
+  author does not create it. Handoff is `review-request-a38-step-07-key-01.md`,
+  106 entries in two parts (52/54) with input and eight candidate hashes. No author seal, no reader run.
+- MDView MCP unavailable; fallback would register/write outside this assignment’s
+  allowed paths, so no preview was invoked. Markdown remains directly reviewable.
+- Smallest next action: Lead dispatches a fresh A38 key reviewer on runner-committed
+  bytes. No permission question needed. Step 8 still waits for that reviewer seal.
+
+Step 7 review packaging registration: `review-input-step-07-key-01/part-01-gaps.json`
+and `review-input-step-07-key-01/part-02-key.json`, one logical request with
+52 and 54 explicit entries respectively (each below 60 entries / 400 KB).

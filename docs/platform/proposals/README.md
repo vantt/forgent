@@ -54,3 +54,29 @@ their scope crosses the area boundary.
 ## Handoff Prompts
 
 - [Step 09 / Step 10 Replan Handoff Prompt](../agent-coordination/history/proposals-redesigns/step-09-step-10-replan-handoff-prompt.md)
+
+## Added in candidate: Candidate collection routes
+
+The historical active list above is preserved. This navigation lists the other
+candidate files in this collection without changing their acceptance status:
+
+- [architecture-advisory-panel](architecture-advisory-panel.md).
+- [component-authority-boundary-map](component-authority-boundary-map.md).
+- [coordination-capability-envelope](coordination-capability-envelope.md).
+- [coordination-dispatch-contract](coordination-dispatch-contract.md).
+- [coordination-envelope-probe-contract](coordination-envelope-probe-contract.md).
+- [coordination-worker-provider-boundary](coordination-worker-provider-boundary.md).
+- [dispatch-control-plane-redesign](dispatch-control-plane-redesign.md).
+- [documentation-system-unification](documentation-system-unification.md).
+- [doing-coordination-redesign](doing-coordination-redesign.md).
+- [knowledge-registry-redesign](knowledge-registry-redesign.md).
+- [step-09-group-thinking-substrate](step-09-group-thinking-substrate.md).
+- [step-10-a0-coding-domain-boundary-facade-plan](step-10-a0-coding-domain-boundary-facade-plan.md).
+- [step-10-coding-domain-adoption](step-10-coding-domain-adoption.md).
+- [visibility-and-interactive-contact-herdr-spawn](visibility-and-interactive-contact-herdr-spawn.md).
+
+For authoring, read [document types](../governance.md#3-document-types),
+[metadata](../governance.md#5-metadata),
+[link discipline](../governance.md#11-linking-discipline), and the
+[proposal shape](../documentation/architecture/documentation-system-design.md#67-proposal).
+Collection membership grants no design or implementation authority.

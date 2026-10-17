@@ -42,14 +42,25 @@ Target area docs live at `docs/platform/<area>/`.
 
 | Area | Current source during migration |
 |---|---|
-| `runner` | [../specs/runner.md](../specs/runner.md), runner architecture docs |
-| `work-state` | [../specs/work-state.md](../specs/work-state.md) |
+| [runner](runner/README.md) | [../specs/runner.md](../specs/runner.md), runner architecture docs |
+| [work-state](work-state/README.md) | [../specs/work-state.md](../specs/work-state.md) |
 | [packaging-distribution](packaging-distribution/README.md) | [packaging-distribution/README.md](packaging-distribution/README.md), [../specs/distribution.md](../specs/distribution.md), [../distribution-vision.md](../distribution-vision.md), [../architect/packaging-distribution/](../architect/packaging-distribution/) |
 | [host-invocation-routing](host-invocation-routing/README.md) | [host-invocation-routing/README.md](host-invocation-routing/README.md), [../architect/host-invocation-routing/](../architect/host-invocation-routing/) |
 | [convention](convention/spec.md) | [convention/spec.md](convention/spec.md) — implemented executable naming and placement authority; no document-body health rules |
 | [agent-coordination](agent-coordination/README.md) | [agent-coordination/README.md](agent-coordination/README.md), [../architect/agent-coordination/](../architect/agent-coordination/), runner coordination specs |
+| system-architecture | Candidate routes: [architecture intent](system-architecture/architecture/architecture-intent.md), [roadmap](system-architecture/architecture/roadmap.md), [workspace topology](system-architecture/architecture/workspace-topology.md), [topology audit](system-architecture/architecture/workspace-topology-audit.md); related [topology roadmap](system-architecture/architecture/workspace-topology-roadmap.md) and [system vision](system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md) |
+| [system-overview](system-overview/spec.md) | Candidate overview; use [component boundaries](component-boundary.md#4-current-high-level-components) for current ownership routes |
+| [holder-lock](holder-lock/spec.md) | Kernel lock port, registry, predecessor-domain rules and guarantee levels |
+| [process](process/spec.md) | Process facts and control; shared judge vectors and platform limits |
+| [event-store](event-store/spec.md) | Draft durability design; [decision awaiting signature](event-store/spec.md#26-decision-record) and [proof required](event-store/spec.md#23-proof-required-before-acceptance-of-the-implementation); navigation does not accept or implement it |
+| [agent-confinement](agent-confinement/README.md) | Candidate area portal; retained sources are identified there |
+| [claude-plugin](claude-plugin/README.md) | Candidate area portal; retained sources are identified there |
+| [decision-citation-drift](decision-citation-drift/README.md) | Candidate area portal; retained sources are identified there |
+| [distillery](distillery/README.md) | Candidate area portal; retained sources are identified there |
+| [herdr-web-dashboard](herdr-web-dashboard/README.md) | Candidate area portal; retained sources are identified there |
+| [observe](observe/README.md) | Candidate area portal; retained sources are identified there |
 | `skills` | domain and skill docs under [../../domains/](../../domains/), [../../.agents/skills/](../../.agents/skills/), [../../plugins/fgOS/skills/](../../plugins/fgOS/skills/) |
-| `ui-spec` | [../ui-spec/](../ui-spec/) |
+| [ui-spec](ui-spec/README.md) | [../ui-spec/](../ui-spec/) |
 | `documentation-system` | Full-horizon proposal: [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md); proposed active H1 migration plan: `plans/260925-documentation-authority-unification/plan.md`; implemented end-user registry foundation: `archive/plans/260825-1841-knowledge-registry/plan.md` |
 
 ## 3. Decision Surface
@@ -64,14 +75,23 @@ Target area docs live at `docs/platform/<area>/`.
 
 ## 4. How To Change Platform Docs
 
-1. Read `docs/doc-governance.md`.
+1. Open the candidate [governance](governance.md) for document types, metadata and links; its header records the retained source during migration.
 2. Read [migration-authoring-rules.md](migration-authoring-rules.md) and [documentation/switchboard.md](documentation/switchboard.md).
 3. Read this portal and the relevant area portal/spec.
 4. Read the relevant vision and intent-preservation ledger when the change
    narrows, stages, or simplifies the full design.
 5. Use a discussion scratchpad for multi-round shaping.
 6. Promote settled content into the right canonical doc.
-7. Update links and verification pointers.
+7. Update links and verification pointers. For cross-area changes, follow the
+   [map registration and verification ritual](architecture-map.md#9-luật-vận-hành-bản-đồ),
+   [boundary change rule](component-boundary.md#5-how-to-change) and
+   [six-question acceptance test](platform-foundations.md#l5-definition-of-done-sáu-câu-hỏi).
+
+Candidate authoring routes: [types](governance.md#3-document-types),
+[metadata](governance.md#5-metadata), [links and boundary checks](governance.md#11-linking-discipline),
+[cross-area proposal collection](proposals/README.md), and
+[proposal shape](documentation/architecture/documentation-system-design.md#67-proposal).
+These are reading links; migration authority and document status remain unchanged.
 
 ## 5. Related Files
 

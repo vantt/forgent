@@ -50,3 +50,13 @@ The functioning compiler root remains `docs/ui-spec/` with `spec.config.yaml`, `
 ## Added in candidate: Verification and change boundary
 
 Use the source citations carried in this area to locate implementation and tests; this portal approves no current truth. The batch report and pending ledger live at `plans/260925-documentation-authority-unification/reports/phase-06/step-08-report.md` and `plans/260925-documentation-authority-unification/ledger/decisions/s8-*`. Read `docs/platform/component-boundary.md` before changing runtime boundaries. No component-boundary change.
+
+## Added in candidate: Cross-area reading links
+
+- [Component boundary and change check](../component-boundary.md#5-how-to-change).
+- [Document types and learning placement](../governance.md#3-document-types).
+- [Metadata, evidence and gap reporting](../governance.md#5-metadata).
+- [Link and registration discipline](../governance.md#11-linking-discipline).
+- [Six-question acceptance](../platform-foundations.md#l5-definition-of-done-sáu-câu-hỏi).
+
+Read these alongside this area's tool-root obligation; they do not certify a compiler root.
