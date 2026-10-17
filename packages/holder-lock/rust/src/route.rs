@@ -287,7 +287,7 @@ fn predecessor_state(lock_file: &Path) -> i32 {
         Err(err) => return emit(Some("predecessor"), json!({ "state": "unknown", "reason": "record-unreadable", "detail": err.to_string() }), EXIT_OK),
     };
     let Ok(raw) = serde_json::from_str::<serde_json::Value>(&text) else {
-        return emit(Some("predecessor"), json!({ "state": "unknown", "reason": "record-not-json", "domain": { "raw": text } }), EXIT_OK);
+        return emit(Some("predecessor"), json!({ "state": "unknown", "reason": "record-not-json", "domain": { "raw": text.chars().take(120).collect::<String>() } }), EXIT_OK);
     };
     let Some(domain) = crate::predecessor::parse_record(&raw) else {
         return emit(Some("predecessor"), json!({ "state": "unknown", "reason": "record-unknown-shape", "domain": raw }), EXIT_OK);

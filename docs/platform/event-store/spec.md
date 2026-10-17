@@ -594,7 +594,7 @@ Doctor checks, registered in `src/setup/registrations.mjs`:
 
 ## 22. Support matrix and known limits
 
-- Linux first. macOS follows holder-lock's `flock` driver once the seal crash matrix runs there. Windows is out until the holder-lock Windows driver exists. Network filesystems are refused.
+- Linux first. macOS follows holder-lock's `flock` driver once the seal crash matrix runs there. Windows has a holder-lock driver now, but the seal crash matrix has not run there, so Windows stays out of this store. Network filesystems are refused.
 - One user; lock directories are mode 0700; multi-user permissions are out of scope.
 - Unsealed events are lost with the disk or the clone; the window is the seal cadence while fgOS runs, unbounded while nothing runs.
 - Cross-machine success is provisional against concurrent events of other stores (section 12); the owner accepted this, and there is no online coordinator.
