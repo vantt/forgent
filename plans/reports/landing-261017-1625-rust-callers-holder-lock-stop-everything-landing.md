@@ -50,6 +50,8 @@ The other failing checks were there before this landing and are not caused by it
 - **Leaked test holder:** pid 196630, a `node -e` process holding an `activation` lock on a deleted `/tmp/fgctl-lockreclaim-proj-*` fixture, parent 1, running 2 h 41 min, cwd the `rc-p03` lead worktree. It was stopped before the landing. A reclaim test in the fgctl suite leaves its holder child alive when it fails or is interrupted; worth a follow-up item.
 - **Lead launch stall:** two lead panes received their prompt but never submitted it (`agent_prompt_stalled`); the launcher now presses Enter once on that error.
 
+- **Two release pins for the same tree:** during the landing, another session pinned `sha256:227abc99…` in `.fgos/distribution.json` (`b319d4b1d`, "the release that carries the model, pool and account slice"), built from the same tree `09f824ea0` on another machine. This machine's `fgctl upgrade` wrote `79ead131…` into the same file. The committed pin `227abc99…` was kept; the local value is saved at `.fgos/runtime/tmp/landing-4.4a/distribution.json.local`. Both releases carry the same source, and no doctor check fails on the difference.
+
 ## Rollback
 - **Previous release:** `sha256:af277e023d0112f06eb03525fe338adb1b7a3ab4523dc31e3540cb3d312f2597` in all three workspaces.
 - **Steps (after fences):** stop every writer, revert the merge on main, copy `fgctl.prev` back to `~/.local/bin/fgctl`, activate the previous release in the three workspaces, then remove the tombstone directories listed by `fenceStatus` (activation and observe per workspace, install once under the state root).
