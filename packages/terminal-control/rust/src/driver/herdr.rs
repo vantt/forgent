@@ -9,7 +9,7 @@
 //! the pipes are dropped when the command returns.
 
 use super::{
-    Activity, CloseOutcome, CreatedPane, Direction, DriverResult, ForegroundProcess, PaneGeometry,
+    Activity, ActivityDetail, CloseOutcome, CreatedPane, Direction, DriverResult, ForegroundProcess, PaneGeometry,
     PaneLiveness, ProcessInfo, PtySize, Rect, TabGeometry, TerminalDriver,
 };
 use crate::port::{Refusal, ServerIncarnation};
@@ -135,7 +135,40 @@ pub fn parse_process_info(result: &Value) -> Option<ProcessInfo> {
 /// `pane get`: what herdr's agent detection says about the pane.
 pub fn parse_activity(result: &Value) -> Option<Activity> {
     let pane = result.get("pane")?;
-    Some(Activity { state: text(pane, "agent_status")?.to_string(), agent: text(pane, "agent").map(str::to_string) })
+    Some(Activity {
+        state: text(pane, "agent_status")?.to_string(),
+        agent: text(pane, "agent").map(str::to_string),
+        session: pane.pointer("/agent_session/value").and_then(Value::as_str).map(str::to_string),
+        detail: None,
+    })
+}
+
+/// `agent explain --json`: the screen detector's verdict. herdr answers the
+/// verdict as the body itself, or wrapped in `result`.
+pub fn parse_explain(body: &Value) -> ActivityDetail {
+    let verdict = body.get("result").filter(|r| r.is_object() && body.get("state").is_none()).unwrap_or(body);
+    let flag = |name: &str| verdict.get(name).and_then(Value::as_bool) == Some(true);
+    let matched = verdict.pointer("/matched_rule/id").and_then(Value::as_str).filter(|s| !s.is_empty());
+    let prompt_text = matched
+        .and_then(|id| {
+            verdict
+                .get("evaluated_rules")?
+                .as_array()?
+                .iter()
+                .find(|r| r.get("matched").and_then(Value::as_bool) == Some(true) && r.get("id").and_then(Value::as_str) == Some(id))
+        })
+        .and_then(|r| r.pointer("/evidence/region_preview"))
+        .and_then(Value::as_str)
+        .unwrap_or_default()
+        .to_string();
+    ActivityDetail {
+        state: verdict.get("state").and_then(Value::as_str).map(str::to_string),
+        visible_blocker: flag("visible_blocker"),
+        visible_idle: flag("visible_idle"),
+        visible_working: flag("visible_working"),
+        matched_rule: matched.map(str::to_string),
+        prompt_text,
+    }
 }
 
 /// `status server --json`: the socket the CLI talks to, when the server runs.
@@ -325,6 +358,10 @@ impl HerdrDriver {
     }
 }
 
+fn env_pairs(env: &[(String, String)]) -> Vec<String> {
+    env.iter().map(|(k, v)| format!("{k}={v}")).collect()
+}
+
 fn probe(config: &HerdrConfig) -> (Vec<&'static str>, Option<String>) {
     if cfg!(windows) {
         return (vec![], Some("herdr is not supported on this platform".into()));
@@ -382,17 +419,21 @@ impl TerminalDriver for HerdrDriver {
         })
     }
 
-    fn tab_create(&self, label: &str, cwd: Option<&str>) -> DriverResult<CreatedPane> {
+    fn tab_create(&self, label: &str, cwd: Option<&str>, env: &[(String, String)]) -> DriverResult<CreatedPane> {
         self.require("tab.create")?;
         let mut args = vec!["tab", "create", "--label", label, "--no-focus"];
         if let Some(cwd) = cwd {
             args.extend(["--cwd", cwd]);
         }
+        let pairs = env_pairs(env);
+        for pair in &pairs {
+            args.extend(["--env", pair]);
+        }
         let result = self.run(&args)?;
         parse_tab_created(&result).ok_or_else(|| unknown("herdr tab create returned no tab_id/pane_id"))
     }
 
-    fn pane_split(&self, anchor_pane: &str, direction: Direction, ratio: f64, cwd: Option<&str>) -> DriverResult<CreatedPane> {
+    fn pane_split(&self, anchor_pane: &str, direction: Direction, ratio: f64, cwd: Option<&str>, env: &[(String, String)]) -> DriverResult<CreatedPane> {
         self.require("pane.split")?;
         let direction = match direction {
             Direction::Right => "right",
@@ -402,6 +443,10 @@ impl TerminalDriver for HerdrDriver {
         let mut args = vec!["pane", "split", "--pane", anchor_pane, "--direction", direction, "--ratio", &ratio, "--no-focus"];
         if let Some(cwd) = cwd {
             args.extend(["--cwd", cwd]);
+        }
+        let pairs = env_pairs(env);
+        for pair in &pairs {
+            args.extend(["--env", pair]);
         }
         let result = self.run(&args)?;
         parse_split(&result).ok_or_else(|| unknown("herdr pane split returned no pane_id"))
@@ -443,11 +488,13 @@ impl TerminalDriver for HerdrDriver {
 
     fn send_text(&self, pane: &str, text: &str, submit: bool) -> DriverResult<()> {
         self.require("send.text")?;
-        self.run(&["pane", "send-text", pane, text])?;
         if submit {
-            self.run(&["pane", "send-keys", pane, "Enter"])?;
+            // The agent's own prompt door: it types and submits, and answers
+            // by name when the agent is blocked or not ready.
+            self.require("activity.state")?;
+            return self.run(&["agent", "prompt", pane, text]).map(|_| ());
         }
-        Ok(())
+        self.run(&["pane", "send-text", pane, text]).map(|_| ())
     }
 
     fn send_keys(&self, pane: &str, keys: &[String]) -> DriverResult<()> {
@@ -511,6 +558,21 @@ impl TerminalDriver for HerdrDriver {
         // being killed mid-answer and reported as unreachable.
         let timeout = Duration::from_millis(timeout_ms + DEFAULT_TIMEOUT_MS);
         call(&self.config, &argv, timeout).map(|_| ()).map_err(CallError::into_refusal)
+    }
+
+    fn activity_detail(&self, pane: &str) -> DriverResult<ActivityDetail> {
+        self.require("activity.state")?;
+        let out = exec(&self.config, &["agent", "explain", pane, "--json"], self.config.timeout())?;
+        let body = json_body(&out).ok_or_else(|| unknown(format!("herdr agent explain returned no parseable JSON (exit {})", out.status.map_or("none".into(), |c| c.to_string()))))?;
+        if let Err(e) = envelope(&body).map(|_| ()) {
+            return Err(CallError::Herdr(e).into_refusal());
+        }
+        Ok(parse_explain(&body))
+    }
+
+    fn report_agent(&self, pane: &str, agent: &str, state: &str) -> DriverResult<()> {
+        self.require("activity.state")?;
+        self.run(&["pane", "report-agent", pane, "--source", "fgos", "--agent", agent, "--state", state]).map(|_| ())
     }
 
     fn label_tab(&self, tab: &str, label: &str) -> DriverResult<()> {

@@ -171,8 +171,9 @@ fn dispatch(op: &str, core: &Core, request: &Value) -> Result<Answer, String> {
         "attach" => {
             let key: String = field(request, "key")?;
             let pane: String = field(request, "pane")?;
+            let group_key: Option<String> = optional(request, "groupKey")?;
             let display: Option<Display> = optional(request, "display")?;
-            answer(core.attach(&key, &pane, display), slot_answer)
+            answer(core.attach(&key, &pane, group_key.as_deref(), display), slot_answer)
         }
         "launch" => {
             let key: String = field(request, "key")?;
@@ -209,7 +210,8 @@ fn dispatch(op: &str, core: &Core, request: &Value) -> Result<Answer, String> {
         }
         "inspect" => {
             let key: String = field(request, "key")?;
-            let inspection = core.inspect(&key);
+            let detail: Option<bool> = optional(request, "detail")?;
+            let inspection = core.inspect(&key, detail.unwrap_or(false));
             let mut fields = json!({ "pane": inspection.pane });
             if let Some(foreground) = inspection.foreground {
                 fields["foreground"] = json!(foreground);
@@ -232,7 +234,8 @@ fn dispatch(op: &str, core: &Core, request: &Value) -> Result<Answer, String> {
         "label" => {
             let key: String = field(request, "key")?;
             let display: Display = field(request, "display")?;
-            answer(core.label(&key, &display), ok_answer)
+            let report_state: Option<String> = optional(request, "reportState")?;
+            answer(core.label(&key, &display, report_state.as_deref()), ok_answer)
         }
         "capabilities" => {
             let report = core.capabilities();

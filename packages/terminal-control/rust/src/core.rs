@@ -187,8 +187,13 @@ impl<'a> Core<'a> {
         })
     }
 
-    pub fn attach(&self, key: &str, pane: &str, display: Option<Display>) -> Result<Allocation, Refusal> {
+    /// Take a pane the caller already has. `group_key` lets it join a group so
+    /// the group's next pane opens beside it; it defaults to the key itself.
+    pub fn attach(&self, key: &str, pane: &str, group_key: Option<&str>, display: Option<Display>) -> Result<Allocation, Refusal> {
         Self::check_key(key)?;
+        if let Some(group) = group_key {
+            Self::check_key(group)?;
+        }
         let (store, incarnation) = self.open()?;
         if let Some(record) = store.read_record(key).map_err(store_err)? {
             if record.pane_id == pane {
@@ -204,7 +209,7 @@ impl<'a> Core<'a> {
         let record = AllocationRecord {
             v: VERSION,
             key: key.to_string(),
-            group_key: key.to_string(),
+            group_key: group_key.unwrap_or(key).to_string(),
             driver: self.driver.name().to_string(),
             server_incarnation: incarnation,
             tab_id: tab_id.clone(),
@@ -214,7 +219,7 @@ impl<'a> Core<'a> {
             origin: Origin::Attached,
         };
         if !store.publish_record(&record).map_err(store_err)? {
-            return self.attach(key, pane, None);
+            return self.attach(key, pane, group_key, None);
         }
         Ok(Allocation { slot: Slot { tab_id, pane_id: pane.to_string() }, origin: Origin::Attached })
     }
@@ -243,7 +248,7 @@ impl<'a> Core<'a> {
     fn place(&self, store: &Store, incarnation: &ServerIncarnation, request: &AllocateRequest) -> Result<CreatedPane, Refusal> {
         let group = self.live_group(store, &request.group_key)?;
         if group.is_empty() {
-            return self.new_tab(&request.display.label);
+            return self.new_tab(request);
         }
         if self.has("layout.geometry") {
             self.place_measured(incarnation, request, &group)
@@ -253,19 +258,19 @@ impl<'a> Core<'a> {
     }
 
     /// First pane of a group's tab: the slot is the tab's own first pane.
-    fn new_tab(&self, label: &str) -> Result<CreatedPane, Refusal> {
+    fn new_tab(&self, request: &AllocateRequest) -> Result<CreatedPane, Refusal> {
         self.need("tab.create")?;
-        self.driver.tab_create(label, None)
+        self.driver.tab_create(&request.display.label, request.cwd.as_deref(), &env_pairs(request))
     }
 
-    fn split(&self, anchor: &str, direction: Direction, ratio: f64, label: &str) -> Result<CreatedPane, Refusal> {
+    fn split(&self, anchor: &str, direction: Direction, ratio: f64, request: &AllocateRequest) -> Result<CreatedPane, Refusal> {
         self.need("pane.split")?;
-        match self.driver.pane_split(anchor, direction, ratio, None) {
+        match self.driver.pane_split(anchor, direction, ratio, request.cwd.as_deref(), &env_pairs(request)) {
             Ok(pane) => Ok(pane),
             // An anchor that died between the liveness check and the split:
             // the group continues in a new tab with the same label.
             Err(refusal) => match self.driver.pane_liveness(anchor) {
-                Ok(PaneLiveness::Gone) => self.new_tab(label),
+                Ok(PaneLiveness::Gone) => self.new_tab(request),
                 _ => Err(refusal),
             },
         }
@@ -297,7 +302,7 @@ impl<'a> Core<'a> {
             limits: self.config.limits,
         };
         match self.policy.place(&input) {
-            Placement::NewTab {} => self.new_tab(&request.display.label),
+            Placement::NewTab {} => self.new_tab(request),
             Placement::Unsupported { reason } => Err(Refusal::Unsupported {
                 capability: format!("placement.{}", self.policy.name()),
                 detail: reason,
@@ -307,15 +312,15 @@ impl<'a> Core<'a> {
                     .iter()
                     .find(|l| l.record.key == anchor_key)
                     .ok_or_else(|| unknown(format!("policy chose unknown anchor `{anchor_key}`")))?;
-                let created = self.split(&anchor.record.pane_id, direction, ratio, &request.display.label)?;
-                self.keep_if_roomy(created, incarnation, &request.display.label)
+                let created = self.split(&anchor.record.pane_id, direction, ratio, request)?;
+                self.keep_if_roomy(created, incarnation, request)
             }
         }
     }
 
     /// Measure the pane a split just made; below the minimum, close that
     /// empty pane (nothing launched in it) and open a new tab instead.
-    fn keep_if_roomy(&self, created: CreatedPane, incarnation: &ServerIncarnation, label: &str) -> Result<CreatedPane, Refusal> {
+    fn keep_if_roomy(&self, created: CreatedPane, incarnation: &ServerIncarnation, request: &AllocateRequest) -> Result<CreatedPane, Refusal> {
         let Ok(geometry) = self.driver.layout_geometry(&created.pane_id) else {
             return Ok(created);
         };
@@ -332,7 +337,7 @@ impl<'a> Core<'a> {
         if self.close_unrecorded(&created.pane_id, incarnation).is_err() {
             return Ok(created);
         }
-        self.new_tab(label)
+        self.new_tab(request)
     }
 
     /// Without geometry: split the newest live group pane down at 0.3, and
@@ -341,9 +346,9 @@ impl<'a> Core<'a> {
         let newest = group.last().expect("group is not empty");
         let in_tab = group.iter().filter(|l| l.record.tab_id == newest.record.tab_id).count();
         if in_tab >= self.config.limits.max_panes_per_tab as usize {
-            return self.new_tab(&request.display.label);
+            return self.new_tab(request);
         }
-        self.split(&newest.record.pane_id, Direction::Down, FALLBACK_SPLIT_RATIO, &request.display.label)
+        self.split(&newest.record.pane_id, Direction::Down, FALLBACK_SPLIT_RATIO, request)
     }
 
     /// Close a pane the core itself just created and never recorded.
@@ -378,7 +383,7 @@ impl<'a> Core<'a> {
                 key,
                 &activity.kind,
                 &activity.args,
-                self.config.launch_identify_timeout_ms,
+                activity.timeout_ms.unwrap_or(self.config.launch_identify_timeout_ms),
             )?,
             None => self.driver.pane_run(&record.pane_id, &line)?,
         }
@@ -397,6 +402,8 @@ impl<'a> Core<'a> {
             if let Ok(info) = self.driver.process_info(pane) {
                 let root = if spec.activity.is_some() {
                     identity::first_non_shell(&info)
+                } else if let Some(expect) = &spec.expect {
+                    identity::match_expected(&info, expect)
                 } else {
                     identity::match_launched(&info, &spec.command, &spec.args)
                 };
@@ -437,7 +444,7 @@ impl<'a> Core<'a> {
         self.driver.read_screen(&record.pane_id, lines, source)
     }
 
-    pub fn inspect(&self, key: &str) -> Inspection {
+    pub fn inspect(&self, key: &str, detail: bool) -> Inspection {
         let unknown_pane = || Inspection { pane: PaneState::Unknown, foreground: None, activity: None };
         let Ok((store, _)) = self.open() else { return unknown_pane() };
         let Ok(record) = self.record_of(&store, key) else { return unknown_pane() };
@@ -450,7 +457,17 @@ impl<'a> Core<'a> {
             return Inspection { pane, foreground: None, activity: None };
         }
         let foreground = if self.has("process.info") { self.foreground_identity(&record.pane_id) } else { None };
-        let activity = if self.has("activity.state") { self.driver.activity(&record.pane_id).ok() } else { None };
+        let mut activity = if self.has("activity.state") { self.driver.activity(&record.pane_id).ok() } else { None };
+        if detail && self.has("activity.state") {
+            // The detector may know a state the pane's own report does not.
+            if let Ok(seen) = self.driver.activity_detail(&record.pane_id) {
+                let base = activity.get_or_insert_with(Default::default);
+                if base.state.is_empty() {
+                    base.state = seen.state.clone().unwrap_or_default();
+                }
+                base.detail = Some(seen);
+            }
+        }
         Inspection { pane, foreground, activity }
     }
 
@@ -461,11 +478,19 @@ impl<'a> Core<'a> {
     }
 
     /// Write display data to the terminal. The record is never edited.
-    pub fn label(&self, key: &str, display: &Display) -> Result<(), Refusal> {
+    pub fn label(&self, key: &str, display: &Display, report_state: Option<&str>) -> Result<(), Refusal> {
         self.need("label")?;
         let (store, _) = self.open()?;
         let record = self.live_record(&store, key)?;
-        self.driver.label_pane(&record.pane_id, &display.label)
+        self.driver.label_pane(&record.pane_id, &display.label)?;
+        if let Some(state) = report_state {
+            // Only for an agent the driver does not recognise on its own: a
+            // reported state becomes the pane's status authority.
+            self.need("activity.state")?;
+            let agent = display.agent.as_deref().ok_or_else(|| unknown("report needs display.agent"))?;
+            self.driver.report_agent(&record.pane_id, agent, state)?;
+        }
+        Ok(())
     }
 
     pub fn capabilities(&self) -> CapabilitiesReport {
@@ -612,6 +637,10 @@ impl<'a> Core<'a> {
             ));
         }
     }
+}
+
+fn env_pairs(request: &AllocateRequest) -> Vec<(String, String)> {
+    request.env.iter().map(|(k, v)| (k.clone(), v.clone())).collect()
 }
 
 /// The shell line a launch types into the pane: change directory, set the

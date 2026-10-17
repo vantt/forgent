@@ -15,8 +15,8 @@ fn herdr_live() {
     assert!(caps.contains(&"layout.geometry") && caps.contains(&"server.incarnation"), "{caps:?}");
 
     let incarnation = driver.server_incarnation().expect("server incarnation");
-    let tab = driver.tab_create("tc-live-driver", None).expect("tab create");
-    let second = driver.pane_split(&tab.pane_id, Direction::Right, 0.5, None).expect("split");
+    let tab = driver.tab_create("tc-live-driver", None, &[]).expect("tab create");
+    let second = driver.pane_split(&tab.pane_id, Direction::Right, 0.5, None, &[]).expect("split");
     assert_eq!(second.tab_id, tab.tab_id);
 
     let geometry = driver.layout_geometry(&second.pane_id).expect("geometry");

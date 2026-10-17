@@ -117,15 +117,15 @@ impl TerminalDriver for MemDriver {
     fn server_incarnation(&self) -> DriverResult<ServerIncarnation> {
         Ok(self.current())
     }
-    fn tab_create(&self, label: &str, _cwd: Option<&str>) -> DriverResult<CreatedPane> {
+    fn tab_create(&self, label: &str, cwd: Option<&str>, env: &[(String, String)]) -> DriverResult<CreatedPane> {
         let tab = self.id("t");
         let pane = self.id("p");
-        self.log.borrow_mut().push(format!("tab.create {label} -> {tab}/{pane}"));
+        self.log.borrow_mut().push(format!("tab.create {label} cwd={} env={} -> {tab}/{pane}", cwd.unwrap_or("-"), env.len()));
         self.tabs.borrow_mut().push((tab.clone(), label.to_string()));
         self.panes.borrow_mut().insert(pane.clone(), MemPane { tab: tab.clone(), rect: self.area, info: bare(900) });
         Ok(CreatedPane { tab_id: tab, pane_id: pane })
     }
-    fn pane_split(&self, anchor: &str, direction: Direction, ratio: f64, _cwd: Option<&str>) -> DriverResult<CreatedPane> {
+    fn pane_split(&self, anchor: &str, direction: Direction, ratio: f64, cwd: Option<&str>, env: &[(String, String)]) -> DriverResult<CreatedPane> {
         let mut panes = self.panes.borrow_mut();
         let Some(a) = panes.get_mut(anchor) else { return Err(unknown("pane_not_found")) };
         let (kept, new_rect) = match direction {
@@ -142,7 +142,7 @@ impl TerminalDriver for MemDriver {
         let tab = a.tab.clone();
         drop(panes);
         let pane = self.id("p");
-        self.log.borrow_mut().push(format!("pane.split {anchor} {direction:?} {ratio} -> {pane}"));
+        self.log.borrow_mut().push(format!("pane.split {anchor} {direction:?} {ratio} cwd={} env={} -> {pane}", cwd.unwrap_or("-"), env.len()));
         self.panes.borrow_mut().insert(pane.clone(), MemPane { tab: tab.clone(), rect: new_rect, info: bare(901) });
         Ok(CreatedPane { tab_id: tab, pane_id: pane })
     }
@@ -184,7 +184,7 @@ impl TerminalDriver for MemDriver {
         self.panes.borrow().get(pane).map(|p| p.info.clone()).ok_or_else(|| unknown("pane_not_found"))
     }
     fn activity(&self, _pane: &str) -> DriverResult<Activity> {
-        Ok(Activity { state: "idle".into(), agent: None })
+        Ok(Activity { state: "idle".into(), ..Default::default() })
     }
     fn activity_start(&self, pane: &str, name: &str, kind: &str, _args: &[String], _timeout_ms: u64) -> DriverResult<()> {
         self.log.borrow_mut().push(format!("activity.start {pane} {name} {kind}"));
@@ -236,5 +236,7 @@ pub fn request(key: &str, group: &str) -> AllocateRequest {
         group_key: group.into(),
         display: Display { label: format!("label-{group}"), ..Display::default() },
         role_hint: None,
+        cwd: None,
+        env: Default::default(),
     }
 }

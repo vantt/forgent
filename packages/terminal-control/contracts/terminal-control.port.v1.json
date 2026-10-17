@@ -20,7 +20,7 @@
   },
   "operations": {
     "allocate": {
-      "input": { "key": "key", "groupKey": "groupKey", "display": "display", "roleHint": "optional string; structured data for the placement policy only" },
+      "input": { "key": "key", "groupKey": "groupKey", "display": "display", "roleHint": "optional string; structured data for the placement policy only", "cwd": "optional absolute path: working directory of the new pane's shell", "env": "optional object of string: environment of the new pane's shell" },
       "results": ["slot", "unsupported", "unknown"],
       "effects": [
         "places a new pane through the placement policy (placement-policy.v1.json) when the driver has layout.geometry, otherwise splits the newest live group pane down at 0.3 and applies maxPanesPerTab by pane count",
@@ -30,7 +30,7 @@
       ]
     },
     "attach": {
-      "input": { "key": "key", "pane": "driver pane id", "display": "optional display" },
+      "input": { "key": "key", "pane": "driver pane id", "groupKey": "optional groupKey: the pane joins that group so its next pane opens beside it; defaults to the key", "display": "optional display" },
       "results": ["slot", "unsupported", "unknown"],
       "effects": ["records origin attached; core never closes an attached pane, release only removes its label and link"]
     },
@@ -42,7 +42,8 @@
           "args": "string[]",
           "cwd": "absolute path",
           "env": "object of string",
-          "activity": "optional {kind, args}: start through the driver's agent support (activity.state) instead of a plain pane.run"
+          "activity": "optional {kind, args, timeoutMs}: start through the driver's agent support (activity.state) instead of a plain pane.run; timeoutMs bounds how long the driver may take to bring the agent to ready",
+          "expect": "optional {argv0, command, args}: the foreground process the launch becomes when it is not the command itself (a launcher script that execs the real one); identity is taken from the process matching it"
         }
       },
       "results": ["launched", "not-started", "unsupported", "unknown"],
@@ -62,7 +63,7 @@
       "results": ["screen", "unsupported", "unknown"]
     },
     "inspect": {
-      "input": { "key": "key" },
+      "input": { "key": "key", "detail": "optional boolean: add the driver's detector verdict to activity.detail" },
       "results": ["inspection"]
     },
     "release": {
@@ -79,7 +80,7 @@
       ]
     },
     "label": {
-      "input": { "key": "key", "display": "display" },
+      "input": { "key": "key", "display": "display", "reportState": "optional string: also tell the driver which agent (display.agent) runs in the pane, for a process it does not recognise on its own; the reported state becomes the pane's status authority" },
       "results": ["ok", "unsupported", "unknown"]
     },
     "capabilities": {
@@ -103,7 +104,7 @@
       "result": "inspection",
       "pane": { "enum": ["live", "gone", "unknown"] },
       "foreground": "optional identity of the foreground process",
-      "activity": "optional {state, agent}; present only when the driver declares activity.state"
+      "activity": "optional {state, agent, session, detail}; present only when the driver declares activity.state; detail = {state, visibleBlocker, visibleIdle, visibleWorking, matchedRule, promptText} only when asked for"
     },
     "released": { "result": "released", "disposition": { "enum": ["close", "retain"] } },
     "kept-unknown": { "result": "kept-unknown", "reason": "string; the pane is kept because the core could not prove it may close it" },
