@@ -274,7 +274,11 @@ impl ContainmentDriver for LinuxPgroup {
         Guarantee {
             driver: "linux-pgroup",
             level: GuaranteeLevel::BestEffort,
-            escapes: vec!["setsid descendants leave the process group", "daemons outside the domain"],
+            escapes: vec![
+                "setsid descendants leave the process group",
+                "a group scan made after the leader died can meet a reused pgid",
+                "daemons outside the domain",
+            ],
         }
     }
 }

@@ -96,14 +96,67 @@ pub fn emit(fields: serde_json::Value) {
     let _ = writeln!(std::io::stdout(), "{line}");
 }
 
+/// `--probe`: answer that this host binary serves `route` at protocol 1 and
+/// name the containment driver it would run here, then do nothing else. Doctor
+/// uses it to learn what the installed host can do without starting an attempt.
+fn probe(route: &str, args: &[String]) -> i32 {
+    if let Err(err) = Flags::parse_with_switches(args, &[], &["probe"], 0) {
+        return refuse(route, err);
+    }
+    let containment = match fgos_process::containment::select(&fgos_process::containment::SelectEnv::default()) {
+        Ok(driver) => {
+            let guarantee = driver.guarantee();
+            let level = match guarantee.level {
+                fgos_process::containment::GuaranteeLevel::Kernel => "kernel",
+                fgos_process::containment::GuaranteeLevel::BestEffort => "best-effort",
+                fgos_process::containment::GuaranteeLevel::Unsupported => "unsupported",
+            };
+            serde_json::json!({"driver": guarantee.driver, "level": level, "escapes": guarantee.escapes})
+        }
+        Err(err) => serde_json::json!({"driver": null, "level": "unsupported", "escapes": [], "error": err.name()}),
+    };
+    emit(serde_json::json!({"result": "ok", "route": route, "containment": containment}));
+    0
+}
+
 /// Dispatch `fgos internal <route> ...` for the routes this crate owns.
 /// `None`: the route is not one of ours.
 pub fn main(route: &str, args: &[String]) -> Option<i32> {
+    if !matches!(route, "supervise" | "gate" | "adopt" | "attempt-step") {
+        return None;
+    }
+    if args.iter().any(|arg| arg == "--probe") {
+        return Some(probe(route, args));
+    }
     Some(match route {
         "supervise" => crate::supervise::run(args),
         "gate" => crate::gate::run(args),
         "adopt" => crate::adopt::run(args),
-        "attempt-step" => crate::attempt_step::run(args),
-        _ => return None,
+        _ => crate::attempt_step::run(args),
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn argv(items: &[&str]) -> Vec<String> {
+        items.iter().map(|s| s.to_string()).collect()
+    }
+
+    #[test]
+    fn probe_needs_protocol_one() {
+        assert_eq!(probe("supervise", &argv(&["--probe"])), EXIT_VERSION_MISMATCH);
+        assert_eq!(probe("supervise", &argv(&["--probe", "--protocol", "1"])), 0);
+    }
+
+    #[test]
+    fn probe_refuses_a_stray_flag() {
+        assert_eq!(probe("adopt", &argv(&["--probe", "--protocol", "1", "--nope", "x"])), EXIT_USAGE);
+    }
+
+    #[test]
+    fn other_routes_are_not_ours() {
+        assert_eq!(main("lock-fd", &argv(&["--probe"])), None);
+    }
 }

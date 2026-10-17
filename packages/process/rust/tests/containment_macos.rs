@@ -122,6 +122,7 @@ fn containment_macos_tree_names_the_double_fork_escape() {
     let guarantee = driver.guarantee();
     assert_eq!(guarantee.level, GuaranteeLevel::BestEffort);
     assert!(guarantee.escapes.iter().any(|e| e.contains("setsid") && e.contains("double fork")));
+    assert!(guarantee.escapes.iter().any(|e| e.contains("reused pgid")));
     // SAFETY: ends the escaped test process this test started.
     unsafe { libc::kill(escape_pid as libc::pid_t, libc::SIGKILL) };
 }

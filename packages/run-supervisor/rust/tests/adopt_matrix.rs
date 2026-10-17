@@ -32,6 +32,32 @@ fn adopt_no_binding_and_no_receipt_is_abandoned_not_started_and_the_steps_run_on
 }
 
 #[test]
+fn adopt_names_why_a_supervisor_never_bound() {
+    let a = attempt("matrix-start-refused", &STEPS);
+    let note = json!({"v": 1, "attemptId": a.attempt_id, "code": "lock-held", "why": "attempt: kernel-lock-held", "at": "2026-10-18T00:00:00.000Z"});
+    fs::write(a.path("start-refused.json"), serde_json::to_vec(&note).unwrap()).unwrap();
+
+    let probe = adopt(&a.dir, &["--probe-only"]);
+    assert_eq!((probe["state"].as_str(), probe["reason"].as_str()), (Some("needs-adopt"), Some("start-refused:lock-held")), "{probe}");
+
+    let adopted = adopt(&a.dir, &[]);
+    assert_eq!(adopted["state"], "adopted", "{adopted}");
+    assert_eq!(adopted["outcome"], "abandoned-not-started");
+    assert_eq!(adopted["reason"], "start-refused:lock-held");
+    assert_eq!(a.json("receipt.json").unwrap()["reason"], "start-refused:lock-held");
+}
+
+#[test]
+fn adopt_ignores_a_start_refusal_of_another_attempt() {
+    let a = attempt("matrix-start-refused-other", &STEPS);
+    let note = json!({"v": 1, "attemptId": "att_someone_else", "code": "lock-held", "why": "x", "at": "2026-10-18T00:00:00.000Z"});
+    fs::write(a.path("start-refused.json"), serde_json::to_vec(&note).unwrap()).unwrap();
+    let adopted = adopt(&a.dir, &[]);
+    assert_eq!(adopted["state"], "adopted", "{adopted}");
+    assert!(adopted.get("reason").is_none(), "{adopted}");
+}
+
+#[test]
 fn adopt_a_binding_without_gate_exit_is_gate_lost_and_records_the_outbox() {
     for (name, outbox) in [("matrix-lost-bare", false), ("matrix-lost-outbox", true)] {
         let a = attempt(name, &STEPS);
