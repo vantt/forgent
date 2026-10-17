@@ -216,6 +216,7 @@ dependencies = [
  "libc",
  "serde_json",
  "sha2",
+ "windows-sys",
 ]
 
 [[package]]
