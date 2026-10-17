@@ -28,13 +28,17 @@ import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { listAssignmentRuns } from '../runner/dispatch/assignment-layout.mjs';
 import { resolveHostBin } from '../util/host-bin.mjs';
+import { resolveStateRoot } from './state-root.mjs';
 
 const REGISTRY_URL = new URL('../../packages/holder-lock/contracts/lock-registry.v1.json', import.meta.url);
 
 /** The release whose cutover places these fences; also the registry `owner` of the fenced locks. */
 export const CUTOVER_RELEASE = '4.2';
-/** Written as `by` in every tombstone and as `fence` in every blocking generation. */
+/** Every registry `owner` whose old lock paths this module fences: the Node locks and the Rust callers' (`fgctl`, Observe). */
+export const CUTOVER_OWNERS = ['4.2', '4.4'];
+/** Written as `by` in a 4.2 tombstone and as `fence` in every blocking generation. */
 export const FENCE_BY = `fgos ${CUTOVER_RELEASE}`;
+const fenceByOf = (owner) => `fgos ${owner}`;
 export const TOMBSTONE_FILE = 'TOMBSTONE';
 export const V1_LOCK_PRESENT = 'v1-lock-present';
 
@@ -136,9 +140,14 @@ const ENUMERATED_V1_PATHS = {
   'provider-state': ({ providerRuntimeDir }) => (isDirectory(providerRuntimeDir) ? [path.join(providerRuntimeDir, 'state-lock')] : []),
 };
 
+const STATE_ROOT_PREFIX = '<stateRoot>/';
+
 function v1PathsOf(lock, context) {
   const enumerate = ENUMERATED_V1_PATHS[lock.name];
   if (enumerate) return enumerate(context);
+  if (typeof lock.v1Path === 'string' && lock.v1Path.startsWith(STATE_ROOT_PREFIX) && !lock.v1Path.slice(STATE_ROOT_PREFIX.length).includes('<')) {
+    return [path.join(context.stateRoot(), ...lock.v1Path.slice(STATE_ROOT_PREFIX.length).split('/'))];
+  }
   if (typeof lock.v1Path === 'string' && lock.v1Path.startsWith('.fgos/') && !lock.v1Path.includes('<')) {
     return [path.join(context.fgosDir, ...lock.v1Path.slice('.fgos/'.length).split('/'))];
   }
@@ -146,17 +155,26 @@ function v1PathsOf(lock, context) {
 }
 
 /**
- * Every old path that needs a fence in this workspace: `{lock, fence, path}`
- * per path, for the registry locks this release owns whose fence is not
- * `none`.
+ * Every old path that needs a fence in this workspace: `{lock, fence, owner,
+ * path}` per path, for the registry locks of the `owners` (default: every
+ * cutover owner) whose fence is not `none`. A path under `<stateRoot>` (the
+ * machine-scope install lock) is placed once for the machine: the state
+ * root is `stateRoot` when given, else the process's own resolution, asked
+ * only when such a lock is among the owners.
  */
-export function fenceTargets({ fgosDir, workspaceRoot, providerRuntimeDir = defaultProviderRuntimeDir() } = {}) {
+export function fenceTargets({ fgosDir, workspaceRoot, providerRuntimeDir = defaultProviderRuntimeDir(), stateRoot, owners = CUTOVER_OWNERS } = {}) {
   if (!fgosDir) throw new Error('fenceTargets requires fgosDir');
-  const context = { fgosDir: path.resolve(fgosDir), workspaceRoot: path.resolve(workspaceRoot ?? path.dirname(fgosDir)), providerRuntimeDir };
+  let resolvedStateRoot = stateRoot ? path.resolve(stateRoot) : null;
+  const context = {
+    fgosDir: path.resolve(fgosDir),
+    workspaceRoot: path.resolve(workspaceRoot ?? path.dirname(fgosDir)),
+    providerRuntimeDir,
+    stateRoot: () => (resolvedStateRoot ??= path.resolve(resolveStateRoot({ fgosDir }).stateRoot)),
+  };
   const targets = [];
   for (const lock of readRegistry().locks) {
-    if (lock.owner !== CUTOVER_RELEASE || !lock.fence || lock.fence === 'none') continue;
-    for (const p of v1PathsOf(lock, context)) targets.push({ lock: lock.name, fence: lock.fence, path: p });
+    if (!owners.includes(lock.owner) || !lock.fence || lock.fence === 'none') continue;
+    for (const p of v1PathsOf(lock, context)) targets.push({ lock: lock.name, fence: lock.fence, owner: lock.owner, path: p });
   }
   return targets;
 }
@@ -197,7 +215,7 @@ function placeTombstone(target, now) {
     if (state === 'fenced') return 'already';
     if (state !== 'empty-dir') throw v1LockPresent(target);
   }
-  fs.writeFileSync(path.join(target.path, TOMBSTONE_FILE), `${JSON.stringify({ lock: target.lock, at: now, by: FENCE_BY })}\n`);
+  fs.writeFileSync(path.join(target.path, TOMBSTONE_FILE), `${JSON.stringify({ lock: target.lock, at: now, by: fenceByOf(target.owner) })}\n`);
   return 'placed';
 }
 
@@ -444,13 +462,13 @@ export function checkStopped({ workspaces, hostBin, excludePids = ownPidChain(),
  * cannot scan needs `attested: true` (a person confirmed that nothing is
  * running) before anything is placed.
  */
-export function fenceCutover({ workspaces, fgosDir, workspaceRoot, providerRuntimeDir, hostBin, excludePids, attested = false, now } = {}) {
+export function fenceCutover({ workspaces, fgosDir, workspaceRoot, providerRuntimeDir, stateRoot, owners, hostBin, excludePids, attested = false, now } = {}) {
   const scanOptions = { workspaces, hostBin, ...(excludePids ? { excludePids } : {}) };
   const before = checkStopped(scanOptions);
   if (before.status === 'blocked' || (before.status === 'needs-attest' && !attested)) {
     return { status: before.status, before, fences: null, after: null };
   }
-  const fences = placeFences({ fgosDir, workspaceRoot, providerRuntimeDir, ...(now ? { now } : {}) });
+  const fences = placeFences({ fgosDir, workspaceRoot, providerRuntimeDir, stateRoot, ...(owners ? { owners } : {}), ...(now ? { now } : {}) });
   if (!fences.ok) return { status: fences.error, before, fences, after: null };
   const after = checkStopped(scanOptions);
   return { status: after.status === 'blocked' ? 'placed-then-blocked' : 'placed', before, fences, after };

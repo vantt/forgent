@@ -10,6 +10,9 @@ import path from 'node:path';
 import { execFileSync, spawn } from 'node:child_process';
 import { checkStopped, placeFences, fenceStatus, fenceCutover, ownPidChain } from '../../src/holder-lock/fences.mjs';
 
+// The machine-scope install lock is fenced under the state root: keep it in a scratch directory, never the real one.
+process.env.FGOS_STATE_ROOT = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-fences-state-'));
+
 const HOST_BIN = process.env.FGOS_HOST_BIN;
 const READY_WAIT_MS = 10_000;
 // Other fgOS processes on the machine (a parallel suite file, another
