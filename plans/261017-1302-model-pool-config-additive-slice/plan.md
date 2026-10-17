@@ -108,6 +108,13 @@ dùng `explain` của 04.
   chối vì `claude-herdr` chỉ có invocation herdr; sau phase 01 chúng chạy
   claude headless. Không ghim invocation herdr cho chúng.
 
+- **Ladder `openai` (2026-10-17):** `frontier` là `gpt-6-astra`, `flagship` là
+  `gpt-6.1-sol`; anh xác nhận đúng ý, không sửa.
+- **Thiếu ô tier (2026-10-17, anh chọn a):** giữ lối rơi về
+  `executor.model ?? "default"`, không từ chối. Đổi sang từ chối
+  `model-tier-missing` làm cùng đợt B, khi lease đọc pool, kèm sửa fixture và
+  để doctor báo ô thiếu trước.
+
 ## Việc tách ra sau đợt A
 
 - **Provenance tier của assignment policy có thể ghi cao hơn tier đã chạy.**
@@ -119,12 +126,7 @@ dùng `explain` của 04.
 - **Pin invocation của capability-prefer bị bỏ qua khi chọn transport:**
   `fgos-coding-implement` headless vẫn ghim `omp-gemini-tetcu72` (pane) với
   transport `cli`; `fgos dispatch explain` cho thấy rõ (đã ghi ngoài phạm vi).
-- Ladder `openai`: `frontier` là `gpt-6-astra`, `flagship` là `gpt-6.1-sol`;
-  ba capability `critical` có `openai` trong pool sẽ chạy `gpt-6-astra`.
 
 ## Outstanding questions
 
-1. **Thiếu ô tier thì từ chối hay rơi về như hôm nay?** (phase 02 bước 5, chưa
-   làm). 89 test và hai check doctor dựa vào lối rơi về
-   `executor.model ?? "default"`; project khác dùng fgOS mà khai thiếu ô sẽ bị
-   từ chối nếu đổi.
+None
