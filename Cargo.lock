@@ -117,6 +117,9 @@ dependencies = [
 [[package]]
 name = "fgos-agent-protocol"
 version = "0.2.0"
+dependencies = [
+ "serde_json",
+]
 
 [[package]]
 name = "fgos-convention"

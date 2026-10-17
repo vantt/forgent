@@ -4,4 +4,9 @@
 //! Contract: `packages/agent-protocol/contracts/agent-protocol.v1.json`.
 
 /// Adapters for the `direct` (headless) launch mode.
-pub mod direct {}
+pub mod direct;
+pub mod outcome;
+pub mod port;
+
+pub use outcome::{Activity, BlockedReason, ExitInfo, Outcome, StdinPolicy};
+pub use port::{AgentIo, IoError, SendInput};

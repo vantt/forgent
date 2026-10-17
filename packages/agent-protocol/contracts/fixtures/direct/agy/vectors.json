@@ -1,0 +1,73 @@
+{
+  "cli": "agy",
+  "stdinPolicy": "null-device",
+  "source": "real stderr line from an agy run",
+  "vectors": [
+    {
+      "name": "completed-with-outbox",
+      "cli": "agy",
+      "exitCode": 0,
+      "captureTail": "done: wrote the report\n",
+      "resultFile": "result-1.json",
+      "expect": {
+        "kind": "completed",
+        "resultFile": "result-1.json"
+      }
+    },
+    {
+      "name": "exited-without-outbox",
+      "cli": "agy",
+      "exitCode": 2,
+      "captureTail": "done: wrote the report\nsome trailing noise\n",
+      "resultFile": null,
+      "expect": {
+        "kind": "exited",
+        "code": 2
+      }
+    },
+    {
+      "name": "blocked-login",
+      "cli": "agy",
+      "exitCode": 1,
+      "captureTail": "working...\nW0912 00:46:26.130859      95 cache.go:135] Cache(userInfo): Singleflight refresh failed: error getting token source: You are not logged into Antigravity.\n",
+      "resultFile": null,
+      "expect": {
+        "kind": "blocked",
+        "reason": "login"
+      }
+    },
+    {
+      "name": "login-wording-far-up-is-not-a-block",
+      "cli": "agy",
+      "exitCode": 1,
+      "captureTail": "W0912 00:46:26.130859      95 cache.go:135] Cache(userInfo): Singleflight refresh failed: error getting token source: You are not logged into Antigravity.\nline 0\nline 1\nline 2\nline 3\nline 4\nline 5\nline 6\nline 7\n",
+      "resultFile": null,
+      "expect": {
+        "kind": "exited",
+        "code": 1
+      }
+    },
+    {
+      "name": "outbox-beats-quoted-wording",
+      "cli": "agy",
+      "exitCode": 0,
+      "captureTail": "ERROR: You've hit your usage limit. Upgrade to Pro (https://chatgpt.com/explore/pro), visit https://chatgpt.com/codex/settings/usage to purchase more credits or try again at 7:18 PM.\n",
+      "resultFile": "result-3.json",
+      "expect": {
+        "kind": "completed",
+        "resultFile": "result-3.json"
+      }
+    },
+    {
+      "name": "blocked-usage-limit",
+      "cli": "agy",
+      "exitCode": 1,
+      "captureTail": "ERROR: You've hit your usage limit. try again at 7:18 PM.\n",
+      "resultFile": null,
+      "expect": {
+        "kind": "blocked",
+        "reason": "usage-limit"
+      }
+    }
+  ]
+}

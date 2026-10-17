@@ -35,7 +35,7 @@
       "pi": { "direct": "6.2", "terminal": "6.3" },
       "omp": { "direct": "6.2", "terminal": "6.3" }
     },
-    "unknownCli": "an envelope naming a CLI without an adapter for its mode is refused before launch (agent-protocol-unsupported)"
+    "unknownCli": "direct: an unknown CLI gets the generic adapter (exit and outbox only, no output patterns); terminal: an envelope naming a CLI without a terminal adapter is refused before launch (agent-protocol-unsupported)"
   },
-  "vectors": "fixtures of real CLI output per cell live under packages/agent-protocol/contracts/vectors/<cli>-<mode>/ (direct cells added with their adapters)"
+  "vectors": "fixtures per cell live under packages/agent-protocol/contracts/fixtures/<mode>/<cli>/vectors.json (direct cells exist; terminal cells arrive with 6.3)"
 }
