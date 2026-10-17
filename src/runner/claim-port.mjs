@@ -1,7 +1,7 @@
 // claim-port.mjs — single choke-point for all claim flows (tsk-53f D1).
 //
 // Every claim (CLI take, CLI pick, runner claimItem) goes through this module.
-// Centralizes: main-checkout-lock acquire/release, acquireClaim (runtime
+// Centralizes: main checkout mutex (repo-locks.mjs), acquireClaim (runtime
 // claim only — tsk-40m retired the durable moveWork(to:'doing') claim-time
 // write entirely; doing is derived purely from the active-claim overlay),
 // optional worktree creation with correct baseRef for leaf items.
@@ -15,12 +15,13 @@ import { foldEvents } from '../state/replay.mjs';
 import { isResolvedStatus, resolveRoot } from '../state/frontier.mjs';
 import { getDomain, stepForPhase, effectiveStep } from '../state/domain-registry.mjs';
 import { visitCount } from './anti-loop.mjs';
-import { acquireMainCheckoutLock, forceReclaimAmbiguousLock, HELD, AMBIGUOUS, DEFAULT_TTL_MS, formatLockDurationMs, lockRefusalDetail, heldMainCheckoutWriter } from './main-checkout-lock.mjs';
+import { withMainCheckout } from './repo-locks.mjs';
+import { checkpointMainFgos } from './main-fgos-checkpoint.mjs';
+import { LockScope, HolderLockError } from '../holder-lock/index.mjs';
 import { createClaimWorktree, branchNameFor, branchExists } from './worktree.mjs';
 import { lastActivityAt, isReclaimEligible } from './claim-liveness.mjs';
 import { hasWorkerSlotRoom } from '../state/worker-slots.mjs';
 import { readSharedConfigOrEmpty } from '../config/shared-config-file.mjs';
-import { runOpportunisticMainCheckoutChecks } from '../state/events-jsonl-truncation-guard.mjs';
 import { acquireClaim, releaseClaim, readClaims, readClaim, buildEffectiveView, getItemDurableRevision, getMainFgosDir } from '../state/runtime-coordination.mjs';
 import { resolveWriterIdentity } from '../util/session-identity.mjs';
 import path from 'node:path';
@@ -63,8 +64,8 @@ function latestTodoReleaseTrigger(events, id) {
 }
 
 // category (R4, store.mjs's categoryOf contract): 'not-found' mirrors
-// StoreError's own not-found convention ('validation'); 'lock-held'/
-// 'lock-ambiguous' reuse 'lock-timeout' (events.mjs's own category for the
+// StoreError's own not-found convention ('validation'); 'lock-held'
+// reuses 'lock-timeout' (events.mjs's own category for the
 // same "couldn't get exclusive access" class) — without this, an uncategorized
 // ClaimError falls through categoryOf to 'unexpected' and crashes the whole
 // runOnce drain-run instead of a graceful per-item halt (same failure mode
@@ -72,7 +73,6 @@ function latestTodoReleaseTrigger(events, id) {
 const CLAIM_ERROR_CATEGORY = Object.freeze({
   'not-found': 'validation',
   'lock-held': 'lock-timeout',
-  'lock-ambiguous': 'lock-timeout',
   'deps-not-merged': 'validation',
   // Same reasoning as 'deps-not-merged': a refused claim is an ordinary,
   // expected outcome, so the runner must halt this one item gracefully
@@ -108,45 +108,16 @@ export class ClaimError extends Error {
  * @param {string} [opts.worktreeDir] - custom worktree directory (for runner)
  * @returns {Object} claim result with worktree info if isolated
  */
-export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = process.cwd(), worktreeDir, skipOutcome = false } = {}) {
-  // Acquire main-checkout-lock before any state mutation. ttlMs is the
-  // window this claim records for itself; a contender judges it by that.
-  // The pre-commit hook no longer writes this lock (it leaves a beacon in
-  // its own file), so a commit on main never blocks a claim here.
-  let lockResult = acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS, releaseOnExit: true });
-  if (lockResult.status === AMBIGUOUS) {
-    // tsk-2l8: AMBIGUOUS means the lock file's content is unparseable, not
-    // that a live holder disagrees -- the same shape verb `unlock` already
-    // self-heals via forceReclaimAmbiguousLock (its own re-read-before-unlink
-    // TOCTOU guard, main-checkout-lock.mjs:655-676), just as a separate
-    // manual command. Mirror that single reclaim-and-retry here so pick/take
-    // recovers in the same call instead of requiring a person to run
-    // `/fgOS:unlock` before retrying. A transient race (a live holder wrote a
-    // valid record between the first read and this call) surfaces below as
-    // whatever that fresh content actually is (HELD/ACQUIRED); only a
-    // SECOND consecutive AMBIGUOUS (content persistently unparseable) still
-    // fails closed.
-    forceReclaimAmbiguousLock(dir);
-    lockResult = acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: DEFAULT_TTL_MS, releaseOnExit: true });
-  }
-  if (lockResult.status === HELD) {
-    const ttlPart = lockResult.remainingTtlMs != null
-      ? `, expires in ${formatLockDurationMs(lockResult.remainingTtlMs)}`
-      : ', no TTL window known';
-    throw new ClaimError(
-      'lock-held',
-      lockResult.reason
-        ? `claimWork: main checkout lock refused${lockRefusalDetail(lockResult)}`
-        : `claimWork: main checkout locked by pid ${lockResult.holderPid} (held ${formatLockDurationMs(lockResult.lockAgeMs)}${ttlPart})`,
-      { remainingTtlMs: lockResult.remainingTtlMs, holderPid: lockResult.holderPid, lockAgeMs: lockResult.lockAgeMs, ...(lockResult.reason ? { reason: lockResult.reason } : {}) },
-    );
-  }
-  if (lockResult.status === AMBIGUOUS) {
-    const agePart = lockResult.lockAgeMs != null ? ` (lock age ${formatLockDurationMs(lockResult.lockAgeMs)})` : '';
-    throw new ClaimError('lock-ambiguous', `claimWork: main checkout lock state ambiguous${agePart}`, { lockAgeMs: lockResult.lockAgeMs });
-  }
-
-  try {
+export async function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = process.cwd(), worktreeDir, skipOutcome = false, waitMs } = {}) {
+  // One scope per claim: the main checkout mutex (rank 50) is held for the
+  // checkpoint, the read-only checks, the worker-slot ceiling check and the
+  // claim write, and released before the worktree is created, so a later
+  // worktree-admin acquire (rank 40) never nests under main (ranks only go up
+  // inside a scope). Serializing every claim on the main mutex is what keeps
+  // the ceiling check correct. `scope` is handed to createClaimWorktree for
+  // that later acquire; the worktree module does not take the lock yet.
+  const scope = new LockScope('claim');
+  const underMain = (mainHandle) => {
     // Tầng A (T2/T3): events now live under baseline-0 (.fgos/events.jsonl)
     // PLUS every per-writer file under .fgos/events/ -- readRawEvents(dir)
     // is the one door that reads all of it, merged/deduped (TA-D7/TA-D13).
@@ -158,11 +129,7 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
     // no longer passes one at all, letting the checks do their own real
     // multi-file discovery from disk.
     const rawEvents = readRawEvents(dir);
-    // heldMainCheckoutWriter: this call already holds main-checkout.lock (identity
-    // process.pid, acquired above), so the checkpoint commits under that
-    // same hold instead of acquiring the mutex again; its git commit carries
-    // the pid so .githooks/pre-commit recognizes fgOS's own commit (tsk-32v).
-    runOpportunisticMainCheckoutChecks(dir, repoRoot, { mainCheckoutWriter: heldMainCheckoutWriter(process.pid) });
+    checkpointMainFgos(mainHandle, dir, repoRoot);
     const durableView = foldEvents(rawEvents);
     const claims = readClaims(dir);
     const view = buildEffectiveView(durableView, claims);
@@ -354,26 +321,26 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
       headAtTake: useBranchSource ? undefined : currentHead(repoRoot),
     };
 
-    if (isolate) {
-      let worktree;
-      try {
-        worktree = createClaimWorktree(repoRoot, id, { worktreeDir, baseRef, beforeProvision: () => lockResult.release() });
-      } catch (err) {
-        releaseClaim(dir, { id, claimId: runtimeClaim.claimId });
-        throw err;
-      }
-      return { ...claim, worktree };
-    }
+    return { claim, claimId: runtimeClaim.claimId, baseRef };
+  };
 
-    return claim;
-  } finally {
-    // Always release lock after claim completes (success or failure). Goes
-    // through lockResult.release() (tsk-45z), not the raw
-    // releaseMainCheckoutLock -- the ACQUIRED result's release() is also
-    // what un-registers the releaseOnExit crash-safety listeners above;
-    // calling the raw function directly would leave those listeners
-    // attached for the rest of this process's life, leaking 3 per call in
-    // a long-running runner that claims many items in sequence.
-    lockResult.release();
+  let held;
+  try {
+    held = await withMainCheckout(scope, 'claim', underMain, { fgosDir: dir, waitMs });
+  } catch (err) {
+    if (err instanceof HolderLockError && err.code === 'lock-held') {
+      throw new ClaimError('lock-held', `claimWork: ${err.message}`, { holders: err.holders, lock: err.lock, timedOut: err.timedOut });
+    }
+    throw err;
   }
+
+  if (!isolate) return held.claim;
+  let worktree;
+  try {
+    worktree = createClaimWorktree(repoRoot, id, { worktreeDir, baseRef: held.baseRef, scope });
+  } catch (err) {
+    releaseClaim(dir, { id, claimId: held.claimId });
+    throw err;
+  }
+  return { ...held.claim, worktree };
 }

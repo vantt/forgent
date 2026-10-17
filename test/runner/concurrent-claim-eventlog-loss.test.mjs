@@ -105,7 +105,7 @@ if (waitMs > 0) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, wai
 let claimed = false;
 for (let attempt = 0; attempt < 300; attempt += 1) {
   try {
-    claimWork(fgosDir, { id: itemId, actor: 'session', isolate: false, repoRoot });
+    await claimWork(fgosDir, { id: itemId, actor: 'session', isolate: false, repoRoot });
     claimed = true;
     break;
   } catch (err) {

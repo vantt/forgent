@@ -81,7 +81,7 @@ const porting = await import(${JSON.stringify(PORTING_URL)});
 const { dir, repoRoot } = JSON.parse(process.argv[1]);
 store.addWork(dir, { id: 'item-b', title: 'Item B', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
 store.editWork(dir, { id: 'item-b', patch: { title: 'Item B edited' } });
-const claim = claimPort.claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot });
+const claim = await claimPort.claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot });
 store.settleClaim(dir, { id: 'item-a', claimId: claim.claimId, finalStatus: 'todo' });
 const runtime = claims.acquireClaim(dir, { id: 'item-c', actor: 'session' });
 claims.releaseClaim(dir, { id: 'item-c', claimId: runtime.claimId });
