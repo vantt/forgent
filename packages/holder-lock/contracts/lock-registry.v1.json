@@ -168,19 +168,19 @@
       "kind": "hot-mutex",
       "scope": "repo",
       "rank": 60,
-      "v3Path": "<fgosDir>/locks/state.lock",
+      "v3Path": "<fgosDir>/locks/state.reclaim.lock",
       "v1Shape": "file-link",
       "v1Path": [".fgos/events.lock", ".fgos/runtime/claims.lock"],
       "fence": "tombstone",
       "owner": "4.3",
-      "note": "events and claims merge into one hot mutex"
+      "note": "events and claims merge into one hot mutex; v3Path is the kernel lock that serialises cleanup of a dead holder, the hot record itself is <fgosDir>/locks/state.hot (contracts/hot-lock.v1.json)"
     },
     {
       "name": "porting-events",
       "kind": "hot-mutex",
       "scope": "repo",
       "rank": 60,
-      "v3Path": "<fgosDir>/locks/porting-events.lock",
+      "v3Path": "<fgosDir>/locks/porting-events.reclaim.lock",
       "v1Shape": "file-link",
       "v1Path": ".fgos/porting/events.lock",
       "fence": "tombstone",

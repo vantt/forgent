@@ -4,7 +4,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { backfillStatusCategory } from "../../scripts/backfill-status-category.mjs";
-import { withEventsLock } from "../../src/state/events.mjs";
+import { holdStateLockInChild } from "../helpers/hold-state-lock-in-child.mjs";
 
 function mkTempDir(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
@@ -233,22 +233,23 @@ test("refuses a backup path that resolves inside the store directory", () => {
 
 // --- (j) a held lock blocks then refuses ------------------------------------
 
-test("a held lock blocks then refuses", () => {
+test("a held lock blocks then refuses", async () => {
   const { logPath, raw } = setup("backfill-locked-");
 
-  let sawBlockThenRefuse = false;
+  // Another process is inside the critical section; this one waits out the lock timeout and refuses.
+  const holder = await holdStateLockInChild(path.dirname(logPath));
   const start = Date.now();
-  withEventsLock(logPath, () => {
+  try {
     assert.throws(
       () => backfillStatusCategory(logPath, {}),
       (err) => err.category === "lock-timeout",
       "migration under a held lock must refuse via the lock-timeout category, not write",
     );
-    sawBlockThenRefuse = true;
-  });
+  } finally {
+    await holder.release();
+  }
   const elapsedMs = Date.now() - start;
 
-  assert.equal(sawBlockThenRefuse, true);
   assert.ok(elapsedMs >= 1900, `refusal must be preceded by the real block (measured ${elapsedMs}ms, expected >= ~2000ms)`);
   assert.equal(fs.readFileSync(logPath, "utf8"), raw, "a refused migration never wrote the target");
 });

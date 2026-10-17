@@ -12,7 +12,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { readEvents, readLastLineBefore, readEventsFromByte, parseEventLines } from './events.mjs';
+import { readEvents, readLastLineBefore, readEventsFromByte, parseEventLines } from './event-log.mjs';
 import { DEFAULTS } from './work.mjs';
 import { getDomain, resolveWorkflow, stepForPhase } from './domain-registry.mjs';
 import { resolveStepAlias } from '../workflow/steps.mjs';
