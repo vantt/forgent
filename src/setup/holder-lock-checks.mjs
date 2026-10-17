@@ -51,7 +51,7 @@ function listed(items) {
   return items.length > MAX_LISTED ? `${head}; and ${items.length - MAX_LISTED} more` : head;
 }
 
-function fgosDirOf(repoRoot) {
+export function fgosDirOf(repoRoot) {
   return path.join(path.resolve(repoRoot), '.fgos');
 }
 
@@ -366,6 +366,9 @@ const LOCK_FILES = {
   'main-checkout': ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'main-checkout.lock')),
   'merge-slot': ({ fgosDir }) => filesIn(path.join(fgosDir, LOCKS_DIR), (name) => name.startsWith('merge-slot--') && name.endsWith('.lock')),
   'worktree-admin': ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'worktree-admin.lock')),
+  // The hot record (`<resource>.hot`) is not a kernel lock file: only the reclaim lock beside it is listed here.
+  state: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'state.reclaim.lock')),
+  'porting-events': ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'porting-events.reclaim.lock')),
   gateway: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'gateway.lock')),
   runner: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'runner.lock')),
   sessions: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'sessions.lock')),

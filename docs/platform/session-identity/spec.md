@@ -58,7 +58,7 @@ The rule lives in `packages/session-identity/rust/src/resolve.rs`; the OS is rea
 - Finds the host binary by `src/util/host-bin-path.mjs`: `FGOS_HOST_BIN`, then the activation next to `fgosDir`, then the nearest activation above the cwd. The activation rule is the fgctl shim's (`<releasePath>/bin/fgos`, executable, inside the release).
 - Runs `fgos identity --pid <own pid>` directly (no shim, no `invokeHost`), with a 2000 ms kill deadline; the child is killed and reaped before the facade returns.
 - Caches per process: `pid`/`unresolved` answers by the session env alone; `env`/`registry` answers by session env and fgos dir. Failures are never cached.
-- Never runs the binary while the process holds `events.lock` or `claims.lock`: both lock helpers resolve before locking, and `probeIdentity` refuses (`identity-in-lock`) while either is held.
+- Never runs the binary while the process holds the `state` or `porting-events` hot mutex: `withStateTx` resolves the writer before locking, and `probeIdentity` refuses (`identity-in-lock`) while one is held.
 
 Errors (`WriterIdentityError`, category `precondition`, exit 2): `host-missing`, `host-version-mismatch` (the active release has no `identity` verb), `timeout`, `host-error`, `bad-output`, `identity-in-lock`. A verb that writes state fails before writing. `unresolved` is a valid answer and blocks nothing.
 

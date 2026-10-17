@@ -204,7 +204,7 @@ test('lock-holders: a foreign flock holder warns with pid and cmdline; a borrowe
   fixLockDirs(root);
   const gateway = path.join(root, '.fgos', 'locks', 'gateway.lock');
   fs.writeFileSync(gateway, '');
-  assert.match(checkLockHolders(root).message, /^\d+ lock file\(s\) of 16 locks, 0 held, every holder a fgOS process or a borrowed child$/);
+  assert.match(checkLockHolders(root).message, /^\d+ lock file\(s\) of 18 locks, 0 held, every holder a fgOS process or a borrowed child$/);
 
   const foreign = await holdWithFlock(gateway, foreignEnv());
   const warned = checkLockHolders(root);
@@ -214,7 +214,7 @@ test('lock-holders: a foreign flock holder warns with pid and cmdline; a borrowe
 
   const borrowed = await holdWithFlock(gateway, foreignEnv({ FGOS_LOCK_FD: 'gateway:3' }));
   const clean = checkLockHolders(root);
-  assert.match(clean.message, /^\d+ lock file\(s\) of 16 locks, 1 held, every holder a fgOS process or a borrowed child$/, clean.message);
+  assert.match(clean.message, /^\d+ lock file\(s\) of 18 locks, 1 held, every holder a fgOS process or a borrowed child$/, clean.message);
   await stop(borrowed);
 });
 
@@ -226,7 +226,7 @@ test('lock-holders covers the main checkout, merge slot and worktree-admin files
   const slot = path.join(locks, 'merge-slot--main.lock');
   const admin = path.join(locks, 'worktree-admin.lock');
   for (const file of [mainLock, slot, admin]) fs.writeFileSync(file, '');
-  assert.match(checkLockHolders(root).message, /^3 lock file\(s\) of 16 locks, 0 held, every holder a fgOS process or a borrowed child$/);
+  assert.match(checkLockHolders(root).message, /^3 lock file\(s\) of 18 locks, 0 held, every holder a fgOS process or a borrowed child$/);
 
   const foreign = await holdWithFlock(mainLock, foreignEnv());
   const warned = checkLockHolders(root);
@@ -309,7 +309,7 @@ test('lock-fences sees the missing fences, and the fix places them only under an
   const providerRuntimeDir = path.join(scratch, 'fences-provider-capacity');
   const before = checkLockFences(root, { providerRuntimeDir });
   assert.equal(before.passed, true);
-  assert.match(before.message, /^warning: 10 of 10 legacy lock path\(s\) not fenced: .*gateway\.lock.* -- the fix waits for this release to be activated here \(no readable activation at .*\)$/);
+  assert.match(before.message, /^warning: 13 of 13 legacy lock path\(s\) not fenced: .*gateway\.lock.* -- the fix waits for this release to be activated here \(no readable activation at .*\)$/);
 
   const noActivation = fixLockFences(root, { providerRuntimeDir, hostBin: HOST_BIN });
   assert.equal(noActivation.changed, false);
@@ -328,9 +328,9 @@ test('lock-fences sees the missing fences, and the fix places them only under an
     if (fixed.changed || !/still running/.test(fixed.message)) break;
   }
   assert.equal(fixed.changed, true, fixed.message);
-  assert.match(fixed.message, /^placed 10 fence\(s\)/);
-  assert.deepEqual(checkLockFences(root, { providerRuntimeDir }), { passed: true, message: 'all 10 legacy lock path(s) fenced' });
-  assert.deepEqual(fixLockFences(root, { providerRuntimeDir, hostBin: HOST_BIN }), { changed: false, message: 'all 10 legacy lock path(s) already fenced' });
+  assert.match(fixed.message, /^placed 13 fence\(s\)/);
+  assert.deepEqual(checkLockFences(root, { providerRuntimeDir }), { passed: true, message: 'all 13 legacy lock path(s) fenced' });
+  assert.deepEqual(fixLockFences(root, { providerRuntimeDir, hostBin: HOST_BIN }), { changed: false, message: 'all 13 legacy lock path(s) already fenced' });
 });
 
 test('a payload registry without the Rust callers\' locks fences only the locks it owns, leaving the paths an older fgctl still uses', () => {
@@ -350,7 +350,7 @@ test('a payload registry without the Rust callers\' locks fences only the locks 
     if (fixed.changed || !/still running/.test(fixed.message)) break;
   }
   assert.equal(fixed.changed, true, fixed.message);
-  assert.match(fixed.message, /^placed 7 fence\(s\)/);
+  assert.match(fixed.message, /^placed 10 fence\(s\)/);
   const left = fenceStatus({ fgosDir: path.join(root, '.fgos'), workspaceRoot: root, providerRuntimeDir }).missing;
   // The install tombstone is machine-wide and an earlier test already placed it under the shared state root.
   assert.deepEqual(left.map((file) => path.relative(path.join(root, '.fgos'), file)).sort(), [path.join('installation', 'activation.lock'), path.join('observe', '.lock')]);
@@ -358,7 +358,7 @@ test('a payload registry without the Rust callers\' locks fences only the locks 
     changed: false,
     message: 'fences not placed: the activated release does not yet take the locks still missing a fence; activate the release that ships them first',
   });
-  assert.match(checkLockFences(root, { providerRuntimeDir }).message, /^warning: 2 of 10 legacy lock path\(s\) not fenced: .* -- the fix waits for this release to be activated here/);
+  assert.match(checkLockFences(root, { providerRuntimeDir }).message, /^warning: 2 of 13 legacy lock path\(s\) not fenced: .* -- the fix waits for this release to be activated here/);
 });
 
 test('the fence fix refuses while an fgOS payload of the workspace runs, and names it', async () => {

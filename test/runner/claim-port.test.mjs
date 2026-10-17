@@ -12,6 +12,7 @@ import { writeSharedConfig } from '../../src/config/shared-config-file.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 import { probe } from '../../src/holder-lock/index.mjs';
 import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
+import { holdStateLockInChild } from '../helpers/hold-state-lock-in-child.mjs';
 import { git, initRepoWithHook, commitCount, HOOK_TEST_SKIP } from '../helpers/main-checkout-hook-repo.mjs';
 
 const CLAIM_PORT_MJS = path.resolve(fileURLToPath(import.meta.url), '../../../src/runner/claim-port.mjs');
@@ -734,8 +735,8 @@ test('claimWork invokes runOpportunisticMainCheckoutChecks non-blockingly and su
 // does its OWN manual pre-check read (the exact same
 // foldEvents(readRawEvents(dir)) claimWork's own early read does) and acks
 // it BEFORE calling the real claimWork, immediately after (same
-// synchronous tick, no yield); this test process also holds the REAL
-// events.lock claimWork's own new re-validation block needs, released
+// synchronous tick, no yield); a holder child also holds the REAL
+// state lock claimWork's own re-validation block needs, released
 // only after the racing write below is already on disk. Both narrow the
 // window a lot, but IPC delivery timing is still real OS scheduling, not
 // something this test fully controls -- empirically this fails against
@@ -745,8 +746,8 @@ test('claimWork invokes runOpportunisticMainCheckoutChecks non-blockingly and su
 test('claimWork re-validates preClaimStatus against a FRESH durable read: a durable move landing mid-flight (a different process, while THIS call is still between its own early read and its final commit) must conflict, never claim over a status it never actually saw', async () => {
   const { repoRoot, dir } = setup();
 
-  const lockPath = path.join(dir, 'events.lock');
-  fs.writeFileSync(lockPath, String(process.pid), 'utf8');
+  // A holder child sits inside the real state lock until the racing write is on disk.
+  const stateHolder = await holdStateLockInChild(dir);
 
   const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-claimwork-race-'));
   const childScript = `
@@ -773,12 +774,10 @@ try {
   });
   assert.equal(ack.status, 'todo', "the child's own pre-check must see 'todo' before this test's racing write lands");
 
-  // Directly append the durable move to a writer file -- this test already
-  // holds events.lock itself (above), so it cannot call the public
-  // moveWork (which would try to re-acquire the very same lock and
-  // deadlock against itself); this is the same event shape moveWork itself
-  // would append, simulating "a different process's moveWork already ran
-  // and released" without actually releasing this test's own hold early.
+  // Directly append the durable move to a writer file -- a holder child holds
+  // the state lock (above), so the public moveWork would block behind it;
+  // this is the same event shape moveWork itself would append, simulating
+  // "a different process's moveWork already ran" before the lock is released.
   const eventsDir = path.join(dir, 'events');
   fs.mkdirSync(eventsDir, { recursive: true });
   fs.writeFileSync(
@@ -786,7 +785,7 @@ try {
     `${JSON.stringify({ seq: 1, ts: new Date().toISOString(), type: 'work.move', payload: { id: 'item-a', from: 'todo', to: 'blocked' }, v: 2 })}\n`,
   );
 
-  fs.unlinkSync(lockPath);
+  await stateHolder.release();
   const result = await new Promise((resolve, reject) => {
     child.on('message', resolve);
     child.on('error', reject);
