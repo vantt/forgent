@@ -90,3 +90,30 @@ Probe v3 (`1ba9cb76a`, exe sha256 `09f7248c…`):
 Review note:
 - In the probe, a named pid whose `OpenProcess(SYNCHRONIZE)` fails is skipped (`Dom::refresh`). That is fine for a probe, where it almost always means "already gone".
 - The driver must **fail closed**: a pid still present in the snapshot but not openable keeps the domain non-empty.
+
+## Run 3 (10:12, probe v3 union rule, 500 repeats, exe sha256 `09f7248c…`): GATE MET
+Result: **15 pass, 0 fail**. Raw data: `.fgos/runtime/tmp/platform-probe/probe-report-windows-v3.json`. Duration 713 s.
+
+| Test | Job opened | Violations | Notes |
+|---|---|---|---|
+| `predecessor-all-owners-dead` (union rule) | 1/500 | **0/500** | 499 repeats used the Toolhelp fallback (job already gone) |
+| `predecessor-dying-job-open` (helper holds the job 0–50 ms) | **495/500** | **0/495** | contender terminated the domain in 493; extra wait p50 122 ms, p95 150 ms |
+| `git-borrow-…-predecessor-check` | 500/500 | 0 | extra wait p95 169 ms |
+| `…-holder-owned` (informational, single job owner) | 0/500 | 467/500 proceeded while members were dying | confirms the r6 rule that a job needs a second handle owner |
+
+Union rule effectiveness in the dying-job run:
+- 1479 live processes were seen at open.
+- Each source (list, in-job scan, holder tree) named all of them; no process was caught by one source alone.
+- `liveAtOpenNamedByNoSource = 0`.
+
+This run did not reproduce the run-2 list omission: git was in the list in 493 of 495 repeats. The union rule stays, because run 2 proved the list can omit a live member, and the scan and tree cost only a snapshot per poll.
+
+**Conclusion:**
+- The union rule plus a second job handle owner gives 0 violations on the owner's machine at 500 repeats, and the dying-job path was exercised 495 times.
+- The 4.4b Windows driver is unblocked from the probe side.
+- Driver must-haves:
+  - the union rule, re-read on every poll;
+  - fail closed on a live, unopenable pid;
+  - a second job handle owner;
+  - the Toolhelp fallback when the job cannot be opened.
+- Expected extra acquire wait after a crash on Windows: about 120–170 ms.
