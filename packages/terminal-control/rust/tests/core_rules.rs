@@ -170,6 +170,26 @@ fn attach_records_the_pane_and_release_never_closes_it() {
 }
 
 #[test]
+fn a_caller_closes_its_own_attached_pane_and_no_other() {
+    let driver = MemDriver::new(352, 69);
+    let core = core(&driver, &MeasuredSplit, state_dir("attach-close-own"));
+    let mine = core.allocate(&request("mine", "g")).unwrap().slot;
+    let other = core.allocate(&request("other", "g")).unwrap().slot;
+    core.attach("att-mine", &mine.pane_id, None, None).unwrap();
+    core.attach("att-other", &other.pane_id, None, None).unwrap();
+
+    // Naming a different pane as the caller's own, or none, never closes.
+    core.release_as("att-other", Disposition::Close, None, Some(&mine.pane_id)).unwrap();
+    assert!(driver.calls("pane.close").is_empty());
+
+    let out = core.release_as("att-mine", Disposition::Close, None, Some(&mine.pane_id)).unwrap();
+    assert_eq!(out, ReleaseOutcome::Released { disposition: Disposition::Close });
+    assert_eq!(driver.calls("pane.close").len(), 1);
+    assert!(!driver.panes.borrow().contains_key(&mine.pane_id));
+    assert!(driver.panes.borrow().contains_key(&other.pane_id));
+}
+
+#[test]
 fn cwd_and_env_reach_the_driver_for_a_new_tab_and_for_a_split() {
     let driver = MemDriver::new(352, 69);
     let core = core(&driver, &MeasuredSplit, state_dir("spawn-env"));

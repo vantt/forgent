@@ -233,7 +233,8 @@ fn dispatch(op: &str, core: &Core, request: &Value) -> Result<Answer, String> {
             let key: String = field(request, "key")?;
             let disposition: Disposition = field(request, "disposition")?;
             let until: Option<u64> = optional(request, "until")?;
-            match core.release(&key, disposition, until) {
+            let caller_pane: Option<String> = optional(request, "callerPane")?;
+            match core.release_as(&key, disposition, until, caller_pane.as_deref()) {
                 Ok(ReleaseOutcome::Released { disposition }) => ("released".into(), json!({ "disposition": disposition })),
                 Ok(ReleaseOutcome::KeptUnknown { reason }) => ("kept-unknown".into(), json!({ "reason": reason })),
                 Err(refusal) => refusal_fields(&refusal),

@@ -17,9 +17,12 @@ description: >-
 Renames the current herdr pane, when the session is running inside one,
 to `<task-id> | fg.ssid:<fgOS/bee session id> | a.ssid:<agent tool's own
 session id>` — dropping either session-id segment it cannot resolve. Pure
-herdr chrome (`herdr pane rename`, per STR40 —
-`docs/operator-runbook-herdr-cockpit.md`): it never reads or writes
-`.fgos/` state, so it needs no `fgos` CLI verb and no one-door-write path.
+herdr chrome (per STR40 — `docs/operator-runbook-herdr-cockpit.md`),
+written through the terminal-control port: it takes the caller's own pane
+(`fgos internal terminal-control attach`, keyed by this session's writer id,
+idempotent) and then writes the label (`label`). It never reads or writes
+`.fgos/` work state, so it needs no user-facing `fgos` verb; `fgos` on `PATH`
+is the activated release, the same one that serves the port.
 Full decision record: `docs/history/fgos-terminal-pane-rename/CONTEXT.md`.
 
 ## The `pane-labeling` capability — this skill is a swappable seam
@@ -60,7 +63,7 @@ Two deliberate details, both load-bearing:
   `fgos tool check` on that machine; gating on it would switch labeling
   off on every fresh clone with no signal. The registry answers "does this
   environment have the concept at all"; the adapter's own guards
-  (`HERDR_ENV=1`, `herdr` on `PATH`, `HERDR_PANE_ID` set) answer "and is
+  (`HERDR_ENV=1`, `herdr` and `fgos` on `PATH`, `HERDR_PANE_ID` set) answer "and is
   it usable right now" — a sharper question than a `PATH` probe, since
   herdr being installed says nothing about this session running inside one
   of its panes.
