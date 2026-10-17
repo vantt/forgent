@@ -88,19 +88,25 @@ fn read_gate_exit(run_dir: &Path, attempt_id: &str) -> Option<Value> {
 
 /// Publish `receipt.json` once and return the outcome of whichever receipt is there.
 fn publish_receipt(envelope: &Value, run_dir: &Path) -> std::io::Result<String> {
+    publish_receipt_as(envelope, run_dir, "supervisor", false)
+}
+
+/// [`publish_receipt`] for either author. `not_started`: the attempt was never
+/// bound, so the receipt names `abandoned-not-started` whatever else is on disk.
+pub(crate) fn publish_receipt_as(envelope: &Value, run_dir: &Path, synthesized_by: &str, not_started: bool) -> std::io::Result<String> {
     let attempt_id = envelope["attemptId"].as_str().unwrap_or_default();
     let gate_exit = read_gate_exit(run_dir, attempt_id);
     let launch = &envelope["launch"];
     let present = launch["outboxDir"].as_str().is_some_and(|dir| outbox_present(Path::new(dir)));
     let digest_of = |key: &str| launch["capture"][key].as_str().and_then(|p| capture_digest(Path::new(p))).map_or(Value::Null, Value::from);
-    let outcome = outcome_for(gate_exit.as_ref(), present);
+    let outcome = if not_started { "abandoned-not-started" } else { outcome_for(gate_exit.as_ref(), present) };
     let mut receipt = json!({
         "v": 1,
         "attemptId": attempt_id,
         "outcome": outcome,
         "captureDigests": {"stdout": digest_of("stdout"), "stderr": digest_of("stderr")},
         "outboxPresent": present,
-        "synthesizedBy": "supervisor",
+        "synthesizedBy": synthesized_by,
         "publishedAt": iso_utc_now(),
     });
     if let Some(exit) = gate_exit {

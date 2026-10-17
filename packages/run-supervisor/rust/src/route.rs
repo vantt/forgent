@@ -26,10 +26,20 @@ pub struct Flags {
 
 impl Flags {
     pub fn parse(args: &[String], allowed: &[&str], positional: usize) -> Result<Flags, ArgsError> {
+        Self::parse_with_switches(args, allowed, &[], positional)
+    }
+
+    /// [`Flags::parse`] where the names in `switches` take no value; `get`
+    /// returns `"true"` for a switch that was given.
+    pub fn parse_with_switches(args: &[String], allowed: &[&str], switches: &[&str], positional: usize) -> Result<Flags, ArgsError> {
         let mut flags = Flags::default();
         let mut iter = args.iter();
         while let Some(arg) = iter.next() {
             if let Some(name) = arg.strip_prefix("--") {
+                if switches.contains(&name) {
+                    flags.values.push((name.to_string(), "true".to_string()));
+                    continue;
+                }
                 if name != "protocol" && !allowed.contains(&name) {
                     return Err(ArgsError::Usage(format!("unknown flag {arg}")));
                 }
