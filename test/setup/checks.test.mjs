@@ -176,6 +176,11 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'shadow-binder-divergence',
       'tier-vocabulary-dead-keys',
       'model-policy-tier-coverage',
+      'executor-family-unique',
+      'model-policy-pools',
+      'llm-accounts-shape',
+      'llm-accounts-vs-legacy',
+      'global-model-policies-portable',
       'coordination-protocol-dead-vocabulary',
     ].sort(),
   );

@@ -1179,8 +1179,8 @@ export const COMMAND_REGISTRY = [
   }),
   withSubcommands({
     name: 'dispatch',
-    invoke: 'fgos dispatch <show-run|inspect|watch|recover|reconcile|decide|probe-account> [args]',
-    description: 'Dispatch-owned reads and repairs; it runs no work itself (one task runs through `fgos run`, planned work through `fgos workflow start`). "decide" answers which mechanism and executor a dispatch resolves to; "show-run"/"watch"/"inspect" read Run state; "recover" observes or applies recovery of a STANDALONE Run; "reconcile" is a narrow, local CAS-guarded guard repair plus provider-capacity quarantine door that never recovers, launches, signals, or controls a Run; "probe-account" is a diagnostic over one provider account.',
+    invoke: 'fgos dispatch <show-run|inspect|watch|recover|reconcile|decide|explain|probe-account> [args]',
+    description: 'Dispatch-owned reads and repairs; it runs no work itself (one task runs through `fgos run`, planned work through `fgos workflow start`). "decide" answers which mechanism and executor a dispatch resolves to; "explain" lays out why a capability binds to its family, tier, model and invocation; "show-run"/"watch"/"inspect" read Run state; "recover" observes or applies recovery of a STANDALONE Run; "reconcile" is a narrow, local CAS-guarded guard repair plus provider-capacity quarantine door that never recovers, launches, signals, or controls a Run; "probe-account" is a diagnostic over one provider account.',
     subcommands: {
       'show-run': {
         description: 'Read one Run\'s recorded state.',
@@ -1304,6 +1304,18 @@ export const COMMAND_REGISTRY = [
           'fgos dispatch decide --for general-purpose --has-live-task-access',
           'fgos dispatch decide --work tsk-abc --stage planning',
         ],
+      },
+      explain: {
+        description: 'Why a capability binds where it does, read-only: binds it as a run would (bind()), then reports the family and the prefer entry that chose it, the tier and its source (rigor, override, maxTier), the whole tier cell with the entry that runs (used, fallback-same-pool, or pending-pool-routing for an entry served by another pool), the executor and invocation, and the accounts of the family\'s pool in the provider account inventory and in runner.llmAccounts. Leases, spawns and writes nothing.',
+        parameters: {
+          type: 'object',
+          properties: {
+            for: { type: 'string', description: 'The capability to explain.' },
+            rigor: { type: 'string', description: 'The unit rigor to bind with (low, standard, high, critical); omitted, the capability\'s own rigor applies.' },
+          },
+          required: ['for'],
+        },
+        examples: ['fgos dispatch explain --for code:implement', 'fgos dispatch explain --for architecture:synthesize --rigor critical'],
       },
       'probe-account': {
         description: 'Diagnostic: start every CLI configured for one provider account at the same moment through the real dispatch door (confinement, leased login, herdr pane) with a read-only prompt; report per CLI an outcome class (ok, blocked-trust-prompt, auth, quota, sandbox, timeout, other) with its evidence line and run/pane refs plus an account-fault vs cli-fault verdict, and close the panes it opened. Selects and schedules nothing.',
