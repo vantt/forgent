@@ -80,7 +80,8 @@ export function moduleSpecifiers(source) {
 const BANNED_FILES = [
   'src/runner/dispatch/detached-run-supervisor.mjs', // process-control adapter: child_process.spawn, worker PGID signalling, receipt publication
   'src/runner/dispatch/herdr-round.mjs', // process-control: prepares/briefs/signals one interactive herdr round
-  'src/runner/dispatch/herdr-agent.mjs', // herdr client: spawns/queries live herdr panes
+  'src/runner/dispatch/terminal-slot.mjs', // a round's pane through terminal-control: launches, types at and closes live panes
+  'src/terminal-control/client.mjs', // terminal-control client: runs the host route that drives herdr
   'src/runner/dispatch/worker-home.mjs', // creates/removes a spawned worker's confined home directory
   'src/runner/dispatch/trust-store.mjs', // seeds trust for a spawned worker
   'src/runner/dispatch/worker-session-boot.mjs', // resume/reattach: ensures a live worker session exists

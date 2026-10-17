@@ -850,16 +850,13 @@ function briefMessage({ delivery = 'inline', briefText, runDir, roundNumber }) {
 }
 
 /**
- * Submit the brief once.
- *
- * `--until working` confirms the submission was accepted and the turn began.
- * Waiting for a settled state instead would block this call for the entire
- * turn, and the turn is what the receipt poll is for.
+ * Submit the brief once: type it and press submit, without waiting for the
+ * turn -- the turn is what the receipt poll is for.
  *
  * Returns the error instead of throwing it, because a first send and a later
  * re-send report the same failure differently.
  */
-function submitBrief({ io, round, message, promptMs, until = ['working'] }) {
+function submitBrief({ io, message }) {
   try {
     io.prompt(message);
     return null;
@@ -870,8 +867,8 @@ function submitBrief({ io, round, message, promptMs, until = ['working'] }) {
 
 /** The first submission. A brief the agent cannot even be handed is a spawn
  * failure, and `agent_blocked` means something is on screen worth quoting. */
-function deliverBrief({ io, round, message, promptMs, resultPath }) {
-  const err = submitBrief({ io, round, message, promptMs });
+function deliverBrief({ io, round, message, resultPath }) {
+  const err = submitBrief({ io, message });
   if (!err) {
     round.note({ status: 'briefed' });
     return;
@@ -1330,7 +1327,7 @@ async function pollForOutcome({ io, round, paths, message, deadlines, usageLimit
       if (isReadyState(agentState)) {
         resends += 1;
         lastResendAt = Date.now();
-        const retryError = submitBrief({ io, round, message, promptMs: deadlines.startup.promptMs });
+        const retryError = submitBrief({ io, message });
         if (retryError) {
           throw round.fail('worker-spawn-fail', retryError.code ?? 'agent_prompt_failed',
             `executor failed to re-brief the worker for work "${round.workId}" (attempt ${resends + 1}): ${retryError.message}`);
@@ -1399,7 +1396,7 @@ async function concludeFailure({ io, round, decision, closeAlways, retainFailedP
  * dies and a `setsid` descendant survives it. Nothing here reports this round
  * as cancelled, and nothing should.
  */
-async function settleRound({ io, round, paths, exitCommand = '/exit', promptMs, readLiveness, workerHomePath, launcherScriptPath, trustStore, cwd, repoRoot, fullEnv, workerEnv }) {
+async function settleRound({ io, round, paths, exitCommand = '/exit', readLiveness, workerHomePath, launcherScriptPath, trustStore, cwd, repoRoot, fullEnv, workerEnv }) {
   let stdout = '';
   try {
     stdout = fs.existsSync(paths.reportPath)
@@ -2122,7 +2119,7 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
       round.note({ promptReadiness: readiness });
       await refuseBriefIntoUnreadyPane({ io, round, readiness });
     }
-    deliverBrief({ io, round, message, promptMs: deadlines.startup.promptMs, resultPath: paths.resultPath });
+    deliverBrief({ io, round, message, resultPath: paths.resultPath });
     if (confinedTarget) {
       await confirmBriefSubmitted({ io, message, paths, round });
     }
@@ -2186,7 +2183,7 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
 
   const stdout = await settleRound({
     io, round, paths, exitCommand,
-    promptMs: deadlines.startup.promptMs, readLiveness, workerHomePath, launcherScriptPath,
+    readLiveness, workerHomePath, launcherScriptPath,
     trustStore, cwd, repoRoot, fullEnv, workerEnv: isConfined ? (preparedWorkerInvocation.env || null) : null,
   });
 
