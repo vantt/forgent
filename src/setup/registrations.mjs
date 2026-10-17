@@ -838,7 +838,7 @@ export function checkTaskSpecsResolve(root = FGOS_INSTALL_ROOT) {
     'fgos-routing',
     'fgos-clarifying',
     'fgos-researching',
-    'fgos-unlock',
+    'fgos-lock-fence',
     'fgos-fanout',
     'fgos-indexing',
     'distill',

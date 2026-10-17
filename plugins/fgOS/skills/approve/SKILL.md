@@ -156,7 +156,7 @@ every command below from the main checkout, not a worktree.
    | Failure | Mechanical? | What this skill does |
    |---|---|---|
    | refuses because cwd is a linked worktree | yes | leave the worktree (`ExitWorktree`, `action: "keep"`), re-run from the main checkout — never `--trust-dir` |
-   | `lock-held` / `lock-ambiguous` (exit 7) | yes | retry once; if it still refuses, run `/fgOS:unlock`, which itself refuses when another session genuinely holds the lock live, then retry once more |
+   | `lock-held` (exit 7) | yes | the verb already waited for the holder; retry once. If it still refuses, run `fgos lock-status`, report the lock and holder pid, and stop: a held lock has a live holder, so waiting is the answer unless the holder is wedged, and stopping a wedged one (`fgos lock fence <name>`, skill `fgos-lock-fence`) is a decision for the person, never a step of this skill |
    | `<id> is "<status>", not "awaiting-approval"` | no | report the real status and stop — re-read state before assuming anything moved |
    | `branch "fgw/<id>" does not exist` / `target branch ... does not exist` | no | report; there is nothing to land |
    | working tree is not clean | no | report the real error. **Never `git stash` or reset to clear it** — the main checkout is shared with every other session, and sweeping it can strand work with no way back |

@@ -6,7 +6,6 @@ import { resolveWriterIdentity } from '../../src/util/session-identity.mjs';
 import { writeBeacon, beaconPath } from '../../src/runner/main-checkout-activity.mjs';
 import {
   ADD_BAD_FLAG_CASES,
-  DEFAULT_TTL_MS,
   EDIT_BAD_FLAG_CASES,
   EDIT_PRIORITY_MATRIX_BAD_FLAG_CASES,
   FGOS,
@@ -48,7 +47,6 @@ import {
   initSessionSafeCwd,
   linkFgosBinInto,
   logPath,
-  mainCheckoutLockPath,
   makeAlreadyCaughtUpItem,
   makeBlockedBranchItem,
   makeBlockedLeafItem,
@@ -83,7 +81,6 @@ import {
   writeCreateFake,
   writeFakeGh,
   writeHangScript,
-  writeLiveLock,
   writeMarkerFake,
   writeMergeSuccessFake,
   writeRunnerConfig,
@@ -277,7 +274,7 @@ test('cleanup (to blocked branch) clears the commit-activity beacon of the calle
   run(cwd, ['move', 'cleanup-lock-blocked', '--to', 'cleanup']);
 
   const sessionId = 'session-cleanup-lock-blocked';
-  const fgosDir = path.dirname(mainCheckoutLockPath(cwd));
+  const fgosDir = path.join(cwd, '.fgos');
   const beacon = beaconPath(fgosDir);
   writeBeacon(fgosDir, { writer: { id: sessionId }, windowMs: 60_000 });
   assert.equal(fs.existsSync(beacon), true);
