@@ -8,6 +8,23 @@ Wave 1. Nhánh `run-supervisor/p02-containment-win-mac`, worktree `.claude/workt
 - Code đã đo xanh: [`tools/platform-probe/src/windows.rs`](../../tools/platform-probe/src/windows.rs), [`predecessor.rs`](../../tools/platform-probe/src/predecessor.rs), [`unix.rs`](../../tools/platform-probe/src/unix.rs); JSON [Windows lần ba](../reports/evidence-261016-1247-platform-probe-all-owners-dead-report-windows.json).
 - Bàn giao 4.4a P06 dòng "Driver chứa process" (plan.md D6: chuyển sang đây).
 
+## Amendment from plan 4.4b (2026-10-17; pending owner confirmation, 4.4b open question 1)
+
+Plan [4.4b](../261017-1256-windows-lockfileex-driver-and-macos-handoff/plan.md) D3 moves ownership of the `windows-job` domain into 4.4b P02 (`packages/process/rust/src/platform/windows_job.rs`). That covers `domain_is_empty`, `domain_kill_all`, `domain_watch`, `create_kill_job`, `open_job` and `unique_job_name`. Changes to this phase:
+
+- **What stays here:**
+  - Windows `create`, `spawn_in` and `guarantee`, which **call** the 4.4b functions and never reimplement them;
+  - the whole of macOS `pgroup-tree`;
+  - the CI workflow.
+- **Out of the "Files owned" table:** `packages/process/rust/src/platform/windows.rs` (domain part) and the Windows half of `domain_is_empty`/`domain_kill_all` in `lib.rs`.
+- **The Windows empty rule below is superseded.** It now follows the owner-machine probe runs 2–3 ([report](../reports/probe-261017-0710-windows-predecessor-all-owners-dead-race.md)):
+  - the union of the job list, the `IsProcessInJob` Toolhelp scan and the recorded root's tree, re-read on every poll;
+  - fail closed on a live, unopenable pid.
+- **Record shape:** `windows-job` `domainId` is `{job, holder: {host, pid, startTime}}`. For an attempt, `holder` is the gate.
+- **Tests:** tests (4)–(6) below move to 4.4b P02. This phase keeps (1)–(3) and (7)–(8).
+
+If the owner rejects the move, delete this block. 4.4b P04 then waits for this phase.
+
 ## Yêu cầu
 
 **Windows `job-object`:**
