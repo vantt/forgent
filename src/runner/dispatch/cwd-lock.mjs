@@ -1,0 +1,65 @@
+// cwd-lock.mjs -- the per-working-directory dispatch lock.
+//
+// One writing dispatch at a time per working directory, because two writers in
+// one tree race. The lock is a kernel lease at
+// `<fgosDir>/locks/dispatch-cwd--<dev>-<ino>.lock`, keyed by the directory's
+// identity after realpath, so a worktree reached through a symlink is the same
+// lock. It has no TTL and no heartbeat: a holder that dies releases it at once.
+
+import fs from 'node:fs';
+import { acquireSync, createLockScope, lockHolders, probe, resolveLock } from '../../holder-lock/index.mjs';
+import { DispatchError } from './dispatch-error.mjs';
+
+const LOCK_NAME = 'dispatch-cwd';
+
+function lockParams(fgosDir, cwd) {
+  return { fgosDir, cwd };
+}
+
+/** The first pid the kernel lists as holding the lock, or null where holders cannot be listed. */
+function holderPidOf(params) {
+  const holders = lockHolders(LOCK_NAME, params);
+  return holders.kind === 'list' && holders.pids.length > 0 ? holders.pids[0] : null;
+}
+
+/**
+ * Take the lock for `cwd` with one try. Returns the handle (release it in a
+ * `finally`); throws `DispatchError('dispatch-in-flight')` naming the holder
+ * when another dispatch has it, `DispatchError('worker-spawn-fail')` when
+ * `cwd` does not exist.
+ */
+export function acquireDispatchCwdLock(fgosDir, cwd) {
+  // The lock is keyed by the directory itself, so a directory that is not
+  // there cannot be dispatched into: say so plainly, as the spawn would.
+  if (!fs.existsSync(cwd)) {
+    throw new DispatchError('worker-spawn-fail', `dispatch cwd "${cwd}" does not exist.`, { cwd });
+  }
+  const params = lockParams(fgosDir, cwd);
+  const res = acquireSync(createLockScope(LOCK_NAME), LOCK_NAME, params);
+  if (res.result === 'acquired') return res.handle;
+  const holderPid = holderPidOf(params);
+  const holder = holderPid ? ` by process ${holderPid}` : '';
+  throw new DispatchError(
+    'dispatch-in-flight',
+    `dispatch for cwd "${cwd}" is already in flight (held${holder}).`,
+    { cwd, holderPid, lockPath: resolveLock(LOCK_NAME, params).v3Path },
+  );
+}
+
+/**
+ * `{ pid, lockPath }` of the dispatch holding `cwd`'s lock (pid null where the
+ * kernel cannot list holders), or null when nothing holds it. Reads the kernel
+ * holder list, which takes no lock, so a check never makes a concurrent
+ * dispatch see the lock held; the probe is only for a platform that cannot list.
+ */
+export function dispatchCwdHolder(fgosDir, cwd) {
+  // A directory that does not exist has no dispatch running in it.
+  if (!fs.existsSync(cwd)) return null;
+  const params = lockParams(fgosDir, cwd);
+  const lockPath = resolveLock(LOCK_NAME, params).v3Path;
+  // A lock file never created was never taken: nothing to look at.
+  if (!fs.existsSync(lockPath)) return null;
+  const holders = lockHolders(LOCK_NAME, params);
+  if (holders.kind === 'list') return holders.pids.length > 0 ? { pid: holders.pids[0], lockPath } : null;
+  return probe(LOCK_NAME, params).result === 'free' ? null : { pid: null, lockPath };
+}

@@ -7,18 +7,9 @@ import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 const repo = path.resolve(fileURLToPath(new URL('../..', import.meta.url)));
 const run = (root, args) => spawnSync(process.execPath, ['bin/fgos.mjs', ...args, '--dir', root], { cwd: repo, encoding: 'utf8' });
-// Real production per-cwd dispatch lock path/shape (see
-// reconciliation-planner.mjs's own lockFile/cwdLockHolder doc comments).
-function lockPathFor(root, cwd = root) { return path.join(root, '.fgos', `dispatch--${encodeURIComponent(cwd)}.lock`); }
-function deadLock(root, cwd = root) {
-  const ts = Date.now();
-  fs.writeFileSync(lockPathFor(root, cwd), JSON.stringify({ pid: `99999999:${ts}:deadfixture`, ts }));
-}
-
 test('CLI exposes only the narrow reconcile plan and refuses forbidden actions', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-reconcile-cli-')); fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
-  deadLock(root);
-  const planned = run(root, ['dispatch', 'reconcile', 'plan', '--cwd', root]); assert.equal(planned.status, 0, planned.stderr); assert.equal(JSON.parse(planned.stdout).data.outcome, 'planned');
+  const planned = run(root, ['dispatch', 'reconcile', 'plan', '--cwd', root]); assert.equal(planned.status, 0, planned.stderr); assert.equal(JSON.parse(planned.stdout).data.outcome, 'blocked', 'no dispatch holds the cwd: nothing to clear');
   const refused = run(root, ['dispatch', 'reconcile', 'plan', '--action', 'resume-driver']); assert.equal(refused.status, 0, refused.stderr); assert.equal(JSON.parse(refused.stdout).data.outcome, 'refused');
 });
 
@@ -77,19 +68,14 @@ test('CLI apply refuses a forbidden/unsupported action smuggled into a plan\'s p
   assert.equal(JSON.parse(applied.stdout).data.outcome, 'refused');
 });
 
-test('CLI apply refuses a same-byte outside-root target tampered into a plan', () => {
+test('CLI apply refuses a clear-cwd-lock plan carrying a target path, and never touches that file', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-reconcile-cli-')); fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
-  const ts = Date.now();
-  const bytes = JSON.stringify({ pid: `99999999:${ts}:deadfixture`, ts });
-  const guard = lockPathFor(root); fs.writeFileSync(guard, bytes);
-  const outside = path.join(path.dirname(root), `${path.basename(root)}-outside-lock`); fs.writeFileSync(outside, bytes);
-  const planned = run(root, ['dispatch', 'reconcile', 'plan', '--cwd', root]); assert.equal(planned.status, 0, planned.stderr);
-  const plan = JSON.parse(planned.stdout).data; plan.proposedAction.path = outside;
-  const applied = run(root, ['dispatch', 'reconcile', 'apply', '--plan', JSON.stringify(plan)]);
+  const outside = path.join(path.dirname(root), `${path.basename(root)}-outside-lock`); fs.writeFileSync(outside, 'x');
+  const tampered = { actionKey: 'reconcile_tampered', snapshot: { expiresAt: '2099-01-01T00:00:00.000Z' }, proposedAction: { kind: 'clear-cwd-lock', cwd: root, path: outside } };
+  const applied = run(root, ['dispatch', 'reconcile', 'apply', '--plan', JSON.stringify(tampered)]);
   assert.equal(applied.status, 0, applied.stderr);
   assert.equal(JSON.parse(applied.stdout).data.outcome, 'plan-stale');
-  assert.equal(fs.existsSync(outside), true, 'outside same-byte file must never be unlinked');
-  assert.equal(fs.existsSync(guard), true, 'canonical guard must remain after refusal');
+  assert.equal(fs.existsSync(outside), true, 'a path named in a plan is never a target');
 });
 
 // S5: clear-assignment-claim (and the dispatch.claim file it existed to

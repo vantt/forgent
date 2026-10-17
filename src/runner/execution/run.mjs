@@ -23,7 +23,7 @@ import { ensureRunnerConfigForDir, RunnerConfigError, assertRunTimeoutMs } from 
 import { commitOnBranch, commitUnitWork, foreignIndexDetail, preflightUnitWorktree } from './commit-unit-work.mjs';
 import { assertSyncResumable, commitRoundWithSync, effectiveWriteScope, runPendingSync, seedSync, syncBrief, syncSummary } from './unit-sync.mjs';
 import { resolveAgentDefinition } from '../agent-definitions.mjs';
-import { dispatchLockFile, parseCompositePidIdentity } from '../main-checkout-lock.mjs';
+import { dispatchCwdHolder } from '../dispatch/cwd-lock.mjs';
 import { reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, plainInputName, isSeatInput } from './handoff-refs.mjs';
 import { outcomeOfRunResult, readUnitRunHistory } from './unit-run-history.mjs';
 import { writeUnitSummary } from './unit-summary.mjs';
@@ -339,28 +339,13 @@ export async function runUnit(options = {}) {
       throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": unit.json has no resolvedInputs`);
     }
 
-    // A mutating dispatch holds `.fgos/dispatch--<cwd>.lock` with a composite
-    // "pid:acquiredAtMs:rand" identity while its worker runs; resuming under a
-    // live holder would launch a second worker into the same worktree.
-    const lockPath = path.join(mainRoot, '.fgos', dispatchLockFile(worktreePath));
-    let holder;
-    try {
-      holder = JSON.parse(fs.readFileSync(lockPath, 'utf8'))?.pid;
-    } catch {
-      holder = undefined;
-    }
-    const pid = Number.isInteger(holder) ? holder : parseCompositePidIdentity(holder)?.pid;
-    if (Number.isInteger(pid) && pid > 0) {
-      let alive;
-      try {
-        process.kill(pid, 0);
-        alive = true;
-      } catch (err) {
-        alive = err.code === 'EPERM';
-      }
-      if (alive) {
-        throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": another process (PID ${pid}) holds lock at "${lockPath}"`);
-      }
+    // A mutating dispatch holds the worktree's dispatch-cwd lock while its
+    // worker runs; resuming under a live holder would launch a second worker
+    // into the same worktree.
+    const cwdHolder = dispatchCwdHolder(path.join(mainRoot, '.fgos'), worktreePath);
+    if (cwdHolder) {
+      const who = cwdHolder.pid ? `another process (PID ${cwdHolder.pid})` : 'another process';
+      throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": ${who} holds lock at "${cwdHolder.lockPath}"`);
     }
     assertNoStrayCommit(unitRunId, unitRecord, mainRoot);
     assertSyncResumable(unitRunId, unitRecord, mainRoot);

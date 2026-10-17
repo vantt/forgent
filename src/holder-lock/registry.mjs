@@ -2,8 +2,8 @@
 // packages/holder-lock/contracts/lock-registry.v1.json (Rust reads the same
 // file). Resolves a row's path templates for a concrete caller: `<fgosDir>`,
 // `<lockRoot>`, `<runDir>`, `<workflowRunDir>`, `<ref>`, `<provider>`,
-// `<account>`, `<NN>`, `<id>`, `<encodeURIComponent(cwd)>`, `<os.tmpdir()>`
-// and a leading `~`. A missing parameter is an error, never a guessed path.
+// `<account>`, `<NN>`, `<id>`, `<encodeURIComponent(cwd)>`, `<cwdDevIno>`,
+// `<os.tmpdir()>` and a leading `~`. A missing parameter is an error, never a guessed path.
 
 import fs from 'node:fs';
 import os from 'node:os';
@@ -33,11 +33,27 @@ export function lockEntry(name) {
 
 const PLACEHOLDER = /<([^<>]+)>/g;
 
+/** `<dev>-<ino>` of the directory `cwd` names after realpath: one key for
+ * every spelling of the same directory, symlinked or not. A cwd that does
+ * not exist has no key (strict resolution then names the missing param). */
+function cwdDevIno(cwd) {
+  if (typeof cwd !== 'string' || !cwd) return undefined;
+  let stat;
+  try {
+    stat = fs.statSync(fs.realpathSync(path.resolve(cwd)));
+  } catch (err) {
+    if (err.code === 'ENOENT' || err.code === 'ENOTDIR') return undefined;
+    throw err;
+  }
+  return `${stat.dev}-${stat.ino}`;
+}
+
 function placeholderValue(key, params) {
   if (key === 'os.tmpdir()') return os.tmpdir();
   if (key === 'encodeURIComponent(cwd)') {
     return typeof params.cwd === 'string' && params.cwd ? encodeURIComponent(path.resolve(params.cwd)) : undefined;
   }
+  if (key === 'cwdDevIno') return cwdDevIno(params.cwd);
   const value = params[key];
   return typeof value === 'string' && value ? value : undefined;
 }

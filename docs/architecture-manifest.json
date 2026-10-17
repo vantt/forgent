@@ -213,6 +213,7 @@
     "src/state/fgos-file-registry.mjs": "kernel",
     "src/state/runtime-coordination.mjs": "infra",
     "src/runner/dispatch/brief.mjs": "infra",
+    "src/runner/dispatch/cwd-lock.mjs": "infra",
     "src/runner/dispatch/dispatch-error.mjs": "infra",
     "src/runner/dispatch/proof-helpers.mjs": "infra",
     "src/runner/dispatch/herdr-agent.mjs": "infra",
