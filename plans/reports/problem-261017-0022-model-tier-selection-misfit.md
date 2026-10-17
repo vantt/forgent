@@ -229,10 +229,195 @@ Gaps in that fallback, which the supply layer must close:
   model → another family at the same tier.** Each step is recorded in the unit's
   provenance with its own `kind`.
 
+### 5.2 Decided config shape (owner, 2026-10-17)
+
+Settled in an owner discussion after two architecture-advisory runs
+(`wf-run-1792174763920-e7cf2329`, reopened as `wf-run-1792195366223-9d3876e1`).
+The council proposed replacing `executors` with new `sources` and `use` maps. The
+owner rejected that, because `executors` is one concept shared with tool
+executors (`gitnexus`, `herdr`). The shape below keeps `executors` and gives each
+piece one question to answer:
+
+| Piece | Answers | File |
+|---|---|---|
+| `capabilities.<cap>.prefer` | which families, in which order | project |
+| `modelPolicies.<family>` | which model per tier, from which pool | project or global |
+| `executors.<id>` | which harness runs the family | project |
+| `llmAccounts.<pool>` | which accounts a pool has, and where each CLI keeps its login | global only |
+
+Decisions:
+
+1. **`prefer` names a family**, not an executor.
+2. **`modelPolicies.<family>.<tier>` is a string or an ordered list of
+   `model` / `model@pool`.** Each entry carries the model id as that pool spells
+   it, so no hidden id-mapping table exists. An entry without `@` uses the
+   family's default pool. The list order is the source fallback order for that
+   tier; source fallback never changes the tier.
+3. **`modelPolicies.<family>.pool` sets the family's default pool**; without it
+   the default pool is the family name. `pool` is a reserved key, never a tier
+   name.
+4. **One family has exactly one executor.** An executor carries
+   `providerModel` and its `invocations` only; it has no pool field. Transport
+   (cli or herdr), harness (codex, pi, omp) and confinement are invocations of
+   that one executor, picked by the existing `bind()` rules. Config validation
+   refuses two executors with the same `providerModel` and names both.
+5. **Accounts move to `runner.llmAccounts.<pool>.<account>` in the global config
+   only.** An account holds `credentialStore: { <store>: <path> }` plus optional
+   `label` and `disabled`. Store directories stay where each CLI keeps them; no
+   machine-wide layout change and no directory per project.
+6. **An invocation declares `credentialStore: { use, homeEnv, files? }`.** `use`
+   names the store key to read inside the account, `homeEnv` the variable the
+   copied private home is bound to, and `files` every file the CLI may need; the
+   runner copies the ones present, and an account with none of them is unusable
+   rather than run with an empty home. It replaces the hard-coded store path in
+   `env` and the `private-home` entry in `resourceBindings`. Invocations no
+   longer carry an account name, so `executors.openai` drops from 9 invocations
+   to 3.
+7. **A pool and an executor match through store keys.** An invocation with
+   `use: "codex"` runs only with accounts that have `credentialStore.codex`,
+   whatever pool they are in. Adding a pool to a family touches `llmAccounts` and
+   `modelPolicies`, never the executor. A tier entry naming a pool where no
+   account matches any invocation of the family's executor is reported by
+   `fgos dispatch explain` and `fgos doctor`.
+8. **The new release also reads `runner.providers.*.accounts` for a transition
+   period.** fgOS is installed globally and runs other projects on older
+   releases, so the old inventory stays readable until they move.
+
+Rejected alternatives: `model@pool:executor` (no case in the current config
+needs a second executor per family; a harness per pool is already expressed by
+which stores the pool's accounts have); a separate `modelSources` map keyed by
+model (the owner preferred the simpler per-tier form); an `accountPool` field on
+the executor (it put a supply fact on the harness layer).
+
+Prerequisites found in the current config:
+
+- `claude` and `claude-herdr` are split only because an executor named `claude`
+  is merged with `runner.executor` and loses its invocations. That merge must be
+  fixed before the two are merged; about ten capabilities name `claude-herdr`.
+- `glm` and `glm-herdr` differ only in transport and merge into one executor.
+- The gemini invocations pass no `--model {model}`; the omp profile fixes the
+  model, so `modelPolicies.gemini` has no effect today.
+- Today an unpinned lease picks among all accounts and refuses a missing CLI
+  store late, at `credential-provisioning` (RUL80). Account selection must filter
+  by the chosen invocation's `credentialStore.use`, or rotation trips over
+  unusable accounts.
+
+How the pieces join at run time:
+
+```
+capabilities.<cap>.prefer            -> family, in order
+modelPolicies.<family>.<tier>        -> [model | model@pool, ...]   (source order)
+modelPolicies.<family>.pool          -> default pool (else the family name)
+executors (providerModel = family)   -> the family's one executor -> invocation by bind() rules
+invocation.credentialStore.use       -> llmAccounts.<pool>.<account>.credentialStore.<use>
+invocation.credentialStore.homeEnv   <- private-home copy of that store path
+```
+
+Recovery order: another account of the same pool (an account without the
+invocation's store, or `disabled`, is skipped), then the next entry of the same
+tier, then the next family of `prefer` at the same tier.
+
+Full example. Global `~/.fgos/config.json`:
+
+```json
+{
+  "runner": {
+    "llmAccounts": {
+      "openai": {
+        "tetnu":   { "credentialStore": { "codex": "${HOME}/.codex-tetnu",
+                                          "pi":    "${HOME}/.pi/accounts/openai-tetnu" } },
+        "tetcu72": { "label": "tetcu72 (Plus)",
+                     "credentialStore": { "codex": "${HOME}/.codex-tetcu72",
+                                          "pi":    "${HOME}/.pi/accounts/openai-tetcu72" } },
+        "fgovn":   { "disabled": true,
+                     "credentialStore": { "codex": "${HOME}/.codex-fgovn" } }
+      },
+      "openrouter": {
+        "or-a": { "credentialStore": { "pi": "${HOME}/.pi/accounts/openrouter" } }
+      },
+      "deepseek-api": {
+        "main": { "credentialStore": { "pi": "${HOME}/.pi/accounts/deepseek-main" } }
+      }
+    }
+  }
+}
+```
+
+Project `.fgos/config.json`:
+
+```json
+{
+  "runner": {
+    "capabilities": {
+      "review": {
+        "prefer": ["deepseek", "openai", "claude"],
+        "serves": { "outputKind": "report", "mutates": false },
+        "rigor": "standard"
+      }
+    },
+    "modelPolicies": {
+      "deepseek": {
+        "pool":     "openrouter",
+        "nano":     "deepseek-v4-flash@deepseek-api",
+        "standard": ["deepseek-v4-flash@deepseek-api", "deepseek/deepseek-v4-flash"],
+        "advanced": ["deepseek/deepseek-v4-pro", "deepseek-v4-pro@deepseek-api"],
+        "flagship": "deepseek/deepseek-v4-pro",
+        "frontier": "deepseek/deepseek-v4-pro"
+      },
+      "z-ai": { "pool": "openrouter", "standard": "z-ai/glm-5.3", "advanced": "z-ai/glm-5.3" },
+      "claude": { "advanced": "sonnet", "flagship": "opus", "frontier": "fable" }
+    },
+    "rigorToTier": { "low": "nano", "standard": "standard", "high": "flagship", "critical": "frontier" },
+    "maxTier": "advanced",
+    "executors": {
+      "openai": {
+        "kind": "agent", "providerModel": "openai", "allowCrossProvider": true,
+        "invocations": [
+          { "id": "codex-cli-bwrap", "via": "cli", "adapter": "cli-spawn", "command": "codex",
+            "args": ["exec", "--skip-git-repo-check", "-s", "danger-full-access", "--model", "{model}", "{prompt}"],
+            "confinement": { "backend": "bwrap" },
+            "credentialStore": { "use": "codex", "homeEnv": "CODEX_HOME" } },
+          { "id": "codex-herdr", "via": "cli", "adapter": "herdr-spawn", "command": "codex",
+            "args": ["-s", "danger-full-access", "-a", "never", "--no-daemon", "--model", "{model}"],
+            "confinement": { "backend": "bwrap" },
+            "interactiveMode": { "exitCommand": "/quit", "kind": "codex", "trustStore": { "kind": "codex-toml" } },
+            "credentialStore": { "use": "codex", "homeEnv": "CODEX_HOME" } },
+          { "id": "pi-cli-bwrap", "via": "cli", "adapter": "cli-spawn", "command": "pi",
+            "args": ["--model", "{model}", "--thinking", "medium", "--tools", "read,write,edit,bash,grep,find,ls", "--mode", "json", "--approve", "-p", "{prompt}"],
+            "confinement": { "backend": "bwrap" },
+            "credentialStore": { "use": "pi", "homeEnv": "PI_CODING_AGENT_DIR", "files": ["auth.json"] } }
+        ]
+      },
+      "deepseek": {
+        "kind": "agent", "providerModel": "deepseek", "allowCrossProvider": true,
+        "invocations": [
+          { "id": "pi-cli-bwrap", "via": "cli", "adapter": "cli-spawn", "command": "pi",
+            "args": ["--model", "{model}", "--thinking", "medium", "--tools", "read,write,edit,bash,grep,find,ls", "--mode", "json", "--approve", "-p", "{prompt}"],
+            "confinement": { "backend": "bwrap" },
+            "credentialStore": { "use": "pi", "homeEnv": "PI_CODING_AGENT_DIR", "files": ["settings.json"] } },
+          { "id": "pi-herdr", "via": "cli", "adapter": "herdr-spawn", "command": "pi",
+            "args": ["--model", "{model}", "--thinking", "medium", "--tools", "read,write,edit,bash,grep,find,ls", "--approve"],
+            "confinement": { "backend": "bwrap" },
+            "interactiveMode": { "exitCommand": "/quit", "kind": "pi" },
+            "credentialStore": { "use": "pi", "homeEnv": "PI_CODING_AGENT_DIR", "files": ["settings.json"] } }
+        ]
+      }
+    }
+  }
+}
+```
+
+Assumptions the spike must check: the deepseek vendor API runs through `pi`
+with its key in the store's `settings.json`; `${HOME}/.pi/accounts/deepseek-main`
+does not exist yet; the three unconfined openai invocations
+(`codex-cli-bypass-fgovn`, `pi-cli-<account>`) have no remaining caller.
+
 ## 6. Constraints
 
 - **Single user, no backward compatibility:** delete old surfaces in the same
-  change (no aliases).
+  change (no aliases). Exception decided in 5.2 item 8: the account inventory
+  keeps a read path for `runner.providers.*.accounts`, because other projects run
+  older fgOS releases against the same machine-wide config.
 - **One Door:** `fgos run` / `workflow start` stay the only execution doors.
 - **Do not edit other people's tooling** (ak/ck/rtk, Claude Code itself).
   Design around them.
@@ -261,8 +446,11 @@ Gaps in that fallback, which the supply layer must close:
   separate "orchestrator" capability?
 - Is the cross-family fallback order declared per tier only, or can a capability
   still narrow it (for example a review that must never leave claude)?
-- Do supply sources live only in the global config (credentials are per
-  machine), with the project config naming sources by id only?
+- Is cross-family fallback on by default, or only when allowlisted (the council's
+  provisional default is off)?
+- Does account rotation follow the declared order in `llmAccounts`, or keep
+  today's least-lease then least-recently-used ranking
+  (`rankProviderAccounts`, `src/runner/dispatch/provider-capacity.mjs:806`)?
 - When the provider serving the tier a capability needs is unavailable, may that
   capability switch straight to another family at the same tier? Today the order
   is implicit and fixed: rotate accounts within the same family first, change

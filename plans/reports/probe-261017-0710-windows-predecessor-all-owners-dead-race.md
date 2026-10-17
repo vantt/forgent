@@ -49,3 +49,44 @@ Linux and macOS are unaffected. The 4.2 holder-lock work continues as planned, b
 ## Unresolved questions
 - Does `JobObjectBasicProcessIdList` list a terminating, not yet signaled process?
 - Is the 2-in-50 "job still openable after both owners died" a teardown delay that ends on its own, or does it depend on load?
+
+## Run 2 (08:59, probe with the full r6 rule, 200 repeats, exe sha256 `949f8c0e…`)
+Result: 14 pass, 1 fail. Raw data: `.fgos/runtime/tmp/platform-probe/probe-report-windows-v2.json`.
+
+### `predecessor-all-owners-dead` (full r6 rule): FAIL, 1 violation in 200
+The failing event is repeat 15.
+- The contender opened the job: `activeProcessesAtOpen = 3`, but `memberListSizeAtOpen = 2`.
+- **The git pid was not in the list**; both hook pids were.
+- The contender waited for the 2 listed members and proceeded without terminating the domain.
+- Git was still alive and not signaled.
+
+### `…-list-empty-toolhelp` variant: PASS, 0 in 200
+This pass proves little. The job opened only once in those 200 repeats (count 0, list empty, Toolhelp found no live descendants). The "count > list" case never occurred in the variant.
+
+### Finding
+`JobObjectBasicProcessIdList` can **omit a live, unsignaled member** while `ActiveProcesses` still counts it. So the answer to the run-1 open question is: the list is not complete. Neither the count nor the list is enough, alone or together.
+
+### Proposed rule (r6 amendment, to verify in probe v3)
+When the job opens, the set to wait on is the union of three sources, and the contender proceeds only when every member of the union is signaled:
+1. the job list;
+2. every process in a Toolhelp snapshot for which `IsProcessInJob(proc, job)` is true;
+3. the recorded holder's process tree.
+
+The union is re-read on every query.
+
+When the job does not open, the existing Toolhelp fallback applies.
+
+Probe v3 also records, per event, whether `IsProcessInJob(git, job)` is true when git is missing from the list. That shows whether source 2 alone closes the gap.
+
+The 4.4b driver stays blocked until v3 shows 0 violations in at least 500 repeats on the owner's machine.
+
+## Probe v3 (union rule) merged; review note for the 4.4b driver
+Probe v3 (`1ba9cb76a`, exe sha256 `09f7248c…`):
+- waits on the union of the job list, the `IsProcessInJob` scan and the holder tree;
+- adds `predecessor-dying-job-open`;
+- runs 500 repeats by default;
+- drops the list-empty-toolhelp variant, because the union rule covers it.
+
+Review note:
+- In the probe, a named pid whose `OpenProcess(SYNCHRONIZE)` fails is skipped (`Dom::refresh`). That is fine for a probe, where it almost always means "already gone".
+- The driver must **fail closed**: a pid still present in the snapshot but not openable keeps the domain non-empty.
