@@ -50,6 +50,11 @@ impl Locks {
         Ok(())
     }
 
+    /// The gate carries the lease description, so a dead supervisor leaves the lease held until the gate is gone.
+    pub(super) fn declare_on_lease(&self, _record: &Domain) -> io::Result<()> {
+        Ok(())
+    }
+
     pub(super) fn release_cwd(&mut self) {
         drop(self.cwd_lease.take());
     }

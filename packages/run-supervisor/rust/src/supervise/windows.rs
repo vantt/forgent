@@ -34,12 +34,13 @@ const LOCK_WAIT_MS: u64 = 10_000;
 pub(super) struct Locks {
     attempt: Option<Handle>,
     cwd_lease: Option<Handle>,
+    lease_path: Option<PathBuf>,
 }
 
 impl Locks {
     /// Nothing is inherited on Windows: the locks are taken once the envelope names them.
     pub(super) fn early() -> Result<Locks, Refusal> {
-        Ok(Locks { attempt: None, cwd_lease: None })
+        Ok(Locks { attempt: None, cwd_lease: None, lease_path: None })
     }
 
     pub(super) fn complete(&mut self, envelope: &Value, run_dir: &Path) -> Result<(), Refusal> {
@@ -49,8 +50,19 @@ impl Locks {
                 return Err(Refusal { exit: EXIT_ENVELOPE_INVALID, code: "envelope-invalid", why: "a mutating attempt needs cwdLeaseFile on Windows".into() });
             };
             self.cwd_lease = Some(take("dispatch-cwd", Path::new(lease))?);
+            self.lease_path = Some(PathBuf::from(lease));
         }
         Ok(())
+    }
+
+    /// The lease dies with this process while the agent may live on in the job,
+    /// so the lease records the same domain: a later holder of the lease waits for
+    /// it to be empty exactly as a later holder of the attempt lock does.
+    pub(super) fn declare_on_lease(&self, record: &Domain) -> io::Result<()> {
+        match &self.lease_path {
+            Some(path) => fgos_holder_lock::predecessor::declare(&fgos_holder_lock::predecessor::record_path(path), record),
+            None => Ok(()),
+        }
     }
 
     pub(super) fn release_cwd(&mut self) {

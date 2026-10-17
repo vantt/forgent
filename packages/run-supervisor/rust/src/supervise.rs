@@ -261,7 +261,7 @@ fn supervise(args: &SuperviseArgs) -> Result<i32, Refusal> {
     let gate_started = Instant::now();
 
     // The domain is on record before the gate may run anything.
-    if let Err(why) = bind(&envelope, &run_dir, &*driver, &domain, &spawned) {
+    if let Err(why) = bind(&envelope, &run_dir, &locks, &*driver, &domain, &spawned) {
         let _ = driver.kill_all(&mut domain, 0);
         return Err(Refusal::internal(why));
     }
@@ -321,11 +321,12 @@ fn open_driver(envelope: &Value) -> Result<Box<dyn ContainmentDriver>, String> {
 }
 
 /// `declare_domain` on the attempt lock, then `supervisor-binding.json`.
-fn bind(envelope: &Value, run_dir: &Path, driver: &dyn ContainmentDriver, domain: &ContainmentDomain, spawned: &Spawned) -> Result<(), String> {
+fn bind(envelope: &Value, run_dir: &Path, locks: &os::Locks, driver: &dyn ContainmentDriver, domain: &ContainmentDomain, spawned: &Spawned) -> Result<(), String> {
     let record = os::record_to_declare(domain.domain().ok_or("the driver returned no domain id")?);
     // The supervisor holds the attempt lock exclusively.
     let predecessor = fgos_holder_lock::predecessor::record_path(&run_dir.join("attempt.lock"));
     fgos_holder_lock::predecessor::declare(&predecessor, &record).map_err(|e| format!("declare_domain: {e}"))?;
+    locks.declare_on_lease(&record).map_err(|e| format!("declare_domain on the cwd lease: {e}"))?;
     let declared = fgos_holder_lock::predecessor::domain_json(&record);
     let me = facts::self_identity().ok_or("the supervisor's own identity is unreadable")?;
     let guarantee = driver.guarantee();

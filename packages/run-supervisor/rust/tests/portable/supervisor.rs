@@ -34,11 +34,13 @@ pub struct Opts {
     pub steps: Vec<Value>,
     pub host_bin: Option<String>,
     pub grace_ms: u64,
+    /// A mutating attempt: it also holds the dispatch-cwd lease.
+    pub mutating: bool,
 }
 
 impl Opts {
     pub fn agent(args: &[&str]) -> Self {
-        Self { agent_args: args.iter().map(|a| a.to_string()).collect(), soft_ms: None, steps: Vec::new(), host_bin: None, grace_ms: 3_000 }
+        Self { agent_args: args.iter().map(|a| a.to_string()).collect(), soft_ms: None, steps: Vec::new(), host_bin: None, grace_ms: 3_000, mutating: false }
     }
 }
 
@@ -71,8 +73,11 @@ pub struct Run {
     pub attempt_id: String,
     pub envelope: PathBuf,
     pub lock_path: PathBuf,
+    pub lease_path: PathBuf,
     #[cfg(unix)]
     lock: Option<fs::File>,
+    #[cfg(unix)]
+    lease: Option<fs::File>,
 }
 
 impl Run {
@@ -86,6 +91,7 @@ impl Run {
         fs::write(&side_file, json!({"v": 1, "attemptId": attempt_id, "env": {}, "controlEpoch": 1, "controlToken": "t"}).to_string()).unwrap();
         let soft = opts.soft_ms.map(|ms| boottime_ns() + ms * 1_000_000);
         let host_bin = opts.host_bin.clone().unwrap_or_else(|| internal_harness().to_string_lossy().into_owned());
+        let lease_path = dir.join("cwd.lease");
         let mut value = json!({
             "v": 3,
             "attemptId": attempt_id,
@@ -97,7 +103,7 @@ impl Run {
             "hostBin": host_bin,
             "payloadRoot": dir,
             "cwd": dir,
-            "mutation": "read-only",
+            "mutation": if opts.mutating { "mutating" } else { "read-only" },
             "launch": {
                 "command": agent_exe(),
                 "args": opts.agent_args,
@@ -118,6 +124,9 @@ impl Run {
             "steps": opts.steps,
             "sideFile": side_file,
         });
+        if opts.mutating && cfg!(windows) {
+            value["cwdLeaseFile"] = json!(lease_path);
+        }
         let digest = envelope::digest(&value).unwrap();
         value["digest"] = Value::String(digest);
         let path = dir.join("envelope.json");
@@ -125,21 +134,28 @@ impl Run {
         let lock_path = dir.join("attempt.lock");
 
         #[cfg(unix)]
-        let lock = {
+        let take = |path: &Path| {
             use std::os::fd::AsRawFd;
             use std::os::unix::fs::OpenOptionsExt;
-            let file = fs::OpenOptions::new().read(true).write(true).create(true).truncate(false).mode(0o600).open(&lock_path).unwrap();
+            let file = fs::OpenOptions::new().read(true).write(true).create(true).truncate(false).mode(0o600).open(path).unwrap();
             // SAFETY: flock on a descriptor this process owns.
-            assert_eq!(unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_EX | libc::LOCK_NB) }, 0, "controller takes the attempt lock");
-            Some(file)
+            assert_eq!(unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_EX | libc::LOCK_NB) }, 0, "controller takes {}", path.display());
+            file
         };
+        #[cfg(unix)]
+        let lock = Some(take(&lock_path));
+        #[cfg(unix)]
+        let lease = opts.mutating.then(|| take(&lease_path));
         Self {
             dir,
             attempt_id,
             envelope: path,
             lock_path,
+            lease_path,
             #[cfg(unix)]
             lock,
+            #[cfg(unix)]
+            lease,
         }
     }
 
@@ -159,8 +175,13 @@ impl Run {
             unsafe {
                 cmd.pre_exec(|| if libc::setsid() < 0 { Err(std::io::Error::last_os_error()) } else { Ok(()) });
             }
-            let child = spawn_with_fds(cmd, &[(FdSlot(3), self.lock.as_ref().unwrap())]).expect("supervisor starts");
+            let mut map = vec![(FdSlot(3), self.lock.as_ref().unwrap())];
+            if let Some(lease) = &self.lease {
+                map.push((FdSlot(4), lease));
+            }
+            let child = spawn_with_fds(cmd, &map).expect("supervisor starts");
             self.lock = None;
+            self.lease = None;
             child
         }
         #[cfg(windows)]
@@ -187,6 +208,11 @@ impl Run {
     /// Whether a stranger can take the attempt lock now.
     pub fn lock_is_free(&self) -> bool {
         matches!(probe(&Resource::new("attempt", &self.lock_path)), Ok(Probe::Free))
+    }
+
+    /// Whether a stranger can take the cwd lease now.
+    pub fn lease_is_free(&self) -> bool {
+        matches!(probe(&Resource::new("dispatch-cwd", &self.lease_path)), Ok(Probe::Free))
     }
 
     /// `internal adopt` on this run's directory, as the host runs it: the one JSON line.

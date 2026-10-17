@@ -69,6 +69,8 @@ fn a_supervisor_killed_midway_leaves_the_agent_running_and_adopt_settles_from_ga
 
     assert!(!run.path("gate-exit.json").exists(), "the agent is still running");
     assert!(!run.path("agent.done").exists());
+    #[cfg(windows)]
+    assert!(run.lock_is_free(), "the lock died with the supervisor: only the live domain keeps the attempt");
     let running = run.adopt(&["--probe-only"]);
     assert_eq!(running["state"], "running", "a live domain is never adopted: {running}");
 
@@ -197,4 +199,70 @@ fn an_unbound_attempt_of_another_boot_is_not_starting() {
     fs::write(&run.envelope, serde_json::to_vec(&value).unwrap()).unwrap();
     let line = run.adopt(&["--probe-only"]);
     assert_eq!(line["state"], "needs-adopt", "{line}");
+}
+
+#[test]
+fn a_mutating_attempt_frees_the_cwd_lease_when_the_gate_is_gone_not_after_the_steps() {
+    let (name, dir) = ("lease", dir_of("lease"));
+    let mut opts = Opts::agent(&["work", "300", &arg_path(name, "agent.up"), &arg_path(name, "agent.done")]);
+    opts.mutating = true;
+    // The step outlives the gate and is ended at its timeout, so it never gets a receipt.
+    opts.steps = vec![step(&dir, "settle-attempt", &["step-sleep", &arg_path(name, "step.pid")], 4_000)];
+    let mut run = Run::new(name, &opts);
+    let supervisor = run.start();
+    wait_until(Duration::from_secs(30), "the gate to publish gate-exit", || run.path("gate-exit.json").exists());
+    wait_until(Duration::from_secs(3), "the cwd lease to be free", || run.lease_is_free());
+    assert!(!run.path("steps/settle-attempt.json").exists(), "the step is still running when the lease is already free");
+    let (code, line) = finish(supervisor, LIMIT);
+    assert_eq!(code, 0, "{}", run.log());
+    assert_eq!(line["result"], "open", "{line}");
+}
+
+#[test]
+fn a_supervisor_killed_during_a_mutating_attempt_keeps_the_cwd_lease_guarded_while_the_agent_lives() {
+    let name = "lease-crash";
+    let mut opts = Opts::agent(&["work", "3000", &arg_path(name, "agent.up"), &arg_path(name, "agent.done")]);
+    opts.mutating = true;
+    let mut run = Run::new(name, &opts);
+    let mut supervisor = run.start();
+    wait_until(Duration::from_secs(30), "the agent binding", || run.path("agent-binding.json").exists());
+    supervisor.kill().expect("kill the supervisor");
+    let _ = supervisor.wait();
+    // Unix: the gate still holds the lease description. Windows: the lease is free but names the live domain,
+    // so the next holder of the lease has to wait for it exactly like the next holder of the attempt lock.
+    #[cfg(unix)]
+    assert!(!run.lease_is_free(), "the gate keeps the lease");
+    #[cfg(windows)]
+    {
+        let record = run.json("cwd.lease.predecessor.json").expect("the lease names the live domain");
+        assert_eq!(record["domainKind"], "windows-job");
+    }
+    wait_until(Duration::from_secs(60), "the gate to end the attempt", || run.path("gate-exit.json").exists());
+    wait_until(Duration::from_secs(10), "the lease to be free once the gate is gone", || run.lease_is_free());
+}
+
+#[cfg(windows)]
+#[test]
+fn a_mutating_windows_envelope_without_a_lease_file_is_refused() {
+    let mut opts = Opts::agent(&["say", ""]);
+    opts.mutating = true;
+    let mut run = Run::new("no-lease-file", &opts);
+    let mut value: serde_json::Value = serde_json::from_str(&fs::read_to_string(&run.envelope).unwrap()).unwrap();
+    value.as_object_mut().unwrap().remove("cwdLeaseFile");
+    value["digest"] = json!(fgos_run_supervisor::envelope::digest(&value).unwrap());
+    fs::write(&run.envelope, serde_json::to_vec(&value).unwrap()).unwrap();
+    let (code, line) = finish(run.start(), LIMIT);
+    assert_eq!(code, 65, "{}", run.log());
+    assert_eq!(line["code"], "envelope-invalid");
+    assert!(!run.path("supervisor-binding.json").exists());
+}
+
+#[test]
+fn an_agent_that_ends_at_once_still_gets_its_binding_and_a_receipt() {
+    let opts = Opts::agent(&["say", ""]);
+    let mut run = Run::new("instant", &opts);
+    let (code, line) = finish(run.start(), LIMIT);
+    assert_eq!(code, 0, "{}", run.log());
+    assert_eq!(line["outcome"], "exited", "{line}");
+    assert!(run.json("agent-binding.json").is_some(), "the AGENT frame is read even when the gate leaves within a tick");
 }
