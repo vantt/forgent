@@ -54,8 +54,8 @@ The three fixes were rechecked by cargo test (457), cross-check and CI run 39039
 
 ## Gate procedure for the owner (Section B)
 Machine: the Windows 10.0.26200 machine of probe runs 1-3.
-1. Get the artifact `windows-predecessor-stress` from run `39039207227` (or any later dispatch of `holder-lock-cross-platform.yml` on the integration head):
-   `gh run download 39039207227 -n windows-predecessor-stress -D stress-artifact`.
+1. Get the artifact `windows-predecessor-stress` from run `39044432620` (integration head `6cf430051`, after the follow-up fixes of the P05b report; runs `39044415238` and `39044423657` are the other two green dispatches; the older run `39039207227` predates them):
+   `gh run download 39044432620 -n windows-predecessor-stress -D stress-artifact`.
    It holds `windows_predecessor_stress.exe`, `fgos.exe`, `README.txt`.
 2. PowerShell, in that folder, about 15 minutes:
    ```

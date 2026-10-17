@@ -1,6 +1,6 @@
 # Windows driver follow-up: hot-lock judge and spawn handle list
 
-Status: DONE_WITH_CONCERNS (Windows CI result pending, see end). Branch `win-driver/p05b-hotlock-judge-handle-list`, merged `--no-ff` into `win-driver/integration`.
+Status: DONE_WITH_CONCERNS (Windows CI green on 6cf430051; concerns at the end). Branch `win-driver/p05b-hotlock-judge-handle-list`, merged `--no-ff` into `win-driver/integration`.
 
 ## Step 1: main into integration
 Merged main (`c2cadb082`, state hot-lock, `186c257a5`). Conflicts in `CHANGELOG.md`, `docs/specs/distribution.md`, `docs/specs/reading-map.md`: kept both sides (Windows wording from integration plus the `lock-record-unreadable` check and `hot-lock.mjs` entry from main). Re-ran holder-lock, state and setup lock tests there: 156 tests, 140 pass, 0 fail, 16 skipped (Windows-only).
@@ -43,11 +43,22 @@ Second round (head 26976c74b: stress green 3/3, crates red 4/4):
 - Windows hot-lock now spawns the host once per process (self start time) and on contention; cost accepted, cache bounds it.
 - Docs: holder-lock spec sections 8.1, 10, 15, 17, `CHANGELOG.md`, reading-map.
 
-## Unresolved questions
-- Windows CI run ids and the stress artifact: see below once the runs finish.
 
 ## Third round (head 20126c08d: stress green 3/3, windows_spawn green, `a_stale_record_with_a_reused_holder_pid_is_empty_at_once` red 4/4)
 Cause not proven (no Windows run here). Reading: with `declaredAt = 0` every parentless process of the runner is a candidate and each poll re-opens a handle per process, so the 500 ms window plus the two quiet polls the fallback needs can pass the test's 2 s. Change: the window is a one-shot `OrphanWindow` (opens at the first poll that finds the job gone, closed for good after 200 ms, never reopens; teardown after kill-on-close is milliseconds), candidates stay bounded by `declaredAt`, candidates are only waited for. Pure test `the_orphan_window_opens_once_and_never_reopens`. If the stale-record test is still red, the next step is to read its poll count and timing from a Windows run, not to widen it.
 
 ## Fourth round (head 606f9202e: stress green 3/3, stale-record test red at repeat 20 instead of 0)
 Each repeat of the stale-record test now cost about 0.6 s (a window plus a handle per process of the runner), so one slow repeat passed 2 s. Principled change instead of a shorter window: the orphan clause is skipped when the holder's pid already belongs to a newer process. A pid is not reused within the milliseconds a closing job needs to tear down, so a reused holder pid means the holder died a while ago and nothing is tearing down on its behalf; the real race (holder absent, job just gone) keeps the clause. Pure test `a_reused_holder_pid_means_nothing_is_tearing_down`. Timing assumption stated plainly: the 200 ms window is an assumption; a member whose teardown outlasts it and that no other source names could still slip. The owner's 500-repeat gate is the test for it.
+
+## Final Windows CI (integration head 6cf430051)
+- Push run 39044412682: crates (windows, macos) green.
+- Stress-artifact dispatches 39044415238, 39044423657, 39044432620: crates and stress-artifact green in all three (150 rounds, no Held, no violation). Artifact for the owner's gate: `windows-predecessor-stress` from run 39044432620.
+- Earlier reds on the way, all explained above: 39041782155 (round 5 Held), 39042084746 on a24d58e48 (violation, predates this phase), crates reds on 26976c74b, 20126c08d and 606f9202e (stale-record test).
+
+## Concerns
+- The 200 ms orphan window is a timing assumption: a member whose teardown outlasts it and that no other source names could still slip. The owner's 500-repeat gate is the test.
+- The round-5 `Held` failure was never reproduced and has no proven cause; the stress test now prints the trace if it recurs.
+- `skill-wrappers` test (instruction-audit wrapper missing) fails on the integration tip independent of this phase.
+
+## Unresolved questions
+- None blocking; the 500-repeat owner gate is still to run.
