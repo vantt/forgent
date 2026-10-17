@@ -138,6 +138,7 @@ import { probeIdentity } from '../util/session-identity.mjs';
 import { listAssignmentRuns, scanAssignmentLayout, projectRunEligibility } from '../runner/dispatch/assignment-layout.mjs';
 import { conventionCheck } from '../convention/convention-client.mjs';
 import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, checkLockFences, fixLockFences, checkLockPredecessorKillWait, checkStateRoot, fixLockDirs } from './holder-lock-checks.mjs';
+import { checkLockRecordUnreadable } from './lock-record-checks.mjs';
 import { DEFAULT_KILL_WAIT_MS } from '../holder-lock/protocol.mjs';
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 export { claudeCodeHookWired } from './claude-code-hooks.mjs';
@@ -2286,6 +2287,11 @@ registerCheck({
   id: 'lock-fences',
   description: 'every legacy lock path carries its cutover fence, so an older fgOS binary fails loudly instead of holding the old lock',
   check: (cwd) => checkLockFences(cwd),
+});
+registerCheck({
+  id: 'lock-record-unreadable',
+  description: 'the state and porting-events hot records parse and their holder can be judged; otherwise fgos lock fence names the way out',
+  check: (cwd) => checkLockRecordUnreadable(cwd),
 });
 registerCheck({
   id: 'lock-predecessor-kill-wait',

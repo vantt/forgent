@@ -38,13 +38,14 @@ export const CUTOVER_RELEASE = '4.2';
 export const CUTOVER_OWNERS = ['4.2', '4.3', '4.4'];
 
 /**
- * The repo locks of the main checkout cutover, by registry name. The state
- * store locks (`state`, `porting-events`) carry the same owner but stay on
- * their old files until the event store decision, so they are not fenced here.
+ * The repo locks of the main checkout cutover, by registry name: the main
+ * door (`main-checkout`, `merge-slot`) and the two hot mutexes of the state
+ * store (`state` replaces `events.lock` and `runtime/claims.lock`,
+ * `porting-events` replaces `porting/events.lock`).
  */
 const MAIN_DOOR_RELEASE = '4.3';
 /** The repo locks of the main checkout cutover; `worktree-admin` is new and has no old path to fence. */
-export const MAIN_DOOR_LOCKS = ['main-checkout', 'merge-slot', 'worktree-admin'];
+export const MAIN_DOOR_LOCKS = ['main-checkout', 'merge-slot', 'state', 'porting-events', 'worktree-admin'];
 const MAIN_DOOR_FENCED = new Set(MAIN_DOOR_LOCKS);
 
 /** Whether a registry row is a lock a cutover moved onto a kernel lock. */
@@ -182,6 +183,7 @@ const STATE_ROOT_PREFIX = '<stateRoot>/';
 function v1PathsOf(lock, context) {
   const enumerate = ENUMERATED_V1_PATHS[lock.name];
   if (enumerate) return enumerate(context);
+  if (Array.isArray(lock.v1Path)) return lock.v1Path.flatMap((v1Path) => v1PathsOf({ ...lock, v1Path }, context));
   if (typeof lock.v1Path === 'string' && lock.v1Path.startsWith(STATE_ROOT_PREFIX) && !lock.v1Path.slice(STATE_ROOT_PREFIX.length).includes('<')) {
     return [path.join(context.stateRoot(), ...lock.v1Path.slice(STATE_ROOT_PREFIX.length).split('/'))];
   }
