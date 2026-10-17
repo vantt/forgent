@@ -8,3 +8,6 @@ fgos-process = { path = "../../process/rust" }
 fgos-holder-lock = { path = "../../holder-lock/rust" }
 serde = { workspace = true }
 serde_json = { workspace = true }
+
+[target.'cfg(unix)'.dependencies]
+libc = { workspace = true }
