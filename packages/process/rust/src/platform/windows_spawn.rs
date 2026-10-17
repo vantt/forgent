@@ -309,7 +309,9 @@ pub fn spawn(spec: SpawnSpec) -> io::Result<Spawned> {
         Some(env) => env,
         None => std::env::vars_os().collect(),
     };
-    let program = resolve_program(&spec.program, path_of(&env).as_deref())?;
+    // A child environment without PATH still finds a bare program name, as it did under std.
+    let search = path_of(&env).or_else(|| std::env::var_os("PATH"));
+    let program = resolve_program(&spec.program, search.as_deref())?;
     let mut line = command_line(&spec.program, &spec.args);
     let application = wide(program.as_os_str()).into_iter().chain(std::iter::once(0)).collect::<Vec<u16>>();
     let block = environment_block(&env);

@@ -132,16 +132,17 @@ const liveReadings = new Map();
  * one, the host's process facts on Windows. A live reading is reused for a
  * moment, since a waiter judges the same holder every few milliseconds; the
  * existence check still runs every time, so a holder that dies is seen at
- * once and a reused pid is only ever taken for the holder (never the other
- * way round), which keeps the judge closed. */
-export function hotObserver(fgosDir, { platform = process.platform } = {}) {
+ * once. A cached reading can outlive a holder whose pid was reused, so it may
+ * only ever be used to keep a record (`alive`), never to reclaim one: the
+ * reclaim judges with `cache: false`. */
+export function hotObserver(fgosDir, { platform = process.platform, cache = true } = {}) {
   if (platform !== 'win32') return (pid) => observeProcess(pid);
   return (pid) => {
     if (!pidExists(pid)) {
       liveReadings.delete(pid);
       return { kind: 'absent' };
     }
-    const cached = liveReadings.get(pid);
+    const cached = cache ? liveReadings.get(pid) : undefined;
     const now = Date.now();
     if (cached && now - cached.at < HOST_OBSERVE_TTL_MS) return cached.seen;
     const seen = observeViaHost(pid, { fgosDir });
@@ -239,7 +240,7 @@ export function reclaimDeadHolder(fgosDir, resource, observed) {
   try {
     const again = readHotRecord(record);
     if (again.state !== 'ok' || again.raw !== observed.raw) return 'changed';
-    if (judgeHotRecord(again.record, fgosDir) !== 'dead') return 'changed';
+    if (judgeHotRecord(again.record, fgosDir, { cache: false }) !== 'dead') return 'changed';
     return unlinkRecordIfUnchanged(record, observed.raw) ? 'cleaned' : 'changed';
   } finally {
     attempt.handle.release();

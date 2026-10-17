@@ -97,9 +97,20 @@ fn start_keeper(helper: &HelperExe, job: &str, record: &std::path::Path) -> io::
 /// process outside the job, before assignment. It inherits the handles of its
 /// three streams and nothing else the holder owns.
 fn start_child(handle: &Handle, spec: &BorrowSpec, job: &str, program: &str, args: &[String]) -> io::Result<Spawned> {
-    let mut env: std::collections::BTreeMap<OsString, OsString> = if spec.clear_env { Default::default() } else { std::env::vars_os().collect() };
-    env.extend(spec.env.iter().map(|(name, value)| (OsString::from(name), OsString::from(value))));
-    env.insert(OsString::from(LOCK_JOB_ENV), OsString::from(format!("{}:{job}", handle.name())));
+    // Names compare without case, as Windows reads them: a caller's `PATH` replaces the parent's `Path`.
+    let mut env: std::collections::BTreeMap<String, (OsString, OsString)> = std::collections::BTreeMap::new();
+    let mut set = |name: OsString, value: OsString| {
+        env.insert(name.to_string_lossy().to_uppercase(), (name, value));
+    };
+    if !spec.clear_env {
+        for (name, value) in std::env::vars_os() {
+            set(name, value);
+        }
+    }
+    for (name, value) in &spec.env {
+        set(OsString::from(name), OsString::from(value));
+    }
+    set(OsString::from(LOCK_JOB_ENV), OsString::from(format!("{}:{job}", handle.name())));
     let open = |path: &std::path::Path| std::fs::OpenOptions::new().create(true).append(true).open(path);
     let (stdin, stdout, stderr) = match &spec.stdio {
         BorrowStdio::Inherit => (ChildStdio::Inherit, ChildStdio::Inherit, ChildStdio::Inherit),
@@ -110,7 +121,7 @@ fn start_child(handle: &Handle, spec: &BorrowSpec, job: &str, program: &str, arg
         program: OsString::from(program),
         args: args.iter().map(OsString::from).collect(),
         cwd: spec.cwd.clone(),
-        env: Some(env.into_iter().collect()),
+        env: Some(env.into_values().collect()),
         creation_flags: CREATE_SUSPENDED | CREATE_NO_WINDOW,
         stdin,
         stdout,

@@ -79,3 +79,15 @@ test('the process-observe route of a host refuses a missing pid argument', { ski
   assert.equal(out.status, 2);
   assert.equal(JSON.parse(out.stdout).code, 'usage');
 });
+
+test('a cached live reading is never used to reclaim: the reclaim judge reads afresh', { skip: NEEDS_HOST }, async () => {
+  const child = liveChild();
+  const record = { v: 1, pid: child.pid, startTime: observeViaHost(child.pid, { fgosDir }).startTime };
+  const warm = hotObserver(fgosDir, WIN);
+  warm(child.pid);
+  // Another start time with the pid still alive: the cached reading says the recorded one is a reused pid.
+  const stale = { ...record, startTime: `${record.startTime}1` };
+  assert.equal(judgeHotRecord(stale, fgosDir, { ...WIN, cache: false }), 'dead');
+  child.kill('SIGKILL');
+  await exited(child);
+});
