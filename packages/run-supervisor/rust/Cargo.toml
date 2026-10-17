@@ -5,6 +5,8 @@ edition.workspace = true
 
 [dependencies]
 fgos-process = { path = "../../process/rust" }
+fgos-holder-lock = { path = "../../holder-lock/rust" }
+fgos-agent-protocol = { path = "../../agent-protocol/rust" }
 serde_json = { workspace = true }
 sha2 = { workspace = true }
 

@@ -103,6 +103,7 @@ dependencies = [
  "fgos-observe",
  "fgos-process",
  "fgos-run-result",
+ "fgos-run-supervisor",
  "fgos-session-identity",
  "fgos-work-state",
  "libc",
@@ -209,6 +210,8 @@ dependencies = [
 name = "fgos-run-supervisor"
 version = "0.2.0"
 dependencies = [
+ "fgos-agent-protocol",
+ "fgos-holder-lock",
  "fgos-process",
  "libc",
  "serde_json",
