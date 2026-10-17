@@ -34,3 +34,5 @@ Lệnh: `cargo test -p fgos`; `env -u CLAUDE_CODE_SESSION_ID -u CODEX_THREAD_ID 
 ## Tiêu chí nghiệm thu / rollback
 
 Bốn test xanh; số đo latency trong báo cáo. Rollback: revert (chưa caller production).
+
+Điều chỉnh 2026-10-18 (sau khi hot-lock 4.3-S land trên main): client Node chạy `spawnSync fgos internal terminal-control` không được gọi khi đang giữ state hot lock (`src/state/hot-lock.mjs` ném `exec-under-hot-lock` khi sinh subprocess dưới lock). Mọi chỗ P05/P06 gọi client phải đứng ngoài đoạn giữ hot lock; route Rust nhận `stateRoot` từ `fgos_terminal_control::store::default_state_root()` (cùng cửa `fgos_holder_lock::state_root`).

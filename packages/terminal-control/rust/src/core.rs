@@ -1,1 +1,641 @@
 //! Core rules: grouping, anchoring, closing only what was allocated.
+//!
+//! Rules (design 7.4): panes of one group share a tab; a group's first pane is
+//! the pane a new tab opens with (no empty root pane); the core closes only a
+//! pane it allocated, by key, and never a tab; a driver failure is `Unknown`,
+//! never gone or closed; labels are written, never read back to decide.
+
+use crate::driver::{
+    CloseOutcome, CreatedPane, Direction, PaneLiveness, TabGeometry, TerminalDriver,
+};
+use crate::identity;
+use crate::policy::{GroupPane, Limits, PlaceInput, PlaceRequest, Placement, PlacementPolicy};
+use crate::port::*;
+use crate::record::*;
+use crate::store::{self, Store};
+use std::path::PathBuf;
+use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
+
+/// Split share kept by the anchor when the driver cannot measure geometry.
+const FALLBACK_SPLIT_RATIO: f64 = 0.3;
+const IDENTIFY_POLL: Duration = Duration::from_millis(50);
+
+#[derive(Debug, Clone)]
+pub struct CoreConfig {
+    pub state_root: PathBuf,
+    pub limits: Limits,
+    /// A slot that was never launched into and holds a bare shell this long
+    /// after allocation is reported by the reconcile scan.
+    pub allocation_grace_ms: u64,
+    /// How long `launch` waits to see the launched root process.
+    pub launch_identify_timeout_ms: u64,
+}
+
+pub struct Core<'a> {
+    driver: &'a dyn TerminalDriver,
+    policy: &'a dyn PlacementPolicy,
+    config: CoreConfig,
+    now_ms: Box<dyn Fn() -> u64 + 'a>,
+}
+
+fn wall_clock_ms() -> u64 {
+    SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_millis() as u64).unwrap_or(0)
+}
+
+fn unknown(reason: impl Into<String>) -> Refusal {
+    Refusal::Unknown { reason: reason.into() }
+}
+
+fn store_err(e: std::io::Error) -> Refusal {
+    unknown(format!("allocation store: {e}"))
+}
+
+fn shell_quote(s: &str) -> String {
+    format!("'{}'", s.replace('\'', "'\\''"))
+}
+
+/// A group pane that is alive right now, with its record.
+struct LivePane {
+    record: AllocationRecord,
+}
+
+impl<'a> Core<'a> {
+    pub fn new(driver: &'a dyn TerminalDriver, policy: &'a dyn PlacementPolicy, config: CoreConfig) -> Self {
+        Core { driver, policy, config, now_ms: Box::new(wall_clock_ms) }
+    }
+
+    /// Use another clock (epoch ms) for record times and expiry decisions.
+    pub fn with_clock(mut self, now_ms: impl Fn() -> u64 + 'a) -> Self {
+        self.now_ms = Box::new(now_ms);
+        self
+    }
+
+    fn now(&self) -> u64 {
+        (self.now_ms)()
+    }
+
+    fn need(&self, capability: &str) -> Result<(), Refusal> {
+        if self.driver.capabilities().contains(&capability) {
+            Ok(())
+        } else {
+            Err(Refusal::Unsupported {
+                capability: capability.to_string(),
+                detail: format!("driver {} does not declare {capability}", self.driver.name()),
+            })
+        }
+    }
+
+    fn has(&self, capability: &str) -> bool {
+        self.driver.capabilities().contains(&capability)
+    }
+
+    /// The store of the live server incarnation, and that incarnation.
+    fn open(&self) -> Result<(Store, ServerIncarnation), Refusal> {
+        self.need("server.incarnation")?;
+        let incarnation = self.driver.server_incarnation()?;
+        let store = Store::open(&self.config.state_root, self.driver.name(), &incarnation).map_err(store_err)?;
+        Ok((store, incarnation))
+    }
+
+    fn check_key(key: &str) -> Result<(), Refusal> {
+        if store::valid_key(key) {
+            Ok(())
+        } else {
+            Err(unknown(format!("invalid key `{key}`")))
+        }
+    }
+
+    fn record_of(&self, store: &Store, key: &str) -> Result<AllocationRecord, Refusal> {
+        Self::check_key(key)?;
+        match store.read_record(key).map_err(store_err)? {
+            Some(record) => Ok(record),
+            None => Err(unknown(self.missing_record_reason(key))),
+        }
+    }
+
+    /// A record only a previous server incarnation holds is invalid for every
+    /// operation; say so instead of calling it missing.
+    fn missing_record_reason(&self, key: &str) -> String {
+        let root = &self.config.state_root;
+        let stale = store::incarnation_ids(root, self.driver.name()).into_iter().any(|id| {
+            Store::existing(root, self.driver.name(), &id).is_some_and(|s| s.read_record(key).ok().flatten().is_some())
+        });
+        if stale {
+            format!("record for `{key}` belongs to a previous server incarnation")
+        } else {
+            format!("no allocation record for `{key}`")
+        }
+    }
+
+    fn live_record(&self, store: &Store, key: &str) -> Result<AllocationRecord, Refusal> {
+        let record = self.record_of(store, key)?;
+        if store.has_marker(key, MarkerKind::Released) {
+            return Err(unknown(format!("slot `{key}` was released")));
+        }
+        match self.driver.pane_liveness(&record.pane_id)? {
+            PaneLiveness::Live => Ok(record),
+            PaneLiveness::Gone => Err(unknown(format!("pane {} of `{key}` is gone", record.pane_id))),
+        }
+    }
+
+    // ---- allocate / attach -------------------------------------------------
+
+    pub fn allocate(&self, request: &AllocateRequest) -> Result<Allocation, Refusal> {
+        Self::check_key(&request.key)?;
+        Self::check_key(&request.group_key)?;
+        let (store, incarnation) = self.open()?;
+
+        if let Some(record) = store.read_record(&request.key).map_err(store_err)? {
+            return match self.driver.pane_liveness(&record.pane_id)? {
+                PaneLiveness::Live => Ok(Allocation {
+                    slot: Slot { tab_id: record.tab_id, pane_id: record.pane_id },
+                    origin: record.origin,
+                }),
+                PaneLiveness::Gone => Err(unknown(format!("pane of `{}` is gone", request.key))),
+            };
+        }
+
+        let created = self.place(&store, &incarnation, request)?;
+        let record = AllocationRecord {
+            v: VERSION,
+            key: request.key.clone(),
+            group_key: request.group_key.clone(),
+            driver: self.driver.name().to_string(),
+            server_incarnation: incarnation.clone(),
+            tab_id: created.tab_id.clone(),
+            pane_id: created.pane_id.clone(),
+            allocated_at: self.now(),
+            display: request.display.clone(),
+            origin: Origin::Allocated,
+        };
+        if !store.publish_record(&record).map_err(store_err)? {
+            // A concurrent allocate of the same key published first; the pane
+            // just created has no record and nothing launched in it.
+            let _ = self.close_unrecorded(&created.pane_id, &incarnation);
+            return self.allocate(request);
+        }
+        let hint = GroupHint {
+            v: VERSION,
+            group_key: request.group_key.clone(),
+            tab_id: created.tab_id.clone(),
+            updated_at: self.now(),
+        };
+        store.write_hint(&hint).map_err(store_err)?;
+        Ok(Allocation {
+            slot: Slot { tab_id: created.tab_id, pane_id: created.pane_id },
+            origin: Origin::Allocated,
+        })
+    }
+
+    pub fn attach(&self, key: &str, pane: &str, display: Option<Display>) -> Result<Allocation, Refusal> {
+        Self::check_key(key)?;
+        let (store, incarnation) = self.open()?;
+        if let Some(record) = store.read_record(key).map_err(store_err)? {
+            if record.pane_id == pane {
+                return Ok(Allocation { slot: Slot { tab_id: record.tab_id, pane_id: record.pane_id }, origin: record.origin });
+            }
+            return Err(unknown(format!("`{key}` already names pane {}", record.pane_id)));
+        }
+        self.need("layout.geometry")?;
+        if self.driver.pane_liveness(pane)? != PaneLiveness::Live {
+            return Err(unknown(format!("pane {pane} is not live")));
+        }
+        let tab_id = self.driver.layout_geometry(pane)?.tab_id;
+        let record = AllocationRecord {
+            v: VERSION,
+            key: key.to_string(),
+            group_key: key.to_string(),
+            driver: self.driver.name().to_string(),
+            server_incarnation: incarnation,
+            tab_id: tab_id.clone(),
+            pane_id: pane.to_string(),
+            allocated_at: self.now(),
+            display: display.unwrap_or_default(),
+            origin: Origin::Attached,
+        };
+        if !store.publish_record(&record).map_err(store_err)? {
+            return self.attach(key, pane, None);
+        }
+        Ok(Allocation { slot: Slot { tab_id, pane_id: pane.to_string() }, origin: Origin::Attached })
+    }
+
+    /// Live panes of a group, oldest first: records of the group that were not
+    /// released and whose pane the driver reports live.
+    fn live_group(&self, store: &Store, group_key: &str) -> Result<Vec<LivePane>, Refusal> {
+        let mut records = Vec::new();
+        for key in store.record_keys().map_err(store_err)? {
+            let Some(record) = store.read_record(&key).map_err(store_err)? else { continue };
+            if record.group_key != group_key || store.has_marker(&key, MarkerKind::Released) {
+                continue;
+            }
+            records.push(record);
+        }
+        records.sort_by(|a, b| (a.allocated_at, &a.key).cmp(&(b.allocated_at, &b.key)));
+        let mut live = Vec::new();
+        for record in records {
+            if self.driver.pane_liveness(&record.pane_id)? == PaneLiveness::Live {
+                live.push(LivePane { record });
+            }
+        }
+        Ok(live)
+    }
+
+    fn place(&self, store: &Store, incarnation: &ServerIncarnation, request: &AllocateRequest) -> Result<CreatedPane, Refusal> {
+        let group = self.live_group(store, &request.group_key)?;
+        if group.is_empty() {
+            return self.new_tab(&request.display.label);
+        }
+        if self.has("layout.geometry") {
+            self.place_measured(incarnation, request, &group)
+        } else {
+            self.place_by_count(request, &group)
+        }
+    }
+
+    /// First pane of a group's tab: the slot is the tab's own first pane.
+    fn new_tab(&self, label: &str) -> Result<CreatedPane, Refusal> {
+        self.need("tab.create")?;
+        self.driver.tab_create(label, None)
+    }
+
+    fn split(&self, anchor: &str, direction: Direction, ratio: f64, label: &str) -> Result<CreatedPane, Refusal> {
+        self.need("pane.split")?;
+        match self.driver.pane_split(anchor, direction, ratio, None) {
+            Ok(pane) => Ok(pane),
+            // An anchor that died between the liveness check and the split:
+            // the group continues in a new tab with the same label.
+            Err(refusal) => match self.driver.pane_liveness(anchor) {
+                Ok(PaneLiveness::Gone) => self.new_tab(label),
+                _ => Err(refusal),
+            },
+        }
+    }
+
+    fn place_measured(&self, incarnation: &ServerIncarnation, request: &AllocateRequest, group: &[LivePane]) -> Result<CreatedPane, Refusal> {
+        let mut tabs: Vec<TabGeometry> = Vec::new();
+        let mut group_panes = Vec::new();
+        for live in group {
+            let geometry = self.driver.layout_geometry(&live.record.pane_id)?;
+            if !tabs.iter().any(|t| t.tab_id == geometry.tab_id) {
+                tabs.push(geometry.clone());
+            }
+            if let Some(p) = geometry.panes.iter().find(|p| p.pane_id == live.record.pane_id) {
+                group_panes.push(GroupPane {
+                    key: live.record.key.clone(),
+                    tab_id: geometry.tab_id.clone(),
+                    pane_id: p.pane_id.clone(),
+                    rect: p.rect,
+                    role_hint: None,
+                });
+            }
+        }
+        let input = PlaceInput {
+            group_key: request.group_key.clone(),
+            tabs,
+            group_panes,
+            request: PlaceRequest { label: request.display.label.clone(), role_hint: request.role_hint.clone() },
+            limits: self.config.limits,
+        };
+        match self.policy.place(&input) {
+            Placement::NewTab {} => self.new_tab(&request.display.label),
+            Placement::Unsupported { reason } => Err(Refusal::Unsupported {
+                capability: format!("placement.{}", self.policy.name()),
+                detail: reason,
+            }),
+            Placement::Split { anchor_key, direction, ratio } => {
+                let anchor = group
+                    .iter()
+                    .find(|l| l.record.key == anchor_key)
+                    .ok_or_else(|| unknown(format!("policy chose unknown anchor `{anchor_key}`")))?;
+                let created = self.split(&anchor.record.pane_id, direction, ratio, &request.display.label)?;
+                self.keep_if_roomy(created, incarnation, &request.display.label)
+            }
+        }
+    }
+
+    /// Measure the pane a split just made; below the minimum, close that
+    /// empty pane (nothing launched in it) and open a new tab instead.
+    fn keep_if_roomy(&self, created: CreatedPane, incarnation: &ServerIncarnation, label: &str) -> Result<CreatedPane, Refusal> {
+        let Ok(geometry) = self.driver.layout_geometry(&created.pane_id) else {
+            return Ok(created);
+        };
+        let Some(pane) = geometry.panes.iter().find(|p| p.pane_id == created.pane_id) else {
+            return Ok(created);
+        };
+        let (cols, rows) = pane.pty.map(|s| (s.cols, s.rows)).unwrap_or((pane.rect.width, pane.rect.height));
+        let limits = &self.config.limits;
+        if cols >= limits.min_cols && rows >= limits.min_rows {
+            return Ok(created);
+        }
+        // If the empty pane cannot be closed, keep it as the slot: a recorded
+        // pane below the minimum is better than an orphan nobody tracks.
+        if self.close_unrecorded(&created.pane_id, incarnation).is_err() {
+            return Ok(created);
+        }
+        self.new_tab(label)
+    }
+
+    /// Without geometry: split the newest live group pane down at 0.3, and
+    /// open a new tab once its tab holds `maxPanesPerTab` panes.
+    fn place_by_count(&self, request: &AllocateRequest, group: &[LivePane]) -> Result<CreatedPane, Refusal> {
+        let newest = group.last().expect("group is not empty");
+        let in_tab = group.iter().filter(|l| l.record.tab_id == newest.record.tab_id).count();
+        if in_tab >= self.config.limits.max_panes_per_tab as usize {
+            return self.new_tab(&request.display.label);
+        }
+        self.split(&newest.record.pane_id, Direction::Down, FALLBACK_SPLIT_RATIO, &request.display.label)
+    }
+
+    /// Close a pane the core itself just created and never recorded.
+    fn close_unrecorded(&self, pane: &str, incarnation: &ServerIncarnation) -> Result<(), Refusal> {
+        self.need("pane.close")?;
+        self.driver.pane_close(pane, incarnation).map(|_| ())
+    }
+
+    // ---- launch ------------------------------------------------------------
+
+    pub fn launch(&self, key: &str, spec: &LaunchSpec) -> Result<LaunchOutcome, Refusal> {
+        let (store, _) = self.open()?;
+        let record = self.live_record(&store, key)?;
+        if record.origin == Origin::Attached {
+            return Err(unknown(format!("`{key}` is an attached pane; the core never launches into it")));
+        }
+        match &spec.activity {
+            Some(_) => self.need("activity.state")?,
+            None => self.need("pane.run")?,
+        }
+        self.need("process.info")?;
+        let line = launch_line(spec)?;
+
+        let requested = LaunchRequestedMarker { v: VERSION, key: key.to_string(), at: self.now() };
+        if !store.publish_marker(key, MarkerKind::LaunchRequested, &requested).map_err(store_err)? {
+            return Ok(LaunchOutcome::NotStarted { reason: "launch was already requested for this slot".into() });
+        }
+        // The marker is on disk: from here on the slot is kept, whatever happens.
+        match &spec.activity {
+            Some(activity) => self.driver.activity_start(
+                &record.pane_id,
+                key,
+                &activity.kind,
+                &activity.args,
+                self.config.launch_identify_timeout_ms,
+            )?,
+            None => self.driver.pane_run(&record.pane_id, &line)?,
+        }
+
+        let Some(identity) = self.identify_root(&record.pane_id, spec) else {
+            return Ok(LaunchOutcome::NotStarted { reason: "launched root process was not identified in time".into() });
+        };
+        let launched = LaunchedMarker { v: VERSION, key: key.to_string(), at: self.now(), identity: identity.clone() };
+        store.publish_marker(key, MarkerKind::Launched, &launched).map_err(store_err)?;
+        Ok(LaunchOutcome::Launched(identity))
+    }
+
+    fn identify_root(&self, pane: &str, spec: &LaunchSpec) -> Option<ProcessIdentity> {
+        let deadline = Instant::now() + Duration::from_millis(self.config.launch_identify_timeout_ms);
+        loop {
+            if let Ok(info) = self.driver.process_info(pane) {
+                let root = if spec.activity.is_some() {
+                    identity::first_non_shell(&info)
+                } else {
+                    identity::match_launched(&info, &spec.command, &spec.args)
+                };
+                if let Some(identity) = root.and_then(|p| identity::identity_of(p.pid, info.foreground_pgid)) {
+                    return Some(identity);
+                }
+            }
+            if Instant::now() >= deadline {
+                return None;
+            }
+            std::thread::sleep(IDENTIFY_POLL);
+        }
+    }
+
+    // ---- send / read / inspect / label -------------------------------------
+
+    pub fn send(&self, key: &str, text: Option<&str>, keys: Option<&[String]>, submit: bool) -> Result<(), Refusal> {
+        let (store, _) = self.open()?;
+        match (text, keys) {
+            (Some(text), None) => {
+                self.need("send.text")?;
+                let record = self.live_record(&store, key)?;
+                self.driver.send_text(&record.pane_id, text, submit)
+            }
+            (None, Some(keys)) => {
+                self.need("send.keys")?;
+                let record = self.live_record(&store, key)?;
+                self.driver.send_keys(&record.pane_id, keys)
+            }
+            _ => Err(unknown("send takes exactly one of text or keys")),
+        }
+    }
+
+    pub fn read(&self, key: &str, lines: Option<u32>, source: Option<&str>) -> Result<String, Refusal> {
+        self.need("read.screen")?;
+        let (store, _) = self.open()?;
+        let record = self.live_record(&store, key)?;
+        self.driver.read_screen(&record.pane_id, lines, source)
+    }
+
+    pub fn inspect(&self, key: &str) -> Inspection {
+        let unknown_pane = || Inspection { pane: PaneState::Unknown, foreground: None, activity: None };
+        let Ok((store, _)) = self.open() else { return unknown_pane() };
+        let Ok(record) = self.record_of(&store, key) else { return unknown_pane() };
+        let pane = match self.driver.pane_liveness(&record.pane_id) {
+            Ok(PaneLiveness::Live) => PaneState::Live,
+            Ok(PaneLiveness::Gone) => PaneState::Gone,
+            Err(_) => PaneState::Unknown,
+        };
+        if pane != PaneState::Live {
+            return Inspection { pane, foreground: None, activity: None };
+        }
+        let foreground = if self.has("process.info") { self.foreground_identity(&record.pane_id) } else { None };
+        let activity = if self.has("activity.state") { self.driver.activity(&record.pane_id).ok() } else { None };
+        Inspection { pane, foreground, activity }
+    }
+
+    fn foreground_identity(&self, pane: &str) -> Option<ProcessIdentity> {
+        let info = self.driver.process_info(pane).ok()?;
+        let root = identity::first_non_shell(&info)?;
+        identity::identity_of(root.pid, info.foreground_pgid)
+    }
+
+    /// Write display data to the terminal. The record is never edited.
+    pub fn label(&self, key: &str, display: &Display) -> Result<(), Refusal> {
+        self.need("label")?;
+        let (store, _) = self.open()?;
+        let record = self.live_record(&store, key)?;
+        self.driver.label_pane(&record.pane_id, &display.label)
+    }
+
+    pub fn capabilities(&self) -> CapabilitiesReport {
+        CapabilitiesReport {
+            driver: self.driver.name().to_string(),
+            capabilities: self.driver.capabilities().into_iter().map(String::from).collect(),
+            server_incarnation: self.driver.server_incarnation().ok(),
+        }
+    }
+
+    // ---- release -----------------------------------------------------------
+
+    pub fn release(&self, key: &str, disposition: Disposition, until: Option<u64>) -> Result<ReleaseOutcome, Refusal> {
+        let (store, incarnation) = self.open()?;
+        let record = match self.record_of(&store, key) {
+            Ok(record) => record,
+            Err(Refusal::Unknown { reason }) => return Ok(ReleaseOutcome::KeptUnknown { reason }),
+            Err(other) => return Err(other),
+        };
+        if let Some(done) = store.read_marker::<ReleasedMarker>(key, MarkerKind::Released).map_err(store_err)? {
+            if done.disposition == Disposition::Retain && disposition == Disposition::Close && record.origin == Origin::Allocated {
+                return Ok(ReleaseOutcome::KeptUnknown {
+                    reason: "already retained; the pane closes when its retain expires".into(),
+                });
+            }
+            return Ok(ReleaseOutcome::Released { disposition: done.disposition });
+        }
+        let marker = |outcome, until| ReleasedMarker {
+            v: VERSION,
+            key: key.to_string(),
+            at: self.now(),
+            disposition,
+            until,
+            outcome,
+        };
+        let outcome = match (record.origin, disposition) {
+            // An attached pane is never closed by the core.
+            (Origin::Attached, _) => ReleaseMarkerOutcome::Unlinked,
+            (Origin::Allocated, Disposition::Retain) => ReleaseMarkerOutcome::Retained,
+            (Origin::Allocated, Disposition::Close) => {
+                self.need("pane.close")?;
+                match self.driver.pane_close(&record.pane_id, &incarnation) {
+                    Ok(CloseOutcome::Closed | CloseOutcome::AlreadyGone) => ReleaseMarkerOutcome::Closed,
+                    Err(Refusal::Unknown { reason }) => return Ok(ReleaseOutcome::KeptUnknown { reason }),
+                    Err(other) => return Err(other),
+                }
+            }
+        };
+        let until = if disposition == Disposition::Retain { until } else { None };
+        store.publish_marker(key, MarkerKind::Released, &marker(outcome, until)).map_err(store_err)?;
+        Ok(ReleaseOutcome::Released { disposition })
+    }
+
+    // ---- reconcile scan ----------------------------------------------------
+
+    /// Report what needs attention. Closes nothing because time passed, except
+    /// a retained pane past its `until` on the same incarnation with no foreign
+    /// foreground process.
+    pub fn reconcile_scan(&self, older_than_ms: u64) -> Result<Vec<Finding>, Refusal> {
+        let (store, incarnation) = self.open()?;
+        let mut findings = Vec::new();
+        let current = incarnation.id();
+        for id in store::incarnation_ids(&self.config.state_root, self.driver.name()) {
+            if id != current {
+                self.scan_stale(&id, &mut findings);
+            }
+        }
+        for key in store.record_keys().map_err(store_err)? {
+            let Ok(Some(record)) = store.read_record(&key) else {
+                findings.push(Finding { key, kind: FindingKind::Unknown, detail: "record unreadable; kept".into() });
+                continue;
+            };
+            self.scan_record(&store, &incarnation, &record, older_than_ms, &mut findings);
+        }
+        Ok(findings)
+    }
+
+    fn scan_stale(&self, id: &str, findings: &mut Vec<Finding>) {
+        let Some(old) = Store::existing(&self.config.state_root, self.driver.name(), id) else { return };
+        for key in old.record_keys().unwrap_or_default() {
+            if !old.has_marker(&key, MarkerKind::Released) {
+                findings.push(Finding {
+                    key,
+                    kind: FindingKind::StaleIncarnation,
+                    detail: format!("record of server incarnation {id}; invalid for every operation"),
+                });
+            }
+        }
+    }
+
+    fn scan_record(&self, store: &Store, incarnation: &ServerIncarnation, record: &AllocationRecord, older_than_ms: u64, findings: &mut Vec<Finding>) {
+        let key = &record.key;
+        let note = |kind, detail: &str| Finding { key: key.clone(), kind, detail: detail.to_string() };
+        let released = store.read_marker::<ReleasedMarker>(key, MarkerKind::Released).ok().flatten();
+        if released.as_ref().is_some_and(|m| m.disposition == Disposition::Close || m.outcome == ReleaseMarkerOutcome::Unlinked) {
+            return;
+        }
+        let liveness = self.driver.pane_liveness(&record.pane_id);
+        match liveness {
+            Ok(PaneLiveness::Gone) => return,
+            Err(_) => return findings.push(note(FindingKind::Unknown, "pane liveness unreadable; kept")),
+            Ok(PaneLiveness::Live) => {}
+        }
+        let info = if self.has("process.info") { self.driver.process_info(&record.pane_id).ok() } else { None };
+
+        if let Some(marker) = released {
+            // Retained: closable only past `until`, same incarnation (store is
+            // this incarnation's), and no foreign foreground process.
+            let Some(until) = marker.until else { return };
+            if self.now() <= until {
+                return;
+            }
+            let launched = store.read_marker::<LaunchedMarker>(key, MarkerKind::Launched).ok().flatten();
+            let foreign = match (&info, &launched) {
+                (None, _) => true,
+                (Some(info), launched) => info.foreground.iter().any(|p| {
+                    p.pid != info.shell_pid && launched.as_ref().is_none_or(|l| l.identity.pid != p.pid)
+                }),
+            };
+            if foreign {
+                return findings.push(note(FindingKind::Unknown, "retain expired but the foreground is not provably the launched process; kept"));
+            }
+            let detail = match self.close_unrecorded(&record.pane_id, incarnation) {
+                Ok(()) => "retain expired; pane closed",
+                Err(_) => "retain expired; close not proven, kept",
+            };
+            return findings.push(note(FindingKind::RetainExpired, detail));
+        }
+
+        if store.has_marker(key, MarkerKind::LaunchRequested) {
+            if !store.has_marker(key, MarkerKind::Launched) {
+                findings.push(note(FindingKind::Unknown, "launch-requested without launched; kept"));
+            }
+            return;
+        }
+        let age = self.now().saturating_sub(record.allocated_at);
+        if record.origin == Origin::Allocated
+            && age >= older_than_ms.max(self.config.allocation_grace_ms)
+            && info.as_ref().is_some_and(identity::is_bare_shell)
+        {
+            findings.push(note(
+                FindingKind::AllocatedNotLaunchedBareShell,
+                "allocated, never launched into, bare shell past the allocation grace; not closed",
+            ));
+        }
+    }
+}
+
+/// The shell line a launch types into the pane: change directory, set the
+/// environment, `exec` the command so the pane's root process is the command.
+fn launch_line(spec: &LaunchSpec) -> Result<String, Refusal> {
+    let mut line = format!("cd {} && exec", shell_quote(&spec.cwd));
+    if !spec.env.is_empty() {
+        line.push_str(" env");
+        for (name, value) in &spec.env {
+            let mut chars = name.chars();
+            let ok = chars.next().is_some_and(|c| c.is_ascii_alphabetic() || c == '_')
+                && chars.all(|c| c.is_ascii_alphanumeric() || c == '_');
+            if !ok {
+                return Err(unknown(format!("invalid environment variable name `{name}`")));
+            }
+            line.push_str(&format!(" {name}={}", shell_quote(value)));
+        }
+    }
+    line.push(' ');
+    line.push_str(&shell_quote(&spec.command));
+    for arg in &spec.args {
+        line.push(' ');
+        line.push_str(&shell_quote(arg));
+    }
+    Ok(line)
+}
+

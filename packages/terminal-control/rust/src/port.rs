@@ -64,3 +64,112 @@ pub enum Refusal {
     /// Driver timeout, unreadable output, incarnation mismatch, missing record.
     Unknown { reason: String },
 }
+
+/// Where a slot came from; the core only ever closes `Allocated` ones.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Origin {
+    Allocated,
+    Attached,
+}
+
+/// A slot handed out by `allocate` or `attach`.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Allocation {
+    pub slot: Slot,
+    pub origin: Origin,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AllocateRequest {
+    pub key: String,
+    pub group_key: String,
+    pub display: Display,
+    /// Structured data for the placement policy only.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub role_hint: Option<String>,
+}
+
+/// Start through the driver's agent support instead of a plain `pane.run`.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ActivitySpec {
+    pub kind: String,
+    #[serde(default)]
+    pub args: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct LaunchSpec {
+    pub command: String,
+    #[serde(default)]
+    pub args: Vec<String>,
+    pub cwd: String,
+    #[serde(default)]
+    pub env: std::collections::BTreeMap<String, String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub activity: Option<ActivitySpec>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum LaunchOutcome {
+    Launched(ProcessIdentity),
+    /// Nothing was proven to run. The `launch-requested` marker stays, so the
+    /// slot is kept and never launched into again.
+    NotStarted { reason: String },
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Disposition {
+    Close,
+    Retain,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ReleaseOutcome {
+    Released { disposition: Disposition },
+    /// The core could not prove it may close the pane, so it kept it.
+    KeptUnknown { reason: String },
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum PaneState {
+    Live,
+    Gone,
+    Unknown,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Inspection {
+    pub pane: PaneState,
+    pub foreground: Option<ProcessIdentity>,
+    pub activity: Option<crate::driver::Activity>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CapabilitiesReport {
+    pub driver: String,
+    pub capabilities: Vec<String>,
+    pub server_incarnation: Option<ServerIncarnation>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum FindingKind {
+    #[serde(rename = "allocated-not-launched-bare-shell")]
+    AllocatedNotLaunchedBareShell,
+    #[serde(rename = "retain-expired")]
+    RetainExpired,
+    #[serde(rename = "stale-incarnation")]
+    StaleIncarnation,
+    #[serde(rename = "unknown")]
+    Unknown,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Finding {
+    pub key: String,
+    pub kind: FindingKind,
+    pub detail: String,
+}
