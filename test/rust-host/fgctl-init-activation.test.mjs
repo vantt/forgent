@@ -4,7 +4,6 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync, spawn, execFileSync } from 'node:child_process';
-import { DEFAULT_TTL_MS } from '../../src/runner/main-checkout-lock.mjs';
 import { holdLock } from './fgctl-lock-holder.mjs';
 import { useReleaseFixture, releaseDirName, fixture, runFgctl } from './fgctl-init-fixture.mjs';
 
@@ -41,39 +40,6 @@ test('Item 3: Idempotent re-run skips stage_release entirely (does not contend f
     assert.equal(rerunRes.status, 0, `Idempotent re-run must not touch install.lock: ${rerunRes.stderr}`);
   } finally {
     if (holder) await holder.kill();
-    fs.rmSync(tempHome, { recursive: true, force: true });
-    fs.rmSync(tempState, { recursive: true, force: true });
-    fs.rmSync(tempProj, { recursive: true, force: true });
-  }
-});
-
-test('Item 4: Live-PID lock whose ts is older than DEFAULT_TTL_MS is treated as free', () => {
-  const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-l1-home-'));
-  const tempState = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-l1-state-'));
-  const tempProj = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-l1-proj-'));
-
-  try {
-    execFileSync('git', ['init'], { cwd: tempProj });
-    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: tempProj });
-    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: tempProj });
-
-    const fgosDir = path.join(tempProj, '.fgos');
-    fs.mkdirSync(fgosDir, { recursive: true });
-    const lockPath = path.join(fgosDir, 'main-checkout.lock');
-
-    // Write a lock held by current live PID, but with ts older than DEFAULT_TTL_MS (3 mins)
-    const expiredTs = Date.now() - DEFAULT_TTL_MS - 5000;
-    fs.writeFileSync(lockPath, JSON.stringify({ pid: process.pid, ts: expiredTs }));
-
-    // Must be treated as free and succeed!
-    const res = runFgctl(['init', '--from', fixture.releaseDir], {
-      cwd: tempProj,
-      stateHome: tempState,
-      env: { HOME: tempHome },
-    });
-    assert.equal(res.status, 0, `Init must succeed when live PID lock is expired: ${res.stderr}`);
-    assert.ok(fs.existsSync(path.join(tempProj, '.fgos', 'installation', 'activation.json')));
-  } finally {
     fs.rmSync(tempHome, { recursive: true, force: true });
     fs.rmSync(tempState, { recursive: true, force: true });
     fs.rmSync(tempProj, { recursive: true, force: true });

@@ -153,11 +153,11 @@ fn the_main_checkout_probe_sees_a_kernel_holder_and_passes_over_a_tombstone() {
     assert!(check_main_checkout_lock(&ws).is_ok(), "no holder: free");
 
     let mut holder = Holder::spawn(&v3, &ws.join("ready"));
-    assert!(matches!(check_main_checkout_lock(&ws), Err(MainCheckoutLockError::HeldV3)));
+    assert!(matches!(check_main_checkout_lock(&ws), Err(MainCheckoutLockError::Held)));
     holder.kill();
     assert!(check_main_checkout_lock(&ws).is_ok(), "holder gone: free");
 
-    // The v1 path as a directory is the tombstone: the v1 read is skipped.
+    // A tombstone at the old v1 path has no effect on the probe.
     let v1 = ws.join(".fgos").join("main-checkout.lock");
     fs::create_dir_all(&v1).unwrap();
     fs::write(v1.join("TOMBSTONE"), "moved\n").unwrap();
