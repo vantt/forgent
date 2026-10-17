@@ -3,14 +3,16 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync, spawn, spawnSync } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { initStore, addWork, listWork, readRawEvents, EXIT_CODES } from '../../src/state/store.mjs';
-import { acquireRunnerLock, runOnce, EXIT_BUSY, LOCK_FILE } from '../../src/runner/loop.mjs';
+import { acquireRunnerLock, runOnce, EXIT_BUSY } from '../../src/runner/loop.mjs';
+import { probe } from '../../src/holder-lock/index.mjs';
 
 const LOOP_MOD_PATH = fileURLToPath(new URL('../../src/runner/loop.mjs', import.meta.url));
 
-// Inter-process exclusivity for the runner: `.fgos/runner.lock`. Every test
+// Inter-process exclusivity for the runner: the `runner` kernel lock at
+// `.fgos/locks/runner.lock`. Every test
 // builds its own disposable git repo (git init in mkdtemp) with its own
 // `.fgos/` inside it; nothing here touches THIS repo (forgent itself).
 
@@ -47,14 +49,6 @@ function seedItem(dir, overrides = {}) {
     verify: 'test -f output.txt',
     ...overrides,
   });
-}
-
-/** A pid that is guaranteed dead: a node child that already ran to
- * completion (spawnSync only returns after the child exits). */
-function deadPid() {
-  const result = spawnSync(process.execPath, ['-e', ''], { encoding: 'utf8' });
-  assert.equal(result.status, 0);
-  return result.pid;
 }
 
 function fgwBranches(repoRoot) {
@@ -102,140 +96,118 @@ test('a held events.lock halts the drain-run gracefully (lock-timeout exit code,
 test('second overlapping runOnce exits busy: zero store writes, zero worktree ops, holder lock untouched', async () => {
   const { repoRoot, dir, worktreeDir } = setup();
   seedItem(dir);
-  // The "first runner" is simulated by its lock: a live pid (this very test
-  // process) holding runner.lock — exactly what a concurrent run leaves in
-  // place for its whole lifetime.
-  const lockPath = path.join(dir, LOCK_FILE);
-  fs.writeFileSync(lockPath, String(process.pid), { flag: 'wx' });
-  const eventsBefore = readRawEvents(dir).length;
+  // The "first runner" is this test process holding the runner lock for the
+  // whole call — exactly what a concurrent run does for its lifetime.
+  const holder = acquireRunnerLock(dir);
+  assert.equal(holder.acquired, true);
+  try {
+    const eventsBefore = readRawEvents(dir).length;
 
-  const result = await runOnce({ repoRoot, config: { timeoutMs: 5000 }, worktreeDir, log: noLog });
+    const result = await runOnce({ repoRoot, config: { timeoutMs: 5000 }, worktreeDir, log: noLog });
 
-  assert.equal(result.outcome, 'busy');
-  assert.equal(result.exitCode, EXIT_BUSY);
-  assert.equal(result.holderPid, process.pid);
-  // zero store writes: no reap, no claim — the seeded item never moved
-  assert.equal(readRawEvents(dir).length, eventsBefore);
-  assert.equal(listWork(dir).work['item-x'].status, 'todo');
-  // zero worktree ops: no fgw branch, no checkout directory
-  assert.deepEqual(fgwBranches(repoRoot), []);
-  assert.deepEqual(fs.readdirSync(worktreeDir), []);
-  // the live holder's lock survives the busy exit, pid intact
-  assert.equal(fs.readFileSync(lockPath, 'utf8'), String(process.pid));
+    assert.equal(result.outcome, 'busy');
+    assert.equal(result.exitCode, EXIT_BUSY);
+    assert.equal(result.holderPid, process.pid);
+    // zero store writes: no reap, no claim — the seeded item never moved
+    assert.equal(readRawEvents(dir).length, eventsBefore);
+    assert.equal(listWork(dir).work['item-x'].status, 'todo');
+    // zero worktree ops: no fgw branch, no checkout directory
+    assert.deepEqual(fgwBranches(repoRoot), []);
+    assert.deepEqual(fs.readdirSync(worktreeDir), []);
+    // the live holder still holds the lock after the busy exit
+    assert.equal(probe('runner', { fgosDir: dir }).result, 'held');
+  } finally {
+    holder.release();
+  }
 });
 
-test('stale lock (dead pid) is cleaned-and-yielded: first runOnce exits busy having removed it, the next run acquires and proceeds', async () => {
-  const { repoRoot, dir, worktreeDir } = setup();
-  const lockPath = path.join(dir, LOCK_FILE);
-  fs.writeFileSync(lockPath, String(deadPid()), { flag: 'wx' });
+/** Start a separate Node process that takes the runner lock of `dir` and
+ * keeps it until killed; resolves `{ child, exited }` once it holds it. */
+async function spawnRunnerLockHolder(dir) {
+  const readyPath = path.join(dir, `holder-ready-${Date.now()}`);
+  const child = spawn(process.execPath, ['--input-type=module', '-e', `
+    import fs from 'node:fs';
+    import { acquireRunnerLock } from ${JSON.stringify(LOOP_MOD_PATH)};
+    const lock = acquireRunnerLock(${JSON.stringify(dir)});
+    if (!lock.acquired) process.exit(3);
+    fs.writeFileSync(${JSON.stringify(readyPath)}, String(process.pid));
+    setInterval(() => {}, 1000);
+  `], { stdio: 'ignore' });
+  const exited = new Promise((resolve) => child.once('exit', (code, signal) => resolve({ code, signal })));
+  const deadline = Date.now() + 5000;
+  while (!fs.existsSync(readyPath)) {
+    assert.ok(Date.now() < deadline, 'holder process never acquired the runner lock');
+    await new Promise((resolve) => setTimeout(resolve, 10));
+  }
+  return { child, exited };
+}
 
-  const first = await runOnce({ repoRoot, config: { timeoutMs: 5000 }, worktreeDir, log: noLog });
-  assert.equal(first.outcome, 'busy');
-  assert.equal(first.exitCode, EXIT_BUSY);
-  assert.equal(first.reclaimedStale, true);
-  // the stale lock is gone, but this call never acquired on the path it deleted
-  assert.equal(fs.existsSync(lockPath), false);
+test('a runner killed with SIGKILL releases its lock at once: the next runOnce acquires and proceeds', { skip: process.platform === 'win32' && 'SIGKILL is POSIX-only' }, async () => {
+  const { repoRoot, dir, worktreeDir } = setup();
+  const { child, exited } = await spawnRunnerLockHolder(dir);
+
+  const busy = await runOnce({ repoRoot, config: { timeoutMs: 5000 }, worktreeDir, log: noLog });
+  assert.equal(busy.outcome, 'busy');
+  assert.equal(busy.holderPid, child.pid);
+
+  child.kill('SIGKILL');
+  assert.equal((await exited).signal, 'SIGKILL');
 
   // empty frontier: proceeding past the lock means reaching the idle path
-  const second = await runOnce({ repoRoot, config: { timeoutMs: 5000 }, worktreeDir, log: noLog });
-  assert.equal(second.outcome, 'idle');
-  assert.equal(second.exitCode, 0);
-  assert.equal(fs.existsSync(lockPath), false);
-});
-
-test('garbage lock content (no live holder can prove ownership) is treated as stale: cleaned, then next run proceeds', async () => {
-  const { repoRoot, dir, worktreeDir } = setup();
-  const lockPath = path.join(dir, LOCK_FILE);
-  fs.writeFileSync(lockPath, 'not-a-pid\n', { flag: 'wx' });
-
-  const first = await runOnce({ repoRoot, config: { timeoutMs: 5000 }, worktreeDir, log: noLog });
-  assert.equal(first.outcome, 'busy');
-  assert.equal(first.reclaimedStale, true);
-  assert.equal(fs.existsSync(lockPath), false);
-
-  const second = await runOnce({ repoRoot, config: { timeoutMs: 5000 }, worktreeDir, log: noLog });
-  assert.equal(second.outcome, 'idle');
-});
-
-test('reclaim never acquires in the deleting call: two racers over a stale lock both yield, a clean wx create wins afterwards', () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-lock-test-dir-'));
-  const lockPath = path.join(dir, LOCK_FILE);
-  fs.writeFileSync(lockPath, String(deadPid()), { flag: 'wx' });
-
-  // racer 1 sees the stale lock: cleans it, yields, never holds it
-  const first = acquireRunnerLock(dir);
-  assert.equal(first.acquired, false);
-  assert.equal(first.reclaimedStale, true);
-  assert.equal(fs.existsSync(lockPath), false);
-
-  // racer 2 arriving after the clean finds an empty path and acquires via
-  // plain wx — the only way any process ever acquires
-  const second = acquireRunnerLock(dir);
-  assert.equal(second.acquired, true);
-  assert.equal(fs.readFileSync(lockPath, 'utf8'), String(process.pid));
-  second.release();
+  const next = await runOnce({ repoRoot, config: { timeoutMs: 5000 }, worktreeDir, log: noLog });
+  assert.equal(next.outcome, 'idle');
+  assert.equal(next.exitCode, 0);
+  assert.equal(probe('runner', { fgosDir: dir }).result, 'free');
 });
 
 // --- acquire/release primitive --------------------------------------------
 
-// Regression: acquireRunnerLock's own create step used to be
-// `fs.openSync(lockPath, 'wx')` + a separate `fs.writeSync` -- the same
-// TOCTOU already fixed in the two modules that mirror this function's shape
-// (events.mjs tsk-3ld, session.mjs tsk-1u7), never ported back here. Real
-// separate OS processes with a shared start barrier is the reproduction
-// technique those two fixes' own tests use (tsk-1u7, mirroring
-// events.test.mjs's own technique).
-//
-// The winner deliberately HOLDS the lock (sleeps) past every loser's own
-// attempt before releasing -- a loser that reported a dead/stale holder
-// while the real winner is still alive and unreleased is exactly the
-// TOCTOU failure shape (a live holder's lock misread as a crash leftover
-// and reclaimed out from under it). Without this hold, a winner that
-// acquires-then-immediately-exits is legitimately indistinguishable from a
-// crash to a later loser, which is a different (correct) code path, not
-// this bug.
-//
-// Honest caveat (found while writing this test): the actual vulnerable
-// window is the two syscalls between `openSync` and `writeSync` --
-// microseconds -- so even with the hold, this test reproduces the bug on
-// the pre-fix code only some of the time, not on every run (spot-checked
-// manually: failed roughly half of ~15 manual repetitions against the
-// unfixed code, passed consistently across an equal number of repetitions
-// against the fix). It is a real, working regression check, just not a
-// deterministic one -- `node --test`'s own single default run can pass by
-// luck against a reintroduced bug. The fix's correctness does not rest on
-// this test alone: it is the identical, already twice-proven
-// temp-file-then-`fs.linkSync` pattern, which POSIX guarantees never
-// exposes a partially-written target.
-test('concurrent acquireRunnerLock from real separate OS processes: every loser sees a real winner as holder, never a null/corrupted/misattributed one', async () => {
+// Real separate OS processes with a shared start barrier, each holding the
+// lock for a moment when it wins: at no instant do two of them hold it. A
+// winner marks its critical section with an exclusive (`wx`) file; a second
+// winner overlapping it would fail that create. Some racers are SIGKILLed
+// while they hold, which must free the lock for the rest.
+test('concurrent acquireRunnerLock from real separate OS processes: never two holders at once, including holders killed mid-hold', { skip: process.platform === 'win32' && 'SIGKILL is POSIX-only' }, async () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-lock-test-dir-'));
   const outDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-lock-test-out-'));
-  const N = 50;
-  const startAt = Date.now() + 300;
+  const insidePath = path.join(outDir, 'inside');
+  const N = 16;
+  const startAt = Date.now() + 500;
   const childScript = `
     const fs = require('node:fs');
     const { pathToFileURL } = require('node:url');
-    const startAt = Number(process.argv[3]);
-    const outFile = process.argv[4];
-    const waitMs = startAt - Date.now();
-    if (waitMs > 0) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, waitMs);
-    import(pathToFileURL(process.argv[1]).href)
+    const [modPath, dir, startAtArg, outFile, insidePath, dieWhileHolding] = process.argv.slice(1);
+    const sleep = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+    import(pathToFileURL(modPath).href)
       .then((m) => {
-        const result = m.acquireRunnerLock(process.argv[2]);
-        if (result.acquired) {
-          // hold the lock well past every other racer's own attempt window
-          Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 800);
+        const waitMs = Number(startAtArg) - Date.now();
+        if (waitMs > 0) sleep(waitMs);
+        let wins = 0;
+        let violations = 0;
+        for (const deadline = Date.now() + 1500; Date.now() < deadline;) {
+          const result = m.acquireRunnerLock(dir);
+          if (!result.acquired) { sleep(5); continue; }
+          wins += 1;
+          try { fs.writeFileSync(insidePath, String(process.pid), { flag: 'wx' }); } catch { violations += 1; }
+          sleep(10);
+          if (dieWhileHolding === '1') {
+            // leave the critical section, then die still holding the lock
+            fs.unlinkSync(insidePath);
+            process.kill(process.pid, 'SIGKILL');
+          }
+          try { fs.unlinkSync(insidePath); } catch {}
           result.release();
+          sleep(5);
         }
-        fs.writeFileSync(outFile, JSON.stringify({ acquired: result.acquired, holderPid: result.holderPid ?? null, pid: process.pid }));
-        process.exitCode = 0;
+        fs.writeFileSync(outFile, JSON.stringify({ wins, violations }));
       })
       .catch((e) => { fs.writeFileSync(outFile, JSON.stringify({ error: String(e && e.stack || e) })); process.exitCode = 1; });
   `;
   function forkAcquire(i) {
     const outFile = path.join(outDir, `r${i}.json`);
+    const dieWhileHolding = i % 4 === 0 ? '1' : '0';
     return new Promise((resolve, reject) => {
-      const child = spawn(process.execPath, ['-e', childScript, LOOP_MOD_PATH, dir, String(startAt), outFile], {
+      const child = spawn(process.execPath, ['-e', childScript, LOOP_MOD_PATH, dir, String(startAt), outFile, insidePath, dieWhileHolding], {
         stdio: ['ignore', 'ignore', 'pipe'],
       });
       let stderr = '';
@@ -243,61 +215,50 @@ test('concurrent acquireRunnerLock from real separate OS processes: every loser 
         stderr += d;
       });
       child.on('error', reject);
-      child.on('exit', (code) => (code === 0 ? resolve(JSON.parse(fs.readFileSync(outFile, 'utf8'))) : reject(new Error(`child exited ${code}: ${stderr}`))));
+      child.on('exit', (code, signal) => {
+        if (signal === 'SIGKILL' && dieWhileHolding === '1') {
+          resolve({ killed: true });
+          return;
+        }
+        if (code === 0) resolve(JSON.parse(fs.readFileSync(outFile, 'utf8')));
+        else reject(new Error(`child exited ${code ?? signal}: ${stderr}`));
+      });
     });
   }
 
-  const results = await Promise.all(Array.from({ length: N }, (_, i) => forkAcquire(i)));
-  const winners = results.filter((r) => r.acquired === true);
-  assert.ok(winners.length >= 1, `expected at least one winner among ${N} racers, got 0`);
-  // Real system scheduling under 50-way process contention can legitimately
-  // stagger a straggler's actual attempt past an earlier winner's hold --
-  // more than one NON-OVERLAPPING winner is not itself a bug, so this does
-  // not assert winners.length === 1. The precise, timing-independent
-  // invariant: as long as `acquireRunnerLock`'s create step fails EEXIST at
-  // all (i.e. a lock file existed to fail against), the immediate very next
-  // read of it must always resolve to a real, live pid -- `acquireRunnerLock`
-  // returns `holderPid: null` from exactly two places: the final "lost the
-  // wx create twice in a row" fallback, and the ENOENT branch when a read
-  // finds the file already gone. Neither should ever fire here: every
-  // holder in this test stays alive and unreleased for the whole race
-  // window, so a loser can only ever legitimately see EITHER its own
-  // successful create (a winner) OR that live holder's real pid on its very
-  // first read -- never null. Pre-fix, the TOCTOU let a loser's read land in
-  // the create-vs-write gap, see empty/unparseable content, misjudge a live
-  // holder as a dead one, and reclaim it -- producing exactly this null.
-  const losers = results.filter((r) => r.acquired === false);
-  assert.ok(losers.length > 0, 'expected at least one loser to actually contend');
-  for (const loser of losers) {
-    assert.notEqual(
-      loser.holderPid,
-      null,
-      `every loser must see a live holder's real pid, never null (a live lock misread as absent/dead/corrupted) -- got ${JSON.stringify(loser)}`,
-    );
+  try {
+    const results = await Promise.all(Array.from({ length: N }, (_, i) => forkAcquire(i)));
+    const survivors = results.filter((r) => !r.killed);
+    assert.ok(results.length > survivors.length, `at least one holder died holding the lock: ${JSON.stringify(results)}`);
+    assert.equal(survivors.reduce((sum, r) => sum + r.violations, 0), 0, `two holders overlapped: ${JSON.stringify(results)}`);
+    // the lock kept changing hands after the kills: the survivors won too
+    assert.ok(survivors.reduce((sum, r) => sum + r.wins, 0) >= survivors.length, `the lock stopped changing hands: ${JSON.stringify(results)}`);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+    fs.rmSync(outDir, { recursive: true, force: true });
   }
 });
 
-test('acquireRunnerLock: wx create wins once, refuses a live holder, release removes the file', () => {
+test('acquireRunnerLock: wins once, refuses a live holder naming its pid, release frees it', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-lock-test-dir-'));
   const first = acquireRunnerLock(dir);
   assert.equal(first.acquired, true);
-  assert.equal(fs.readFileSync(first.lockPath, 'utf8'), String(process.pid));
+  assert.equal(first.lockPath, path.join(dir, 'locks', 'runner.lock'));
 
   const second = acquireRunnerLock(dir);
   assert.equal(second.acquired, false);
   assert.equal(second.holderPid, process.pid);
 
   first.release();
-  assert.equal(fs.existsSync(first.lockPath), false);
   // released — a new acquire succeeds again
   const third = acquireRunnerLock(dir);
   assert.equal(third.acquired, true);
   third.release();
 });
 
-test('release is idempotent when the lock file is already gone', () => {
+test('release twice is a no-op', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-lock-test-dir-'));
   const lock = acquireRunnerLock(dir);
-  fs.unlinkSync(lock.lockPath);
+  lock.release();
   lock.release(); // must not throw
 });
