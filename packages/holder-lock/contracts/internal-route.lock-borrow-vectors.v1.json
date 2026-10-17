@@ -40,6 +40,10 @@
       "assert": "the lock is free as soon as git has exited and the owner closed its description; no gc process outlives the call"
     }
   ],
+  "platformAssertions": {
+    "posix": "as written in each vector: the lock is free (probe == free) once git exited and the owner closed its description",
+    "windows": "each background command writes its Windows pid (/proc/$!/winpid under Git for Windows' sh). The vector opens its own SYNCHRONIZE handle to that pid and asserts it is signaled when run_borrowed returns, and the lock is free after release. The check never uses the driver's own empty rule and never relies on probe == free alone."
+  },
   "siblingCheck": {
     "name": "sibling-refused",
     "meaning": "a sibling process with the same FGOS_LOCK_FD value that opened the file itself is not a borrower (lock-fd --borrowed-check answers not-borrower)"
