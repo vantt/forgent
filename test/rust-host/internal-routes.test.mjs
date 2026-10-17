@@ -48,10 +48,12 @@ test('internal is neither a route nor in the help manifest', () => {
   const names = JSON.parse(help.stdout).commands.map((c) => c.name);
   assert.ok(names.length > 0);
   assert.ok(!names.includes('internal'), 'help lists internal');
+  assert.ok(!names.includes('terminal-control'), 'help lists terminal-control');
+  assert.equal(ROUTES['terminal-control'], undefined);
 });
 
 test('a protocol other than 1 fails closed with exit 3 and host-version-mismatch', () => {
-  for (const args of [['state-root'], ['state-root', '--protocol', '2'], ['lock-fd', '--try'], ['lock-borrow-vectors', '--protocol', '9']]) {
+  for (const args of [['state-root'], ['state-root', '--protocol', '2'], ['lock-fd', '--try'], ['lock-borrow-vectors', '--protocol', '9'], ['terminal-control', 'capabilities', '--json'], ['terminal-control', 'capabilities', '--protocol', '2', '--json']]) {
     const result = host(args);
     assert.equal(result.status, 3, args.join(' '));
     const parsed = line(result);

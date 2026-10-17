@@ -12,6 +12,7 @@
       "driver": { "enum": ["herdr"], "default": "herdr" },
       "herdrBin": "optional string; resolveHerdrBin() of the caller (FGOS_HERDR_BIN or herdr)",
       "env": "optional object of string; driver environment overrides such as HERDR_SESSION and HERDR_SOCKET_PATH for a confined round's own herdr server",
+      "config": "optional object: minCols, minRows, maxPanesPerTab (integers >= 1), policy (name), allocationGraceMs, launchIdentifyTimeoutMs; absent keys keep the defaults (80x20, 8 panes, measured-split, 60000, 5000)",
       "request": "the operation input of terminal-control.port.v1.json"
     }
   },

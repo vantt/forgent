@@ -104,6 +104,7 @@ dependencies = [
  "fgos-process",
  "fgos-run-result",
  "fgos-session-identity",
+ "fgos-terminal-control",
  "fgos-work-state",
  "libc",
  "serde",

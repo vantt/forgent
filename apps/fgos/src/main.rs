@@ -157,6 +157,12 @@ fn main() {
         if args.get(2).is_some_and(|a| a == "holder-lock-helper") {
             std::process::exit(fgos_holder_lock::helper::main(&args[3..]));
         }
+        // `terminal-control <op>`: the key-addressed terminal port, one
+        // operation per process (see `fgos_terminal_control::route`).
+        if args.get(2).is_some_and(|a| a == "terminal-control") {
+            let rest: Vec<String> = args[3..].iter().map(|a| a.to_string_lossy().into_owned()).collect();
+            std::process::exit(fgos_terminal_control::route::main(&rest));
+        }
         std::process::exit(fgos_holder_lock::route::main(&args[2..]));
     }
 
