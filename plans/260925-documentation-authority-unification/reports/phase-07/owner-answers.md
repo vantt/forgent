@@ -281,3 +281,5 @@ the independent findings without authorizing promotion, cutover or retirement.
 An L11 decision settles only its stated scope. It cannot authorize promotion, alias
 adoption, retirement, deletion, cutover, main landing, push, locked-law change or the
 CTR010 renumbering that remains with the owner.
+
+A45 (owner-decided 2026-10-17 ~11:00, option A of the CTR010 numbering question sent under L11-7): the Gateway REST API `/v1` (`fgos-gateway.v1`) keeps `CTR010`, because it held the number first (2026-08-13) and the number is already in the shipped OpenAPI `x-contract`, `apps/fgos-gateway/src/gateway.rs`, the doc registry, the end-user index and the knowledge article. `confinement-authority.v1` takes the next verified-free number (`CTR011` is unused at the time of the answer) and the platform contract registry gains the missing Gateway REST row. No code or shipped contract changes. Scope: this numbering and the registry row only; the legacy `docs/architecture-map.md` on main is updated at the Phase 9 cutover.
