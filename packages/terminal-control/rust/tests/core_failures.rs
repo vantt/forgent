@@ -206,3 +206,45 @@ fn inspect_of_a_missing_key_or_gone_pane_is_not_live() {
     driver.kill_pane(&slot.pane_id);
     assert_eq!(core.inspect("a").pane, PaneState::Gone);
 }
+
+#[test]
+fn a_command_that_replaced_the_shell_is_identified() {
+    let driver = MemDriver::new(352, 69);
+    let core = core(&driver, &MeasuredSplit, state_dir("exec-replaced-shell"));
+    let slot = core.allocate(&request("a", "g")).unwrap().slot;
+    let mut child = spawn_sleeper();
+    // `exec` keeps the shell's pid: the foreground process is the shell pid itself.
+    driver.set_foreground(
+        &slot.pane_id,
+        child.id(),
+        vec![ForegroundProcess { pid: child.id(), argv: vec!["sleep".into(), "30".into()] }],
+        child.id(),
+    );
+    let out = core.launch("a", &launch_spec()).unwrap();
+    assert!(matches!(out, LaunchOutcome::Launched(ref i) if i.pid == child.id()), "{out:?}");
+    child.kill().unwrap();
+    child.wait().unwrap();
+}
+
+#[test]
+fn close_after_retain_does_not_pretend_to_close() {
+    let driver = MemDriver::new(352, 69);
+    let core = core(&driver, &MeasuredSplit, state_dir("close-after-retain"));
+    core.allocate(&request("a", "g")).unwrap();
+    core.release("a", Disposition::Retain, Some(1)).unwrap();
+    let out = core.release("a", Disposition::Close, None).unwrap();
+    assert!(matches!(out, ReleaseOutcome::KeptUnknown { .. }), "{out:?}");
+    assert!(driver.calls("pane.close").is_empty());
+}
+
+#[test]
+fn the_core_never_launches_into_an_attached_or_released_slot() {
+    let driver = MemDriver::new(352, 69);
+    let core = core(&driver, &MeasuredSplit, state_dir("launch-guards"));
+    let own = core.allocate(&request("own", "g")).unwrap().slot;
+    core.attach("att", &own.pane_id, None).unwrap();
+    assert!(core.launch("att", &launch_spec()).is_err());
+    core.release("own", Disposition::Retain, None).unwrap();
+    assert!(core.launch("own", &launch_spec()).is_err());
+    assert!(driver.calls("pane.run").is_empty());
+}

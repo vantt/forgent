@@ -129,6 +129,9 @@ impl<'a> Core<'a> {
 
     fn live_record(&self, store: &Store, key: &str) -> Result<AllocationRecord, Refusal> {
         let record = self.record_of(store, key)?;
+        if store.has_marker(key, MarkerKind::Released) {
+            return Err(unknown(format!("slot `{key}` was released")));
+        }
         match self.driver.pane_liveness(&record.pane_id)? {
             PaneLiveness::Live => Ok(record),
             PaneLiveness::Gone => Err(unknown(format!("pane {} of `{key}` is gone", record.pane_id))),
@@ -210,7 +213,9 @@ impl<'a> Core<'a> {
             display: display.unwrap_or_default(),
             origin: Origin::Attached,
         };
-        store.publish_record(&record).map_err(store_err)?;
+        if !store.publish_record(&record).map_err(store_err)? {
+            return self.attach(key, pane, None);
+        }
         Ok(Allocation { slot: Slot { tab_id, pane_id: pane.to_string() }, origin: Origin::Attached })
     }
 
@@ -322,7 +327,11 @@ impl<'a> Core<'a> {
         if cols >= limits.min_cols && rows >= limits.min_rows {
             return Ok(created);
         }
-        self.close_unrecorded(&created.pane_id, incarnation)?;
+        // If the empty pane cannot be closed, keep it as the slot: a recorded
+        // pane below the minimum is better than an orphan nobody tracks.
+        if self.close_unrecorded(&created.pane_id, incarnation).is_err() {
+            return Ok(created);
+        }
         self.new_tab(label)
     }
 
@@ -348,6 +357,9 @@ impl<'a> Core<'a> {
     pub fn launch(&self, key: &str, spec: &LaunchSpec) -> Result<LaunchOutcome, Refusal> {
         let (store, _) = self.open()?;
         let record = self.live_record(&store, key)?;
+        if record.origin == Origin::Attached {
+            return Err(unknown(format!("`{key}` is an attached pane; the core never launches into it")));
+        }
         match &spec.activity {
             Some(_) => self.need("activity.state")?,
             None => self.need("pane.run")?,
@@ -474,6 +486,11 @@ impl<'a> Core<'a> {
             Err(other) => return Err(other),
         };
         if let Some(done) = store.read_marker::<ReleasedMarker>(key, MarkerKind::Released).map_err(store_err)? {
+            if done.disposition == Disposition::Retain && disposition == Disposition::Close && record.origin == Origin::Allocated {
+                return Ok(ReleaseOutcome::KeptUnknown {
+                    reason: "already retained; the pane closes when its retain expires".into(),
+                });
+            }
             return Ok(ReleaseOutcome::Released { disposition: done.disposition });
         }
         let marker = |outcome, until| ReleasedMarker {
