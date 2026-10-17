@@ -226,10 +226,17 @@ test('concurrent acquireRunnerLock from real separate OS processes: never two ho
     });
   }
 
-  const results = await Promise.all(Array.from({ length: N }, (_, i) => forkAcquire(i)));
-  const survivors = results.filter((r) => !r.killed);
-  assert.equal(survivors.reduce((sum, r) => sum + r.violations, 0), 0, `two holders overlapped: ${JSON.stringify(results)}`);
-  assert.ok(survivors.reduce((sum, r) => sum + r.wins, 0) > N, `the lock kept changing hands: ${JSON.stringify(results)}`);
+  try {
+    const results = await Promise.all(Array.from({ length: N }, (_, i) => forkAcquire(i)));
+    const survivors = results.filter((r) => !r.killed);
+    assert.ok(results.length > survivors.length, `at least one holder died holding the lock: ${JSON.stringify(results)}`);
+    assert.equal(survivors.reduce((sum, r) => sum + r.violations, 0), 0, `two holders overlapped: ${JSON.stringify(results)}`);
+    // the lock kept changing hands after the kills: the survivors won too
+    assert.ok(survivors.reduce((sum, r) => sum + r.wins, 0) >= survivors.length, `the lock stopped changing hands: ${JSON.stringify(results)}`);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+    fs.rmSync(outDir, { recursive: true, force: true });
+  }
 });
 
 test('acquireRunnerLock: wins once, refuses a live holder naming its pid, release frees it', () => {

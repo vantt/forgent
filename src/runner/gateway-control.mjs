@@ -53,8 +53,7 @@ export class GatewayControlError extends Error {
   }
 }
 
-/** Synchronous backoff — mirrors session.mjs's own sleepSync (no busy
- * spin, no extra dependency). */
+/** Synchronous backoff (no busy spin, no extra dependency). */
 function sleepSync(ms) {
   Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
 }
