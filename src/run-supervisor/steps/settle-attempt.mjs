@@ -11,6 +11,7 @@ import { computeSha256Digest } from '../../runner/dispatch/proof-helpers.mjs';
 import { acquireRunControl, buildRunControlHolder } from '../../runner/dispatch/run-lock.mjs';
 import { resolveWorkerArtifactPath } from '../../runner/dispatch/worker-artifacts.mjs';
 import { collectModelWarnings } from '../../runner/dispatch/provider-adapter.mjs';
+import { strayWriteWarning, watchWritesOutsideWorkspace } from '../../runner/dispatch/stray-writes.mjs';
 import { readSideFile, StepError } from '../step-support.mjs';
 
 const CAPTURE_TAIL_BYTES = 64 * 1024 * 1024;
@@ -103,7 +104,8 @@ export async function settleAttempt({ runDir, envelope }) {
   const control = controlOf(runDir, envelope);
   if (!control) return { result: 'retry', reason: 'run-control-held' };
 
-  const assignment = readJson(path.join(path.dirname(runDir), '..', 'assignment.json')) ?? readJson(path.join(runDir, 'assignment.json'));
+  // The controller's effective assignment (stored fields plus what it backfilled), else the stored one.
+  const assignment = readJson(path.join(runDir, 'assignment.json')) ?? readJson(path.join(path.dirname(runDir), '..', 'assignment.json'));
   const baseline = evaluatorBaseline(runDir, receipt.outcome);
   const outboxClaim = resolveWorkerArtifactPath(runDir, /^result-(\d+)\.json$/, 'agent-result.json');
   const raw = rawResultOf(receipt, fs.existsSync(outboxClaim));
@@ -112,6 +114,10 @@ export async function settleAttempt({ runDir, envelope }) {
   // fallback). Absent for an attempt whose controller died before it wrote it: the settlement then
   // simply has less provenance, never a different outcome.
   const context = readJson(path.join(runDir, 'controller', 'settle-context.json')) ?? {};
+  const strayWarning = context.strayWatch
+    ? strayWriteWarning({ repoRoot: context.strayWatch.repoRoot, strayPaths: watchWritesOutsideWorkspace(context.strayWatch).strayPaths() })
+    : null;
+  const strayWarnings = strayWarning ? [strayWarning] : [];
   const stdoutText = readTail(capture.stdout);
   const stderrText = readTail(capture.stderr);
 
@@ -136,6 +142,7 @@ export async function settleAttempt({ runDir, envelope }) {
       dirtyBefore: baseline?.dirtyBefore ?? [],
       dirtyBeforeSnapshots: baseline?.dirtyBeforeSnapshots ?? null,
       launchCommandId: envelope.attemptId,
+      dispatchWarnings: strayWarnings,
       inputDigests: context.inputDigests,
       resolvedExecutorId: context.resolvedExecutorId,
       effectivePolicy: context.effectivePolicy,

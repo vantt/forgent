@@ -78,7 +78,7 @@ export function moduleSpecifiers(source) {
 // own exact-set assertion further down is the load-bearing proof, this is
 // the human-readable cross-check for it.
 const BANNED_FILES = [
-  'src/runner/dispatch/detached-run-supervisor.mjs', // process-control adapter: child_process.spawn, worker PGID signalling, receipt publication
+  'src/run-supervisor/direct-launch.mjs', // process-control: starts the detached run supervisor and hands it the attempt's locks
   'src/runner/dispatch/herdr-round.mjs', // process-control: prepares/briefs/signals one interactive herdr round
   'src/runner/dispatch/terminal-slot.mjs', // a round's pane through terminal-control: launches, types at and closes live panes
   'src/terminal-control/client.mjs', // terminal-control client: runs the host route that drives herdr
@@ -240,7 +240,6 @@ const EXPECTED_CLOSURE = [
 // they are listed so a new or retargeted dynamic import in the closure is a
 // reviewed change rather than a silent one.
 const EXPECTED_LAZY_EDGES = [
-  'src/runner/dispatch/visibility-session.mjs -> ./assignment-runner.mjs',
   'src/runner/dispatch/visibility-session.mjs -> ./herdr-round.mjs',
 ];
 

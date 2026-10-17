@@ -21,6 +21,7 @@ import { OWN_PAYLOAD_ROOT, realpathOrNull, releasePayloadRoot } from './payload-
 const PROTOCOL = 1;
 const BINDING_WAIT_MS = 30_000;
 const POLL_MS = 25;
+const CLOSE_WAIT_MS = 60_000;
 const STEP_TIMEOUT_MS = 10 * 60 * 1000;
 /** Slack past the soft deadline for SIGTERM, the kill grace and the supervisor's own domain sweep. */
 const HARD_CEILING_SLACK_MS = 15_000;
@@ -283,6 +284,22 @@ export function readSettledResult(runDir, runId) {
 }
 
 /**
+ * The result is written by the first step; the supervisor still runs the steps after it and holds the
+ * attempt lock until it has written `closed.json`. Whoever dispatches next over the same cwd or attempt must
+ * not meet that tail, so the controller waits for it (bounded: a stuck step never holds the caller).
+ */
+async function waitForClosed(runDir, child, { timeoutMs = CLOSE_WAIT_MS } = {}) {
+  const closed = path.join(runDir, 'closed.json');
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    if (fs.existsSync(closed)) return true;
+    if (child.exitCode !== null || child.signalCode !== null) return fs.existsSync(closed);
+    await sleep(POLL_MS);
+  }
+  return false;
+}
+
+/**
  * After the binding: read progress, wait for `result.json`. If the supervisor ends before the result
  * exists, the adopt door finishes whatever it left (the steps), then the result is read again.
  * Returns the frozen run result, or null when nothing settled it.
@@ -294,7 +311,11 @@ export async function awaitSettledResult({ runDir, runId, child, capture, onChun
   for (;;) {
     follow();
     const result = readSettledResult(runDir, runId);
-    if (result) { follow(); return Object.freeze(result); }
+    if (result) {
+      follow();
+      await waitForClosed(runDir, child);
+      return Object.freeze(result);
+    }
     const supervisorGone = child.exitCode !== null || child.signalCode !== null;
     if (supervisorGone || Date.now() >= giveUpAt) {
       if (adopted) return null;

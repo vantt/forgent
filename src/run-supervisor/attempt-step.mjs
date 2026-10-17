@@ -35,6 +35,9 @@ export function verifyPayload(envelope) {
   if (realpathOrNull(PAYLOAD_ROOT) !== named) {
     throw new StepError('payload-missing', 'this step runs from a payload other than the envelope payloadRoot', EXIT_PAYLOAD_MISSING);
   }
+  if (!realpathOrNull(envelope.hostBin)) {
+    throw new StepError('payload-missing', 'the release manifest of hostBin cannot be read: hostBin does not exist', EXIT_PAYLOAD_MISSING);
+  }
   // A host with no release manifest next to it is a development host: the payload that started the
   // controller is the only anchor there is, and the check above already holds the step to it.
   const declared = releasePayloadRoot(envelope.hostBin);

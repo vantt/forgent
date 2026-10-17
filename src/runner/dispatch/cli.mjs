@@ -60,6 +60,9 @@ const REPO_ROOT = fileURLToPath(new URL('../../..', import.meta.url));
 const BIN_FGOS_PATH = resolveFgosBin(REPO_ROOT)?.path ?? fileURLToPath(new URL('../../../bin/fgos.mjs', import.meta.url));
 import { acquireDispatchCwdLock } from './cwd-lock.mjs';
 import { checkoutDirtyPaths } from '../worktree.mjs';
+import { watchWritesOutsideWorkspace, strayWriteWarning } from './stray-writes.mjs';
+
+export { watchWritesOutsideWorkspace, strayWriteWarning };
 
 // Work-driven dispatch (`spawnWorker`, the executor a Work item's step resolves to) lives in
 // the Work layer, src/runner/work-dispatch.mjs; this module takes what that layer resolved.
@@ -127,69 +130,6 @@ export function resolveAgentTypeForTaskSpec(taskSpecHeader, agentDefs = [], curr
  * failure branch as much as the success one, because a failed round ended and
  * has a named answer. Both are inert when there is no `.fgos/` to write into.
  */
-/**
- * Watch for work done outside the workspace the dispatch handed the worker.
- *
- * A round settles when the worker writes its own result file. That establishes
- * the worker DID something; it establishes nothing about WHERE. Measured: agy
- * was given a worktree, reported settled, and had written six files into the
- * main checkout instead -- onto another track's branch.
- *
- * This compares the main checkout's dirty paths before and after. It is
- * EVIDENCE, not proof: the main checkout is a live working tree other sessions
- * write to while a round is in flight (measured 2026-10-14: a Doer's whole
- * round was refused for three reports another session wrote into main). So
- * what it sees is reported as a warning on the result, never a refusal; a
- * refusal needs a write observed and bound to the run, which this is not.
- *
- * Nothing is watched when the worker was given the repo root itself as its
- * workspace -- there is no outside to write to.
- */
-export function watchWritesOutsideWorkspace({ repoRoot, cwd }) {
-  const watching = Boolean(repoRoot) && Boolean(cwd) && path.resolve(cwd) !== path.resolve(repoRoot);
-
-  // The workspace usually lives INSIDE the repo root -- fgOS puts worktrees at
-  // `<repo>/.claude/worktrees/<id>` -- so the root's own status reports the
-  // workspace directory itself as untracked. Everything at or under the
-  // workspace is the worker's to write; only what lies outside it is stray.
-  const insideWorkspace = (relPath) => {
-    const rel = path.relative(path.resolve(cwd), path.resolve(repoRoot, relPath));
-    return rel === '' || (!rel.startsWith('..') && !path.isAbsolute(rel));
-  };
-  const outsideOnly = () => (watching
-    ? checkoutDirtyPaths(repoRoot, repoRoot).filter((entry) => !insideWorkspace(entry))
-    : []);
-
-  const before = new Set(outsideOnly());
-  return {
-    watching,
-    /** Paths outside the workspace that are dirty now and were not before. */
-    strayPaths() {
-      return outsideOnly().filter((entry) => !before.has(entry));
-    },
-  };
-}
-
-/**
- * The warning a round carries when paths outside its workspace became dirty
- * while it ran, or null when none did. Correlated evidence only: it names what
- * appeared and where, and says nothing about who wrote it. Also printed to
- * stderr so a caller reading only the process output sees it.
- */
-export function strayWriteWarning({ repoRoot, strayPaths }) {
-  if (!Array.isArray(strayPaths) || strayPaths.length === 0) return null;
-  process.stderr.write(
-    `fgos: warning: paths outside the worker's workspace became dirty in ${repoRoot} during the round (another session may have written them): ${strayPaths.join(', ')}\n`,
-  );
-  return {
-    code: 'stray-write-correlated',
-    level: 'correlated',
-    basis: ['pre-post-git-snapshot'],
-    repoRoot,
-    paths: strayPaths,
-  };
-}
-
 export function openRunnerRun({ fgosDir, executorId, cwd }) {
   const baseDir = fgosDir || path.join(os.tmpdir(), 'fgos-assignments');
   const assignmentId = `asgn-${executorId || 'run'}-${Date.now()}`;

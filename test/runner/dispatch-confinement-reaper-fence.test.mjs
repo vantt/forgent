@@ -50,7 +50,7 @@ import { finalizeConfinementResources, bindingForPrepared } from '../../src/runn
 import { computeSha256Digest } from '../../src/runner/dispatch/proof-helpers.mjs';
 import { RUN_TIMEOUT_MAX_MS } from '../../src/runner/dispatch/run-timeout.mjs';
 import { herdrEndpointForEnv, socketPathForSession } from '../../src/runner/dispatch/worker-session.mjs';
-import { EXECUTOR_ADAPTERS, bindConfinedHomesToSupervisor } from '../../src/runner/dispatch/transport.mjs';
+import { EXECUTOR_ADAPTERS } from '../../src/runner/dispatch/transport.mjs';
 import { createTerminalControl } from '../../src/terminal-control/client.mjs';
 import { createSessionFake } from '../helpers/fake-herdr-session.mjs';
 import { createFakeHerdr } from '../helpers/fake-herdr-pane.mjs';
@@ -693,12 +693,12 @@ function cliSpawnBinding(dir) {
   }]);
 }
 
-test('S2(9) a pane-less binding (the old cli-spawn supervisor) is kept for doctor, whoever is alive and however old', { skip: process.platform !== 'linux' && 'reads /proc for the start time' }, async () => {
+test('S2(9) a pane-less binding (written by a release before the run supervisor) is kept for doctor, whoever is alive and however old', { skip: process.platform !== 'linux' && 'reads /proc for the start time' }, async () => {
   const w = workspace();
   const supervisor = spawnSupervisorStandIn();
   try {
     const dir = preparedHome(w, { timeoutMs: HOUR, ageMs: 2 * HOUR }); // marker pid: a dead controller
-    assert.equal(bindConfinedHomesToSupervisor(cliSpawnBinding(dir), supervisor), true);
+    cliSpawnBinding(dir).bind({ binderPid: supervisor.pid });
     const marker = readOwnershipMarker(dir);
     assert.equal(marker.binderPid, supervisor.pid);
     assert.ok(marker.binderStartTime, 'the supervisor start time is recorded');
@@ -731,21 +731,6 @@ test('S2(9) a pane-less binding past its old window or on a reused pid is kept a
     assert.equal(exists(reused), true);
     assert.deepEqual(result.reaped, []);
   } finally { supervisor.kill('SIGKILL'); await waitExit(supervisor); w.cleanup(); }
-});
-
-test('S2(9) a cli-spawn bind that cannot be written leaves the run going and the home as prepared', () => {
-  const w = workspace();
-  try {
-    const failing = { bind: () => { throw new Error('no marker'); } };
-    const saved = process.stderr.write;
-    let said = '';
-    process.stderr.write = (s) => { said += s; return true; };
-    try {
-      assert.equal(bindConfinedHomesToSupervisor(failing, { pid: 4242 }), false);
-    } finally { process.stderr.write = saved; }
-    assert.match(said, /confinement-bind-failed/);
-    assert.equal(bindConfinedHomesToSupervisor(null, { pid: 4242 }), false, 'an unconfined run has nothing to bind');
-  } finally { w.cleanup(); }
 });
 
 test('an attempt home (marker version 2) is never judged by the reaper: dead pid, closed pane, any age', () => {

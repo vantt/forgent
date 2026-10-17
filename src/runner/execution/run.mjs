@@ -316,9 +316,15 @@ export async function runUnit(options = {}) {
   // goes through, so it is also where the ones whose pane has since closed are
   // reclaimed. Best effort: a reap problem never blocks the run.
   const cwd = options.cwd ?? process.cwd();
-  const roots = resolveGitRoots(cwd);
-  const mainRoot = options.repoRoot ? path.resolve(options.repoRoot) : roots.mainCheckoutRoot;
-  try { sweepAttempts({ assignmentsRoot: path.join(mainRoot, '.fgos', 'assignments'), tempRoot: resolveConfinementTempRoot() }); } catch { /* best effort */ }
+  // A directory that is no git checkout still gets its homes reclaimed; the run then refuses as before.
+  let roots = null;
+  let rootsFailure = null;
+  try { roots = resolveGitRoots(cwd); } catch (err) { rootsFailure = err; }
+  const mainRoot = options.repoRoot ? path.resolve(options.repoRoot) : roots?.mainCheckoutRoot;
+  try {
+    sweepAttempts({ assignmentsRoot: mainRoot ? path.join(mainRoot, '.fgos', 'assignments') : undefined, tempRoot: resolveConfinementTempRoot() });
+  } catch { /* best effort */ }
+  if (rootsFailure) throw rootsFailure;
   const worktreePath = options.worktree ? path.resolve(options.worktree) : roots.worktreeRoot;
   const workflowLink = normalizeWorkflowLink(options.workflow);
 

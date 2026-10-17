@@ -93,6 +93,7 @@ import {
   writeSettleContext,
 } from '../../run-supervisor/direct-launch.mjs';
 import { adoptRun } from '../../run-supervisor/client.mjs';
+import { watchWritesOutsideWorkspace } from './stray-writes.mjs';
 import { resolveLock } from '../../holder-lock/index.mjs';
 import { reconcileHerdrSpawnRun, isHerdrSpawnRunStillWorking } from './herdr-reconcile.mjs';
 import { prepareConfinementForLaunch } from './confinement/authority.mjs';
@@ -2141,6 +2142,9 @@ export async function executeAssignment(assignment, opts = {}) {
   // behavior (assignment-cwd-mutex-concurrency.test.mjs proves both).
   let attemptLocks = null;
   let attemptSettled = false;
+  // Set once the supervisor owns the attempt: from then on the run control token belongs to its settle
+  // step (side file) and this controller no longer releases it unless it saw the result.
+  let attemptHandedOver = false;
 
   // Opted in with a renewal function: a login close to expiry is renewed once, in a copy fgOS holds, and
   // applied to the account's real store BEFORE the private home is copied from it (so no pane has to
@@ -2188,6 +2192,9 @@ export async function executeAssignment(assignment, opts = {}) {
     // the envelope carries) is resolved before the first lock, and outside any state transaction.
     const attemptHost = supervisedDirect ? resolveAttemptHost() : null;
     const attemptSettings = supervisedDirect ? readLaunchSettings(root) : null;
+    // The main checkout as it is before the agent starts: what is dirty outside the workspace afterwards
+    // and was not before is reported on the result.
+    const strayWatch = supervisedDirect ? watchWritesOutsideWorkspace({ repoRoot: root, cwd: effectiveCwd }) : null;
     const attemptStepEnv = supervisedDirect ? attemptStepEnvOf(fgosDir) : null;
     if (supervisedDirect) {
       attemptLocks = acquireAttemptLocks({
@@ -2449,9 +2456,11 @@ export async function executeAssignment(assignment, opts = {}) {
           ? { cwdLeaseFile: resolveLock('dispatch-cwd', { fgosDir, cwd }).v3Path }
           : {}),
       });
+      publishMutableProjection(path.join(path.resolve(runDir), 'assignment.json'), effectiveAssignment);
       writeSettleContext(path.resolve(runDir), {
         launchCommandId,
         repoRoot: root,
+        strayWatch: { repoRoot: root, cwd: effectiveCwd, before: strayWatch.before },
         resolvedExecutorId,
         effectivePolicy,
         executorRedirected,
@@ -2477,6 +2486,7 @@ export async function executeAssignment(assignment, opts = {}) {
       let supervisor;
       try {
         supervisor = startSupervisor({ envelope: attemptEnvelope, locks: attemptLocks, stepEnv: attemptStepEnv });
+        attemptHandedOver = true;
         bound = await waitForBinding(path.resolve(runDir), supervisor.child);
       } finally {
         attemptLocks.release();
@@ -2511,6 +2521,14 @@ export async function executeAssignment(assignment, opts = {}) {
         ceilingMs: timeoutMs + attemptSettings.gateKillGraceMs + 120_000,
       });
       if (!settledResult) {
+        // A fresher controller took the run control over while the agent ran: the settle step refused to append
+        // (it preserves its work product as result.superseded.json), and this controller says so by name.
+        if (!isRunControlCurrent(runDir, { controlEpoch, controlToken })) {
+          throw new RunnerConfigError(
+            `executeAssignment: control of Run "${runId}" was superseded while its attempt ran -- no settlement was appended`,
+            { code: 'run-control-superseded', phase: 'post-admission' },
+          );
+        }
         throw new RunnerConfigError(
           `executeAssignment: Run "${runId}" has no settled result after its supervisor ended -- the adopt door owns it now`,
           { code: 'run-unreconciled', phase: 'post-admission' },
@@ -2673,6 +2691,6 @@ export async function executeAssignment(assignment, opts = {}) {
     if (providerCapacitySelection?.status === 'selected') {
       releaseSelectedProviderLease(providerCapacitySelection, runId, opts.providerCapacityRuntimeDir);
     }
-    if (!supervisedDirect || attemptSettled) releaseRunControl(runDir, { controlEpoch, controlToken });
+    if (!attemptHandedOver || attemptSettled) releaseRunControl(runDir, { controlEpoch, controlToken });
   }
 }
