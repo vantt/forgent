@@ -81,7 +81,15 @@ fn a_supervisor_killed_midway_leaves_the_agent_running_and_adopt_settles_from_ga
     assert_eq!(fs::read_to_string(run.path("agent.done")).unwrap(), "done", "the agent finished its work");
     assert!(!run.path("receipt.json").exists(), "no supervisor, no receipt: adopt synthesizes it");
 
-    wait_until(Duration::from_secs(30), "the lock and the domain to be free", || run.lock_is_free() && run.adopt(&["--probe-only"])["state"] == "needs-adopt");
+    let start = std::time::Instant::now();
+    loop {
+        let (free, line) = (run.lock_is_free(), run.adopt(&["--probe-only"]));
+        if free && line["state"] == "needs-adopt" {
+            break;
+        }
+        assert!(start.elapsed() < Duration::from_secs(30), "the lock and the domain never became free: lock free {free}, adopt {line}, gate-exit {:?}", run.json("gate-exit.json"));
+        std::thread::sleep(Duration::from_millis(200));
+    }
     let adopted = run.adopt(&[]);
     assert_eq!(adopted["state"], "adopted", "{adopted}");
     assert_eq!(adopted["outcome"], "exited");
@@ -187,6 +195,7 @@ fn an_attempt_whose_supervisor_has_not_bound_yet_is_starting_not_abandoned() {
 
 /// The grace belongs to the starter's boot: an envelope written on another boot
 /// has no starter left, so a lock-free unbound attempt is abandoned at once.
+/// Windows has no boot id; a reboot shows as a `createdAt` later than now.
 #[cfg(windows)]
 #[test]
 fn an_unbound_attempt_of_another_boot_is_not_starting() {
@@ -194,7 +203,7 @@ fn an_unbound_attempt_of_another_boot_is_not_starting() {
     let run = Run::new("starting-other-boot", &opts);
     fs::write(run.path("attempt.lock"), "").unwrap();
     let mut value: serde_json::Value = serde_json::from_str(&fs::read_to_string(&run.envelope).unwrap()).unwrap();
-    value["createdAt"]["bootId"] = json!("another-boot");
+    value["createdAt"]["boottimeNs"] = json!(fgos_run_supervisor::gate::boottime_ns() + 3_600_000_000_000u64);
     value["digest"] = json!(fgos_run_supervisor::envelope::digest(&value).unwrap());
     fs::write(&run.envelope, serde_json::to_vec(&value).unwrap()).unwrap();
     let line = run.adopt(&["--probe-only"]);

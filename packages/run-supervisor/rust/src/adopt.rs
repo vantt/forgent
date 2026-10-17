@@ -245,7 +245,8 @@ pub(crate) fn still_starting(envelope: Option<&Value>, grace: Duration) -> bool 
     if facts::boot_id().is_some_and(|current| current != boot_id) {
         return false;
     }
-    u128::from(crate::gate::boottime_ns().saturating_sub(at)) < grace.as_nanos()
+    // A `createdAt` later than now can only come from before a reboot of a platform with no boot id.
+    crate::gate::boottime_ns().checked_sub(at).is_some_and(|age| u128::from(age) < grace.as_nanos())
 }
 
 /// Cheap check for a scan: the file is JSON with `v` 3. The digest is checked when the attempt is adopted.
@@ -282,6 +283,7 @@ mod tests {
         if facts::boot_id().is_some() {
             assert!(!still_starting(Some(&at("another-boot", now)), grace), "another boot: the starter is gone");
         }
+        assert!(!still_starting(Some(&at(&boot, now + 3_600_000_000_000)), grace), "later than now: the clock restarted");
         assert!(!still_starting(Some(&json!({"v": 3})), grace), "no createdAt, no grace");
         assert!(!still_starting(None, grace));
     }
