@@ -13,4 +13,5 @@ pub mod identity;
 pub mod policy;
 pub mod port;
 pub mod record;
+pub mod route;
 pub mod store;
