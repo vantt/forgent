@@ -141,6 +141,8 @@ export function recoverObserveUseCase(ctx, { runId, intent = DEFAULT_INTENT, now
 // awaited or spawned, so "acquire, compare, act, release" never spans
 // anything slow.
 function withRunLock(repoRoot, runDir, fn) {
+  // Taking the lock creates its directory; never bring back a run that was deleted.
+  if (!fs.existsSync(runDir)) throw new RecoveryError('run-not-found', `run directory ${runDir} is gone`, { runDir });
   const res = acquireSync(createLockScope('recovery'), 'recovery', { runDir, fgosDir: fgosDirFromRoot(repoRoot) });
   if (res.result !== 'acquired') {
     const lockPath = resolveLock('recovery', { runDir }).v3Path;

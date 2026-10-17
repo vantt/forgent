@@ -623,6 +623,32 @@ test('a run directory deleted while a process holds its advance lock gives the n
   }
 });
 
+test('reading status while another process advances never makes the advance see the lock held', async () => {
+  if (process.platform === 'win32') return;
+  const tmp = setupTestRepo();
+  const parked = await startWorkflow({ workflow: validateWorkflow(GATE_WORKFLOW), repoRoot: tmp, cwd: tmp });
+  const id = parked.workflowRunId;
+  const donePath = path.join(tmp, 'status-loop-done');
+  const reader = spawn(process.execPath, ['--input-type=module', '-e', `
+    import fs from 'node:fs';
+    import { statusWorkflow } from ${JSON.stringify(path.resolve('src/workflow/index.mjs'))};
+    const stopAt = Date.now() + 1500;
+    let reads = 0;
+    while (Date.now() < stopAt) { statusWorkflow(${JSON.stringify(id)}, { repoRoot: ${JSON.stringify(tmp)}, cwd: ${JSON.stringify(tmp)} }); reads += 1; }
+    fs.writeFileSync(${JSON.stringify(donePath)}, String(reads));
+  `], { stdio: 'ignore' });
+  const exited = new Promise((resolve) => reader.once('exit', resolve));
+  let tries = 0;
+  while (!fs.existsSync(donePath)) {
+    const res = acquireSync(createLockScope('test-advance'), 'advance', advanceParams(tmp, id));
+    assert.equal(res.result, 'acquired', 'a status read must never hold the advance lock');
+    res.handle.release();
+    tries += 1;
+  }
+  await exited;
+  assert.ok(tries > 10 && Number(fs.readFileSync(donePath, 'utf8')) > 10, 'both loops overlapped');
+});
+
 function writeRunLog(tmp, id, text) {
   fs.writeFileSync(path.join(tmp, '.fgos', 'workflow-runs', id, 'advance.log'), text);
 }
@@ -673,6 +699,7 @@ test('status says a running run has no live advance and names resume once the la
   assert.equal(fresh.status, 'running');
   assert.equal(fresh.advance.running, false);
   assert.equal(fresh.advance.hint, undefined, 'a just-recorded run may still be starting its advance');
+  assert.equal(fs.existsSync(path.join(tmp, '.fgos', 'workflow-runs', id, 'locks')), false, 'status of a run never advanced creates no lock file');
 
   ageRunEvents(tmp, id, 10 * 60 * 1000);
   writeRunLog(tmp, id, 'Error: spawn failed\n');

@@ -803,8 +803,11 @@ function liveAdvanceHolder(mainRoot, workflowRunId) {
   const params = advanceLockParams(mainRoot, workflowRunId);
   // A run whose lock file was never created was never advanced under this lock: nothing to probe.
   if (!fs.existsSync(resolveLock('advance', params).v3Path)) return null;
-  if (probe('advance', params).result === 'free') return null;
-  return { pid: advanceHolderPid(params) };
+  // The kernel's holder list takes no lock, so a status read never makes a concurrent advance see
+  // the lock held; the probe, which does, is only for a platform that cannot list holders.
+  const holders = lockHolders('advance', params);
+  if (holders.kind === 'list') return holders.pids.length > 0 ? { pid: holders.pids[0] } : null;
+  return probe('advance', params).result === 'free' ? null : { pid: null };
 }
 
 function advanceRefusal(workflowRunId, pid) {
@@ -826,6 +829,8 @@ function assertNoLiveAdvance(mainRoot, workflowRunId) {
  */
 function acquireAdvanceLock(mainRoot, workflowRunId) {
   const params = advanceLockParams(mainRoot, workflowRunId);
+  // Taking the lock creates its directory; never bring back a run that was deleted.
+  if (!fs.existsSync(params.workflowRunDir)) throw new RunnerConfigError(`Workflow run "${workflowRunId}" not found`);
   const res = acquireSync(createLockScope('advance'), 'advance', params);
   if (res.result === 'acquired') return () => res.handle.release();
   throw advanceRefusal(workflowRunId, advanceHolderPid(params));
