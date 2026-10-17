@@ -22,7 +22,7 @@ use fgos_process::containment::{ContainmentDriver, GuaranteeLevel, SpawnSpec, St
 use fgos_process::control::{signal_by_identity, Signal};
 use fgos_process::facts::{self, Observed};
 use fgos_process::platform::windows_job::open_job;
-use fgos_process::{domain_is_empty, Domain, DomainState, ProcId};
+use fgos_process::{domain_watch, Domain, DomainState, ProcId};
 
 /// `JOB_OBJECT_QUERY` access right.
 const JOB_OBJECT_QUERY: u32 = 0x0004;
@@ -222,8 +222,10 @@ fn containment_windows_job_close_ends_child_grandchild_and_detached_child() {
     for (name, pid) in &pids {
         wait_dead(*pid, name);
     }
+    // The fallback over the process tree needs quiet rounds, so one watch is polled, not one-shot calls.
+    let mut watch = domain_watch(&record);
     let start = Instant::now();
-    while domain_is_empty(&record) != DomainState::Empty {
+    while watch.is_empty() != DomainState::Empty {
         assert!(start.elapsed() < Duration::from_secs(20), "a closed job's record never judged empty");
         sleep(Duration::from_millis(50));
     }
