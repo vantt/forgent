@@ -132,9 +132,9 @@ pub fn parse_process_info(result: &Value) -> Option<ProcessInfo> {
     Some(ProcessInfo { shell_pid: number(info, "shell_pid")?, foreground_pgid: number(info, "foreground_process_group_id")?, foreground })
 }
 
-/// `pane get`: what herdr's agent detection says about the pane.
+/// `agent get` (or `pane get`): what herdr's agent detection says about the pane.
 pub fn parse_activity(result: &Value) -> Option<Activity> {
-    let pane = result.get("pane")?;
+    let pane = result.get("agent").or_else(|| result.get("pane"))?;
     Some(Activity {
         state: text(pane, "agent_status")?.to_string(),
         agent: text(pane, "agent").map(str::to_string),
@@ -429,7 +429,26 @@ impl TerminalDriver for HerdrDriver {
         for pair in &pairs {
             args.extend(["--env", pair]);
         }
-        let result = self.run(&args)?;
+        let result = match self.call(&args) {
+            Ok(result) => result,
+            // A session that has just started has no workspace to hold a tab:
+            // its first workspace comes with a tab and a root pane, which is
+            // the group's first pane, and the tab takes the group's label.
+            Err(CallError::Herdr(e)) if e.code == "workspace_not_found" => {
+                let mut ws = vec!["workspace", "create", "--label", label, "--no-focus"];
+                if let Some(cwd) = cwd {
+                    ws.extend(["--cwd", cwd]);
+                }
+                for pair in &pairs {
+                    ws.extend(["--env", pair]);
+                }
+                let created = self.run(&ws)?;
+                let pane = parse_tab_created(&created).ok_or_else(|| unknown("herdr workspace create returned no tab_id/pane_id"))?;
+                let _ = self.run(&["tab", "rename", &pane.tab_id, label]);
+                return Ok(pane);
+            }
+            Err(other) => return Err(other.into_refusal()),
+        };
         parse_tab_created(&result).ok_or_else(|| unknown("herdr tab create returned no tab_id/pane_id"))
     }
 
@@ -542,8 +561,10 @@ impl TerminalDriver for HerdrDriver {
 
     fn activity(&self, pane: &str) -> DriverResult<Activity> {
         self.require("activity.state")?;
-        let result = self.run(&["pane", "get", pane])?;
-        parse_activity(&result).ok_or_else(|| unknown("herdr pane get reported no agent_status"))
+        // `agent get` answers only for a pane herdr knows an agent in: for any
+        // other pane it says `agent_not_found`, which is "no activity", not a fault.
+        let result = self.run(&["agent", "get", pane])?;
+        parse_activity(&result).ok_or_else(|| unknown("herdr agent get reported no agent_status"))
     }
 
     fn activity_start(&self, pane: &str, name: &str, kind: &str, args: &[String], timeout_ms: u64) -> DriverResult<()> {

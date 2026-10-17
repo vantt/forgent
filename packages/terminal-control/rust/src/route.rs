@@ -162,6 +162,12 @@ fn herdr_config(envelope: &Value) -> Result<HerdrConfig, String> {
             config.env.push((key.clone(), value.to_string()));
         }
     }
+    // herdr sets `HERDR_SOCKET_PATH` in every pane it creates, so a caller
+    // running inside one reaches the same server the CLI would; the caller's own
+    // `env` still wins.
+    if config.socket_path.is_none() {
+        config.socket_path = std::env::var("HERDR_SOCKET_PATH").ok().filter(|p| !p.is_empty());
+    }
     Ok(config)
 }
 

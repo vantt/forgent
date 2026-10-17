@@ -123,7 +123,7 @@ fn each_capability_runs_the_expected_command() {
         "pane send-keys wS:p59Y Escape Enter",
         "pane read wS:p59Y --lines 40 --source visible",
         "pane process-info --pane wS:p59Y",
-        "pane get wS:p59Y",
+        "agent get wS:p59Y",
         "agent start seat-1 --kind claude --pane wS:p59Y --timeout 30000 -- --model opus",
         "tab rename wS:tF9 fgos lead",
         "pane rename wS:p59Y seat 1",
@@ -173,13 +173,15 @@ fn absent_herdr_declares_nothing_and_every_op_is_unsupported() {
 
 #[test]
 fn a_hung_herdr_command_is_unknown_after_the_timeout() {
-    let mut fake = Fake::new("hang").env("FAKE_HERDR_HANG", "pane get");
-    fake.config.timeout_ms = 400;
-    let d = fake.driver();
-    let started = std::time::Instant::now();
-    assert!(is_unknown(d.activity("wS:p59Y")));
-    assert!(is_unknown(d.pane_liveness("wS:p59Y")), "a hang is never read as gone");
-    assert!(started.elapsed() < std::time::Duration::from_secs(5));
+    for hung in ["agent get", "pane get"] {
+        let mut fake = Fake::new("hang").env("FAKE_HERDR_HANG", hung);
+        fake.config.timeout_ms = 400;
+        let d = fake.driver();
+        let started = std::time::Instant::now();
+        let refused = if hung == "agent get" { is_unknown(d.activity("wS:p59Y")) } else { is_unknown(d.pane_liveness("wS:p59Y")) };
+        assert!(refused, "a hang of `{hung}` is never read as gone or idle");
+        assert!(started.elapsed() < std::time::Duration::from_secs(5));
+    }
 }
 
 #[test]
@@ -383,4 +385,20 @@ mod incarnation {
         assert_eq!(fake.calls().iter().filter(|c| c.starts_with("pane close")).count(), 1, "never closed a second time");
         let _ = std::fs::remove_dir_all(&dir);
     }
+}
+
+#[test]
+fn a_session_without_a_workspace_gets_one_and_its_root_pane_is_the_first_pane() {
+    let fake = Fake::new("no-workspace").env("FAKE_HERDR_NO_WORKSPACE", "1");
+    let created = fake.driver().tab_create("lead-1", Some("/work"), &[]).unwrap();
+    assert_eq!((created.tab_id.as_str(), created.pane_id.as_str()), ("wS:tF9", "wS:p59X"));
+    let calls: Vec<String> = fake.calls().into_iter().skip(2).collect();
+    assert_eq!(
+        calls,
+        [
+            "tab create --label lead-1 --no-focus --cwd /work",
+            "workspace create --label lead-1 --no-focus --cwd /work",
+            "tab rename wS:tF9 lead-1",
+        ]
+    );
 }
