@@ -227,6 +227,7 @@
     "src/report/knowledge-projection.mjs": "domain",
     "src/run-supervisor/attempt-step.mjs": "infra",
     "src/run-supervisor/client.mjs": "infra",
+    "src/run-supervisor/runtime-dir.mjs": "infra",
     "src/run-supervisor/step-support.mjs": "infra",
     "src/run-supervisor/steps/finalize-home.mjs": "infra",
     "src/run-supervisor/steps/settle-attempt.mjs": "infra",
