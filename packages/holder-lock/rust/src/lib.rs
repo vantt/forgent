@@ -7,7 +7,8 @@
 //! declared is empty (`predecessor`), and a borrowing holder returns only
 //! once nothing but itself holds the description. The OS drivers sit in
 //! `driver`; the single state-root resolution in `state_root`; the borrow
-//! vectors in `borrow_vectors`; the host's `fgos internal` routes in
+//! vectors in `borrow_vectors`; the two-process semantics probe in
+//! `semantics`; the host's `fgos internal` routes in
 //! `route`. Contracts, lock registry and shared vectors:
 //! `packages/holder-lock/contracts/`.
 
@@ -16,6 +17,7 @@ pub mod driver;
 pub mod port;
 pub mod predecessor;
 pub mod route;
+pub mod semantics;
 pub mod state_root;
 
 pub use port::{
