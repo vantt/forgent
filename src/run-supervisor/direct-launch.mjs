@@ -22,6 +22,8 @@ const PROTOCOL = 1;
 const BINDING_WAIT_MS = 30_000;
 const POLL_MS = 25;
 const CLOSE_WAIT_MS = 60_000;
+const ADOPT_POLL_MS = 250;
+const ADOPT_WAIT_MS = 60_000;
 const STEP_TIMEOUT_MS = 10 * 60 * 1000;
 /** Slack past the soft deadline for SIGTERM, the kill grace and the supervisor's own domain sweep. */
 const HARD_CEILING_SLACK_MS = 15_000;
@@ -307,7 +309,8 @@ async function waitForClosed(runDir, child, { timeoutMs = CLOSE_WAIT_MS } = {}) 
 export async function awaitSettledResult({ runDir, runId, child, capture, onChunk, ceilingMs }) {
   const follow = captureTail(capture, onChunk);
   const giveUpAt = Date.now() + ceilingMs;
-  let adopted = false;
+  // The gate ends the agent by its hard ceiling, so an attempt that is still alive past ours is stuck.
+  const hardGiveUpAt = giveUpAt + ADOPT_WAIT_MS;
   for (;;) {
     follow();
     const result = readSettledResult(runDir, runId);
@@ -318,10 +321,16 @@ export async function awaitSettledResult({ runDir, runId, child, capture, onChun
     }
     const supervisorGone = child.exitCode !== null || child.signalCode !== null;
     if (supervisorGone || Date.now() >= giveUpAt) {
-      if (adopted) return null;
-      adopted = true;
-      // Nothing of this attempt may still be running for the adopt door to act; it judges that itself.
-      try { adoptRun(runDir); } catch { /* adopt names its own failure; the result read decides */ }
+      // No supervisor left to write the answer: the adopt door judges the attempt and finishes whatever it
+      // left (the steps). An agent that still lives (the gate holds the attempt lock) is waited for here.
+      let judged;
+      try { judged = adoptRun(runDir); } catch { return readSettledResult(runDir, runId); }
+      const waiting = judged.state === 'running' || judged.state === 'being-adopted' || judged.state === 'held' || judged.state === 'needs-adopt';
+      if (!waiting || Date.now() >= hardGiveUpAt) {
+        const last = readSettledResult(runDir, runId);
+        return last ? Object.freeze(last) : null;
+      }
+      await sleep(ADOPT_POLL_MS);
       continue;
     }
     await sleep(POLL_MS);
