@@ -49,6 +49,7 @@ import { RunnerConfigError, assertReasoningEffort } from './config.mjs';
 import { resolveExecutorConfig } from './resolve.mjs';
 import { resolveVerifiedProviderArgs, recordShadowBinderDivergence, renderReasoningEffortArgs, checkLaunchedModel } from './provider-adapter.mjs';
 import { runHerdrRound } from './herdr-round.mjs';
+import { resolveHerdrBin } from './terminal-slot.mjs';
 import { DispatchError } from './dispatch-error.mjs';
 import { startDetachedRunSupervisorProcess } from './detached-run-supervisor.mjs';
 import { resolveWriterIdentity } from '../../util/session-identity.mjs';
@@ -84,9 +85,7 @@ export {
   resolveExecutorEnv,
 };
 
-export function resolveHerdrBin(optsHerdrBin) {
-  return optsHerdrBin?.trim() || process.env.FGOS_HERDR_BIN?.trim() || 'herdr';
-}
+export { resolveHerdrBin };
 
 /**
  * Substitute `{prompt}` and `{model}` into the resolved executor's `args` —

@@ -11,6 +11,11 @@
 import path from 'node:path';
 import { createTerminalControl } from '../../terminal-control/client.mjs';
 
+/** The herdr binary a caller names, else `FGOS_HERDR_BIN`, else `herdr` on PATH. The one place that default lives. */
+export function resolveHerdrBin(optsHerdrBin, env = process.env) {
+  return optsHerdrBin?.trim() || env.FGOS_HERDR_BIN?.trim() || 'herdr';
+}
+
 export class TerminalSlotError extends Error {
   constructor(code, message, details = {}) {
     super(message);

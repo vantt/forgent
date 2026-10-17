@@ -25,7 +25,7 @@ r6 §7.6 (hàng promise theo `groupKey` trong process điều phối), §7.10, �
 ## Test
 
 1. Mỗi op qua binary thật + fake herdr → kết quả đúng contract.
-2. `--protocol 2` → exit 4 `host-version-mismatch`.
+2. `--protocol 2` → exit 3 `host-version-mismatch`.
 3. Hàng theo nhóm: 5 `allocate` + 2 `release(close)` đồng thời cùng nhóm → log fake herdr cho thấy tuần tự, không tách trên pane đang bị đóng.
 4. `fgos help` không có `internal`.
 

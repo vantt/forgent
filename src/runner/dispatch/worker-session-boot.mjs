@@ -20,7 +20,7 @@
 
 import fs from 'node:fs';
 import { spawn } from 'node:child_process';
-import { createRoundTerminalControl } from './terminal-slot.mjs';
+import { createRoundTerminalControl, resolveHerdrBin } from './terminal-slot.mjs';
 import { isolatedSessionEnv, socketPathForSession, assertNotOperatorSession, WorkerSessionError } from './worker-session.mjs';
 
 /** The session every confined worker shares unless an executor names another. */
@@ -52,7 +52,7 @@ function serverAnswers(terminalControl) {
  */
 export async function ensureWorkerSession(sessionName = DEFAULT_WORKER_SESSION, {
   callerEnv = process.env,
-  herdrBin = 'herdr',
+  herdrBin = resolveHerdrBin(undefined, callerEnv),
   spawnFn = spawn,
   existsSync = fs.existsSync,
   // The terminal-control client that asks a session whether it answers.

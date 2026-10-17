@@ -9,7 +9,7 @@ import { DispatchError } from './dispatch-error.mjs';
 import { interpretRunResult } from './run-result.mjs';
 import { getProcessStartTime } from './process-identity.mjs';
 import { normalizeAgentName } from './herdr-agent.mjs';
-import { createRoundTerminalControl, createSlotIo, portKey } from './terminal-slot.mjs';
+import { createRoundTerminalControl, createSlotIo, portKey, resolveHerdrBin } from './terminal-slot.mjs';
 import { envForSession } from './worker-session.mjs';
 import {
   publishImmutableProof,
@@ -178,12 +178,7 @@ export async function isHerdrSpawnRunStillWorking(runDir, { slotIo, herdrBin, en
   const paneId = command?.paneId;
   if (!paneId) return false;
 
-  // Inlined rather than imported from transport.mjs's own
-  // `resolveHerdrBin` -- transport.mjs imports herdr-round.mjs, which
-  // imports THIS file, so importing transport.mjs here would close a real
-  // cycle (herdr-reconcile.mjs -> transport.mjs -> herdr-round.mjs ->
-  // herdr-reconcile.mjs). The expression itself is the same one-liner.
-  const resolvedHerdrBin = (herdrBin && herdrBin.trim()) || (env ?? process.env).FGOS_HERDR_BIN?.trim() || 'herdr';
+  const resolvedHerdrBin = resolveHerdrBin(herdrBin, env ?? process.env);
   // The pane lives in the session it was launched in, which is not necessarily the one this process's
   // own environment names; a record written without a session keeps asking the ambient one.
   let clientEnv = env;

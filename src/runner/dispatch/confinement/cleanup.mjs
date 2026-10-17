@@ -10,7 +10,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { stopProcessesInside } from '../stop-processes-inside.mjs';
 import { envForSession, envForEndpoint } from '../worker-session.mjs';
-import { createRoundTerminalControl } from '../terminal-slot.mjs';
+import { createRoundTerminalControl, resolveHerdrBin } from '../terminal-slot.mjs';
 import { getProcessStartTime } from '../process-identity.mjs';
 import { writeBackRenewedCredential, settleHeldCredentialHome, writeFileAtomic, createCredentialRenewal } from '../provider-credential-renewal.mjs';
 import { RUN_TIMEOUT_MAX_MS } from '../run-timeout.mjs';
@@ -409,7 +409,7 @@ function defaultPaneOpen(paneId, herdrSession, herdrEndpoint, terminalKey) {
     // expiry rule decides.
     const env = envForMarkerPane(herdrSession, herdrEndpoint);
     if (!env || !terminalKey) return null;
-    const seen = createRoundTerminalControl({ herdrBin: process.env.FGOS_HERDR_BIN?.trim() || 'herdr', herdrEnv: env }).inspect({ key: terminalKey });
+    const seen = createRoundTerminalControl({ herdrBin: resolveHerdrBin(), herdrEnv: env }).inspect({ key: terminalKey });
     if (seen.pane === 'live') return true;
     if (seen.pane === 'gone') return false;
     return null;
@@ -424,7 +424,7 @@ function defaultClosePane(paneId, herdrSession, herdrEndpoint, terminalKey) {
   const env = envForMarkerPane(herdrSession, herdrEndpoint);
   if (!env || !terminalKey) return;
   try {
-    createRoundTerminalControl({ herdrBin: process.env.FGOS_HERDR_BIN?.trim() || 'herdr', herdrEnv: env }).release({ key: terminalKey, disposition: 'close' });
+    createRoundTerminalControl({ herdrBin: resolveHerdrBin(), herdrEnv: env }).release({ key: terminalKey, disposition: 'close' });
   } catch { /* best effort */ }
 }
 

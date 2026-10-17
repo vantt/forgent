@@ -138,7 +138,7 @@ The research's 85×20 and "at most 4" are not used; nobody measured them.
 
 ## 10. Internal route only
 
-Node reaches the core through `fgos internal terminal-control <op> --protocol 1 --json`, one process per operation ([contract](../../../packages/terminal-control/contracts/internal-route.terminal-control.v1.json)). There is **no user verb**: adding `fgos terminal` would reverse the standing decision that herdr is display only and would hand an old release in another project a verb it does not know. The caller serializes the operations of one `groupKey` (one promise queue per coordinating process); Terminal Control takes no lock.
+Node reaches the core through `fgos internal terminal-control <op> --protocol 1 --json`, one process per operation ([contract](../../../packages/terminal-control/contracts/internal-route.terminal-control.v1.json)). There is **no user verb**: adding `fgos terminal` would reverse the standing decision that herdr is display only and would hand an old release in another project a verb it does not know. The caller serializes the operations of one `groupKey` (one promise queue per coordinating process); Terminal Control takes no lock. A missing or different `--protocol` exits 3 with code `host-version-mismatch`, like the other internal routes; a usage error exits 2.
 
 Two coordinators with the same `groupKey` (only when set by hand) can create two tabs with the same label. This is harmless: a label is not a key, and every slot still has its own key.
 

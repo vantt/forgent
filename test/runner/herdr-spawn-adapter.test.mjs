@@ -947,17 +947,19 @@ test('an agent that keeps reporting working while its screen is parked on "model
     screen: '• Ran out=/work/outbox\n■ Selected model is at capacity. Please try a different model.\n• Reconnected. No input was resent.\n── ⠋ Working ──',
   });
 
+  // The stall probe settles within a few probe ticks (about 3 s here, measured on a quiet machine); the
+  // round has to be over before the idle ceiling could have ended it, so the bound is the ceiling itself.
+  const idleCeilingMs = 15000;
   const started = Date.now();
   await assert.rejects(
-    // The ceiling is far above the few seconds a probe tick takes, so a loaded machine cannot race it.
-    () => dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing', timeoutMs: 90000, idleTimeoutMs: 80000, transportDeadlines: { stallProbeMs: 300 } }),
+    () => dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing', timeoutMs: idleCeilingMs + 5000, idleTimeoutMs: idleCeilingMs, transportDeadlines: { stallProbeMs: 300 } }),
     (err) => {
       assert.equal(err.outcome, 'provider-limit');
       assert.match(err.screen, /model is at capacity/i);
       return true;
     },
   );
-  assert.ok(Date.now() - started < 45000, 'concluded long before the absolute ceiling');
+  assert.ok(Date.now() - started < idleCeilingMs, 'concluded before the idle ceiling could end the round');
 
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
