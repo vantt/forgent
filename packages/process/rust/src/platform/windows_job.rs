@@ -213,7 +213,7 @@ pub use os::*;
 
 #[cfg(windows)]
 mod os {
-    use std::collections::BTreeMap;
+    use std::collections::{BTreeMap, BTreeSet};
     use std::ffi::c_void;
     use std::io;
     use std::os::windows::io::AsRawHandle;
@@ -604,6 +604,8 @@ mod os {
         /// While the closed job's members may still be tearing down: set at the
         /// first poll that finds no job, so unrelated orphans block only briefly.
         orphan_until: Option<std::time::Instant>,
+        /// Pids named only as orphan candidates; dropped from `tracked` once the window ends.
+        orphan_pids: BTreeSet<u32>,
     }
 
     impl Core {
@@ -670,6 +672,20 @@ mod os {
                 seen.in_scan |= by.in_scan;
                 seen.in_tree |= by.in_tree;
                 seen.in_orphan |= by.in_orphan;
+            }
+            for (pid, by) in &named {
+                if by.in_orphan && !by.in_list && !by.in_scan && !by.in_tree {
+                    self.orphan_pids.insert(*pid);
+                }
+            }
+            // After the window an orphan candidate that no other source ever named stops counting.
+            if self.orphan_until.is_some_and(|until| std::time::Instant::now() >= until) {
+                for pid in std::mem::take(&mut self.orphan_pids) {
+                    let by_other = self.seen.get(&pid).is_some_and(|n| n.in_list || n.in_scan || n.in_tree);
+                    if !by_other {
+                        self.tracked.remove(&pid);
+                    }
+                }
             }
             for pid in named.keys().copied().collect::<Vec<_>>() {
                 if self.tracked.contains_key(&pid) {

@@ -17,7 +17,8 @@ use fgos_holder_lock::predecessor::record_path;
 use fgos_holder_lock::{acquire, probe, release, run_borrowed, Acquire, BorrowError, BorrowSpec, BorrowStdio, HelperExe, Mode, Probe, Resource, Wait};
 use serde_json::Value;
 use windows_support::*;
-use windows_sys::Win32::Foundation::{GetHandleInformation, SetHandleInformation, HANDLE, HANDLE_FLAG_INHERIT};
+use windows_sys::Win32::Foundation::{SetHandleInformation, HANDLE, HANDLE_FLAG_INHERIT};
+use windows_sys::Win32::Storage::FileSystem::{GetFileInformationByHandle, BY_HANDLE_FILE_INFORMATION};
 use std::os::windows::io::AsRawHandle;
 
 const KILL_WAIT_MS: u64 = 2000;
@@ -235,6 +236,20 @@ fn the_borrow_vectors_and_the_sibling_check_are_green_on_windows() {
 
 const PROBE_ROLE: &str = "WB_PROBE_RESULT";
 const PROBE_HANDLE: &str = "WB_PROBE_HANDLE";
+const PROBE_IDENTITY: &str = "WB_PROBE_IDENTITY";
+
+/// Who a handle value names: the volume and file index of the file behind it,
+/// or `None` when the value is not a file handle of this process. A bare
+/// "is this value open" test would be wrong: handle values are per process,
+/// and the child's own handles can carry the same number.
+fn file_identity(handle: HANDLE) -> Option<String> {
+    // SAFETY: a zeroed out-structure for a handle value; a value that is not a file fails.
+    unsafe {
+        let mut info: BY_HANDLE_FILE_INFORMATION = std::mem::zeroed();
+        (GetFileInformationByHandle(handle, &mut info) != 0).then(|| format!("{}:{}:{}", info.dwVolumeSerialNumber, info.nFileIndexHigh, info.nFileIndexLow))
+    }
+}
+
 
 /// The borrowed child's side of the handle test: reports whether the handle
 /// value it was given is open in this process. Does nothing unless a borrow
@@ -243,9 +258,7 @@ const PROBE_HANDLE: &str = "WB_PROBE_HANDLE";
 fn borrowed_child_handle_probe() {
     let Ok(result) = std::env::var(PROBE_ROLE) else { return };
     let value: usize = std::env::var(PROBE_HANDLE).unwrap().parse().unwrap();
-    let mut flags = 0u32;
-    // SAFETY: asking the kernel about a handle value; an invalid one fails.
-    let open = unsafe { GetHandleInformation(value as HANDLE, &mut flags) } != 0;
+    let open = file_identity(value as HANDLE).is_some_and(|id| id == std::env::var(PROBE_IDENTITY).unwrap());
     fs::write(result, if open { "open" } else { "closed" }).unwrap();
 }
 
@@ -265,7 +278,7 @@ fn a_handle_the_holder_owns_is_not_open_in_the_borrowed_child() {
     let spec = BorrowSpec {
         argv: vec![exe.to_string_lossy().into_owned(), "--exact".into(), "borrowed_child_handle_probe".into(), "--nocapture".into()],
         cwd: None,
-        env: [(PROBE_ROLE.to_string(), result.to_string_lossy().into_owned()), (PROBE_HANDLE.to_string(), (raw as usize).to_string())].into_iter().collect(),
+        env: [(PROBE_ROLE.to_string(), result.to_string_lossy().into_owned()), (PROBE_HANDLE.to_string(), (raw as usize).to_string()), (PROBE_IDENTITY.to_string(), file_identity(raw).expect("the holder's file has an identity"))].into_iter().collect(),
         clear_env: false,
         stdio: BorrowStdio::Null,
     };
