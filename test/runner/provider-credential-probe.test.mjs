@@ -126,13 +126,18 @@ test('a dead login named at the end of a long output is still seen, so the accou
   assert.match(result.detail, /still rejected/);
 });
 
-test('the probe tells its caller about the child it started', async () => {
-  const { spawnFn } = fakeSpawn({ output: 'OK' });
-  const pids = [];
-  const wrapped = (...args) => { const child = spawnFn(...args); child.pid = 777; return child; };
-  const result = await createCredentialProbe({ spawnFn: wrapped, env: {} })({ account: { credentialSource: piSource }, onSpawn: (child) => pids.push(child.pid) });
-  assert.equal(result.ok, true);
-  assert.deepEqual(pids, [777]);
+test('without its own spawn the probe starts the call through the lock spawn it is handed, and answers only after that call let go of the lock', async () => {
+  const { spawnFn, seen } = fakeSpawn({ output: 'OK' });
+  let letGo;
+  const borrowed = new Promise((resolve) => { letGo = resolve; });
+  const spawnHolding = (...args) => { const child = spawnFn(...args); child.borrowed = borrowed; return child; };
+  let answered = false;
+  const pending = createCredentialProbe({ env: {} })({ account: { credentialSource: piSource }, spawnHolding }).then((result) => { answered = true; return result; });
+  await new Promise((resolve) => setTimeout(resolve, 20));
+  assert.equal(seen.length, 1, 'the call ran through the handed spawn');
+  assert.equal(answered, false, 'no answer while the call still holds the lock');
+  letGo({ exit: 0, signal: null, leftoversKilled: 0 });
+  assert.equal((await pending).ok, true);
 });
 
 test('the unlock probe call is wrapped so it ends on its own, and runs unwrapped when timeout is not on PATH', async () => {

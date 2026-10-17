@@ -97,11 +97,14 @@ version = "0.2.0"
 dependencies = [
  "fgos-convention",
  "fgos-distribution",
+ "fgos-holder-lock",
  "fgos-host-runtime",
  "fgos-observe",
+ "fgos-process",
  "fgos-run-result",
  "fgos-session-identity",
  "fgos-work-state",
+ "libc",
  "serde",
  "serde_json",
  "sha2",
@@ -124,6 +127,7 @@ dependencies = [
 name = "fgos-distribution"
 version = "0.2.0"
 dependencies = [
+ "fgos-holder-lock",
  "fgos-host-runtime",
  "flate2",
  "serde",
@@ -138,6 +142,11 @@ dependencies = [
 [[package]]
 name = "fgos-holder-lock"
 version = "0.2.0"
+dependencies = [
+ "fgos-process",
+ "libc",
+ "serde_json",
+]
 
 [[package]]
 name = "fgos-host-runtime"
@@ -155,6 +164,7 @@ dependencies = [
 name = "fgos-observe"
 version = "0.2.0"
 dependencies = [
+ "fgos-holder-lock",
  "fgos-host-runtime",
  "fgos-session-identity",
  "libc",
@@ -168,6 +178,10 @@ dependencies = [
 [[package]]
 name = "fgos-process"
 version = "0.2.0"
+dependencies = [
+ "libc",
+ "serde_json",
+]
 
 [[package]]
 name = "fgos-run-result"

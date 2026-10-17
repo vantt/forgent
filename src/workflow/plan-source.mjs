@@ -3,7 +3,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import YAML from 'yaml';
+import { parseYaml } from '../util/yaml.mjs';
 
 import { validateWorkflowChecked as validateWorkflow } from './checked.mjs';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
@@ -12,7 +12,7 @@ function parseFrontmatter(content) {
   const match = /^---\r?\n([\s\S]*?)\r?\n---/.exec(content);
   if (!match) return { frontmatter: {}, body: content };
   try {
-    const frontmatter = YAML.parse(match[1]) || {};
+    const frontmatter = parseYaml(match[1]) || {};
     const body = content.slice(match[0].length).trim();
     return { frontmatter, body };
   } catch {

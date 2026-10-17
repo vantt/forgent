@@ -22,12 +22,18 @@ function root() {
   fs.mkdirSync(path.join(out, '.fgos'), { recursive: true });
   return out;
 }
-// Real production per-cwd dispatch lock path/shape (see
-// reconciliation-planner.mjs's own lockFile/cwdLockHolder doc comments).
-function lockPathFor(dir, cwd = dir) { return path.join(dir, '.fgos', `dispatch--${encodeURIComponent(cwd)}.lock`); }
-function deadLock(dir, cwd = dir) {
-  const ts = Date.now();
-  fs.writeFileSync(lockPathFor(dir, cwd), JSON.stringify({ pid: `99999999:${ts}:deadfixture`, ts }));
+// A Run whose run.json still says "running" although a valid terminal result
+// exists: the repair-projection action plans and applies against it.
+function staleRun(dir, runId = 'run-stale') {
+  const assignment = path.join(dir, '.fgos', 'assignments', 'a');
+  const runDir = path.join(assignment, 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.mkdirSync(path.join(assignment, 'admission', 'generations'), { recursive: true });
+  fs.writeFileSync(path.join(assignment, 'assignment.json'), JSON.stringify({ assignmentId: 'a' }));
+  fs.writeFileSync(path.join(runDir, 'run.json'), JSON.stringify({ assignmentId: 'a', runId, status: 'running' }));
+  fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({ runId, assignmentId: 'a', status: 'done', confidence: 'reported' }));
+  fs.writeFileSync(path.join(assignment, 'admission', 'generations', '0000000001.json'), JSON.stringify({ runId, attempt: 1 }));
+  return { runId, runJson: path.join(runDir, 'run.json') };
 }
 
 test('invokeDispatchReconcileOperation refuses a mismatched operationId or effect, and never a read effect', () => {
@@ -44,33 +50,33 @@ test('invokeDispatchReconcileOperation refuses a forbidden/unsupported reconcile
   assert.match(result.reason, /unsupported reconciliation action/);
 });
 
-test('invokeDispatchReconcileOperation with no --apply defaults to the plan path for a real dead-holder guard', () => {
+test('invokeDispatchReconcileOperation with no --apply defaults to the plan path (clear-cwd-lock, nothing held)', () => {
   const dir = root();
-  deadLock(dir);
   const ctx = { repoRoot: dir };
   const result = invokeDispatchReconcileOperation({ operationId: 'dispatch.runtime.reconcile', effect: 'write', ctx, payload: { cwd: dir } });
-  assert.equal(result.outcome, 'planned');
+  assert.equal(result.outcome, 'blocked');
+  assert.match(result.reason, /no cwd lock is held/);
 });
 
-test('invokeDispatchReconcileOperation with payload.apply routes to the real apply path and mutates the guard', () => {
+test('invokeDispatchReconcileOperation with payload.apply routes to the real apply path and mutates the projection', () => {
   const dir = root();
-  deadLock(dir);
+  const { runId, runJson } = staleRun(dir);
   const ctx = { repoRoot: dir };
-  const plan = invokeDispatchReconcileOperation({ operationId: 'dispatch.runtime.reconcile', effect: 'write', ctx, payload: { cwd: dir } });
+  const plan = invokeDispatchReconcileOperation({ operationId: 'dispatch.runtime.reconcile', effect: 'write', ctx, payload: { action: 'repair-projection', runId } });
   assert.equal(plan.outcome, 'planned');
   const applied = invokeDispatchReconcileOperation({ operationId: 'dispatch.runtime.reconcile', effect: 'write', ctx, payload: { apply: true, plan } });
   assert.equal(applied.outcome, 'applied');
-  assert.equal(fs.existsSync(lockPathFor(dir)), false);
+  assert.equal(JSON.parse(fs.readFileSync(runJson, 'utf8')).status, 'settled');
 });
 
 test('invokeDispatchReconcileOperation ignores a forged now/ttlMs in payload for both plan and apply (F6)', () => {
   const dir = root();
-  deadLock(dir);
+  const { runId } = staleRun(dir);
   const ctx = { repoRoot: dir };
   const forgedFuture = '2099-01-01T00:00:00.000Z';
   const plan = invokeDispatchReconcileOperation({
     operationId: 'dispatch.runtime.reconcile', effect: 'write', ctx,
-    payload: { cwd: dir, now: forgedFuture, ttlMs: 999999999 },
+    payload: { action: 'repair-projection', runId, now: forgedFuture, ttlMs: 999999999 },
   });
   assert.equal(plan.outcome, 'planned');
   // A forged now/ttlMs must never reach planReconciliation: expiresAt has

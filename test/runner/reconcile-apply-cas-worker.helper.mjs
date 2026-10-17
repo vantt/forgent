@@ -1,7 +1,7 @@
 // Worker process for the concurrent-apply CAS proof in
 // dispatch-reconciliation-concurrency.test.mjs. Spawned as a real, separate
 // OS process (never an in-process fs.readFileSync monkeypatch), so
-// the local-lock file contention and the action-log append it exercises are
+// the reconcile.lock contention and the action-log append it exercises are
 // genuine concurrent filesystem operations between two independent
 // processes, not a simulation of one.
 //

@@ -1,4 +1,8 @@
-//! Read-only inspection of `.fgos/main-checkout.lock`.
+//! Read-only inspection of the main checkout lock.
+//!
+//! The kernel lock `<workspace>/.fgos/locks/main-checkout.lock` is probed first (shared, never
+//! held). The v1 read below it stays only while Node writers of the main checkout still use the
+//! v1 file; once `.fgos/main-checkout.lock` is a directory (the tombstone) the v1 read is skipped.
 //!
 //! Reuses the liveness rules from `src/runner/main-checkout-lock.mjs` per R5:
 //! - Missing lock file: free.
@@ -64,6 +68,8 @@ pub enum MainCheckoutLockError {
     Ambiguous,
     #[error("lock-unsupported: .fgos/main-checkout.lock was written by a newer fgOS lock protocol than this release understands; upgrade fgOS on this machine (never delete the lock by hand)")]
     Unsupported,
+    #[error("lock-held: main checkout is held (kernel lock)")]
+    HeldV3,
     #[error("lock-held: .fgos/main-checkout.lock is held by process {0}")]
     HeldNumeric(i64),
     #[error("lock-held: .fgos/main-checkout.lock is held by session \"{0}\"")]
@@ -203,6 +209,18 @@ pub fn is_unsupported_schema(raw: &str) -> bool {
 /// Performs a read-only liveness check on `.fgos/main-checkout.lock` under `workspace_root`.
 /// Never creates, refreshes, or clears the lock.
 pub fn check_main_checkout_lock(workspace_root: &Path) -> Result<(), MainCheckoutLockError> {
+    let v3 = fgos_holder_lock::Resource::new(
+        "main-checkout",
+        workspace_root.join(".fgos").join("locks").join("main-checkout.lock"),
+    );
+    if fgos_holder_lock::probe(&v3)? == fgos_holder_lock::Probe::Held {
+        return Err(MainCheckoutLockError::HeldV3);
+    }
+    // A directory at the v1 path is the tombstone: the main checkout moved to the kernel lock
+    // and the probe above already answered.
+    if workspace_root.join(".fgos").join("main-checkout.lock").is_dir() {
+        return Ok(());
+    }
     // The protocol marker decides first: a resource moved to another lock protocol is never free,
     // whether or not this protocol's file exists (same rule as the Node module).
     if !protocol_marker_is_supported(workspace_root)? {

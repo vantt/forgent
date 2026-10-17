@@ -9,6 +9,12 @@ use std::path::PathBuf;
 use std::process::Command;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
+/// No process holds the observe lock under `root` once a command returned.
+fn assert_observe_lock_free(root: &std::path::Path) {
+    let resource = fgos_holder_lock::Resource::new("observe", fgos_observe::store_lock::observe_lock_path(root));
+    assert_eq!(fgos_holder_lock::probe(&resource).unwrap(), fgos_holder_lock::Probe::Free);
+}
+
 static NEXT: AtomicUsize = AtomicUsize::new(0);
 struct TempRoot(PathBuf);
 impl TempRoot {
@@ -312,7 +318,7 @@ fn concurrent_process_writers_leave_complete_shards() {
             assert_eq!(record.ts, "2026-10-05T10:00:00.000Z");
         }
     }
-    assert!(!root.0.join(".fgos/observe/.lock").exists());
+    assert_observe_lock_free(&root.0);
 }
 
 #[test]
@@ -370,7 +376,7 @@ fn symlink_writer_shard_never_changes_external_target() {
         .unwrap()
         .evals
         .is_empty());
-    assert!(!root.0.join(".fgos/observe/.lock").exists());
+    assert_observe_lock_free(&root.0);
 }
 
 #[cfg(unix)]
@@ -388,7 +394,7 @@ fn symlink_eval_directory_is_rejected_before_external_writes() {
         .contains("real directory"));
     assert_eq!(fs::read_to_string(marker).unwrap(), "keep");
     assert_eq!(fs::read_dir(&external.0).unwrap().count(), 1);
-    assert!(!root.0.join(".fgos/observe/.lock").exists());
+    assert_observe_lock_free(&root.0);
 }
 
 #[test]
@@ -520,7 +526,7 @@ fn missing_store_list_does_not_create_directories() {
             json!({"ok":true,"evals":[],"invalid":[]})
         );
         assert!(!root.0.join(missing).exists());
-        assert!(!root.0.join(".fgos/observe/.lock").exists());
+        assert_observe_lock_free(&root.0);
     }
 }
 
@@ -627,7 +633,7 @@ fn invalid_existing_data_blocks_identity_check_without_mutating_the_store() {
     let listed = eval_journal::list(&root.0, None, None).unwrap();
     assert_eq!(listed.evals.len(), 1);
     assert_eq!(listed.invalid.len(), 1);
-    assert!(!root.0.join(".fgos/observe/.lock").exists());
+    assert_observe_lock_free(&root.0);
 }
 
 #[test]

@@ -61,7 +61,7 @@ test('manifest verb-name set equals the set of verbs runVerb() actually dispatch
 test('every registry entry has touchesState, externalEffect, paginated, requiresExistingStore booleans and the required keys', () => {
   const baseKeys = ['deprecated', 'description', 'examples', 'externalEffect', 'invoke', 'name', 'paginated', 'parameters', 'requiresExistingStore', 'touchesState'];
   for (const entry of COMMAND_REGISTRY) {
-    const expectedKeys = [...baseKeys, ...(entry.nativeOnly !== undefined ? ['nativeOnly'] : []), ...(entry.subcommands !== undefined ? ['subcommands'] : [])].sort();
+    const expectedKeys = [...baseKeys, ...(entry.nativeOnly !== undefined ? ['nativeOnly'] : []), ...(entry.subcommands !== undefined ? ['subcommands'] : []), ...(entry.retiredFlags !== undefined ? ['retiredFlags'] : [])].sort();
     assert.deepEqual(
       Object.keys(entry).sort(),
       expectedKeys,

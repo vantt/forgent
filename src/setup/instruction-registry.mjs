@@ -14,7 +14,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import YAML from 'yaml';
+import { parseYaml } from '../util/yaml.mjs';
 import { buildDecisionIndexMarkdown } from '../report/decision-index.mjs';
 import { listWork } from '../state/store.mjs';
 
@@ -163,7 +163,7 @@ export function extractInstructionFrontmatter(rawContent, filePath = '') {
 
   let meta;
   try {
-    meta = YAML.parse(match[1]);
+    meta = parseYaml(match[1], { filename: filePath });
   } catch (err) {
     throw new InstructionRegistryError(
       `Failed to parse YAML frontmatter: ${err.message}`,

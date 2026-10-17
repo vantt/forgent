@@ -77,3 +77,7 @@ Tất cả với `env -u CLAUDE_CODE_SESSION_ID`.
 
 `git revert <doctrine-commit>` cho một commit `AGENTS.md`; không có anchor test mới cần revert. Thu hồi barrier Plan B nếu commit bị revert trước khi Plan B bắt đầu.
 
+
+## Ghi chú sau khi xong (2026-10-17)
+
+Tiền đề ở mục Files, "`CLAUDE.md` (chỉ import `@AGENTS.md`)", không đúng ở thời điểm phase chạy: `CLAUDE.md` khi đó còn mục "Impact-analysis capability gate" và các khối GitNexus, MDView lặp lại `AGENTS.md`, nên Claude đọc các khối đó hai lần. Đo ngày 2026-10-17 cho thấy Claude Code chỉ tự đọc `AGENTS.md` khi không có `CLAUDE.md`. Commit `40c667c83` đưa `CLAUDE.md` về đúng tiền đề này (chỉ còn `@AGENTS.md`) và chuyển gate sang `AGENTS.md`. Chi tiết và số đo: `plans/reports/research-261016-1118-agent-code-quality-guardrails.md` mục 2d và 6.
