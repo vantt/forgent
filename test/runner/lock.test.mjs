@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { initStore, addWork, listWork, readRawEvents, EXIT_CODES } from '../../src/state/store.mjs';
 import { acquireRunnerLock, runOnce, EXIT_BUSY } from '../../src/runner/loop.mjs';
 import { probe } from '../../src/holder-lock/index.mjs';
+import { holdStateLockInChild } from '../helpers/hold-state-lock-in-child.mjs';
 
 const LOOP_MOD_PATH = fileURLToPath(new URL('../../src/runner/loop.mjs', import.meta.url));
 
@@ -72,12 +73,11 @@ test('EXIT_BUSY collides with no existing exit code (0 ok, 1 unexpected, R4 cate
 // already-dispatched item's structured result (review-unreviewed-260717,
 // corroborated by two independent reviewers). This proves the fix: runOnce
 // returns its structured result with the distinct exit code instead of
-// throwing. Real contention, not a mock — waits out the actual 2s timeout.
-test('a held events.lock halts the drain-run gracefully (lock-timeout exit code, no throw)', async () => {
+// throwing. Real contention, not a mock — another process sits inside the state critical section while this one waits out the lock timeout.
+test('a held state lock halts the drain-run gracefully (lock-timeout exit code, no throw)', async () => {
   const { repoRoot, dir, worktreeDir } = setup();
   seedItem(dir);
-  const eventsLockPath = path.join(dir, 'events.lock');
-  fs.writeFileSync(eventsLockPath, String(process.pid)); // this test process: alive for the whole test
+  const holder = await holdStateLockInChild(dir);
 
   try {
     const result = await runOnce({ repoRoot, dir, worktreeDir, log: noLog });
@@ -87,7 +87,7 @@ test('a held events.lock halts the drain-run gracefully (lock-timeout exit code,
     assert.equal(result.dispatched[0].outcome, 'halted');
     assert.equal(result.dispatched[0].errorClass, 'lock-timeout');
   } finally {
-    fs.rmSync(eventsLockPath, { force: true });
+    await holder.release();
   }
 });
 
