@@ -126,9 +126,10 @@ fn kill_all_on_init_is_refused_for_an_unprivileged_user() {
 
 #[test]
 fn other_domain_kinds_have_no_driver_yet() {
-    assert_eq!(domain_is_empty(&Domain::WindowsJob("job".into())), DomainState::Unknown);
-    assert_eq!(domain_kill_all(&Domain::WindowsJob("job".into())), KillOutcome::Refused);
     let me = identity(std::process::id());
+    let job = Domain::WindowsJob(fgos_process::WindowsJob { job: "job".into(), session_id: 0, declared_at: 0, holder: me.clone(), keeper: None });
+    assert_eq!(domain_is_empty(&job), DomainState::Unknown);
+    assert_eq!(domain_kill_all(&job), KillOutcome::Refused);
     assert_eq!(domain_is_empty(&Domain::MacosTree(me.clone())), DomainState::Unknown);
     assert_eq!(domain_kill_all(&Domain::MacosTree(me)), KillOutcome::Refused);
 }
