@@ -861,3 +861,72 @@ test('bind: a capability rigor floor still raises a lower unit rigor, and no rig
   );
   assert.equal(unset.tier, 'standard');
 });
+
+// runner.maxTier caps every seat, but a capability that declares its own rigor in the config raises
+// the cap for itself to the tier of that rigor. A unit's rigor and a human override stay capped.
+function ceilingConfig() {
+  const config = createMockRunnerConfig();
+  config.maxTier = 'advanced';
+  config.capabilities.synthesize = { prefer: [{ executor: 'claude', invocation: 'claude-cli' }], rigor: 'critical' };
+  config.capabilities.frame = { prefer: [{ executor: 'claude', invocation: 'claude-cli' }], rigor: 'high' };
+  return config;
+}
+const ceilingCtx = () => ({ runnerConfig: ceilingConfig(), session: { headless: true } });
+const ceilingAsk = (capability, extra = {}) => ({ unit: { id: 'u', capability, writes: [], ...extra }, role: 'producer', independentOf: [] });
+
+test('bind: with no capability rigor the global maxTier caps the tier as before', () => {
+  const result = bind(ceilingAsk('implement', { rigor: 'high' }), ceilingCtx());
+  assert.equal(result.tier, 'advanced');
+  assert.equal(result.model, 'claude-3-5-sonnet');
+  assert.equal(result.provenance.tier.source, 'clamped:maxTier(advanced, global)');
+  assert.deepEqual(result.provenance.tier.ceiling, { value: 'advanced', source: 'global' });
+});
+
+test('bind: a capability declaring rigor critical runs at frontier above a global advanced cap, others stay capped', () => {
+  const synth = bind(ceilingAsk('synthesize'), ceilingCtx());
+  assert.equal(synth.tier, 'frontier');
+  assert.equal(synth.model, 'claude-3-opus');
+  assert.equal(synth.provenance.tier.source, 'rigor:critical');
+  assert.deepEqual(synth.provenance.tier.ceiling, { value: 'frontier', source: 'capability-rigor(synthesize, critical)' });
+
+  const other = bind(ceilingAsk('implement', { rigor: 'critical' }), ceilingCtx());
+  assert.equal(other.tier, 'advanced');
+});
+
+test('bind: a unit asking rigor critical on a capability without rigor stays at the global cap', () => {
+  const result = bind(ceilingAsk('implement', { rigor: 'critical' }), ceilingCtx());
+  assert.equal(result.tier, 'advanced');
+  assert.equal(result.provenance.tier.source, 'clamped:maxTier(advanced, global)');
+});
+
+test('bind: a frontier override on a capability without rigor stays at the global cap', () => {
+  const ask = { ...ceilingAsk('implement'), overrides: [{ origin: 'human-cli', tier: 'frontier' }] };
+  const result = bind(ask, ceilingCtx());
+  assert.equal(result.tier, 'advanced');
+  assert.equal(result.provenance.tier.source, 'clamped:maxTier(advanced, global)');
+});
+
+test('bind: a frontier override on a capability with rigor high stops at that rigor\'s tier', () => {
+  const ask = { ...ceilingAsk('frame'), overrides: [{ origin: 'human-cli', tier: 'frontier' }] };
+  const result = bind(ask, ceilingCtx());
+  assert.equal(result.tier, 'flagship');
+  assert.equal(result.provenance.tier.source, 'clamped:maxTier(flagship, capability-rigor(frame, high))');
+  assert.deepEqual(result.provenance.tier.ceiling, { value: 'flagship', source: 'capability-rigor(frame, high)' });
+});
+
+test('bind: without runner.maxTier there is no ceiling at all', () => {
+  const config = ceilingConfig();
+  delete config.maxTier;
+  const result = bind(ceilingAsk('implement', { rigor: 'critical' }), { runnerConfig: config, session: { headless: true } });
+  assert.equal(result.tier, 'frontier');
+  assert.equal(result.provenance.tier.ceiling, undefined);
+});
+
+test('bind: a capability rigor below the global cap leaves the global cap in force', () => {
+  const config = ceilingConfig();
+  config.capabilities.implement.rigor = 'low';
+  const ask = { ...ceilingAsk('implement'), overrides: [{ origin: 'human-cli', tier: 'frontier' }] };
+  const result = bind(ask, { runnerConfig: config, session: { headless: true } });
+  assert.equal(result.tier, 'advanced');
+  assert.deepEqual(result.provenance.tier.ceiling, { value: 'advanced', source: 'global' });
+});

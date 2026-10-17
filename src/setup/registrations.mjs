@@ -60,6 +60,14 @@ import {
   withUnreadableDefinitions,
   workflowRoots,
 } from './workflow-pool-independence.mjs';
+import {
+  checkExecutorFamilyUnique,
+  checkModelPolicyPools,
+  checkLlmAccountsShape,
+  checkLlmAccountsVsLegacy,
+  checkGlobalModelPoliciesPortable,
+  checkCapabilityRigorCeiling,
+} from './model-pool-checks.mjs';
 import { checkBlindStepsUseProvenPools } from './blind-steps-proven-pools.mjs';
 import { checkExecutorPostureCoverage } from './executor-posture-coverage.mjs';
 import { checkAgyPermissionsConfigured, checkAgySubHomesConfigured, fixAgyPermissionsConfigured } from './agy-permissions.mjs';
@@ -838,7 +846,7 @@ export function checkTaskSpecsResolve(root = FGOS_INSTALL_ROOT) {
     'fgos-routing',
     'fgos-clarifying',
     'fgos-researching',
-    'fgos-unlock',
+    'fgos-lock-fence',
     'fgos-fanout',
     'fgos-indexing',
     'distill',
@@ -1293,7 +1301,7 @@ function checkMainCheckoutHookWired(cwd) {
     return { passed: true, message: 'not applicable -- this project ships no .githooks/ directory' };
   }
   if (mainCheckoutHookWired(cwd)) {
-    return { passed: true, message: 'core.hooksPath = .githooks — main-checkout lock guards every commit here' };
+    return { passed: true, message: 'core.hooksPath = .githooks — the hook checks the main-checkout kernel lock on every commit here (a fgOS child borrows it through its description)' };
   }
   return { passed: false, message: 'core.hooksPath not wired to .githooks — commits here are NOT guarded against concurrent-writer clobbering (str65) — run fgos setup' };
 }
@@ -1449,6 +1457,42 @@ registerCheck({
 });
 
 registerCheck({
+  id: 'executor-family-unique',
+  description: 'each agent family (providerModel) is served by exactly one executor; its transports are invocations of that executor',
+  check: (cwd) => checkExecutorFamilyUnique(cwd),
+});
+
+registerCheck({
+  id: 'model-policy-pools',
+  description: 'every pool a runner.modelPolicies cell names (model@pool) is declared in runner.llmAccounts; warns otherwise',
+  check: (cwd) => checkModelPolicyPools(cwd),
+});
+
+registerCheck({
+  id: 'llm-accounts-shape',
+  description: 'runner.llmAccounts is global-only and well formed: pool names without "@" or a family alias, every account with a credentialStore directory per CLI',
+  check: (cwd) => checkLlmAccountsShape(cwd),
+});
+
+registerCheck({
+  id: 'llm-accounts-vs-legacy',
+  description: 'when runner.llmAccounts is declared, it carries the same accounts and login directories as runner.providers, which the lease still reads; warns otherwise',
+  check: (cwd) => checkLlmAccountsVsLegacy(cwd),
+});
+
+registerCheck({
+  id: 'global-model-policies-portable',
+  description: 'runner.modelPolicies in ~/.fgos/config.json uses plain model names only, since every fgOS release on the machine reads it',
+  check: () => checkGlobalModelPoliciesPortable(),
+});
+
+registerCheck({
+  id: 'capability-rigor-ceiling',
+  description: 'lists the capabilities whose own rigor lifts their seats above runner.maxTier, with the tier and model they then run at; informational',
+  check: (cwd) => checkCapabilityRigorCeiling(cwd),
+});
+
+registerCheck({
   id: 'coordination-protocol-dead-vocabulary',
   description: 'coordination protocols and workflows in project do not contain retired minTier or minRigor',
   check: (cwd) => checkCoordinationProtocolDeadVocabulary(cwd),
@@ -1520,7 +1564,7 @@ registerCheck({
 
 registerCheck({
   id: 'main-checkout-hook-wired',
-  description: 'core.hooksPath wired to .githooks (main-checkout lock and source-checkout new-root-file guards)',
+  description: 'core.hooksPath wired to .githooks (main-checkout kernel lock check, borrowed through the description, and source-checkout new-root-file guards)',
   check: (cwd) => checkMainCheckoutHookWired(cwd),
 });
 

@@ -1,7 +1,7 @@
 ---
 title: "Đợt A: lát bổ sung cho hình dạng config model/pool/account"
 description: "Sửa test vỡ khi gemini chuyển sang omp; dọn config để mỗi họ một executor; đọc ô tier dạng model hoặc model@pool; đọc runner.llmAccounts chỉ để kiểm tra; thêm dispatch explain và các check doctor chỉ đọc; rigor do capability khai thì nâng trần tier. Không đổi lease, confinement hay prefer."
-status: pending
+status: done
 priority: P1
 effort: 33h
 branch: plan/model-pool-config-additive-slice
@@ -39,7 +39,7 @@ created: 2026-10-17
 | A3 trả về đúng hình dạng `providerAccountInventory` và gộp vào kho lease | Kho cũ đòi `kind` và `files` trên account (`provider-capacity.mjs:68-156`); thiết kế mới chuyển chúng về invocation, việc đó thuộc B2 | Bộ đọc `llmAccounts` chỉ phục vụ `explain` và doctor; lease không đọc nó cho tới B1 |
 | A2 cho phép danh sách và `@pool` | Lease còn xoay account theo họ (`capacityProviderOf`, `account-pin.mjs:17`) cho tới B1 | Khi chạy, `bind()` chỉ dùng mục thuộc pool của họ; mục khác hiện trong `explain` với nhãn `pending-pool-routing` |
 | Gộp claude cần sửa lỗi "gộp với `runner.executor`" | Red-team thấy lỗi đó không còn (`resolve.mjs:270-276`) | Phase 01 chứng minh bằng test trước, không sửa lỗi |
-| Gemini thêm `--model {model}` | Ladder gemini dùng id kiểu agy (`gemini-3.8-flash-low`, `gemini-4-argon-high`) | Phase 01 chứng minh omp nhận các id này bằng một lần chạy thật; không nhận thì sửa ladder trong cùng phase |
+| Gemini thêm `--model {model}` | Ladder gemini dùng id kiểu agy (`gemini-3.8-flash-low`, `gemini-4-argon-high`) | Đã giải ở phase 05: chạy thật cho thấy omp khớp cả bốn id sang `gemini-3.8-flash` / `gemini-4-argon`; ladder giữ nguyên |
 
 ## Phạm vi
 
@@ -67,12 +67,12 @@ invocation trong `prefer` của capability là ghim (`advise` ghim
 | Phase | Nội dung | Phụ thuộc | Giờ | Trạng thái |
 |---|---|---|---|---|
 | [00](phase-00-preconditions.md) | Commit config của anh; chụp baseline `bind()` | — | 1 | xong |
-| [05](phase-05-gemini-omp-tests.md) | Sửa 35 test vỡ khi gemini chuyển sang omp | 00 | 3 | chờ |
-| [01](phase-01-config-one-executor-per-family.md) | Gộp `claude-herdr` vào `claude`; bỏ `glm-herdr`; `--model {model}` cho gemini | 00, 05 | 4 | config và test đã sửa trong working tree, chưa commit; gemini chờ kết quả 05 |
-| [02](phase-02-tier-cell-reader.md) | Bộ đọc ô tier, validator project/global, thiếu ô thì từ chối | 05 | 5 | chờ |
-| [03](phase-03-llm-accounts-reader.md) | Bộ đọc `runner.llmAccounts` chỉ đọc, kiểm tên pool | 05 | 3 | chờ |
-| [04](phase-04-explain-and-doctor.md) | `fgos dispatch explain`, check doctor, spec, CHANGELOG | 01, 02, 03 | 6 | chờ |
-| [06](phase-06-capability-tier-cap.md) | Rigor của capability nâng trần tier; kiểm hai bộ tính tier | 02, 04 | 5 | chờ |
+| [05](phase-05-gemini-omp-tests.md) | Sửa 35 test vỡ khi gemini chuyển sang omp; thêm `--model {model}` cho gemini | 00 | 3 | xong |
+| [01](phase-01-config-one-executor-per-family.md) | Gộp `claude-herdr` vào `claude`; bỏ `glm-herdr` | 00, 05 | 4 | xong |
+| [02](phase-02-tier-cell-reader.md) | Bộ đọc ô tier, validator project/global, thiếu ô thì từ chối | 05 | 5 | xong (bước từ chối chờ anh) |
+| [03](phase-03-llm-accounts-reader.md) | Bộ đọc `runner.llmAccounts` chỉ đọc, kiểm tên pool | 05 | 3 | xong |
+| [04](phase-04-explain-and-doctor.md) | `fgos dispatch explain`, check doctor, spec, CHANGELOG | 01, 02, 03 | 6 | xong |
+| [06](phase-06-capability-tier-cap.md) | Rigor của capability nâng trần tier; kiểm hai bộ tính tier | 02, 04 | 5 | xong |
 
 Thứ tự: 05 trước tiên, để main xanh lại; rồi commit 01; 02 và 03 song song;
 04; cuối cùng 06, vì 06 sửa đoạn tính tier ngay trên đoạn chọn model của 02 và
@@ -107,6 +107,25 @@ dùng `explain` của 04.
   thay đổi. Trong herdr, kết quả giữ nguyên. Ngoài herdr, hôm nay chúng bị từ
   chối vì `claude-herdr` chỉ có invocation herdr; sau phase 01 chúng chạy
   claude headless. Không ghim invocation herdr cho chúng.
+
+- **Ladder `openai` (2026-10-17):** `frontier` là `gpt-6-astra`, `flagship` là
+  `gpt-6.1-sol`; anh xác nhận đúng ý, không sửa.
+- **Thiếu ô tier (2026-10-17, anh chọn a):** giữ lối rơi về
+  `executor.model ?? "default"`, không từ chối. Đổi sang từ chối
+  `model-tier-missing` làm cùng đợt B, khi lease đọc pool, kèm sửa fixture và
+  để doctor báo ô thiếu trước.
+
+## Việc tách ra sau đợt A
+
+- **Provenance tier của assignment policy có thể ghi cao hơn tier đã chạy.**
+  `resolveAssignmentDispatchPolicy` chỉ nâng tier `bind()` đưa vào và không áp
+  trần; `run.mjs` không truyền capability cho assignment, nên sửa gọn trong hàm
+  không được. Model luôn là của `bind()`; chỉ bản ghi tier lệch khi `bind()` kẹp.
+  Sửa cần `run.mjs` truyền capability và policy dùng `resolveTierCeiling`
+  (ghi trong RUL103).
+- **Pin invocation của capability-prefer bị bỏ qua khi chọn transport:**
+  `fgos-coding-implement` headless vẫn ghim `omp-gemini-tetcu72` (pane) với
+  transport `cli`; `fgos dispatch explain` cho thấy rõ (đã ghi ngoài phạm vi).
 
 ## Outstanding questions
 

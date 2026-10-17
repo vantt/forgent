@@ -1,0 +1,36 @@
+{
+  "contract": { "id": "main-checkout-borrow", "version": 1 },
+  "description": "How a holder of the main-checkout mutex lets its own git child (and the hooks git runs) act under that lock, instead of FGOS_MAIN_LOCK_HOLDER_PID. The child inherits the locked description; nothing else can claim to be a borrower.",
+  "env": {
+    "name": "FGOS_LOCK_FD",
+    "value": "main-checkout:3",
+    "meaning": "<registry lock name>:<stdio slot holding the locked description>"
+  },
+  "holder": {
+    "api": "runBorrowed(handle, command, args, options)",
+    "rules": [
+      "only the holder-lock facade maps a lock description into a child's stdio",
+      "the description is passed only after acquire succeeded",
+      "for git, the API always inserts -c gc.auto=0 -c maintenance.auto=false before the subcommand, so no background gc inherits the description",
+      "the holder waits for the child to exit before it treats the transaction as done"
+    ],
+    "gitConfigPrefix": ["-c", "gc.auto=0", "-c", "maintenance.auto=false"]
+  },
+  "borrowerCheck": {
+    "route": "fgos internal lock-fd --protocol 1 --borrowed-check <main-checkout lock path> (internal-route.lock-fd.v1.json)",
+    "allOf": [
+      "FGOS_LOCK_FD names main-checkout and the slot",
+      "fstat(slot) has the same dev:ino as the main-checkout lock file",
+      "flock(slot, LOCK_EX|LOCK_NB) succeeds"
+    ],
+    "otherwise": "not a borrower: the hook probes main-checkout once with its own description and refuses when it is held; it never waits"
+  },
+  "child": {
+    "mayNot": [
+      "release the lock for the holder (closing its copy releases nothing while the holder keeps its own)",
+      "pass the description on beyond git's own hooks",
+      "start anything in the background"
+    ]
+  },
+  "scrub": "workerBaseEnv drops FGOS_LOCK_FD; a leaked env var without the description gives nothing"
+}

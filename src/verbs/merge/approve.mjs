@@ -33,7 +33,7 @@ import { driftStatus } from '../../state/drift-status.mjs';
 import {
   classifySource,
   mergeRunnerItem,
-  withMergeTargetSlot,
+  withMergeSlot,
   performCatchUp,
   buildOwnFileSet,
   isWorkingTreeClean as isMainTreeClean,
@@ -53,6 +53,7 @@ import {
 import { ironLawForItem, ironLawRefusal } from '../../runner/iron-law-gate.mjs';
 import { readIronLawLevel, recordIronLawSkip, recordIronLawAcknowledge } from './iron-law-level.mjs';
 import { withLockRetry } from '../../runner/lock-wait.mjs';
+import { createLockScope } from '../../holder-lock/index.mjs';
 import { listSessions } from '../../runner/session.mjs';
 import { runGoalCheck } from '../../runner/goal-check.mjs';
 import { mergeGitHubPR } from '../../runner/github-adapter.mjs';
@@ -146,7 +147,10 @@ export async function approveUseCase(
   // refuses a malformed flag, exactly when it always did.
   const timeoutMs = resolveTimeoutMs();
   const { noWait, waitMs } = resolveWaitFlags();
-  const runMerge = (mergeFn) => (noWait ? mergeFn() : withLockRetry(mergeFn, { waitMs }));
+  // Every merge into the target runs under the target's merge slot, taken
+  // through `runMerge` (a single try under --no-wait, a wait otherwise).
+  const scope = createLockScope('approve');
+  const runMerge = (mergeFn) => (noWait ? mergeFn({}) : withLockRetry(mergeFn, { waitMs }));
 
   const view = listWork(dir);
   const item = view.work[id];
@@ -457,12 +461,9 @@ export async function approveUseCase(
       // the target's tip BEFORE this callback runs, so the slot must
       // already be held by the time that read happens, not acquired
       // from inside it (that would leave the tip read unprotected).
-      // tsk-5k4: withLockRetry must wrap the call that can actually
-      // throw lock-held (withMergeTargetSlot's own acquire) — the
-      // runMerge below wrapping only mergeRunnerItem(...,{targetSlot:
-      // true}) never catches anything, since that path skips its own
-      // lock acquire once the caller already holds the target's slot.
-      return await runMerge(() => withMergeTargetSlot(repoRoot, rootBranch, async () => {
+      // The wait budget goes to the slot's own acquire, the only call here
+      // that can throw lock-held for contention on this target.
+      return await runMerge(({ waitMs: slotWaitMs }) => withMergeSlot(scope, repoRoot, rootBranch, async () => {
         // tsk-4ax (D3): catchup as a STANDARD step, not only a recovery
         // from `blocked` — if the target isn't yet an ancestor of the
         // branch, catch it up FIRST, still inside the slot (so the
@@ -530,17 +531,12 @@ export async function approveUseCase(
           effectiveItem = { ...item, branchHeadAtReturn: catchupResult.catchupHead };
         }
         return await withMergeEphemeralWorktree(repoRoot, rootId, async (ephemeral) => {
-        // tsk-2eq: lockRoot pins the main-checkout lock to the real
-        // repo root — ephemeral.path stays the git-op cwd (unchanged)
-        // but is never the lock's own root, since it's a throwaway
-        // worktree with no writable .fgos/ (ADR0020).
-        // targetSlot:true (tsk-xyr): this merge runs entirely in the
-        // detached ephemeral worktree above, never touching the shared
-        // main checkout — main-checkout.lock protects a resource this
-        // path doesn't use, so it is skipped in favor of the target
-        // slot already held by withMergeTargetSlot around this whole
-        // call.
-        const result = await runMerge(() => mergeRunnerItem(ephemeral.path, effectiveItem, { timeoutMs, lockRoot: repoRoot, targetSlot: true }));
+        // lockRoot pins the lock files to the real repo root — ephemeral.path
+        // stays the git-op cwd but is never the lock's own root, since it's
+        // a throwaway worktree with no writable .fgos/ (ADR0020). The merge
+        // runs in that detached worktree under the target's slot, which is
+        // already held in `scope`.
+        const result = await mergeRunnerItem(ephemeral.path, effectiveItem, { timeoutMs, lockRoot: repoRoot, scope, waitMs: slotWaitMs });
 
         if (result.outcome === 'conflict') {
           const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-conflict', role: 'system' });
@@ -594,23 +590,6 @@ export async function approveUseCase(
             detail: `main checkout already has a MERGE_HEAD from another item's in-progress merge; ${rootBranch}'s own merge of ${result.branch} was never attempted`,
           });
           return { id, mode: 'merge', to: 'blocked', reason: 'merge-blocked-other-item', target: rootBranch };
-        }
-
-        if (result.outcome === 'lock-lost-mid-merge') {
-          // tsk-2qp: main checkout lock was lost mid-merge (heartbeat renewal failed).
-          // Merge commit was not performed and git merge --abort was never called,
-          // preserving the new lock holder's tree state intact.
-          const conflict = moveBlockedOrConflict(dir, { id, reason: 'lock-lost-mid-merge', role: 'system' });
-          if (conflict) return conflict;
-          recordFriction(dir, {
-            id,
-            disposition: 'blocked',
-            errorClass: 'lock-lost-mid-merge',
-            layer: 'state',
-            attempts: 1,
-            detail: `main checkout lock was lost mid-merge; ${rootBranch}'s own merge of ${result.branch} was stopped before commit`,
-          });
-          return { id, mode: 'merge', to: 'blocked', reason: 'lock-lost-mid-merge', target: rootBranch };
         }
 
         if (result.outcome === 'fgos-write-rejected') {
@@ -696,7 +675,7 @@ export async function approveUseCase(
           postLand: result.postLand,
         };
         });
-      }));
+      }, { waitMs: slotWaitMs }));
     }
 
 
@@ -721,13 +700,12 @@ export async function approveUseCase(
       throw new StoreError('validation', `approve: working tree at "${repoRoot}" is not clean — commit or stash pending changes before approving "${id}".`);
     }
 
-    // Not wrapped in runMerge: a whole-call lock retry would redo the full
-    // verify run. The CAS merge only takes main-checkout.lock for its final
-    // land step and waits there itself (or fails fast under --no-wait).
+    // Not wrapped in runMerge: the CAS merge takes the trunk's merge slot
+    // itself, the main checkout mutex only for its final land step, and waits
+    // on each (or fails fast under --no-wait) without redoing the verify run.
     const { mergeRootIntoMainCas } = await import('../../runner/merge.mjs');
     const result = await mergeRootIntoMainCas(repoRoot, item, branchNameFor(id), {
       timeoutMs,
-      failFastIfLocked: noWait,
       ownFileSet,
       ...(noWait ? { lockWaitMs: 0 } : waitMs !== undefined ? { lockWaitMs: waitMs } : {}),
     });
@@ -795,25 +773,6 @@ export async function approveUseCase(
       return { id, mode: 'merge', to: 'blocked', reason: 'merge-blocked-other-item', target: 'main' };
     }
 
-    if (result.outcome === 'lock-lost-mid-merge') {
-      // tsk-2qp: main checkout lock was lost mid-merge (heartbeat renewal failed).
-      // Merge commit was not performed and git merge --abort was never called.
-      const detail = hadChildren
-        ? `cross-root integration attempt at main@${currentHead(repoRoot)}; main checkout lock was lost mid-merge; merge of ${result.branch} was stopped before commit`
-        : `main checkout lock was lost mid-merge; merge of ${result.branch} was stopped before commit`;
-      const conflict = moveBlockedOrConflict(dir, { id, reason: 'lock-lost-mid-merge', role: 'system' });
-      if (conflict) return conflict;
-      recordFriction(dir, {
-        id,
-        disposition: 'blocked',
-        errorClass: 'lock-lost-mid-merge',
-        layer: 'state',
-        attempts: 1,
-        detail,
-      });
-      return { id, mode: 'merge', to: 'blocked', reason: 'lock-lost-mid-merge', target: 'main' };
-    }
-
     if (result.outcome === 'main-checkout-dirty-mid-merge') {
       // A path in the item's own file set was clean at the pre-check above
       // (before the CAS worktree merge+verify, which can take minutes) but
@@ -821,9 +780,12 @@ export async function approveUseCase(
       // main-checkout.lock, right before update-ref -- the exact same
       // real-conflict shape the pre-check refuses, just caught later.
       // Nothing was moved: no ref update, no working-tree sync attempted.
+      const dirtied = result.stagedPaths
+        ? `staged changes on the main checkout (${result.stagedPaths.join(', ')}) would be discarded by the working-tree sync`
+        : 'a path in this item\'s own file set was dirtied on the main checkout between the pre-merge check and the land step';
       const detail = hadChildren
-        ? `cross-root integration attempt at main@${currentHead(repoRoot)}; a path in this item's own file set was dirtied on the main checkout between the pre-merge check and the land step; merge of ${result.branch} was stopped before update-ref`
-        : `a path in this item's own file set was dirtied on the main checkout between the pre-merge check and the land step; merge of ${result.branch} was stopped before update-ref`;
+        ? `cross-root integration attempt at main@${currentHead(repoRoot)}; ${dirtied}; merge of ${result.branch} was stopped before update-ref`
+        : `${dirtied}; merge of ${result.branch} was stopped before update-ref`;
       const conflict = moveBlockedOrConflict(dir, { id, reason: 'main-checkout-dirty-mid-merge', role: 'system' });
       if (conflict) return conflict;
       recordFriction(dir, {

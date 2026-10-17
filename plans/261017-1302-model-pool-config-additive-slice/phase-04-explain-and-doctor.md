@@ -1,7 +1,7 @@
 ---
 phase: 4
 title: "fgos dispatch explain, check doctor, spec, CHANGELOG"
-status: pending
+status: done
 effort: 6h
 ---
 
@@ -63,6 +63,24 @@ thành ba commit riêng.
 - `fgos doctor` xanh trên config đã commit; chạy qua
   `npm run fgos:dev -- doctor` để dùng code trong working tree.
 - `npm test` xanh.
+
+## Kết quả (2026-10-17)
+
+- `src/runner/execution/explain.mjs` (hàm thuần, tầng infra, gọi `bind()`); `bin/fgos.mjs`
+  nạp config không ghi (`loadRunnerConfigFromDir`) và phát hiện herdr qua
+  `detectHerdrPresent`, vì `run.mjs` ở tầng use-case. Đăng ký trong
+  `command-registry.mjs`.
+- Năm check đặt trong `src/setup/model-pool-checks.mjs` (giống
+  `workflow-pool-independence.mjs`), `registrations.mjs` chỉ đăng ký; danh sách id
+  check ở `distribution.md` hàng 7, bảng how-to doctor và `checks.test.mjs` cập nhật
+  cùng commit.
+- `fgos doctor` qua `npm run fgos:dev`: năm check mới đều pass trên config đã
+  commit; 11 check khác đỏ từ trước, không liên quan.
+- `explain` làm lộ một hành vi cũ: `fgos-coding-implement` headless vẫn ghim invocation
+  pane `omp-gemini-tetcu72` với transport `cli` (pin của capability-prefer; đã ghi
+  ngoài phạm vi trong `plan.md`).
+- Spec: RUL102 trong `docs/specs/runner.md`; ghi luật thiếu ô vẫn rơi về như cũ
+  (bước từ chối của phase 02 chờ anh).
 
 ## Rủi ro
 

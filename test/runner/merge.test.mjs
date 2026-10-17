@@ -9,7 +9,7 @@ import {
   classifySource,
   reviewDiff,
   mergeRunnerItem,
-  withMergeTargetSlot,
+  withMergeSlot,
   cleanupMergedBranch,
   changedFiles,
   isWorkingTreeClean,
@@ -27,7 +27,9 @@ import { writeSharedConfig } from '../../src/config/shared-config-file.mjs';
 // this file, next to the merge behavior that resolves a target through it.
 import { branchNameFor, withMergeEphemeralWorktree, detectTrunk } from '../../src/runner/worktree.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
-import { acquireMainCheckoutLock, mergeSlotLockFile, ACQUIRED, DEFAULT_TTL_MS } from '../../src/runner/main-checkout-lock.mjs';
+import { createLockScope, probe } from '../../src/holder-lock/index.mjs';
+import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
+import { withMainCheckout, withWorktreeAdmin } from '../../src/runner/repo-locks.mjs';
 
 // Every test here creates its own disposable git repo (mirrors
 // worktree.test.mjs's own initTempRepo) — never this repo's own checkout.
@@ -66,62 +68,12 @@ function makeItem(overrides = {}) {
   return { id: 'demo-item', verify: 'true', ...overrides };
 }
 
-// --- tsk-70l fanout-multiprocess helpers --------------------------------
-// Mirrors merge-target-slot-multiprocess.test.mjs's own rationale for
-// tsk-1wr's sibling fix: `resolveWriterIdentity` hands two real forked
-// processes that share an inherited env session id the exact SAME string
-// identity, a shape a same-process (in-memory) test cannot construct. Two
-// SEPARATE repos share only `lockRoot` (mergeRunnerItem's own parameter,
-// proven by tsk-2eq's "resolves the lock against lockRoot, not repoRoot")
-// so a wrongly-admitted second merge lands on its own repo, never racing
-// the held child's real git state.
-const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const FANOUT_MARKER_WAIT_MS = 20_000;
-
-function makeLockRoot() {
-  const lockRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-fanout-mp-lockroot-'));
-  fs.mkdirSync(path.join(lockRoot, '.fgos'), { recursive: true });
-  return lockRoot;
-}
-
-/** A child that runs the REAL mergeRunnerItem root->main path (no
- * targetSlot) against its own repo, with a verify command that announces
- * itself via `heldMarker` then busy-waits for `releaseMarker` — pausing
- * WHILE the lock is held, before any commit, the same "hold on a
- * condition, never a sleep" discipline the target-slot precedent uses. */
-function writeFanoutHolderChild(dir) {
-  const childPath = path.join(dir, 'fanout-holder-child.mjs');
-  fs.writeFileSync(
-    childPath,
-    `import { mergeRunnerItem } from ${JSON.stringify(pathToFileURL(path.join(REPO_ROOT, 'src/runner/merge.mjs')).href)};
-
-const [repoRoot, lockRoot, branch, heldMarker, releaseMarker] = process.argv.slice(2);
-const verify = 'node -e ' + JSON.stringify(
-  "require('fs').writeFileSync(" + JSON.stringify(heldMarker) + ",'1');" +
-  "const s=Date.now();" +
-  "while(!require('fs').existsSync(" + JSON.stringify(releaseMarker) + ") && Date.now()-s<15000){}"
-);
-
-try {
-  const result = await mergeRunnerItem(repoRoot, { id: branch.replace('fgw/', ''), verify }, { lockRoot });
-  process.stdout.write('CHILD_OUTCOME:' + result.outcome + '\\n');
-  process.exit(0);
-} catch (err) {
-  process.stdout.write('CHILD_ERROR:' + err.message + '\\n');
-  process.exit(1);
-}
-`,
-    'utf8',
-  );
-  return childPath;
-}
-
-async function waitForFile(filePath, deadlineMs = FANOUT_MARKER_WAIT_MS) {
-  const deadline = Date.now() + deadlineMs;
-  while (!fs.existsSync(filePath)) {
-    if (Date.now() > deadline) throw new Error(`timed out waiting for ${filePath}`);
-    await new Promise((r) => setTimeout(r, 10));
-  }
+/** Run mergeRunnerItem the way every caller does: inside the merge slot of the
+ * item's target, with the scope that holds it. */
+async function mergeInSlot(repoRoot, item, opts = {}) {
+  const lockRoot = opts.lockRoot ?? repoRoot;
+  const target = item.parent ? branchNameFor(item.parent) : detectTrunk(repoRoot);
+  return withMergeSlot(createLockScope('merge-test'), lockRoot, target, (scope) => mergeRunnerItem(repoRoot, item, { ...opts, scope }));
 }
 
 // --- classifySource ---------------------------------------------------
@@ -435,7 +387,7 @@ test('buildOwnFileSet: tolerates an absent footprint (item.footprint undefined) 
 test('mergeRunnerItem merges cleanly, verify passes, and commits — outcome "merged"', async () => {
   const repoRoot = initRepo();
   makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
-  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
+  const result = await mergeInSlot(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
   assert.equal(result.outcome, 'merged');
   assert.ok(fs.existsSync(path.join(repoRoot, 'produced.txt')));
   assert.equal(isWorkingTreeClean(repoRoot), true);
@@ -454,7 +406,7 @@ test('mergeRunnerItem sweeps a dirty untracked .fgos/events/ shard file into its
   fs.writeFileSync(shardPath, '{"id":"e1"}\n');
 
   const headBefore = headOf(repoRoot);
-  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
+  const result = await mergeInSlot(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
   assert.equal(result.outcome, 'merged');
 
   // A merge commit has two parents — plain `diff-tree`/`diff-tree -r` prints
@@ -509,7 +461,7 @@ test('mergeRunnerItem sweeps a dirty .fgos/events/ shard under lockRoot (not rep
   fs.writeFileSync(shardPath, '{"id":"e1"}\n');
 
   const lockRootHeadBefore = headOf(lockRoot);
-  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }), { lockRoot });
+  const result = await mergeInSlot(repoRoot, makeItem({ verify: 'test -f produced.txt' }), { lockRoot });
   assert.equal(result.outcome, 'merged');
 
   const lockRootStatus = git(lockRoot, ['status', '--porcelain']);
@@ -541,7 +493,7 @@ test('mergeRunnerItem aborts cleanly on a real conflict — main left byte-for-b
   git(repoRoot, ['commit', '-q', '-m', 'main changes shared.txt']);
 
   const headBefore = headOf(repoRoot);
-  const result = await mergeRunnerItem(repoRoot, makeItem());
+  const result = await mergeInSlot(repoRoot, makeItem());
   assert.equal(result.outcome, 'conflict');
   assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged after an aborted merge');
   assert.equal(isWorkingTreeClean(repoRoot), true, 'tree must be clean after merge --abort');
@@ -567,7 +519,7 @@ test('mergeRunnerItem reports "merge-failed-unclassified" (not "conflict") when 
   fs.writeFileSync(path.join(repoRoot, 'newfile.txt'), 'stray-untracked\n');
 
   const headBefore = headOf(repoRoot);
-  const result = await mergeRunnerItem(repoRoot, makeItem());
+  const result = await mergeInSlot(repoRoot, makeItem());
   assert.equal(result.outcome, 'merge-failed-unclassified');
   assert.equal(result.branch, 'fgw/demo-item');
   assert.match(result.error.stderr, /untracked working tree files would be overwritten/);
@@ -606,7 +558,7 @@ test('mergeRunnerItem reports "merge-blocked-other-item" (not "conflict") and ne
   );
 
   const headBefore = headOf(repoRoot);
-  const result = await mergeRunnerItem(repoRoot, makeItem());
+  const result = await mergeInSlot(repoRoot, makeItem());
   assert.equal(result.outcome, 'merge-blocked-other-item');
   assert.equal(result.branch, 'fgw/demo-item');
 
@@ -619,32 +571,6 @@ test('mergeRunnerItem reports "merge-blocked-other-item" (not "conflict") and ne
   assert.match(git(repoRoot, ['diff', '--name-only', '--cached']).trim(), /other\.txt/);
   assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged');
   assert.equal(fs.existsSync(path.join(repoRoot, 'newfile.txt')), false, 'demo-item\'s own merge must never have been attempted');
-});
-
-test('mergeRunnerItem reports "lock-lost-mid-merge" when final lock renewal fails before commit and never calls abortMergeIfPossible', async () => {
-  const repoRoot = initRepo();
-  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'newfile.txt', 'clean-content\n');
-
-  const headBefore = headOf(repoRoot);
-
-  // Goal check script that simulates another session reclaiming the lock
-  // mid-hold. mergeRunnerItem's final synchronous renewal must notice this
-  // before commit; the assertion must not depend on a timer tick happening
-  // during a fixed wall-clock window.
-  const lockPath = path.join(repoRoot, '.fgos', 'main-checkout.lock');
-  const lockOverwriter = `node -e "require('fs').writeFileSync('${lockPath.replace(/\\/g, '/')}', JSON.stringify({pid: 999999, ts: Date.now()}))"`;
-
-  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: lockOverwriter }));
-
-  assert.equal(result.outcome, 'lock-lost-mid-merge');
-  assert.equal(result.branch, 'fgw/demo-item');
-  assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged (no commit landed)');
-
-  // Verify abortMergeIfPossible was NOT called: staged merge changes still remain on disk
-  assert.doesNotThrow(
-    () => git(repoRoot, ['rev-parse', '--verify', 'MERGE_HEAD']),
-    'MERGE_HEAD must survive untouched because abortMergeIfPossible was not called',
-  );
 });
 
 // --- mergeRunnerItem: decision-ID collision auto-resolve (tsk-3mv-1 D1a) ---
@@ -687,7 +613,7 @@ test('mergeRunnerItem self-resolves a decision-ID collision (both sides independ
   git(repoRoot, ['add', 'docs/decisions']);
   git(repoRoot, ['commit', '-q', '-m', 'main: add 0022']);
 
-  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }));
+  const result = await mergeInSlot(repoRoot, makeItem({ verify: 'true' }));
   assert.equal(result.outcome, 'merged');
   assert.equal(result.selfResolved, true);
   assert.equal(fs.existsSync(path.join(repoRoot, 'docs/decisions/0022-branch-decision.md')), false, 'branch\'s colliding file must be renamed away, not left under its old id');
@@ -733,7 +659,7 @@ test('tsk-2iz: mergeRunnerItem\'s decision-ID auto-resolve considers the BRANCH\
   git(repoRoot, ['add', 'docs/decisions']);
   git(repoRoot, ['commit', '-q', '-m', 'main: independently add 0041']);
 
-  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }));
+  const result = await mergeInSlot(repoRoot, makeItem({ verify: 'true' }));
   assert.equal(result.outcome, 'merged');
   assert.equal(result.selfResolved, true);
 
@@ -778,7 +704,7 @@ test('tsk-2iz: a real failure INSIDE the decision-ID auto-resolve attempt (not t
   // throw, never the documented "shape mismatch" false-return case.
   fs.writeFileSync(path.join(repoRoot, 'docs/decisions/0023-branch-decision.md'), 'pre-existing garbage\n');
 
-  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }));
+  const result = await mergeInSlot(repoRoot, makeItem({ verify: 'true' }));
 
   assert.equal(result.outcome, 'merge-failed-unclassified', 'a real resolve-step failure is reported, never swallowed into a generic conflict or left to throw uncaught');
   assert.match(result.error.message, /decision-index auto-resolve failed/);
@@ -812,7 +738,7 @@ test('mergeRunnerItem self-resolves a purely positional decision-index collision
   git(repoRoot, ['add', 'docs/decisions']);
   git(repoRoot, ['commit', '-q', '-m', 'main: add 0025']);
 
-  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }));
+  const result = await mergeInSlot(repoRoot, makeItem({ verify: 'true' }));
   assert.equal(result.outcome, 'merged');
   assert.equal(result.selfResolved, true);
   assert.equal(fs.existsSync(path.join(repoRoot, 'docs/decisions/0030-branch-only.md')), true, 'no collision -- branch\'s file keeps its own id, never renamed');
@@ -840,7 +766,7 @@ test('mergeRunnerItem does NOT self-resolve a same-row edit dispute inside docs/
   git(repoRoot, ['commit', '-q', '-m', 'main: edit 0021 row text']);
 
   const headBefore = headOf(repoRoot);
-  const result = await mergeRunnerItem(repoRoot, makeItem());
+  const result = await mergeInSlot(repoRoot, makeItem());
   assert.equal(result.outcome, 'conflict');
   assert.equal(result.selfResolved, undefined, 'a same-row edit must never be reported as self-resolved');
   assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged -- an edit dispute is never auto-resolved');
@@ -898,7 +824,7 @@ test('mergeRunnerItem does NOT self-resolve when the conflict is not confined to
   git(repoRoot, ['commit', '-q', '-m', 'main: add 0022 + edit shared.txt']);
 
   const headBefore = headOf(repoRoot);
-  const result = await mergeRunnerItem(repoRoot, makeItem());
+  const result = await mergeInSlot(repoRoot, makeItem());
   assert.equal(result.outcome, 'conflict');
   assert.equal(result.selfResolved, undefined);
   assert.equal(headOf(repoRoot), headBefore);
@@ -910,7 +836,7 @@ test('mergeRunnerItem aborts cleanly when the staged merge fails its own verify 
   makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
 
   const headBefore = headOf(repoRoot);
-  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f required-file-never-produced.txt' }));
+  const result = await mergeInSlot(repoRoot, makeItem({ verify: 'test -f required-file-never-produced.txt' }));
   assert.equal(result.outcome, 'verify-fail');
   assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged after an aborted merge');
   assert.equal(isWorkingTreeClean(repoRoot), true, 'tree must be clean after merge --abort');
@@ -934,7 +860,7 @@ test('mergeRunnerItem aborts the merge when "git commit" itself fails (e.g. a re
 
   const headBefore = headOf(repoRoot);
   await assert.rejects(
-    () => mergeRunnerItem(repoRoot, makeItem({ verify: 'true' })),
+    () => mergeInSlot(repoRoot, makeItem({ verify: 'true' })),
     /verify passed for "fgw\/demo-item" but "git commit" failed/,
   );
   assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged after the aborted merge');
@@ -959,7 +885,7 @@ test('mergeRunnerItem carries the real "git commit" stderr/status on its thrown 
 
   let caught;
   try {
-    await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }));
+    await mergeInSlot(repoRoot, makeItem({ verify: 'true' }));
     assert.fail('expected mergeRunnerItem to throw');
   } catch (err) {
     caught = err;
@@ -969,364 +895,185 @@ test('mergeRunnerItem carries the real "git commit" stderr/status on its thrown 
   assert.equal(typeof caught.status, 'number', 'the real git commit exit status must reach the caller');
 });
 
-// The pre-commit hook only ever locked the final `git commit` — the merge
-// --no-commit/verify steps before it ran unprotected, letting a concurrent
-// session's own merge/commit land in that window and pull MERGE_HEAD out
-// from under this one. mergeRunnerItem now acquires the same lock up front.
-test('mergeRunnerItem refuses to even attempt the merge when another identity already holds the main-checkout lock', async () => {
+// --- repo locks: the target's merge slot and the main checkout mutex ------
+// Kernel locks on real files, held by real other processes below. A merge
+// runs under the target's slot and takes the main mutex only for the steps
+// that write the main checkout.
+
+const sleep = (ms) => new Promise((resolve) => { setTimeout(resolve, ms); });
+
+function slotParams(lockRoot, targetRef) {
+  return { fgosDir: path.join(lockRoot, '.fgos'), ref: encodeURIComponent(targetRef) };
+}
+
+async function killHolder(holder) {
+  holder.child.kill('SIGKILL');
+  await holder.exited;
+}
+
+test('mergeRunnerItem refuses to run without the scope that holds the target slot', async () => {
   const repoRoot = initRepo();
   makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
-
-  const fgosDir = path.join(repoRoot, '.fgos');
-  const otherLock = acquireMainCheckoutLock(fgosDir, { identity: 'a-different-live-session' });
-  assert.equal(otherLock.status, ACQUIRED);
-
-  const headBefore = headOf(repoRoot);
-  await assert.rejects(
-    () => mergeRunnerItem(repoRoot, makeItem({ verify: 'true' })),
-    (err) => {
-      assert.match(err.message, /cannot merge "fgw\/demo-item": main checkout is locked by pid a-different-live-session/);
-      // tsk-6c2: a caller-side retry wrapper needs a way to tell "lock
-      // contested, worth retrying" apart from a real merge conflict or
-      // verify failure — errorClass/category alone can't (both are always
-      // 'merge-fail'). This `code` is that discriminator.
-      assert.equal(err.code, 'lock-held');
-      assert.equal(typeof err.remainingTtlMs, 'number');
-      return true;
-    },
-  );
-  assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged — the merge must never even start while locked');
-  assert.equal(isWorkingTreeClean(repoRoot), true, 'tree must stay clean — refusing before the merge means nothing was ever staged');
+  await assert.rejects(() => mergeRunnerItem(repoRoot, makeItem({ verify: 'true' })), /needs the LockScope that holds the target merge slot/);
+  assert.equal(fs.existsSync(path.join(repoRoot, 'produced.txt')), false);
 });
 
-// tsk-70l: mergeRunnerItem's root->main path now acquires the lock under a
-// numeric process.pid identity instead of a session-id string, so isPidAlive
-// can tell a live rival apart from a crashed same-session holder. These two
-// tests exercise that against a REAL other OS process (not merely a
-// different in-memory value), the shape a same-process test cannot
-// construct — mirroring merge-target-slot-multiprocess.test.mjs's own
-// rationale for tsk-1wr's sibling fix.
-test('mergeRunnerItem refuses a REAL second root->main merge sharing the same inherited env session id — the fanout bug tsk-70l closes', async () => {
-  const lockRoot = makeLockRoot();
-  const childScriptDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-fanout-mp-child-'));
-  const childPath = writeFanoutHolderChild(childScriptDir);
-
-  const repoRootA = initRepo();
-  makeBranchWithCommit(repoRootA, 'fgw/demo-item-a', 'produced-a.txt', 'ok\n');
-  const repoRootB = initRepo();
-  makeBranchWithCommit(repoRootB, 'fgw/demo-item-b', 'produced-b.txt', 'ok\n');
-
-  const heldMarker = path.join(childScriptDir, 'held');
-  const releaseMarker = path.join(childScriptDir, 'release');
-  const sharedSessionId = 'fanout-shared-session-tsk-70l';
-
-  const child = fork(childPath, [repoRootA, lockRoot, 'fgw/demo-item-a', heldMarker, releaseMarker], {
-    stdio: 'inherit',
-    env: { ...process.env, BEE_SESSION_ID: sharedSessionId, CLAUDE_CODE_SESSION_ID: undefined },
-  });
-  const childExit = new Promise((resolve) => child.on('exit', (code) => resolve(code ?? 0)));
-
-  const savedBeeSessionId = process.env.BEE_SESSION_ID;
-  const savedClaudeSessionId = process.env.CLAUDE_CODE_SESSION_ID;
-  try {
-    await waitForFile(heldMarker);
-
-    // Same inherited env session id as the child — exactly the subagent
-    // fanout shape (docs/history/main-checkout-lock-fanout-self-
-    // recognition-gap/CONTEXT.md) two independent real processes end up
-    // sharing. Pre-fix, main-checkout-lock.mjs's self-recognition
-    // (record.pid === identity, both this string) would wrongly admit
-    // this as "the same writer" and let the merge below proceed for
-    // real, on repoRootB — reproducing the bug without racing repoRootA's
-    // own git state. Post-fix, identity is process.pid (unique per real
-    // process, tsk-70l D1), so self-recognition can never match across
-    // two genuinely separate processes and this must be refused instead.
-    process.env.BEE_SESSION_ID = sharedSessionId;
-    delete process.env.CLAUDE_CODE_SESSION_ID;
-
-    await assert.rejects(
-      () => mergeRunnerItem(repoRootB, { id: 'demo-item-b', verify: 'true' }, { lockRoot }),
-      (err) => {
-        assert.equal(err.code, 'lock-held', `expected refusal, got: ${err.message}`);
-        return true;
-      },
-    );
-    assert.equal(isWorkingTreeClean(repoRootB), true, 'repoRootB must stay untouched — refused before any git mutation');
-  } finally {
-    if (savedBeeSessionId === undefined) delete process.env.BEE_SESSION_ID; else process.env.BEE_SESSION_ID = savedBeeSessionId;
-    if (savedClaudeSessionId === undefined) delete process.env.CLAUDE_CODE_SESSION_ID; else process.env.CLAUDE_CODE_SESSION_ID = savedClaudeSessionId;
-    fs.writeFileSync(releaseMarker, 'go');
-    await childExit;
-  }
-});
-
-test('mergeRunnerItem refuses when a REAL different live process holds the main-checkout lock', async () => {
+test('a merge into a target whose slot a REAL other process holds is refused naming the slot and the holder pid, before any git mutation', async () => {
   const repoRoot = initRepo();
   makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
-
-  // A genuinely separate, live OS process — its own real pid, not a value
-  // this test process merely invented.
-  const holder = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { stdio: 'ignore' });
+  const holder = await holdLockInChild('merge-slot', slotParams(repoRoot, 'main'));
   try {
-    await new Promise((resolve) => { holder.once('spawn', resolve); });
-
-    const fgosDir = path.join(repoRoot, '.fgos');
-    const otherLock = acquireMainCheckoutLock(fgosDir, { identity: holder.pid });
-    assert.equal(otherLock.status, ACQUIRED);
-
     const headBefore = headOf(repoRoot);
     await assert.rejects(
-      () => mergeRunnerItem(repoRoot, makeItem({ verify: 'true' })),
+      () => mergeInSlot(repoRoot, makeItem({ verify: 'true' })),
       (err) => {
-        assert.match(err.message, new RegExp(`main checkout is locked by pid ${holder.pid}\\b`));
+        assert.ok(err instanceof MergeError);
         assert.equal(err.code, 'lock-held');
-        assert.equal(err.holderPid, holder.pid);
+        assert.equal(err.targetRef, 'main');
+        assert.match(err.message, /merge slot of "main" is held by another process/);
+        assert.ok(err.holders.includes(holder.child.pid), `holder pid ${holder.child.pid} must be named, got ${err.holders}`);
         return true;
       },
     );
-    assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged — a live rival process must fully exclude this merge');
+    assert.equal(headOf(repoRoot), headBefore);
+    assert.equal(isWorkingTreeClean(repoRoot), true, 'refused before anything was staged');
   } finally {
-    holder.kill();
+    await killHolder(holder);
   }
 });
 
-test('mergeRunnerItem reclaims the lock immediately (never waiting out the TTL) when its recorded pid belongs to an already-exited process', async () => {
+test('a REAL other process holding the main checkout mutex refuses the merge at once without waitMs, and nothing was staged', async () => {
   const repoRoot = initRepo();
   makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
-
-  // A real pid that genuinely existed and has now genuinely exited — proves
-  // reclaim is driven by isPidAlive, not merely "some number that never
-  // matches", and that it never waits for DEFAULT_TTL_MS just because the
-  // record's timestamp is fresh.
-  const crashed = spawn(process.execPath, ['-e', 'process.exit(0)'], { stdio: 'ignore' });
-  const deadPid = await new Promise((resolve, reject) => {
-    crashed.once('spawn', () => resolve(crashed.pid));
-    crashed.once('error', reject);
-  });
-  await new Promise((resolve) => { crashed.once('exit', resolve); });
-
-  const fgosDir = path.join(repoRoot, '.fgos');
-  // Freshly timestamped, same as a lock this process itself would have
-  // just written before crashing — a same-session retry must not need to
-  // wait out DEFAULT_TTL_MS's full 3 minutes to resume.
-  const staleLock = acquireMainCheckoutLock(fgosDir, { identity: deadPid });
-  assert.equal(staleLock.status, ACQUIRED);
-
-  const start = Date.now();
-  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }));
-  const elapsed = Date.now() - start;
-
-  assert.equal(result.outcome, 'merged');
-  assert.ok(elapsed < DEFAULT_TTL_MS / 2, `must reclaim promptly on a dead pid, not wait out the TTL (took ${elapsed}ms)`);
+  const holder = await holdLockInChild('main-checkout', { fgosDir: path.join(repoRoot, '.fgos') });
+  try {
+    const headBefore = headOf(repoRoot);
+    await assert.rejects(
+      () => mergeInSlot(repoRoot, makeItem({ verify: 'true' })),
+      (err) => {
+        assert.equal(err.code, 'lock-held');
+        assert.match(err.message, /main checkout \(checkpoint\) is held by another process/);
+        assert.ok(err.holders.includes(holder.child.pid));
+        return true;
+      },
+    );
+    assert.equal(headOf(repoRoot), headBefore);
+    assert.equal(isWorkingTreeClean(repoRoot), true);
+  } finally {
+    await killHolder(holder);
+  }
 });
 
-// tsk-2eq: a leaf approve calls mergeRunnerItem with an ephemeral,
-// freshly-.fgos-stripped worktree as `repoRoot` (the git-op cwd) — before
-// this fix, the lock resolved against that same ephemeral path and so
-// never contended with a real concurrent leaf merge. The two tests below
-// simulate that shape with two separate directories: `repoRoot` (a real
-// git checkout, standing in for the ephemeral worktree) and `lockRoot` (a
-// plain directory, standing in for the real main checkout).
-test('mergeRunnerItem resolves the main-checkout lock against lockRoot, not repoRoot', async () => {
+test('with waitMs the merge waits for the main checkout mutex and lands once a SIGKILLed holder is gone', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+  const holder = await holdLockInChild('main-checkout', { fgosDir: path.join(repoRoot, '.fgos') });
+  const merging = mergeInSlot(repoRoot, makeItem({ verify: 'true' }), { waitMs: 10000 });
+  await sleep(300);
+  await killHolder(holder);
+  const result = await merging;
+  assert.equal(result.outcome, 'merged');
+});
+
+test('a merge takes the main mutex only for its checkpoint and commit: it is free while verify runs, on the main checkout and in a disposable worktree alike', async () => {
+  for (const shape of ['main-checkout', 'disposable-worktree']) {
+    const repoRoot = initRepo();
+    makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+    const lockRoot = shape === 'main-checkout' ? repoRoot : fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-merge-test-lockroot-'));
+    const marker = path.join(lockRoot, 'verify-started');
+    const verify = `node -e "require('fs').writeFileSync('${marker.replace(/\\/g, '/')}','1');setTimeout(()=>{},1500)"`;
+    const merging = mergeInSlot(repoRoot, makeItem({ verify }), { lockRoot });
+    const deadline = Date.now() + 15000;
+    while (!fs.existsSync(marker)) {
+      assert.ok(Date.now() < deadline, `verify never started (${shape})`);
+      await sleep(20);
+    }
+    const entered = await withMainCheckout(createLockScope('concurrent'), 'concurrent', () => 'in', { fgosDir: path.join(lockRoot, '.fgos') });
+    assert.equal(entered, 'in', `the main mutex must be free during verify (${shape})`);
+    assert.equal((await merging).outcome, 'merged');
+  }
+});
+
+test('mergeRunnerItem resolves the locks against lockRoot, not repoRoot', async () => {
   const repoRoot = initRepo();
   makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
   const lockRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-merge-test-lockroot-'));
 
-  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }), { lockRoot });
+  const result = await mergeInSlot(repoRoot, makeItem({ verify: 'true' }), { lockRoot });
 
   assert.equal(result.outcome, 'merged');
   assert.equal(fs.existsSync(path.join(lockRoot, '.fgos')), true, 'the lock directory must be created under lockRoot');
   assert.equal(fs.existsSync(path.join(repoRoot, '.fgos')), false, 'repoRoot must never receive a lock directory when lockRoot is set explicitly');
 });
 
-test('mergeRunnerItem refuses when lockRoot (not repoRoot) already holds the main-checkout lock — proves a leaf-approve-shaped call now actually contends', async () => {
+test('a leaf-shaped merge (repoRoot is a worktree, lockRoot the real checkout) contends on lockRoot\'s main mutex', async () => {
   const repoRoot = initRepo();
   makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
   const lockRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-merge-test-lockroot-'));
-
-  const fgosDir = path.join(lockRoot, '.fgos');
-  const otherLock = acquireMainCheckoutLock(fgosDir, { identity: 'a-different-live-session' });
-  assert.equal(otherLock.status, ACQUIRED);
-
-  const headBefore = headOf(repoRoot);
-  await assert.rejects(
-    () => mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }), { lockRoot }),
-    (err) => {
-      assert.equal(err.code, 'lock-held');
-      return true;
-    },
-  );
-  assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged — refused before the merge ever started');
+  const holder = await holdLockInChild('main-checkout', { fgosDir: path.join(lockRoot, '.fgos') });
+  try {
+    const headBefore = headOf(repoRoot);
+    await assert.rejects(() => mergeInSlot(repoRoot, makeItem({ verify: 'true' }), { lockRoot }), (err) => err.code === 'lock-held');
+    assert.equal(headOf(repoRoot), headBefore);
+  } finally {
+    await killHolder(holder);
+  }
 });
 
-// withMergeTargetSlot / mergeRunnerItem's targetSlot option (tsk-xyr, §E of
-// the Merge Conductor design: a queue keyed by target ref, not a directory).
+test('mergeRunnerItem releases the main mutex and the slot after a merge', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+  const result = await mergeInSlot(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
+  assert.equal(result.outcome, 'merged');
+  assert.equal(probe('main-checkout', { fgosDir: path.join(repoRoot, '.fgos') }).result, 'free');
+  assert.equal(probe('merge-slot', slotParams(repoRoot, 'main')).result, 'free');
+});
 
-test('withMergeTargetSlot acquires and releases cleanly around a successful fn', async () => {
+test('withMergeSlot holds the slot while fn runs and frees it after, also when fn throws', async () => {
   const lockRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-merge-test-slot-'));
-  const slotFile = mergeSlotLockFile('fgw/tsk-51m');
-
-  let ranInsideSlot = false;
-  const result = await withMergeTargetSlot(lockRoot, 'fgw/tsk-51m', async () => {
-    assert.equal(fs.existsSync(path.join(lockRoot, '.fgos', slotFile)), true, 'the slot lock file must exist while fn runs');
-    ranInsideSlot = true;
+  const params = slotParams(lockRoot, 'fgw/tsk-51m');
+  const result = await withMergeSlot(createLockScope('slot'), lockRoot, 'fgw/tsk-51m', async () => {
+    assert.equal(probe('merge-slot', params).result, 'held');
     return 'fn-result';
   });
-
-  assert.equal(ranInsideSlot, true);
   assert.equal(result, 'fn-result');
-  assert.equal(fs.existsSync(path.join(lockRoot, '.fgos', slotFile)), false, 'the slot lock file must be released once fn returns');
+  assert.equal(probe('merge-slot', params).result, 'free');
+  await assert.rejects(() => withMergeSlot(createLockScope('slot'), lockRoot, 'fgw/tsk-51m', async () => { throw new Error('fn blew up'); }), /fn blew up/);
+  assert.equal(probe('merge-slot', params).result, 'free', 'a thrown fn must still free the slot');
 });
 
-test('withMergeTargetSlot releases the slot even when fn throws', async () => {
+test('withMergeSlot: the same target is refused with lock-held while held, two different targets run at once', async () => {
   const lockRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-merge-test-slot-'));
-  const slotFile = mergeSlotLockFile('fgw/tsk-51m');
-
-  await assert.rejects(
-    () => withMergeTargetSlot(lockRoot, 'fgw/tsk-51m', async () => {
-      throw new Error('fn blew up');
-    }),
-    /fn blew up/,
-  );
-  assert.equal(fs.existsSync(path.join(lockRoot, '.fgos', slotFile)), false, 'a thrown fn must still release the slot (finally)');
-});
-
-test('withMergeTargetSlot refuses when the SAME target ref is already held by another live identity — code lock-held', async () => {
-  const lockRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-merge-test-slot-'));
-  const fgosDir = path.join(lockRoot, '.fgos');
-  const slotFile = mergeSlotLockFile('fgw/tsk-51m');
-  const otherLock = acquireMainCheckoutLock(fgosDir, { identity: 'a-different-live-session', lockFile: slotFile });
-  assert.equal(otherLock.status, ACQUIRED);
-
-  await assert.rejects(
-    () => withMergeTargetSlot(lockRoot, 'fgw/tsk-51m', async () => 'should never run'),
-    (err) => {
-      assert.match(err.message, /target's merge slot is held by another live session/);
-      assert.equal(err.code, 'lock-held');
-      assert.equal(err.targetRef, 'fgw/tsk-51m');
-      assert.equal(typeof err.remainingTtlMs, 'number');
-      return true;
-    },
-  );
-});
-
-test('withMergeTargetSlot for TWO DIFFERENT target refs run concurrently — no shared serialization between them (acceptance 3)', async () => {
-  const lockRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-merge-test-slot-'));
-  let bothInsideAtOnce = false;
-
+  let bothInside = false;
   const gate = { a: false, b: false };
-  const runA = withMergeTargetSlot(lockRoot, 'fgw/tsk-xyr', async () => {
-    gate.a = true;
-    // Wait for b to also be inside before either finishes — if the two
-    // slots contended with each other, this would deadlock and the test
-    // would time out instead of passing.
-    while (!gate.b) await new Promise((r) => setTimeout(r, 5));
-    bothInsideAtOnce = true;
-  });
-  const runB = withMergeTargetSlot(lockRoot, 'fgw/tsk-55p', async () => {
-    gate.b = true;
-    while (!gate.a) await new Promise((r) => setTimeout(r, 5));
-  });
-
-  await Promise.all([runA, runB]);
-  assert.equal(bothInsideAtOnce, true, 'both target slots must have been held simultaneously — they must not contend with each other');
+  await Promise.all([
+    withMergeSlot(createLockScope('a'), lockRoot, 'fgw/tsk-xyr', async () => {
+      gate.a = true;
+      while (!gate.b) await sleep(5);
+      bothInside = true;
+      await assert.rejects(
+        () => withMergeSlot(createLockScope('same'), lockRoot, 'fgw/tsk-xyr', async () => 'never'),
+        (err) => err.code === 'lock-held' && err.targetRef === 'fgw/tsk-xyr',
+      );
+    }),
+    withMergeSlot(createLockScope('b'), lockRoot, 'fgw/tsk-55p', async () => {
+      gate.b = true;
+      while (!gate.a) await sleep(5);
+    }),
+  ]);
+  assert.equal(bothInside, true);
 });
 
-test('mergeRunnerItem with targetSlot:true does NOT take main-checkout.lock — a concurrent holder of main-checkout.lock does not block it (acceptance: additive, unchanged default when omitted)', async () => {
-  const repoRoot = initRepo();
-  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
-
-  // Simulate another session holding the ORDINARY main-checkout.lock (the
-  // resource mergeRunnerItem's default path contends on) — targetSlot:true
-  // must not even look at it.
-  const fgosDir = path.join(repoRoot, '.fgos');
-  const otherLock = acquireMainCheckoutLock(fgosDir, { identity: 'a-different-live-session' });
-  assert.equal(otherLock.status, ACQUIRED);
-
-  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }), { targetSlot: true });
-  assert.equal(result.outcome, 'merged', 'targetSlot:true must merge successfully while main-checkout.lock is held by someone else');
-});
-
-test('mergeRunnerItem omitting targetSlot (default false) still takes main-checkout.lock exactly as before — byte-identical default', async () => {
-  const repoRoot = initRepo();
-  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
-
-  const fgosDir = path.join(repoRoot, '.fgos');
-  const otherLock = acquireMainCheckoutLock(fgosDir, { identity: 'a-different-live-session' });
-  assert.equal(otherLock.status, ACQUIRED);
-
+test('lock ranks: slot, then worktree-admin, then main is allowed in one scope; main before worktree-admin throws at once', async () => {
+  const lockRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-merge-test-rank-'));
+  const fgosDir = path.join(lockRoot, '.fgos');
+  const scope = createLockScope('rank');
+  const order = await withMergeSlot(scope, lockRoot, 'main', () => withWorktreeAdmin(scope, fgosDir, async () => 'admin-held').then(() => withMainCheckout(scope, 'after-admin', () => 'main-held', { fgosDir })));
+  assert.equal(order, 'main-held');
   await assert.rejects(
-    () => mergeRunnerItem(repoRoot, makeItem({ verify: 'true' })),
-    (err) => {
-      assert.equal(err.code, 'lock-held');
-      return true;
-    },
+    () => withMainCheckout(scope, 'outer', () => withWorktreeAdmin(scope, fgosDir, () => 'never'), { fgosDir }),
+    (err) => err.code === 'lock-order-violation',
   );
-});
-
-test('the target-slot pattern in practice: withMergeTargetSlot held around withMergeEphemeralWorktree blocks a second concurrent attempt on the SAME target BEFORE it can read the target tip (acceptance 7)', async () => {
-  const repoRoot = initRepo();
-  makeBranchWithCommit(repoRoot, 'fgw/tsk-51m', 'root.txt', 'root\n');
-  makeBranchWithCommit(repoRoot, 'fgw/leaf-a', 'a.txt', 'a\n');
-
-  const targetRef = 'fgw/tsk-51m';
-  const tipBefore = git(repoRoot, ['rev-parse', targetRef]).trim();
-
-  // Hold the slot exactly as a real caller would (bin/fgos.mjs wraps
-  // withMergeEphemeralWorktree in this), simulating a first, in-progress
-  // merge into the same target from a different session.
-  const fgosDir = path.join(repoRoot, '.fgos');
-  const slotFile = mergeSlotLockFile(targetRef);
-  const heldByOther = acquireMainCheckoutLock(fgosDir, { identity: 'a-different-live-session', lockFile: slotFile });
-  assert.equal(heldByOther.status, ACQUIRED);
-
-  // A second attempt on the SAME target must be refused by the slot BEFORE
-  // withMergeEphemeralWorktree ever creates its detached checkout (which is
-  // what reads the tip) — proven here by wrapping the whole ephemeral-merge
-  // call in withMergeTargetSlot and asserting it throws lock-held, with the
-  // target's tip completely unchanged.
-  await assert.rejects(
-    () => withMergeTargetSlot(repoRoot, targetRef, () => withMergeEphemeralWorktree(repoRoot, 'tsk-51m', async (ephemeral) => {
-      throw new Error('must never reach here — the slot should refuse first');
-    })),
-    (err) => {
-      assert.equal(err.code, 'lock-held');
-      return true;
-    },
-  );
-  assert.equal(git(repoRoot, ['rev-parse', targetRef]).trim(), tipBefore, 'target tip must be completely untouched — the ephemeral worktree must never even have been created');
-});
-
-test('mergeRunnerItem: an ambiguous (unparseable) lock file carries code "lock-ambiguous", distinct from "lock-held" -- a retry wrapper must never retry this one either', async () => {
-  const repoRoot = initRepo();
-  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
-
-  const fgosDir = path.join(repoRoot, '.fgos');
-  fs.mkdirSync(fgosDir, { recursive: true });
-  fs.writeFileSync(path.join(fgosDir, 'main-checkout.lock'), 'not json at all {{{');
-
-  await assert.rejects(
-    () => mergeRunnerItem(repoRoot, makeItem({ verify: 'true' })),
-    (err) => {
-      assert.match(err.message, /main checkout lock is ambiguous/);
-      assert.equal(err.code, 'lock-ambiguous');
-      return true;
-    },
-  );
-});
-
-test('mergeRunnerItem merges normally when the lock is free, and releases it afterward', async () => {
-  const repoRoot = initRepo();
-  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
-
-  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
-  assert.equal(result.outcome, 'merged');
-
-  // Lock released (not left held past this call) — a second, differently-
-  // identified caller must be able to acquire it immediately afterward.
-  const fgosDir = path.join(repoRoot, '.fgos');
-  const afterLock = acquireMainCheckoutLock(fgosDir, { identity: 'someone-else' });
-  assert.equal(afterLock.status, ACQUIRED, 'lock must be released after a successful merge, not left held');
 });
 
 // tsk-3yl: idempotent already-merged branch (docs/backlog.md p-b91d487a) —
@@ -1343,7 +1090,7 @@ test('mergeRunnerItem is idempotent: a branch already merged into HEAD returns o
   git(repoRoot, ['merge', '--no-ff', '-q', '-m', 'earlier successful merge', 'fgw/demo-item']);
   const headAfterFirstMerge = headOf(repoRoot);
 
-  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
+  const result = await mergeInSlot(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
   assert.equal(result.outcome, 'merged');
   assert.equal(result.check.passed, true);
   assert.equal(headOf(repoRoot), headAfterFirstMerge, 'no new commit should be created for an already-merged branch');
@@ -1360,7 +1107,7 @@ test('mergeRunnerItem on an already-merged branch still re-runs verify and retur
   git(repoRoot, ['add', '-A']);
   git(repoRoot, ['commit', '-q', '-m', 'unrelated regression removes produced.txt']);
 
-  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
+  const result = await mergeInSlot(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
   assert.equal(result.outcome, 'verify-fail');
   assert.equal(result.check.passed, false);
 });
@@ -1433,7 +1180,7 @@ test('mergeRunnerItem does not report "merged" when an already-ancestor branch h
 
   // A weak/generic verify command not scoped to the item's own artifact —
   // the exact condition that used to let this slip through as "merged".
-  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }));
+  const result = await mergeInSlot(repoRoot, makeItem({ verify: 'true' }));
   assert.equal(result.outcome, 'verify-fail');
   assert.equal(result.check.passed, false);
   assert.match(result.check.output, /integrity check failed/);
@@ -1465,7 +1212,7 @@ test('mergeRunnerItem does not false-flag an already-merged branch just because 
 
   // First real merge of demo-item: a normal 3-way merge combining both
   // edits — exercises the ordinary (not-yet-ancestor) path.
-  const firstResult = await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }));
+  const firstResult = await mergeInSlot(repoRoot, makeItem({ verify: 'true' }));
   assert.equal(firstResult.outcome, 'merged');
   assert.equal(
     fs.readFileSync(path.join(repoRoot, 'shared.txt'), 'utf8').replaceAll('\r\n', '\n'),
@@ -1477,7 +1224,7 @@ test('mergeRunnerItem does not false-flag an already-merged branch just because 
   // demo-item's own branch tip ("line1\ndemo added\n") and current HEAD
   // ("other added\nline1\ndemo added\n") — that must not be mistaken for
   // discarded content.
-  const secondResult = await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }));
+  const secondResult = await mergeInSlot(repoRoot, makeItem({ verify: 'true' }));
   assert.equal(secondResult.outcome, 'merged');
   assert.equal(secondResult.check.passed, true);
 });
@@ -1501,7 +1248,7 @@ test('mergeRunnerItem refuses a branch that stages a change under .fgos/ — mai
   git(repoRoot, ['checkout', 'main']);
 
   const headBefore = headOf(repoRoot);
-  const result = await mergeRunnerItem(repoRoot, makeItem());
+  const result = await mergeInSlot(repoRoot, makeItem());
   assert.equal(result.outcome, 'fgos-write-rejected');
   assert.deepEqual(result.paths, ['.fgos/events.jsonl']);
   assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged after an aborted merge');
@@ -1525,7 +1272,7 @@ test('mergeRunnerItem merges normally when the branch touches ordinary files alo
   git(repoRoot, ['commit', '-q', '-m', 'seed .fgos/events.jsonl on main']);
 
   makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
-  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
+  const result = await mergeInSlot(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
   assert.equal(result.outcome, 'merged');
   assert.ok(fs.existsSync(path.join(repoRoot, 'produced.txt')));
 });
@@ -1570,7 +1317,7 @@ test('mergeRunnerItem resolves two-sided-drift-after-forced-restore cleanly via 
   git(repoRoot, ['add', logRelPath]);
   git(repoRoot, ['commit', '-q', '-m', 'main grows fault log 2']);
 
-  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
+  const result = await mergeInSlot(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
   assert.equal(result.outcome, 'merged');
   assert.equal(isWorkingTreeClean(repoRoot), true);
 
@@ -1630,7 +1377,7 @@ test('mergeRunnerItem merges cleanly when a merge=union .fgos/ file genuinely di
   git(repoRoot, ['commit', '-q', '-m', 'main grows diagnostic log independently']);
   const mainOwnContent = fs.readFileSync(path.join(repoRoot, logRelPath), 'utf8');
 
-  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
+  const result = await mergeInSlot(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
   assert.equal(result.outcome, 'merged');
   assert.ok(fs.existsSync(path.join(repoRoot, 'produced.txt')), 'the worker\'s real (non-.fgos) work must still land');
 
@@ -1680,13 +1427,13 @@ test('mergeRunnerItem does not false-flag an already-merged branch over a legiti
   git(repoRoot, ['add', logRelPath]);
   git(repoRoot, ['commit', '-q', '-m', 'main grows diagnostic log independently']);
 
-  const firstResult = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
+  const firstResult = await mergeInSlot(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
   assert.equal(firstResult.outcome, 'merged');
 
   // Re-approve of the now-already-merged branch is exactly the path that
   // runs branchContentMismatch — this must still report 'merged', not
   // 'verify-fail'.
-  const secondResult = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
+  const secondResult = await mergeInSlot(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
   assert.equal(secondResult.outcome, 'merged');
   assert.equal(secondResult.check.passed, true);
 });
@@ -1768,7 +1515,7 @@ test('mergeRunnerItem merges cleanly when a non-union .fgos/ path auto-merges to
   git(repoRoot, ['commit', '-q', '-m', 'main updates config.json field b (round 2)']);
   const mainOwnContent = fs.readFileSync(path.join(repoRoot, configRelPath), 'utf8');
 
-  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt', branchHeadAtTake: forkCommit }));
+  const result = await mergeInSlot(repoRoot, makeItem({ verify: 'test -f produced.txt', branchHeadAtTake: forkCommit }));
   assert.equal(result.outcome, 'merged');
   assert.ok(fs.existsSync(path.join(repoRoot, 'produced.txt')), 'the worker\'s real (non-.fgos) work must still land');
 
@@ -1825,7 +1572,7 @@ test('mergeRunnerItem merges cleanly when a .fgos/ path is absent at branchHeadA
   // only the branch changed anything relative to the merge-base, the exact
   // one-sided-deletion shape that auto-resolves without a conflict.
 
-  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt', branchHeadAtTake: forkCommit }));
+  const result = await mergeInSlot(repoRoot, makeItem({ verify: 'test -f produced.txt', branchHeadAtTake: forkCommit }));
   assert.equal(result.outcome, 'merged');
   assert.ok(fs.existsSync(path.join(repoRoot, 'produced.txt')), 'the worker\'s real (non-.fgos) work must still land');
 
@@ -1874,7 +1621,7 @@ test('mergeRunnerItem merges cleanly when a .fgos/ path is unchanged on the bran
   git(repoRoot, ['rm', '-q', logRelPath]);
   git(repoRoot, ['commit', '-q', '-m', 'main migrates diagnostic log out of .fgos/ root']);
 
-  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt', branchHeadAtTake: forkCommit }));
+  const result = await mergeInSlot(repoRoot, makeItem({ verify: 'test -f produced.txt', branchHeadAtTake: forkCommit }));
   assert.equal(result.outcome, 'merged');
   assert.ok(fs.existsSync(path.join(repoRoot, 'produced.txt')), 'the worker\'s real (non-.fgos) work must still land');
   assert.equal(fs.existsSync(path.join(repoRoot, logRelPath)), false, 'main\'s own deletion must survive unaffected -- the branch\'s stale copy must never resurrect it');
@@ -1923,7 +1670,7 @@ test('mergeRunnerItem prefers item.lastAttempt.branchHeadAtTake over a stale top
   git(repoRoot, ['rm', '-q', configRelPath]);
   git(repoRoot, ['commit', '-q', '-m', 'main migrates diagnostic file out of .fgos/ root']);
 
-  const result = await mergeRunnerItem(repoRoot, makeItem({
+  const result = await mergeInSlot(repoRoot, makeItem({
     verify: 'test -f produced.txt',
     branchHeadAtTake: staleTakeCommit, // stale top-level field (real bug shape)
     lastAttempt: { branchHeadAtTake: freshTakeCommit }, // the correct, fresh reference point
@@ -1966,7 +1713,7 @@ test('mergeRunnerItem still refuses a non-union .fgos/ path that auto-merges cle
   git(repoRoot, ['commit', '-q', '-m', 'main edits .fgos/config.json line 3']);
   const headBefore = headOf(repoRoot);
 
-  const result = await mergeRunnerItem(repoRoot, makeItem());
+  const result = await mergeInSlot(repoRoot, makeItem());
   assert.equal(result.outcome, 'fgos-write-rejected');
   assert.deepEqual(result.paths, [configRelPath.split(path.sep).join('/')]);
   assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged after an aborted merge');
@@ -2041,7 +1788,7 @@ test('mergeRunnerItem resolves a stale deleted-.fgos-shard branch cleanly instea
   const item = makeItem({ id: 'demo-item', verify: 'test -f produced.txt' });
   const mainShardBefore = fs.readFileSync(path.join(repoRoot, shardRelPath), 'utf8');
 
-  const result = await mergeRunnerItem(repoRoot, item);
+  const result = await mergeInSlot(repoRoot, item);
   assert.equal(result.outcome, 'merged', 'approve must resolve the false .fgos conflict, not report a real one');
   assert.ok(fs.existsSync(path.join(repoRoot, 'produced.txt')), 'the worker\'s real (non-.fgos) work must still land');
   assert.equal(
@@ -2126,7 +1873,7 @@ test('withMergeEphemeralWorktree still force-moves normally when nothing else to
 test('cleanupMergedBranch deletes the now-fully-merged branch and never throws', async () => {
   const repoRoot = initRepo();
   makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
-  await mergeRunnerItem(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
+  await mergeInSlot(repoRoot, makeItem({ verify: 'test -f produced.txt' }));
 
   const result = cleanupMergedBranch(repoRoot, 'fgw/demo-item');
   assert.deepEqual(result.warnings, []);
@@ -2227,7 +1974,7 @@ test('a red repo-invariant check blocks the merge even when the item verify is g
   configureInvariantChecks(repoRoot, ['exit 9']);
   const before = headOf(repoRoot);
 
-  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }));
+  const result = await mergeInSlot(repoRoot, makeItem({ verify: 'true' }));
 
   assert.equal(result.outcome, 'verify-fail');
   assert.match(result.check.output, /repo-invariant check failed: exit 9/);
@@ -2240,7 +1987,7 @@ test('a green repo-invariant check lets the merge land', async () => {
   makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
   configureInvariantChecks(repoRoot, ['exit 0']);
 
-  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }));
+  const result = await mergeInSlot(repoRoot, makeItem({ verify: 'true' }));
 
   assert.equal(result.outcome, 'merged');
   assert.equal(fs.existsSync(path.join(repoRoot, 'produced.txt')), true);
@@ -2252,7 +1999,7 @@ test('no invariantChecks config means no invariant check runs at merge', async (
   const repoRoot = initRepo();
   makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
 
-  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }));
+  const result = await mergeInSlot(repoRoot, makeItem({ verify: 'true' }));
 
   assert.equal(result.outcome, 'merged');
 });
@@ -2266,7 +2013,7 @@ test('D5: the merged tree already verified at return skips both the verify and t
   configureInvariantChecks(repoRoot, ['exit 9']);
   const branchHeadAtReturn = tipOf(repoRoot, 'fgw/demo-item');
 
-  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'exit 1', branchHeadAtReturn }));
+  const result = await mergeInSlot(repoRoot, makeItem({ verify: 'exit 1', branchHeadAtReturn }));
 
   assert.equal(result.outcome, 'merged');
   assert.equal(result.check.passed, true);
@@ -2291,7 +2038,7 @@ test('D5: main advancing past the fork on an overlapping path forces the checks 
   git(repoRoot, ['add', 'seed.txt']);
   git(repoRoot, ['commit', '-q', '-m', 'main advanced after return touching seed.txt']);
 
-  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'exit 1', branchHeadAtReturn }));
+  const result = await mergeInSlot(repoRoot, makeItem({ verify: 'exit 1', branchHeadAtReturn }));
 
   assert.equal(result.outcome, 'verify-fail', 'the verify must actually run, and its red must be honoured');
   assert.notEqual(result.check.skipped, true);
@@ -2306,7 +2053,7 @@ test('D5: main advancing past the fork on a disjoint path still allows skip', as
   git(repoRoot, ['add', 'moved-on.txt']);
   git(repoRoot, ['commit', '-q', '-m', 'main advanced after the return on disjoint path']);
 
-  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'exit 1', branchHeadAtReturn }));
+  const result = await mergeInSlot(repoRoot, makeItem({ verify: 'exit 1', branchHeadAtReturn }));
 
   assert.equal(result.outcome, 'merged');
   assert.equal(result.check.passed, true);
@@ -2328,7 +2075,7 @@ test('D5: main renaming a path that branch modified forces checks to run again',
   git(repoRoot, ['mv', 'seed.txt', 'renamed-seed.txt']);
   git(repoRoot, ['commit', '-q', '-m', 'main renamed seed.txt']);
 
-  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'exit 1', branchHeadAtReturn }));
+  const result = await mergeInSlot(repoRoot, makeItem({ verify: 'exit 1', branchHeadAtReturn }));
 
   assert.equal(result.outcome, 'verify-fail');
   assert.notEqual(result.check.skipped, true);
@@ -2346,7 +2093,7 @@ test('D5: a branch tip that moved past branchHeadAtReturn forces the checks to r
   git(repoRoot, ['commit', '-q', '-m', 'pushed after the return']);
   git(repoRoot, ['checkout', '-q', 'main']);
 
-  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'exit 1', branchHeadAtReturn }));
+  const result = await mergeInSlot(repoRoot, makeItem({ verify: 'exit 1', branchHeadAtReturn }));
 
   assert.equal(result.outcome, 'verify-fail');
   assert.notEqual(result.check.skipped, true);
@@ -2358,7 +2105,7 @@ test('D5: an item with no branchHeadAtReturn is never eligible for the skip', as
   const repoRoot = initRepo();
   makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
 
-  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'exit 1', headAtReturn: headOf(repoRoot) }));
+  const result = await mergeInSlot(repoRoot, makeItem({ verify: 'exit 1', headAtReturn: headOf(repoRoot) }));
 
   assert.equal(result.outcome, 'verify-fail');
   assert.notEqual(result.check.skipped, true);
@@ -2521,7 +2268,7 @@ test('mergeRunnerItem attaches a postLand report whose landed paths were capture
   const repoRoot = initRepo();
   makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'shared.mjs', 'landed\n');
 
-  const result = await mergeRunnerItem(repoRoot, makeItem());
+  const result = await mergeInSlot(repoRoot, makeItem());
 
   assert.equal(result.outcome, 'merged');
   // Once the merge lands, main contains fgw/demo-item, so the three-dot diff
@@ -2536,7 +2283,7 @@ test('mergeRunnerItem attaches no postLand report when the merge did not land', 
   const repoRoot = initRepo();
   makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
 
-  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'exit 1' }));
+  const result = await mergeInSlot(repoRoot, makeItem({ verify: 'exit 1' }));
 
   assert.equal(result.outcome, 'verify-fail');
   assert.equal(result.postLand, undefined);

@@ -577,7 +577,7 @@ async function claimItem({ dir, ownershipStore, queue, ownerIdentity, item, repo
       // token, never re-read "whichever claim is active right now" at
       // settle time (that would settle a DIFFERENT actor's claim if this
       // one got reclaimed as stale in the meantime).
-      claimId = claimWork(dir, { id: item.id, actor: 'runner', isolate: false, repoRoot, skipOutcome: true }).claimId;
+      claimId = (await claimWork(dir, { id: item.id, actor: 'runner', isolate: false, repoRoot, skipOutcome: true })).claimId;
     }
     return { ...decision, claimId };
   });

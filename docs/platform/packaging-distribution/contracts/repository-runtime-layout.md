@@ -76,9 +76,12 @@ machineReleaseStore:
       docs/
   installs/
     <activationId>.json
-  install.lock
+  locks/
+    install.lock            # kernel lock (holder-lock), machine scope
   quarantine/
 ```
+
+The workspace activation lock is the kernel lock `.fgos/locks/activation.lock` (repo scope). The legacy paths `.fgos/installation/activation.lock` and `<machineReleaseStore>/install.lock` are tombstone directories after the cutover; neither is a lock file any more.
 
 ## 3. Separation Rules
 

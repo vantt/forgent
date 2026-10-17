@@ -5,7 +5,7 @@ Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent
 Purpose: Define the single lock port for every cold fgOS lock: kernel locks on open file descriptions behind one OS-neutral port
 Design status: Accepted
-Implementation status: In progress (contracts and registry landed; crate, routes, Node facade, fences, fgctl gate and the cutover of ten locks land in parallel phases)
+Implementation status: In progress (contracts and registry landed; crate, routes, Node facade, fences, fgctl gate and the cutover of ten locks land in parallel phases; the main checkout single door, `worktree-admin` and `fgos lock fence` are specified in sections 14, 16 and 17 and land with the main-door track; the hot state mutex is pending the event store decision, section 15)
 Canonical: Yes
 Owner: Holder-lock component
 Source: packages/holder-lock/rust (crate fgos-holder-lock), src/holder-lock/ (Node facade)
@@ -18,6 +18,7 @@ Related:
 - docs/specs/distribution.md
 - docs/specs/runner.md
 - plans/261016-1104-holder-lock-kernel-lock-foundation/plan.md
+- plans/261016-1306-main-checkout-single-door-hot-lock/plan.md
 - plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md
 ```
 
@@ -27,14 +28,14 @@ Holder-lock answers one question for every cold lock in fgOS: who holds this res
 
 Every caller (the Node facade, a Rust crate, a git hook) goes through one port with one set of operations. Each operating system has one driver behind the port, and the port reports the guarantee level that driver gives on the filesystem the lock files live on. Nothing in the public interface is POSIX-only: a caller never sees a file descriptor or a handle of the operating system.
 
-The component owns the cold locks only. The hot state mutex (`events.lock` and `claims.lock`, merged into one `state` lock) keeps its in-process fast path and uses this port only for the reclaim step; that work and the main-checkout mutex belong to the next track (see the ownership column of the registry, section 7).
+The component owns the cold locks, the main checkout mutex, the merge slot and `worktree-admin` (sections 14 and 16). The state store locks (`events.lock`, `claims.lock`) are not part of this component yet (section 15).
 
 ## 2. Ownership boundary
 
 | Owns | Does not own |
 |---|---|
 | The port: `acquire`, `release`, `run_borrowed`, `probe`, `holders`, `guarantee` ([contract](../../../packages/holder-lock/contracts/holder-lock.port.v1.json)) | Writer identity (Session Identity) |
-| Which process holds which resource, as the kernel reports it | Taking a lock away from a live holder (there is no such path; a hung live holder is stopped by a person, `fgos lock fence`, next track) |
+| Which process holds which resource, as the kernel reports it | Taking a lock away from a live holder (there is no such path; a hung live holder is stopped by a person, `fgos lock fence`, section 17) |
 | Lock order inside one `LockScope` and the description rules (section 5) | Liveness judgment of a process tuple (process facts) |
 | The lock registry: every lock's name, kind, scope, rank, path, legacy shape and fence ([registry](../../../packages/holder-lock/contracts/lock-registry.v1.json)) | The attempt lock's lifecycle (run supervisor) and the containment port (process control) |
 | The single state-root resolution and `lockRoot` (section 11) | The meaning of a lock's contents (a lock file is never read for data) |
@@ -98,10 +99,10 @@ The borrower test used by a hook has three conditions, all required: `FGOS_LOCK_
 
 | Kind | Mechanism | Used for |
 |---|---|---|
-| `mutex` | Kernel lock, held briefly | sessions, advance, reconcile, recovery, provider account, provider state; later main checkout, `worktree-admin`, merge slot, observe, activation, install |
+| `mutex` | Kernel lock, held briefly | sessions, advance, reconcile, recovery, provider account, provider state, main checkout, `worktree-admin`, merge slot; later observe, activation, install |
 | `lease` | Kernel lock, held for the length of a long job; may be handed to a gate | gateway, runner, dispatch cwd, full-suite; later the attempt lock, whose file lives in the run directory |
-| `hot-mutex` | Node in-process link/unlink, dead-holder cleanup under a kernel lock | `state` (events and claims merged), `porting-events`; next track |
-| `beacon` | Not a lock | the main-checkout activity file |
+| `hot-mutex` | reserved for the state store locks; no row is taken through this port yet (section 15) | `state`, `porting-events` |
+| `beacon` | Not a lock | the main-checkout activity file (read by the hook only when the commit is not a borrower, section 14) |
 
 Run control is not a kind: its ledger and CAS stay as they are, with no garbage collection; real exclusion of an attempt is the attempt lock.
 
@@ -127,6 +128,16 @@ Ranks (a scope may only take a lock of a higher rank than every lock it holds):
 
 Locks cut over by this track: `gateway`, `runner`, `sessions`, `advance`, `reconcile`, `recovery`, `full-suite`, `provider-account`, `provider-state`, `dispatch-cwd`. Their new files live under `<fgosDir>/locks/` (repo scope), `<lockRoot>/` (machine scope) or a `locks/` directory inside the run (`<workflowRunDir>/locks/advance.lock`, `<runDir>/locks/recovery.lock`), so a run's new lock never lands on the tombstone of its legacy path. The dispatch cwd lock is keyed by the directory's identity after `realpath` (`<fgosDir>/locks/dispatch-cwd--<dev>-<ino>.lock`), so a worktree reached through a symlink is the same lock. The npm package and the staged legacy-node payload ship the registry file, because every lock of this track resolves through it. The dispatch cwd lock keeps the `fgosDir` scope; a machine-wide cwd lock is a separate item, opened only when two workspaces share one cwd for real.
 
+Locks cut over by the Rust-callers track (registry owner `4.4`), all leaves of rank 80, all mutex, all fenced by a tombstone:
+
+| Lock | Scope | New path | Legacy path (becomes a tombstone directory) | Caller |
+|---|---|---|---|---|
+| `activation` | repo | `<fgosDir>/locks/activation.lock` | `.fgos/installation/activation.lock` | `fgctl` init, upgrade, repair |
+| `install` | machine | `<lockRoot>/install.lock` (`<stateRoot>/locks/install.lock`) | `<stateRoot>/install.lock` | `fgctl` release store |
+| `observe` | repo | `<fgosDir>/locks/observe.lock` | `.fgos/observe/.lock` | Observe store (`fgos metrics`, `fgos friction`) |
+
+The observe lock waits at most 5 s, has no TTL, and the shard snapshot is written under it. The activation and install locks are held by `fgctl` through the crate it links; a holder that is killed leaves the lock free at once. Until the main-checkout lock is cut over, `fgctl` checks the main checkout with `probe` (shared, non-blocking, never held) plus the v1 read, and reads a directory at `.fgos/main-checkout.lock` (a tombstone) as "moved".
+
 ## 8. The predecessor domain rule
 
 Measured on Windows: a lock bound to a process is released the moment that process dies, while the job that kills its children does so asynchronously, so for a few milliseconds the lock reads free while a borrowed git may still be writing. Linux and macOS have no such gap on the borrow path (git itself holds a copy of the description), but the rule is part of the port from the first driver so no driver can be written without it ([contract](../../../packages/holder-lock/contracts/predecessor.v1.json)).
@@ -150,7 +161,7 @@ In this track only the `linux-gate` domain has an implementation (`judge(gate) =
 - `probe(name, params)` runs `--shared-try` on a fresh description and closes it at once.
 - `runBorrowed(handle, spec, {sync | async})` is the only function that puts the lock fd into `stdio`; it sets `FGOS_LOCK_FD=<name>:3` and, for git, prepends the gc flags. The async form returns the child for a caller that needs `onSpawn` (the account lock).
 - `held` with reason `predecessor-domain-not-empty` becomes the named error `lock-predecessor-domain-not-empty` with the domain; `borrow-leftover-not-killed` keeps its name.
-- The host binary is found once per process by `resolveActiveHostBin` (`FGOS_HOST_BIN`, then the activation), the same rule Session Identity uses; the route is exec'd directly, never through a shim, and never inside a hot lock.
+- The host binary is found once per process by `resolveActiveHostBin` (`FGOS_HOST_BIN`, then the activation), the same rule Session Identity uses; the route is exec'd directly, never through a shim.
 
 `LockScope` is an object passed explicitly through calls; every parallel `claimAndDispatch` in the runner has its own. Inside one scope a lock may be acquired only at a rank higher than every rank the scope holds; two locks of the same rank in one scope are forbidden. A violation throws `lock-order-violation` with `{held, acquiring}` at once. There is no trace-then-warn release and no environment switch: the full test suite and dogfood expose a wrong order, and the phase that caused it fixes it. Exclusion between two scopes of one process is the kernel's job (two descriptions), so no process-wide rank set exists. Across processes (hook, helper) no order check is needed: the hook tries once and never waits, the helper holds nothing after it exits.
 
@@ -189,9 +200,10 @@ The fences that remain are the cheapest thing that makes an old binary fail loud
 | `advance`, `recovery` (per run) | Tombstone for every run that exists at cutover, not lazily | An old binary aiming at a run created after the cutover is rare; lazy placement adds code to every acquire |
 | `dispatch-cwd` | Tombstone for both the `path.resolve` form and the `realpath` form, for every worktree (`git worktree list --porcelain`) and every claim at cutover | Two writers in one worktree is real harm; listing once is cheap |
 | `provider-account`, `provider-state` | Blocking generation: a final generation published by `link` whose holder is pid 1 with no start time and no boot id | A tombstone does not stop a generation ledger; pid 1 is alive in every namespace and a holder without a start time is always `held` to old code |
+| `activation`, `install`, `observe` | Tombstone: the legacy path (`.fgos/installation/activation.lock`, `<stateRoot>/install.lock`, `.fgos/observe/.lock`) becomes a directory holding `TOMBSTONE`, placed once | An older `fgctl` or `fgos` meets the directory and stops with an error rather than taking a legacy lock beside the kernel lock |
 | `full-suite` | None | A tombstone makes the old branch's queue loop forever; without a fence the old branch only runs the suite unqueued, which is harmless |
 
-`src/holder-lock/fences.mjs` is the body of the doctor check `lock-fences` and of its fix: `checkStopped({workspaces})` runs `quiesce-scan` per workspace and lists every blocker (an unreadable entry is a blocker; a platform that cannot scan answers `needs-attest`); `placeFences({fgosDir, workspaceRoot, providerRuntimeDir})` places each fence by exclusive `mkdir` or by `link`, is idempotent, and stops with `v1-lock-present` and the path when a legacy lock file is in use (nobody's file is removed); `fenceStatus` reports which registry paths still lack their fence. The fix (`fenceCutover`) runs `checkStopped`, then `placeFences`, then `checkStopped` again to catch a process that started while the fences went in (it has met the fence and failed loudly, but it is still reported for a person to stop). A blocker on the first scan places nothing. The fix acts only in a workspace whose own activation (`.fgos/installation/activation.json`) runs a release that ships the lock registry in its legacy-node payload: fencing a workspace that still runs the legacy lock code would stop that workspace, so the order is activate first, then fence. The provider ledgers are machine-wide: fencing them from one workspace makes every other workspace that still runs a release from before the cutover fail loudly at its next provider lock ("held by pid 1"), which is the A1 trade-off, so the cutover activates every workspace on the machine before any of them runs the fix. While the activation is older, the check's warning says the fix waits for it rather than pointing at `doctor --fix`. The scan treats any fgOS process on the machine as a blocker, so the fix only goes through once every session has stopped, which is the intent of the cutover.
+`src/holder-lock/fences.mjs` is the body of the doctor check `lock-fences` and of its fix: `checkStopped({workspaces})` runs `quiesce-scan` per workspace and lists every blocker (an unreadable entry is a blocker; a platform that cannot scan answers `needs-attest`); `placeFences({fgosDir, workspaceRoot, providerRuntimeDir, stateRoot, owners})` places each fence by exclusive `mkdir` or by `link`, is idempotent, and stops with `v1-lock-present` and the path when a legacy lock file is in use (nobody's file is removed); `fenceStatus` reports which registry paths still lack their fence. The registry rows it fences are those of the `owners` (default: `4.2` and `4.4`); the machine-scope `install` path is resolved under the state root of §11 (`stateRoot`, else the process's own resolution) and fenced once per machine, so a second workspace finds it already fenced. The fix (`fenceCutover`) runs `checkStopped`, then `placeFences`, then `checkStopped` again to catch a process that started while the fences went in (it has met the fence and failed loudly, but it is still reported for a person to stop). A blocker on the first scan places nothing. The fix acts only in a workspace whose own activation (`.fgos/installation/activation.json`) runs a release that ships the lock registry in its legacy-node payload: fencing a workspace that still runs the legacy lock code would stop that workspace, so the order is activate first, then fence. The fix fences only the locks of the owners that payload registry names: a release whose registry has no `4.4` rows has an older `fgctl`, which still takes `.fgos/installation/activation.lock` and `<stateRoot>/install.lock`, so those two paths and `.fgos/observe/.lock` stay open until the release that ships the Rust callers is the activated one (a tombstone there would stop that older `fgctl` from upgrading the workspace). The provider ledgers are machine-wide: fencing them from one workspace makes every other workspace that still runs a release from before the cutover fail loudly at its next provider lock ("held by pid 1"), which is the A1 trade-off, so the cutover activates every workspace on the machine before any of them runs the fix. While the activation is older, the check's warning says the fix waits for it rather than pointing at `doctor --fix`. The scan treats any fgOS process on the machine as a blocker, so the fix only goes through once every session has stopped, which is the intent of the cutover.
 
 A release from before the cutover meets a fence as a raw `EISDIR` or "held by pid 1", not a named error: accepted for a single user and noted in the changelog. Rollback to an older release is by hand: remove the `TOMBSTONE` directories of exactly the registry paths, and publish one more generation with `releasedAt` on each blocked ledger.
 
@@ -206,7 +218,7 @@ A release from before the cutover meets a fence as a raw `EISDIR` or "held by pi
 | `lock-kernel-semantics` | For `<fgosDir>/locks` and `<lockRoot>`: `--guarantee` through the route plus a two-process probe on that same mount (a child holds EX, the parent must see `held`; the child dies, the parent must see `free`) | Prints `{driver, exclusion, borrow, holders}`. `kernel` with a green probe passes; a missing directory warns until setup creates it; Windows `unsupported` warns that holder-lock has no Windows driver yet and names the components that do not run; a network filesystem (`none`) fails by name. A platform is never failed for being itself |
 | `lock-borrow-vectors` | `fgos internal lock-borrow-vectors` | Any red vector or a red sibling check fails; `unavailable` (no git) fails too, as activation refuses it. Not applicable on Windows |
 | `lock-holders` | The kernel's holder list for every existing lock file of this track's registry rows (run and account rows enumerated from their directories) | A holder warns with pid and cmdline unless it is a borrowed child of that lock (`FGOS_LOCK_FD=<name>:<slot>` in its environment), a process the host started (the `FGOS_STATE_ROOT` pin), or a fgOS payload by argv (`fgos`, `fgos-runner`, `fgos-gateway`, `bin/fgos.mjs`, `scripts/run-tests.mjs`). A `<lock>.predecessor.json` whose domain is not judged dead, whose version is unknown, or which names a Windows job warns with the domain; a record written in another PID namespace judges `unknown` and keeps warning (and keeps the lock `held (predecessor-domain-not-empty)`) until a person confirms the domain is gone and removes the record. Holders that cannot be listed are informational |
-| `lock-fences` | `fenceStatus` | A registry path without its fence warns and names the fix; a legacy lock file still present is named. Fix: only under an activated holder-lock release (§12), `checkStopped`, `placeFences`, `checkStopped`; with a blocker nothing is placed and the processes are listed |
+| `lock-fences` | `fenceStatus` | A registry path without its fence warns and names the fix (up to five paths, then a count); a legacy lock file still present is named. Covers the `activation`, `install` and `observe` paths next to the Node locks'. Fix: only under an activated holder-lock release (§12) and only for the owners its registry names, `checkStopped`, `placeFences`, `checkStopped`; with a blocker nothing is placed and the processes are listed |
 | `lock-predecessor-kill-wait` | Reads `lock.predecessorKillWaitMs` after the config merge | Prints the value and its source (`project`, `global` or `default`). Not an integer from 1 to 60000, or a config that does not parse, fails by name; absent passes with the default 2000 |
 | `state-root` | `stateRoot`, `lockRoot` and the source, from Node and from the host for the same environment | A difference fails. A pinned root also prints what the host resolves without the pin |
 
@@ -214,10 +226,50 @@ The check `provider-capacity-lock-stale` is removed with its body: the provider-
 
 `fgctl` gates activation: right before it publishes the activation file on every path (init, upgrade, repair) it runs, through the crate it links itself and never under the candidate directory, the guarantee plus the two-process semantics probe for `<workspace>/.fgos/locks` and `<lockRoot>`, and the borrow vectors. On Linux and macOS a red probe or vector refuses the activation with `lock-kernel-semantics-failed` or `lock-borrow-vectors-failed` and the detail. On Windows the vectors do not run, the activation goes through, and one line says holder-lock is unsupported until the Windows driver. A network filesystem is refused by name. There is no flag that turns the gate off. The manifest carries no `lockProtocol` field and there is no `lockProtocolFloor`.
 
-## 14. Known limits
+## 14. Main checkout: one door, one lock, borrowing through the description
+
+The main checkout is written by claim, merge, land and the `.fgos` checkpoint. Its single guard is the `main-checkout` mutex (rank 50, `<fgosDir>/locks/main-checkout.lock`, [registry](../../../packages/holder-lock/contracts/lock-registry.v1.json)): a kernel lock like every other mutex, so it has no TTL, no ambiguous state, no recognition of a holder by pid and no protocol marker. The kernel answers `held` or `free`; nothing in the component decides anything from a pid or a clock.
+
+**One door.** Code reaches the main checkout through `withMainCheckout(scope, purpose, fn)`, which acquires the mutex in the caller's `LockScope` (section 9) and hands `fn` a `mainHandle`. A function that must write under the lock (the `.fgos` checkpoint) takes the handle as a required argument and never acquires by itself. A caller that already holds main (claim) passes its handle down; a merge holds only its slot while it merges and verifies in a temporary worktree, and calls `withMainCheckout` just for the checkpoint, the merge commit and the land. The order in a scope is fixed by rank: merge slot 20, `worktree-admin` 40, main checkout 50 (the state store locks sit at 60 in the registry).
+
+**The merge slot** is a mutex per target ref (rank 20), at `<fgosDir>/locks/merge-slot--<encodeURIComponent(ref)>.lock`; the encoded ref is what v1 already wrote. It serialises merges into one ref and is released after the merge, after main.
+
+**Borrowing replaces `FGOS_MAIN_LOCK_HOLDER_PID`.** The holder runs every git child of a checkpoint or merge through `runBorrowed` (section 3), which gives the locked description to exactly that child in slot 3 with `FGOS_LOCK_FD=main-checkout:3` and prepends `-c gc.auto=0 -c maintenance.auto=false` ([contract](../../../packages/holder-lock/contracts/main-checkout-borrow.v1.json)). The `.githooks/pre-commit` hook, which git runs inside that child, is a borrower only when the three conditions of section 5 hold, checked by `fgos internal lock-fd --protocol 1 --borrowed-check <lock path>`. A borrower skips the activity beacon, because the lock proves who is committing. Anything else is a stranger: the hook probes `main-checkout` once with a description of its own, refuses when it is held, and never waits (git already holds `index.lock`, rank 55). The child cannot release the lock for the holder, cannot pass the description on beyond git's own hooks and cannot start anything in the background; the holder waits for the child before the transaction counts as done. The worker base env of a dispatch drops `FGOS_LOCK_FD`; a leaked variable gives nothing without the description.
+
+`FGOS_MAIN_LOCK_HOLDER_PID`, the holder record with its `ttlMs`, the recognition of the same identity as a refresh, the `protocol.json` marker and the `ambiguous` state of v1 do not exist in v3. A stuck holder is handled by section 17.
+
+## 15. Hot state mutex and porting events (pending)
+
+Not specified here. `events.lock`, `runtime/claims.lock` and `porting/events.lock` stay the in-process locks of the state store, unchanged, until the event store decision says which locks the store keeps and in what form. Nothing in this component imports the event log, a shard, `events.lock` or a state transaction: the `.fgos` checkpoint of the main door is a detachable adapter, and every test of the repo locks passes with an adapter that does nothing. The registry keeps the rows `state` and `porting-events` (rank 60, kind `hot-mutex`) as the reserved place in the lock order; no fence is placed for them and no code takes them through this port.
+
+## 16. `worktree-admin`
+
+`worktree-admin` is a mutex (rank 40, `<fgosDir>/locks/worktree-admin.lock`) with no v1 predecessor and no fence. It wraps every runner call of `git worktree add` and nothing else: `remove` and `prune` have no recorded incident and stay unwrapped. Rank 40 is below main checkout (50), so `git worktree add` never runs while main is held: a claim creates its worktree after it has released main; a merge creates its temporary worktree under the merge slot (20), before it takes main.
+
+## 17. `fgos lock fence`
+
+A hung live holder is never taken over. `fgos lock fence <name>` is the one door a person uses for it, and it replaces `unlock --force`:
+
+1. It lists every process that holds a description of the lock file (Linux: `holders()`) and shows each with pid and cmdline.
+2. It asks the person to confirm.
+3. It sends SIGTERM and then SIGKILL to each by identity ([process spec](../process/spec.md)); the lock releases when they are dead. There is no path that takes a lock from a live holder.
+4. Where holders are `unlistable` (macOS, Windows) the person stops the process and runs `fgos lock fence <name> --attest-stopped`, which only re-checks by try-lock.
+
+## 18. Cutover of the main checkout and the merge slot
+
+The same stop-everything rule as section 12 applies; each lock moves to its new path and the legacy path is deleted in the same phase. Fences, all tombstones placed once by exclusive `mkdir` through `placeFences`. The state locks move in a later cutover and get their own fences then:
+
+| Lock | Legacy path made a tombstone directory |
+|---|---|
+| `main-checkout` | `.fgos/main-checkout.lock` |
+| `merge-slot` | `.fgos/merge-slot--<ref>.lock` for every `refs/heads/*` that exists at cutover |
+
+`worktree-admin` has none. An older release that meets a tombstone fails with a raw `EISDIR`; that is accepted for a single user and noted in the changelog.
+
+## 19. Known limits
 
 - A live holder that is wedged keeps its lock until it exits: a dispatcher stuck on a cwd blocks that cwd with no time limit (the legacy lock had a 4-hour ttl and a reconcile clear; `dispatch reconcile clear-cwd-lock` now only reports held or free). The worker it started is still killed at its run timeout.
-- A hung live holder is never taken over. Until `fgos lock fence` exists (next track), a person stops the process; the lock releases when it dies.
+- A hung live holder is never taken over. A person fences it (section 17); the lock releases when it dies.
 - `holders()` is `unlistable` on macOS and Windows, so `lock-holders` and the leftover kill of `run_borrowed` rely on the process group there (best-effort).
 - The predecessor rule only has the `linux-gate` domain in this track; nothing declares a domain on Linux or macOS until the attempt lock (run supervisor) and the Windows driver exist.
 - The dispatch cwd lock keeps the `fgosDir` scope: two workspaces whose `.fgos` directories differ do not exclude each other on one cwd.
@@ -225,7 +277,7 @@ The check `provider-capacity-lock-stale` is removed with its body: the provider-
 - The lease on a dispatch cwd is released at the end of the assignment, before the runner commits the Unit's writes; that gap exists today and is a named deferred item of the run supervisor.
 - `FGOS_HOST_BIN` is inherited, so a child uses its parent's host binary; a release whose route speaks another protocol answers `host-version-mismatch` and the facade fails closed.
 
-## 15. Lịch sử quyết định
+## 20. Lịch sử quyết định
 
 - **2026-10-15 — Thiết kế nền bản 3 (r1): kernel lock trên open file description thay mọi lock TTL/pid.** Lock thuộc description, không thuộc pid: không tái dùng pid, không boot id, không TTL, không record cần dọn, không GC; con kế thừa description lúc spawn nên mượn quyền không có khe; kernel trả lời "có ai giữ không" bằng try-lock. Bằng chứng: probe kernel lock trên Linux thật (giữ sau khi helper thoát, hai description cùng process loại trừ, SIGKILL nhả ngay, mượn qua git thật với owner bị SIGKILL). Thiết kế và probe: [design r6](../../../plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md) §6, §12.1.
 - **2026-10-16 — r2, r3: ba vòng phản biện (kongming, Astra, Argon).** Nhận: luật description (Rust kế thừa fd ≥ 3 không `CLOEXEC`; `git gc --auto` giữ lock sau commit; fd mượn rò qua shell nền) → `FD_CLOEXEC`, `O_RDWR`, close-only, API mượn tắt gc, test rò trên route thật, doctor `lock-holders`; tombstone không phải hàng rào chung → kiểm kê theo hình dạng giao thức, thế hệ chặn cho ledger, tombstone cả `path.resolve` lẫn `realpath`; zombie bị coi là sống và record thiếu pid bị coi là chết → sửa ở process facts; `probe` dùng `LOCK_SH` để quét adopt không cản holder (kongming N6); vân tay runtime tắt mượn khi đổi git/host bị bác vì tự chặn commit của fgOS → check `lock-borrow-vectors`, đỏ = FAIL, không có chế độ tắt mượn (kongming M4). Design §14.
@@ -237,13 +289,19 @@ The check `provider-capacity-lock-stale` is removed with its body: the provider-
 - **2026-10-17 — Cutover từng lock, sửa registry theo code thật.** Registry: `advance` và `recovery` chuyển vào `<run>/locks/` (đường cũ chính là chỗ đặt tombstone, giữ nguyên thì mọi run đã rào đều `EISDIR`); `dispatch-cwd` khoá theo `dev:ino` sau `realpath` thay `encodeURIComponent(cwd)` (worktree qua symlink là một lock); gói npm và payload legacy-node mang file registry. Lock tài khoản provider và `provider-state` thành mutex phạm vi máy; con probe/renewal chạy qua `runBorrowed` nên holder chết mà con còn sống thì lock vẫn giữ. `reconcile.lock` thành kernel mutex; `clear-cwd-lock` chỉ còn báo held/free. Check `provider-capacity-lock-stale` và `inspectProviderCapacityLock` xoá cùng lúc.
 - **2026-10-17 — Doctor và setup của holder-lock.** Fix `lock-fences` chỉ chạy khi activation của chính workspace đã là release có registry (activate trước, rào sau): `fgos setup` chạy mọi fix, và một fix không điều kiện sẽ rào ledger provider thật dưới `$HOME` từ bất kỳ test hay lần setup nào trên máy đang yên, làm hỏng các workspace còn chạy code cũ. Probe hai process của doctor viết lại trong Node bằng chính route `lock-fd` (thân Rust ở `semantics.rs` không có route); message không mang thời gian để hai lần doctor trên cùng trạng thái in giống nhau. `lock-holders` nhận diện process fgOS bằng pin `FGOS_STATE_ROOT`, argv payload, và `FGOS_LOCK_FD=<lock>:` cho con mượn. Thư mục lock do fix `lock-dirs` tạo (setup chỉ tạo qua fix), cả hai ở mode 0700.
 
-## 16. Related files
+- **2026-10-16 — Quyết định của anh (plan main-door, thay M5 của thiết kế).** Sai thứ tự lock ném lỗi ngay; bỏ lịch trace → cảnh báo → ném (design §6.5). Full `npm test` và dogfood lộ call site sai, sửa trong phase gây ra; không có biến môi trường bật tắt gác. Spec: mục 9. Phần gác `hot-lock-reentry` / `exec-under-hot-lock` thuộc mutex nóng, chờ quyết định event store. [Plan](../../../plans/261016-1306-main-checkout-single-door-hot-lock/plan.md).
+- **2026-10-16 — Lead tự quyết (plan main-door, phần khoá repo).** D1: cửa main checkout ở module mới `src/runner/repo-locks.mjs` (`withMainCheckout` trao `mainHandle`, `withMergeTargetSlot`, `withWorktreeAdmin`); phần main của `main-checkout-lock.mjs` bị xoá, checkpoint `.fgos` là adapter tháo rời nhận handle. D4: hàng rào merge slot là tombstone cho mọi `refs/heads/*` có lúc cutover; registry giữ chỗ giữ `<ref>`, caller truyền ref đã `encodeURIComponent` như v1. D5: `withLockRetry` giữ tên và cờ `--wait`/`--no-wait`, thân chờ bằng facade, bỏ ETA/TTL. D6: hook pre-commit nhận borrower qua `FGOS_LOCK_FD=main-checkout:3` + `--borrowed-check`, không thì `probe` main một lần, `held` thì từ chối; beacon W1' giữ nguyên. D7: `fgos lock fence <name>` thay verb `unlock` (xoá), skill `fgos-unlock` đổi tên `fgos-lock-fence`, `lock-status` đọc registry. D8: `worktree-admin` chỉ bọc `git worktree add`. Spec: mục 14, 16–18. Nguồn: [plan](../../../plans/261016-1306-main-checkout-single-door-hot-lock/plan.md), `packages/holder-lock/contracts/main-checkout-borrow.v1.json`.
+- **2026-10-17 — Rào chắn F10: phần state của 4.3 chờ hội đồng event store.** Mutex nóng `state`/`porting-events`, `stateTx`, gộp `events.lock` + `claims.lock` và trần claim không được chốt ở đây; luật L3 đã chạm ngưỡng xem lại. Phần khoá repo không import event log, shard, `events.lock` hay `stateTx`; mọi test của nó pass với adapter checkpoint rỗng; `merge=union`, `.gitattributes` và luật strip `.fgos` không đổi. Mục 15 chỉ giữ chỗ.
+- **2026-10-16 — Lead tự quyết (plan 4.4a: fgctl và Observe gọi từ Rust).** `activation`, `install`, `observe` thành kernel lock: `activation.lock` ở `<fgosDir>/locks/` (mutex, rank 80, repo), `install.lock` ở `<stateRoot>/locks/` (machine), `observe.lock` ở `<fgosDir>/locks/` chờ 5 giây, không TTL, snapshot shard ghi dưới lock. Holder bị giết thì lock nhả ngay. Ba đường cũ (`.fgos/installation/activation.lock`, `<stateRoot>/install.lock`, `.fgos/observe/.lock`) thành thư mục tombstone, fgctl/fgos cũ dừng có lỗi. Tới khi main checkout được cutover, fgctl kiểm main checkout bằng `probe` (shared, không chặn, không giữ) cộng đọc v1, và coi thư mục tombstone ở `.fgos/main-checkout.lock` là "đã chuyển". Windows: `fgctl init`/`upgrade`/`repair` từ chối với `lock-driver-unavailable` cho tới khi có driver Windows, không lùi về file cũ. D1: ba lock là ba hàng registry riêng (`activation`, `install`, `observe`), cả ba mutex hạng 80, hàng rào tombstone. D2: `check_main_checkout_lock` của `fgctl` = `probe(main-checkout)` không giữ, cộng đường đọc v1 chỉ thêm nhánh tombstone; không giữ main mutex qua publish vì `run_tail` chạy `fgos setup` có thể checkpoint main. D3: Rust không giữ `LockScope`; thứ tự cố định trong code: `probe(main-checkout)` → `activation`; `install` chỉ giữ trong `stage_release`, nhả trước `activation`, hai lock hạng 80 không lồng nhau. D4: ghi shard snapshot của Observe đi dưới observe lock (hai process cùng writer id có thể xen dòng). D5: Windows trước driver Windows: `lock-driver-unavailable`, không lùi về v1. D6: giữ tên kiểu công khai `ActivationLockGuard`, `InstallLockGuard`, `StoreLockGuard` và biến thể lỗi `ActivationLockHeld`, `AlreadyInProgress`, `observe-lock-timeout`; guard bọc handle, `Drop` chỉ đóng description. Hàng rào: `placeFences`/`fenceStatus` phủ cả owner `4.4` (tombstone ghi `by: fgos 4.4`), đường `install` giải dưới state root và đặt một lần cho máy; fix `lock-fences` chỉ rào các owner mà registry trong payload của release đang activate nêu tên, vì `fgctl` cũ vẫn lấy `activation.lock` và `install.lock` ở đường cũ và một tombstone ở đó chặn nó nâng cấp workspace. [Plan](../../../plans/261016-1306-fgctl-rust-callers-on-holder-lock/plan.md).
+
+## 21. Related files
 
 | Relationship | File |
 |---|---|
 | defines (port) | [holder-lock.port.v1.json](../../../packages/holder-lock/contracts/holder-lock.port.v1.json) |
 | defines (predecessor domain) | [predecessor.v1.json](../../../packages/holder-lock/contracts/predecessor.v1.json) |
 | defines (registry) | [lock-registry.v1.json](../../../packages/holder-lock/contracts/lock-registry.v1.json), [lock-registry.schema.v1.json](../../../packages/holder-lock/contracts/lock-registry.schema.v1.json) |
+| defines (main checkout borrowing) | [main-checkout-borrow.v1.json](../../../packages/holder-lock/contracts/main-checkout-borrow.v1.json) |
 | defines (routes) | [lock-fd](../../../packages/holder-lock/contracts/internal-route.lock-fd.v1.json), [state-root](../../../packages/holder-lock/contracts/internal-route.state-root.v1.json), [quiesce-scan](../../../packages/holder-lock/contracts/internal-route.quiesce-scan.v1.json), [lock-borrow-vectors](../../../packages/holder-lock/contracts/internal-route.lock-borrow-vectors.v1.json) |
 | evidenced by (vectors) | [state-root.vectors.v1.json](../../../packages/holder-lock/contracts/state-root.vectors.v1.json) |
 | consumes | [process/spec.md](../process/spec.md) |

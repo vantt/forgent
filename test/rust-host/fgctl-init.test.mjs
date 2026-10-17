@@ -5,14 +5,10 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync, spawn, execFileSync } from 'node:child_process';
 import { REPO_ROOT } from '../../scripts/build-rust-distribution.mjs';
-import { DEFAULT_TTL_MS } from '../../src/runner/main-checkout-lock.mjs';
+import { holdLock } from './fgctl-lock-holder.mjs';
 import { useReleaseFixture, FGCTL_BIN, fixture, runFgctl, runShim, waitForProcess } from './fgctl-init-fixture.mjs';
 
 useReleaseFixture();
-
-test('R5 drift guard: DEFAULT_TTL_MS in src/runner/main-checkout-lock.mjs:110 is 3 * 60 * 1000 ms', () => {
-  assert.equal(DEFAULT_TTL_MS, 3 * 60 * 1000, 'DEFAULT_TTL_MS must match 180_000 ms');
-});
 
 test('R11 & R1-R8, R10: fgctl init in a fresh git project publishes shims, root.json, activation.json, and passes preflight/tail', () => {
   const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-init-home-'));
@@ -167,10 +163,10 @@ test('R11 & R1-R8, R10: fgctl init in a fresh git project publishes shims, root.
   }
 });
 
-test('R5 & R11: Hand-written live .fgos/main-checkout.lock refuses init writing nothing', () => {
-  const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-lock-home-'));
-  const tempState = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-lock-state-'));
-  const tempProj = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-lock-proj-'));
+test('a leftover v1 .fgos/main-checkout.lock file is never read: init passes over it', () => {
+  const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-v1file-home-'));
+  const tempState = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-v1file-state-'));
+  const tempProj = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-v1file-proj-'));
 
   try {
     execFileSync('git', ['init'], { cwd: tempProj });
@@ -179,26 +175,11 @@ test('R5 & R11: Hand-written live .fgos/main-checkout.lock refuses init writing 
 
     const fgosDir = path.join(tempProj, '.fgos');
     fs.mkdirSync(fgosDir, { recursive: true });
-    const lockPath = path.join(fgosDir, 'main-checkout.lock');
+    // A record naming a live process: the old reader refused on it.
+    fs.writeFileSync(path.join(fgosDir, 'main-checkout.lock'), JSON.stringify({ pid: process.pid, ts: Date.now() }));
 
-    // Write a live numeric-pid lock (current process is alive)
-    fs.writeFileSync(lockPath, JSON.stringify({ pid: process.pid, ts: Date.now() }));
-
-    const res = runFgctl(['init', '--from', fixture.releaseDir], {
-      cwd: tempProj,
-      stateHome: tempState,
-      env: { HOME: tempHome },
-    });
-
-    assert.notEqual(res.status, 0, 'fgctl init must fail when lock is held');
-    assert.match(res.stderr, /lock-held/, 'stderr must report lock-held');
-    assert.match(res.stderr, new RegExp(String(process.pid)), 'stderr must name the holder process');
-
-    // Assert no .fgos/installation was created
-    assert.ok(
-      !fs.existsSync(path.join(tempProj, '.fgos', 'installation')),
-      'No .fgos/installation directory must be created on lock refusal'
-    );
+    const res = runFgctl(['init', '--from', fixture.releaseDir], { cwd: tempProj, stateHome: tempState, env: { HOME: tempHome } });
+    assert.equal(res.status, 0, `init must not read the v1 file: ${res.stderr}`);
   } finally {
     fs.rmSync(tempHome, { recursive: true, force: true });
     fs.rmSync(tempState, { recursive: true, force: true });
@@ -206,10 +187,10 @@ test('R5 & R11: Hand-written live .fgos/main-checkout.lock refuses init writing 
   }
 });
 
-test('R5 & R11: Live string-identity lock within DEFAULT_TTL_MS refuses init writing nothing', () => {
-  const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-strlock-home-'));
-  const tempState = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-strlock-state-'));
-  const tempProj = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-strlock-proj-'));
+test('main checkout held through the kernel lock refuses init; once the Node holder dies it passes', async () => {
+  const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-v3lock-home-'));
+  const tempState = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-v3lock-state-'));
+  const tempProj = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-v3lock-proj-'));
 
   try {
     execFileSync('git', ['init'], { cwd: tempProj });
@@ -217,27 +198,18 @@ test('R5 & R11: Live string-identity lock within DEFAULT_TTL_MS refuses init wri
     execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: tempProj });
 
     const fgosDir = path.join(tempProj, '.fgos');
-    fs.mkdirSync(fgosDir, { recursive: true });
-    const lockPath = path.join(fgosDir, 'main-checkout.lock');
+    const holder = await holdLock('main-checkout', { fgosDir });
+    try {
+      const refused = runFgctl(['init', '--from', fixture.releaseDir], { cwd: tempProj, stateHome: tempState, env: { HOME: tempHome } });
+      assert.notEqual(refused.status, 0, 'a Node holder of the main checkout must refuse fgctl init');
+      assert.match(refused.stderr, /lock-held: main checkout is held \(kernel lock\)/);
+      assert.ok(!fs.existsSync(path.join(fgosDir, 'installation')), 'a refused init creates no installation directory');
+    } finally {
+      await holder.kill();
+    }
 
-    // Write a fresh string-identity lock
-    fs.writeFileSync(lockPath, JSON.stringify({ pid: 'active-session-123', ts: Date.now() }));
-
-    const res = runFgctl(['init', '--from', fixture.releaseDir], {
-      cwd: tempProj,
-      stateHome: tempState,
-      env: { HOME: tempHome },
-    });
-
-    assert.notEqual(res.status, 0, 'fgctl init must fail when string-identity lock is fresh');
-    assert.match(res.stderr, /lock-held/, 'stderr must report lock-held');
-    assert.match(res.stderr, /active-session-123/, 'stderr must name the session');
-
-    // Assert no .fgos/installation was created
-    assert.ok(
-      !fs.existsSync(path.join(tempProj, '.fgos', 'installation')),
-      'No .fgos/installation directory must be created on lock refusal'
-    );
+    const res = runFgctl(['init', '--from', fixture.releaseDir], { cwd: tempProj, stateHome: tempState, env: { HOME: tempHome } });
+    assert.equal(res.status, 0, `init must pass once nobody holds the main checkout: ${res.stderr}`);
   } finally {
     fs.rmSync(tempHome, { recursive: true, force: true });
     fs.rmSync(tempState, { recursive: true, force: true });
@@ -245,37 +217,23 @@ test('R5 & R11: Live string-identity lock within DEFAULT_TTL_MS refuses init wri
   }
 });
 
-test('R5: Ambiguous (unparseable) main-checkout.lock refuses init writing nothing', () => {
-  const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-ambig-home-'));
-  const tempState = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-ambig-state-'));
-  const tempProj = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-ambig-proj-'));
+test('a tombstone directory at .fgos/main-checkout.lock has no effect on init', () => {
+  const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-tomb-home-'));
+  const tempState = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-tomb-state-'));
+  const tempProj = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-tomb-proj-'));
 
   try {
     execFileSync('git', ['init'], { cwd: tempProj });
     execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: tempProj });
     execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: tempProj });
 
-    const fgosDir = path.join(tempProj, '.fgos');
-    fs.mkdirSync(fgosDir, { recursive: true });
-    const lockPath = path.join(fgosDir, 'main-checkout.lock');
+    const tombstone = path.join(tempProj, '.fgos', 'main-checkout.lock');
+    fs.mkdirSync(tombstone, { recursive: true });
+    fs.writeFileSync(path.join(tombstone, 'TOMBSTONE'), 'moved to .fgos/locks/main-checkout.lock\n');
 
-    // Write an invalid/unparseable lock record
-    fs.writeFileSync(lockPath, 'this is not valid json or record');
-
-    const res = runFgctl(['init', '--from', fixture.releaseDir], {
-      cwd: tempProj,
-      stateHome: tempState,
-      env: { HOME: tempHome },
-    });
-
-    assert.notEqual(res.status, 0, 'fgctl init must fail when lock is ambiguous');
-    assert.match(res.stderr, /lock-ambiguous/, 'stderr must report lock-ambiguous');
-
-    // Assert no .fgos/installation was created
-    assert.ok(
-      !fs.existsSync(path.join(tempProj, '.fgos', 'installation')),
-      'No .fgos/installation directory must be created on ambiguous lock refusal'
-    );
+    const res = runFgctl(['init', '--from', fixture.releaseDir], { cwd: tempProj, stateHome: tempState, env: { HOME: tempHome } });
+    assert.equal(res.status, 0, `init must pass over a tombstone: ${res.stderr}`);
+    assert.ok(fs.statSync(tombstone).isDirectory(), 'init leaves the tombstone in place');
   } finally {
     fs.rmSync(tempHome, { recursive: true, force: true });
     fs.rmSync(tempState, { recursive: true, force: true });
@@ -399,9 +357,11 @@ test('Item 1: Concurrent fgctl init invocations against pre-staged pinned worksp
     const txFiles = fs.readdirSync(installsDir).filter((f) => f.endsWith('.json'));
     assert.equal(txFiles.length, 1, 'Release store must contain exactly one completed install transaction');
 
-    // activation.json exists, activation.lock is removed
+    // activation.json exists; the old lock file path holds no file (a fence tombstone directory
+    // placed by the init's own doctor fix is fine)
     assert.ok(fs.existsSync(path.join(tempProj, '.fgos', 'installation', 'activation.json')));
-    assert.ok(!fs.existsSync(path.join(tempProj, '.fgos', 'installation', 'activation.lock')));
+    const oldLock = path.join(tempProj, '.fgos', 'installation', 'activation.lock');
+    assert.ok(!fs.existsSync(oldLock) || fs.statSync(oldLock).isDirectory());
   } finally {
     fs.rmSync(tempHome, { recursive: true, force: true });
     fs.rmSync(tempState, { recursive: true, force: true });

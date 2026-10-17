@@ -19,7 +19,7 @@ import { hostBin, guaranteeFor, runLockRouteSync, runStateRootRoute, description
 import { PROTOCOL, KILL_WAIT_CONFIG_KEY, DEFAULT_KILL_WAIT_MS, MAX_KILL_WAIT_MS, LOCK_FD_ENV } from '../holder-lock/protocol.mjs';
 import { resolveStateRoot, STATE_ROOT_ENV, LOCKS_DIR } from '../holder-lock/state-root.mjs';
 import { loadLockRegistry } from '../holder-lock/registry.mjs';
-import { CUTOVER_RELEASE, fenceStatus, fenceCutover, defaultProviderRuntimeDir } from '../holder-lock/fences.mjs';
+import { isCutOverLock, fenceStatus, fenceCutover, defaultProviderRuntimeDir } from '../holder-lock/fences.mjs';
 import { judge } from '../runner/dispatch/process-identity.mjs';
 import { listAssignmentRuns } from '../runner/dispatch/assignment-layout.mjs';
 import { readSharedConfig } from '../config/shared-config-file.mjs';
@@ -301,13 +301,19 @@ function existing(file) {
 // row. Rows with a parameter (a run, a cwd, an account) are enumerated from
 // the directories their v3 path lives in.
 const LOCK_FILES = {
+  'main-checkout': ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'main-checkout.lock')),
+  'merge-slot': ({ fgosDir }) => filesIn(path.join(fgosDir, LOCKS_DIR), (name) => name.startsWith('merge-slot--') && name.endsWith('.lock')),
+  'worktree-admin': ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'worktree-admin.lock')),
   gateway: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'gateway.lock')),
   runner: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'runner.lock')),
   sessions: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'sessions.lock')),
   reconcile: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'reconcile.lock')),
+  activation: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'activation.lock')),
+  observe: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'observe.lock')),
   'dispatch-cwd': ({ fgosDir }) => filesIn(path.join(fgosDir, LOCKS_DIR), (name) => name.startsWith('dispatch-cwd--') && name.endsWith('.lock')),
   advance: ({ fgosDir }) => subdirs(path.join(fgosDir, 'workflow-runs')).flatMap((runDir) => existing(path.join(runDir, LOCKS_DIR, 'advance.lock'))),
   recovery: ({ fgosDir }) => [...listAssignmentRuns(fgosDir)].flatMap(({ runDir }) => existing(path.join(runDir, LOCKS_DIR, 'recovery.lock'))),
+  install: ({ lockRoot }) => (lockRoot ? existing(path.join(lockRoot, 'install.lock')) : []),
   'full-suite': ({ lockRoot }) => (lockRoot ? existing(path.join(lockRoot, 'full-suite.lock')) : []),
   'provider-state': ({ lockRoot }) => (lockRoot ? existing(path.join(lockRoot, 'provider-state.lock')) : []),
   'provider-account': ({ lockRoot }) => (lockRoot ? subdirs(path.join(lockRoot, 'provider-account')).flatMap((dir) => filesIn(dir, (name) => name.endsWith('.lock'))) : []),
@@ -315,10 +321,10 @@ const LOCK_FILES = {
 
 /** The registry rows this release cut over, with every lock file of each that exists. */
 export function cutOverLockFiles({ fgosDir, lockRoot }) {
-  const rows = loadLockRegistry().locks.filter((lock) => lock.owner === CUTOVER_RELEASE);
+  const rows = loadLockRegistry().locks.filter(isCutOverLock);
   return rows.map((lock) => {
     const enumerate = LOCK_FILES[lock.name];
-    if (!enumerate) throw new Error(`lock "${lock.name}" of release ${CUTOVER_RELEASE} has no lock-file enumeration in holder-lock-checks.mjs`);
+    if (!enumerate) throw new Error(`lock "${lock.name}" of release ${lock.owner} has no lock-file enumeration in holder-lock-checks.mjs`);
     return { lock: lock.name, files: enumerate({ fgosDir, lockRoot }) };
   });
 }
@@ -446,9 +452,10 @@ export function checkLockFences(repoRoot, { providerRuntimeDir = defaultProvider
   if (status.complete) return { passed: true, message: `all ${status.targets.length} legacy lock path(s) fenced` };
   const present = status.v1Present.length > 0 ? `; old lock still present (blocks the fix until its holder is gone): ${listed(status.v1Present)}` : '';
   const activated = activatedHolderLockRelease(repoRoot);
-  const next = activated.release
+  const fixable = fixableTargets(status, activated);
+  const next = fixable.length > 0
     ? 'stop every fgOS process of this workspace, then run fgos doctor --fix'
-    : `the fix waits for this release to be activated here (${activated.reason})`;
+    : `the fix waits for this release to be activated here (${activated.reason ?? 'the activated release does not yet take every one of these locks'})`;
   return {
     passed: true,
     message: warn(`${status.missing.length} of ${status.targets.length} legacy lock path(s) not fenced: ${listed(status.missing)}${present} -- ${next}`),
@@ -456,9 +463,22 @@ export function checkLockFences(repoRoot, { providerRuntimeDir = defaultProvider
 }
 
 /**
+ * The missing fences the activated release can already stand behind: those
+ * of registry owners whose rows its own registry carries. A fence placed
+ * before the release that takes the lock as a kernel lock is active would
+ * stop that very release from upgrading (an older `fgctl` meets the
+ * tombstone at its own lock path).
+ */
+function fixableTargets(status, activated) {
+  const owners = activated.owners ?? [];
+  return status.targets.filter((target) => !target.fenced && owners.includes(target.owner));
+}
+
+/**
  * The release the workspace's own activation runs, when its payload takes
  * this release's locks as kernel locks (it ships the lock registry); null
- * with the reason otherwise.
+ * with the reason otherwise. `owners` lists the registry owners whose locks
+ * that payload's registry names.
  */
 export function activatedHolderLockRelease(repoRoot) {
   const activationPath = path.join(fgosDirOf(repoRoot), 'installation', 'activation.json');
@@ -481,7 +501,14 @@ export function activatedHolderLockRelease(repoRoot) {
   if (typeof payloadRoot !== 'string' || !fs.existsSync(path.join(activation.releasePath, payloadRoot, REGISTRY_IN_PAYLOAD))) {
     return { release: null, reason: `the activated release ${activation.releasePath} still runs the old lock code (no ${REGISTRY_IN_PAYLOAD} in its payload); activate this release first` };
   }
-  return { release: activation.releasePath, reason: null };
+  let owners;
+  try {
+    const payloadRegistry = JSON.parse(fs.readFileSync(path.join(activation.releasePath, payloadRoot, REGISTRY_IN_PAYLOAD), 'utf8'));
+    owners = [...new Set(payloadRegistry.locks.map((lock) => lock.owner))];
+  } catch (err) {
+    return { release: null, reason: `the activated release ${activation.releasePath} has no readable lock registry (${err.code ?? err.message})` };
+  }
+  return { release: activation.releasePath, reason: null, owners };
 }
 
 /**
@@ -502,9 +529,11 @@ export function fixLockFences(repoRoot, { providerRuntimeDir = defaultProviderRu
   if (status.complete) return { changed: false, message: `all ${status.targets.length} legacy lock path(s) already fenced` };
   const activated = activatedHolderLockRelease(repoRoot);
   if (!activated.release) return { changed: false, message: `fences not placed: ${activated.reason}` };
+  const owners = [...new Set(fixableTargets(status, activated).map((target) => target.owner))];
+  if (owners.length === 0) return { changed: false, message: 'fences not placed: the activated release does not yet take the locks still missing a fence; activate the release that ships them first' };
   let result;
   try {
-    result = fenceCutover({ workspaces: [workspaceRoot], fgosDir, workspaceRoot, providerRuntimeDir, ...(bin ? { hostBin: bin } : {}), ...(excludePids ? { excludePids } : {}) });
+    result = fenceCutover({ workspaces: [workspaceRoot], fgosDir, workspaceRoot, providerRuntimeDir, owners, ...(bin ? { hostBin: bin } : {}), ...(excludePids ? { excludePids } : {}) });
   } catch (err) {
     return { changed: false, message: `fences not placed: ${err.message}` };
   }

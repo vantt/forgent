@@ -149,7 +149,7 @@
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -170,7 +170,7 @@
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -191,7 +191,7 @@
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -224,7 +224,7 @@
             "executor": "deepseek"
           },
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           }
         ],
         "rigor": "high"
@@ -236,7 +236,7 @@
             "executor": "openai"
           },
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "gemini"
@@ -266,7 +266,7 @@
             "executor": "openai"
           },
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           }
         ],
         "rigor": "high"
@@ -275,7 +275,7 @@
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "gemini"
@@ -296,7 +296,7 @@
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -317,7 +317,7 @@
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -338,7 +338,7 @@
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -359,7 +359,7 @@
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -380,7 +380,7 @@
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -401,7 +401,7 @@
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -422,7 +422,7 @@
         "description": "Workflow unit capability \"delphi:propose\" -- declare a \"prefer\" pool to choose which executors serve it.",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -443,7 +443,7 @@
         "description": "Workflow unit capability \"delphi:synthesize\" -- declare a \"prefer\" pool to choose which executors serve it.",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -464,7 +464,7 @@
         "description": "Workflow unit capability \"group-cognition:explore\" -- declare a \"prefer\" pool to choose which executors serve it.",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -485,7 +485,7 @@
         "description": "Workflow unit capability \"group-cognition:critique\" -- declare a \"prefer\" pool to choose which executors serve it.",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -506,7 +506,7 @@
         "description": "Workflow unit capability \"group-cognition:synthesize\" -- declare a \"prefer\" pool to choose which executors serve it.",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -527,7 +527,7 @@
         "description": "Workflow unit capability \"nominal-group:generate\" -- declare a \"prefer\" pool to choose which executors serve it.",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -548,7 +548,7 @@
         "description": "Workflow unit capability \"nominal-group:share\" -- declare a \"prefer\" pool to choose which executors serve it.",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -569,7 +569,7 @@
         "description": "Workflow unit capability \"nominal-group:vote\" -- declare a \"prefer\" pool to choose which executors serve it.",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -590,7 +590,7 @@
         "description": "Workflow unit capability \"nominal-group:rank\" -- declare a \"prefer\" pool to choose which executors serve it.",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -610,7 +610,7 @@
       "coding:discover": {
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -631,7 +631,7 @@
       "coding:explore": {
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -653,7 +653,7 @@
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -673,7 +673,7 @@
       "coding:validate": {
         "prefer": [
           {
-            "executor": "claude-herdr"
+            "executor": "claude"
           },
           {
             "executor": "openai"
@@ -705,7 +705,8 @@
     "executors": {
       "claude": {
         "kind": "agent",
-        "description": "Claude Code CLI -- consolidated executor (executor-id-consolidation Step 2): cli/cli-bwrap invocations, replacing the former separate claude-reviewer/claude-reviewer-herdr/claude-bwrap ids.",
+        "providerModel": "claude",
+        "description": "Claude Code CLI, the one executor of the claude family: claude-cli and claude-cli-bwrap run headless, claude-herdr-bwrap runs a claude REPL in a herdr pane under the bwrap posture. bind() picks the pane invocation inside herdr and a cli one outside, so a capability gets claude in both places.",
         "identity": {
           "principalRef": "principal://claude",
           "runtimeBackendRef": "backend://claude-cli",
@@ -752,6 +753,26 @@
             ],
             "confinement": {
               "backend": "bwrap"
+            }
+          },
+          {
+            "id": "claude-herdr-bwrap",
+            "via": "cli",
+            "adapter": "herdr-spawn",
+            "command": "claude",
+            "args": [
+              "--model",
+              "{model}"
+            ],
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "interactiveMode": {
+              "exitCommand": "/exit",
+              "kind": "claude",
+              "trustStore": {
+                "kind": "claude-json"
+              }
             }
           }
         ]
@@ -1126,6 +1147,8 @@
             },
             "command": "omp",
             "args": [
+              "--model",
+              "{model}",
               "--thinking",
               "medium",
               "--tools",
@@ -1156,6 +1179,8 @@
             "adapter": "cli-spawn",
             "command": "omp",
             "args": [
+              "--model",
+              "{model}",
               "--thinking",
               "medium",
               "--tools",
@@ -1350,77 +1375,6 @@
               }
             ]
           },
-          {
-            "id": "pi-herdr-openrouter",
-            "via": "cli",
-            "adapter": "herdr-spawn",
-            "confinement": {
-              "backend": "bwrap"
-            },
-            "command": "pi",
-            "args": [
-              "--model",
-              "{model}",
-              "--thinking",
-              "medium",
-              "--tools",
-              "read,write,edit,bash,grep,find,ls",
-              "--approve"
-            ],
-            "interactiveMode": {
-              "exitCommand": "/quit",
-              "kind": "pi"
-            },
-            "env": {
-              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openrouter",
-              "OPENROUTER_API_KEY": "${GLM_OPENROUTER_API_KEY}"
-            },
-            "resourceBindings": [
-              {
-                "resource": "private-home",
-                "target": {
-                  "kind": "env",
-                  "name": "PI_CODING_AGENT_DIR"
-                }
-              }
-            ]
-          }
-        ]
-      },
-      "claude-herdr": {
-        "kind": "agent",
-        "description": "Claude Code REPL in a herdr pane under the bwrap posture, same provider family as `claude`. Separate id because `claude` is merged with the global default executor, which drops its own invocations.",
-        "allowCrossProvider": true,
-        "providerModel": "claude",
-        "invocations": [
-          {
-            "id": "claude-herdr-bwrap",
-            "via": "cli",
-            "adapter": "herdr-spawn",
-            "command": "claude",
-            "args": [
-              "--model",
-              "{model}"
-            ],
-            "confinement": {
-              "backend": "bwrap"
-            },
-            "interactiveMode": {
-              "exitCommand": "/exit",
-              "kind": "claude",
-              "trustStore": {
-                "kind": "claude-json"
-              }
-            }
-          }
-        ]
-      },
-      "glm-herdr": {
-        "kind": "agent",
-        "description": "GLM 5.3 (z-ai/glm-5.3) through the pi CLI and OpenRouter, in a herdr pane under the bwrap posture. Replaces the claude-CLI-through-gateway route, whose pane stopped at a /login prompt with a 401.",
-        "allowCrossProvider": true,
-        "providerModel": "z-ai",
-        "invocations": [
           {
             "id": "pi-herdr-openrouter",
             "via": "cli",

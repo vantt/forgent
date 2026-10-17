@@ -1179,8 +1179,8 @@ export const COMMAND_REGISTRY = [
   }),
   withSubcommands({
     name: 'dispatch',
-    invoke: 'fgos dispatch <show-run|inspect|watch|recover|reconcile|decide|probe-account> [args]',
-    description: 'Dispatch-owned reads and repairs; it runs no work itself (one task runs through `fgos run`, planned work through `fgos workflow start`). "decide" answers which mechanism and executor a dispatch resolves to; "show-run"/"watch"/"inspect" read Run state; "recover" observes or applies recovery of a STANDALONE Run; "reconcile" is a narrow, local CAS-guarded guard repair plus provider-capacity quarantine door that never recovers, launches, signals, or controls a Run; "probe-account" is a diagnostic over one provider account.',
+    invoke: 'fgos dispatch <show-run|inspect|watch|recover|reconcile|decide|explain|probe-account> [args]',
+    description: 'Dispatch-owned reads and repairs; it runs no work itself (one task runs through `fgos run`, planned work through `fgos workflow start`). "decide" answers which mechanism and executor a dispatch resolves to; "explain" lays out why a capability binds to its family, tier, model and invocation; "show-run"/"watch"/"inspect" read Run state; "recover" observes or applies recovery of a STANDALONE Run; "reconcile" is a narrow, local CAS-guarded guard repair plus provider-capacity quarantine door that never recovers, launches, signals, or controls a Run; "probe-account" is a diagnostic over one provider account.',
     subcommands: {
       'show-run': {
         description: 'Read one Run\'s recorded state.',
@@ -1304,6 +1304,18 @@ export const COMMAND_REGISTRY = [
           'fgos dispatch decide --for general-purpose --has-live-task-access',
           'fgos dispatch decide --work tsk-abc --stage planning',
         ],
+      },
+      explain: {
+        description: 'Why a capability binds where it does, read-only: binds it as a run would (bind()), then reports the family and the prefer entry that chose it, the tier, its source (rigor, override) and its ceiling (runner.maxTier, or the capability\'s own rigor when that is higher), the whole tier cell with the entry that runs (used, fallback-same-pool, or pending-pool-routing for an entry served by another pool), the executor and invocation, and the accounts of the family\'s pool in the provider account inventory and in runner.llmAccounts. Leases, spawns and writes nothing.',
+        parameters: {
+          type: 'object',
+          properties: {
+            for: { type: 'string', description: 'The capability to explain.' },
+            rigor: { type: 'string', description: 'The unit rigor to bind with (low, standard, high, critical); omitted, the capability\'s own rigor applies.' },
+          },
+          required: ['for'],
+        },
+        examples: ['fgos dispatch explain --for code:implement', 'fgos dispatch explain --for architecture:synthesize --rigor critical'],
       },
       'probe-account': {
         description: 'Diagnostic: start every CLI configured for one provider account at the same moment through the real dispatch door (confinement, leased login, herdr pane) with a read-only prompt; report per CLI an outcome class (ok, blocked-trust-prompt, auth, quota, sandbox, timeout, other) with its evidence line and run/pane refs plus an account-fault vs cli-fault verdict, and close the panes it opened. Selects and schedules nothing.',
@@ -2089,26 +2101,38 @@ export const COMMAND_REGISTRY = [
     paginated: false,
     deprecated: null,
   },
-  {
-    name: 'unlock',
-    invoke: 'fgos unlock',
-    description: 'Safely clears .fgos/main-checkout.lock (the STR65 concurrent-writer guard) when it is stale or corrupt. Never force-deletes: refuses and reports the holder identity when a different session genuinely still holds it live.',
-    parameters: {
-      type: 'object',
-      properties: {},
-      required: [],
+  withSubcommands({
+    name: 'lock',
+    invoke: 'fgos lock fence <name>',
+    description: 'Stop the process that holds a registry lock so the lock can be taken again. Lists the holders (pid, start time, command line), asks for confirmation (--yes skips it), sends SIGTERM by identity, waits 5 s, sends SIGKILL, then asks the kernel with a probe whether the lock is free. A lock is never taken from a live holder: with no listable holder (a platform without /proc) the caller stops it, then --attest-stopped only re-checks the lock. Lock names: fgos lock-status.',
+    subcommands: {
+      fence: {
+        description: 'Fence the holder(s) of one registry lock. Reports free (exit 0) when nobody holds it.',
+        parameters: {
+          type: 'object',
+          properties: {
+            name: { type: 'string', description: 'Positional: the registry lock name (e.g. main-checkout, merge-slot, worktree-admin, gateway).' },
+            param: { type: 'string', description: 'Repeatable key=value for a lock path parameter the verb cannot know (e.g. --param ref=main for merge-slot, --param provider=codex --param account=a1 for provider-account). fgosDir and lockRoot default to this checkout / this machine.' },
+            yes: { type: 'boolean', description: 'Skip the confirmation prompt. Without it and without a terminal, nothing is signalled.' },
+            'attest-stopped': { type: 'boolean', description: 'Only where holders cannot be listed: say the holder is already stopped; the lock is then only re-checked with a probe, never signalled.' },
+          },
+          positional: ['name'],
+          required: ['name'],
+        },
+        examples: ['fgos lock fence main-checkout', 'fgos lock fence merge-slot --param ref=main --yes'],
+      },
     },
-    examples: ['fgos unlock'],
+    examples: ['fgos lock fence main-checkout', 'fgos lock fence merge-slot --param ref=main --yes'],
     touchesState: true,
     requiresExistingStore: true,
-    externalEffect: false,
+    externalEffect: true,
     paginated: false,
     deprecated: null,
-  },
+  }),
   {
     name: 'lock-status',
     invoke: 'fgos lock-status',
-    description: 'Read-only report on .fgos/main-checkout.lock: whether it is free, live (genuinely held), stale (reclaimable), or ambiguous (corrupt/undecidable), plus holder identity, lock age, and remaining TTL, and separately the pre-commit hook\'s commit-activity beacon (.fgos/runtime/main-checkout-activity.json). Never creates, refreshes, or deletes either file.',
+    description: 'Read-only report on every repo- and machine-scoped registry lock (main-checkout, merge-slot, worktree-admin, gateway, ...): free or held, the holder pids the kernel shows, and the guarantee of the filesystem the lock file lives in; plus, separately, the pre-commit hook\'s commit-activity beacon (.fgos/runtime/main-checkout-activity.json). Top-level keys: mainCheckout, locks, beacon. Never creates, refreshes, or deletes a lock file or the beacon.',
     parameters: {
       type: 'object',
       properties: {},
@@ -2143,7 +2167,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'main-checkout-reset',
     invoke: 'fgos main-checkout-reset',
-    description: 'The safe path for a destructive `git reset --hard` on the main checkout (tsk-3au). Refuses when the whole-repo tree is dirty unless --confirm is passed after reviewing the full git status printed in the refusal — closes the failure mode where a session checked only its own files and reset away another in-flight session\'s uncommitted work.',
+    description: 'The safe path for a destructive `git reset --hard` on the main checkout (tsk-3au). Runs while holding the main checkout mutex, so no other fgOS writer touches the checkout meanwhile; when another process holds it the verb refuses at once (lock-timeout), naming the lock and the holder pid, and touches nothing. Refuses when the whole-repo tree is dirty unless --confirm is passed after reviewing the full git status printed in the refusal — closes the failure mode where a session checked only its own files and reset away another in-flight session\'s uncommitted work.',
     parameters: {
       type: 'object',
       properties: {
