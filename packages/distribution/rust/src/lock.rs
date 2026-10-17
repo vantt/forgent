@@ -74,6 +74,8 @@ pub enum MainCheckoutLockError {
     HeldNumeric(i64),
     #[error("lock-held: .fgos/main-checkout.lock is held by session \"{0}\"")]
     HeldString(String),
+    #[error("lock-driver-unavailable: main-checkout: {0}")]
+    DriverUnavailable(String),
     #[error("io error reading lock file: {0}")]
     Io(#[from] std::io::Error),
 }
@@ -213,7 +215,11 @@ pub fn check_main_checkout_lock(workspace_root: &Path) -> Result<(), MainCheckou
         "main-checkout",
         workspace_root.join(".fgos").join("locks").join("main-checkout.lock"),
     );
-    if fgos_holder_lock::probe(&v3)? == fgos_holder_lock::Probe::Held {
+    let probed = fgos_holder_lock::probe(&v3).map_err(|e| match e.kind() {
+        std::io::ErrorKind::Unsupported => MainCheckoutLockError::DriverUnavailable(e.to_string()),
+        _ => MainCheckoutLockError::Io(e),
+    })?;
+    if probed == fgos_holder_lock::Probe::Held {
         return Err(MainCheckoutLockError::HeldV3);
     }
     // A directory at the v1 path is the tombstone: the main checkout moved to the kernel lock
