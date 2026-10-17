@@ -1673,7 +1673,9 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
   const tc = createRoundTerminalControl({
     herdrBin,
     herdrEnv: sessionEnv,
-    config: { launchIdentifyTimeoutMs: Math.min(deadlines.startup.readyMs || 10000, 5000), ...(ctx.terminalConfig ?? {}) },
+    // How long a launched worker may take to show up in its pane: a loaded machine or a slow shell startup
+    // can need more than a few seconds, and a worker that is late is not a tampered one.
+    config: { launchIdentifyTimeoutMs: Math.min(deadlines.startup.readyMs || 10000, 10000), ...(ctx.terminalConfig ?? {}) },
   });
   const io = createSlotIo({ tc, key, groupKey });
   // A confined worker's pane gets the private HOME; herdr honours `--env` for
