@@ -2688,7 +2688,9 @@ export async function executeAssignment(assignment, opts = {}) {
     // A supervised attempt that never produced its result is still the supervisor's (and, after it,
     // the adopt door's): its run control token stays, the settle step uses it.
     if (attemptLocks) attemptLocks.release();
-    if (providerCapacitySelection?.status === 'selected') {
+    // An agent the supervisor still owns keeps the account it was given; the lease is reclaimed through
+    // isCliSpawnRunStillWorking once its attempt has really ended.
+    if (providerCapacitySelection?.status === 'selected' && (!attemptHandedOver || attemptSettled)) {
       releaseSelectedProviderLease(providerCapacitySelection, runId, opts.providerCapacityRuntimeDir);
     }
     if (!attemptHandedOver || attemptSettled) releaseRunControl(runDir, { controlEpoch, controlToken });

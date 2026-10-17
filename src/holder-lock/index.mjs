@@ -601,6 +601,9 @@ export function spawnWithLocks(handles, spec) {
   });
   const stdio = ['ignore', spec.stdout ?? 'ignore', spec.stderr ?? 'ignore', ...fds];
   const child = spawn(spec.command, spec.args ?? [], { cwd: spec.cwd, env: spec.env ?? process.env, stdio, detached: true, windowsHide: true });
+  // A program that cannot start is reported asynchronously: keep it on the child for the caller to read
+  // instead of letting an unhandled 'error' event end this process.
+  child.once('error', (err) => { child.spawnError = err; });
   child.unref();
   return child;
 }

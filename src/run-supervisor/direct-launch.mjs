@@ -7,6 +7,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { StringDecoder } from 'node:string_decoder';
 import { spawn } from 'node:child_process';
 import { acquireSync, createLockScope, spawnWithLocks, resolveLock, resolveStateRoot, readPredecessorKillWaitMs, HolderLockError } from '../holder-lock/index.mjs';
 import { acquireDispatchCwdLockIn } from '../runner/dispatch/cwd-lock.mjs';
@@ -22,6 +23,7 @@ const PROTOCOL = 1;
 const BINDING_WAIT_MS = 30_000;
 const POLL_MS = 25;
 const CLOSE_WAIT_MS = 60_000;
+const TAIL_CHUNK_BYTES = 1024 * 1024;
 const ADOPT_POLL_MS = 250;
 const ADOPT_WAIT_MS = 60_000;
 const STEP_TIMEOUT_MS = 10 * 60 * 1000;
@@ -218,18 +220,24 @@ export function readLaunchSettings(projectRoot) {
 export function startSupervisor({ envelope, locks, stepEnv }) {
   const runDir = envelope.runDir;
   const log = fs.openSync(path.join(runDir, 'supervisor.log'), 'a', 0o600);
+  let started = false;
   const argv = ['internal', 'supervise', '--envelope', path.join(runDir, 'envelope.json'), '--protocol', String(PROTOCOL)];
   try {
     if (process.platform === 'win32') {
       const child = spawn(envelope.hostBin, argv, { cwd: runDir, env: stepEnv, stdio: ['ignore', log, log], detached: true, windowsHide: true });
+      child.once('error', (err) => { child.spawnError = err; });
       child.unref();
+      started = true;
       return { child, handsOverLocks: false };
     }
     const held = [locks.attempt, ...(locks.cwdLease ? [locks.cwdLease] : [])];
     const child = spawnWithLocks(held, { command: envelope.hostBin, args: argv, cwd: runDir, env: stepEnv, stdout: log, stderr: log });
+    started = true;
     return { child, handsOverLocks: true };
   } finally {
     fs.closeSync(log);
+    // Nothing was handed over: the secrets and the control token have no reader, so they do not stay on disk.
+    if (!started) fs.rmSync(envelope.sideFile, { force: true });
   }
 }
 
@@ -237,20 +245,27 @@ function readJson(file) {
   try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return null; }
 }
 
-/** Follow the capture files by offset and hand new text to `onChunk(stream, text)`. No IPC. */
-function captureTail(paths, onChunk) {
+/**
+ * Follow the capture files by offset and hand new text to `onChunk(stream, text)`; no IPC. The agent writes
+ * these files, so each look reads at most TAIL_CHUNK_BYTES and never follows a link; a multibyte character
+ * that straddles two looks is held back until its rest arrives.
+ */
+export function captureTail(paths, onChunk) {
   const offsets = { stdout: 0, stderr: 0 };
+  const decoders = { stdout: new StringDecoder('utf8'), stderr: new StringDecoder('utf8') };
   return () => {
     for (const stream of ['stdout', 'stderr']) {
       let fd;
       try {
-        fd = fs.openSync(paths[stream], 'r');
-        const { size } = fs.fstatSync(fd);
-        if (size <= offsets[stream]) continue;
-        const buffer = Buffer.alloc(size - offsets[stream]);
-        fs.readSync(fd, buffer, 0, buffer.length, offsets[stream]);
-        offsets[stream] = size;
-        if (onChunk) { try { onChunk(stream, buffer.toString('utf8')); } catch { /* an observer never stops the run */ } }
+        fd = fs.openSync(paths[stream], fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW ?? 0));
+        const stat = fs.fstatSync(fd);
+        if (!stat.isFile() || stat.size <= offsets[stream]) continue;
+        const length = Math.min(stat.size - offsets[stream], TAIL_CHUNK_BYTES);
+        const buffer = Buffer.alloc(length);
+        const read = fs.readSync(fd, buffer, 0, length, offsets[stream]);
+        offsets[stream] += read;
+        const text = decoders[stream].write(buffer.subarray(0, read));
+        if (text && onChunk) { try { onChunk(stream, text); } catch { /* an observer never stops the run */ } }
       } catch { /* the file is not there yet */ } finally {
         if (fd !== undefined) try { fs.closeSync(fd); } catch { /* closed */ }
       }
@@ -267,9 +282,9 @@ export async function waitForBinding(runDir, child, { timeoutMs = BINDING_WAIT_M
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
     if (fs.existsSync(binding)) return { state: 'bound' };
-    if (child.exitCode !== null || child.signalCode !== null) {
+    if (child.spawnError || child.exitCode !== null || child.signalCode !== null) {
       // The binding may have been published in the instant before it exited.
-      return fs.existsSync(binding) ? { state: 'bound' } : { state: 'exited', exit: child.exitCode, signal: child.signalCode };
+      return fs.existsSync(binding) ? { state: 'bound' } : { state: 'exited', exit: child.exitCode, signal: child.signalCode, ...(child.spawnError ? { error: child.spawnError.code ?? String(child.spawnError.message) } : {}) };
     }
     await sleep(POLL_MS);
   }

@@ -10,7 +10,7 @@ import { spawnSync } from 'node:child_process';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { acquireSync, createLockScope, spawnWithLocks } from '../../src/holder-lock/index.mjs';
 import { computeSha256Digest } from '../../src/runner/dispatch/proof-helpers.mjs';
-import { attemptGateCommand, attemptPaths, attemptStepEnv, awaitSettledResult, buildEnvelope, prepareAttemptFiles, waitForBinding, writeAttemptFiles } from '../../src/run-supervisor/direct-launch.mjs';
+import { attemptGateCommand, attemptPaths, attemptStepEnv, awaitSettledResult, buildEnvelope, captureTail, prepareAttemptFiles, waitForBinding, writeAttemptFiles } from '../../src/run-supervisor/direct-launch.mjs';
 import { BIN_FGOS, bwrapUsable, createProject, killToken, readJson, startRun, waitUntil } from './support/direct-harness.mjs';
 
 seedFileLocalBwrapRegistry();
@@ -152,4 +152,37 @@ test('a real run carries the configured kill grace and kill wait in its envelope
   assert.doesNotMatch(fs.readFileSync(path.join(dir, 'envelope.json'), 'utf8'), /sk-live-secret-9/);
   assert.equal(readJson(path.join(dir, 'protected', 'attempt-secrets.json')).env.API_KEY, 'sk-live-secret-9');
   assert.ok(readJson(path.join(dir, 'supervisor-binding.json')).supervisor.pid > 0);
+});
+
+test('captureTail reads a capture file in bounded chunks, keeps multibyte text whole and ignores a link', (t) => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-tail-'));
+  t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  const out = path.join(dir, 'out.log');
+  const err = path.join(dir, 'err.log');
+  // 3 MiB of a three-byte character: no chunk boundary of 1 MiB can be a character boundary by luck.
+  const text = '\u20ac'.repeat(1024 * 1024);
+  fs.writeFileSync(out, text);
+  fs.writeFileSync(path.join(dir, 'secret.txt'), 'must not be read');
+  fs.symlinkSync(path.join(dir, 'secret.txt'), err);
+  const chunks = [];
+  const follow = captureTail({ stdout: out, stderr: err }, (stream, chunk) => chunks.push({ stream, chunk }));
+  for (let i = 0; i < 6; i += 1) follow();
+  assert.ok(chunks.length >= 3, 'a 3 MiB file arrives in several looks');
+  assert.ok(chunks.every((c) => Buffer.byteLength(c.chunk) <= 1024 * 1024 + 3), 'no look reads more than its bound');
+  assert.equal(chunks.filter((c) => c.stream === 'stdout').map((c) => c.chunk).join(''), text, 'the characters arrive whole and in order');
+  assert.equal(chunks.some((c) => c.stream === 'stderr'), false, 'a link in a capture path is never followed');
+});
+
+test('a supervisor program that cannot start is reported on the child and by waitForBinding, not as an uncaught error', async (t) => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-spawn-fail-'));
+  t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  const fgosDir = path.join(dir, '.fgos');
+  fs.mkdirSync(fgosDir);
+  const scope = createLockScope('test');
+  const attempt = acquireSync(scope, 'attempt', { fgosDir, runDir: path.join(dir, 'asg'), NN: '01' });
+  const child = spawnWithLocks([attempt.handle], { command: path.join(dir, 'no-such-host'), args: [], env: {} });
+  const bound = await waitForBinding(dir, child, { timeoutMs: 5000 });
+  assert.equal(bound.state, 'exited');
+  assert.equal(bound.error, 'ENOENT');
+  attempt.handle.release();
 });
