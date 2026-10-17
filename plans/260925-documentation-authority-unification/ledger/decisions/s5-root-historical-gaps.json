@@ -17,15 +17,9 @@
       "sourceAnchor": "file-block",
       "sourceUnitDigest": "5f58910d4cdc07be43c78270071ac798fa791e899156e63497fcd94e6815f664",
       "disposition": "retain-as-evidence",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:23@2026-10-14",
-      "rationale": "Retain this exact historical whole-contract version as immutable evidence at docs/architecture-manifest.json at e63a17b8ec87ec6b29671d00a0111dc84b3eb848 (blob c530841eb23f1ac0b2acd46a32cf9ff9da4ba9a3, full unit SHA256 5f58910d4cdc07be43c78270071ac798fa791e899156e63497fcd94e6815f664). It predates merged upstream contract edits; the current source bytes are carried byte-identically at docs/platform/contracts/architecture-manifest.json, independently accepted by review-5-root-source-completion-02.md at 9f087f37d134366bd2057af2fac831ed18a9b3c3. The frozen placement-map blob is older than the carried bytes and does not identify this version as current. Keep the old native identity and its complete text for lineage; no claim that every old field survives in the current contract, no invented same-unit identity, no deletion-as-obsolete, and no authority retirement. The current owner is an informational successor in the companion evidence, not a false whole-unit exact carry. Independent review of this historical-evidence disposition is owed.",
-      "reviewNote": "deep: blob c530841eb at e63a17b8e hashes to the stated sha256 by sha256sum; the diff to the current manifest is only 14 added file-map entries and no removal, so the retain wording (no claim every old field survives) is honest; current owner is byte-equal and named as informational successor only; file class is a live contract so retain-as-evidence of a git-history version is a stretch of the history-evidence class but the author discloses it",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261014-2105-root-closure.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "b20dc73158d6c0a636522555da23de8428e1fc59"
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "Retain this exact historical whole-contract version as immutable evidence at docs/architecture-manifest.json at e63a17b8ec87ec6b29671d00a0111dc84b3eb848 (blob c530841eb23f1ac0b2acd46a32cf9ff9da4ba9a3, full unit SHA256 5f58910d4cdc07be43c78270071ac798fa791e899156e63497fcd94e6815f664). It predates merged upstream contract edits; the current source bytes are carried byte-identically at docs/platform/contracts/architecture-manifest.json, independently accepted by review-5-root-source-completion-02.md at 9f087f37d134366bd2057af2fac831ed18a9b3c3. The frozen placement-map blob is older than the carried bytes and does not identify this version as current. Keep the old native identity and its complete text for lineage; no claim that every old field survives in the current contract, no invented same-unit identity, no deletion-as-obsolete, and no authority retirement. The current owner is an informational successor in the companion evidence, not a false whole-unit exact carry. Independent review of this historical-evidence disposition is owed. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending."
     },
     {
       "claimId": "claim_b6f28092c03285c2745234912da0f2ab",
@@ -33,15 +27,9 @@
       "sourceAnchor": "file-block",
       "sourceUnitDigest": "6a69875965acf828d7357bc049fc6a1d4d404bc31fbeabef87adb4bfd4eeac0e",
       "disposition": "retain-as-evidence",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:23@2026-10-14",
-      "rationale": "Retain this exact historical whole-contract version as immutable evidence at docs/architecture-manifest.json at e2fc7754259747ea70b23f1bab72ba5671b2cf87 (blob f8daa37e065f3b1178a1929a874ed5d2f83c5c82, full unit SHA256 6a69875965acf828d7357bc049fc6a1d4d404bc31fbeabef87adb4bfd4eeac0e). It predates merged upstream contract edits; the current source bytes are carried byte-identically at docs/platform/contracts/architecture-manifest.json, independently accepted by review-5-root-source-completion-02.md at 9f087f37d134366bd2057af2fac831ed18a9b3c3. The frozen placement-map blob is older than the carried bytes and does not identify this version as current. Keep the old native identity and its complete text for lineage; no claim that every old field survives in the current contract, no invented same-unit identity, no deletion-as-obsolete, and no authority retirement. The current owner is an informational successor in the companion evidence, not a false whole-unit exact carry. Independent review of this historical-evidence disposition is owed.",
-      "reviewNote": "deep: blob f8daa37e0 at e2fc77542 hashes to the stated sha256; unlike the first version this one holds entries since removed upstream (placement-policy, operation-choice, coordination/* and others), so retaining the whole old text as evidence is the right call and no deletion-as-obsolete is claimed",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261014-2105-root-closure.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "b20dc73158d6c0a636522555da23de8428e1fc59"
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "Retain this exact historical whole-contract version as immutable evidence at docs/architecture-manifest.json at e2fc7754259747ea70b23f1bab72ba5671b2cf87 (blob f8daa37e065f3b1178a1929a874ed5d2f83c5c82, full unit SHA256 6a69875965acf828d7357bc049fc6a1d4d404bc31fbeabef87adb4bfd4eeac0e). It predates merged upstream contract edits; the current source bytes are carried byte-identically at docs/platform/contracts/architecture-manifest.json, independently accepted by review-5-root-source-completion-02.md at 9f087f37d134366bd2057af2fac831ed18a9b3c3. The frozen placement-map blob is older than the carried bytes and does not identify this version as current. Keep the old native identity and its complete text for lineage; no claim that every old field survives in the current contract, no invented same-unit identity, no deletion-as-obsolete, and no authority retirement. The current owner is an informational successor in the companion evidence, not a false whole-unit exact carry. Independent review of this historical-evidence disposition is owed. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending."
     },
     {
       "claimId": "claim_0956ea2eadf0a32787b7fd0e51d693a6",
@@ -121,5 +109,6 @@
       ],
       "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     }
-  ]
+  ],
+  "correctionSession": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17"
 }

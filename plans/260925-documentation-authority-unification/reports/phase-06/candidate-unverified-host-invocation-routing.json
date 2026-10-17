@@ -4,7 +4,7 @@
   "authorization": "A28",
   "authoredCommit": "cfd4cffc17caae2e4b28417487f967f35ebae845",
   "meaning": "Conservation is separate from candidate truth; no per-unit reverse receipts or current-truth approvals.",
-  "count": 588,
+  "count": 578,
   "rows": [
     {
       "claimId": "claim_eeff6182ca11adda0451a09f2f25d350",
@@ -270,145 +270,6 @@
       "path": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
       "anchor": "unheaded-block-32",
       "unitDigest": "826ad676386ede7942a16e3ad5cde0fd19dbd5994eec4ac9b868e4d0e2ac3638",
-      "fileStatus": {
-        "kind": "architecture",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Draft",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_bcf87e90dca23b52464b0b136da9a278",
-      "path": "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
-      "anchor": "architecture-host-use-cases",
-      "unitDigest": "db300f2a4ce6ca6001124a27fd72c795d2db15c6d115315059431371ccefcc43",
-      "fileStatus": {
-        "kind": "architecture",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Draft",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
-      "unverifiedReason": "Current native reverse candidate; no source decision accounts for this unit and no current-truth/promotion approval is claimed.",
-      "currentStateAccounting": "step10-author-candidate-accounting.json"
-    },
-    {
-      "claimId": "claim_8849da37d90bc154199f04f997e8caf2",
-      "path": "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
-      "anchor": "1-claim",
-      "unitDigest": "713a7e1add97f7c4e46c2abbd177faccbb180cfef9b25ddc4eeaa0a9bfa44677",
-      "fileStatus": {
-        "kind": "architecture",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Draft",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_0ba0c62f90554b8f8aebc2065c0bb745",
-      "path": "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
-      "anchor": "unheaded-block-2",
-      "unitDigest": "c395dc61c107e4c78162825bd309dde15d9b672a7cf94d951a646e55c1184674",
-      "fileStatus": {
-        "kind": "architecture",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Draft",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_a8dbecf1a16f703dad48df815ef7a5ab",
-      "path": "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
-      "anchor": "2-host-responsibilities",
-      "unitDigest": "cbbac9b86b96dfbbfb36e57cddcc43b3cc9827d5b24dfeb6488dbcb477c1af9b",
-      "fileStatus": {
-        "kind": "architecture",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Draft",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_a3e7345b432cdd142d863315ede0737e",
-      "path": "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
-      "anchor": "unheaded-block-3",
-      "unitDigest": "b0c7fc568233f6cb0898dcd719016d14695b3eba8321e1ce9e029e8c558fdf9e",
-      "fileStatus": {
-        "kind": "architecture",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Draft",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_916553a65bfea95ff1f5fd4b9a0aee40",
-      "path": "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
-      "anchor": "3-implementation-alignment",
-      "unitDigest": "d60a6b2883a08d45cdcd7ce0c5cbfe97143a7e966103958e7cae73771a169e37",
-      "fileStatus": {
-        "kind": "architecture",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Draft",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_8bfbb4262b7fd8f909a0ba87fd0e6206",
-      "path": "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
-      "anchor": "unheaded-block-4",
-      "unitDigest": "0030a8ecadd3da43d02992eaa5351328b9e479dbf5632372af05a0f27f2a343b",
-      "fileStatus": {
-        "kind": "architecture",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Draft",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_ac6f3986495be867bc300bb464413d8e",
-      "path": "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
-      "anchor": "4-related-files",
-      "unitDigest": "629c3ebc4d40d78a7fa46a7577161566d17fad7ca3e00bb035425ce22ede5802",
-      "fileStatus": {
-        "kind": "architecture",
-        "kindCanonical": true,
-        "authorityStatus": "candidate",
-        "designStatus": "Draft",
-        "canonical": false,
-        "eligibility": "non-promoted Candidate/Draft"
-      },
-      "status": "candidate-unverified"
-    },
-    {
-      "claimId": "claim_ac60cea128a499fd60540ff035634387",
-      "path": "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
-      "anchor": "unheaded-block-5",
-      "unitDigest": "1445ff220a93b5864634f29de1750eea50899fc7d34f79a0418597eeb56af7a4",
       "fileStatus": {
         "kind": "architecture",
         "kindCanonical": true,
@@ -8662,17 +8523,6 @@
       "currentStateAccounting": "step10-author-candidate-accounting.json"
     },
     {
-      "claimId": "claim_6e2eefa7616c0f5d0fddb20533993f45",
-      "path": "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
-      "anchor": "unheaded-block-1",
-      "unitDigest": "c40c4d14fd769b2009774a820ce5e7fdbd66c71cbdbfb657b015110c25a6e13f",
-      "status": "candidate-unverified",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792168391979-ad740169@2026-10-16",
-      "unverifiedReason": "Current native reverse candidate in persisted global E; absent from every current-state list after authenticated rebindings. No source decision accounts for it; truth and promotion remain unverified.",
-      "currentStateAccounting": "step10-author-candidate-accounting.json"
-    },
-    {
       "claimId": "claim_9093fbedfcf5270ece7757e7df5ef1c5",
       "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
       "anchor": "unheaded-block-5",
@@ -8857,5 +8707,11 @@
     },
     "reviewStatus": "pending",
     "meaning": "Prior list-level review/native-equality receipts describe their historical pins; changed entries require new independent review. Current tuple membership verified against persisted native registry and reverse set, not current implementation truth."
+  },
+  "packageRebind": {
+    "contentCommit": "8b2ee4dd99fc89689f20274f1cfd5e1ad7a3469a",
+    "authorSession": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+    "changedRowsMovedTo": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-package-candidate-unverified.json",
+    "approvalCarried": false
   }
 }

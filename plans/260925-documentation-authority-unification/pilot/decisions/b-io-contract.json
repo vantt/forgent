@@ -7,68 +7,50 @@
   "claims": [
     {
       "claimId": "claim_9466cce125cf03619e4d50ff9f340dcb",
-      "sourceUnitDigest": "f72297b85c91b398",
+      "sourceUnitDigest": "f72297b85c91b398d8341653aabae3add3e9cfc3079149c05b594d543b853d8a",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "1-purpose-and-scope",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "Document H1 of the legacy contract; the frozen map section 5 places it under the candidate heading 1. Purpose And Scope (the candidate H1 'CLI I/O Contract' is the document title), so the Vietnamese title is replaced by an English heading title.",
-      "authoredBy": "codex-session:1@2026-10-08",
-      "reviewNote": "Provenance re-confirmation: row byte-equal to its reviewed form at 7df871822 apart from the added authoredBy and the reset review fields; source L1-1 -> target L18-18 (contract/promote); target differs from source by 2 changed line(s), as the row rationale declares; the sidecar digests extend the decision's short digests and are unchanged since the prior pass. Old approval not carried: now pending.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-09",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-b-io-contract.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "Document H1 of the legacy contract; the frozen map section 5 places it under the candidate heading 1. Purpose And Scope (the candidate H1 'CLI I/O Contract' is the document title), so the Vietnamese title is replaced by an English heading title. Package rebind at 8b2ee4dd9: native source content changed. Independent review pending.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "11a6e0e929f3ed69d0f883a5385618ea167d7902bd97f767fd7b0540f085ba52",
       "targetAncestry": [
         "CLI I/O Contract"
-      ],
-      "reviewReportCommit": "7f8d12784d642097c17e7a7ebdfa4cff43aabbee"
+      ]
     },
     {
       "claimId": "claim_1b5bd12129cc41ea75fc7dd3993142f3",
-      "sourceUnitDigest": "476e7efba05e358c",
+      "sourceUnitDigest": "476e7efba05e358ccd01c95cbfb350eca1cc6a7905d784c5651cb99960515322",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-2",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "Intro paragraph carried into 1. Purpose And Scope as its own block but CHANGED in two links: the 0014 link (decisions/0014-... .md, dead after the decision corpus retired) is rewritten to plain code text `0014` plus its path, and the 0011 link is repointed to retired-decision-history.md#7-adr-0011-explicit-version-for-every-contract; the rest of the text is verbatim.",
-      "authoredBy": "codex-session:1@2026-10-08",
-      "reviewNote": "Provenance re-confirmation: row byte-equal to its reviewed form at 7df871822 apart from the added authoredBy and the reset review fields; source L3-10 -> target L20-27 (contract/promote); target differs from source by 4 changed line(s), as the row rationale declares; the sidecar digests extend the decision's short digests and are unchanged since the prior pass. Old approval not carried: now pending.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-09",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-b-io-contract.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "Intro paragraph carried into 1. Purpose And Scope as its own block but CHANGED in two links: the 0014 link (decisions/0014-... .md, dead after the decision corpus retired) is rewritten to plain code text `0014` plus its path, and the 0011 link is repointed to retired-decision-history.md#7-adr-0011-explicit-version-for-every-contract; the rest of the text is verbatim. Package rebind at 8b2ee4dd9: native source content changed. Independent review pending.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "fb2a927391a144152bec76f586c13c1fcba302d284ddf5c00776250504d1fbd1",
       "targetAncestry": [
         "CLI I/O Contract",
         "1. Purpose And Scope"
-      ],
-      "reviewReportCommit": "7f8d12784d642097c17e7a7ebdfa4cff43aabbee"
+      ]
     },
     {
       "claimId": "claim_882ee3f986d0dacee87764a5b6bb75d8",
-      "sourceUnitDigest": "accb25b08ef0d839",
+      "sourceUnitDigest": "accb25b08ef0d839f5a86e898250752fc12d3dac678c12fb5776e0743e68001c",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-3",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "The 'Mục tiêu' goal paragraph (new transport plugs in via transport-to-verb and envelope/manifest) is carried verbatim as the second block of 1. Purpose And Scope.",
-      "authoredBy": "codex-session:1@2026-10-08",
-      "reviewNote": "Provenance re-confirmation: row byte-equal to its reviewed form at 7df871822 apart from the added authoredBy and the reset review fields; source L12-15 -> target L29-32 (contract/promote); target text byte-equal to source; the sidecar digests extend the decision's short digests and are unchanged since the prior pass. Old approval not carried: now pending.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-09",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-b-io-contract.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "The 'Mục tiêu' goal paragraph (new transport plugs in via transport-to-verb and envelope/manifest) is carried verbatim as the second block of 1. Purpose And Scope. Package rebind at 8b2ee4dd9: native source content changed. Independent review pending.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "accb25b08ef0d839f5a86e898250752fc12d3dac678c12fb5776e0743e68001c",
       "targetAncestry": [
         "CLI I/O Contract",
         "1. Purpose And Scope"
-      ],
-      "reviewReportCommit": "7f8d12784d642097c17e7a7ebdfa4cff43aabbee"
+      ]
     },
     {
       "claimId": "claim_51848961a2bbf93d37bc2b46d9f141f5",
@@ -95,231 +77,171 @@
     },
     {
       "claimId": "claim_426f29d1e11055574c203d89cba84cc7",
-      "sourceUnitDigest": "4d3e5ba86bd907ab",
+      "sourceUnitDigest": "4d3e5ba86bd907aba25dfcc099af5e2891236ac44ec6aac4eb3e2fc2bd2a5c83",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-4",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "Single write door rule (CTR001/CTR002, no second write path into .fgos/) carried verbatim under the new H3 Single Write Door; not stated in work-state.md so no merge.",
-      "authoredBy": "codex-session:1@2026-10-08",
-      "reviewNote": "Provenance re-confirmation: row byte-equal to its reviewed form at 7df871822 apart from the added authoredBy and the reset review fields; source L19-20 -> target L38-39 (contract/promote); target text byte-equal to source; the sidecar digests extend the decision's short digests and are unchanged since the prior pass. Old approval not carried: now pending.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-09",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-b-io-contract.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "Single write door rule (CTR001/CTR002, no second write path into .fgos/) carried verbatim under the new H3 Single Write Door; not stated in work-state.md so no merge. Package rebind at 8b2ee4dd9: native source content changed. Independent review pending.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "4d3e5ba86bd907aba25dfcc099af5e2891236ac44ec6aac4eb3e2fc2bd2a5c83",
       "targetAncestry": [
         "CLI I/O Contract",
         "2. Input Direction Verb And Identity",
         "Single Write Door"
-      ],
-      "reviewReportCommit": "7f8d12784d642097c17e7a7ebdfa4cff43aabbee"
+      ]
     },
     {
       "claimId": "claim_b5ef9b491d020583ac6ca1379e4115a0",
-      "sourceUnitDigest": "eed0b8520401ce77",
+      "sourceUnitDigest": "eed0b8520401ce77b1b75379282e339007dd17d09e38cccd31ba0efad4e0a4dd",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-7",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
-      "rationale": "Lead-in sentence for the writer field; the candidate keeps it verbatim inside Writer Identity next to the work-state.md writer text (map section 6 pairs io 22, 33-39 with ws 154-167), though it sits after the ws paragraph and before the io rationale paragraph.",
-      "authoredBy": "codex-session:1@2026-10-08",
-      "reviewNote": "Provenance re-confirmation: row byte-equal to its reviewed form at 7df871822 apart from the added authoredBy and the reset review fields; source L22-22 -> target L56-56 (contract/merge); target text byte-equal to source; the sidecar digests extend the decision's short digests and are unchanged since the prior pass. Old approval not carried: now pending.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-09",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-b-io-contract.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "Lead-in sentence for the writer field; the candidate keeps it verbatim inside Writer Identity next to the work-state.md writer text (map section 6 pairs io 22, 33-39 with ws 154-167), though it sits after the ws paragraph and before the io rationale paragraph. Package rebind at 8b2ee4dd9: native source content changed. Independent review pending.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "eed0b8520401ce77b1b75379282e339007dd17d09e38cccd31ba0efad4e0a4dd",
       "targetAncestry": [
         "CLI I/O Contract",
         "2. Input Direction Verb And Identity",
         "Writer Identity"
-      ],
-      "reviewReportCommit": "7f8d12784d642097c17e7a7ebdfa4cff43aabbee"
+      ]
     },
     {
       "claimId": "claim_cb629f70ad6029530d70253f96ad3221",
-      "sourceUnitDigest": "bd8b780f96dd2ecc",
+      "sourceUnitDigest": "bd8b780f96dd2ecc5b5f628c94f6b5b30a5a09eb139ef809d5b9334cd25d5992",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-8",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
-      "rationale": "Attribution-not-authentication paragraph (D1, D9 never-block rationale, STR38/STR48 out of scope) carried verbatim in Writer Identity alongside the overlapping work-state.md 154-167 text; io-contract is the side that adds the never-block rationale.",
-      "authoredBy": "codex-session:1@2026-10-08",
-      "reviewNote": "Provenance re-confirmation: row byte-equal to its reviewed form at 7df871822 apart from the added authoredBy and the reset review fields; source L33-39 -> target L58-64 (contract/merge); target text byte-equal to source; the sidecar digests extend the decision's short digests and are unchanged since the prior pass. Old approval not carried: now pending.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-09",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-b-io-contract.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "Attribution-not-authentication paragraph (D1, D9 never-block rationale, STR38/STR48 out of scope) carried verbatim in Writer Identity alongside the overlapping work-state.md 154-167 text; io-contract is the side that adds the never-block rationale. Package rebind at 8b2ee4dd9: native source content changed. Independent review pending.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "bd8b780f96dd2ecc5b5f628c94f6b5b30a5a09eb139ef809d5b9334cd25d5992",
       "targetAncestry": [
         "CLI I/O Contract",
         "2. Input Direction Verb And Identity",
         "Writer Identity"
-      ],
-      "reviewReportCommit": "7f8d12784d642097c17e7a7ebdfa4cff43aabbee"
+      ]
     },
     {
       "claimId": "claim_153f56c2d5a2e895f8e6b2607bb7ab3d",
-      "sourceUnitDigest": "25e4a007d2fc9a15",
+      "sourceUnitDigest": "25e4a007d2fc9a153cb3273376471f15e4bfca5c257f0c8bf06d1dd6af198770",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-14",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "role vs writer paragraph (human/runner/session/system) carried verbatim under the new H3 Caller Role; no counterpart in work-state.md per the map. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent.",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "reviewNote": "deep: source docs/io-contract.md unheaded-block-8 (lines 51-55) and target cli-io-contract.md unheaded-block-14 (lines 123-127) are the same 5-line role vs writer paragraph with equal full digest, placed under Caller Role in section 2 right after the new installation-error paragraph that explains the rebound; source digest in the shard is the 16-hex prefix and the full value recomputes; anchor ok; note equals the earlier ok note",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-01-287a22d33.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "role vs writer paragraph (human/runner/session/system) carried verbatim under the new H3 Caller Role; no counterpart in work-state.md per the map. A31: target paragraph numbering shifted after the new installation-error paragraph; rebound by unique complete prior target digest, preserving the prior referent. Package rebind at 8b2ee4dd9: native source content changed. Independent review pending.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "25e4a007d2fc9a153cb3273376471f15e4bfca5c257f0c8bf06d1dd6af198770",
       "targetAncestry": [
         "CLI I/O Contract",
         "2. Input Direction Verb And Identity",
         "Caller Role"
-      ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      ]
     },
     {
       "claimId": "claim_e9c39f67bc2eab533faa3053ff482708",
-      "sourceUnitDigest": "e067ab7149569e51",
+      "sourceUnitDigest": "e067ab7149569e512622147ea6100a60c966d66751d0e4058bf7e78d06be9f8d",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "3-output-direction-unified-envelope",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "Section heading 'Chiều ra — envelope thống nhất' maps to the frozen heading '3. Output Direction Unified Envelope'; only the title language and numbering differ.",
-      "authoredBy": "codex-session:1@2026-10-08",
-      "reviewNote": "Provenance re-confirmation: row byte-equal to its reviewed form at 7df871822 apart from the added authoredBy and the reset review fields; source L47-47 -> target L111-111 (contract/promote); target differs from source by 2 changed line(s), as the row rationale declares; the sidecar digests extend the decision's short digests and are unchanged since the prior pass. Old approval not carried: now pending.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-09",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-b-io-contract.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "Section heading 'Chiều ra — envelope thống nhất' maps to the frozen heading '3. Output Direction Unified Envelope'; only the title language and numbering differ. Package rebind at 8b2ee4dd9: native source content changed. Independent review pending.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "01eac1846cb1ba744cb0732c6b1b4773335a34f63361db7824958afeca36e989",
       "targetAncestry": [
         "CLI I/O Contract"
-      ],
-      "reviewReportCommit": "7f8d12784d642097c17e7a7ebdfa4cff43aabbee"
+      ]
     },
     {
       "claimId": "claim_38ad96d62f2c6cf7a639fc24a83c2621",
-      "sourceUnitDigest": "6dcf0faa76d27fed",
+      "sourceUnitDigest": "6dcf0faa76d27fed777c0586dad2b3b78200213c58d5606ad5e901e81e13e6fa",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-16",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
-      "rationale": "Source: docs/io-contract.md:59-61#unheaded-block-9 (current lines); unit SHA256 6dcf0faa76d27fed777c0586dad2b3b78200213c58d5606ad5e901e81e13e6fa.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:145-147#unheaded-block-16 (current lines); unit SHA256 6dcf0faa76d27fed777c0586dad2b3b78200213c58d5606ad5e901e81e13e6fa.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 6dcf0faa76d27fed777c0586dad2b3b78200213c58d5606ad5e901e81e13e6fa at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-9 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-16; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất\", target context \"CLI I/O Contract / 3. Output Direction Unified Envelope / Envelope Shape\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewNote": "mechanical: merge io-contract.md:59-61#unheaded-block-9 -> cli-io-contract.md:145-147#unheaded-block-16; both digests recomputed by script and equal; lines equal real spans; anchor ok; ancestry equals real chain; links 0/0/0/0/0/0; row equals shard at the pin; last-reviewed digest backed by a committed ok verdict; class Weak-exact. hand-recomputed both digests (seed 2026101608).",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-10-287a22d33.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/io-contract.md:59-61#unheaded-block-9 (current lines); unit SHA256 6dcf0faa76d27fed777c0586dad2b3b78200213c58d5606ad5e901e81e13e6fa.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:145-147#unheaded-block-16 (current lines); unit SHA256 6dcf0faa76d27fed777c0586dad2b3b78200213c58d5606ad5e901e81e13e6fa.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 6dcf0faa76d27fed777c0586dad2b3b78200213c58d5606ad5e901e81e13e6fa at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-9 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-16; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất\", target context \"CLI I/O Contract / 3. Output Direction Unified Envelope / Envelope Shape\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: native source content changed. Independent review pending.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "6dcf0faa76d27fed777c0586dad2b3b78200213c58d5606ad5e901e81e13e6fa",
       "targetAncestry": [
         "CLI I/O Contract",
         "3. Output Direction Unified Envelope",
         "Envelope Shape"
-      ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      ]
     },
     {
       "claimId": "claim_dc506074dcc2f08f6012ebb078b50371",
-      "sourceUnitDigest": "18c5d821a55d3517",
+      "sourceUnitDigest": "18c5d821a55d3517cf3efe368fb1d34e13730b3bc1d70ff376d72b147621bdd2",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-17",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
-      "rationale": "Source: docs/io-contract.md:63-65#unheaded-block-10 (current lines); unit SHA256 18c5d821a55d3517cf3efe368fb1d34e13730b3bc1d70ff376d72b147621bdd2.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:149-151#unheaded-block-17 (current lines); unit SHA256 18c5d821a55d3517cf3efe368fb1d34e13730b3bc1d70ff376d72b147621bdd2.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 18c5d821a55d3517cf3efe368fb1d34e13730b3bc1d70ff376d72b147621bdd2 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-10 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-17; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất\", target context \"CLI I/O Contract / 3. Output Direction Unified Envelope / Envelope Shape\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewNote": "mechanical: merge io-contract.md:63-65#unheaded-block-10 -> cli-io-contract.md:149-151#unheaded-block-17; both digests recomputed by script and equal; lines equal real spans; anchor ok; ancestry equals real chain; links 0/0/0/0/0/0; row equals shard at the pin; last-reviewed digest backed by a committed ok verdict; class Weak-exact. hand-recomputed both digests (seed 2026101608).",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-10-287a22d33.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/io-contract.md:63-65#unheaded-block-10 (current lines); unit SHA256 18c5d821a55d3517cf3efe368fb1d34e13730b3bc1d70ff376d72b147621bdd2.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:149-151#unheaded-block-17 (current lines); unit SHA256 18c5d821a55d3517cf3efe368fb1d34e13730b3bc1d70ff376d72b147621bdd2.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 18c5d821a55d3517cf3efe368fb1d34e13730b3bc1d70ff376d72b147621bdd2 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-10 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-17; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất\", target context \"CLI I/O Contract / 3. Output Direction Unified Envelope / Envelope Shape\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: native source content changed. Independent review pending.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "18c5d821a55d3517cf3efe368fb1d34e13730b3bc1d70ff376d72b147621bdd2",
       "targetAncestry": [
         "CLI I/O Contract",
         "3. Output Direction Unified Envelope",
         "Envelope Shape"
-      ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      ]
     },
     {
       "claimId": "claim_62d31ae4e5abfcf0ab158c0c6a8337ee",
-      "sourceUnitDigest": "84367855d92bb2e3",
+      "sourceUnitDigest": "84367855d92bb2e3914cb9bc385c2dce9b5625c8acaf9e577c9c791e40d07e71",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-18",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
-      "rationale": "Source: docs/io-contract.md:67-70#unheaded-block-11 (current lines); unit SHA256 84367855d92bb2e3914cb9bc385c2dce9b5625c8acaf9e577c9c791e40d07e71.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:153-156#unheaded-block-18 (current lines); unit SHA256 84367855d92bb2e3914cb9bc385c2dce9b5625c8acaf9e577c9c791e40d07e71.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 84367855d92bb2e3914cb9bc385c2dce9b5625c8acaf9e577c9c791e40d07e71 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-11 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-18; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất\", target context \"CLI I/O Contract / 3. Output Direction Unified Envelope / Envelope Shape\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewNote": "mechanical: merge io-contract.md:67-70#unheaded-block-11 -> cli-io-contract.md:153-156#unheaded-block-18; both digests recomputed by script and equal; lines equal real spans; anchor ok; ancestry equals real chain; links 0/0/0/0/0/0; row equals shard at the pin; last-reviewed digest backed by a committed ok verdict; class Weak-exact.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-10-287a22d33.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/io-contract.md:67-70#unheaded-block-11 (current lines); unit SHA256 84367855d92bb2e3914cb9bc385c2dce9b5625c8acaf9e577c9c791e40d07e71.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:153-156#unheaded-block-18 (current lines); unit SHA256 84367855d92bb2e3914cb9bc385c2dce9b5625c8acaf9e577c9c791e40d07e71.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 84367855d92bb2e3914cb9bc385c2dce9b5625c8acaf9e577c9c791e40d07e71 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-11 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-18; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất\", target context \"CLI I/O Contract / 3. Output Direction Unified Envelope / Envelope Shape\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: native source content changed. Independent review pending.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "84367855d92bb2e3914cb9bc385c2dce9b5625c8acaf9e577c9c791e40d07e71",
       "targetAncestry": [
         "CLI I/O Contract",
         "3. Output Direction Unified Envelope",
         "Envelope Shape"
-      ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      ]
     },
     {
       "claimId": "claim_5e282fb457ff9ef02e88cf329556cf34",
-      "sourceUnitDigest": "6a5b9a01b0427971",
+      "sourceUnitDigest": "6a5b9a01b04279716a3d504e251d1de122ff1652714708512706640ec9edd4ca",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-21",
       "claimKind": "contract",
       "disposition": "merge",
-      "reviewStatus": "reviewed",
-      "rationale": "Source: docs/io-contract.md:72-76#unheaded-block-12 (current lines); unit SHA256 6a5b9a01b04279716a3d504e251d1de122ff1652714708512706640ec9edd4ca.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:173-177#unheaded-block-21 (current lines); unit SHA256 6a5b9a01b04279716a3d504e251d1de122ff1652714708512706640ec9edd4ca.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 6a5b9a01b04279716a3d504e251d1de122ff1652714708512706640ec9edd4ca at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-12 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-21; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất\", target context \"CLI I/O Contract / 3. Output Direction Unified Envelope / Runner Stdout Envelope\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewNote": "mechanical: merge io-contract.md:72-76#unheaded-block-12 -> cli-io-contract.md:173-177#unheaded-block-21; both digests recomputed by script and equal; lines equal real spans; anchor ok; ancestry equals real chain; links 0/0/0/0/0/0; row equals shard at the pin; last-reviewed digest backed by a committed ok verdict; class Weak-exact.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-10-287a22d33.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/io-contract.md:72-76#unheaded-block-12 (current lines); unit SHA256 6a5b9a01b04279716a3d504e251d1de122ff1652714708512706640ec9edd4ca.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:173-177#unheaded-block-21 (current lines); unit SHA256 6a5b9a01b04279716a3d504e251d1de122ff1652714708512706640ec9edd4ca.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 6a5b9a01b04279716a3d504e251d1de122ff1652714708512706640ec9edd4ca at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition merge: Account for docs/io-contract.md#unheaded-block-12 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-21; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất\", target context \"CLI I/O Contract / 3. Output Direction Unified Envelope / Runner Stdout Envelope\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: native source content changed. Independent review pending.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "6a5b9a01b04279716a3d504e251d1de122ff1652714708512706640ec9edd4ca",
       "targetAncestry": [
         "CLI I/O Contract",
         "3. Output Direction Unified Envelope",
         "Runner Stdout Envelope"
-      ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      ]
     },
     {
       "claimId": "claim_5b930b5ce84afec3d4b2c383c7f85925",
-      "sourceUnitDigest": "bdeca0144b587f82",
+      "sourceUnitDigest": "bdeca0144b587f826ce46ea61d3be2e882ad021614d1e5f7c14cf2982573f056",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "unheaded-block-22",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "Source: docs/io-contract.md:78-81#unheaded-block-13 (current lines); unit SHA256 bdeca0144b587f826ce46ea61d3be2e882ad021614d1e5f7c14cf2982573f056.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:181-184#unheaded-block-22 (current lines); unit SHA256 bdeca0144b587f826ce46ea61d3be2e882ad021614d1e5f7c14cf2982573f056.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest bdeca0144b587f826ce46ea61d3be2e882ad021614d1e5f7c14cf2982573f056 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/io-contract.md#unheaded-block-13 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-22; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất\", target context \"CLI I/O Contract / 3. Output Direction Unified Envelope / Recognizing A Real Envelope\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewNote": "deep: A36 draw (seed 2026101609); promote io-contract.md:78-81#unheaded-block-13 -> cli-io-contract.md:181-184#unheaded-block-22, source and target text opened and identical (starts: **Nhận diện một phong bì thật:** parse một dò); classed Weak-exact (ancestor headings differ); target context 3. Output Direction Unified Envelope / Recognizing A Real Envelope equals the real heading chain; links 0/0/0/0/0/0; last-reviewed digest backed by a committed ok verdict.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-10-287a22d33.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/io-contract.md:78-81#unheaded-block-13 (current lines); unit SHA256 bdeca0144b587f826ce46ea61d3be2e882ad021614d1e5f7c14cf2982573f056.\nTarget: docs/platform/work-state/contracts/cli-io-contract.md:181-184#unheaded-block-22 (current lines); unit SHA256 bdeca0144b587f826ce46ea61d3be2e882ad021614d1e5f7c14cf2982573f056.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest bdeca0144b587f826ce46ea61d3be2e882ad021614d1e5f7c14cf2982573f056 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition promote: Account for docs/io-contract.md#unheaded-block-13 under docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-22; source context \"Hợp Đồng I/O của fgOS — cửa CLI + bề mặt stdout của `fgos-runner` / Chiều ra — envelope thống nhất\", target context \"CLI I/O Contract / 3. Output Direction Unified Envelope / Recognizing A Real Envelope\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: native source content changed. Independent review pending.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "bdeca0144b587f826ce46ea61d3be2e882ad021614d1e5f7c14cf2982573f056",
       "targetAncestry": [
         "CLI I/O Contract",
         "3. Output Direction Unified Envelope",
         "Recognizing A Real Envelope"
-      ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      ]
     },
     {
       "claimId": "claim_f50b3640275fce5d0a7e8d4f4077c0c9",
@@ -344,24 +266,18 @@
     },
     {
       "claimId": "claim_27d4d4dca46d6a8859628c443df0b31e",
-      "sourceUnitDigest": "413cdab72d47c625",
+      "sourceUnitDigest": "413cdab72d47c625b9d5ebcc87a18b8ee1a05a85ac6aee0ad9a56e5adad017df",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "6-cursor-pagination",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "H3 'Phân trang — con trỏ đục' becomes the H2 '6. Cursor Pagination'; title language and level change only.",
-      "authoredBy": "codex-session:1@2026-10-08",
-      "reviewNote": "Provenance re-confirmation: row byte-equal to its reviewed form at 7df871822 apart from the added authoredBy and the reset review fields; source L104-104 -> target L200-200 (contract/promote); target differs from source by 2 changed line(s), as the row rationale declares; the sidecar digests extend the decision's short digests and are unchanged since the prior pass. Old approval not carried: now pending.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-09",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-b-io-contract.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "H3 'Phân trang — con trỏ đục' becomes the H2 '6. Cursor Pagination'; title language and level change only. Package rebind at 8b2ee4dd9: native source content changed. Independent review pending.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "302bf7838a49e51804feb94da762bf7a0422cbe76ee2e49a3c32836d23f3ae6a",
       "targetAncestry": [
         "CLI I/O Contract"
-      ],
-      "reviewReportCommit": "7f8d12784d642097c17e7a7ebdfa4cff43aabbee"
+      ]
     },
     {
       "claimId": "claim_da21278ab32966f6631c82420552ed2b",
@@ -453,24 +369,18 @@
     },
     {
       "claimId": "claim_ba1c2ac95c9c161d9fd345e3bfa63741",
-      "sourceUnitDigest": "1a437d176164754d",
+      "sourceUnitDigest": "1a437d176164754dd1284bda7be3e18464c24c6cbcb8406723f763d940d871e4",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "8-multi-value-flag-convention",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "H3 'Quy ước cờ nhiều-giá-trị' becomes the H2 '8. Multi-Value Flag Convention'; title language and level change only.",
-      "authoredBy": "codex-session:1@2026-10-08",
-      "reviewNote": "Provenance re-confirmation: row byte-equal to its reviewed form at 7df871822 apart from the added authoredBy and the reset review fields; source L142-142 -> target L296-296 (contract/promote); target differs from source by 2 changed line(s), as the row rationale declares; the sidecar digests extend the decision's short digests and are unchanged since the prior pass. Old approval not carried: now pending.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-09",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-b-io-contract.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "H3 'Quy ước cờ nhiều-giá-trị' becomes the H2 '8. Multi-Value Flag Convention'; title language and level change only. Package rebind at 8b2ee4dd9: native source content changed. Independent review pending.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "3e7cfb35e58461211cd5f01de9abfc2ee65622422e045ce05205496b1c82a0d8",
       "targetAncestry": [
         "CLI I/O Contract"
-      ],
-      "reviewReportCommit": "7f8d12784d642097c17e7a7ebdfa4cff43aabbee"
+      ]
     },
     {
       "claimId": "claim_d0e16d088cdecf2dd0b491f819009aa6",
@@ -496,24 +406,18 @@
     },
     {
       "claimId": "claim_6c529b87f6073cc75fdf836d3507d21d",
-      "sourceUnitDigest": "a1b267899ca12fa9",
+      "sourceUnitDigest": "a1b267899ca12fa969dfca32cd480bab82b6869cb5b582b89955e2a3d3d8348d",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "10-version-tokens",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "H2 'Version token' maps to '10. Version Tokens' (section 9 Per-Verb Help sits between, owned only by work-state.md); only title language and numbering differ.",
-      "authoredBy": "codex-session:1@2026-10-08",
-      "reviewNote": "Provenance re-confirmation: row byte-equal to its reviewed form at 7df871822 apart from the added authoredBy and the reset review fields; source L150-150 -> target L333-333 (contract/promote); target differs from source by 2 changed line(s), as the row rationale declares; the sidecar digests extend the decision's short digests and are unchanged since the prior pass. Old approval not carried: now pending.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-09",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-b-io-contract.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "H2 'Version token' maps to '10. Version Tokens' (section 9 Per-Verb Help sits between, owned only by work-state.md); only title language and numbering differ. Package rebind at 8b2ee4dd9: native source content changed. Independent review pending.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "934cee435d2ab0ff2f52c0731e412fd76bc710ad64737c06ec5b8376287f58f0",
       "targetAncestry": [
         "CLI I/O Contract"
-      ],
-      "reviewReportCommit": "7f8d12784d642097c17e7a7ebdfa4cff43aabbee"
+      ]
     },
     {
       "claimId": "claim_e9ee744c6e1847ef25b3eb0bf180f577",
@@ -583,24 +487,18 @@
     },
     {
       "claimId": "claim_95a909b7be1252ba8de3be4c15f3638e",
-      "sourceUnitDigest": "6e8ef157c4c9861c",
+      "sourceUnitDigest": "6e8ef157c4c9861c47a991a59cc44ca82728233e8fc2938c6ba7c54bd1dcae8c",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "11-scope-boundary",
       "claimKind": "contract",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "H2 'Ranh giới — điều gì KHÔNG thuộc hợp đồng này' maps to '11. Scope Boundary'; title language and numbering differ.",
-      "authoredBy": "codex-session:1@2026-10-08",
-      "reviewNote": "Provenance re-confirmation: row byte-equal to its reviewed form at 7df871822 apart from the added authoredBy and the reset review fields; source L166-166 -> target L349-349 (contract/promote); target differs from source by 2 changed line(s), as the row rationale declares; the sidecar digests extend the decision's short digests and are unchanged since the prior pass. Old approval not carried: now pending.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-09",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-b-io-contract.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "H2 'Ranh giới — điều gì KHÔNG thuộc hợp đồng này' maps to '11. Scope Boundary'; title language and numbering differ. Package rebind at 8b2ee4dd9: native source content changed. Independent review pending.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "f57aa1458563f22d63881b3372998ece0773b7fbf0be550fb99b5e928f23d91b",
       "targetAncestry": [
         "CLI I/O Contract"
-      ],
-      "reviewReportCommit": "7f8d12784d642097c17e7a7ebdfa4cff43aabbee"
+      ]
     },
     {
       "claimId": "claim_8999e61e46d6c02b407b84263d7a2d67",
@@ -692,24 +590,18 @@
     },
     {
       "claimId": "claim_7524deb4b2a1c12d1652076040bfec36",
-      "sourceUnitDigest": "701eefe16b5100fc",
+      "sourceUnitDigest": "701eefe16b5100fc56090ce1f1a948d0eedb1faf7ff9c8b385ce9039a3e2d141",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
       "targetAnchor": "12-references",
       "claimKind": "navigation",
       "disposition": "promote",
-      "reviewStatus": "reviewed",
-      "rationale": "H2 'Tham chiếu' maps to '12. References'; title language and numbering differ. Reference lists are navigation, not contract.",
-      "authoredBy": "codex-session:1@2026-10-08",
-      "reviewNote": "Provenance re-confirmation: row byte-equal to its reviewed form at 7df871822 apart from the added authoredBy and the reset review fields; source L188-188 -> target L371-371 (navigation/promote); target differs from source by 2 changed line(s), as the row rationale declares; the sidecar digests extend the decision's short digests and are unchanged since the prior pass. Old approval not carried: now pending.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-09",
-      "reviewedAt": "2026-10-09",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2final-b-io-contract.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "rationale": "H2 'Tham chiếu' maps to '12. References'; title language and numbering differ. Reference lists are navigation, not contract. Package rebind at 8b2ee4dd9: native source content changed. Independent review pending.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "9b906d61cd8f824de9ce5a5b203808e71c4b30774cc1d7ddb857d464197ee5f3",
       "targetAncestry": [
         "CLI I/O Contract"
-      ],
-      "reviewReportCommit": "7f8d12784d642097c17e7a7ebdfa4cff43aabbee"
+      ]
     },
     {
       "claimId": "claim_d802aabd387ae98595c102f0e857f9b1",
@@ -949,5 +841,6 @@
       ],
       "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
     }
-  ]
+  ],
+  "correctionSession": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17"
 }

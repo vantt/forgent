@@ -4495,44 +4495,32 @@
       "sourceUnitDigest": "d74a7c870b40fd6183b83d50c3c7dcf7476ba60cd85bd505ff6406c425bb4d29",
       "claimKind": "contract",
       "disposition": "move",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-3 is retained in docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-5. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-3 is retained in docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-5. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "targetAnchor": "unheaded-block-5",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "LEG:contracts/assignment-run-runresult.md#unheaded-block-3 -> PLAT:contracts/assignment-run-runresult.md#unheaded-block-5: Other rows are either digest-identical live units in ok sections (Run, RunResult, Confidence, Work Boundary, proposal text) or retired-engine/stale units correctly carried in the history literal snapshot with rewritten live equivalents.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-01.md",
-      "reviewMode": "ordinary",
+      "targetAnchor": "unheaded-block-6",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
       "targetUnitDigest": "d74a7c870b40fd6183b83d50c3c7dcf7476ba60cd85bd505ff6406c425bb4d29",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Assignment"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_c65a6e58ed2d732552888912afa789d9",
       "sourceUnitDigest": "7882515927e6ec670a9302d644f25d27c1e9bd409b48341de43918b3071008fd",
       "claimKind": "contract",
       "disposition": "move",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-4 is retained in docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-6. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-4 is retained in docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-6. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "targetAnchor": "unheaded-block-6",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "LEG:contracts/assignment-run-runresult.md#unheaded-block-4 -> PLAT:contracts/assignment-run-runresult.md#unheaded-block-6: Other rows are either digest-identical live units in ok sections (Run, RunResult, Confidence, Work Boundary, proposal text) or retired-engine/stale units correctly carried in the history literal snapshot with rewritten live equivalents.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-01.md",
-      "reviewMode": "ordinary",
+      "targetAnchor": "unheaded-block-7",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
       "targetUnitDigest": "7882515927e6ec670a9302d644f25d27c1e9bd409b48341de43918b3071008fd",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Assignment"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_544533de914a2423336a607c7be1b809",
@@ -4560,111 +4548,81 @@
       "sourceUnitDigest": "565c53c7942aaa01ecfb4d4ab3ef3aa47fdf996bee4bb8e3eb6aa71722ec0eee",
       "claimKind": "contract",
       "disposition": "move",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-8 is retained in docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-10. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-8 is retained in docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-10. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "targetAnchor": "unheaded-block-10",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "LEG:contracts/assignment-run-runresult.md#unheaded-block-8 -> PLAT:contracts/assignment-run-runresult.md#unheaded-block-10: Other rows are either digest-identical live units in ok sections (Run, RunResult, Confidence, Work Boundary, proposal text) or retired-engine/stale units correctly carried in the history literal snapshot with rewritten live equivalents.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-01.md",
-      "reviewMode": "ordinary",
+      "targetAnchor": "unheaded-block-11",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
       "targetUnitDigest": "565c53c7942aaa01ecfb4d4ab3ef3aa47fdf996bee4bb8e3eb6aa71722ec0eee",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Assignment"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_d9ab016deb6b9afee6f15f6c64e6afcd",
       "sourceUnitDigest": "33346b44e6b4b44fe74afe32411c557533ccab34422588c1c1178fd6ac12f6ae",
       "claimKind": "contract",
       "disposition": "move",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-9 is retained in docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-11. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-9 is retained in docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-11. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "targetAnchor": "unheaded-block-11",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "LEG:contracts/assignment-run-runresult.md#unheaded-block-9 -> PLAT:contracts/assignment-run-runresult.md#unheaded-block-11: Other rows are either digest-identical live units in ok sections (Run, RunResult, Confidence, Work Boundary, proposal text) or retired-engine/stale units correctly carried in the history literal snapshot with rewritten live equivalents.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-01.md",
-      "reviewMode": "ordinary",
+      "targetAnchor": "unheaded-block-12",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
       "targetUnitDigest": "33346b44e6b4b44fe74afe32411c557533ccab34422588c1c1178fd6ac12f6ae",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Run"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_da291cc0c412d59e804cff48d0c9e02b",
       "sourceUnitDigest": "b9ae84b5be84f824140806531393acc10d4d1099ec9f9469eb632ad691ae127c",
       "claimKind": "contract",
       "disposition": "move",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-10 is retained in docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-12. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-10 is retained in docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-12. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "targetAnchor": "unheaded-block-12",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "LEG:contracts/assignment-run-runresult.md#unheaded-block-10 -> PLAT:contracts/assignment-run-runresult.md#unheaded-block-12: Other rows are either digest-identical live units in ok sections (Run, RunResult, Confidence, Work Boundary, proposal text) or retired-engine/stale units correctly carried in the history literal snapshot with rewritten live equivalents.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-01.md",
-      "reviewMode": "ordinary",
+      "targetAnchor": "unheaded-block-13",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
       "targetUnitDigest": "b9ae84b5be84f824140806531393acc10d4d1099ec9f9469eb632ad691ae127c",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Run"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_a4d5885fc99d2b763275022071a83297",
       "sourceUnitDigest": "a88904b8ce295fac3f08b415abb9b62c049871918fec7021c1112fffa94253cf",
       "claimKind": "contract",
       "disposition": "move",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-11 is retained in docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-13. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-11 is retained in docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-13. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "targetAnchor": "unheaded-block-13",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "LEG:contracts/assignment-run-runresult.md#unheaded-block-11 -> PLAT:contracts/assignment-run-runresult.md#unheaded-block-13: Other rows are either digest-identical live units in ok sections (Run, RunResult, Confidence, Work Boundary, proposal text) or retired-engine/stale units correctly carried in the history literal snapshot with rewritten live equivalents.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-01.md",
-      "reviewMode": "ordinary",
+      "targetAnchor": "unheaded-block-14",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
       "targetUnitDigest": "a88904b8ce295fac3f08b415abb9b62c049871918fec7021c1112fffa94253cf",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Run"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_a72a1844a4a2bd7cce6524b6a3d0165a",
       "sourceUnitDigest": "0bd94d3dc57743365dfff5e23cb4f4d44b3be102b0032d452c5e1f45d365a6e1",
       "claimKind": "contract",
       "disposition": "move",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-12 is retained in docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-14. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-12 is retained in docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-14. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "targetAnchor": "unheaded-block-14",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "LEG:contracts/assignment-run-runresult.md#unheaded-block-12 -> PLAT:contracts/assignment-run-runresult.md#unheaded-block-14: Other rows are either digest-identical live units in ok sections (Run, RunResult, Confidence, Work Boundary, proposal text) or retired-engine/stale units correctly carried in the history literal snapshot with rewritten live equivalents.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-01.md",
-      "reviewMode": "ordinary",
+      "targetAnchor": "unheaded-block-15",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
       "targetUnitDigest": "0bd94d3dc57743365dfff5e23cb4f4d44b3be102b0032d452c5e1f45d365a6e1",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Run",
         "Run Phases And Admission"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_e97742a8d5a8286abc87f5d8c17883f2",
@@ -4734,69 +4692,51 @@
       "sourceUnitDigest": "e8b8e8545f6f12e5770ef2e60375acd17b3dcd5966f7a82c9166b5f2f501a740",
       "claimKind": "contract",
       "disposition": "move",
-      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:143-155#unheaded-block-20 (current lines); unit SHA256 e8b8e8545f6f12e5770ef2e60375acd17b3dcd5966f7a82c9166b5f2f501a740.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:159-171#unheaded-block-25 (current lines); unit SHA256 e8b8e8545f6f12e5770ef2e60375acd17b3dcd5966f7a82c9166b5f2f501a740.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest e8b8e8545f6f12e5770ef2e60375acd17b3dcd5966f7a82c9166b5f2f501a740 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-20 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-25; source context \"Assignment, Run, And RunResult Contract / Run / Proposed Runtime Recovery Amendment\", target context \"Assignment, Run, And RunResult Contract / Run / Proposed Runtime Recovery Amendment\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:143-155#unheaded-block-20 (current lines); unit SHA256 e8b8e8545f6f12e5770ef2e60375acd17b3dcd5966f7a82c9166b5f2f501a740.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:159-171#unheaded-block-25 (current lines); unit SHA256 e8b8e8545f6f12e5770ef2e60375acd17b3dcd5966f7a82c9166b5f2f501a740.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest e8b8e8545f6f12e5770ef2e60375acd17b3dcd5966f7a82c9166b5f2f501a740 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-20 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-25; source context \"Assignment, Run, And RunResult Contract / Run / Proposed Runtime Recovery Amendment\", target context \"Assignment, Run, And RunResult Contract / Run / Proposed Runtime Recovery Amendment\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "targetAnchor": "unheaded-block-25",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "reviewed",
-      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 143-155, target 159-171, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (1139 chars); anchor unheaded-block-25 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
-      "reviewMode": "ordinary",
+      "targetAnchor": "unheaded-block-26",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
       "targetUnitDigest": "e8b8e8545f6f12e5770ef2e60375acd17b3dcd5966f7a82c9166b5f2f501a740",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Run",
         "Proposed Runtime Recovery Amendment"
-      ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      ]
     },
     {
       "claimId": "claim_436d05aab9ac75398d205d17cf0a0398",
       "sourceUnitDigest": "a06f2788a9dbc9526dfec0d179db0a0af2f4c4bfc898200fa5849916a1116cef",
       "claimKind": "contract",
       "disposition": "move",
-      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:157-163#unheaded-block-21 (current lines); unit SHA256 a06f2788a9dbc9526dfec0d179db0a0af2f4c4bfc898200fa5849916a1116cef.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:173-179#unheaded-block-26 (current lines); unit SHA256 a06f2788a9dbc9526dfec0d179db0a0af2f4c4bfc898200fa5849916a1116cef.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest a06f2788a9dbc9526dfec0d179db0a0af2f4c4bfc898200fa5849916a1116cef at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-21 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-26; source context \"Assignment, Run, And RunResult Contract / Run / Proposed Runtime Recovery Amendment\", target context \"Assignment, Run, And RunResult Contract / Run / Proposed Runtime Recovery Amendment\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:157-163#unheaded-block-21 (current lines); unit SHA256 a06f2788a9dbc9526dfec0d179db0a0af2f4c4bfc898200fa5849916a1116cef.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:173-179#unheaded-block-26 (current lines); unit SHA256 a06f2788a9dbc9526dfec0d179db0a0af2f4c4bfc898200fa5849916a1116cef.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest a06f2788a9dbc9526dfec0d179db0a0af2f4c4bfc898200fa5849916a1116cef at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-21 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-26; source context \"Assignment, Run, And RunResult Contract / Run / Proposed Runtime Recovery Amendment\", target context \"Assignment, Run, And RunResult Contract / Run / Proposed Runtime Recovery Amendment\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "targetAnchor": "unheaded-block-26",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "reviewed",
-      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 157-163, target 173-179, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (525 chars); anchor unheaded-block-26 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
-      "reviewMode": "ordinary",
+      "targetAnchor": "unheaded-block-27",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
       "targetUnitDigest": "a06f2788a9dbc9526dfec0d179db0a0af2f4c4bfc898200fa5849916a1116cef",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Run",
         "Proposed Runtime Recovery Amendment"
-      ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      ]
     },
     {
       "claimId": "claim_5bebe9b972a01c94f4968e0d721d8f7a",
       "sourceUnitDigest": "0dcd9d73d70d1638927e44149d33a5dd42bdefa0f0260a456ec691bff38027d9",
       "claimKind": "contract",
       "disposition": "move",
-      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:165-174#unheaded-block-22 (current lines); unit SHA256 0dcd9d73d70d1638927e44149d33a5dd42bdefa0f0260a456ec691bff38027d9.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:181-190#unheaded-block-27 (current lines); unit SHA256 0dcd9d73d70d1638927e44149d33a5dd42bdefa0f0260a456ec691bff38027d9.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 0dcd9d73d70d1638927e44149d33a5dd42bdefa0f0260a456ec691bff38027d9 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-22 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-27; source context \"Assignment, Run, And RunResult Contract / Run / Proposed Runtime Recovery Amendment\", target context \"Assignment, Run, And RunResult Contract / Run / Proposed Runtime Recovery Amendment\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:165-174#unheaded-block-22 (current lines); unit SHA256 0dcd9d73d70d1638927e44149d33a5dd42bdefa0f0260a456ec691bff38027d9.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:181-190#unheaded-block-27 (current lines); unit SHA256 0dcd9d73d70d1638927e44149d33a5dd42bdefa0f0260a456ec691bff38027d9.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 0dcd9d73d70d1638927e44149d33a5dd42bdefa0f0260a456ec691bff38027d9 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-22 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-27; source context \"Assignment, Run, And RunResult Contract / Run / Proposed Runtime Recovery Amendment\", target context \"Assignment, Run, And RunResult Contract / Run / Proposed Runtime Recovery Amendment\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "targetAnchor": "unheaded-block-27",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "reviewed",
-      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 165-174, target 181-190, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (767 chars); anchor unheaded-block-27 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
-      "reviewMode": "ordinary",
+      "targetAnchor": "unheaded-block-28",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
       "targetUnitDigest": "0dcd9d73d70d1638927e44149d33a5dd42bdefa0f0260a456ec691bff38027d9",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Run",
         "Proposed Runtime Recovery Amendment"
-      ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      ]
     },
     {
       "claimId": "claim_291c57b61e8c891826da4e2593b50d6f",
@@ -4824,23 +4764,17 @@
       "sourceUnitDigest": "acba98e4c7e67a551f49ca9c205ee1b8eec81e8ae6ca2962e6b5d3763db7057f",
       "claimKind": "contract",
       "disposition": "move",
-      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:187-191#unheaded-block-24 (current lines); unit SHA256 acba98e4c7e67a551f49ca9c205ee1b8eec81e8ae6ca2962e6b5d3763db7057f.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:194-198#unheaded-block-29 (current lines); unit SHA256 acba98e4c7e67a551f49ca9c205ee1b8eec81e8ae6ca2962e6b5d3763db7057f.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest acba98e4c7e67a551f49ca9c205ee1b8eec81e8ae6ca2962e6b5d3763db7057f at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-24 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-29; source context \"Assignment, Run, And RunResult Contract / Run / Proposed Runtime Recovery Amendment\", target context \"Assignment, Run, And RunResult Contract / Run / Proposed Runtime Recovery Amendment\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:187-191#unheaded-block-24 (current lines); unit SHA256 acba98e4c7e67a551f49ca9c205ee1b8eec81e8ae6ca2962e6b5d3763db7057f.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:194-198#unheaded-block-29 (current lines); unit SHA256 acba98e4c7e67a551f49ca9c205ee1b8eec81e8ae6ca2962e6b5d3763db7057f.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest acba98e4c7e67a551f49ca9c205ee1b8eec81e8ae6ca2962e6b5d3763db7057f at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-24 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-29; source context \"Assignment, Run, And RunResult Contract / Run / Proposed Runtime Recovery Amendment\", target context \"Assignment, Run, And RunResult Contract / Run / Proposed Runtime Recovery Amendment\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "targetAnchor": "unheaded-block-29",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "reviewed",
-      "reviewNote": "deep: sampled; rationale lines regenerate equal from the binding (source 187-191, target 194-198, anchors, digests, link counts, context, disposition word), checker clean; source and target text byte-equal (384 chars) and ancestry \"Assignment, Run, And RunResult Contract / Run / Proposed Runtime Recov...\" equal to the source; prior digest found in the target at the cited commit; anchor unheaded-block-29 ok; disposition move is the right one for an equal carry.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
-      "reviewMode": "ordinary",
+      "targetAnchor": "unheaded-block-30",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
       "targetUnitDigest": "acba98e4c7e67a551f49ca9c205ee1b8eec81e8ae6ca2962e6b5d3763db7057f",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Run",
         "Proposed Runtime Recovery Amendment"
-      ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      ]
     },
     {
       "claimId": "claim_b4e7776bf7e5360851b857f10c05ee1e",
@@ -4868,23 +4802,17 @@
       "sourceUnitDigest": "037571490a8ad01e165828745658491e6af4640499660472f00af9be0c5d0292",
       "claimKind": "contract",
       "disposition": "move",
-      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:203-211#unheaded-block-26 (current lines); unit SHA256 037571490a8ad01e165828745658491e6af4640499660472f00af9be0c5d0292.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:210-218#unheaded-block-31 (current lines); unit SHA256 037571490a8ad01e165828745658491e6af4640499660472f00af9be0c5d0292.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 037571490a8ad01e165828745658491e6af4640499660472f00af9be0c5d0292 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-26 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-31; source context \"Assignment, Run, And RunResult Contract / Run / Proposed Runtime Recovery Amendment\", target context \"Assignment, Run, And RunResult Contract / Run / Proposed Runtime Recovery Amendment\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:203-211#unheaded-block-26 (current lines); unit SHA256 037571490a8ad01e165828745658491e6af4640499660472f00af9be0c5d0292.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:210-218#unheaded-block-31 (current lines); unit SHA256 037571490a8ad01e165828745658491e6af4640499660472f00af9be0c5d0292.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 037571490a8ad01e165828745658491e6af4640499660472f00af9be0c5d0292 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-26 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-31; source context \"Assignment, Run, And RunResult Contract / Run / Proposed Runtime Recovery Amendment\", target context \"Assignment, Run, And RunResult Contract / Run / Proposed Runtime Recovery Amendment\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "targetAnchor": "unheaded-block-31",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "reviewed",
-      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 203-211, target 210-218, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (818 chars); anchor unheaded-block-31 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
-      "reviewMode": "ordinary",
+      "targetAnchor": "unheaded-block-32",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
       "targetUnitDigest": "037571490a8ad01e165828745658491e6af4640499660472f00af9be0c5d0292",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Run",
         "Proposed Runtime Recovery Amendment"
-      ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      ]
     },
     {
       "claimId": "claim_44013f730570bcace75375b6cac5b517",
@@ -4933,23 +4861,17 @@
       "sourceUnitDigest": "d06c7574443b0aadd4c8ad00e37d717ef0b35f1f8afb81d4356101f194013da8",
       "claimKind": "contract",
       "disposition": "move",
-      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:230-233#unheaded-block-29 (current lines); unit SHA256 d06c7574443b0aadd4c8ad00e37d717ef0b35f1f8afb81d4356101f194013da8.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:232-235#unheaded-block-33 (current lines); unit SHA256 d06c7574443b0aadd4c8ad00e37d717ef0b35f1f8afb81d4356101f194013da8.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest d06c7574443b0aadd4c8ad00e37d717ef0b35f1f8afb81d4356101f194013da8 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-29 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-33; source context \"Assignment, Run, And RunResult Contract / Run / Proposed Runtime Recovery Amendment\", target context \"Assignment, Run, And RunResult Contract / Run / Proposed Runtime Recovery Amendment\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:230-233#unheaded-block-29 (current lines); unit SHA256 d06c7574443b0aadd4c8ad00e37d717ef0b35f1f8afb81d4356101f194013da8.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:232-235#unheaded-block-33 (current lines); unit SHA256 d06c7574443b0aadd4c8ad00e37d717ef0b35f1f8afb81d4356101f194013da8.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest d06c7574443b0aadd4c8ad00e37d717ef0b35f1f8afb81d4356101f194013da8 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-29 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-33; source context \"Assignment, Run, And RunResult Contract / Run / Proposed Runtime Recovery Amendment\", target context \"Assignment, Run, And RunResult Contract / Run / Proposed Runtime Recovery Amendment\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "targetAnchor": "unheaded-block-33",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "reviewed",
-      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 230-233, target 232-235, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (299 chars); anchor unheaded-block-33 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve. Digests also hand-recomputed with an independent script: equal.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
-      "reviewMode": "ordinary",
+      "targetAnchor": "unheaded-block-34",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
       "targetUnitDigest": "d06c7574443b0aadd4c8ad00e37d717ef0b35f1f8afb81d4356101f194013da8",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Run",
         "Proposed Runtime Recovery Amendment"
-      ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      ]
     },
     {
       "claimId": "claim_9176bc8efe3db1009e816ddede12630d",
@@ -4977,110 +4899,80 @@
       "sourceUnitDigest": "03dc23a85a4bf61c385247aa08a484bfcc044c51dc56319f08df09410704621f",
       "claimKind": "contract",
       "disposition": "move",
-      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:245-245#unheaded-block-31 (current lines); unit SHA256 03dc23a85a4bf61c385247aa08a484bfcc044c51dc56319f08df09410704621f.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:241-241#unheaded-block-35 (current lines); unit SHA256 03dc23a85a4bf61c385247aa08a484bfcc044c51dc56319f08df09410704621f.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 03dc23a85a4bf61c385247aa08a484bfcc044c51dc56319f08df09410704621f at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-31 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-35; source context \"Assignment, Run, And RunResult Contract / RunResult\", target context \"Assignment, Run, And RunResult Contract / RunResult\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:245-245#unheaded-block-31 (current lines); unit SHA256 03dc23a85a4bf61c385247aa08a484bfcc044c51dc56319f08df09410704621f.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:241-241#unheaded-block-35 (current lines); unit SHA256 03dc23a85a4bf61c385247aa08a484bfcc044c51dc56319f08df09410704621f.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 03dc23a85a4bf61c385247aa08a484bfcc044c51dc56319f08df09410704621f at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-31 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-35; source context \"Assignment, Run, And RunResult Contract / RunResult\", target context \"Assignment, Run, And RunResult Contract / RunResult\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "targetAnchor": "unheaded-block-35",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "reviewed",
-      "reviewNote": "deep: sampled; rationale lines regenerate equal from the binding (source 245-245, target 241-241, anchors, digests, link counts, context, disposition word), checker clean; source and target text byte-equal (68 chars) and ancestry \"Assignment, Run, And RunResult Contract / RunResult\" equal to the source; prior digest found in the target at the cited commit; anchor unheaded-block-35 ok; disposition move is the right one for an equal carry.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
-      "reviewMode": "ordinary",
+      "targetAnchor": "unheaded-block-36",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
       "targetUnitDigest": "03dc23a85a4bf61c385247aa08a484bfcc044c51dc56319f08df09410704621f",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "RunResult"
-      ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      ]
     },
     {
       "claimId": "claim_81cb4d578e22df80989070ca854bf181",
       "sourceUnitDigest": "a2e5819ee575628c2f31b335c4557f6e5373380286619a0b927a2ea29c939c89",
       "claimKind": "contract",
       "disposition": "move",
-      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:247-254#unheaded-block-32 (current lines); unit SHA256 a2e5819ee575628c2f31b335c4557f6e5373380286619a0b927a2ea29c939c89.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:243-250#unheaded-block-36 (current lines); unit SHA256 a2e5819ee575628c2f31b335c4557f6e5373380286619a0b927a2ea29c939c89.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest a2e5819ee575628c2f31b335c4557f6e5373380286619a0b927a2ea29c939c89 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-32 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-36; source context \"Assignment, Run, And RunResult Contract / RunResult\", target context \"Assignment, Run, And RunResult Contract / RunResult\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:247-254#unheaded-block-32 (current lines); unit SHA256 a2e5819ee575628c2f31b335c4557f6e5373380286619a0b927a2ea29c939c89.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:243-250#unheaded-block-36 (current lines); unit SHA256 a2e5819ee575628c2f31b335c4557f6e5373380286619a0b927a2ea29c939c89.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest a2e5819ee575628c2f31b335c4557f6e5373380286619a0b927a2ea29c939c89 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-32 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-36; source context \"Assignment, Run, And RunResult Contract / RunResult\", target context \"Assignment, Run, And RunResult Contract / RunResult\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "targetAnchor": "unheaded-block-36",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "reviewed",
-      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 247-254, target 243-250, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (306 chars); anchor unheaded-block-36 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
-      "reviewMode": "ordinary",
+      "targetAnchor": "unheaded-block-37",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
       "targetUnitDigest": "a2e5819ee575628c2f31b335c4557f6e5373380286619a0b927a2ea29c939c89",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "RunResult"
-      ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      ]
     },
     {
       "claimId": "claim_b570659f53fe08dee4bf9eda19e761b8",
       "sourceUnitDigest": "96d7bd85c9b3ed7aeee722d7edce9b05c7bf6d8390e61a5a33903a41419b797e",
       "claimKind": "contract",
       "disposition": "move",
-      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:288-288#unheaded-block-36 (current lines); unit SHA256 96d7bd85c9b3ed7aeee722d7edce9b05c7bf6d8390e61a5a33903a41419b797e.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:287-287#unheaded-block-40 (current lines); unit SHA256 96d7bd85c9b3ed7aeee722d7edce9b05c7bf6d8390e61a5a33903a41419b797e.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 96d7bd85c9b3ed7aeee722d7edce9b05c7bf6d8390e61a5a33903a41419b797e at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-36 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-40; source context \"Assignment, Run, And RunResult Contract / Confidence\", target context \"Assignment, Run, And RunResult Contract / Confidence\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:288-288#unheaded-block-36 (current lines); unit SHA256 96d7bd85c9b3ed7aeee722d7edce9b05c7bf6d8390e61a5a33903a41419b797e.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:287-287#unheaded-block-40 (current lines); unit SHA256 96d7bd85c9b3ed7aeee722d7edce9b05c7bf6d8390e61a5a33903a41419b797e.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 96d7bd85c9b3ed7aeee722d7edce9b05c7bf6d8390e61a5a33903a41419b797e at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-36 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-40; source context \"Assignment, Run, And RunResult Contract / Confidence\", target context \"Assignment, Run, And RunResult Contract / Confidence\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "targetAnchor": "unheaded-block-40",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "reviewed",
-      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 288-288, target 287-287, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (68 chars); anchor unheaded-block-40 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve. Digests also hand-recomputed with an independent script: equal.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
-      "reviewMode": "ordinary",
+      "targetAnchor": "unheaded-block-41",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
       "targetUnitDigest": "96d7bd85c9b3ed7aeee722d7edce9b05c7bf6d8390e61a5a33903a41419b797e",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Confidence"
-      ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      ]
     },
     {
       "claimId": "claim_d63817bd2e829afcaa3ca8e6b0829099",
       "sourceUnitDigest": "0ca283efed4d41f991c27193c2147ea504032aabd6ee4e1873e257d7b38ddef7",
       "claimKind": "contract",
       "disposition": "move",
-      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:290-295#unheaded-block-37 (current lines); unit SHA256 0ca283efed4d41f991c27193c2147ea504032aabd6ee4e1873e257d7b38ddef7.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:289-294#unheaded-block-41 (current lines); unit SHA256 0ca283efed4d41f991c27193c2147ea504032aabd6ee4e1873e257d7b38ddef7.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 0ca283efed4d41f991c27193c2147ea504032aabd6ee4e1873e257d7b38ddef7 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-37 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-41; source context \"Assignment, Run, And RunResult Contract / Confidence\", target context \"Assignment, Run, And RunResult Contract / Confidence\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:290-295#unheaded-block-37 (current lines); unit SHA256 0ca283efed4d41f991c27193c2147ea504032aabd6ee4e1873e257d7b38ddef7.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:289-294#unheaded-block-41 (current lines); unit SHA256 0ca283efed4d41f991c27193c2147ea504032aabd6ee4e1873e257d7b38ddef7.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 0ca283efed4d41f991c27193c2147ea504032aabd6ee4e1873e257d7b38ddef7 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-37 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-41; source context \"Assignment, Run, And RunResult Contract / Confidence\", target context \"Assignment, Run, And RunResult Contract / Confidence\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "targetAnchor": "unheaded-block-41",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "reviewed",
-      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 290-295, target 289-294, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (386 chars); anchor unheaded-block-41 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
-      "reviewMode": "ordinary",
+      "targetAnchor": "unheaded-block-42",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
       "targetUnitDigest": "0ca283efed4d41f991c27193c2147ea504032aabd6ee4e1873e257d7b38ddef7",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Confidence"
-      ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      ]
     },
     {
       "claimId": "claim_49bd109f3f24770faae9adfc5b03e415",
       "sourceUnitDigest": "1c5ff824ccce43e904bad356347b4718ebebcf1da12129a4ae4cc0e5f249e307",
       "claimKind": "contract",
       "disposition": "move",
-      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:299-301#unheaded-block-38 (current lines); unit SHA256 1c5ff824ccce43e904bad356347b4718ebebcf1da12129a4ae4cc0e5f249e307.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:298-300#unheaded-block-42 (current lines); unit SHA256 1c5ff824ccce43e904bad356347b4718ebebcf1da12129a4ae4cc0e5f249e307.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 1c5ff824ccce43e904bad356347b4718ebebcf1da12129a4ae4cc0e5f249e307 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-38 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-42; source context \"Assignment, Run, And RunResult Contract / Evidence Freshness\", target context \"Assignment, Run, And RunResult Contract / Evidence Freshness\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:299-301#unheaded-block-38 (current lines); unit SHA256 1c5ff824ccce43e904bad356347b4718ebebcf1da12129a4ae4cc0e5f249e307.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:298-300#unheaded-block-42 (current lines); unit SHA256 1c5ff824ccce43e904bad356347b4718ebebcf1da12129a4ae4cc0e5f249e307.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 1c5ff824ccce43e904bad356347b4718ebebcf1da12129a4ae4cc0e5f249e307 at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-38 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-42; source context \"Assignment, Run, And RunResult Contract / Evidence Freshness\", target context \"Assignment, Run, And RunResult Contract / Evidence Freshness\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "targetAnchor": "unheaded-block-42",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "reviewed",
-      "reviewNote": "mechanical: rationale lines regenerate equal from the binding (source 299-301, target 298-300, anchors, digests, link counts, context, disposition word), checker clean; text equal by script (240 chars); anchor unheaded-block-42 ok; in the whole-pack read the opening text and heading context agree with the rationale and the target links resolve. Digests also hand-recomputed with an independent script: equal.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
-      "reviewMode": "ordinary",
+      "targetAnchor": "unheaded-block-43",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
       "targetUnitDigest": "1c5ff824ccce43e904bad356347b4718ebebcf1da12129a4ae4cc0e5f249e307",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Evidence Freshness"
-      ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      ]
     },
     {
       "claimId": "claim_f9845f6ed18802de0c3bd276e4d2778a",
@@ -5108,22 +5000,16 @@
       "sourceUnitDigest": "bb4ee6cf72f874865a3bc73e75f4c7947428f9505375e089709b5046b52721ad",
       "claimKind": "contract",
       "disposition": "move",
-      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:335-336#unheaded-block-42 (current lines); unit SHA256 bb4ee6cf72f874865a3bc73e75f4c7947428f9505375e089709b5046b52721ad.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:335-336#unheaded-block-46 (current lines); unit SHA256 7ecbfde0b13952ce64d4c6064436ec1734b1d491c54814c38d6a16ff3f10ddcf.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 7ecbfde0b13952ce64d4c6064436ec1734b1d491c54814c38d6a16ff3f10ddcf at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 2, target 2; 2 changed spellings/labels, 2 destination changes; 0 added, 0 removed.\nLink 1: \"Step 03\" (../roadmap/team-dispatch-v1/step-03-assignment-runresult.md) → \"Step 03\" (../history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md#literal-snapshot); resolved docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md → docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md#literal-snapshot.\nLink 2: \"Step 04\" (../roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md) → \"Step 04\" (../history/retired-engine/files/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md#literal-snapshot); resolved docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md → docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md#literal-snapshot.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-42 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-46; source context \"Assignment, Run, And RunResult Contract / Required Negative Tests\", target context \"Assignment, Run, And RunResult Contract / Required Negative Tests\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:335-336#unheaded-block-42 (current lines); unit SHA256 bb4ee6cf72f874865a3bc73e75f4c7947428f9505375e089709b5046b52721ad.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:335-336#unheaded-block-46 (current lines); unit SHA256 7ecbfde0b13952ce64d4c6064436ec1734b1d491c54814c38d6a16ff3f10ddcf.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 7ecbfde0b13952ce64d4c6064436ec1734b1d491c54814c38d6a16ff3f10ddcf at 96a13ab21670e1f5d9748c02cd615ea5598b53f5.\nLinks: source 2, target 2; 2 changed spellings/labels, 2 destination changes; 0 added, 0 removed.\nLink 1: \"Step 03\" (../roadmap/team-dispatch-v1/step-03-assignment-runresult.md) → \"Step 03\" (../history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md#literal-snapshot); resolved docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-03-assignment-runresult.md → docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md#literal-snapshot.\nLink 2: \"Step 04\" (../roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md) → \"Step 04\" (../history/retired-engine/files/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md#literal-snapshot); resolved docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md → docs/platform/agent-coordination/history/retired-engine/files/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md#literal-snapshot.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-42 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-46; source context \"Assignment, Run, And RunResult Contract / Required Negative Tests\", target context \"Assignment, Run, And RunResult Contract / Required Negative Tests\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "targetAnchor": "unheaded-block-46",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "reviewed",
-      "reviewNote": "deep: two-line pointer text; only the two link destinations change from the legacy roadmap files to the history copies with #literal-snapshot, as the rationale lists (both files exist, both anchors exist); text otherwise equal; digests differ for that reason; anchor unheaded-block-46 ok. Digests also hand-recomputed with an independent script: equal.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-01-287a22d33.md",
-      "reviewMode": "ordinary",
+      "targetAnchor": "unheaded-block-47",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
       "targetUnitDigest": "7ecbfde0b13952ce64d4c6064436ec1734b1d491c54814c38d6a16ff3f10ddcf",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Required Negative Tests"
-      ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      ]
     },
     {
       "claimId": "claim_d369d32c9415f053acf8ae750f7d0c95",
@@ -8238,22 +8124,16 @@
       "sourceUnitDigest": "4c317f8cd933af89f206b12ca1f7c74fd6a99662ca51e8fc8e509ce9c6cf5e9a",
       "claimKind": "contract",
       "disposition": "move",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/contracts/workflow-stage-operation.md#unheaded-block-4 is retained in docs/platform/agent-coordination/contracts/workflow-stage-operation.md#unheaded-block-4. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/contracts/workflow-stage-operation.md#unheaded-block-4 is retained in docs/platform/agent-coordination/contracts/workflow-stage-operation.md#unheaded-block-4. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
-      "targetAnchor": "unheaded-block-4",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "LEG:contracts/workflow-stage-operation.md#unheaded-block-4 -> PLAT:contracts/workflow-stage-operation.md#unheaded-block-4: Rows that stay current are the operation reference list, the primary-operation rule and the closing history pointer; all in sections judged ok.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-01.md",
-      "reviewMode": "ordinary",
+      "targetAnchor": "unheaded-block-5",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
       "targetUnitDigest": "4c317f8cd933af89f206b12ca1f7c74fd6a99662ca51e8fc8e509ce9c6cf5e9a",
       "targetAncestry": [
         "Workflow Step Operation Contract",
         "Contract"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_29cdd831c381055f456f07ee4357f31e",
@@ -8302,22 +8182,16 @@
       "sourceUnitDigest": "6c8545d72dd9106edf457c925c5d67d5662056bb797b039e76ed020c49e0b03c",
       "claimKind": "contract",
       "disposition": "move",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/contracts/workflow-stage-operation.md#unheaded-block-8 is retained in docs/platform/agent-coordination/contracts/workflow-stage-operation.md#unheaded-block-8. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/contracts/workflow-stage-operation.md#unheaded-block-8 is retained in docs/platform/agent-coordination/contracts/workflow-stage-operation.md#unheaded-block-8. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
-      "targetAnchor": "unheaded-block-8",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "LEG:contracts/workflow-stage-operation.md#unheaded-block-8 -> PLAT:contracts/workflow-stage-operation.md#unheaded-block-8: Rows that stay current are the operation reference list, the primary-operation rule and the closing history pointer; all in sections judged ok.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-01.md",
-      "reviewMode": "ordinary",
+      "targetAnchor": "unheaded-block-9",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
       "targetUnitDigest": "6c8545d72dd9106edf457c925c5d67d5662056bb797b039e76ed020c49e0b03c",
       "targetAncestry": [
         "Workflow Step Operation Contract",
         "Primary Compatibility Path"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_444801cf88d12aeadfa7fd7c39cac423",
@@ -8471,22 +8345,16 @@
       "sourceUnitDigest": "bc6f85723df563815f619f7a3296bcbc9ad9f461afd58bf19b6c75e6b32f3d59",
       "claimKind": "contract",
       "disposition": "move",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/contracts/workflow-stage-operation.md#unheaded-block-16 is retained in docs/platform/agent-coordination/contracts/workflow-stage-operation.md#unheaded-block-17. Only Markdown reference locations differ in the full shown section. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
+      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/contracts/workflow-stage-operation.md#unheaded-block-16 is retained in docs/platform/agent-coordination/contracts/workflow-stage-operation.md#unheaded-block-17. Only Markdown reference locations differ in the full shown section. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
-      "targetAnchor": "unheaded-block-17",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "LEG:contracts/workflow-stage-operation.md#unheaded-block-16 -> PLAT:contracts/workflow-stage-operation.md#unheaded-block-17: Rows that stay current are the operation reference list, the primary-operation rule and the closing history pointer; all in sections judged ok.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-exact-01.md",
-      "reviewMode": "ordinary",
+      "targetAnchor": "unheaded-block-18",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
       "targetUnitDigest": "eea7f0ebdfb049a1e5a68ba2992dab9c7eef04adf9a53436e198bff878699bab",
       "targetAncestry": [
         "Workflow Step Operation Contract",
         "Compatibility Proof Obligations"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_5edc02c406ce378a7cf264dd1eb65abd",
@@ -8884,5 +8752,6 @@
       ],
       "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     }
-  ]
+  ],
+  "correctionSession": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17"
 }

@@ -17,21 +17,15 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "unheaded-block-22",
-      "authoredBy": "codex-session:21@2026-10-14",
-      "reviewStatus": "reviewed",
-      "rationale": "A35 Findings sentence corrections create this native predecessor/successor consequence. Complete old/current same-file unit is shown; only authorized false clauses change, heading structure/ancestry is retained. A22 requires independent re-review and no approval carry. Historical identity is preserved, not grafted to the current non-stable block.",
-      "reviewNote": "deep: native predecessor for the G-row table block, kept under its immutable id; old digest 896856e1 equals the resume-tree unit and new digest 412aa1ea equals HEAD, ancestry Human Gate Record recomputed equal, anchor ok; successor named in the same file, no identity grafted onto the new claim id.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
-      "reviewMode": "ordinary",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "A35 Findings sentence corrections create this native predecessor/successor consequence. Complete old/current same-file unit is shown; only authorized false clauses change, heading structure/ancestry is retained. A22 requires independent re-review and no approval carry. Historical identity is preserved, not grafted to the current non-stable block. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "412aa1ea6671a21153e7a478836be52612dd86b48e8f06ac59cc3add3f4f720a",
       "targetAncestry": [
         "Work State Specification",
         "4. Capture And Evidence Records",
         "Human Gate Record"
-      ],
-      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+      ]
     },
     {
       "claimId": "claim_1a6a7460ede876ae7fa1de7c2e168cfe",
@@ -41,21 +35,15 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "unheaded-block-65",
-      "authoredBy": "codex-session:22@2026-10-14",
-      "reviewStatus": "reviewed",
-      "rationale": "A35 Findings sentence corrections create this native predecessor/successor consequence. Complete old/current same-file unit is shown; only authorized false clauses change, heading structure/ancestry is retained. A22 requires independent re-review and no approval carry. Historical identity is preserved, not grafted to the current non-stable block. The current U8/RUL60 fragment is corrected to the exact required fields/live wrapper ordering under A19; A22 real target digest and ancestry are rebound, no approval carries.",
-      "reviewNote": "deep: old gap keeps its immutable id and original fingerprint 122c77d8, before-digest 72721c54 equals the c3895c140 unit, successor 91c2e63a equals HEAD, anchor unheaded-block-65 exists, shard equals pack; identity not grafted.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-rework2.md",
-      "reviewMode": "ordinary",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "A35 Findings sentence corrections create this native predecessor/successor consequence. Complete old/current same-file unit is shown; only authorized false clauses change, heading structure/ancestry is retained. A22 requires independent re-review and no approval carry. Historical identity is preserved, not grafted to the current non-stable block. The current U8/RUL60 fragment is corrected to the exact required fields/live wrapper ordering under A19; A22 real target digest and ancestry are rebound, no approval carries. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "91c2e63acc8563a92edc6d06d6634a299a3120b6682db0bf3e3fd289b6987445",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Add Verb"
-      ],
-      "reviewReportCommit": "9f087f37d134366bd2057af2fac831ed18a9b3c3"
+      ]
     },
     {
       "claimId": "claim_64efd51dc50d417f21972188bf57afe9",
@@ -65,21 +53,15 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "unheaded-block-75",
-      "authoredBy": "codex-session:21@2026-10-14",
-      "reviewStatus": "reviewed",
-      "rationale": "A35 Findings sentence corrections create this native predecessor/successor consequence. Complete old/current same-file unit is shown; only authorized false clauses change, heading structure/ancestry is retained. A22 requires independent re-review and no approval carry. Historical identity is preserved, not grafted to the current non-stable block.",
-      "reviewNote": "deep: native predecessor for the answer body, immutable id kept, old digest 504b6a5b and new digest 31381297 both recomputed and equal, ancestry Answer Verb equal, anchor ok; the corrected successor text is true per the truth part and no identity is guessed.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
-      "reviewMode": "ordinary",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "A35 Findings sentence corrections create this native predecessor/successor consequence. Complete old/current same-file unit is shown; only authorized false clauses change, heading structure/ancestry is retained. A22 requires independent re-review and no approval carry. Historical identity is preserved, not grafted to the current non-stable block. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "31381297e4545267ec79a77e7535df60d454ddacffe884ced82a687bfcce2d2c",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Answer Verb"
-      ],
-      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+      ]
     },
     {
       "claimId": "claim_3b151159fccbac3b57c7ea93fb1d8ca7",
@@ -89,21 +71,15 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "unheaded-block-91",
-      "authoredBy": "codex-session:21@2026-10-14",
-      "reviewStatus": "reviewed",
-      "rationale": "A35 Findings sentence corrections create this native predecessor/successor consequence. Complete old/current same-file unit is shown; only authorized false clauses change, heading structure/ancestry is retained. A22 requires independent re-review and no approval carry. Historical identity is preserved, not grafted to the current non-stable block.",
-      "reviewNote": "deep: native predecessor for the footprint block, immutable id kept, old digest 27a3ba15 and new digest c6a18ec4 both recomputed and equal, ancestry Conflicts Verb equal, anchor ok; successor text verified true and no identity is guessed.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-5-root-truth-corrections.md",
-      "reviewMode": "ordinary",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "A35 Findings sentence corrections create this native predecessor/successor consequence. Complete old/current same-file unit is shown; only authorized false clauses change, heading structure/ancestry is retained. A22 requires independent re-review and no approval carry. Historical identity is preserved, not grafted to the current non-stable block. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "c6a18ec4c4d25ad879f1d641ceca294e769d4e0da33767626d17a8403c449400",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Conflicts Verb"
-      ],
-      "reviewReportCommit": "c3895c140e9fa02a4a5b9e9649049b1a906c6601"
+      ]
     },
     {
       "claimId": "claim_8d273e8328dac53565eb0286c6a91d65",
@@ -113,20 +89,14 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "unheaded-block-93",
-      "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
-      "reviewStatus": "reviewed",
-      "rationale": "Source: docs/platform/work-state/spec.md:1032-1085#unheaded-block-93 (historical witness at c18698bbeb77c8d0dbb615cfe83273e4b49baeb0); unit SHA256 19f7dcac1af1f366369c2b1b75261b376f12ecaabf4b65f5f0d6f92c191a712d.\nTarget: docs/platform/work-state/spec.md:1041-1094#unheaded-block-93 (current lines); unit SHA256 9098a0e9ed02a324a16abe3c1016fad73ad261bfc4459aed889be5baeb1515b3.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 9098a0e9ed02a324a16abe3c1016fad73ad261bfc4459aed889be5baeb1515b3 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nU26 RUL10: \"`addWork`/`editWork`/`moveWork`/`moveStage` ở `store.mjs` nay bọc TRỌN chuỗi đọc-tiền-kiểm-rồi-ghi (kiểm id-đã-tồn-tại, CAS `expectedStatus`/`expectedStage`)\" → \"`addWork`/`editWork`/`moveWork`/`moveStep` ở `store.mjs` nay bọc TRỌN chuỗi đọc-tiền-kiểm-rồi-ghi (kiểm id-đã-tồn-tại, CAS `expectedStatus`/`expectedStep`)\"; evidence root-authorities-truth-corrections-turn21.json; src/state/store.mjs:1430-1465 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 418f3d688929b78bae26607a8eb624737e0ead25).\nU26 RUL15: \"(dep chỉ mở khi thật `done`)\" → \"(dep mở ở `delivered`/`retrospective`/`cleanup`/`done` hoặc khi bị hủy)\"; evidence root-authorities-truth-corrections-turn21.json; src/state/frontier.mjs:240-273 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 07bb8d9e5ec8439cc0af6541c878f9f0ae3fa764).\nU26 RUL16 classification: \"Phân loại tier/kind/risk của `submit`\" → \"Phân loại size/kind/risk cơ học của `submit` (rigor là cờ tùy chọn)\"; evidence root-authorities-truth-corrections-turn21.json; bin/fgos.mjs:1066-1088 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 99d801a92839b2a7b7202bb9c07bb8fd2277f705).\nU26 RUL16 heavy: \"bộ từ khóa rủi-ro-nặng quyết định tier `heavy`\" → \"bộ từ khóa rủi-ro-nặng quyết định size `heavy` và risk `heavy`\"; evidence root-authorities-truth-corrections-turn21.json; src/intake/classify.mjs:1-137 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 35a3d03da7317a42574aa7bda3818adfb5a19c63).\nU26 RUL18 add entry: \"qua `add` (hoặc bất kỳ item nào tạo trước tính năng này) mặc định `executing`\" → \"qua `add` cũng mặc định step đầu chuỗi qua `entryStepFor` (`discovery` với `coding`); chỉ bản ghi cũ không mang step mới được đọc lazy là `executing`\"; evidence root-authorities-truth-corrections-turn21.json; bin/fgos.mjs:970-985 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 99d801a92839b2a7b7202bb9c07bb8fd2277f705); src/state/replay.mjs:45-58 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 905e0d26ba2789e1b7ad4b9ad89a46632bd5d48a).\nU26 RUL19 discovery worker: \"Lượt quét cơ học này KHÔNG tự phán hộ verdict: không có verdict do người gọi cung cấp thì nó để item nguyên tại chỗ, chờ một phiên sống.\" → \"Lượt quét dispatch worker `fgos-researching`; verdict thật của worker đi qua `resolveDiscovery`, có thể chuyển item sang `planning` hoặc `exploring` mà không cần một phiên sống ngồi chờ.\"; evidence root-authorities-truth-corrections-turn21.json; src/runner/loop.mjs:1446-1500 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 13364c84cdad619b5aa671d700847f2d5e3a02ae); src/runner/loop.mjs:1530-1587 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 13364c84cdad619b5aa671d700847f2d5e3a02ae).\nU26 RUL26 plan gate: \"item đậu `awaiting-human` mang đề xuất chia CHỈ KHI phán tự báo mơ hồ HOẶC risk của gốc là `heavy`.\" → \"item đậu `awaiting-human` mang đề xuất chia khi phán báo cần người, khi cổng từ khóa rủi ro đòi duyệt, khi blast-radius gate đòi duyệt, khi lần kiểm thứ hai tranh chấp verify của con, hoặc khi footprint con overlap mà chưa được phân thứ tự bằng deps.\"; evidence root-authorities-truth-corrections-turn21.json; src/intake/plan.mjs:745-819 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob ea2bad13189ba75f59b9d4c45a3ba0a6f28013ad); src/intake/plan.mjs:884-898 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob ea2bad13189ba75f59b9d4c45a3ba0a6f28013ad).\nU26 RUL30 settlement: \"lên CÙNG sự kiện `doing→awaiting-approval`\" → \"lên CÙNG sự kiện settle về `awaiting-approval` (claim mới: `todo→awaiting-approval` hoặc `blocked→awaiting-approval`; không ghi bền vào `doing`)\"; evidence root-authorities-truth-corrections-turn21.json; src/state/status-fsm.mjs:120-139 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 6eede4ce0c28fe8bc5488ffa209a35e94180c26c); src/state/store.mjs:1180-1207 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 418f3d688929b78bae26607a8eb624737e0ead25).\nU26 RUL33 take: \"với người chọn cầm việc qua cửa pull để tự làm-lại tay (`blocked→doing`, có tính)\" → \"với người chọn cầm việc qua cửa pull để tự làm-lại tay (claim overlay đọc effective status `doing`, không ghi cạnh bền `blocked→doing`)\"; evidence root-authorities-truth-corrections-turn21.json; src/state/status-fsm.mjs:120-139 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 6eede4ce0c28fe8bc5488ffa209a35e94180c26c); src/runner/claim-port.mjs:210-234 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob ed742a7d151ff914e80f0ce5b640391e3d391388).\nU26 RUL34 markers: \"`branchHeadAtTake` (HEAD của NHÁNH lúc `take`, Data Dictionary #19) trên cạnh `blocked→doing`, `branchHeadAtReturn` (HEAD của NHÁNH lúc `return` đo xanh, Data Dictionary #20) trên cạnh `doing→awaiting-approval`\" → \"`branchHeadAtTake` (HEAD của NHÁNH lúc `take`, Data Dictionary #19) trên claim record, `branchHeadAtReturn` (HEAD của NHÁNH lúc `return` đo xanh, Data Dictionary #20) trên settlement/lastAttempt khi về `awaiting-approval`\"; evidence root-authorities-truth-corrections-turn21.json; src/state/store.mjs:1213-1245 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 418f3d688929b78bae26607a8eb624737e0ead25); src/runner/claim-port.mjs:210-234 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob ed742a7d151ff914e80f0ce5b640391e3d391388).\nU26 RUL53 doc path: \"KHÔNG kiểm hình dạng (đường dẫn tự do)\" → \"`compound` (đã deprecated, khuyến nghị `fgos doc`) đòi đường dẫn đã commit ở HEAD của main checkout; khi bật `docRegistry.enforce`, đường dẫn phải là currentPath đã đăng ký, không ambiguous hay alias\"; evidence root-authorities-truth-corrections-turn21.json; bin/fgos.mjs:1640-1655 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 99d801a92839b2a7b7202bb9c07bb8fd2277f705); bin/fgos.mjs:1677-1710 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 99d801a92839b2a7b7202bb9c07bb8fd2277f705).\nU26 RUL60 retired tier (composed with U26 RUL60 wrapper ordering): \"- **RUL60 (`submit` — ba cờ ghi-đè `--tier`/`--kind`/`--risk`, độc lập từng trường; `risk` KHÔNG mirror `tier` khi có cờ).** Xem \\\"Nộp vấn đề tự do (submit)\\\" trên: mặc định cả ba trường vẫn suy cơ học từ mô tả (đếm từ khóa) như trước; ba cờ tùy chọn ghi đè TỪNG TRƯỜNG một cách độc lập — có `--tier` không bắt buộc phải có `--kind`/`--risk`, và ngược lại. Khi CHỈ `--tier` có mặt (không `--risk`), `risk` VẪN suy cơ học như trước — tức `risk` khi đó mirror `tier` CƠ HỌC (giá trị suy ra, không phải giá trị vừa ghi đè qua cờ) — một điểm dễ hiểu lầm: `submit \\\"...\\\" --tier heavy` (không `--risk`) có thể cho ra item `risk` KHÁC `heavy` nếu suy luận cơ học trên mô tả đó tự ra một bậc khác. Cờ vắng mặt không đổi hành vi cũ một byte (cùng khuôn optional-additive như `--domain`/`--deps`/`--acceptance` — RUL nền). Trường `domain` KHÔNG nằm trong phạm vi ba cờ này và không bị đụng tới (giữ nguyên hành vi cũ hoàn toàn). BÊN SẢN XUẤT giá trị cho ba cờ này từng là kỹ năng ĐỘC LẬP `fgos-submit-assist` (str51-llm-assist-classify), gọi trực tiếp khi có một mô tả tự do cần nộp trước cả khi `submit` chạy; skill đó đã RÚT (tsk-6ar) vì việc nó làm bị `/fgOS:submit` bước 6 (`plugins/fgOS/skills/submit/SKILL.md`, tsk-5wz) làm lại — trên bản mô tả SẠCH hơn (sau clarify, không phải trước) — cho bất kỳ phiên sống nào gọi cửa thường, không cần gọi riêng một skill nữa. Đường sản xuất còn sống hiện nay KHÔNG còn đi qua ba cờ `--tier`/`--kind`/`--risk` của chính verb `submit` mô tả ở trên — ba cờ ấy vẫn hoạt động y nguyên cho bất kỳ bên gọi nào (người, script, agent khác) muốn ghi đè trực tiếp lúc nộp, chỉ là không còn một skill đứng sẵn để tự suy luận và điền hộ chúng. **Cập nhật (cờ phân loại của `discover`):** chỗ phán lại chính thức nay là verb `discover` ở stage `discovery` — nó nhận cùng ba cờ và áp qua chốt chặn dùng chung với đường headless (xem \\\"Chạy context-discovery (discover)\\\" trên). `fgos edit` vẫn là cửa ghi hợp lệ cho một chỉnh tay lẻ, nhưng nó không còn là đường sản xuất được mô tả ở đây: phân loại thuộc về `discovery`, sau research, chứ không thuộc về một bước 6b nối sau `submit`.\" → \"- **RUL60 (`submit` — cờ phân loại hiện hành).** `--tier` đã retired và bị từ chối với hướng dẫn dùng `--size` hoặc `--rigor`; `--size`/`--rigor`/`--kind`/`--risk` là các cờ ghi đè độc lập hiện hành. Khi không ghi đè, `submit` dùng phân loại cơ học; risk không được lấy từ size do bên gọi ghi đè. `domain` là trường riêng. Kỹ năng ĐỘC LẬP `fgos-submit-assist` (str51-llm-assist-classify) đã RÚT (tsk-6ar); Trong phiên tương tác sống, `/fgOS:submit` bước 4 gọi `fgos-clarifying` trên raw text trước khi item tồn tại: helper chỉ phân loại `domain`, có thể trả title/description đã viết lại hoặc câu hỏi làm rõ; không phán lại size/kind/risk. Bước 5 gọi `submit` với text/domain đã chốt; bước 6 chỉ báo kết quả. Chỗ phán lại chính thức là `discover` ở discovery, sau research; phần mô tả cờ tier cũ không phải hợp đồng CLI còn sống.\"; evidence root-authorities-truth-corrections-turn21.json; bin/fgos.mjs:1066-1088 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 99d801a92839b2a7b7202bb9c07bb8fd2277f705); bin/fgos.mjs:806-840 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 99d801a92839b2a7b7202bb9c07bb8fd2277f705); core/skills/fgos-clarifying/SKILL.md:1-65 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 38d80a088108662906cc81f1c9488a5ab2bd6183).\nU26 RUL61 writer event: \"Ba cửa ghi `work.move`/`work.edit`/`work.stage`\" → \"Ba cửa ghi `work.move`/`work.edit`/`work.step`\"; evidence root-authorities-truth-corrections-turn21.json; src/state/store.mjs:1432-1455 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 418f3d688929b78bae26607a8eb624737e0ead25); src/state/replay.mjs:447-456 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 905e0d26ba2789e1b7ad4b9ad89a46632bd5d48a).\nDisposition supersede: Account for docs/platform/work-state/spec.md#unheaded-block-93 under docs/platform/work-state/spec.md#unheaded-block-93; source context \"Work State Specification / 11. Business Rules\", target context \"Work State Specification / 11. Business Rules\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "reviewNote": "deep: historical unit-93 at c18698bbe (1032-1085, digest recomputed) against current 1041-1094; all 13 listed corrections have their before-text in the historical source and after-text in the target with evidence commit and blob; after applying them only the RUL55 upstream extension and the RUL59 rewrite remain, covered by the generic successor-text sentence as in the earlier round; anchor ok.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-10-62751458b.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "9098a0e9ed02a324a16abe3c1016fad73ad261bfc4459aed889be5baeb1515b3",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/platform/work-state/spec.md:1032-1085#unheaded-block-93 (historical witness at c18698bbeb77c8d0dbb615cfe83273e4b49baeb0); unit SHA256 19f7dcac1af1f366369c2b1b75261b376f12ecaabf4b65f5f0d6f92c191a712d.\nTarget: docs/platform/work-state/spec.md:1041-1094#unheaded-block-93 (current lines); unit SHA256 9098a0e9ed02a324a16abe3c1016fad73ad261bfc4459aed889be5baeb1515b3.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 9098a0e9ed02a324a16abe3c1016fad73ad261bfc4459aed889be5baeb1515b3 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nU26 RUL10: \"`addWork`/`editWork`/`moveWork`/`moveStage` ở `store.mjs` nay bọc TRỌN chuỗi đọc-tiền-kiểm-rồi-ghi (kiểm id-đã-tồn-tại, CAS `expectedStatus`/`expectedStage`)\" → \"`addWork`/`editWork`/`moveWork`/`moveStep` ở `store.mjs` nay bọc TRỌN chuỗi đọc-tiền-kiểm-rồi-ghi (kiểm id-đã-tồn-tại, CAS `expectedStatus`/`expectedStep`)\"; evidence root-authorities-truth-corrections-turn21.json; src/state/store.mjs:1430-1465 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 418f3d688929b78bae26607a8eb624737e0ead25).\nU26 RUL15: \"(dep chỉ mở khi thật `done`)\" → \"(dep mở ở `delivered`/`retrospective`/`cleanup`/`done` hoặc khi bị hủy)\"; evidence root-authorities-truth-corrections-turn21.json; src/state/frontier.mjs:240-273 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 07bb8d9e5ec8439cc0af6541c878f9f0ae3fa764).\nU26 RUL16 classification: \"Phân loại tier/kind/risk của `submit`\" → \"Phân loại size/kind/risk cơ học của `submit` (rigor là cờ tùy chọn)\"; evidence root-authorities-truth-corrections-turn21.json; bin/fgos.mjs:1066-1088 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 99d801a92839b2a7b7202bb9c07bb8fd2277f705).\nU26 RUL16 heavy: \"bộ từ khóa rủi-ro-nặng quyết định tier `heavy`\" → \"bộ từ khóa rủi-ro-nặng quyết định size `heavy` và risk `heavy`\"; evidence root-authorities-truth-corrections-turn21.json; src/intake/classify.mjs:1-137 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 35a3d03da7317a42574aa7bda3818adfb5a19c63).\nU26 RUL18 add entry: \"qua `add` (hoặc bất kỳ item nào tạo trước tính năng này) mặc định `executing`\" → \"qua `add` cũng mặc định step đầu chuỗi qua `entryStepFor` (`discovery` với `coding`); chỉ bản ghi cũ không mang step mới được đọc lazy là `executing`\"; evidence root-authorities-truth-corrections-turn21.json; bin/fgos.mjs:970-985 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 99d801a92839b2a7b7202bb9c07bb8fd2277f705); src/state/replay.mjs:45-58 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 905e0d26ba2789e1b7ad4b9ad89a46632bd5d48a).\nU26 RUL19 discovery worker: \"Lượt quét cơ học này KHÔNG tự phán hộ verdict: không có verdict do người gọi cung cấp thì nó để item nguyên tại chỗ, chờ một phiên sống.\" → \"Lượt quét dispatch worker `fgos-researching`; verdict thật của worker đi qua `resolveDiscovery`, có thể chuyển item sang `planning` hoặc `exploring` mà không cần một phiên sống ngồi chờ.\"; evidence root-authorities-truth-corrections-turn21.json; src/runner/loop.mjs:1446-1500 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 13364c84cdad619b5aa671d700847f2d5e3a02ae); src/runner/loop.mjs:1530-1587 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 13364c84cdad619b5aa671d700847f2d5e3a02ae).\nU26 RUL26 plan gate: \"item đậu `awaiting-human` mang đề xuất chia CHỈ KHI phán tự báo mơ hồ HOẶC risk của gốc là `heavy`.\" → \"item đậu `awaiting-human` mang đề xuất chia khi phán báo cần người, khi cổng từ khóa rủi ro đòi duyệt, khi blast-radius gate đòi duyệt, khi lần kiểm thứ hai tranh chấp verify của con, hoặc khi footprint con overlap mà chưa được phân thứ tự bằng deps.\"; evidence root-authorities-truth-corrections-turn21.json; src/intake/plan.mjs:745-819 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob ea2bad13189ba75f59b9d4c45a3ba0a6f28013ad); src/intake/plan.mjs:884-898 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob ea2bad13189ba75f59b9d4c45a3ba0a6f28013ad).\nU26 RUL30 settlement: \"lên CÙNG sự kiện `doing→awaiting-approval`\" → \"lên CÙNG sự kiện settle về `awaiting-approval` (claim mới: `todo→awaiting-approval` hoặc `blocked→awaiting-approval`; không ghi bền vào `doing`)\"; evidence root-authorities-truth-corrections-turn21.json; src/state/status-fsm.mjs:120-139 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 6eede4ce0c28fe8bc5488ffa209a35e94180c26c); src/state/store.mjs:1180-1207 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 418f3d688929b78bae26607a8eb624737e0ead25).\nU26 RUL33 take: \"với người chọn cầm việc qua cửa pull để tự làm-lại tay (`blocked→doing`, có tính)\" → \"với người chọn cầm việc qua cửa pull để tự làm-lại tay (claim overlay đọc effective status `doing`, không ghi cạnh bền `blocked→doing`)\"; evidence root-authorities-truth-corrections-turn21.json; src/state/status-fsm.mjs:120-139 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 6eede4ce0c28fe8bc5488ffa209a35e94180c26c); src/runner/claim-port.mjs:210-234 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob ed742a7d151ff914e80f0ce5b640391e3d391388).\nU26 RUL34 markers: \"`branchHeadAtTake` (HEAD của NHÁNH lúc `take`, Data Dictionary #19) trên cạnh `blocked→doing`, `branchHeadAtReturn` (HEAD của NHÁNH lúc `return` đo xanh, Data Dictionary #20) trên cạnh `doing→awaiting-approval`\" → \"`branchHeadAtTake` (HEAD của NHÁNH lúc `take`, Data Dictionary #19) trên claim record, `branchHeadAtReturn` (HEAD của NHÁNH lúc `return` đo xanh, Data Dictionary #20) trên settlement/lastAttempt khi về `awaiting-approval`\"; evidence root-authorities-truth-corrections-turn21.json; src/state/store.mjs:1213-1245 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 418f3d688929b78bae26607a8eb624737e0ead25); src/runner/claim-port.mjs:210-234 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob ed742a7d151ff914e80f0ce5b640391e3d391388).\nU26 RUL53 doc path: \"KHÔNG kiểm hình dạng (đường dẫn tự do)\" → \"`compound` (đã deprecated, khuyến nghị `fgos doc`) đòi đường dẫn đã commit ở HEAD của main checkout; khi bật `docRegistry.enforce`, đường dẫn phải là currentPath đã đăng ký, không ambiguous hay alias\"; evidence root-authorities-truth-corrections-turn21.json; bin/fgos.mjs:1640-1655 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 99d801a92839b2a7b7202bb9c07bb8fd2277f705); bin/fgos.mjs:1677-1710 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 99d801a92839b2a7b7202bb9c07bb8fd2277f705).\nU26 RUL60 retired tier (composed with U26 RUL60 wrapper ordering): \"- **RUL60 (`submit` — ba cờ ghi-đè `--tier`/`--kind`/`--risk`, độc lập từng trường; `risk` KHÔNG mirror `tier` khi có cờ).** Xem \\\"Nộp vấn đề tự do (submit)\\\" trên: mặc định cả ba trường vẫn suy cơ học từ mô tả (đếm từ khóa) như trước; ba cờ tùy chọn ghi đè TỪNG TRƯỜNG một cách độc lập — có `--tier` không bắt buộc phải có `--kind`/`--risk`, và ngược lại. Khi CHỈ `--tier` có mặt (không `--risk`), `risk` VẪN suy cơ học như trước — tức `risk` khi đó mirror `tier` CƠ HỌC (giá trị suy ra, không phải giá trị vừa ghi đè qua cờ) — một điểm dễ hiểu lầm: `submit \\\"...\\\" --tier heavy` (không `--risk`) có thể cho ra item `risk` KHÁC `heavy` nếu suy luận cơ học trên mô tả đó tự ra một bậc khác. Cờ vắng mặt không đổi hành vi cũ một byte (cùng khuôn optional-additive như `--domain`/`--deps`/`--acceptance` — RUL nền). Trường `domain` KHÔNG nằm trong phạm vi ba cờ này và không bị đụng tới (giữ nguyên hành vi cũ hoàn toàn). BÊN SẢN XUẤT giá trị cho ba cờ này từng là kỹ năng ĐỘC LẬP `fgos-submit-assist` (str51-llm-assist-classify), gọi trực tiếp khi có một mô tả tự do cần nộp trước cả khi `submit` chạy; skill đó đã RÚT (tsk-6ar) vì việc nó làm bị `/fgOS:submit` bước 6 (`plugins/fgOS/skills/submit/SKILL.md`, tsk-5wz) làm lại — trên bản mô tả SẠCH hơn (sau clarify, không phải trước) — cho bất kỳ phiên sống nào gọi cửa thường, không cần gọi riêng một skill nữa. Đường sản xuất còn sống hiện nay KHÔNG còn đi qua ba cờ `--tier`/`--kind`/`--risk` của chính verb `submit` mô tả ở trên — ba cờ ấy vẫn hoạt động y nguyên cho bất kỳ bên gọi nào (người, script, agent khác) muốn ghi đè trực tiếp lúc nộp, chỉ là không còn một skill đứng sẵn để tự suy luận và điền hộ chúng. **Cập nhật (cờ phân loại của `discover`):** chỗ phán lại chính thức nay là verb `discover` ở stage `discovery` — nó nhận cùng ba cờ và áp qua chốt chặn dùng chung với đường headless (xem \\\"Chạy context-discovery (discover)\\\" trên). `fgos edit` vẫn là cửa ghi hợp lệ cho một chỉnh tay lẻ, nhưng nó không còn là đường sản xuất được mô tả ở đây: phân loại thuộc về `discovery`, sau research, chứ không thuộc về một bước 6b nối sau `submit`.\" → \"- **RUL60 (`submit` — cờ phân loại hiện hành).** `--tier` đã retired và bị từ chối với hướng dẫn dùng `--size` hoặc `--rigor`; `--size`/`--rigor`/`--kind`/`--risk` là các cờ ghi đè độc lập hiện hành. Khi không ghi đè, `submit` dùng phân loại cơ học; risk không được lấy từ size do bên gọi ghi đè. `domain` là trường riêng. Kỹ năng ĐỘC LẬP `fgos-submit-assist` (str51-llm-assist-classify) đã RÚT (tsk-6ar); Trong phiên tương tác sống, `/fgOS:submit` bước 4 gọi `fgos-clarifying` trên raw text trước khi item tồn tại: helper chỉ phân loại `domain`, có thể trả title/description đã viết lại hoặc câu hỏi làm rõ; không phán lại size/kind/risk. Bước 5 gọi `submit` với text/domain đã chốt; bước 6 chỉ báo kết quả. Chỗ phán lại chính thức là `discover` ở discovery, sau research; phần mô tả cờ tier cũ không phải hợp đồng CLI còn sống.\"; evidence root-authorities-truth-corrections-turn21.json; bin/fgos.mjs:1066-1088 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 99d801a92839b2a7b7202bb9c07bb8fd2277f705); bin/fgos.mjs:806-840 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 99d801a92839b2a7b7202bb9c07bb8fd2277f705); core/skills/fgos-clarifying/SKILL.md:1-65 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 38d80a088108662906cc81f1c9488a5ab2bd6183).\nU26 RUL61 writer event: \"Ba cửa ghi `work.move`/`work.edit`/`work.stage`\" → \"Ba cửa ghi `work.move`/`work.edit`/`work.step`\"; evidence root-authorities-truth-corrections-turn21.json; src/state/store.mjs:1432-1455 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 418f3d688929b78bae26607a8eb624737e0ead25); src/state/replay.mjs:447-456 (evidence commit 9bb7e6edb45f46297d79b419d5cb79db6cebe82d) (pinned blob 905e0d26ba2789e1b7ad4b9ad89a46632bd5d48a).\nDisposition supersede: Account for docs/platform/work-state/spec.md#unheaded-block-93 under docs/platform/work-state/spec.md#unheaded-block-93; source context \"Work State Specification / 11. Business Rules\", target context \"Work State Specification / 11. Business Rules\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval.",
+      "targetUnitDigest": "7d80c83e476d1ea9876b7e97929dda23f88c6c5ae30fde132da9455c31d9593a",
       "targetAncestry": [
         "Work State Specification",
         "11. Business Rules"
-      ],
-      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
+      ]
     },
     {
       "claimId": "claim_2d8114529b804f49494e6d42548e1372",
@@ -136,20 +106,14 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/platform-foundations.md",
       "targetAnchor": "unheaded-block-12",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry.",
-      "reviewNote": "deep: successor of the old unit 8fc59c5d (predecessor id and old digest kept, recomputed from cd82746a8), new unit de888795 recomputes at b1e53b4fb; diff is the 3 decisions-pointer ops, pointers verified (docs/decisions/index.md exists, .bee and distill report absent), no approval carried",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0027-root-truth-resume.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "de888795c53722a1fceec49302307ace1e440cf43aa639e2d32fce78aad12273",
       "targetAncestry": [
         "Platform Foundations",
         "Luật nền platform forgent (Phase 0 — compound-learning stack)"
-      ],
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      ]
     },
     {
       "claimId": "claim_eb0bf7783bb1b1027c012f050c782203",
@@ -159,20 +123,14 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "unheaded-block-3",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry.",
-      "reviewNote": "deep: successor of old unit c8fc6e5b to 21e9b6c7, both recompute; diff is tier to size, per-item TTL (leafTtlDays 0, ttlDays 7) and cleanup noop vs blocked, each verified in bin/fgos.mjs and cleanup-harness.mjs; pending, no approval carried",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0027-root-truth-resume.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "21e9b6c7342fa4e8f55cbc2f791698156e82ba65eeb4cacc8f80decfa70fc58c",
       "targetAncestry": [
         "Work State Specification",
         "2. Entry Points And Triggers"
-      ],
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      ]
     },
     {
       "claimId": "claim_3c9b65402d8ece4ef57ad337ba5d9d72",
@@ -182,21 +140,15 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "unheaded-block-39",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry.",
-      "reviewNote": "deep: successor of old unit fadda0c2 to the corrected alias paragraph; verified aliases {decompose: planning} and 4 coding transitions by node import of domain-registry and domains/coding/workflows/feature.yaml:154-162; pending, no approval carried",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0027-root-truth-resume.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "f092e335e21534b0c6d0a03e9d98b8b6311f62d646ae9216dafb872d86c23ba0",
       "targetAncestry": [
         "Work State Specification",
         "5. Workflow Step And Stage Model",
         "Planning Stage"
-      ],
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      ]
     },
     {
       "claimId": "claim_1f9fb4feceda8f5bf6a18b151ce0a397",
@@ -206,20 +158,14 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "unheaded-block-55",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry.",
-      "reviewNote": "deep: successor of old unit 4b215c2f; take explicit id checks deps and lineage only when todo (bin/fgos.mjs take case), pick explicit id only checks existence and claim-port.mjs enforces status todo and leaf unmerged deps; corrected text matches",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0027-root-truth-resume.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "b93b1271702eedfac07aee1897bce1aa36c6322ede478bf5b3df20194da452ad",
       "targetAncestry": [
         "Work State Specification",
         "7. Pull Door Take And Return"
-      ],
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      ]
     },
     {
       "claimId": "claim_acab595482e4f9f7ae05e21a1a28f11b",
@@ -229,21 +175,15 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "unheaded-block-64",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry.",
-      "reviewNote": "deep: successor of old unit 6507aee6; init refused outside the main worktree at bin/fgos.mjs:4978-4984 init-in-worktree guard and detection wrapped in try/catch in case init, so the corrected Blocked-when is true",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0027-root-truth-resume.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "8c083fa704b78795877465578a80d3603ef9ef8bbf2f9000c1547daead10880f",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Init Verb"
-      ],
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      ]
     },
     {
       "claimId": "claim_7c4295aa058b6a7fa5c6b945a0441a35",
@@ -253,21 +193,15 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "unheaded-block-67",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry.",
-      "reviewNote": "deep: successor of old unit 0cee9be2; submit rejects --tier as retired and reads size/rigor/kind/risk (bin/fgos.mjs submit case and submitWork, classify.mjs returns size/kind/risk, rigor only when passed); RUL60 title now matches the pointer",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0027-root-truth-resume.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "dbfcaa1881570e24492daa35eb776b4fbea75fab92318188517e6b81ee2bdbd2",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Submit Verb"
-      ],
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      ]
     },
     {
       "claimId": "claim_02a2110f086ac00ef2d59c9d4d9afeb1",
@@ -277,21 +211,16 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/spec.md",
       "targetAnchor": "unheaded-block-68",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry.",
-      "reviewNote": "deep: successor of old unit ecb4ec26; discover rejects --tier and reads size/rigor/kind/risk, classificationPatchFromVerdict in src/intake/discovery.mjs patches size/rigor/kind/risk; corrected synopsis and four-flag text true",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0027-root-truth-resume.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "Authorized A37 correction: the exact old candidate paragraph is replaced by the code-backed corrected same-file paragraph shown in the truth evidence. A22 mechanical successor accounting preserves the old native identity as a gap and the new current native identity without grafting; independent truth/conservation review pending, no approval carry. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "bc0b6df719a361a226f5f5c04024ef0cb5a149307ffccb2cbd07d1c556d51616",
       "targetAncestry": [
         "Work State Specification",
         "9. Behaviors And Operations",
         "Discover Verb"
-      ],
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      ]
     }
-  ]
+  ],
+  "correctionSession": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17"
 }

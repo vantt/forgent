@@ -3687,19 +3687,13 @@
       "targetAnchor": "10-lộ-trình-rollout-và-trạng-thái-hoàn-thành",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792126341980-e0c35701@2026-10-16",
-      "rationale": "Source: docs/specs/confinement-authority.md:1247-1247#10-lộ-trình-rollout-và-trạng-thái-hoàn-thành (current lines); unit SHA256 d190224e5d950146033421700ed7ddb13820841f2cebcdb371223943ceacd82d.\nTarget: docs/platform/agent-confinement/history/rollout-and-settled-facts.md:24-24#10-lộ-trình-rollout-và-trạng-thái-hoàn-thành (current lines); unit SHA256 d190224e5d950146033421700ed7ddb13820841f2cebcdb371223943ceacd82d.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest d190224e5d950146033421700ed7ddb13820841f2cebcdb371223943ceacd82d at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 2; title \"10. Lộ trình rollout và trạng thái hoàn thành\" → \"10. Lộ trình rollout và trạng thái hoàn thành\".\nWhole direct section equal; depth 2 → 2; 0 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (equal-section): Complete direct source and target sections are byte-equal; no removed or added lines.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/confinement-authority.md#10-lộ-trình-rollout-và-trạng-thái-hoàn-thành under docs/platform/agent-confinement/history/rollout-and-settled-facts.md#10-lộ-trình-rollout-và-trạng-thái-hoàn-thành; source context \"Spec: Agent Confinement Authority\", target context \"Added in candidate: rollout and settled facts\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "reviewNote": "deep: move of 10. Lộ trình rollout từ docs/specs/confinement-authority.md into agent-confinement/history/rollout-and-settled-facts.md; the target heading is a real heading (not inside a fence, line 24) and the section text is byte-equal to the source with equal unit digests, so the new equal-section accounting is true (the earlier wrapper caveat no longer applies to this bound unit); 0 links; unchanged-since d190224e at 62751458b is an ok row.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-02-4d3634360.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "Source: docs/specs/confinement-authority.md:1247-1247#10-lộ-trình-rollout-và-trạng-thái-hoàn-thành (current lines); unit SHA256 d190224e5d950146033421700ed7ddb13820841f2cebcdb371223943ceacd82d.\nTarget: docs/platform/agent-confinement/history/rollout-and-settled-facts.md:24-24#10-lộ-trình-rollout-và-trạng-thái-hoàn-thành (current lines); unit SHA256 d190224e5d950146033421700ed7ddb13820841f2cebcdb371223943ceacd82d.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest d190224e5d950146033421700ed7ddb13820841f2cebcdb371223943ceacd82d at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 2; title \"10. Lộ trình rollout và trạng thái hoàn thành\" → \"10. Lộ trình rollout và trạng thái hoàn thành\".\nWhole direct section equal; depth 2 → 2; 0 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (equal-section): Complete direct source and target sections are byte-equal; no removed or added lines.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/confinement-authority.md#10-lộ-trình-rollout-và-trạng-thái-hoàn-thành under docs/platform/agent-confinement/history/rollout-and-settled-facts.md#10-lộ-trình-rollout-và-trạng-thái-hoàn-thành; source context \"Spec: Agent Confinement Authority\", target context \"Added in candidate: rollout and settled facts\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "d190224e5d950146033421700ed7ddb13820841f2cebcdb371223943ceacd82d",
       "targetAncestry": [
         "Added in candidate: rollout and settled facts"
-      ],
-      "reviewReportCommit": "203f4ef93867a60e6a37624b31ce14de426cafa8"
+      ]
     },
     {
       "claimId": "claim_029dd2509143e3a718a8fc0b7f7be03e",
@@ -3708,20 +3702,14 @@
       "targetAnchor": "unheaded-block-3",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "rationale": "Source: docs/specs/confinement-authority.md:1249-1258#unheaded-block-128 (current lines); unit SHA256 5036517c45b86b22554b3c8c1b11e63cc453d4a66722bbd0c820af5ec68cc56f.\nTarget: docs/platform/agent-confinement/history/rollout-and-settled-facts.md:26-35#unheaded-block-3 (current lines); unit SHA256 5036517c45b86b22554b3c8c1b11e63cc453d4a66722bbd0c820af5ec68cc56f.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 5036517c45b86b22554b3c8c1b11e63cc453d4a66722bbd0c820af5ec68cc56f at 1276467f37a99d19aff05808d42fafbf40341449.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/confinement-authority.md#unheaded-block-128 under docs/platform/agent-confinement/history/rollout-and-settled-facts.md#unheaded-block-3; source context \"Spec: Agent Confinement Authority / 10. Lộ trình rollout và trạng thái hoàn thành\", target context \"Added in candidate: rollout and settled facts / 10. Lộ trình rollout và trạng thái hoàn thành\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "reviewNote": "deep: A36 draw (seed 2026101609); move confinement-authority.md:1249-1258#unheaded-block-128 -> rollout-and-settled-facts.md:26-35#unheaded-block-3, source and target text opened and identical (starts: / Phase / Kết quả / Trạng thái (Track `confin); classed Weak-exact (ancestor headings differ; document exact share below one half); target context Added in candidate: rollout and settled facts / 10. Lộ trình rollout v equals the real heading chain; links 0/0/0/0/0/0; last-reviewed digest backed by a committed ok verdict.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-12-287a22d33.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "Source: docs/specs/confinement-authority.md:1249-1258#unheaded-block-128 (current lines); unit SHA256 5036517c45b86b22554b3c8c1b11e63cc453d4a66722bbd0c820af5ec68cc56f.\nTarget: docs/platform/agent-confinement/history/rollout-and-settled-facts.md:26-35#unheaded-block-3 (current lines); unit SHA256 5036517c45b86b22554b3c8c1b11e63cc453d4a66722bbd0c820af5ec68cc56f.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 5036517c45b86b22554b3c8c1b11e63cc453d4a66722bbd0c820af5ec68cc56f at 1276467f37a99d19aff05808d42fafbf40341449.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/confinement-authority.md#unheaded-block-128 under docs/platform/agent-confinement/history/rollout-and-settled-facts.md#unheaded-block-3; source context \"Spec: Agent Confinement Authority / 10. Lộ trình rollout và trạng thái hoàn thành\", target context \"Added in candidate: rollout and settled facts / 10. Lộ trình rollout và trạng thái hoàn thành\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "5036517c45b86b22554b3c8c1b11e63cc453d4a66722bbd0c820af5ec68cc56f",
       "targetAncestry": [
         "Added in candidate: rollout and settled facts",
         "10. Lộ trình rollout và trạng thái hoàn thành"
-      ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      ]
     },
     {
       "claimId": "claim_0a81cfc730773e8a468f69c67e1a7948",
@@ -3730,20 +3718,14 @@
       "targetAnchor": "unheaded-block-4",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "rationale": "Source: docs/specs/confinement-authority.md:1260-1260#unheaded-block-129 (current lines); unit SHA256 685026d049d214e631c09ff55243094abcf13ea2acb41222f115d94bcc335107.\nTarget: docs/platform/agent-confinement/history/rollout-and-settled-facts.md:37-37#unheaded-block-4 (current lines); unit SHA256 685026d049d214e631c09ff55243094abcf13ea2acb41222f115d94bcc335107.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 685026d049d214e631c09ff55243094abcf13ea2acb41222f115d94bcc335107 at 1276467f37a99d19aff05808d42fafbf40341449.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/confinement-authority.md#unheaded-block-129 under docs/platform/agent-confinement/history/rollout-and-settled-facts.md#unheaded-block-4; source context \"Spec: Agent Confinement Authority / 10. Lộ trình rollout và trạng thái hoàn thành\", target context \"Added in candidate: rollout and settled facts / 10. Lộ trình rollout và trạng thái hoàn thành\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "reviewNote": "deep: A36 draw (seed 2026101609); move confinement-authority.md:1260-1260#unheaded-block-129 -> rollout-and-settled-facts.md:37-37#unheaded-block-4, source and target text opened and identical (starts: Observe-first là thứ tự rollout, không phải k); classed Weak-exact (ancestor headings differ; document exact share below one half); target context Added in candidate: rollout and settled facts / 10. Lộ trình rollout v equals the real heading chain; links 0/0/0/0/0/0; last-reviewed digest backed by a committed ok verdict.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-12-287a22d33.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "Source: docs/specs/confinement-authority.md:1260-1260#unheaded-block-129 (current lines); unit SHA256 685026d049d214e631c09ff55243094abcf13ea2acb41222f115d94bcc335107.\nTarget: docs/platform/agent-confinement/history/rollout-and-settled-facts.md:37-37#unheaded-block-4 (current lines); unit SHA256 685026d049d214e631c09ff55243094abcf13ea2acb41222f115d94bcc335107.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 685026d049d214e631c09ff55243094abcf13ea2acb41222f115d94bcc335107 at 1276467f37a99d19aff05808d42fafbf40341449.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/confinement-authority.md#unheaded-block-129 under docs/platform/agent-confinement/history/rollout-and-settled-facts.md#unheaded-block-4; source context \"Spec: Agent Confinement Authority / 10. Lộ trình rollout và trạng thái hoàn thành\", target context \"Added in candidate: rollout and settled facts / 10. Lộ trình rollout và trạng thái hoàn thành\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "685026d049d214e631c09ff55243094abcf13ea2acb41222f115d94bcc335107",
       "targetAncestry": [
         "Added in candidate: rollout and settled facts",
         "10. Lộ trình rollout và trạng thái hoàn thành"
-      ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      ]
     },
     {
       "claimId": "claim_1ef2bc00c79bc7a40787b62a4943f0df",
@@ -4087,19 +4069,13 @@
       "targetAnchor": "13-kết-quả-giải-quyết-rủi-ro-và-các-tồn-đọng-mở-settled-facts-deferred-items",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792126341980-e0c35701@2026-10-16",
-      "rationale": "Source: docs/specs/confinement-authority.md:1343-1343#13-kết-quả-giải-quyết-rủi-ro-và-các-tồn-đọng-mở-settled-facts-deferred-items (current lines); unit SHA256 5b4b826dee4bf97e40378670f520aa3dc9c667d40de9d6e2b10447578371d38f.\nTarget: docs/platform/agent-confinement/history/rollout-and-settled-facts.md:39-39#13-kết-quả-giải-quyết-rủi-ro-và-các-tồn-đọng-mở-settled-facts-deferred-items (current lines); unit SHA256 5b4b826dee4bf97e40378670f520aa3dc9c667d40de9d6e2b10447578371d38f.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 5b4b826dee4bf97e40378670f520aa3dc9c667d40de9d6e2b10447578371d38f at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 2; title \"13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)\" → \"13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)\".\nWhole direct section equal; depth 2 → 2; 0 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (equal-section): Complete direct source and target sections are byte-equal; no removed or added lines.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/confinement-authority.md#13-kết-quả-giải-quyết-rủi-ro-và-các-tồn-đọng-mở-settled-facts-deferred-items under docs/platform/agent-confinement/history/rollout-and-settled-facts.md#13-kết-quả-giải-quyết-rủi-ro-và-các-tồn-đọng-mở-settled-facts-deferred-items; source context \"Spec: Agent Confinement Authority\", target context \"Added in candidate: rollout and settled facts\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "reviewNote": "deep: heading 13 direct section (intro plus seven numbered settled risks) read in the legacy spec and in history/rollout-and-settled-facts.md, byte-identical; target context correctly named as the Added in candidate rollout carrier; subsections 13.1 to 13.3 and the open items are separate rows.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "5b4b826dee4bf97e40378670f520aa3dc9c667d40de9d6e2b10447578371d38f",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "Source: docs/specs/confinement-authority.md:1343-1343#13-kết-quả-giải-quyết-rủi-ro-và-các-tồn-đọng-mở-settled-facts-deferred-items (current lines); unit SHA256 5b4b826dee4bf97e40378670f520aa3dc9c667d40de9d6e2b10447578371d38f.\nTarget: docs/platform/agent-confinement/history/rollout-and-settled-facts.md:39-39#13-kết-quả-giải-quyết-rủi-ro-và-các-tồn-đọng-mở-settled-facts-deferred-items (current lines); unit SHA256 5b4b826dee4bf97e40378670f520aa3dc9c667d40de9d6e2b10447578371d38f.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 5b4b826dee4bf97e40378670f520aa3dc9c667d40de9d6e2b10447578371d38f at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 2 → 2; title \"13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)\" → \"13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)\".\nWhole direct section equal; depth 2 → 2; 0 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (equal-section): Complete direct source and target sections are byte-equal; no removed or added lines.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/confinement-authority.md#13-kết-quả-giải-quyết-rủi-ro-và-các-tồn-đọng-mở-settled-facts-deferred-items under docs/platform/agent-confinement/history/rollout-and-settled-facts.md#13-kết-quả-giải-quyết-rủi-ro-và-các-tồn-đọng-mở-settled-facts-deferred-items; source context \"Spec: Agent Confinement Authority\", target context \"Added in candidate: rollout and settled facts\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
+      "targetUnitDigest": "c5a7146bb985dd4b99d655ddbf76ae3aa7e48c6714038a2a7013958545864c4d",
       "targetAncestry": [
         "Added in candidate: rollout and settled facts"
-      ],
-      "reviewReportCommit": "203f4ef93867a60e6a37624b31ce14de426cafa8"
+      ]
     },
     {
       "claimId": "claim_84e60054f3f70565af1fcf9c09352d83",
@@ -4108,20 +4084,14 @@
       "targetAnchor": "unheaded-block-5",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "rationale": "Source: docs/specs/confinement-authority.md:1345-1345#unheaded-block-138 (current lines); unit SHA256 a7fc9ce0823faab5b809042244aae5280d335cab7d03343c7e3ba2fe7e1e20ea.\nTarget: docs/platform/agent-confinement/history/rollout-and-settled-facts.md:41-41#unheaded-block-5 (current lines); unit SHA256 a7fc9ce0823faab5b809042244aae5280d335cab7d03343c7e3ba2fe7e1e20ea.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest a7fc9ce0823faab5b809042244aae5280d335cab7d03343c7e3ba2fe7e1e20ea at 1276467f37a99d19aff05808d42fafbf40341449.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/confinement-authority.md#unheaded-block-138 under docs/platform/agent-confinement/history/rollout-and-settled-facts.md#unheaded-block-5; source context \"Spec: Agent Confinement Authority / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)\", target context \"Added in candidate: rollout and settled facts / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "reviewNote": "mechanical: move confinement-authority.md:1345-1345#unheaded-block-138 -> rollout-and-settled-facts.md:41-41#unheaded-block-5; both digests recomputed by script and equal; lines equal real spans; anchor ok; ancestry equals real chain; links 0/0/0/0/0/0; row equals shard at the pin; last-reviewed digest backed by a committed ok verdict; class Weak-exact.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-12-287a22d33.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "Source: docs/specs/confinement-authority.md:1345-1345#unheaded-block-138 (current lines); unit SHA256 a7fc9ce0823faab5b809042244aae5280d335cab7d03343c7e3ba2fe7e1e20ea.\nTarget: docs/platform/agent-confinement/history/rollout-and-settled-facts.md:41-41#unheaded-block-5 (current lines); unit SHA256 a7fc9ce0823faab5b809042244aae5280d335cab7d03343c7e3ba2fe7e1e20ea.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest a7fc9ce0823faab5b809042244aae5280d335cab7d03343c7e3ba2fe7e1e20ea at 1276467f37a99d19aff05808d42fafbf40341449.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/confinement-authority.md#unheaded-block-138 under docs/platform/agent-confinement/history/rollout-and-settled-facts.md#unheaded-block-5; source context \"Spec: Agent Confinement Authority / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)\", target context \"Added in candidate: rollout and settled facts / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "a7fc9ce0823faab5b809042244aae5280d335cab7d03343c7e3ba2fe7e1e20ea",
       "targetAncestry": [
         "Added in candidate: rollout and settled facts",
         "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)"
-      ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      ]
     },
     {
       "claimId": "claim_53e0df53a67f6897195cbf23839c6c9b",
@@ -4130,20 +4100,14 @@
       "targetAnchor": "unheaded-block-6",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "rationale": "Source: docs/specs/confinement-authority.md:1347-1353#unheaded-block-139 (current lines); unit SHA256 d06ca4feb3fc1e931aa43134c6d30fe620ab3850b195c9d1dd417a68464059f4.\nTarget: docs/platform/agent-confinement/history/rollout-and-settled-facts.md:43-49#unheaded-block-6 (current lines); unit SHA256 d06ca4feb3fc1e931aa43134c6d30fe620ab3850b195c9d1dd417a68464059f4.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest d06ca4feb3fc1e931aa43134c6d30fe620ab3850b195c9d1dd417a68464059f4 at 1276467f37a99d19aff05808d42fafbf40341449.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/confinement-authority.md#unheaded-block-139 under docs/platform/agent-confinement/history/rollout-and-settled-facts.md#unheaded-block-6; source context \"Spec: Agent Confinement Authority / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)\", target context \"Added in candidate: rollout and settled facts / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "reviewNote": "deep: A36 draw (seed 2026101609); move confinement-authority.md:1347-1353#unheaded-block-139 -> rollout-and-settled-facts.md:43-49#unheaded-block-6, source and target text opened and identical (starts: 1. **`herdr-spawn` convergence:** Pre-adapter); classed Weak-exact (ancestor headings differ; document exact share below one half); target context Added in candidate: rollout and settled facts / 13. Kết quả giải quyết equals the real heading chain; links 0/0/0/0/0/0; last-reviewed digest backed by a committed ok verdict.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-12-287a22d33.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "d06ca4feb3fc1e931aa43134c6d30fe620ab3850b195c9d1dd417a68464059f4",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "Source: docs/specs/confinement-authority.md:1347-1353#unheaded-block-139 (current lines); unit SHA256 d06ca4feb3fc1e931aa43134c6d30fe620ab3850b195c9d1dd417a68464059f4.\nTarget: docs/platform/agent-confinement/history/rollout-and-settled-facts.md:43-49#unheaded-block-6 (current lines); unit SHA256 d06ca4feb3fc1e931aa43134c6d30fe620ab3850b195c9d1dd417a68464059f4.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest d06ca4feb3fc1e931aa43134c6d30fe620ab3850b195c9d1dd417a68464059f4 at 1276467f37a99d19aff05808d42fafbf40341449.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/confinement-authority.md#unheaded-block-139 under docs/platform/agent-confinement/history/rollout-and-settled-facts.md#unheaded-block-6; source context \"Spec: Agent Confinement Authority / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)\", target context \"Added in candidate: rollout and settled facts / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
+      "targetUnitDigest": "cf32d7588ba4b1e680c9f0612b52374f9f466f8562e9560fb1440b83b7f31553",
       "targetAncestry": [
         "Added in candidate: rollout and settled facts",
         "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)"
-      ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      ]
     },
     {
       "claimId": "claim_39c40cef341e227d936ea768b12ba435",
@@ -4152,20 +4116,14 @@
       "targetAnchor": "131-pane-herdr-bị-confine-cho-agent-không-phải-claude-công-thức-lịch-sử-vì-sao-từng-bị-quên",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792126341980-e0c35701@2026-10-16",
-      "rationale": "Source: docs/specs/confinement-authority.md:1355-1355#131-pane-herdr-bị-confine-cho-agent-không-phải-claude-công-thức-lịch-sử-vì-sao-từng-bị-quên (current lines); unit SHA256 ea51c76dca7a1c31cbc4288b0970c5b108a4ebf755e9b0d5790638262cf0580b.\nTarget: docs/platform/agent-confinement/history/rollout-and-settled-facts.md:51-51#131-pane-herdr-bị-confine-cho-agent-không-phải-claude-công-thức-lịch-sử-vì-sao-từng-bị-quên (current lines); unit SHA256 ea51c76dca7a1c31cbc4288b0970c5b108a4ebf755e9b0d5790638262cf0580b.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest ea51c76dca7a1c31cbc4288b0970c5b108a4ebf755e9b0d5790638262cf0580b at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 3 → 3; title \"13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên\" → \"13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên\".\nWhole direct section equal; depth 3 → 3; 0 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (equal-section): Complete direct source and target sections are byte-equal; no removed or added lines.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/confinement-authority.md#131-pane-herdr-bị-confine-cho-agent-không-phải-claude-công-thức-lịch-sử-vì-sao-từng-bị-quên under docs/platform/agent-confinement/history/rollout-and-settled-facts.md#131-pane-herdr-bị-confine-cho-agent-không-phải-claude-công-thức-lịch-sử-vì-sao-từng-bị-quên; source context \"Spec: Agent Confinement Authority / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)\", target context \"Added in candidate: rollout and settled facts / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "reviewNote": "mechanical: extractor digests recomputed (equal both sides), cited lines and anchor match the real spans, direct sections byte-equal (cmp), link count 0 and 0, depth and title and ancestry contexts equal the rationale, target digest unchanged since 62751458b (git show), anchor passes list-doc-anchors (target context is the Added in candidate rollout carrier plus the 13 heading, as named); I did not re-read the text beyond the rationale.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-03-4d3634360.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "Source: docs/specs/confinement-authority.md:1355-1355#131-pane-herdr-bị-confine-cho-agent-không-phải-claude-công-thức-lịch-sử-vì-sao-từng-bị-quên (current lines); unit SHA256 ea51c76dca7a1c31cbc4288b0970c5b108a4ebf755e9b0d5790638262cf0580b.\nTarget: docs/platform/agent-confinement/history/rollout-and-settled-facts.md:51-51#131-pane-herdr-bị-confine-cho-agent-không-phải-claude-công-thức-lịch-sử-vì-sao-từng-bị-quên (current lines); unit SHA256 ea51c76dca7a1c31cbc4288b0970c5b108a4ebf755e9b0d5790638262cf0580b.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest ea51c76dca7a1c31cbc4288b0970c5b108a4ebf755e9b0d5790638262cf0580b at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: 3 → 3; title \"13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên\" → \"13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên\".\nWhole direct section equal; depth 3 → 3; 0 distinct link changes; normalized line order equal; 0 removed and 0 added nonblank lines after heading/link/correction normalization.\nSection accounting (equal-section): Complete direct source and target sections are byte-equal; no removed or added lines.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/confinement-authority.md#131-pane-herdr-bị-confine-cho-agent-không-phải-claude-công-thức-lịch-sử-vì-sao-từng-bị-quên under docs/platform/agent-confinement/history/rollout-and-settled-facts.md#131-pane-herdr-bị-confine-cho-agent-không-phải-claude-công-thức-lịch-sử-vì-sao-từng-bị-quên; source context \"Spec: Agent Confinement Authority / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)\", target context \"Added in candidate: rollout and settled facts / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "ea51c76dca7a1c31cbc4288b0970c5b108a4ebf755e9b0d5790638262cf0580b",
       "targetAncestry": [
         "Added in candidate: rollout and settled facts",
         "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)"
-      ],
-      "reviewReportCommit": "203f4ef93867a60e6a37624b31ce14de426cafa8"
+      ]
     },
     {
       "claimId": "claim_eaadf6a68a7c7f9ed4005478db93c95b",
@@ -4174,21 +4132,15 @@
       "targetAnchor": "unheaded-block-7",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "rationale": "Source: docs/specs/confinement-authority.md:1357-1357#unheaded-block-140 (current lines); unit SHA256 09081a2c1a3eb4536192eed72162efca188fdf9b084170519b57415f216c32c3.\nTarget: docs/platform/agent-confinement/history/rollout-and-settled-facts.md:53-53#unheaded-block-7 (current lines); unit SHA256 09081a2c1a3eb4536192eed72162efca188fdf9b084170519b57415f216c32c3.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 09081a2c1a3eb4536192eed72162efca188fdf9b084170519b57415f216c32c3 at 1276467f37a99d19aff05808d42fafbf40341449.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/confinement-authority.md#unheaded-block-140 under docs/platform/agent-confinement/history/rollout-and-settled-facts.md#unheaded-block-7; source context \"Spec: Agent Confinement Authority / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items) / 13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên\", target context \"Added in candidate: rollout and settled facts / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items) / 13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "reviewNote": "deep: A36 draw (seed 2026101609); move confinement-authority.md:1357-1357#unheaded-block-140 -> rollout-and-settled-facts.md:53-53#unheaded-block-7, source and target text opened and identical (starts: **Công thức (đã chạy thật, Request-to-Run P6)); classed Weak-exact (ancestor headings differ; document exact share below one half); target context 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Defe equals the real heading chain; links 0/0/0/0/0/0; last-reviewed digest backed by a committed ok verdict.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-12-287a22d33.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "Source: docs/specs/confinement-authority.md:1357-1357#unheaded-block-140 (current lines); unit SHA256 09081a2c1a3eb4536192eed72162efca188fdf9b084170519b57415f216c32c3.\nTarget: docs/platform/agent-confinement/history/rollout-and-settled-facts.md:53-53#unheaded-block-7 (current lines); unit SHA256 09081a2c1a3eb4536192eed72162efca188fdf9b084170519b57415f216c32c3.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 09081a2c1a3eb4536192eed72162efca188fdf9b084170519b57415f216c32c3 at 1276467f37a99d19aff05808d42fafbf40341449.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/confinement-authority.md#unheaded-block-140 under docs/platform/agent-confinement/history/rollout-and-settled-facts.md#unheaded-block-7; source context \"Spec: Agent Confinement Authority / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items) / 13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên\", target context \"Added in candidate: rollout and settled facts / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items) / 13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "09081a2c1a3eb4536192eed72162efca188fdf9b084170519b57415f216c32c3",
       "targetAncestry": [
         "Added in candidate: rollout and settled facts",
         "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
         "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
-      ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      ]
     },
     {
       "claimId": "claim_e017f3c0a36bb052472cf9ad2bd616b4",
@@ -4197,21 +4149,15 @@
       "targetAnchor": "unheaded-block-8",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "rationale": "Source: docs/specs/confinement-authority.md:1359-1361#unheaded-block-141 (current lines); unit SHA256 0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc.\nTarget: docs/platform/agent-confinement/history/rollout-and-settled-facts.md:55-57#unheaded-block-8 (current lines); unit SHA256 0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc at 1276467f37a99d19aff05808d42fafbf40341449.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/confinement-authority.md#unheaded-block-141 under docs/platform/agent-confinement/history/rollout-and-settled-facts.md#unheaded-block-8; source context \"Spec: Agent Confinement Authority / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items) / 13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên\", target context \"Added in candidate: rollout and settled facts / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items) / 13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "reviewNote": "deep: A36 draw (seed 2026101609); move confinement-authority.md:1359-1361#unheaded-block-141 -> rollout-and-settled-facts.md:55-57#unheaded-block-8, source and target text opened and identical (starts: 1. `resourceBindings: [{ resource: 'private-h); classed Weak-exact (ancestor headings differ; document exact share below one half); target context 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Defe equals the real heading chain; links 0/0/0/0/0/0; last-reviewed digest backed by a committed ok verdict. hand-recomputed both digests (seed 2026101608).",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-12-287a22d33.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "Source: docs/specs/confinement-authority.md:1359-1361#unheaded-block-141 (current lines); unit SHA256 0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc.\nTarget: docs/platform/agent-confinement/history/rollout-and-settled-facts.md:55-57#unheaded-block-8 (current lines); unit SHA256 0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc at 1276467f37a99d19aff05808d42fafbf40341449.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/confinement-authority.md#unheaded-block-141 under docs/platform/agent-confinement/history/rollout-and-settled-facts.md#unheaded-block-8; source context \"Spec: Agent Confinement Authority / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items) / 13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên\", target context \"Added in candidate: rollout and settled facts / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items) / 13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "0291bfb160d8cd95cf9b5d305ba952d9f824993e04ebbfdde79b629f8b1a92dc",
       "targetAncestry": [
         "Added in candidate: rollout and settled facts",
         "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
         "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
-      ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      ]
     },
     {
       "claimId": "claim_81ec7e246f5d04771ed8242d9f45a51c",
@@ -4220,21 +4166,15 @@
       "targetAnchor": "unheaded-block-9",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "rationale": "Source: docs/specs/confinement-authority.md:1363-1363#unheaded-block-142 (current lines); unit SHA256 3adecc728b89a0251ef17f37a38077c58eb02791d61ae5358fbf4e73445230b5.\nTarget: docs/platform/agent-confinement/history/rollout-and-settled-facts.md:59-59#unheaded-block-9 (current lines); unit SHA256 3adecc728b89a0251ef17f37a38077c58eb02791d61ae5358fbf4e73445230b5.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 3adecc728b89a0251ef17f37a38077c58eb02791d61ae5358fbf4e73445230b5 at 1276467f37a99d19aff05808d42fafbf40341449.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/confinement-authority.md#unheaded-block-142 under docs/platform/agent-confinement/history/rollout-and-settled-facts.md#unheaded-block-9; source context \"Spec: Agent Confinement Authority / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items) / 13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên\", target context \"Added in candidate: rollout and settled facts / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items) / 13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "reviewNote": "mechanical: move confinement-authority.md:1363-1363#unheaded-block-142 -> rollout-and-settled-facts.md:59-59#unheaded-block-9; both digests recomputed by script and equal; lines equal real spans; anchor ok; ancestry equals real chain; links 0/0/0/0/0/0; row equals shard at the pin; last-reviewed digest backed by a committed ok verdict; class Weak-exact.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-12-287a22d33.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "Source: docs/specs/confinement-authority.md:1363-1363#unheaded-block-142 (current lines); unit SHA256 3adecc728b89a0251ef17f37a38077c58eb02791d61ae5358fbf4e73445230b5.\nTarget: docs/platform/agent-confinement/history/rollout-and-settled-facts.md:59-59#unheaded-block-9 (current lines); unit SHA256 3adecc728b89a0251ef17f37a38077c58eb02791d61ae5358fbf4e73445230b5.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 3adecc728b89a0251ef17f37a38077c58eb02791d61ae5358fbf4e73445230b5 at 1276467f37a99d19aff05808d42fafbf40341449.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/confinement-authority.md#unheaded-block-142 under docs/platform/agent-confinement/history/rollout-and-settled-facts.md#unheaded-block-9; source context \"Spec: Agent Confinement Authority / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items) / 13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên\", target context \"Added in candidate: rollout and settled facts / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items) / 13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "3adecc728b89a0251ef17f37a38077c58eb02791d61ae5358fbf4e73445230b5",
       "targetAncestry": [
         "Added in candidate: rollout and settled facts",
         "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
         "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
-      ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      ]
     },
     {
       "claimId": "claim_0da9c2a174db070122d3b5c6af25e677",
@@ -4243,21 +4183,15 @@
       "targetAnchor": "unheaded-block-10",
       "claimKind": "specification",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "rationale": "Source: docs/specs/confinement-authority.md:1365-1365#unheaded-block-143 (current lines); unit SHA256 ae79ac51f3a5a094bad8bc45affea34150699320dc4e427a6a8b8653b5ea8c6d.\nTarget: docs/platform/agent-confinement/history/rollout-and-settled-facts.md:61-61#unheaded-block-10 (current lines); unit SHA256 ae79ac51f3a5a094bad8bc45affea34150699320dc4e427a6a8b8653b5ea8c6d.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest ae79ac51f3a5a094bad8bc45affea34150699320dc4e427a6a8b8653b5ea8c6d at 1276467f37a99d19aff05808d42fafbf40341449.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/confinement-authority.md#unheaded-block-143 under docs/platform/agent-confinement/history/rollout-and-settled-facts.md#unheaded-block-10; source context \"Spec: Agent Confinement Authority / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items) / 13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên\", target context \"Added in candidate: rollout and settled facts / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items) / 13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "reviewNote": "mechanical: move confinement-authority.md:1365-1365#unheaded-block-143 -> rollout-and-settled-facts.md:61-61#unheaded-block-10; both digests recomputed by script and equal; lines equal real spans; anchor ok; ancestry equals real chain; links 0/0/0/0/0/0; row equals shard at the pin; last-reviewed digest backed by a committed ok verdict; class Weak-exact.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-12-287a22d33.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "Source: docs/specs/confinement-authority.md:1365-1365#unheaded-block-143 (current lines); unit SHA256 ae79ac51f3a5a094bad8bc45affea34150699320dc4e427a6a8b8653b5ea8c6d.\nTarget: docs/platform/agent-confinement/history/rollout-and-settled-facts.md:61-61#unheaded-block-10 (current lines); unit SHA256 ae79ac51f3a5a094bad8bc45affea34150699320dc4e427a6a8b8653b5ea8c6d.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest ae79ac51f3a5a094bad8bc45affea34150699320dc4e427a6a8b8653b5ea8c6d at 1276467f37a99d19aff05808d42fafbf40341449.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/specs/confinement-authority.md#unheaded-block-143 under docs/platform/agent-confinement/history/rollout-and-settled-facts.md#unheaded-block-10; source context \"Spec: Agent Confinement Authority / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items) / 13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên\", target context \"Added in candidate: rollout and settled facts / 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items) / 13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "ae79ac51f3a5a094bad8bc45affea34150699320dc4e427a6a8b8653b5ea8c6d",
       "targetAncestry": [
         "Added in candidate: rollout and settled facts",
         "13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)",
         "13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên"
-      ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      ]
     },
     {
       "claimId": "claim_bed90dbb7de2a5782fafcdb4a3d6e0da",
@@ -4529,5 +4463,6 @@
       ],
       "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
     }
-  ]
+  ],
+  "correctionSession": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17"
 }

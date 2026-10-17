@@ -77,16 +77,10 @@
       "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
       "targetAnchor": "runtime-identity-and-activation",
       "targetUnitDigest": "35e38e606082e6cd88d11569dba34e338d7d11f0344a3abdcd80ca9fe89b9371",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "reviewed",
-      "rationale": "The original top-level runtime-identity heading and complete metadata carrier survive with additive promotion fields. A repeated source heading creates a native ambiguity gap; this real root-heading successor preserves the full old direct payload. No identity is grafted and no approval carries forward.",
-      "targetAncestry": [],
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
-      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
-      "reviewMode": "ordinary",
-      "reviewNote": "Heading unit (H1 plus its metadata section) recomputes at both ends; only the eight metadata lines are added; gap reason in native accounting is the unstable repeated heading anchor, as the rationale says."
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "The original top-level runtime-identity heading and complete metadata carrier survive with additive promotion fields. A repeated source heading creates a native ambiguity gap; this real root-heading successor preserves the full old direct payload. No identity is grafted and no approval carries forward. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "targetAncestry": []
     },
     {
       "claimId": "claim_27b1af759fb21ff4f449727ff648a319",
@@ -96,18 +90,12 @@
       "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
       "targetAnchor": "unheaded-block-1",
       "targetUnitDigest": "b9c0f64986bfc20a1c8a2c79c4922b1e4db19e2a687a2275876185a7402ad0fc",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "reviewed",
-      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetAncestry": [
         "Runtime Identity And Activation"
-      ],
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
-      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
-      "reviewMode": "ordinary",
-      "reviewNote": "Header block of runtime-identity-and-activation.md verified unit-for-unit: old digest at d173e545 and target digest at baef3a075 recompute exact; diff is eight added metadata lines only, zero removed, anchor ok."
+      ]
     },
     {
       "claimId": "claim_989ea01c49a7f3b2a8f2ff600f16311a",
@@ -138,18 +126,12 @@
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
       "targetAnchor": "unheaded-block-1",
       "targetUnitDigest": "8980fe7db4f59777813ca8119f184178e96980c3f53e001ee88ffe67c944c254",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "reviewed",
-      "rationale": "The complete metadata and frozen V1 contract intent survive in the real same-file successor. Document status is Candidate, contract design status remains Frozen (V1), and every schema body is unchanged. This authored header binding is pending independent review; no approval or identity is grafted.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "The complete metadata and frozen V1 contract intent survive in the real same-file successor. Document status is Candidate, contract design status remains Frozen (V1), and every schema body is unchanged. This authored header binding is pending independent review; no approval or identity is grafted. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetAncestry": [
         "Contract: Activation Binding"
-      ],
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
-      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
-      "reviewMode": "ordinary",
-      "reviewNote": "Digests recompute; sole removed line is Design status Frozen (V1), carried as Contract design status: Frozen (V1) beside Design status: Candidate, plus the eight added lines; the rest of the body is outside this unit."
+      ]
     },
     {
       "claimId": "claim_8394482ef76eefc839bff33778acfd97",
@@ -180,18 +162,12 @@
       "targetOwner": "docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md",
       "targetAnchor": "unheaded-block-1",
       "targetUnitDigest": "ec70a9f2370b13a414fe8127403591fa584f371183e4299c81a40e556929db72",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "reviewed",
-      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetAncestry": [
         "Contract: Instruction Composition And Projection"
-      ],
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
-      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
-      "reviewMode": "ordinary",
-      "reviewNote": "Header block of instruction-composition-and-projection.md verified unit-for-unit: old digest at d173e545 and target digest at baef3a075 recompute exact; diff is eight added metadata lines only, zero removed, anchor ok."
+      ]
     },
     {
       "claimId": "claim_37c7a9df001adb3f2920a3d10610118a",
@@ -243,18 +219,12 @@
       "targetOwner": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
       "targetAnchor": "unheaded-block-1",
       "targetUnitDigest": "b022e0559d190ec4bacc002d8da26237c4ee70beb924db5d7dba660fd8a5c3ab",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "reviewed",
-      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetAncestry": [
         "Contract: Repository Runtime Layout"
-      ],
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
-      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
-      "reviewMode": "ordinary",
-      "reviewNote": "Header block of repository-runtime-layout.md verified unit-for-unit: old digest at d173e545 and target digest at baef3a075 recompute exact; diff is eight added metadata lines only, zero removed, anchor ok."
+      ]
     },
     {
       "claimId": "claim_acd9a23bb5fe3a5dda7169c04a12b409",
@@ -264,18 +234,12 @@
       "targetOwner": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
       "targetAnchor": "unheaded-block-1",
       "targetUnitDigest": "944079021a60a7c200c15894a7cf363ee0c9f17fc8ef4af919d470003b3bdc5e",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "reviewed",
-      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetAncestry": [
         "Contract: Setup Doctor Registry"
-      ],
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
-      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
-      "reviewMode": "ordinary",
-      "reviewNote": "Header block of setup-doctor-registry.md verified unit-for-unit: old digest at d173e545 and target digest at baef3a075 recompute exact; diff is eight added metadata lines only, zero removed, anchor ok."
+      ]
     },
     {
       "claimId": "claim_21466306fb5c7d4947c0d640af25c2c9",
@@ -348,18 +312,12 @@
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
       "targetAnchor": "unheaded-block-1",
       "targetUnitDigest": "cf5fad7a3844bb38c373e31ee428ca709305246713e4d0292b0f90cb0d3c9c40",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "reviewed",
-      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetAncestry": [
         "Spec: Packaging-Distribution"
-      ],
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
-      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
-      "reviewMode": "ordinary",
-      "reviewNote": "Header block of spec.md verified unit-for-unit: old digest at d173e545 and target digest at baef3a075 recompute exact; diff is eight added metadata lines only, zero removed, anchor ok."
+      ]
     },
     {
       "claimId": "claim_2e34a457bfadf9cae284b1c9e04378f2",
@@ -390,18 +348,12 @@
       "targetOwner": "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
       "targetAnchor": "unheaded-block-1",
       "targetUnitDigest": "941e3a3deb6ae7ddf24248a0773765c11f3ae0f9a05798b4db30a087c7736bb5",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "reviewed",
-      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "The complete existing candidate metadata survives with the additive promotion fields. This is a real same-file header successor, pending independent conservation review; no approval carries forward. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetAncestry": [
         "Verification: Install And Release Proof"
-      ],
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
-      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
-      "reviewMode": "ordinary",
-      "reviewNote": "Header block of install-and-release-proof.md verified unit-for-unit: old digest at d173e545 and target digest at baef3a075 recompute exact; diff is eight added metadata lines only, zero removed, anchor ok."
+      ]
     },
     {
       "claimId": "claim_a0df084e87f84a39e95fdc13a6385747",
@@ -475,21 +427,15 @@
       "disposition": "partial-carry",
       "targetOwner": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
       "targetAnchor": "unheaded-block-36",
-      "authoredBy": "codex-session:unit-run-1792066534402-cb278bf5@2026-10-15",
-      "reviewStatus": "reviewed",
-      "rationale": "L9-10/A22: partial-carry to the actual RUL77-RUL80 successor; only historical lines not carried verbatim form the residual. RUL77 heading, RUL79 mixed suffix and the old pending-copy cap line of item 4 are not carried verbatim. Pending independent conservation and A34 review; blocks cutover.",
-      "targetUnitDigest": "3b974a9c1a82356e256e9b6923c80104f778651f67447179efdc0ffbf09ac485",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "L9-10/A22: partial-carry to the actual RUL77-RUL80 successor; only historical lines not carried verbatim form the residual. RUL77 heading, RUL79 mixed suffix and the old pending-copy cap line of item 4 are not carried verbatim. Pending independent conservation and A34 review; blocks cutover. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval.",
+      "targetUnitDigest": "16aceb211d3eddbf0bb863a7d3fe18e7c88a2e9972afd4a205ccf66efff3a633",
       "targetAncestry": [
         "Added in candidate: Runner Business Rules",
         "Business Rules"
       ],
       "remainder": "Only uncarried historical RUL77/RUL79 lines and the changed item 4 pending-copy-cap line retained verbatim in plans/260925-documentation-authority-unification/reports/phase-06/step9-l9-9-partial-carry-residual.json, file SHA256 2cd7eb5b8a07e891d20bcd680ea83362c768566120f9b656d34d81559b63ad6c; row SHA256 f4af984047c4b4749d392eb331da7317f24509ea78725acbe59ce605cef49ab7; source 95e75f7d43d50bbae0d6a7979aa0db2f01326f00fc290507fdf8bf046403a547; primary target 3b974a9c1a82356e256e9b6923c80104f778651f67447179efdc0ffbf09ac485. Pending independent A34 acceptance; blocks cutover.",
-      "reviewNote": "deep A34: historical RUL77-RUL80 unit (witness 31f676749 blob f101cf85, unit digest 95e75f7d recomputed, L1089-1098) bound to h-6979005beaf7/spec.md#unheaded-block-36 (L166-194, digest 3b974a9c recomputed, anchor exists, ancestry Added in candidate Runner Business Rules then Business Rules is real); 6 of its 10 lines (items 1,2,3,5,6 and RUL78) are verbatim in the target, residual is exactly the 3 lines not carried (RUL77 line with the bracketed replacement and appended sentence, item 4 with the changed pending-copy rule, RUL79 with its mixed suffix), residual text equals those lines joined, row SHA256 f4af9840 and file SHA256 2cd7eb5b recomputed, RUL80 excluded because the successor only inserts sentences into it; no carried line sits in the residual, rationale cites L9-10 where the Lead decision is L9-11 (label slip only), shard row equals pack",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-runner-bounded-rereview-b80e8c16c-part1.md",
-      "reviewReportCommit": "11fc7590f7d0af4da10205359516aee0b0bff5c9",
-      "reviewMode": "ordinary",
       "reviewEntryId": "claim_40aafcee52b22eda087c5f85eacb9392",
       "evidenceDigest": "4ff260ff0616fc51883eb35fc9ff33f18317e57de34c496cd5ff5aa90e730c8f",
       "acceptanceScope": "Exact independently reviewed predecessor disposition and residual/group evidence only; no truth, promotion, retirement or cutover approval."
@@ -502,19 +448,13 @@
       "targetOwner": "docs/platform/packaging-distribution/history/distribution-baseline.md",
       "targetAnchor": "unheaded-block-34",
       "targetUnitDigest": "b697cc3bb07baa49db491c86cd4d18e71eec7a2fdeb8777e2bd4ffaba8848088",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "reviewed",
-      "rationale": "This native pre-existing distribution gap was displaced by main before this batch. Its complete old unit from 3ea75475d911ca02c9d8b5011dca4f748cc5820f is retained literally as dated evidence at docs/platform/packaging-distribution/history/distribution-baseline.md#unheaded-block-34. No current implementation or intentional retirement is inferred, and no identity is grafted.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "This native pre-existing distribution gap was displaced by main before this batch. Its complete old unit from 3ea75475d911ca02c9d8b5011dca4f748cc5820f is retained literally as dated evidence at docs/platform/packaging-distribution/history/distribution-baseline.md#unheaded-block-34. No current implementation or intentional retirement is inferred, and no identity is grafted. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetAncestry": [
         "History: Distribution Baseline",
         "Inherited Distribution Source Unit 1"
-      ],
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
-      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
-      "reviewMode": "ordinary",
-      "reviewNote": "Old unit recomputes from docs/specs/distribution.md at 3ea75475d and is absent from main's current blob 13d2e172; target unit unheaded-block-34 is byte-identical (digests equal) under Inherited Distribution Source Unit 1, labelled as dated evidence with no current-truth claim, so move is honest."
+      ]
     },
     {
       "claimId": "claim_f4bd6f64355d526302ac0a49940dd9ed",
@@ -524,19 +464,13 @@
       "targetOwner": "docs/platform/packaging-distribution/history/distribution-baseline.md",
       "targetAnchor": "unheaded-block-36",
       "targetUnitDigest": "3e9bb65b419ff88ea5687f13e0839b8853a576a35cdba1c25f4982edba4b0b0f",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "reviewed",
-      "rationale": "This native pre-existing distribution gap was displaced by main before this batch. Its complete old unit from f053de033bc4399a42db3c67cfd6583412ab283e is retained literally as dated evidence at docs/platform/packaging-distribution/history/distribution-baseline.md#unheaded-block-36. No current implementation or intentional retirement is inferred, and no identity is grafted.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "This native pre-existing distribution gap was displaced by main before this batch. Its complete old unit from f053de033bc4399a42db3c67cfd6583412ab283e is retained literally as dated evidence at docs/platform/packaging-distribution/history/distribution-baseline.md#unheaded-block-36. No current implementation or intentional retirement is inferred, and no identity is grafted. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetAncestry": [
         "History: Distribution Baseline",
         "Inherited Distribution Source Unit 2"
-      ],
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
-      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
-      "reviewMode": "ordinary",
-      "reviewNote": "Old unit recomputes from docs/specs/distribution.md at f053de033 and is absent from main's current blob 13d2e172; target unit unheaded-block-36 is byte-identical (digests equal) under Inherited Distribution Source Unit 2, labelled as dated evidence with no current-truth claim, so move is honest."
+      ]
     },
     {
       "claimId": "claim_f4745934a72c880a881c756d98c9a722",
@@ -546,19 +480,13 @@
       "targetOwner": "docs/platform/packaging-distribution/history/distribution-baseline.md",
       "targetAnchor": "unheaded-block-38",
       "targetUnitDigest": "c0329d5c09da5a02921ba0646be0cbf7321f48badb59e9316c2df1d1a1c1985a",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "reviewed",
-      "rationale": "This native pre-existing distribution gap was displaced by main before this batch. Its complete old unit from f053de033bc4399a42db3c67cfd6583412ab283e is retained literally as dated evidence at docs/platform/packaging-distribution/history/distribution-baseline.md#unheaded-block-38. No current implementation or intentional retirement is inferred, and no identity is grafted.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "This native pre-existing distribution gap was displaced by main before this batch. Its complete old unit from f053de033bc4399a42db3c67cfd6583412ab283e is retained literally as dated evidence at docs/platform/packaging-distribution/history/distribution-baseline.md#unheaded-block-38. No current implementation or intentional retirement is inferred, and no identity is grafted. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetAncestry": [
         "History: Distribution Baseline",
         "Inherited Distribution Source Unit 3"
-      ],
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
-      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
-      "reviewMode": "ordinary",
-      "reviewNote": "Old unit recomputes from docs/specs/distribution.md at f053de033 and is absent from main's current blob 13d2e172; target unit unheaded-block-38 is byte-identical (digests equal) under Inherited Distribution Source Unit 3, labelled as dated evidence with no current-truth claim, so move is honest."
+      ]
     },
     {
       "claimId": "claim_a288c743a526263c62df6ee0b67fb6e3",
@@ -568,19 +496,13 @@
       "targetOwner": "docs/platform/packaging-distribution/history/distribution-baseline.md",
       "targetAnchor": "unheaded-block-40",
       "targetUnitDigest": "44d8677f8928e78d07314600b104a33bb4ff23e84e92a7aa4077cddee98ae6bc",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "reviewed",
-      "rationale": "This native pre-existing distribution gap was displaced by main before this batch. Its complete old unit from 0b06824a7e987cb2b4574912e400c6e79f6697f2 is retained literally as dated evidence at docs/platform/packaging-distribution/history/distribution-baseline.md#unheaded-block-40. No current implementation or intentional retirement is inferred, and no identity is grafted.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "This native pre-existing distribution gap was displaced by main before this batch. Its complete old unit from 0b06824a7e987cb2b4574912e400c6e79f6697f2 is retained literally as dated evidence at docs/platform/packaging-distribution/history/distribution-baseline.md#unheaded-block-40. No current implementation or intentional retirement is inferred, and no identity is grafted. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetAncestry": [
         "History: Distribution Baseline",
         "Inherited Distribution Source Unit 4"
-      ],
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
-      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
-      "reviewMode": "ordinary",
-      "reviewNote": "Old unit recomputes from docs/specs/distribution.md at 0b06824a7 and is absent from main's current blob 13d2e172; target unit unheaded-block-40 is byte-identical (digests equal) under Inherited Distribution Source Unit 4, labelled as dated evidence with no current-truth claim, so move is honest."
+      ]
     },
     {
       "claimId": "claim_1449f02666e99c92dd8ce3340af8a060",
@@ -590,19 +512,13 @@
       "targetOwner": "docs/platform/packaging-distribution/history/distribution-baseline.md",
       "targetAnchor": "unheaded-block-42",
       "targetUnitDigest": "a51332b21702f71114c85f64f1c049cf198998f20e8e1fe3ae468c0c7b191c5d",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "reviewed",
-      "rationale": "This native pre-existing distribution gap was displaced by main before this batch. Its complete old unit from 0b06824a7e987cb2b4574912e400c6e79f6697f2 is retained literally as dated evidence at docs/platform/packaging-distribution/history/distribution-baseline.md#unheaded-block-42. No current implementation or intentional retirement is inferred, and no identity is grafted.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "This native pre-existing distribution gap was displaced by main before this batch. Its complete old unit from 0b06824a7e987cb2b4574912e400c6e79f6697f2 is retained literally as dated evidence at docs/platform/packaging-distribution/history/distribution-baseline.md#unheaded-block-42. No current implementation or intentional retirement is inferred, and no identity is grafted. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetAncestry": [
         "History: Distribution Baseline",
         "Inherited Distribution Source Unit 5"
-      ],
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
-      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
-      "reviewMode": "ordinary",
-      "reviewNote": "Old unit recomputes from docs/specs/distribution.md at 0b06824a7 and is absent from main's current blob 13d2e172; target unit unheaded-block-42 is byte-identical (digests equal) under Inherited Distribution Source Unit 5, labelled as dated evidence with no current-truth claim, so move is honest."
+      ]
     },
     {
       "claimId": "claim_8eaaa820698633aedf4339ea1f923d89",
@@ -612,18 +528,12 @@
       "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
       "targetAnchor": "unheaded-block-1",
       "targetUnitDigest": "8980fe7db4f59777813ca8119f184178e96980c3f53e001ee88ffe67c944c254",
-      "authoredBy": "codex-session:8@2026-10-13",
-      "reviewStatus": "reviewed",
-      "rationale": "This exact intermediate authored metadata unit becomes a native gap when Candidate document status is separated from Frozen (V1) contract status. The real same-file successor preserves the complete frozen contract intent and schema body, with no approval or identity graft.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "This exact intermediate authored metadata unit becomes a native gap when Candidate document status is separated from Frozen (V1) contract status. The real same-file successor preserves the complete frozen contract intent and schema body, with no approval or identity graft. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetAncestry": [
         "Contract: Activation Binding"
-      ],
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-14",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-4-packaging-successors.md",
-      "reviewReportCommit": "09fdd6746a39429288762a4a7b91d6a70af03a87",
-      "reviewMode": "ordinary",
-      "reviewNote": "Intermediate header unit from 857ad83f8 recomputes; successor keeps every line and only splits Design status into Candidate plus Contract design status Frozen (V1); shares its target digest with the d173e545-based gap of the same file."
+      ]
     },
     {
       "claimId": "claim_99600767aa1a793a02dbdc32107693d2",
@@ -667,5 +577,6 @@
       "reviewMode": "ordinary",
       "reviewNote": "Intermediate header unit from 857ad83f8 recomputes; successor keeps every line and only splits Design status into Candidate plus Contract design status Frozen (V1); shares its target digest with the d173e545-based gap of the same file."
     }
-  ]
+  ],
+  "correctionSession": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17"
 }

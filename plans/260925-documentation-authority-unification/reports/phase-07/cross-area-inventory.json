@@ -1244,15 +1244,23 @@
       "authorityKind": "candidate-navigation",
       "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
       "sourceId": "reader-gap-1",
-      "sourceDigest": "1d696e0b20a19ae7c324196e7e5a3a18d383c900b658d7c0fded4f37754d9c96",
-      "targetPath": "docs/platform/system-architecture/architecture/roadmap.md",
+      "sourceDigest": "690c8fbac1432291ac77566d2d41140e8852342db2fe6cec3c854b239709481d",
+      "targetPath": "docs/platform/README.md",
       "targetId": "src_0405b8fa1116031b6c8c540558c6225e",
-      "targetDigest": "b754ba350d11bb56d93912f42b3d1dec9fa2cef2d3e425fc0586f1a5f1517e8e",
+      "targetDigest": "2f9e96d9b198663b2abdb793170ee16e0913e5d6a755e829980a89542b964016",
       "implementationEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md#whole-system-architecture-fresh-reader-gaps--pending-owner-work",
       "readerGapId": "RG-NAV-1",
       "disposition": "repair-candidate-portal-or-header",
       "blockedDecision": null,
-      "targetStep": "Step 7"
+      "targetStep": "Step 7",
+      "sourceBinding": {
+        "line": 432
+      },
+      "targetBinding": {
+        "anchor": "unheaded-block-6"
+      },
+      "reviewStatus": "pending",
+      "digestBindingReceipt": "step-09-package-placeholder-bindings.json"
     },
     {
       "rowId": "X-NAV-02",
@@ -1265,15 +1273,23 @@
       "authorityKind": "candidate-navigation",
       "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
       "sourceId": "reader-gap-2",
-      "sourceDigest": "2d7a839dc26ebac248825f00b8922b736d6630b37cc419a5ea518d6183e77906",
-      "targetPath": "docs/platform/system-architecture/architecture/workspace-topology.md",
+      "sourceDigest": "690c8fbac1432291ac77566d2d41140e8852342db2fe6cec3c854b239709481d",
+      "targetPath": "docs/platform/README.md",
       "targetId": "src_d04b1b4bd04d551fa9c37eed05fbfbb4",
-      "targetDigest": "441108da9c93fa071b4065319c40562ab44d410b714fe0140252a26280a4c15e",
+      "targetDigest": "2f9e96d9b198663b2abdb793170ee16e0913e5d6a755e829980a89542b964016",
       "implementationEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md#whole-system-architecture-fresh-reader-gaps--pending-owner-work",
       "readerGapId": "RG-NAV-2",
       "disposition": "repair-candidate-portal-or-header",
       "blockedDecision": null,
-      "targetStep": "Step 7"
+      "targetStep": "Step 7",
+      "sourceBinding": {
+        "line": 432
+      },
+      "targetBinding": {
+        "anchor": "unheaded-block-6"
+      },
+      "reviewStatus": "pending",
+      "digestBindingReceipt": "step-09-package-placeholder-bindings.json"
     },
     {
       "rowId": "X-NAV-03",
@@ -1286,15 +1302,23 @@
       "authorityKind": "candidate-navigation",
       "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
       "sourceId": "reader-gap-3",
-      "sourceDigest": "3cef27d8cc84b937a6e4835a84397622589357f3f62d7f83ae971a568c30be3b",
-      "targetPath": "docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+      "sourceDigest": "690c8fbac1432291ac77566d2d41140e8852342db2fe6cec3c854b239709481d",
+      "targetPath": "docs/platform/README.md",
       "targetId": "src_8170ffbe8c7f803912c761d92f89f12c",
-      "targetDigest": "9ee4f29458ce8631cb9df0818b3d27ef17d715ea18f631248676e868ccd4f8c0",
+      "targetDigest": "2f9e96d9b198663b2abdb793170ee16e0913e5d6a755e829980a89542b964016",
       "implementationEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md#whole-system-architecture-fresh-reader-gaps--pending-owner-work",
       "readerGapId": "RG-NAV-3",
       "disposition": "repair-candidate-portal-or-header",
       "blockedDecision": null,
-      "targetStep": "Step 7"
+      "targetStep": "Step 7",
+      "sourceBinding": {
+        "line": 432
+      },
+      "targetBinding": {
+        "anchor": "unheaded-block-6"
+      },
+      "reviewStatus": "pending",
+      "digestBindingReceipt": "step-09-package-placeholder-bindings.json"
     },
     {
       "rowId": "X-NAV-04",
@@ -1307,15 +1331,23 @@
       "authorityKind": "candidate-navigation",
       "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
       "sourceId": "reader-gap-4",
-      "sourceDigest": "744e2cd3ab696faffecbdc2b3b7f5a549a92a882ca9d374567a6994e98263c2d",
-      "targetPath": "docs/platform/system-architecture/architecture/workspace-topology-roadmap.md",
+      "sourceDigest": "690c8fbac1432291ac77566d2d41140e8852342db2fe6cec3c854b239709481d",
+      "targetPath": "docs/platform/README.md",
       "targetId": "src_7a74dd2fa918974eced4f09ee88536fc",
-      "targetDigest": "6ecd6c1b15d31fde295f8c16995661ed0d381b61dd926608c205c10449555577",
+      "targetDigest": "2f9e96d9b198663b2abdb793170ee16e0913e5d6a755e829980a89542b964016",
       "implementationEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md#whole-system-architecture-fresh-reader-gaps--pending-owner-work",
       "readerGapId": "RG-NAV-4",
       "disposition": "repair-candidate-portal-or-header",
       "blockedDecision": null,
-      "targetStep": "Step 7"
+      "targetStep": "Step 7",
+      "sourceBinding": {
+        "line": 432
+      },
+      "targetBinding": {
+        "anchor": "unheaded-block-6"
+      },
+      "reviewStatus": "pending",
+      "digestBindingReceipt": "step-09-package-placeholder-bindings.json"
     },
     {
       "rowId": "X-STALE-01",
@@ -1460,15 +1492,23 @@
       "authorityKind": "candidate-text-or-projection",
       "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
       "sourceId": "C1-D01",
-      "sourceDigest": "50ebebc9bb831d230db76fa340ed9749e71cb68872df83f21a8686737a53916a",
-      "targetPath": "resolved-by-Step-4-6-binding",
+      "sourceDigest": "064bb348bed734a355d08a9c98ebbba4d753c5c5b169c7ddc5a0b5ebf85707ff",
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
       "targetId": "C1-D01",
-      "targetDigest": "9ee3c9351f3cb18a6fa796bc542b258c8d78cd0be67f2d749fbf59a609defff1",
+      "targetDigest": "064bb348bed734a355d08a9c98ebbba4d753c5c5b169c7ddc5a0b5ebf85707ff",
       "implementationEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md#final-wording-and-citation-notes-one-line-each",
       "readerGapId": null,
       "disposition": "inspect-and-fix-if-candidate-text; rationale-only-to-Phase-9",
       "blockedDecision": null,
-      "targetStep": "Step 4-6"
+      "targetStep": "Step 4-6",
+      "sourceBinding": {
+        "line": 21
+      },
+      "targetBinding": {
+        "line": 21
+      },
+      "reviewStatus": "pending",
+      "digestBindingReceipt": "step-09-package-placeholder-bindings.json"
     },
     {
       "rowId": "X-DEFECT-02",
@@ -1481,15 +1521,23 @@
       "authorityKind": "candidate-text-or-projection",
       "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
       "sourceId": "C1-A01",
-      "sourceDigest": "5901abe4aca01b28e740200da373c5b84be3b2d61fe44ebd239aa268dd167054",
-      "targetPath": "resolved-by-Step-4-6-binding",
+      "sourceDigest": "8b7a8b080fff75e4cd6f8bdfdeeba31b5d3870a0011595ea21c7a59fae3d86f8",
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
       "targetId": "C1-A01",
-      "targetDigest": "d4c3a7b1954333e1280abce7f398ceca68f2e40b418d855eb6cf0465888eb20a",
+      "targetDigest": "8b7a8b080fff75e4cd6f8bdfdeeba31b5d3870a0011595ea21c7a59fae3d86f8",
       "implementationEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md#final-wording-and-citation-notes-one-line-each",
       "readerGapId": null,
       "disposition": "inspect-and-fix-if-candidate-text; rationale-only-to-Phase-9",
       "blockedDecision": null,
-      "targetStep": "Step 4-6"
+      "targetStep": "Step 4-6",
+      "sourceBinding": {
+        "line": 22
+      },
+      "targetBinding": {
+        "line": 22
+      },
+      "reviewStatus": "pending",
+      "digestBindingReceipt": "step-09-package-placeholder-bindings.json"
     },
     {
       "rowId": "X-DEFECT-03",
@@ -1502,15 +1550,23 @@
       "authorityKind": "candidate-text-or-projection",
       "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
       "sourceId": "C1-R01",
-      "sourceDigest": "6058901d9bdaf1836d6cd14711fc185bbebe6496985d7938483ec3eefeb3d443",
-      "targetPath": "resolved-by-Step-4-6-binding",
+      "sourceDigest": "9ac3de9cb5ae0decf4dcb996edb1a04d2acdbc0dd7af801d383e84d256bba873",
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
       "targetId": "C1-R01",
-      "targetDigest": "e9189a0b66a7d8de08a148ff7bbfcb36d25e0a78faff4166f723a4e0df4fed24",
+      "targetDigest": "9ac3de9cb5ae0decf4dcb996edb1a04d2acdbc0dd7af801d383e84d256bba873",
       "implementationEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md#final-wording-and-citation-notes-one-line-each",
       "readerGapId": null,
       "disposition": "inspect-and-fix-if-candidate-text; rationale-only-to-Phase-9",
       "blockedDecision": null,
-      "targetStep": "Step 4-6"
+      "targetStep": "Step 4-6",
+      "sourceBinding": {
+        "line": 23
+      },
+      "targetBinding": {
+        "line": 23
+      },
+      "reviewStatus": "pending",
+      "digestBindingReceipt": "step-09-package-placeholder-bindings.json"
     },
     {
       "rowId": "X-DEFECT-04",
@@ -1523,15 +1579,23 @@
       "authorityKind": "candidate-text-or-projection",
       "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
       "sourceId": "C1-R03",
-      "sourceDigest": "dabd54bfd1e0866c9de8986596589a8f5ccf998f13dc0b05b80ca003744ede3c",
-      "targetPath": "resolved-by-Step-4-6-binding",
+      "sourceDigest": "39f664d531ae1c1aa370b9cfd9676828a19a9901f164445e8062b4ee1841ea7d",
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
       "targetId": "C1-R03",
-      "targetDigest": "6796912330ca35b74e1209ca199fb6d610a88e164b5d2bfd4a66a59cdf6b9dd2",
+      "targetDigest": "39f664d531ae1c1aa370b9cfd9676828a19a9901f164445e8062b4ee1841ea7d",
       "implementationEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md#final-wording-and-citation-notes-one-line-each",
       "readerGapId": null,
       "disposition": "inspect-and-fix-if-candidate-text; rationale-only-to-Phase-9",
       "blockedDecision": null,
-      "targetStep": "Step 4-6"
+      "targetStep": "Step 4-6",
+      "sourceBinding": {
+        "line": 24
+      },
+      "targetBinding": {
+        "line": 24
+      },
+      "reviewStatus": "pending",
+      "digestBindingReceipt": "step-09-package-placeholder-bindings.json"
     },
     {
       "rowId": "X-DEFECT-05",
@@ -1544,15 +1608,23 @@
       "authorityKind": "candidate-text-or-projection",
       "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
       "sourceId": "C1-R05",
-      "sourceDigest": "8cc578d485b610ceca859ba2ba3f5a0fca7dd5b8783361f6a95ed3671df1d73c",
-      "targetPath": "resolved-by-Step-4-6-binding",
+      "sourceDigest": "acd8cbf8c73b0d789154d6161ddba5e0376fa8494f7582e50f1fd139d9a00eaa",
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
       "targetId": "C1-R05",
-      "targetDigest": "38a8da6969f51fc977f17f8414226e678a5cf197b6591a15c0fa8f5d104215db",
+      "targetDigest": "acd8cbf8c73b0d789154d6161ddba5e0376fa8494f7582e50f1fd139d9a00eaa",
       "implementationEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md#final-wording-and-citation-notes-one-line-each",
       "readerGapId": null,
       "disposition": "inspect-and-fix-if-candidate-text; rationale-only-to-Phase-9",
       "blockedDecision": null,
-      "targetStep": "Step 4-6"
+      "targetStep": "Step 4-6",
+      "sourceBinding": {
+        "line": 25
+      },
+      "targetBinding": {
+        "line": 25
+      },
+      "reviewStatus": "pending",
+      "digestBindingReceipt": "step-09-package-placeholder-bindings.json"
     },
     {
       "rowId": "X-DEFECT-06",
@@ -1565,15 +1637,26 @@
       "authorityKind": "candidate-text-or-projection",
       "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
       "sourceId": "TRUTH-15",
-      "sourceDigest": "ebc5d2061c649814c10b91e12cf9522326db641329021a07a3a07b5557efe89c",
-      "targetPath": "resolved-by-Step-4-6-binding",
+      "sourceDigest": "5f217536df9ddb4a9c2752298e3ec107d6552dce77c1765645b0a176877c0c93",
+      "targetPath": "docs/platform/runner/architecture/h-7af1f0242611.md",
       "targetId": "TRUTH-15",
-      "targetDigest": "c88b7e6065b5d5d6fc45ad5654d2202c793577f07e5341294185d4a216646218",
+      "targetDigest": "d9dbe2611a5fd925014cf684fefd224e8fdc9d3924ddca14ad182b2da215d342",
       "implementationEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md#final-wording-and-citation-notes-one-line-each",
       "readerGapId": null,
       "disposition": "inspect-and-fix-if-candidate-text; rationale-only-to-Phase-9",
       "blockedDecision": null,
-      "targetStep": "Step 4"
+      "targetStep": "Step 4",
+      "sourceBinding": {
+        "line": 29
+      },
+      "targetBinding": {
+        "anchors": [
+          "unheaded-block-4",
+          "unheaded-block-5"
+        ]
+      },
+      "reviewStatus": "pending",
+      "digestBindingReceipt": "step-09-package-placeholder-bindings.json"
     },
     {
       "rowId": "X-DEFECT-07",
@@ -1586,15 +1669,26 @@
       "authorityKind": "candidate-text-or-projection",
       "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
       "sourceId": "TRUTH-26",
-      "sourceDigest": "f874454e51dd34b938c5fa8cec4e3c77a44d800720c6070a11cafa8765be3430",
-      "targetPath": "resolved-by-Step-4-6-binding",
+      "sourceDigest": "d04bd39c92985593d2d452b48bbb820cfd9a8cbaa0b5ecd373a08c6db49c2599",
+      "targetPath": "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
       "targetId": "TRUTH-26",
-      "targetDigest": "537e171dec7d8db7dff74e311888bf6aec1eae59cab82875649ff97314ce23a8",
+      "targetDigest": "e3169a0bfb8db8d60cd2f28720d859c70ac887accb3fb0055b8675e2c2486d52",
       "implementationEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md#final-wording-and-citation-notes-one-line-each",
       "readerGapId": null,
       "disposition": "inspect-and-fix-if-candidate-text; rationale-only-to-Phase-9",
       "blockedDecision": null,
-      "targetStep": "Step 4"
+      "targetStep": "Step 4",
+      "sourceBinding": {
+        "line": 30
+      },
+      "targetBinding": {
+        "anchors": [
+          "unheaded-block-4",
+          "unheaded-block-5"
+        ]
+      },
+      "reviewStatus": "pending",
+      "digestBindingReceipt": "step-09-package-placeholder-bindings.json"
     },
     {
       "rowId": "X-DEFECT-08",
@@ -1607,15 +1701,25 @@
       "authorityKind": "candidate-text-or-projection",
       "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
       "sourceId": "TRUTH-27",
-      "sourceDigest": "25008be5244c28e1dc4c4636c15acc97fa4ad13049b2220aba85d1198dff7c90",
-      "targetPath": "resolved-by-Step-4-6-binding",
+      "sourceDigest": "2e0f9080da097965ecc2d3de7b65ef40bbc6fb817006194fd7b3507f93050e21",
+      "targetPath": "docs/platform/runner/operations/h-51f5cd7279fd.md",
       "targetId": "TRUTH-27",
-      "targetDigest": "f0bc55be8a5d937604207303b1085ff0011c3dae254b1486e23373e802ee2668",
+      "targetDigest": "239d8c4fd2b10e5b0f2b0e638ab6fbd263b5f26246ff1c60b7685dc733ff5539",
       "implementationEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md#final-wording-and-citation-notes-one-line-each",
       "readerGapId": null,
       "disposition": "inspect-and-fix-if-candidate-text; rationale-only-to-Phase-9",
       "blockedDecision": null,
-      "targetStep": "Step 4"
+      "targetStep": "Step 4",
+      "sourceBinding": {
+        "line": 31
+      },
+      "targetBinding": {
+        "anchors": [
+          "unheaded-block-26"
+        ]
+      },
+      "reviewStatus": "pending",
+      "digestBindingReceipt": "step-09-package-placeholder-bindings.json"
     },
     {
       "rowId": "X-DEFECT-09",
@@ -1628,15 +1732,24 @@
       "authorityKind": "candidate-text-or-projection",
       "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
       "sourceId": "GRP-LIVE-01",
-      "sourceDigest": "007af87ed5c0e9b3f7290acb17bbd3e10e8f0bc20dbebe97ab25ed8aabb89757",
-      "targetPath": "resolved-by-Step-4-6-binding",
+      "sourceDigest": "354ea8a0a8ac07795e12fef2173d35ca608d8047fb4feb9f6f380f03f7354633",
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-07/step-06-projections.json",
       "targetId": "GRP-LIVE-01",
-      "targetDigest": "55efe1334efb40b3c106f647450c68085f77a19a5f9bfb2f601ea3f7c3b82a31",
+      "targetDigest": "91a6bc1200613fd915c5a0a7d102847757d7e79429f0fe2f2eeac173ee0cc7ef",
       "implementationEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md#final-wording-and-citation-notes-one-line-each",
       "readerGapId": null,
       "disposition": "inspect-and-fix-if-candidate-text; rationale-only-to-Phase-9",
       "blockedDecision": null,
-      "targetStep": "Step 6"
+      "targetStep": "Step 6",
+      "sourceBinding": {
+        "line": 26
+      },
+      "targetBinding": {
+        "array": "dispositions",
+        "id": "GRP-LIVE-01"
+      },
+      "reviewStatus": "pending",
+      "digestBindingReceipt": "step-09-package-placeholder-bindings.json"
     },
     {
       "rowId": "X-DEFECT-10",
@@ -1649,15 +1762,24 @@
       "authorityKind": "candidate-text-or-projection",
       "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
       "sourceId": "GRP-HEAD-02",
-      "sourceDigest": "6d49bd5ea906c441d402fc4c45502d2a437ffcfff3b830a53e387eac75bfbc4f",
-      "targetPath": "resolved-by-Step-4-6-binding",
+      "sourceDigest": "235494ff2249252da7e5dac8a18de05c2206f4a4faa195130a7f51c449227ad2",
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-07/step-06-projections.json",
       "targetId": "GRP-HEAD-02",
-      "targetDigest": "8ca758f2059430bf6b49a1423cfca755c79120adf5d7d4b24bc0b76af241138a",
+      "targetDigest": "e9f7ee591cd086d76d2a1144f5c25aab9f75d1ead1736e9bd67071a0ef26b48b",
       "implementationEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md#final-wording-and-citation-notes-one-line-each",
       "readerGapId": null,
       "disposition": "inspect-and-fix-if-candidate-text; rationale-only-to-Phase-9",
       "blockedDecision": null,
-      "targetStep": "Step 6"
+      "targetStep": "Step 6",
+      "sourceBinding": {
+        "line": 27
+      },
+      "targetBinding": {
+        "array": "dispositions",
+        "id": "GRP-HEAD-02"
+      },
+      "reviewStatus": "pending",
+      "digestBindingReceipt": "step-09-package-placeholder-bindings.json"
     },
     {
       "rowId": "X-DEFECT-11",
@@ -1670,15 +1792,24 @@
       "authorityKind": "candidate-text-or-projection",
       "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
       "sourceId": "GRP-SPECS-03",
-      "sourceDigest": "c8c97bd300493118c362120fb444c185084d913761155e0663ecd996c289559a",
-      "targetPath": "resolved-by-Step-4-6-binding",
+      "sourceDigest": "96f965b903c82661d4d837bba4874ed7bab5c63debe2a33e6c14304610ac0a99",
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-07/step-06-projections.json",
       "targetId": "GRP-SPECS-03",
-      "targetDigest": "157a0ac3f22c4ac5e3c6697b8d3d3f1b7e81bfcf8b182bf70415cf7b4f2b2638",
+      "targetDigest": "87c6061661adbc689ecfa730961307753f5a4962bef8d4db29a2beb90f60c18a",
       "implementationEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md#final-wording-and-citation-notes-one-line-each",
       "readerGapId": null,
       "disposition": "inspect-and-fix-if-candidate-text; rationale-only-to-Phase-9",
       "blockedDecision": null,
-      "targetStep": "Step 6"
+      "targetStep": "Step 6",
+      "sourceBinding": {
+        "line": 28
+      },
+      "targetBinding": {
+        "array": "dispositions",
+        "id": "GRP-SPECS-03"
+      },
+      "reviewStatus": "pending",
+      "digestBindingReceipt": "step-09-package-placeholder-bindings.json"
     },
     {
       "rowId": "X-DEFECT-12",
@@ -1691,15 +1822,24 @@
       "authorityKind": "candidate-text-or-projection",
       "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
       "sourceId": "F10-11",
-      "sourceDigest": "7ded24290f25bca8d54633e0eb392bf4a104b5340f11771f45a04f91c0dccd89",
-      "targetPath": "resolved-by-Step-4-6-binding",
+      "sourceDigest": "e68683b7cf866f320778bea0ef29be2a581d162885ca0d01d2cefa6220ccdaf8",
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-07/step-06-projections.json",
       "targetId": "F10-11",
-      "targetDigest": "790435d19677d547369bb454d292688da539dd384b409de31c6507515b0d8050",
+      "targetDigest": "427dafb7d6db163493f4c5c20689f2472f014c8f44394322f269983ff9c86361",
       "implementationEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md#final-wording-and-citation-notes-one-line-each",
       "readerGapId": null,
       "disposition": "inspect-and-fix-if-candidate-text; rationale-only-to-Phase-9",
       "blockedDecision": null,
-      "targetStep": "Step 6"
+      "targetStep": "Step 6",
+      "sourceBinding": {
+        "line": 34
+      },
+      "targetBinding": {
+        "array": "dispositions",
+        "id": "F10-11"
+      },
+      "reviewStatus": "pending",
+      "digestBindingReceipt": "step-09-package-placeholder-bindings.json"
     },
     {
       "rowId": "X-DEFECT-13",
@@ -1712,15 +1852,24 @@
       "authorityKind": "candidate-text-or-projection",
       "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
       "sourceId": "F10-12",
-      "sourceDigest": "f9cc5fc3cbdf054d0a95560b5a3c68978e863c00755763f6f840aa384b78536d",
-      "targetPath": "resolved-by-Step-4-6-binding",
+      "sourceDigest": "1761ab5d21d39708b40a0d2762b49ecc975435def1f31df7c1b90b5654ebb6f8",
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-07/step-06-projections.json",
       "targetId": "F10-12",
-      "targetDigest": "2ccb29c7afa495bfb1c85fcdb869209d1cd120c108bd64ec2aa2d0e054d9c11f",
+      "targetDigest": "a2e4b935f3804ac2833960a85e4e18215c79cddf90c99e722678785296aeeeb9",
       "implementationEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md#final-wording-and-citation-notes-one-line-each",
       "readerGapId": null,
       "disposition": "inspect-and-fix-if-candidate-text; rationale-only-to-Phase-9",
       "blockedDecision": null,
-      "targetStep": "Step 6"
+      "targetStep": "Step 6",
+      "sourceBinding": {
+        "line": 35
+      },
+      "targetBinding": {
+        "array": "dispositions",
+        "id": "F10-12"
+      },
+      "reviewStatus": "pending",
+      "digestBindingReceipt": "step-09-package-placeholder-bindings.json"
     },
     {
       "rowId": "X-DEFECT-14",
@@ -1733,15 +1882,24 @@
       "authorityKind": "candidate-text-or-projection",
       "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
       "sourceId": "F10-13",
-      "sourceDigest": "49132a45cfc23b82fd4da39215aebafccfdb87533a3e359e0dd6d6e3ce37dae8",
-      "targetPath": "resolved-by-Step-4-6-binding",
+      "sourceDigest": "a510c89b2254ce50ae8ec14bf1cbf8ccf231a8670dee59579e71cc4908090a6a",
+      "targetPath": "plans/260925-documentation-authority-unification/reports/phase-07/step-06-projections.json",
       "targetId": "F10-13",
-      "targetDigest": "c36779e550ec6729c1d68395b79c48c89514f8dcefe25e193b11e71d279e8b3b",
+      "targetDigest": "adbb53c38056fe051b9aaf570bc06834c2893284d956ee780ba1336c79dcff9b",
       "implementationEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md#final-wording-and-citation-notes-one-line-each",
       "readerGapId": null,
       "disposition": "inspect-and-fix-if-candidate-text; rationale-only-to-Phase-9",
       "blockedDecision": null,
-      "targetStep": "Step 6"
+      "targetStep": "Step 6",
+      "sourceBinding": {
+        "line": 36
+      },
+      "targetBinding": {
+        "array": "dispositions",
+        "id": "F10-13"
+      },
+      "reviewStatus": "pending",
+      "digestBindingReceipt": "step-09-package-placeholder-bindings.json"
     },
     {
       "rowId": "X-CTR010-01",
@@ -1772,17 +1930,25 @@
       "owner": "phase-route-owner",
       "consumers": [],
       "authorityKind": "routing-control",
-      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
+      "sourcePath": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
       "sourceId": "family-1",
-      "sourceDigest": "4f9535313454c91438e1b864ea306f642f017345fb74c710419773bd8a405d0b",
-      "targetPath": "phase-route",
+      "sourceDigest": "5db98529896ba8d9016f121196a1e364ab68e41d0d500621999549d0dd5d58d9",
+      "targetPath": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
       "targetId": "family-route-1",
-      "targetDigest": "356aa3334a6d6c42a306e48df2fa5e5d9a6f57d53d56a517cd781b19378879c3",
+      "targetDigest": "5db98529896ba8d9016f121196a1e364ab68e41d0d500621999549d0dd5d58d9",
       "implementationEvidence": "Phase 7 mandatory routing table; Phase 9 must re-home residuals X-A34-01 and X-A34-17..X-A34-28 because their successor is the retiring legacy source",
       "readerGapId": null,
       "disposition": "Step 5 sample; Step 9 affected; Phase 9 promotion truth and 12-row residual re-home",
       "blockedDecision": null,
-      "targetStep": "Step 5 sample; Step 9 affected; Phase 9 promotion truth and 12-row residual re-home"
+      "targetStep": "Step 5 sample; Step 9 affected; Phase 9 promotion truth and 12-row residual re-home",
+      "sourceBinding": {
+        "line": 196
+      },
+      "targetBinding": {
+        "line": 196
+      },
+      "reviewStatus": "pending",
+      "digestBindingReceipt": "step-09-package-placeholder-bindings.json"
     },
     {
       "rowId": "QF-02",
@@ -1791,17 +1957,25 @@
       "owner": "phase-route-owner",
       "consumers": [],
       "authorityKind": "routing-control",
-      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
+      "sourcePath": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
       "sourceId": "family-2",
-      "sourceDigest": "ebdc5faabd0c64b3bc2e742a0231791f7914fe40a20c7872ed0532b2de483551",
-      "targetPath": "phase-route",
+      "sourceDigest": "18f17623230f65c73539577bb4dee7235b1dbf2bf2e79ae09f1cdc4fbb3db14f",
+      "targetPath": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
       "targetId": "family-route-2",
-      "targetDigest": "51ed493c41202aa4d659ed3c340638c7f6e66bfceba473ddc57afaf2a094534b",
+      "targetDigest": "18f17623230f65c73539577bb4dee7235b1dbf2bf2e79ae09f1cdc4fbb3db14f",
       "implementationEvidence": "Phase 7 mandatory routing table",
       "readerGapId": null,
       "disposition": "Step 5 bounded; Phase 9 full",
       "blockedDecision": null,
-      "targetStep": "Step 5 bounded; Phase 9 full"
+      "targetStep": "Step 5 bounded; Phase 9 full",
+      "sourceBinding": {
+        "line": 197
+      },
+      "targetBinding": {
+        "line": 197
+      },
+      "reviewStatus": "pending",
+      "digestBindingReceipt": "step-09-package-placeholder-bindings.json"
     },
     {
       "rowId": "QF-03",
@@ -1810,17 +1984,25 @@
       "owner": "phase-route-owner",
       "consumers": [],
       "authorityKind": "routing-control",
-      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
+      "sourcePath": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
       "sourceId": "family-3",
-      "sourceDigest": "657e43250474108ca468ecc6f15251882d2a25b20fb78895f9c66d359e73f510",
-      "targetPath": "phase-route",
+      "sourceDigest": "0e95675b482640fee657a57d15ccfa712153c6b274b1e0bb29317668b39754d1",
+      "targetPath": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
       "targetId": "family-route-3",
-      "targetDigest": "c72a35747375d015d89de43d49bae518f5253399388f6d04c3fd155a99dde9e9",
+      "targetDigest": "0e95675b482640fee657a57d15ccfa712153c6b274b1e0bb29317668b39754d1",
       "implementationEvidence": "Phase 7 mandatory routing table",
       "readerGapId": null,
       "disposition": "Steps 4-6 candidate defects; Phase 9 rationale-only",
       "blockedDecision": null,
-      "targetStep": "Steps 4-6 candidate defects; Phase 9 rationale-only"
+      "targetStep": "Steps 4-6 candidate defects; Phase 9 rationale-only",
+      "sourceBinding": {
+        "line": 198
+      },
+      "targetBinding": {
+        "line": 198
+      },
+      "reviewStatus": "pending",
+      "digestBindingReceipt": "step-09-package-placeholder-bindings.json"
     },
     {
       "rowId": "QF-04",
@@ -1829,17 +2011,25 @@
       "owner": "phase-route-owner",
       "consumers": [],
       "authorityKind": "routing-control",
-      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
+      "sourcePath": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
       "sourceId": "family-4",
-      "sourceDigest": "d3ff8c157924333b3763296221de7899d5c407f1faa807e9687497bc024d8683",
-      "targetPath": "phase-route",
+      "sourceDigest": "5d59603b574a0ed320e77848fc286e8d31692e5af94cb634c72fd8ef4ee5e21c",
+      "targetPath": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
       "targetId": "family-route-4",
-      "targetDigest": "368988299e94b56b1671e79dd753130fb168b77097667e9a9ac9f057bd4c5657",
+      "targetDigest": "5d59603b574a0ed320e77848fc286e8d31692e5af94cb634c72fd8ef4ee5e21c",
       "implementationEvidence": "Phase 7 mandatory routing table",
       "readerGapId": null,
       "disposition": "Step 2 semantic; Step 6 duplicate; Phase 8 alias mechanics",
       "blockedDecision": null,
-      "targetStep": "Step 2 semantic; Step 6 duplicate; Phase 8 alias mechanics"
+      "targetStep": "Step 2 semantic; Step 6 duplicate; Phase 8 alias mechanics",
+      "sourceBinding": {
+        "line": 199
+      },
+      "targetBinding": {
+        "line": 199
+      },
+      "reviewStatus": "pending",
+      "digestBindingReceipt": "step-09-package-placeholder-bindings.json"
     },
     {
       "rowId": "QF-05",
@@ -1848,17 +2038,25 @@
       "owner": "phase-route-owner",
       "consumers": [],
       "authorityKind": "routing-control",
-      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
+      "sourcePath": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
       "sourceId": "family-5",
-      "sourceDigest": "87339216e95b1a5e72d2a6a90d673c05891307b31006160e095ec23e56cf7082",
-      "targetPath": "phase-route",
+      "sourceDigest": "b97c87775dea4c5c54df6474942c7c435e665c422d9e69fc1dd76c08162ca7ce",
+      "targetPath": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
       "targetId": "family-route-5",
-      "targetDigest": "19581e27de7ced00ff1ce50b2047e7a567c76b1cbaebabe5ef03f7c3017bb5b7",
+      "targetDigest": "b97c87775dea4c5c54df6474942c7c435e665c422d9e69fc1dd76c08162ca7ce",
       "implementationEvidence": "Phase 7 mandatory routing table",
       "readerGapId": null,
       "disposition": "Phase 9",
       "blockedDecision": null,
-      "targetStep": "Phase 9"
+      "targetStep": "Phase 9",
+      "sourceBinding": {
+        "line": 200
+      },
+      "targetBinding": {
+        "line": 200
+      },
+      "reviewStatus": "pending",
+      "digestBindingReceipt": "step-09-package-placeholder-bindings.json"
     },
     {
       "rowId": "QF-06",
@@ -1867,17 +2065,25 @@
       "owner": "phase-route-owner",
       "consumers": [],
       "authorityKind": "routing-control",
-      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
+      "sourcePath": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
       "sourceId": "family-6",
-      "sourceDigest": "2cdd50005ae11d7391e301267ee24835806770494b236eb255b47843ae0592b3",
-      "targetPath": "phase-route",
+      "sourceDigest": "5f0f95cefce4c618e0f9e520285179fa7302350876867a5774963d80ab3b8d37",
+      "targetPath": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
       "targetId": "family-route-6",
-      "targetDigest": "2c624232cdd221771294dfbb310aca000a0df6ac8b66b696d90ef06fdefb64a3",
+      "targetDigest": "5f0f95cefce4c618e0f9e520285179fa7302350876867a5774963d80ab3b8d37",
       "implementationEvidence": "Phase 7 mandatory routing table",
       "readerGapId": null,
       "disposition": "Phase 8",
       "blockedDecision": null,
-      "targetStep": "Phase 8"
+      "targetStep": "Phase 8",
+      "sourceBinding": {
+        "line": 201
+      },
+      "targetBinding": {
+        "line": 201
+      },
+      "reviewStatus": "pending",
+      "digestBindingReceipt": "step-09-package-placeholder-bindings.json"
     },
     {
       "rowId": "QF-07",
@@ -1886,17 +2092,25 @@
       "owner": "phase-route-owner",
       "consumers": [],
       "authorityKind": "routing-control",
-      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
+      "sourcePath": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
       "sourceId": "family-7",
-      "sourceDigest": "7961d7aacbfeeb4149b5f929ae6e47eb3bd88019d4243f9aecb2ab00cb8c84fa",
-      "targetPath": "phase-route",
+      "sourceDigest": "d7b9b02e7eae6728bcc08649f938ca1bd26d4b0aebcc97385b245f49d6fbdaa3",
+      "targetPath": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
       "targetId": "family-route-7",
-      "targetDigest": "16c4b6b5193bba56c91d416c98ee42ca1261bb7bf86959b3d74d98b3308154db",
+      "targetDigest": "d7b9b02e7eae6728bcc08649f938ca1bd26d4b0aebcc97385b245f49d6fbdaa3",
       "implementationEvidence": "Phase 7 mandatory routing table",
       "readerGapId": null,
       "disposition": "Phase 8/9",
       "blockedDecision": null,
-      "targetStep": "Phase 8/9"
+      "targetStep": "Phase 8/9",
+      "sourceBinding": {
+        "line": 202
+      },
+      "targetBinding": {
+        "line": 202
+      },
+      "reviewStatus": "pending",
+      "digestBindingReceipt": "step-09-package-placeholder-bindings.json"
     },
     {
       "rowId": "QF-08",
@@ -1905,17 +2119,25 @@
       "owner": "phase-route-owner",
       "consumers": [],
       "authorityKind": "routing-control",
-      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
+      "sourcePath": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
       "sourceId": "family-8",
-      "sourceDigest": "78594c45f2e4891326e445e071eab5df8ad39cdcc0b18b72243d34dcedbdd387",
-      "targetPath": "phase-route",
+      "sourceDigest": "c31301e47c097ffc4c933021dc0d071a6e97c9f30d1ef4a798eb8b71d5519ec6",
+      "targetPath": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
       "targetId": "family-route-8",
-      "targetDigest": "787ad5f39b7cb99c840dca7cca7f5d856a73682b5d8fabd63cf75833c2c339fd",
+      "targetDigest": "c31301e47c097ffc4c933021dc0d071a6e97c9f30d1ef4a798eb8b71d5519ec6",
       "implementationEvidence": "Phase 7 mandatory routing table",
       "readerGapId": null,
       "disposition": "Phase 8 preparation; Phase 9 adoption",
       "blockedDecision": null,
-      "targetStep": "Phase 8 preparation; Phase 9 adoption"
+      "targetStep": "Phase 8 preparation; Phase 9 adoption",
+      "sourceBinding": {
+        "line": 203
+      },
+      "targetBinding": {
+        "line": 203
+      },
+      "reviewStatus": "pending",
+      "digestBindingReceipt": "step-09-package-placeholder-bindings.json"
     },
     {
       "rowId": "QF-09",
@@ -1924,17 +2146,25 @@
       "owner": "phase-route-owner",
       "consumers": [],
       "authorityKind": "routing-control",
-      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
+      "sourcePath": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
       "sourceId": "family-9",
-      "sourceDigest": "58415978ad25dd3cef65017ffdb0be679e4d0ef172c4b3d8de8a72e09cd62f6c",
-      "targetPath": "phase-route",
+      "sourceDigest": "006ce9148ce42a6bb262fcd7d7d21cba992609da5fca2561deff16fc93773066",
+      "targetPath": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
       "targetId": "family-route-9",
-      "targetDigest": "eedfaeca089553da22448fff13d37f3d15b3c94b0fee46c4226335f3bfb86bbd",
+      "targetDigest": "006ce9148ce42a6bb262fcd7d7d21cba992609da5fca2561deff16fc93773066",
       "implementationEvidence": "Phase 7 mandatory routing table",
       "readerGapId": null,
       "disposition": "preserve; Step 9 affected rebind",
       "blockedDecision": null,
-      "targetStep": "preserve; Step 9 affected rebind"
+      "targetStep": "preserve; Step 9 affected rebind",
+      "sourceBinding": {
+        "line": 204
+      },
+      "targetBinding": {
+        "line": 204
+      },
+      "reviewStatus": "pending",
+      "digestBindingReceipt": "step-09-package-placeholder-bindings.json"
     },
     {
       "rowId": "QF-10",
@@ -1943,17 +2173,25 @@
       "owner": "owner",
       "consumers": [],
       "authorityKind": "routing-control",
-      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
+      "sourcePath": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
       "sourceId": "family-10",
-      "sourceDigest": "fbb765b483625d71a8270c52ed99a8d81a7fb16b1ce12a2786accb8f9e369e6b",
-      "targetPath": "phase-route",
+      "sourceDigest": "1565f5845ab8c19da32f1a73572acdea44d5f6c02d422d0be693b752294c4565",
+      "targetPath": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
       "targetId": "family-route-10",
-      "targetDigest": "7e49e9efa4aaaaa14ac0ae2cdb5d26f6dc81f347dfcab11f117b72e1d93144a1",
+      "targetDigest": "1565f5845ab8c19da32f1a73572acdea44d5f6c02d422d0be693b752294c4565",
       "implementationEvidence": "Phase 7 mandatory routing table",
       "readerGapId": null,
       "disposition": "owner-only carry",
       "blockedDecision": null,
-      "targetStep": "owner-only carry"
+      "targetStep": "owner-only carry",
+      "sourceBinding": {
+        "line": 205
+      },
+      "targetBinding": {
+        "line": 205
+      },
+      "reviewStatus": "pending",
+      "digestBindingReceipt": "step-09-package-placeholder-bindings.json"
     },
     {
       "rowId": "QF-11",
@@ -1962,17 +2200,25 @@
       "owner": "owner",
       "consumers": [],
       "authorityKind": "routing-control",
-      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
+      "sourcePath": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
       "sourceId": "family-11",
-      "sourceDigest": "e5a8e27dabf695eac5ab84c94ec5c229c85fbce0622c437a817832367bfe6907",
-      "targetPath": "phase-route",
+      "sourceDigest": "f11292c50e10c28824fb30937c94ebec06fc3911b28d23d1789a95755c24a2ca",
+      "targetPath": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
       "targetId": "family-route-11",
-      "targetDigest": "5b4828f7dcf2e03ee11d1afa3aa6691427e046eb35a55459f7b8457df3fc5507",
+      "targetDigest": "f11292c50e10c28824fb30937c94ebec06fc3911b28d23d1789a95755c24a2ca",
       "implementationEvidence": "Phase 7 mandatory routing table",
       "readerGapId": null,
       "disposition": "owner at Phase 9",
       "blockedDecision": "owner promotion/cutover authority",
-      "targetStep": "owner at Phase 9"
+      "targetStep": "owner at Phase 9",
+      "sourceBinding": {
+        "line": 206
+      },
+      "targetBinding": {
+        "line": 206
+      },
+      "reviewStatus": "pending",
+      "digestBindingReceipt": "step-09-package-placeholder-bindings.json"
     },
     {
       "rowId": "QF-12",
@@ -1981,17 +2227,25 @@
       "owner": "phase-route-owner",
       "consumers": [],
       "authorityKind": "routing-control",
-      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
+      "sourcePath": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
       "sourceId": "family-12",
-      "sourceDigest": "05917472d96e1fddf8d297b127c9eccd8602551f30c85dfbeca20fee89164eb9",
-      "targetPath": "phase-route",
+      "sourceDigest": "0218679c14adf2c68cc2e5b4186e270ea61bc0a7aa974eb7715cd761536601ef",
+      "targetPath": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
       "targetId": "family-route-12",
-      "targetDigest": "fadd3dc024849b13978ebc2f29cd5219ba154048ebccb690b5c71bd2296aa309",
+      "targetDigest": "0218679c14adf2c68cc2e5b4186e270ea61bc0a7aa974eb7715cd761536601ef",
       "implementationEvidence": "Phase 7 mandatory routing table",
       "readerGapId": null,
       "disposition": "Steps 4-6 named; Phase 9 remaining truth",
       "blockedDecision": null,
-      "targetStep": "Steps 4-6 named; Phase 9 remaining truth"
+      "targetStep": "Steps 4-6 named; Phase 9 remaining truth",
+      "sourceBinding": {
+        "line": 207
+      },
+      "targetBinding": {
+        "line": 207
+      },
+      "reviewStatus": "pending",
+      "digestBindingReceipt": "step-09-package-placeholder-bindings.json"
     },
     {
       "rowId": "QF-13",
@@ -2000,17 +2254,25 @@
       "owner": "phase-route-owner",
       "consumers": [],
       "authorityKind": "routing-control",
-      "sourcePath": "plans/260925-documentation-authority-unification/reports/phase-06/owner-queue.md",
+      "sourcePath": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
       "sourceId": "family-13",
-      "sourceDigest": "a2e765afeadae14de4605037e3650e58dfe4ec814886b66987a18ba3c27b7895",
-      "targetPath": "phase-route",
+      "sourceDigest": "b159b36a92653fd0f16d1e67b35477dde4391d3c2113f652514e2f87ca765079",
+      "targetPath": "plans/260925-documentation-authority-unification/phase-07-cross-area-integrity-and-fresh-reader-review.md",
       "targetId": "family-route-13",
-      "targetDigest": "347aca01ddedec4127cb9960c58eb1c5407ebb61ffd1d4e39b8104fc7dc8c5ba",
+      "targetDigest": "b159b36a92653fd0f16d1e67b35477dde4391d3c2113f652514e2f87ca765079",
       "implementationEvidence": "Phase 7 mandatory routing table",
       "readerGapId": null,
       "disposition": "separate main-owned item",
       "blockedDecision": null,
-      "targetStep": "separate main-owned item"
+      "targetStep": "separate main-owned item",
+      "sourceBinding": {
+        "line": 208
+      },
+      "targetBinding": {
+        "line": 208
+      },
+      "reviewStatus": "pending",
+      "digestBindingReceipt": "step-09-package-placeholder-bindings.json"
     },
     {
       "rowId": "X-MAIN-01",

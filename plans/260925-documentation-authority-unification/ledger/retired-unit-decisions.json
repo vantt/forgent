@@ -82800,6 +82800,55 @@
         "Historical File: Canonical Agent Coordination Concepts"
       ],
       "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+    },
+    {
+      "claimId": "claim_dcd34697ac5ac6857e5216f7d3798a0d",
+      "sourceUnitDigest": "e8964fb80febb2c42771c961f8c52823197acec44b253c0a2f7943c6406d5d4f",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "disposition": "retain-as-evidence",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "Native retired predecessor at 8b2ee4dd99fc89689f20274f1cfd5e1ad7a3469a. Retain the immutable B0 source unit as historical evidence; no current-source counterpart or live-anchor graft is claimed. The former decision is preserved in the package before-image; independent review pending.",
+      "targetAncestry": [
+        "Contract: Activation Binding",
+        "Retained Runtime Identity And Activation Source Detail",
+        "6. WorkspaceActivationBinding"
+      ],
+      "sourcePath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "sourceAnchor": "unheaded-block-53"
+    },
+    {
+      "claimId": "claim_2e94447a40d78f539424a7213cc35f89",
+      "sourceUnitDigest": "5c3b67297cdbaebc23f1d091ecdd6516c6441c6fbbed563616bd3b9e11b5ccf3",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "disposition": "retain-as-evidence",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "Native retired predecessor at 8b2ee4dd99fc89689f20274f1cfd5e1ad7a3469a. Retain the immutable B0 source unit as historical evidence; no current-source counterpart or live-anchor graft is claimed. The former decision is preserved in the package before-image; independent review pending.",
+      "targetAncestry": [
+        "Runtime Identity And Activation",
+        "Retained Runtime Identity And Activation Source Detail",
+        "Runtime Identity And Activation",
+        "14. Walking Skeleton"
+      ],
+      "sourcePath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "sourceAnchor": "unheaded-block-145"
+    },
+    {
+      "claimId": "claim_8dfcaa2f9800fae91fcc919f932ee897",
+      "sourcePath": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "sourceAnchor": "unheaded-block-22",
+      "sourceUnitDigest": "e177cd634ccbeb3491a371a5e05f52476c693db7d52385b6cb6d653499c42936",
+      "disposition": "retain-as-evidence",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "Historical predecessor retained in immutable B0 Git evidence after native retirement at 8b2ee4dd99fc89689f20274f1cfd5e1ad7a3469a; no live counterpart or approval is claimed."
     }
   ]
 }

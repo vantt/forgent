@@ -480,20 +480,14 @@
       "targetAnchor": "dispatch-operability-addendum",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The same owned unit is rebound to the corrected text authorized by A20/A22 in f4bc8027ff2ef34b7c7c1b084330b62fdcbc353f. The old target wording is superseded in place, with the legacy source and accepted historical carriage unchanged. Independent review must check the current shown text against the section truth ledger; no prior text approval is carried. Previous rationale (historical): The current successor at docs/platform/agent-coordination/contracts/assignment-run-runresult.md#dispatch-operability-addendum supersedes the stale current-state claim shown at docs/platform/agent-coordination/contracts/assignment-run-runresult.md#dispatch-operability-addendum before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval.",
-      "reviewNote": "legacy:contracts/assignment-run-runresult.md#dispatch-operability-addendum -> contracts/assignment-run-runresult.md#dispatch-operability-addendum (supersede): addendum heading superseded by corrected text; v3 default and v4 support verified (run-result.mjs:350,559-563)",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-fix-source.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The same owned unit is rebound to the corrected text authorized by A20/A22 in f4bc8027ff2ef34b7c7c1b084330b62fdcbc353f. The old target wording is superseded in place, with the legacy source and accepted historical carriage unchanged. Independent review must check the current shown text against the section truth ledger; no prior text approval is carried. Previous rationale (historical): The current successor at docs/platform/agent-coordination/contracts/assignment-run-runresult.md#dispatch-operability-addendum supersedes the stale current-state claim shown at docs/platform/agent-coordination/contracts/assignment-run-runresult.md#dispatch-operability-addendum before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "ae15a88c7eb4499399761dd51ce845613c7d19ad7a6ab7578dec7ba0226ed93c",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "RunResult"
-      ],
-      "reviewReportCommit": "9351a257f718ae8f41545792fda3b477a0616e9e"
+      ]
     },
     {
       "claimId": "claim_e761c7c9e0eb2c158978cd99751f5fb5",
@@ -502,19 +496,13 @@
       "targetAnchor": "work-boundary",
       "claimKind": "contract",
       "disposition": "supersede",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The current successor at docs/platform/agent-coordination/contracts/assignment-run-runresult.md#work-boundary supersedes the stale current-state claim shown at docs/platform/agent-coordination/contracts/assignment-run-runresult.md#work-boundary before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval.",
-      "reviewNote": "LEG:contracts/assignment-run-runresult.md#work-boundary -> contracts/assignment-run-runresult.md#work-boundary (supersede): old claim moved or superseded into work-boundary (lines 303-303): current text is true and keeps the live obligation or retires the stale part honestly; check: true: runner.md decision 0049 (docs/specs/runner.md:3072) removed state imports from dispatch and execution, and git grep finds no src/state import there; Work has workflowStep not stage",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-files.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The current successor at docs/platform/agent-coordination/contracts/assignment-run-runresult.md#work-boundary supersedes the stale current-state claim shown at docs/platform/agent-coordination/contracts/assignment-run-runresult.md#work-boundary before 96a13ab21670e1f5d9748c02cd615ea5598b53f5. The original frozen source remains conserved by the accepted carriage and its dated complete historical carrier; this is a truth correction, not a new move or retirement. The section-specific code/CLI evidence is recorded in plans/260925-documentation-authority-unification/reports/phase-06/truth-ledger-agent-coordination.json. This successor is pending independent truth review, with no inherited approval. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "1dfda63c8c6d8b9e8eb8a8d6ad8db92845e0f85e8956b80c9eba8bb35600a275",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract"
-      ],
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      ]
     },
     {
       "claimId": "claim_6279bf73565fbb95fed9dfef0448fe53",
@@ -523,19 +511,13 @@
       "targetAnchor": "required-negative-tests",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/contracts/assignment-run-runresult.md#required-negative-tests is retained in docs/platform/agent-coordination/contracts/assignment-run-runresult.md#required-negative-tests. Only Markdown reference locations differ in the full shown section. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "reviewNote": "LEG:contracts/assignment-run-runresult.md#required-negative-tests -> contracts/assignment-run-runresult.md#required-negative-tests (move): old claim moved or superseded into required-negative-tests (lines 309-309): current text is true and keeps the live obligation or retires the stale part honestly; check: obligation list; the status table already marks the late-result item as tied to retired run-retried, and the matching result-fencing text is labeled a stronger proposal; the cited test files exist",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-truth-files.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/contracts/assignment-run-runresult.md#required-negative-tests is retained in docs/platform/agent-coordination/contracts/assignment-run-runresult.md#required-negative-tests. Only Markdown reference locations differ in the full shown section. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "7f34485c3f02a36a5fbd15a27325f35a99bcff6470f007f1b991668581f76dd5",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract"
-      ],
-      "reviewReportCommit": "947f6169e826564b6e00bafb8a0535ec2ff6f0ea"
+      ]
     },
     {
       "claimId": "claim_712431116afadba36eb56eaa0c0b2d2e",
@@ -2998,142 +2980,105 @@
       "sourceUnitDigest": "5b70c17ccf304cd9b34dfd3d35a8c2de11bd40b4276e7b07fcbf563cc3f8321e",
       "claimKind": "contract",
       "disposition": "supersede",
-      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:27-27#unheaded-block-5 (current lines); unit SHA256 5b70c17ccf304cd9b34dfd3d35a8c2de11bd40b4276e7b07fcbf563cc3f8321e.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:42-42#assignment (current lines); unit SHA256 97396cdd3cbd4c71c571e6b253019014d445ce4d4e1f7eeef80e4b7a60fc4fa5.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 97396cdd3cbd4c71c571e6b253019014d445ce4d4e1f7eeef80e4b7a60fc4fa5 at 9aa37b12a329abd16900dad73ab98408e6ef3aec.\nLinks: source 0, target 1; 1 changed spellings/labels, 0 destination changes; 1 added, 0 removed.\nLink 1: \"none\" (none) → \"ADR-006\" (../decisions/ADR-006-assignment-provenance-and-contract-snapshot.md); resolved none → docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md.\nHeading depth: not a heading → 2; title \"Unheaded block 5\" → \"Assignment\".\nWhole direct section differs; depth block → 2; 1 distinct link changes; normalized line order differs; 1 removed and 25 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-5 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#assignment; source context \"Assignment, Run, And RunResult Contract / Assignment\", target context \"Assignment, Run, And RunResult Contract\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:27-27#unheaded-block-5 (current lines); unit SHA256 5b70c17ccf304cd9b34dfd3d35a8c2de11bd40b4276e7b07fcbf563cc3f8321e.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:42-42#assignment (current lines); unit SHA256 97396cdd3cbd4c71c571e6b253019014d445ce4d4e1f7eeef80e4b7a60fc4fa5.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 97396cdd3cbd4c71c571e6b253019014d445ce4d4e1f7eeef80e4b7a60fc4fa5 at 9aa37b12a329abd16900dad73ab98408e6ef3aec.\nLinks: source 0, target 1; 1 changed spellings/labels, 0 destination changes; 1 added, 0 removed.\nLink 1: \"none\" (none) → \"ADR-006\" (../decisions/ADR-006-assignment-provenance-and-contract-snapshot.md); resolved none → docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md.\nHeading depth: not a heading → 2; title \"Unheaded block 5\" → \"Assignment\".\nWhole direct section differs; depth block → 2; 1 distinct link changes; normalized line order differs; 1 removed and 25 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-5 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#assignment; source context \"Assignment, Run, And RunResult Contract / Assignment\", target context \"Assignment, Run, And RunResult Contract\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "targetAnchor": "assignment",
-      "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
-      "reviewStatus": "reviewed",
-      "reviewNote": "deep: supersede assignment-run-runresult.md:27-27#unheaded-block-5 -> assignment-run-runresult.md:42-42#assignment; both unit digests hand-recomputed from raw lines, anchors ok, context and heading depth and title recomputed equal, links 0/1 with 1 changed recomputed equal, section delta 1 removed and 25 added recomputed equal, 57% of source words survive in place and the rest is a truth rewrite the supersede label covers (first changed hunk: [two accepted] -> [three])",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-62751458b.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "97396cdd3cbd4c71c571e6b253019014d445ce4d4e1f7eeef80e4b7a60fc4fa5",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "targetUnitDigest": "f9d94da0fcc7bc1d8b6356f0b120cedfcccb7414a67f8906d702f833517a8ee4",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract"
-      ],
-      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
+      ]
     },
     {
       "claimId": "claim_1a54f3db0a30f97f58e3f5bdf48a2f18",
       "sourceUnitDigest": "af0984cd7f09308d4738fa381f862a7dab8983aa738675df60636e0dc72e57b4",
       "claimKind": "contract",
       "disposition": "supersede",
-      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:29-31#unheaded-block-6 (current lines); unit SHA256 af0984cd7f09308d4738fa381f862a7dab8983aa738675df60636e0dc72e57b4.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:42-42#assignment (current lines); unit SHA256 97396cdd3cbd4c71c571e6b253019014d445ce4d4e1f7eeef80e4b7a60fc4fa5.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 97396cdd3cbd4c71c571e6b253019014d445ce4d4e1f7eeef80e4b7a60fc4fa5 at 9aa37b12a329abd16900dad73ab98408e6ef3aec.\nLinks: source 0, target 1; 1 changed spellings/labels, 0 destination changes; 1 added, 0 removed.\nLink 1: \"none\" (none) → \"ADR-006\" (../decisions/ADR-006-assignment-provenance-and-contract-snapshot.md); resolved none → docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md.\nHeading depth: not a heading → 2; title \"Unheaded block 6\" → \"Assignment\".\nWhole direct section differs; depth block → 2; 1 distinct link changes; normalized line order differs; 3 removed and 25 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-6 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#assignment; source context \"Assignment, Run, And RunResult Contract / Assignment\", target context \"Assignment, Run, And RunResult Contract\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:29-31#unheaded-block-6 (current lines); unit SHA256 af0984cd7f09308d4738fa381f862a7dab8983aa738675df60636e0dc72e57b4.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:42-42#assignment (current lines); unit SHA256 97396cdd3cbd4c71c571e6b253019014d445ce4d4e1f7eeef80e4b7a60fc4fa5.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 97396cdd3cbd4c71c571e6b253019014d445ce4d4e1f7eeef80e4b7a60fc4fa5 at 9aa37b12a329abd16900dad73ab98408e6ef3aec.\nLinks: source 0, target 1; 1 changed spellings/labels, 0 destination changes; 1 added, 0 removed.\nLink 1: \"none\" (none) → \"ADR-006\" (../decisions/ADR-006-assignment-provenance-and-contract-snapshot.md); resolved none → docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md.\nHeading depth: not a heading → 2; title \"Unheaded block 6\" → \"Assignment\".\nWhole direct section differs; depth block → 2; 1 distinct link changes; normalized line order differs; 3 removed and 25 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-6 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#assignment; source context \"Assignment, Run, And RunResult Contract / Assignment\", target context \"Assignment, Run, And RunResult Contract\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "targetAnchor": "assignment",
-      "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
-      "reviewStatus": "reviewed",
-      "reviewNote": "deep: supersede assignment-run-runresult.md:29-31#unheaded-block-6 -> assignment-run-runresult.md:42-42#assignment; both unit digests hand-recomputed from raw lines, anchors ok, context and heading depth and title recomputed equal, links 0/1 with 1 changed recomputed equal, section delta 3 removed and 25 added recomputed equal, 18% of source words survive in place and the rest is a truth rewrite the supersede label covers (first changed hunk: [a] -> [deleted])",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-62751458b.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "97396cdd3cbd4c71c571e6b253019014d445ce4d4e1f7eeef80e4b7a60fc4fa5",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "targetUnitDigest": "f9d94da0fcc7bc1d8b6356f0b120cedfcccb7414a67f8906d702f833517a8ee4",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract"
-      ],
-      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
+      ]
     },
     {
       "claimId": "claim_b0ed3798ba3d726ad708747bf9f3e417",
       "sourceUnitDigest": "33dd801eb1c88a8c6a7a04ce3c14c3aee10a861214e2a30761e57c30e04f1a0b",
       "claimKind": "contract",
       "disposition": "supersede",
-      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:68-76#unheaded-block-13 (current lines); unit SHA256 33dd801eb1c88a8c6a7a04ce3c14c3aee10a861214e2a30761e57c30e04f1a0b.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:88-88#run-phases-and-admission (current lines); unit SHA256 73bad58d6b9f94e6a764be7e1d7a8be5c2f995043e9a15b8ac617d7edd96a295.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 73bad58d6b9f94e6a764be7e1d7a8be5c2f995043e9a15b8ac617d7edd96a295 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 13\" → \"Run Phases And Admission\".\nWhole direct section differs; depth block → 3; 0 distinct link changes; normalized line order differs; 1 removed and 42 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-13 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#run-phases-and-admission; source context \"Assignment, Run, And RunResult Contract / Run / Run Phases And Admission\", target context \"Assignment, Run, And RunResult Contract / Run\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:68-76#unheaded-block-13 (current lines); unit SHA256 33dd801eb1c88a8c6a7a04ce3c14c3aee10a861214e2a30761e57c30e04f1a0b.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:88-88#run-phases-and-admission (current lines); unit SHA256 73bad58d6b9f94e6a764be7e1d7a8be5c2f995043e9a15b8ac617d7edd96a295.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 73bad58d6b9f94e6a764be7e1d7a8be5c2f995043e9a15b8ac617d7edd96a295 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 13\" → \"Run Phases And Admission\".\nWhole direct section differs; depth block → 3; 0 distinct link changes; normalized line order differs; 1 removed and 42 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-13 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#run-phases-and-admission; source context \"Assignment, Run, And RunResult Contract / Run / Run Phases And Admission\", target context \"Assignment, Run, And RunResult Contract / Run\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "targetAnchor": "run-phases-and-admission",
-      "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
-      "reviewStatus": "reviewed",
-      "reviewNote": "deep: supersede assignment-run-runresult.md:68-76#unheaded-block-13 -> assignment-run-runresult.md:88-88#run-phases-and-admission; both unit digests hand-recomputed from raw lines, anchors ok, context and heading depth and title recomputed equal, links 0/0 with 0 changed recomputed equal, section delta 1 removed and 42 added recomputed equal, 98% of source words survive in place and the rest is a truth rewrite the supersede label covers (first changed hunk: [Phases, in order:] -> [Run Phases And Admission A Run is the unit of])",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-62751458b.md",
-      "reviewMode": "ordinary",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
       "targetUnitDigest": "73bad58d6b9f94e6a764be7e1d7a8be5c2f995043e9a15b8ac617d7edd96a295",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Run"
-      ],
-      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
+      ]
     },
     {
       "claimId": "claim_b5e9a0cb05c450974c572df6c74d80c0",
       "sourceUnitDigest": "5d61f284eb32792d2bc93158e694eebb660af9e6bce9e66feeb577f010182ed7",
       "claimKind": "contract",
       "disposition": "supersede",
-      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:94-109#unheaded-block-16 (current lines); unit SHA256 5d61f284eb32792d2bc93158e694eebb660af9e6bce9e66feeb577f010182ed7.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:88-88#run-phases-and-admission (current lines); unit SHA256 73bad58d6b9f94e6a764be7e1d7a8be5c2f995043e9a15b8ac617d7edd96a295.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 73bad58d6b9f94e6a764be7e1d7a8be5c2f995043e9a15b8ac617d7edd96a295 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 16\" → \"Run Phases And Admission\".\nWhole direct section differs; depth block → 3; 0 distinct link changes; normalized line order differs; 4 removed and 37 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-16 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#run-phases-and-admission; source context \"Assignment, Run, And RunResult Contract / Run / Run Phases And Admission\", target context \"Assignment, Run, And RunResult Contract / Run\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:94-109#unheaded-block-16 (current lines); unit SHA256 5d61f284eb32792d2bc93158e694eebb660af9e6bce9e66feeb577f010182ed7.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:88-88#run-phases-and-admission (current lines); unit SHA256 73bad58d6b9f94e6a764be7e1d7a8be5c2f995043e9a15b8ac617d7edd96a295.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 73bad58d6b9f94e6a764be7e1d7a8be5c2f995043e9a15b8ac617d7edd96a295 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 16\" → \"Run Phases And Admission\".\nWhole direct section differs; depth block → 3; 0 distinct link changes; normalized line order differs; 4 removed and 37 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-16 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#run-phases-and-admission; source context \"Assignment, Run, And RunResult Contract / Run / Run Phases And Admission\", target context \"Assignment, Run, And RunResult Contract / Run\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "targetAnchor": "run-phases-and-admission",
-      "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
-      "reviewStatus": "reviewed",
-      "reviewNote": "deep: supersede assignment-run-runresult.md:94-109#unheaded-block-16 -> assignment-run-runresult.md:88-88#run-phases-and-admission; both unit digests hand-recomputed from raw lines, anchors ok, context and heading depth and title recomputed equal, links 0/0 with 0 changed recomputed equal, section delta 4 removed and 37 added recomputed equal, 79% of source words survive in place and the rest is a truth rewrite the supersede label covers (first changed hunk: [fencing**] -> [fencing (stronger proposal)**])",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-62751458b.md",
-      "reviewMode": "ordinary",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
       "targetUnitDigest": "73bad58d6b9f94e6a764be7e1d7a8be5c2f995043e9a15b8ac617d7edd96a295",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Run"
-      ],
-      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
+      ]
     },
     {
       "claimId": "claim_6a7f1f2db9e46be482d5db01438a7377",
       "sourceUnitDigest": "dab477c9862fdc35259c1cdaa7c472cd37ff9af0ebd825423e14947c31375b21",
       "claimKind": "contract",
       "disposition": "supersede",
-      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:141-141#unheaded-block-19 (current lines); unit SHA256 dab477c9862fdc35259c1cdaa7c472cd37ff9af0ebd825423e14947c31375b21.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:148-148#proposed-runtime-recovery-amendment (current lines); unit SHA256 99a1afe1389f0f8751791b35c90eeada1d947fb81e097f8625a6ebcb499355e1.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 99a1afe1389f0f8751791b35c90eeada1d947fb81e097f8625a6ebcb499355e1 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 1; 1 changed spellings/labels, 0 destination changes; 1 added, 0 removed.\nLink 1: \"none\" (none) → \"Runtime Recovery Design\" (../architecture/runtime-recovery-design.md); resolved none → docs/platform/agent-coordination/architecture/runtime-recovery-design.md.\nHeading depth: not a heading → 3; title \"Unheaded block 19\" → \"Proposed Runtime Recovery Amendment\".\nWhole direct section differs; depth block → 3; 1 distinct link changes; normalized line order differs; 1 removed and 77 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-19 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#proposed-runtime-recovery-amendment; source context \"Assignment, Run, And RunResult Contract / Run / Proposed Runtime Recovery Amendment\", target context \"Assignment, Run, And RunResult Contract / Run\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:141-141#unheaded-block-19 (current lines); unit SHA256 dab477c9862fdc35259c1cdaa7c472cd37ff9af0ebd825423e14947c31375b21.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:148-148#proposed-runtime-recovery-amendment (current lines); unit SHA256 99a1afe1389f0f8751791b35c90eeada1d947fb81e097f8625a6ebcb499355e1.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 99a1afe1389f0f8751791b35c90eeada1d947fb81e097f8625a6ebcb499355e1 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 1; 1 changed spellings/labels, 0 destination changes; 1 added, 0 removed.\nLink 1: \"none\" (none) → \"Runtime Recovery Design\" (../architecture/runtime-recovery-design.md); resolved none → docs/platform/agent-coordination/architecture/runtime-recovery-design.md.\nHeading depth: not a heading → 3; title \"Unheaded block 19\" → \"Proposed Runtime Recovery Amendment\".\nWhole direct section differs; depth block → 3; 1 distinct link changes; normalized line order differs; 1 removed and 77 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-19 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#proposed-runtime-recovery-amendment; source context \"Assignment, Run, And RunResult Contract / Run / Proposed Runtime Recovery Amendment\", target context \"Assignment, Run, And RunResult Contract / Run\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "targetAnchor": "proposed-runtime-recovery-amendment",
-      "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
-      "reviewStatus": "reviewed",
-      "reviewNote": "deep: supersede assignment-run-runresult.md:141-141#unheaded-block-19 -> assignment-run-runresult.md:148-148#proposed-runtime-recovery-amendment; both unit digests hand-recomputed from raw lines, anchors ok, context and heading depth and title recomputed equal, links 0/1 with 1 changed recomputed equal, section delta 1 removed and 77 added recomputed equal, 42% of source words survive in place and the rest is a truth rewrite the supersede label covers (first changed hunk: [**Run] -> [Proposed Runtime Recovery Amendment Status: P]); in the seeded full-text sample, both texts read in full",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-62751458b.md",
-      "reviewMode": "ordinary",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
       "targetUnitDigest": "99a1afe1389f0f8751791b35c90eeada1d947fb81e097f8625a6ebcb499355e1",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Run"
-      ],
-      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
+      ]
     },
     {
       "claimId": "claim_a30e0ef293a9486cb916f09f5e245e6a",
       "sourceUnitDigest": "f2fcc5595e8ec8c27d24cad2115755f77284c19d9f55686485e59201b8a53a34",
       "claimKind": "contract",
       "disposition": "supersede",
-      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:258-261#unheaded-block-33 (current lines); unit SHA256 f2fcc5595e8ec8c27d24cad2115755f77284c19d9f55686485e59201b8a53a34.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:252-252#dispatch-operability-addendum (current lines); unit SHA256 ae15a88c7eb4499399761dd51ce845613c7d19ad7a6ab7578dec7ba0226ed93c.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest ae15a88c7eb4499399761dd51ce845613c7d19ad7a6ab7578dec7ba0226ed93c at 9351a257f718ae8f41545792fda3b477a0616e9e.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 33\" → \"Dispatch Operability Addendum\".\nWhole direct section differs; depth block → 3; 0 distinct link changes; normalized line order differs; 1 removed and 26 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-33 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#dispatch-operability-addendum; source context \"Assignment, Run, And RunResult Contract / RunResult / Dispatch Operability Addendum\", target context \"Assignment, Run, And RunResult Contract / RunResult\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:258-261#unheaded-block-33 (current lines); unit SHA256 f2fcc5595e8ec8c27d24cad2115755f77284c19d9f55686485e59201b8a53a34.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:252-252#dispatch-operability-addendum (current lines); unit SHA256 ae15a88c7eb4499399761dd51ce845613c7d19ad7a6ab7578dec7ba0226ed93c.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest ae15a88c7eb4499399761dd51ce845613c7d19ad7a6ab7578dec7ba0226ed93c at 9351a257f718ae8f41545792fda3b477a0616e9e.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 33\" → \"Dispatch Operability Addendum\".\nWhole direct section differs; depth block → 3; 0 distinct link changes; normalized line order differs; 1 removed and 26 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-33 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#dispatch-operability-addendum; source context \"Assignment, Run, And RunResult Contract / RunResult / Dispatch Operability Addendum\", target context \"Assignment, Run, And RunResult Contract / RunResult\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "targetAnchor": "dispatch-operability-addendum",
-      "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
-      "reviewStatus": "reviewed",
-      "reviewNote": "deep: supersede assignment-run-runresult.md:258-261#unheaded-block-33 -> assignment-run-runresult.md:252-252#dispatch-operability-addendum; both unit digests hand-recomputed from raw lines, anchors ok, context and heading depth and title recomputed equal, links 0/0 with 0 changed recomputed equal, section delta 1 removed and 26 added recomputed equal, 87% of source words survive in place and the rest is a truth rewrite the supersede label covers (first changed hunk: [(`plans/260914-dispatch-operability-evidence-attributio] -> [(`archive/plans/260914-dispatch-operability-e])",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-62751458b.md",
-      "reviewMode": "ordinary",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
       "targetUnitDigest": "ae15a88c7eb4499399761dd51ce845613c7d19ad7a6ab7578dec7ba0226ed93c",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "RunResult"
-      ],
-      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
+      ]
     },
     {
       "claimId": "claim_66366a2de3e810733eaaf6905e57628b",
       "sourceUnitDigest": "98815955352ea016dd5a0d03b1302502496a4fec5202fe95e2f7b126e1cc007f",
       "claimKind": "contract",
       "disposition": "supersede",
-      "rationale": "Whole-unit replacement, not a structural move or promotion: Current v3 default/v4 support replaces the historical v2-default wording while preserving all result, observation, wrapper, classification, legacy and corruption boundaries. The source remains completely accounted by its pinned source unit and the literal historical carriage. Independent review 9351a257f accepted the corrected truth; this relabelled decision requires its own pending targeted check under A23.",
+      "rationale": "Whole-unit replacement, not a structural move or promotion: Current v3 default/v4 support replaces the historical v2-default wording while preserving all result, observation, wrapper, classification, legacy and corruption boundaries. The source remains completely accounted by its pinned source unit and the literal historical carriage. Independent review 9351a257f accepted the corrected truth; this relabelled decision requires its own pending targeted check under A23. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "targetAnchor": "unheaded-block-38",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewNote": "A23 relabel move->supersede correct: bullet 5 replaced \"New v2 results classify...\" by v3 default / v4 supported / v2 historical. Verified run-result.mjs:351 contractVersion=3 and :557-563 v4 branch; other 6 bullets byte-equal; contract-corrupt and legacy-derived still in run-result.mjs (:23). Pending, no approval carried.",
+      "targetAnchor": "unheaded-block-39",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
       "beforeTargetedFix": {
         "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
         "targetAnchor": "unheaded-block-38",
@@ -3143,82 +3088,59 @@
       },
       "shownTargetDigest": "23d3360350d9203713ffa49ccd90c47fae6eff15620a38f2a36e3b9b40a6b48e",
       "truthFixEvidence": "plans/260925-documentation-authority-unification/reports/phase-06/truth-fix-evidence-agent-coordination.json",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-11",
-      "reviewedAt": "2026-10-11",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-carriage-labels-source.md",
-      "reviewMode": "ordinary",
       "targetUnitDigest": "23d3360350d9203713ffa49ccd90c47fae6eff15620a38f2a36e3b9b40a6b48e",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "RunResult",
         "Dispatch Operability Addendum"
-      ],
-      "reviewReportCommit": "865ad66bebcc4748341e676bdc5b53a453ce1556"
+      ]
     },
     {
       "claimId": "claim_01a4127478b48d367f29f82a84b96736",
       "sourceUnitDigest": "4a33074fe5079abc1726c504288cdcd6fe16dca8a2554166ba2588dfb8c4e02f",
       "claimKind": "contract",
       "disposition": "supersede",
-      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:277-284#unheaded-block-35 (current lines); unit SHA256 4a33074fe5079abc1726c504288cdcd6fe16dca8a2554166ba2588dfb8c4e02f.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:252-252#dispatch-operability-addendum (current lines); unit SHA256 ae15a88c7eb4499399761dd51ce845613c7d19ad7a6ab7578dec7ba0226ed93c.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest ae15a88c7eb4499399761dd51ce845613c7d19ad7a6ab7578dec7ba0226ed93c at 9351a257f718ae8f41545792fda3b477a0616e9e.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 35\" → \"Dispatch Operability Addendum\".\nWhole direct section differs; depth block → 3; 0 distinct link changes; normalized line order differs; 2 removed and 23 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-35 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#dispatch-operability-addendum; source context \"Assignment, Run, And RunResult Contract / RunResult / Dispatch Operability Addendum\", target context \"Assignment, Run, And RunResult Contract / RunResult\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:277-284#unheaded-block-35 (current lines); unit SHA256 4a33074fe5079abc1726c504288cdcd6fe16dca8a2554166ba2588dfb8c4e02f.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:252-252#dispatch-operability-addendum (current lines); unit SHA256 ae15a88c7eb4499399761dd51ce845613c7d19ad7a6ab7578dec7ba0226ed93c.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest ae15a88c7eb4499399761dd51ce845613c7d19ad7a6ab7578dec7ba0226ed93c at 9351a257f718ae8f41545792fda3b477a0616e9e.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 3; title \"Unheaded block 35\" → \"Dispatch Operability Addendum\".\nWhole direct section differs; depth block → 3; 0 distinct link changes; normalized line order differs; 2 removed and 23 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-35 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#dispatch-operability-addendum; source context \"Assignment, Run, And RunResult Contract / RunResult / Dispatch Operability Addendum\", target context \"Assignment, Run, And RunResult Contract / RunResult\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "targetAnchor": "dispatch-operability-addendum",
-      "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
-      "reviewStatus": "reviewed",
-      "reviewNote": "deep: supersede assignment-run-runresult.md:277-284#unheaded-block-35 -> assignment-run-runresult.md:252-252#dispatch-operability-addendum; both unit digests hand-recomputed from raw lines, anchors ok, context and heading depth and title recomputed equal, links 0/0 with 0 changed recomputed equal, section delta 2 removed and 23 added recomputed equal, 94% of source words survive in place and the rest is a truth rewrite the supersede label covers (first changed hunk: [accepted] -> [dispatch-operability])",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-62751458b.md",
-      "reviewMode": "ordinary",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
       "targetUnitDigest": "ae15a88c7eb4499399761dd51ce845613c7d19ad7a6ab7578dec7ba0226ed93c",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "RunResult"
-      ],
-      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
+      ]
     },
     {
       "claimId": "claim_c43d8d2e272e534e1af9a432840b598d",
       "sourceUnitDigest": "34dc53ac1ad84df43e7b9e2006ba88a3dd3640bfd590d87cb59141aecf36cfa1",
       "claimKind": "contract",
       "disposition": "supersede",
-      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:311-312#unheaded-block-40 (current lines); unit SHA256 34dc53ac1ad84df43e7b9e2006ba88a3dd3640bfd590d87cb59141aecf36cfa1.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:308-308#work-boundary (current lines); unit SHA256 1dfda63c8c6d8b9e8eb8a8d6ad8db92845e0f85e8956b80c9eba8bb35600a275.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 1dfda63c8c6d8b9e8eb8a8d6ad8db92845e0f85e8956b80c9eba8bb35600a275 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 40\" → \"Work Boundary\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 2 removed and 4 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-40 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#work-boundary; source context \"Assignment, Run, And RunResult Contract / Work Boundary\", target context \"Assignment, Run, And RunResult Contract\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:311-312#unheaded-block-40 (current lines); unit SHA256 34dc53ac1ad84df43e7b9e2006ba88a3dd3640bfd590d87cb59141aecf36cfa1.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:308-308#work-boundary (current lines); unit SHA256 1dfda63c8c6d8b9e8eb8a8d6ad8db92845e0f85e8956b80c9eba8bb35600a275.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 1dfda63c8c6d8b9e8eb8a8d6ad8db92845e0f85e8956b80c9eba8bb35600a275 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nHeading depth: not a heading → 2; title \"Unheaded block 40\" → \"Work Boundary\".\nWhole direct section differs; depth block → 2; 0 distinct link changes; normalized line order differs; 2 removed and 4 added nonblank lines after heading/link/correction normalization.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-40 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#work-boundary; source context \"Assignment, Run, And RunResult Contract / Work Boundary\", target context \"Assignment, Run, And RunResult Contract\". The bound heading title, depth or directly following payload differs; the heading is not an equal-digest copy.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "targetAnchor": "work-boundary",
-      "authoredBy": "codex-session:unit-run-1792118148618-e4fd15ef@2026-10-16",
-      "reviewStatus": "reviewed",
-      "reviewNote": "deep: supersede assignment-run-runresult.md:311-312#unheaded-block-40 -> assignment-run-runresult.md:308-308#work-boundary; both unit digests hand-recomputed from raw lines, anchors ok, context and heading depth and title recomputed equal, links 0/0 with 0 changed recomputed equal, section delta 2 removed and 4 added recomputed equal, 54% of source words survive in place and the rest is a truth rewrite the supersede label covers (first changed hunk: [Run,] -> [Run])",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-03-62751458b.md",
-      "reviewMode": "ordinary",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
       "targetUnitDigest": "1dfda63c8c6d8b9e8eb8a8d6ad8db92845e0f85e8956b80c9eba8bb35600a275",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract"
-      ],
-      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
+      ]
     },
     {
       "claimId": "claim_43f4cc9c8c58f2d272f31c88a438affd",
       "sourceUnitDigest": "686d0c538c04b9f185699889378a6846acfdc4ed2c11ad1886d30627ae491e14",
       "claimKind": "contract",
       "disposition": "move",
-      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:316-333#unheaded-block-41 (current lines); unit SHA256 686d0c538c04b9f185699889378a6846acfdc4ed2c11ad1886d30627ae491e14.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:316-333#unheaded-block-45 (current lines); unit SHA256 686d0c538c04b9f185699889378a6846acfdc4ed2c11ad1886d30627ae491e14.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 686d0c538c04b9f185699889378a6846acfdc4ed2c11ad1886d30627ae491e14 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-41 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-45; source context \"Assignment, Run, And RunResult Contract / Required Negative Tests\", target context \"Assignment, Run, And RunResult Contract / Required Negative Tests\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "rationale": "Source: docs/architect/agent-coordination/contracts/assignment-run-runresult.md:316-333#unheaded-block-41 (current lines); unit SHA256 686d0c538c04b9f185699889378a6846acfdc4ed2c11ad1886d30627ae491e14.\nTarget: docs/platform/agent-coordination/contracts/assignment-run-runresult.md:316-333#unheaded-block-45 (current lines); unit SHA256 686d0c538c04b9f185699889378a6846acfdc4ed2c11ad1886d30627ae491e14.\nSource and target unit digests equal.\nTarget unchanged since last reviewed digest 686d0c538c04b9f185699889378a6846acfdc4ed2c11ad1886d30627ae491e14 at 947f6169e826564b6e00bafb8a0535ec2ff6f0ea.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition move: Account for docs/architect/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-41 under docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-45; source context \"Assignment, Run, And RunResult Contract / Required Negative Tests\", target context \"Assignment, Run, And RunResult Contract / Required Negative Tests\". The complete bound unit is carried with an equal native digest.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "targetAnchor": "unheaded-block-45",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "reviewed",
-      "reviewNote": "mechanical: source assignment-run-runresult.md#unheaded-block-41 and target #unheaded-block-45 recomputed to the stated equal digest, span lines match the rationale, text identical by script, anchor checked, contexts verified against real heading chain; links 0/0 match; last-reviewed digest present in target at 947f6169e;",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-05-287a22d33.md",
-      "reviewMode": "ordinary",
+      "targetAnchor": "unheaded-block-46",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
       "targetUnitDigest": "686d0c538c04b9f185699889378a6846acfdc4ed2c11ad1886d30627ae491e14",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Required Negative Tests"
-      ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      ]
     },
     {
       "claimId": "claim_830dc2ba3442539ad565bf50d809fe19",
@@ -9441,5 +9363,6 @@
       ],
       "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
     }
-  ]
+  ],
+  "correctionSession": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17"
 }

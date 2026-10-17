@@ -163,22 +163,16 @@
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
       "targetAnchor": "unheaded-block-4",
       "successorClaimId": "claim_e1006302cec44bf7ea58a63ed94983d8",
-      "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "reviewed",
-      "rationale": "The independently requested current truth/citation correction at 0ddec07f86f5289a304d6070e27595650625ac7f supersedes this unstable block. The unchanged extractor retains the old identity as an identity-gap record; its real successor is claim_e1006302cec44bf7ea58a63ed94983d8. Original and successor shown text are retained here; no approval carries.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "The independently requested current truth/citation correction at 0ddec07f86f5289a304d6070e27595650625ac7f supersedes this unstable block. The unchanged extractor retains the old identity as an identity-gap record; its real successor is claim_e1006302cec44bf7ea58a63ed94983d8. Original and successor shown text are retained here; no approval carries. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "shownTargetText": "| Section | Status | Evidence / limit |\n|---|---|---|\n| Assignment | Mixed implementation and proposal; no blanket implementation claim | src/runner/dispatch/assignment.mjs:17,276; assignment-normalizer.mjs:2-20 (stamps mutation/evidence.required); assignment-runner.mjs:431,560,574 (provenance.kind inline/declared/unit-run) |\n| Run | Current contract/invariant | src/runner/dispatch/assignment-runner.mjs:697-940 (admitRunAttempt, attempt numbering, prior Runs kept), :1563-1582 (run.json contents) |\n| Run Phases And Admission | Mixed implementation and proposal; no blanket implementation claim | assignment-runner.mjs:932 admission-run-in-flight, :784 expectedRunId refusal, :1941 result-corrupt, :1016/2024 publishMutableProjection/publishMarkerOnce; run-lock.mjs acquireRunControl/buildRunControlHolder/resolveHolderLiveness (assignment-runner.mjs:70-81); runtime-inspection.mjs:160 VALID_PHASES; git grep run-retried src -> none |\n| Proposed Runtime Recovery Amendment | Mixed implementation and proposal; no blanket implementation claim | assignment-runner.mjs:1563-1582 writes contract 'assignment-run.v2' with phase/delivery/supersedesRunId/retryId/payloadDigest; launchCommandId at :2118; recovery-planner.mjs:251-327 (snapshotHash, expectedControlEpoch, actionKey); admission-* refusal codes at :917-940; admitRun/admissionKey/authorityRef/writerRuntime not in src |\n| RunResult | Current contract/invariant | src/runner/dispatch/run-result.mjs:350-385 (normalizeRunResult fields), :1305-1325 (runOutcome) |\n| Dispatch Operability Addendum | Current contract/invariant | src/runner/dispatch/run-result.mjs:7,22-23 (legacy-derived, contract-corrupt); agent-result-claim-contract.mjs:5 (claim v2); runtime-inspection.mjs:255; test/runner/dispatch-operability-production-door.test.mjs |\n| Confidence | Current contract/invariant | src/runner/dispatch/run-result.mjs:1276-1285; packages/run-result/rust/src/lib.rs:129 CONFIDENCE_LEVELS; assignment-normalizer.mjs:67-69 |\n| Evidence Freshness | Current contract/invariant | src/runner/dispatch/evidence-attribution.mjs:10 (levels proven/correlated/excluded/unattributed), :69,:197; test/runner/evidence-attribution.test.mjs |\n| Work Boundary | Current contract/invariant | docs/specs/runner.md:3072-3081 (0049); no src/state import in src/runner/dispatch or src/runner/execution |\n| Required Negative Tests | Mixed implementation and proposal; no blanket implementation claim | test/runner/assignment-runresult.test.mjs, evidence-attribution.test.mjs, run-lock-identity.test.mjs, dispatch-liveness.test.mjs; items about 'superseded Run late result' tied to run-retried (retired) |",
       "shownTargetDigest": "d363fcef7918ebda43ee6044b4fd5597381493ac586187e3328c384e6d663f98",
-      "reviewNote": "Supersede. Source b3c903ac exact at b7fa93a72 block 4. Reviewed: review-2-closure-fixes.md gap row ok, delta exactly the run-metadata citation to assignment-runner.mjs:1563-1582; target d363fcef equals HEAD same-locator digest. Registry claim_e1006302...; ledger successor claim_3f9ba37c... absent. Target docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-4; digest recomputed at HEAD with the repo extractor.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
-      "reviewedAt": "2026-10-12",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md",
-      "reviewMode": "ordinary",
       "targetUnitDigest": "d363fcef7918ebda43ee6044b4fd5597381493ac586187e3328c384e6d663f98",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Implementation And Design Status"
-      ],
-      "reviewReportCommit": "9855bf6cb1492d3a9a368175e53654dbd7939f4a"
+      ]
     },
     {
       "claimId": "claim_34a87472629191c59355e5f74ef2c2d2",
@@ -190,24 +184,18 @@
       "shownSourceDigest": "5861765263e6557b7b6542fbb308cc5bb10cd919f0e521532284054431e54a8e",
       "disposition": "supersede",
       "targetOwner": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
-      "targetAnchor": "unheaded-block-9",
+      "targetAnchor": "unheaded-block-10",
       "successorClaimId": "claim_85872e0eff1738d734a4ec5551b9b4ef",
-      "authoredBy": "codex-session:1@2026-10-11",
-      "reviewStatus": "reviewed",
-      "rationale": "The independently requested current truth/citation correction at 0ddec07f86f5289a304d6070e27595650625ac7f supersedes this unstable block. The unchanged extractor retains the old identity as an identity-gap record; its real successor is claim_85872e0eff1738d734a4ec5551b9b4ef. Original and successor shown text are retained here; no approval carries.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "The independently requested current truth/citation correction at 0ddec07f86f5289a304d6070e27595650625ac7f supersedes this unstable block. The unchanged extractor retains the old identity as an identity-gap record; its real successor is claim_85872e0eff1738d734a4ec5551b9b4ef. Original and successor shown text are retained here; no approval carries. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
       "shownTargetText": "[ADR-006](../decisions/ADR-006-assignment-provenance-and-contract-snapshot.md)\ndistinguishes their shapes. Declared/inline builders stamp policy/normalizer\nversions (`src/runner/dispatch/assignment.mjs:455-460,663-667`; constants in\n`src/runner/dispatch/execution-contract.mjs:47` and\n`src/runner/dispatch/assignment-normalizer.mjs:44`); Unit-run provenance is\nwritten by `execution/run.mjs:334-338`.\nMutation/evidence normalization is current implementation, not an assumption\nthat the retired session stamp-producing door still exists.",
       "shownTargetDigest": "eb1cabf7f7b144e4837bff0f2ff7fa27c6af7bd094a4105a36d27c02fa0b8f3c",
-      "reviewNote": "Supersede. Source 58617652 exact at b7fa93a72 block 9. Reviewed: review-2-closure-fixes.md gap row ok, delta exactly the added policy/normalizer stamp citations; target eb1cabf7 equals HEAD same-locator digest. Registry claim_85872e0e...; ledger successor claim_a7fe161c... absent. Target docs/platform/agent-coordination/contracts/assignment-run-runresult.md#unheaded-block-9; digest recomputed at HEAD with the repo extractor.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
-      "reviewedAt": "2026-10-12",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-recovery.md",
-      "reviewMode": "ordinary",
       "targetUnitDigest": "eb1cabf7f7b144e4837bff0f2ff7fa27c6af7bd094a4105a36d27c02fa0b8f3c",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract",
         "Assignment"
-      ],
-      "reviewReportCommit": "9855bf6cb1492d3a9a368175e53654dbd7939f4a"
+      ]
     },
     {
       "claimId": "claim_e9bb00004e75ca737f2eeca58152063d",
@@ -305,5 +293,6 @@
       "reviewReportCommit": "b7fa93a72eedb4fe7943158c567691aa7b2b130c",
       "reviewMode": "ordinary"
     }
-  ]
+  ],
+  "correctionSession": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17"
 }

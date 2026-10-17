@@ -32,7 +32,7 @@
     "docs/ui-spec/screens/S04-questions-needing-answer.md",
     "docs/ui-spec/spec.config.yaml"
   ],
-  "count": 117,
+  "count": 99,
   "reviewStatus": "pending",
   "meaning": "Exact current native reverse population. Candidate-unverified eligibility only; bounded A40 corrections do not certify full truth or promotion.",
   "rows": [
@@ -129,57 +129,6 @@
       "fileStatus": {
         "kind": "decision",
         "kindCanonical": true,
-        "designStatus": "Candidate",
-        "canonical": false,
-        "canonicalHeader": "No",
-        "authorityStatus": "candidate"
-      },
-      "status": "candidate-unverified",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792050411047-6a93d201@2026-10-15"
-    },
-    {
-      "claimId": "claim_caad0412514600e09b315711f40d63b3",
-      "path": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
-      "anchor": "added-in-candidate-rollout-and-settled-facts",
-      "unitDigest": "145efc2b0f94ac5c4805a029ffbb0a2aa2cbf2e18a631eb41509b25bb3c34d02",
-      "fileStatus": {
-        "kind": "history",
-        "kindCanonical": false,
-        "designStatus": "Candidate",
-        "canonical": false,
-        "canonicalHeader": "No",
-        "authorityStatus": "candidate"
-      },
-      "status": "candidate-unverified",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792050411047-6a93d201@2026-10-15"
-    },
-    {
-      "claimId": "claim_9bdf6c2c4d8dc3d61a6a232a9a91783a",
-      "path": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
-      "anchor": "unheaded-block-1",
-      "unitDigest": "f6baea0d0deaa57d5d1449e87a457095ecffc2f4a590c9624a0ae416ee826d26",
-      "fileStatus": {
-        "kind": "history",
-        "kindCanonical": false,
-        "designStatus": "Candidate",
-        "canonical": false,
-        "canonicalHeader": "No",
-        "authorityStatus": "candidate"
-      },
-      "status": "candidate-unverified",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792050411047-6a93d201@2026-10-15"
-    },
-    {
-      "claimId": "claim_0dca42703f2c03e68471c56b056b7346",
-      "path": "docs/platform/agent-confinement/history/rollout-and-settled-facts.md",
-      "anchor": "unheaded-block-2",
-      "unitDigest": "66aa8277df23cb50198ec2bacc3c3c8533e800d0913449c515c8993d1e167bb0",
-      "fileStatus": {
-        "kind": "history",
-        "kindCanonical": false,
         "designStatus": "Candidate",
         "canonical": false,
         "canonicalHeader": "No",
@@ -1023,57 +972,6 @@
       "authoredBy": "codex-session:unit-run-1792050411047-6a93d201@2026-10-15"
     },
     {
-      "claimId": "claim_4f71574ce31a28e8474ed3b24384aa52",
-      "path": "docs/platform/observe/decisions/observe-component-architecture.md",
-      "anchor": "added-in-candidate-observe-component-architecture",
-      "unitDigest": "e70dac7c44e20f416dee938f4465b08e5275aada0a2bb6fc226ef6b59f1b0f52",
-      "fileStatus": {
-        "kind": "decision",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "canonical": false,
-        "canonicalHeader": "No",
-        "authorityStatus": "candidate"
-      },
-      "status": "candidate-unverified",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792050411047-6a93d201@2026-10-15"
-    },
-    {
-      "claimId": "claim_13df8a0d6f5a1c62749d6a8c51d93ff2",
-      "path": "docs/platform/observe/decisions/observe-component-architecture.md",
-      "anchor": "unheaded-block-1",
-      "unitDigest": "e4e238d6b367db4c066be61009d3ff3e6ef2e5c712833edb430df97e63ba79e8",
-      "fileStatus": {
-        "kind": "decision",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "canonical": false,
-        "canonicalHeader": "No",
-        "authorityStatus": "candidate"
-      },
-      "status": "candidate-unverified",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792050411047-6a93d201@2026-10-15"
-    },
-    {
-      "claimId": "claim_8e9d85cd8252ba230dd84ced8269cecb",
-      "path": "docs/platform/observe/decisions/observe-component-architecture.md",
-      "anchor": "unheaded-block-2",
-      "unitDigest": "66aa8277df23cb50198ec2bacc3c3c8533e800d0913449c515c8993d1e167bb0",
-      "fileStatus": {
-        "kind": "decision",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "canonical": false,
-        "canonicalHeader": "No",
-        "authorityStatus": "candidate"
-      },
-      "status": "candidate-unverified",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792050411047-6a93d201@2026-10-15"
-    },
-    {
       "claimId": "claim_cda0440685fcdf0adb2677c1ff94597a",
       "path": "docs/platform/observe/README.md",
       "anchor": "observe-candidate-area",
@@ -1199,40 +1097,6 @@
       "unitDigest": "50744c72ca12a2b0a1e8e48d687e6896a71683106ba6839335a1c24eed18a6ad",
       "fileStatus": {
         "kind": "area-portal",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "canonical": false,
-        "canonicalHeader": "No",
-        "authorityStatus": "candidate"
-      },
-      "status": "candidate-unverified",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792050411047-6a93d201@2026-10-15"
-    },
-    {
-      "claimId": "claim_f0f42078e4e7365bd6f8f7e977e82670",
-      "path": "docs/platform/observe/spec.md",
-      "anchor": "unheaded-block-1",
-      "unitDigest": "65858f14a8866d99ab79ada3b40242a90b2c18c05531b2d9d574c6cce22c2120",
-      "fileStatus": {
-        "kind": "spec",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "canonical": false,
-        "canonicalHeader": "No",
-        "authorityStatus": "candidate"
-      },
-      "status": "candidate-unverified",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792050411047-6a93d201@2026-10-15"
-    },
-    {
-      "claimId": "claim_5100a4ce73fc19b94765b99f1e52db72",
-      "path": "docs/platform/observe/spec.md",
-      "anchor": "unheaded-block-2",
-      "unitDigest": "1cdde7ed7db6d3826a2eeaa048904706f079cb81502b91c32d27feb1bb932ab0",
-      "fileStatus": {
-        "kind": "spec",
         "kindCanonical": true,
         "designStatus": "Candidate",
         "canonical": false,
@@ -1811,176 +1675,6 @@
       "unitDigest": "7a16f93c0d7d23c5915d7afe7e93d6b32d9eda0b659d66f240912d863eeaa196",
       "fileStatus": {
         "kind": "guide-runbook",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "canonical": false,
-        "canonicalHeader": "No",
-        "authorityStatus": "candidate"
-      },
-      "status": "candidate-unverified",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792050411047-6a93d201@2026-10-15"
-    },
-    {
-      "claimId": "claim_30ef6f326f5abd0d78de97a25cc3f3c5",
-      "path": "docs/platform/ui-spec/README.md",
-      "anchor": "ui-spec-candidate-area",
-      "unitDigest": "ac5c3a02f2a949efbf25c447075bc3408b8ab8bdb6e6cb53b9bb48a8a6f397bb",
-      "fileStatus": {
-        "kind": "area-portal",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "canonical": false,
-        "canonicalHeader": "No",
-        "authorityStatus": "candidate"
-      },
-      "status": "candidate-unverified",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792050411047-6a93d201@2026-10-15"
-    },
-    {
-      "claimId": "claim_475402fdfdcfc59ec54020a104286cd7",
-      "path": "docs/platform/ui-spec/README.md",
-      "anchor": "unheaded-block-1",
-      "unitDigest": "db407f93c0c7383c1016ddfc5938af146800a44eb6359341f78181d54235346c",
-      "fileStatus": {
-        "kind": "area-portal",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "canonical": false,
-        "canonicalHeader": "No",
-        "authorityStatus": "candidate"
-      },
-      "status": "candidate-unverified",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792050411047-6a93d201@2026-10-15"
-    },
-    {
-      "claimId": "claim_498f5e1b2a9e68eacf6869a7c186338d",
-      "path": "docs/platform/ui-spec/README.md",
-      "anchor": "unheaded-block-2",
-      "unitDigest": "71fe6fd752cf765de2e06475eb425b9ca31b4bdf11fa49e640673a5d449a3f63",
-      "fileStatus": {
-        "kind": "area-portal",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "canonical": false,
-        "canonicalHeader": "No",
-        "authorityStatus": "candidate"
-      },
-      "status": "candidate-unverified",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792050411047-6a93d201@2026-10-15"
-    },
-    {
-      "claimId": "claim_45fff0981b35085dac24f660e70f1ee4",
-      "path": "docs/platform/ui-spec/README.md",
-      "anchor": "added-in-candidate-read-this-area",
-      "unitDigest": "636dda94a1c0cfac18a6e994fde88065e9353c311c49f717a294bdcca33bb308",
-      "fileStatus": {
-        "kind": "area-portal",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "canonical": false,
-        "canonicalHeader": "No",
-        "authorityStatus": "candidate"
-      },
-      "status": "candidate-unverified",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792050411047-6a93d201@2026-10-15"
-    },
-    {
-      "claimId": "claim_fa7731ddd1b25fe3ee34b5c7e70edd46",
-      "path": "docs/platform/ui-spec/README.md",
-      "anchor": "unheaded-block-3",
-      "unitDigest": "aa79c5c0a25c4ae18597a52e583e5abbf7800a64be258063de2ca2cf2e51cdc8",
-      "fileStatus": {
-        "kind": "area-portal",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "canonical": false,
-        "canonicalHeader": "No",
-        "authorityStatus": "candidate"
-      },
-      "status": "candidate-unverified",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792050411047-6a93d201@2026-10-15"
-    },
-    {
-      "claimId": "claim_4379bbdc1f5b68158a2f2eac120926b8",
-      "path": "docs/platform/ui-spec/README.md",
-      "anchor": "unheaded-block-4",
-      "unitDigest": "f994379e4db3aaa29a58a74ae1f1fb83959c76367fb54073269352be5eb8ec7b",
-      "fileStatus": {
-        "kind": "area-portal",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "canonical": false,
-        "canonicalHeader": "No",
-        "authorityStatus": "candidate"
-      },
-      "status": "candidate-unverified",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792050411047-6a93d201@2026-10-15"
-    },
-    {
-      "claimId": "claim_29c44bebd5c8bf85860fed14509ccb87",
-      "path": "docs/platform/ui-spec/README.md",
-      "anchor": "added-in-candidate-tool-root-obligation",
-      "unitDigest": "d1b0f95e4cb7e3fdd0af56553b8eaad80a4be0dff9c1251db19f3b8603964241",
-      "fileStatus": {
-        "kind": "area-portal",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "canonical": false,
-        "canonicalHeader": "No",
-        "authorityStatus": "candidate"
-      },
-      "status": "candidate-unverified",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792050411047-6a93d201@2026-10-15"
-    },
-    {
-      "claimId": "claim_e5d8d4d3058c720298266305e3ef2296",
-      "path": "docs/platform/ui-spec/README.md",
-      "anchor": "unheaded-block-5",
-      "unitDigest": "1444111c05c261518780651bd7ca9d59bb69d3259f9401c4cb3ce345c06dcacb",
-      "fileStatus": {
-        "kind": "area-portal",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "canonical": false,
-        "canonicalHeader": "No",
-        "authorityStatus": "candidate"
-      },
-      "status": "candidate-unverified",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792050411047-6a93d201@2026-10-15"
-    },
-    {
-      "claimId": "claim_6a14bb60ec264a23ed7c7f77b596699a",
-      "path": "docs/platform/ui-spec/README.md",
-      "anchor": "added-in-candidate-verification-and-change-boundary",
-      "unitDigest": "6c3c047ddd7118f92f4b6f66178d3e7a27207c28cd5f04fdf5ed65c718286c54",
-      "fileStatus": {
-        "kind": "area-portal",
-        "kindCanonical": true,
-        "designStatus": "Candidate",
-        "canonical": false,
-        "canonicalHeader": "No",
-        "authorityStatus": "candidate"
-      },
-      "status": "candidate-unverified",
-      "reviewStatus": "pending",
-      "authoredBy": "codex-session:unit-run-1792050411047-6a93d201@2026-10-15"
-    },
-    {
-      "claimId": "claim_9b2f071d31edec26e3972debd77cd875",
-      "path": "docs/platform/ui-spec/README.md",
-      "anchor": "unheaded-block-6",
-      "unitDigest": "50744c72ca12a2b0a1e8e48d687e6896a71683106ba6839335a1c24eed18a6ad",
-      "fileStatus": {
-        "kind": "area-portal",
         "kindCanonical": true,
         "designStatus": "Candidate",
         "canonical": false,
@@ -5872,5 +5566,11 @@
       }
     ]
   },
-  "previousDocsContentCommit": "6b8d84f9e"
+  "previousDocsContentCommit": "6b8d84f9e",
+  "packageRebind": {
+    "contentCommit": "8b2ee4dd99fc89689f20274f1cfd5e1ad7a3469a",
+    "authorSession": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+    "changedRowsMovedTo": "plans/260925-documentation-authority-unification/reports/phase-07/step-09-package-candidate-unverified.json",
+    "approvalCarried": false
+  }
 }

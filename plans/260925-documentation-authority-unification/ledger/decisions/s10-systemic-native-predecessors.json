@@ -69,19 +69,13 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
       "targetAnchor": "unheaded-block-2",
-      "rationale": "A22/A31/L10-18b/L10-20: native predecessor from 19ca8de23 is superseded by the current same-section unit after authorized source/target link-cell restoration, sentence-order restoration or evolve code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync345-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval.",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16",
-      "reviewNote": "deep: h-51f5cd7279fd.md unheaded-block-2 L23; the only changed words are the pointer pair bin/fgos.mjs:4373-4380 and 4640-4643 becoming 4414-4417, the evolve code-line citation correction the rationale names; reconciliation record before and after equal the units; digests recompute at 19ca8de23 and HEAD",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-accounting-03-62751458b.md",
-      "reviewMode": "ordinary",
+      "rationale": "A22/A31/L10-18b/L10-20: native predecessor from 19ca8de23 is superseded by the current same-section unit after authorized source/target link-cell restoration, sentence-order restoration or evolve code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync345-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "3fab723eb054be1c1007c12f347887b98f4d864a5ae24d84527fa3eca45e3446",
       "targetAncestry": [
         "Added in candidate: Runner Behaviors & Operations"
-      ],
-      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
+      ]
     },
     {
       "claimId": "claim_08f9b4c140ce931a064c131c2bd4e014",
@@ -91,21 +85,15 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/runner/operations/h-51f5cd7279fd.md",
       "targetAnchor": "unheaded-block-26",
-      "rationale": "Source: docs/platform/runner/operations/h-51f5cd7279fd.md:456-467#unheaded-block-26 (historical witness at 19ca8de23908e161c34c91626e41041b7813167c); unit SHA256 30bbabf9219560dd2744a98e42e43b53e9fbaf15c4282e68860a8682f2b63059.\nTarget: docs/platform/runner/operations/h-51f5cd7279fd.md:456-467#unheaded-block-26 (current lines); unit SHA256 0f61fde6bc880cb19623ecde63a6a137571884e4b6ae2f8b24b8a585b25d600a.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 0f61fde6bc880cb19623ecde63a6a137571884e4b6ae2f8b24b8a585b25d600a at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nL10-24/citation-refuseHelp: \"bin/fgos.mjs:4373,4461\" → \"bin/fgos.mjs:4415,4503\"; evidence step10-round3-doc-edits.json; bin/fgos.mjs:4414-4417,4503 (evidence commit 5035fed52e60254ecbe034cc987553feb24616f4).\nDisposition supersede: Account for docs/platform/runner/operations/h-51f5cd7279fd.md#unheaded-block-26 under docs/platform/runner/operations/h-51f5cd7279fd.md#unheaded-block-26; source context \"Added in candidate: Runner Behaviors & Operations / Behaviors & Operations / Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\", target context \"Added in candidate: Runner Behaviors & Operations / Behaviors & Operations / Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792126341980-e0c35701@2026-10-16",
-      "reviewNote": "deep: supersede of unheaded-block-26 (lines 456-467) of runner/operations/h-51f5cd7279fd.md from the 19ca8de23 witness to the same anchor now; a character diff shows the only change is the citation bin/fgos.mjs:4373,4461 to 4415,4503, which is exactly the one labelled correction the rationale names (before text is in the source witness, after text in the target); the cited lines 4414-4417 and 4503 at 5035fed52 are the unknown-verb default and the refuseHelp call; the last-reviewed sentence matches the ok row of review-step10-accounting-06-62751458b for 0f61fde6 which equals the current target digest.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-changed-01-4d3634360.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "0f61fde6bc880cb19623ecde63a6a137571884e4b6ae2f8b24b8a585b25d600a",
+      "rationale": "Source: docs/platform/runner/operations/h-51f5cd7279fd.md:456-467#unheaded-block-26 (historical witness at 19ca8de23908e161c34c91626e41041b7813167c); unit SHA256 30bbabf9219560dd2744a98e42e43b53e9fbaf15c4282e68860a8682f2b63059.\nTarget: docs/platform/runner/operations/h-51f5cd7279fd.md:456-467#unheaded-block-26 (current lines); unit SHA256 0f61fde6bc880cb19623ecde63a6a137571884e4b6ae2f8b24b8a585b25d600a.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 0f61fde6bc880cb19623ecde63a6a137571884e4b6ae2f8b24b8a585b25d600a at 62751458b22b47e930dc33b8501d07798b91ace3.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections:\nL10-24/citation-refuseHelp: \"bin/fgos.mjs:4373,4461\" → \"bin/fgos.mjs:4415,4503\"; evidence step10-round3-doc-edits.json; bin/fgos.mjs:4414-4417,4503 (evidence commit 5035fed52e60254ecbe034cc987553feb24616f4).\nDisposition supersede: Account for docs/platform/runner/operations/h-51f5cd7279fd.md#unheaded-block-26 under docs/platform/runner/operations/h-51f5cd7279fd.md#unheaded-block-26; source context \"Added in candidate: Runner Behaviors & Operations / Behaviors & Operations / Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\", target context \"Added in candidate: Runner Behaviors & Operations / Behaviors & Operations / Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "e3c02468a7c14b176731dc4ab9e40a7a3b8f5e8c23eacf816f8165dfefd7b4af",
       "targetAncestry": [
         "Added in candidate: Runner Behaviors & Operations",
         "Behaviors & Operations",
         "Gate A — xếp hạng candidate, bắc cầu sang việc thật (evolve)"
-      ],
-      "reviewReportCommit": "203f4ef93867a60e6a37624b31ce14de426cafa8"
+      ]
     },
     {
       "claimId": "claim_e0fc704182450d959f8452cc09da5f20",
@@ -251,20 +239,15 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/work-state/README.md",
       "targetAnchor": "unheaded-block-7",
-      "rationale": "A22/A31/L10-18b/L10-20: native predecessor from 19ca8de23 is superseded by the current same-section unit after authorized source/target link-cell restoration, sentence-order restoration or evolve code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync345-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval.",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792094246578-b2fbe39b@2026-10-16",
-      "reviewNote": "deep: work-state README.md unheaded-block-7 L61; sentence-order restoration, the two links swap places so the retained source docs/work-item-lifecycle-vision.md comes first and the platform vision ../vision.md second; I checked both files exist and that the after sentence is the correct one, so the delta is within the named causes",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-accounting-03-62751458b.md",
-      "reviewMode": "ordinary",
+      "rationale": "A22/A31/L10-18b/L10-20: native predecessor from 19ca8de23 is superseded by the current same-section unit after authorized source/target link-cell restoration, sentence-order restoration or evolve code-line citation correction. Complete immutable before/after unit text and native successor identity are recorded in step10-sync345-predecessor-reconciliation.json; review the actual delta, not ordinal-anchor equality. Current successor remains candidate, no truth or cutover approval. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "targetUnitDigest": "4ec367b6fb47b2dc7705caa2b3ae458f74136f697291ee505a2e884233efd793",
       "targetAncestry": [
         "Work State",
         "4. Legacy Source Pointers"
-      ],
-      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
+      ]
     }
-  ]
+  ],
+  "correctionSession": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17"
 }

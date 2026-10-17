@@ -1527,9 +1527,10 @@
       "claimId": "claim_32f1855de59cc4ae4f957e5af1ccb12d",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-truth.json",
       "receiptCommit": "f7adbc425808460da17f3b2c5386e1b05bbe6103",
-      "authoredBy": "codex-session:1@2026-10-10",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "reviewStatus": "pending",
-      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion.",
+      "rationale": " Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending."
     },
     {
       "claimId": "claim_8ed59b72fce0ae8cbe96ceb925f68cdc",
@@ -6272,5 +6273,6 @@
       "reviewReportCommit": "0b9414d8c214f8ea2885eac5a168431f1f3fb1d9",
       "reviewNote": "vocabulary/deprecated-and-reserved.md#unheaded-block-1: Section \"Deprecated And Reserved Coordination Terms\" (metadata): Title, header and snapshot pointer."
     }
-  ]
+  ],
+  "correctionSession": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17"
 }

@@ -3283,33 +3283,21 @@
       "claimId": "claim_8e290abbe8f1344bf8f19c997da11921",
       "sourcePath": "docs/specs/reading-map.md",
       "sourceAnchor": "reading-map-sản-phẩm",
-      "sourceUnitDigest": "19c2ff247fb664d39a56d6194b1d47b6dce16ea18c8ee19369bd2884efbf918a",
+      "sourceUnitDigest": "da93be5c5e2b785eea34046609e9c62375307069eebcc84ea4f77ead1d8f816c",
       "claimKind": "navigation",
       "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "rationale": "Retain in place outside platform documentation authority: docs/specs/reading-map.md#reading-map-sản-phẩm, source unit SHA256 19c2ff247fb664d39a56d6194b1d47b6dce16ea18c8ee19369bd2884efbf918a, source file SHA256 22606348608523b94c6a25f1540007aec5512d340278efea1f835713a7e67250 at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. docs/reading-map.md section 5 contains seven labelled truth corrections plus the Session Identity entry; retained legacy docs/specs/reading-map.md is untouched. Pending independent review; no authority flip or truth certificate.",
-      "reviewNote": "deep: docs/specs/reading-map.md#reading-map-sản-phẩm unit digest 19c2ff24 reproduces; source file sha256 22606348 equals the rationale pin and is unchanged since 19ca8de23; no target or copy claimed and none exists; the seven-label sentence concerns docs/reading-map.md section 5 not this legacy file, which is true but carried over from the sibling row; legacy docs/specs/reading-map.md is byte-identical to its pin; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-03-62751458b.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "Retain in place outside platform documentation authority: docs/specs/reading-map.md#reading-map-sản-phẩm, source unit SHA256 19c2ff247fb664d39a56d6194b1d47b6dce16ea18c8ee19369bd2884efbf918a, source file SHA256 22606348608523b94c6a25f1540007aec5512d340278efea1f835713a7e67250 at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. docs/reading-map.md section 5 contains seven labelled truth corrections plus the Session Identity entry; retained legacy docs/specs/reading-map.md is untouched. Pending independent review; no authority flip or truth certificate. Package rebind at 8b2ee4dd9: native source content changed, changed-file context; no approval carry. Independent review pending."
     },
     {
       "claimId": "claim_587566a4401b92c909e862d72aad4af0",
       "sourceUnitDigest": "db75e0b3a3bb12f6da1feaaf6321eede85a208e6c93dcf82978ee26618a79196",
       "claimKind": "navigation",
       "disposition": "reclassify-out-of-platform-scope",
-      "authoredBy": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
-      "rationale": "Frozen map/constitution retain docs/specs/reading-map.md as legacy provenance and docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. Section 5 carries 53 original entries, with seven entries explicitly labelled truth corrections and evidence; the wrapper correction is 36 in 55 directories (_shared has no SKILL.md). Main adds one Session Identity entry verbatim under A31. No source retirement, source-to-self carry proof or truth approval; pending independent review. Final b01 clarification: the current merged section 5 carries 53 original entries, with seven entries explicitly labelled truth corrections and evidence, plus one verbatim Session Identity entry from main. It does not assert that all 53 are still verbatim or defer those seven known truth fixes to promotion; wrapper count is 36 in 55 directories (_shared has no SKILL.md). Historical source binding and current navigation are separately pending independent review.",
-      "reviewStatus": "reviewed",
-      "reviewNote": "deep: retained docs/specs/reading-map.md is byte-identical (sha256 22606348) at 59b9b7087, 19ca8de23, 345f15d95, 287a22d33 and now; rationale facts hold on docs/reading-map.md: section 5 has 54 bullets (53 original plus the Session Identity entry), 7 entries mention truth corrections, plugins/fgOS/skills has 55 directories of which 54 hold SKILL.md (_shared has none); target none by design; the sentence Review pending in a reviewed row is carried history, not a claim of current state",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-02-287a22d33.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "Frozen map/constitution retain docs/specs/reading-map.md as legacy provenance and docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. Section 5 carries 53 original entries, with seven entries explicitly labelled truth corrections and evidence; the wrapper correction is 36 in 55 directories (_shared has no SKILL.md). Main adds one Session Identity entry verbatim under A31. No source retirement, source-to-self carry proof or truth approval; pending independent review. Final b01 clarification: the current merged section 5 carries 53 original entries, with seven entries explicitly labelled truth corrections and evidence, plus one verbatim Session Identity entry from main. It does not assert that all 53 are still verbatim or defer those seven known truth fixes to promotion; wrapper count is 36 in 55 directories (_shared has no SKILL.md). Historical source binding and current navigation are separately pending independent review. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
+      "reviewStatus": "pending"
     },
     {
       "claimId": "claim_c8677c74072e0ac1ac4d9b345de1ee1f",
@@ -3389,23 +3377,6 @@
       "reviewReportCommit": "59b9b70876324e07135db53d2351f7db6a7e1746"
     },
     {
-      "claimId": "claim_690e83ad4f79a1bbac8eafc9acb1d4ea",
-      "sourcePath": "docs/specs/reading-map.md",
-      "sourceAnchor": "unheaded-block-2",
-      "sourceUnitDigest": "1c7bbf9e95dcf48b5e1f6de612a5baf82e268ea009eda1ff201ffa5dacdd1fbd",
-      "claimKind": "navigation",
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
-      "rationale": "Retain in place outside platform documentation authority: docs/specs/reading-map.md#unheaded-block-2, source unit SHA256 1c7bbf9e95dcf48b5e1f6de612a5baf82e268ea009eda1ff201ffa5dacdd1fbd, source file SHA256 22606348608523b94c6a25f1540007aec5512d340278efea1f835713a7e67250 at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. docs/reading-map.md section 5 contains seven labelled truth corrections plus the Session Identity entry; retained legacy docs/specs/reading-map.md is untouched. Pending independent review; no authority flip or truth certificate.",
-      "reviewNote": "deep: retain-in-place docs/specs/reading-map.md unheaded-block-2 L11-64, unit digest 1c7bbf9e and file sha256 22606348 recomputed and equal at HEAD and the pin; the section 5 seven corrections statement verified as for its siblings; anchor ok",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-accounting-02-62751458b.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
-    },
-    {
       "claimId": "claim_42444c5f44c4076300c2b9c56516c429",
       "sourcePath": "docs/reading-map.md",
       "sourceAnchor": "unheaded-block-16",
@@ -3449,17 +3420,11 @@
       "sourceUnitDigest": "f3bcb9045712152762754f78ad2524c9e8bfe13c6d2818f145d021bfb3ded9c4",
       "claimKind": "navigation",
       "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This unit of docs/specs/reading-map.md#unheaded-block-2 is navigation, not a platform behavioral owner. Preserve it in place; the detailed legacy docs/specs/reading-map.md is still retained during migration and may retire only after the reviewed navigation merge/consumer rewrite at cutover. No reader edit, retirement or source-to-itself carry proof is claimed. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification.",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "Frozen map/constitution retain docs/reading-map.md as the sole repository-wide navigation singleton outside platform topology. This unit of docs/specs/reading-map.md#unheaded-block-2 is navigation, not a platform behavioral owner. Preserve it in place; the detailed legacy docs/specs/reading-map.md is still retained during migration and may retire only after the reviewed navigation merge/consumer rewrite at cutover. No reader edit, retirement or source-to-itself carry proof is claimed. A31 upstream merge conservation: the exact current source and candidate successor are shown. This is a pending re-carry/rebinding, with no prior approval carry and no code-truth certification. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "sourcePath": "docs/specs/reading-map.md",
-      "sourceAnchor": "unheaded-block-2",
-      "reviewNote": "deep: Old block-2 gap row for the retained reading map, no target; the new text is the successor row; nothing to carry.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      "sourceAnchor": "unheaded-block-2"
     },
     {
       "claimId": "claim_ad83c507f4d4462cd63564650a4a6eb1",
@@ -3524,6 +3489,18 @@
       "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-accounting-01-62751458b.md",
       "reviewMode": "ordinary",
       "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6"
+    },
+    {
+      "claimId": "claim_690e83ad4f79a1bbac8eafc9acb1d4ea",
+      "sourcePath": "docs/specs/reading-map.md",
+      "sourceAnchor": "unheaded-block-2",
+      "sourceUnitDigest": "1c7bbf9e95dcf48b5e1f6de612a5baf82e268ea009eda1ff201ffa5dacdd1fbd",
+      "claimKind": "navigation",
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "Retain in place outside platform documentation authority: docs/specs/reading-map.md#unheaded-block-2, source unit SHA256 1c7bbf9e95dcf48b5e1f6de612a5baf82e268ea009eda1ff201ffa5dacdd1fbd, source file SHA256 22606348608523b94c6a25f1540007aec5512d340278efea1f835713a7e67250 at 19ca8de23. The root instruction/navigation file remains its existing owner. No mapped platform target or platform copy is claimed. Native identity resolved at 19ca8de23; historical predecessors remain separately accounted. docs/reading-map.md section 5 contains seven labelled truth corrections plus the Session Identity entry; retained legacy docs/specs/reading-map.md is untouched. Pending independent review; no authority flip or truth certificate. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending."
     }
-  ]
+  ],
+  "correctionSession": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17"
 }

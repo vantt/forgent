@@ -2664,19 +2664,13 @@
       "targetAnchor": "run",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/contracts/assignment-run-runresult.md#run is retained in docs/platform/agent-coordination/contracts/assignment-run-runresult.md#run. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "reviewNote": "LEG:contracts/assignment-run-runresult.md#run -> PLAT:contracts/assignment-run-runresult.md#run: Other rows are either digest-identical live units in ok sections (Run, RunResult, Confidence, Work Boundary, proposal text) or retired-engine/stale units correctly carried in the history literal snapshot with rewritten live equivalents.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-01.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/contracts/assignment-run-runresult.md#run is retained in docs/platform/agent-coordination/contracts/assignment-run-runresult.md#run. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "7e732173e9808126a9ba5875016004666466413af929c55ec0b30dfb8de2b9b8",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_7d6ce8b4954a7db1975aa19f5a32a308",
@@ -2748,19 +2742,13 @@
       "targetAnchor": "runresult",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/contracts/assignment-run-runresult.md#runresult is retained in docs/platform/agent-coordination/contracts/assignment-run-runresult.md#runresult. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "reviewNote": "LEG:contracts/assignment-run-runresult.md#runresult -> PLAT:contracts/assignment-run-runresult.md#runresult: Other rows are either digest-identical live units in ok sections (Run, RunResult, Confidence, Work Boundary, proposal text) or retired-engine/stale units correctly carried in the history literal snapshot with rewritten live equivalents.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-01.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/contracts/assignment-run-runresult.md#runresult is retained in docs/platform/agent-coordination/contracts/assignment-run-runresult.md#runresult. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "eba175c95005ed3ddf00173a6c755cea93731128994e4e6b8359a0b6d3a3abf3",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_077e39714cc66f866edc090184ecbccd",
@@ -2769,19 +2757,13 @@
       "targetAnchor": "confidence",
       "claimKind": "contract",
       "disposition": "move",
-      "reviewStatus": "reviewed",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/contracts/assignment-run-runresult.md#confidence is retained in docs/platform/agent-coordination/contracts/assignment-run-runresult.md#confidence. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding.",
-      "reviewNote": "LEG:contracts/assignment-run-runresult.md#confidence -> PLAT:contracts/assignment-run-runresult.md#confidence: Other rows are either digest-identical live units in ok sections (Run, RunResult, Confidence, Work Boundary, proposal text) or retired-engine/stale units correctly carried in the history literal snapshot with rewritten live equivalents.",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-10",
-      "reviewedAt": "2026-10-10",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-01.md",
-      "reviewMode": "ordinary",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "rationale": "The complete primitive conservation unit at docs/architect/agent-coordination/contracts/assignment-run-runresult.md#confidence is retained in docs/platform/agent-coordination/contracts/assignment-run-runresult.md#confidence. Its frozen unit digest is identical. The full surrounding section is shown in the native pack and requires an independent semantic/current-code check; digest equality does not approve that context. The rejected whole-file retirement does not retire this surviving subject. The complete dated prior file remains in history, and no previous approval carries to this binding. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "3ab08d7c1c510a41d2df36aacac2314b0301b02ef6ab9c2198c01c9d0d4ae5e5",
       "targetAncestry": [
         "Assignment, Run, And RunResult Contract"
-      ],
-      "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
+      ]
     },
     {
       "claimId": "claim_541292427869b642635451ad1931e1eb",
@@ -9294,5 +9276,6 @@
       "reviewReportCommit": "96a13ab21670e1f5d9748c02cd615ea5598b53f5"
     }
   ],
-  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-01.md"
+  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-s2-agent-coordination-judgment-01.md",
+  "correctionSession": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17"
 }

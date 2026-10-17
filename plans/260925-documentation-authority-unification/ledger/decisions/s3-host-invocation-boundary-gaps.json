@@ -13,17 +13,11 @@
       "disposition": "supersede",
       "targetOwner": "docs/architecture-manifest.json",
       "targetAnchor": "file-block",
-      "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
-      "reviewStatus": "reviewed",
-      "rationale": "Source: docs/architecture-manifest.json:1-257#file-block (historical witness at 6f67a444175e111b1e83c9341319a9908544a595); unit SHA256 6e362a74d975a16c477b8f474f062c5ec769515a149a15dfbba1de7f6e7650a3.\nTarget: docs/architecture-manifest.json:1-272#file-block (current lines); unit SHA256 74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: this historical predecessor remains conserved at the exact cited git witness. Its current mapped candidate incorporates the upstream doctor-check/YAML decision or manifest additions. Unique complete-file identity, exact retained decision-list prefix, or the unique Doctor-check table establishes the successor by content. Current text is pending independent review; no prior approval or identity is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "targetUnitDigest": "74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507",
-      "targetAncestry": [],
-      "reviewNote": "deep: whole-file predecessor. Witness 6f67a4441 sha256 of docs/architecture-manifest.json is 6e362a74 (257 lines) as stated; current file is 74762f5c (272 lines) and equals docs/platform/contracts/architecture-manifest.json. Diff old to new is a set of added map lines (doctor-check and YAML additions), two infra to use-case reclassifications (fanout-batch, work-dispatch) and the removal of the dispatch-log.mjs entry, all upstream main edits, none candidate-authored. Supersede by the same-file live successor is true; the live file unit has its own pending move row (claim_35a5dbff). JSON file-block has no heading anchor so list-doc-anchors reports it missing, which is expected for a file-block unit.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-0102-s2-f70ecf4ec.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/architecture-manifest.json:1-257#file-block (historical witness at 6f67a444175e111b1e83c9341319a9908544a595); unit SHA256 6e362a74d975a16c477b8f474f062c5ec769515a149a15dfbba1de7f6e7650a3.\nTarget: docs/architecture-manifest.json:1-272#file-block (current lines); unit SHA256 74762f5c09d827a6b85a9fafcd493a5b9ea9e37c523be7f5583a6ef3494f3507.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: this historical predecessor remains conserved at the exact cited git witness. Its current mapped candidate incorporates the upstream doctor-check/YAML decision or manifest additions. Unique complete-file identity, exact retained decision-list prefix, or the unique Doctor-check table establishes the successor by content. Current text is pending independent review; no prior approval or identity is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
+      "targetUnitDigest": "d380db6aa752cd05a6f136bda5508b907accff8c8e427767be78c4a08c3d9d36",
+      "targetAncestry": []
     },
     {
       "claimId": "claim_d52f4222d940558ef34a2d7c0f174628",
@@ -54,20 +48,14 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/component-boundary.md",
       "targetAnchor": "unheaded-block-11",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "reviewed",
-      "rationale": "Source: docs/platform/component-boundary.md:60-75#unheaded-block-11 (historical witness at 2098246100d88c7e218066e23838c921e8748cb4); unit SHA256 e7f609881002fff0d6f1ac41035f63cdb09095bb5fbba2f073856682e8f7027b.\nTarget: docs/platform/component-boundary.md:66-82#unheaded-block-11 (current lines); unit SHA256 973ee5615eeb755822f8032d8d11c080f21e340bd20a87952b300cde23661e95.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 973ee5615eeb755822f8032d8d11c080f21e340bd20a87952b300cde23661e95 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 13, target 14; 1 changed spellings/labels, 0 destination changes; 1 added, 0 removed.\nLink 14: \"none\" (none) → \"session-identity/spec.md\" (session-identity/spec.md); resolved none → docs/platform/session-identity/spec.md.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/platform/component-boundary.md#unheaded-block-11 under docs/platform/component-boundary.md#unheaded-block-11; source context \"Component Boundary / 4. Current High-Level Components\", target context \"Component Boundary / 4. Current High-Level Components\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "reviewNote": "deep: supersede component-boundary.md:60-75#unheaded-block-11@209824610 -> component-boundary.md:66-82#unheaded-block-11; digests differ and were recomputed by extractor; lines equal the real spans; anchor ok; context equals the real ancestry; links 13/14/1/0/1/0 recomputed independently and equal; 0 correction line(s) checked (after-text in target); 2 residual text hunk(s) beyond links/corrections, which the successor-text sentence discloses; last-reviewed digest backed by a committed ok verdict. hand-recomputed both digests (seed 2026101608).",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-10-287a22d33.md",
-      "reviewMode": "ordinary",
-      "targetUnitDigest": "973ee5615eeb755822f8032d8d11c080f21e340bd20a87952b300cde23661e95",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/platform/component-boundary.md:60-75#unheaded-block-11 (historical witness at 2098246100d88c7e218066e23838c921e8748cb4); unit SHA256 e7f609881002fff0d6f1ac41035f63cdb09095bb5fbba2f073856682e8f7027b.\nTarget: docs/platform/component-boundary.md:66-82#unheaded-block-11 (current lines); unit SHA256 973ee5615eeb755822f8032d8d11c080f21e340bd20a87952b300cde23661e95.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 973ee5615eeb755822f8032d8d11c080f21e340bd20a87952b300cde23661e95 at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 13, target 14; 1 changed spellings/labels, 0 destination changes; 1 added, 0 removed.\nLink 14: \"none\" (none) → \"session-identity/spec.md\" (session-identity/spec.md); resolved none → docs/platform/session-identity/spec.md.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/platform/component-boundary.md#unheaded-block-11 under docs/platform/component-boundary.md#unheaded-block-11; source context \"Component Boundary / 4. Current High-Level Components\", target context \"Component Boundary / 4. Current High-Level Components\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: target content/context rebind, changed-file context; no approval carry. Independent review pending.",
+      "targetUnitDigest": "e693b4becd1403ce2d0e982cbe5c417090a5de42743413cbaf68aa9073edd35f",
       "targetAncestry": [
         "Component Boundary",
         "4. Current High-Level Components"
-      ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      ]
     },
     {
       "claimId": "claim_9c0e5bb670fb2957bb0998cbe5d8d51e",
@@ -76,20 +64,14 @@
       "disposition": "supersede",
       "targetOwner": "docs/platform/packaging-distribution/spec.md",
       "targetAnchor": "unheaded-block-4",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "reviewed",
-      "rationale": "Source: docs/platform/packaging-distribution/spec.md:28-42#unheaded-block-4 (historical witness at 67a276b0d3534840bd669839776d122ff829ff67); unit SHA256 c068f5dddf466e0aa502a6524b019543a8bff6ed6b34ebed2a18adb3d5d1b745.\nTarget: docs/platform/packaging-distribution/spec.md:36-51#unheaded-block-4 (current lines); unit SHA256 fd8f41577cf07e6e6713f2a48792d88071e7fa072e87b32c08ec0be373173c6c.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest fd8f41577cf07e6e6713f2a48792d88071e7fa072e87b32c08ec0be373173c6c at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/platform/packaging-distribution/spec.md#unheaded-block-4 under docs/platform/packaging-distribution/spec.md#unheaded-block-4; source context \"Spec: Packaging-Distribution / 2. Entry Points\", target context \"Spec: Packaging-Distribution / 2. Entry Points\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "reviewNote": "deep: supersede spec.md:28-42#unheaded-block-4@67a276b0d -> spec.md:36-51#unheaded-block-4; digests differ and were recomputed by extractor; lines equal the real spans; anchor ok; context equals the real ancestry; links 0/0/0/0/0/0 recomputed independently and equal; 0 correction line(s) checked (after-text in target); 1 residual text hunk(s) beyond links/corrections, which the successor-text sentence discloses; last-reviewed digest backed by a committed ok verdict.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-10-287a22d33.md",
-      "reviewMode": "ordinary",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/platform/packaging-distribution/spec.md:28-42#unheaded-block-4 (historical witness at 67a276b0d3534840bd669839776d122ff829ff67); unit SHA256 c068f5dddf466e0aa502a6524b019543a8bff6ed6b34ebed2a18adb3d5d1b745.\nTarget: docs/platform/packaging-distribution/spec.md:36-51#unheaded-block-4 (current lines); unit SHA256 fd8f41577cf07e6e6713f2a48792d88071e7fa072e87b32c08ec0be373173c6c.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest fd8f41577cf07e6e6713f2a48792d88071e7fa072e87b32c08ec0be373173c6c at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/platform/packaging-distribution/spec.md#unheaded-block-4 under docs/platform/packaging-distribution/spec.md#unheaded-block-4; source context \"Spec: Packaging-Distribution / 2. Entry Points\", target context \"Spec: Packaging-Distribution / 2. Entry Points\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "fd8f41577cf07e6e6713f2a48792d88071e7fa072e87b32c08ec0be373173c6c",
       "targetAncestry": [
         "Spec: Packaging-Distribution",
         "2. Entry Points"
-      ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      ]
     },
     {
       "claimId": "claim_15308eb4847ddd38be79bd87bd69a0b6",
@@ -121,20 +103,14 @@
       "disposition": "supersede",
       "targetOwner": "docs/specs/distribution.md",
       "targetAnchor": "unheaded-block-14",
-      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
-      "reviewStatus": "reviewed",
-      "rationale": "Source: docs/specs/distribution.md:297-315#unheaded-block-14 (historical witness at 67a276b0d3534840bd669839776d122ff829ff67); unit SHA256 fa3f748914efbaea7c57bef01798385bca7de83421cb30c59670cc603d278f54.\nTarget: docs/specs/distribution.md:297-320#unheaded-block-14 (current lines); unit SHA256 8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/distribution.md#unheaded-block-14 under docs/specs/distribution.md#unheaded-block-14; source context \"Spec: Distribution / Business Rules\", target context \"Spec: Distribution / Business Rules\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "reviewNote": "deep: supersede distribution.md:297-315#unheaded-block-14@67a276b0d -> distribution.md:297-320#unheaded-block-14; digests differ and were recomputed by extractor; lines equal the real spans; anchor ok; context equals the real ancestry; links 0/0/0/0/0/0 recomputed independently and equal; 0 correction line(s) checked (after-text in target); 4 residual text hunk(s) beyond links/corrections, which the successor-text sentence discloses; last-reviewed digest backed by a committed ok verdict.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-rationales-10-287a22d33.md",
-      "reviewMode": "ordinary",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/specs/distribution.md:297-315#unheaded-block-14 (historical witness at 67a276b0d3534840bd669839776d122ff829ff67); unit SHA256 fa3f748914efbaea7c57bef01798385bca7de83421cb30c59670cc603d278f54.\nTarget: docs/specs/distribution.md:297-320#unheaded-block-14 (current lines); unit SHA256 8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/distribution.md#unheaded-block-14 under docs/specs/distribution.md#unheaded-block-14; source context \"Spec: Distribution / Business Rules\", target context \"Spec: Distribution / Business Rules\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "8f37278a54ba85348e6348a445d2720dd1ece4dfd86426d2c12798a9ae13e69e",
       "targetAncestry": [
         "Spec: Distribution",
         "Business Rules"
-      ],
-      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505"
+      ]
     },
     {
       "claimId": "claim_0f4d968b593902731bd334f9ed2af711",
@@ -143,20 +119,14 @@
       "disposition": "supersede",
       "targetOwner": "docs/specs/distribution.md",
       "targetAnchor": "unheaded-block-5",
-      "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
-      "reviewStatus": "reviewed",
-      "rationale": "Source: docs/specs/distribution.md:57-73#unheaded-block-5 (historical witness at 67a276b0d3534840bd669839776d122ff829ff67); unit SHA256 cdf23ebc6949803aa19ec83913121c79ebc370e9ef29134c0fb3bf49af44a99c.\nTarget: docs/specs/distribution.md:57-73#unheaded-block-5 (current lines); unit SHA256 00a3412a5974cb6c7e2d4f51aadd36437162cdc3bf4a92e4dc781ec0f334ed1d.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: this historical predecessor remains conserved at the exact cited git witness. Its current mapped candidate incorporates the upstream doctor-check/YAML decision or manifest additions. Unique complete-file identity, exact retained decision-list prefix, or the unique Doctor-check table establishes the successor by content. Current text is pending independent review; no prior approval or identity is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "targetUnitDigest": "00a3412a5974cb6c7e2d4f51aadd36437162cdc3bf4a92e4dc781ec0f334ed1d",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/specs/distribution.md:57-73#unheaded-block-5 (historical witness at 67a276b0d3534840bd669839776d122ff829ff67); unit SHA256 cdf23ebc6949803aa19ec83913121c79ebc370e9ef29134c0fb3bf49af44a99c.\nTarget: docs/specs/distribution.md:57-73#unheaded-block-5 (current lines); unit SHA256 00a3412a5974cb6c7e2d4f51aadd36437162cdc3bf4a92e4dc781ec0f334ed1d.\nSource and target unit digests differ.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: A31 SYNC a9a2b079f: this historical predecessor remains conserved at the exact cited git witness. Its current mapped candidate incorporates the upstream doctor-check/YAML decision or manifest additions. Unique complete-file identity, exact retained decision-list prefix, or the unique Doctor-check table establishes the successor by content. Current text is pending independent review; no prior approval or identity is carried.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval.",
+      "targetUnitDigest": "652c4935e9cd747ffdb08e497333f31a461605453d08d7553283985cf4ead7be",
       "targetAncestry": [
         "Spec: Distribution",
         "Data Dictionary"
-      ],
-      "reviewNote": "deep: Data Dictionary table block (witness 67a276b0, digest cdf23ebc confirmed, 57-73). Word diff to the current distribution.md#unheaded-block-5 (00a3412a): every source word present except 'rule below).' now 'rule, now in docs/specs/runner.md)' and 'YAML-free' now 'precompiled', plus new check names and the account-locks sentence, all upstream main edits. Successor-of-record is the retiring source unit, whose carrier is the move row claim_9d97a24e (to packaging-distribution spec block 85, equal digest) in this same pending set, so no words are stranded. Anchor ok.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-0102-s2-f70ecf4ec.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
+      ]
     },
     {
       "claimId": "claim_97479b13a60800e856813bfd4f0cbb78",
@@ -165,22 +135,16 @@
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
       "targetAnchor": "unheaded-block-150",
-      "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
-      "reviewStatus": "reviewed",
-      "rationale": "Source: docs/specs/runner.md:1662-1662#unheaded-block-150 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:1662-1662#unheaded-block-150 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-150 under docs/specs/runner.md#unheaded-block-150; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0005 — Runner & cô lập worker / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0005 — Runner & cô lập worker / Hệ quả\". The complete bound unit is carried with an equal native digest. SOURCE occurrence 1 of 8; registered anchor unheaded-block-144 shifts +6 to unheaded-block-150, with identical text and preserved occurrence order authenticated at 02106766dd6185208187f5fcaca7725cf60da9fe (L10-30).\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/specs/runner.md:1662-1662#unheaded-block-150 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:1662-1662#unheaded-block-150 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-150 under docs/specs/runner.md#unheaded-block-150; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0005 — Runner & cô lập worker / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0005 — Runner & cô lập worker / Hệ quả\". The complete bound unit is carried with an equal native digest. SOURCE occurrence 1 of 8; registered anchor unheaded-block-144 shifts +6 to unheaded-block-150, with identical text and preserved occurrence order authenticated at 02106766dd6185208187f5fcaca7725cf60da9fe (L10-30).\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
         "0005 — Runner & cô lập worker",
         "Hệ quả"
-      ],
-      "reviewNote": "deep: runner.md footer sentence 'Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.' occurrence 1 of 8 (registry anchor unheaded-block-144, now unheaded-block-150). Recomputed with the native extractor at 02106766d and at HEAD: exactly 8 units with digest 95a357e2 in the same order, anchor shift +6, ancestry of the target matches the named ADR Hệ quả heading. Digests equal so the unit is whole. The live unit at the target anchor is the reviewed move row claim_d54ae2a7 (to decisions/h-36d872fbb0e5.md#unheaded-block-9), so the text is conserved there. Anchor ok.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-0102-s2-f70ecf4ec.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
+      ]
     },
     {
       "claimId": "claim_50dca4885019ac5125d941ea5a86f448",
@@ -189,22 +153,16 @@
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
       "targetAnchor": "unheaded-block-155",
-      "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
-      "reviewStatus": "reviewed",
-      "rationale": "Source: docs/specs/runner.md:1690-1690#unheaded-block-155 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:1690-1690#unheaded-block-155 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-155 under docs/specs/runner.md#unheaded-block-155; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0008 — Routing theo audience của từng interface / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0008 — Routing theo audience của từng interface / Hệ quả\". The complete bound unit is carried with an equal native digest. SOURCE occurrence 2 of 8; registered anchor unheaded-block-149 shifts +6 to unheaded-block-155, with identical text and preserved occurrence order authenticated at 02106766dd6185208187f5fcaca7725cf60da9fe (L10-30).\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/specs/runner.md:1690-1690#unheaded-block-155 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:1690-1690#unheaded-block-155 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-155 under docs/specs/runner.md#unheaded-block-155; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0008 — Routing theo audience của từng interface / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0008 — Routing theo audience của từng interface / Hệ quả\". The complete bound unit is carried with an equal native digest. SOURCE occurrence 2 of 8; registered anchor unheaded-block-149 shifts +6 to unheaded-block-155, with identical text and preserved occurrence order authenticated at 02106766dd6185208187f5fcaca7725cf60da9fe (L10-30).\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
         "0008 — Routing theo audience của từng interface",
         "Hệ quả"
-      ],
-      "reviewNote": "deep: runner.md footer sentence 'Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.' occurrence 2 of 8 (registry anchor unheaded-block-149, now unheaded-block-155). Recomputed with the native extractor at 02106766d and at HEAD: exactly 8 units with digest 95a357e2 in the same order, anchor shift +6, ancestry of the target matches the named ADR Hệ quả heading. Digests equal so the unit is whole. The live unit at the target anchor is the reviewed move row claim_fd255b07 (to decisions/h-36d872fbb0e5.md#unheaded-block-14), so the text is conserved there. Anchor ok.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-0102-s2-f70ecf4ec.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
+      ]
     },
     {
       "claimId": "claim_07ae72c4d2c93884a120cf2ca12250a8",
@@ -213,22 +171,16 @@
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
       "targetAnchor": "unheaded-block-167",
-      "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
-      "reviewStatus": "reviewed",
-      "rationale": "Source: docs/specs/runner.md:1799-1799#unheaded-block-167 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:1799-1799#unheaded-block-167 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-167 under docs/specs/runner.md#unheaded-block-167; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập) / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập) / Hệ quả\". The complete bound unit is carried with an equal native digest. SOURCE occurrence 3 of 8; registered anchor unheaded-block-161 shifts +6 to unheaded-block-167, with identical text and preserved occurrence order authenticated at 02106766dd6185208187f5fcaca7725cf60da9fe (L10-30).\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/specs/runner.md:1799-1799#unheaded-block-167 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:1799-1799#unheaded-block-167 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-167 under docs/specs/runner.md#unheaded-block-167; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập) / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập) / Hệ quả\". The complete bound unit is carried with an equal native digest. SOURCE occurrence 3 of 8; registered anchor unheaded-block-161 shifts +6 to unheaded-block-167, with identical text and preserved occurrence order authenticated at 02106766dd6185208187f5fcaca7725cf60da9fe (L10-30).\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
         "0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
         "Hệ quả"
-      ],
-      "reviewNote": "deep: runner.md footer sentence 'Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.' occurrence 3 of 8 (registry anchor unheaded-block-161, now unheaded-block-167). Recomputed with the native extractor at 02106766d and at HEAD: exactly 8 units with digest 95a357e2 in the same order, anchor shift +6, ancestry of the target matches the named ADR Hệ quả heading. Digests equal so the unit is whole. The live unit at the target anchor is the reviewed move row claim_e4beb2d5 (to decisions/h-36d872fbb0e5.md#unheaded-block-26), so the text is conserved there. Anchor ok.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-0102-s2-f70ecf4ec.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
+      ]
     },
     {
       "claimId": "claim_211f0b98400863f2a0e9b9cdaa2259fe",
@@ -237,22 +189,16 @@
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
       "targetAnchor": "unheaded-block-176",
-      "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
-      "reviewStatus": "reviewed",
-      "rationale": "Source: docs/specs/runner.md:1883-1883#unheaded-block-176 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:1883-1883#unheaded-block-176 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-176 under docs/specs/runner.md#unheaded-block-176; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence / Hệ quả\". The complete bound unit is carried with an equal native digest. SOURCE occurrence 4 of 8; registered anchor unheaded-block-170 shifts +6 to unheaded-block-176, with identical text and preserved occurrence order authenticated at 02106766dd6185208187f5fcaca7725cf60da9fe (L10-30).\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/specs/runner.md:1883-1883#unheaded-block-176 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:1883-1883#unheaded-block-176 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-176 under docs/specs/runner.md#unheaded-block-176; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence / Hệ quả\". The complete bound unit is carried with an equal native digest. SOURCE occurrence 4 of 8; registered anchor unheaded-block-170 shifts +6 to unheaded-block-176, with identical text and preserved occurrence order authenticated at 02106766dd6185208187f5fcaca7725cf60da9fe (L10-30).\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
         "0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
         "Hệ quả"
-      ],
-      "reviewNote": "deep: runner.md footer sentence 'Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.' occurrence 4 of 8 (registry anchor unheaded-block-170, now unheaded-block-176). Recomputed with the native extractor at 02106766d and at HEAD: exactly 8 units with digest 95a357e2 in the same order, anchor shift +6, ancestry of the target matches the named ADR Hệ quả heading. Digests equal so the unit is whole. The live unit at the target anchor is the reviewed move row claim_acd0fb1e (to decisions/h-36d872fbb0e5.md#unheaded-block-35), so the text is conserved there. Anchor ok.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-0102-s2-f70ecf4ec.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
+      ]
     },
     {
       "claimId": "claim_1d8baa1def0cea7595b62de99846b489",
@@ -261,22 +207,16 @@
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
       "targetAnchor": "unheaded-block-241",
-      "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
-      "reviewStatus": "reviewed",
-      "rationale": "Source: docs/specs/runner.md:2407-2407#unheaded-block-241 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:2407-2407#unheaded-block-241 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-241 under docs/specs/runner.md#unheaded-block-241; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0028 — Đổi tên pinned term `orchestrator` thành `launcher` / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0028 — Đổi tên pinned term `orchestrator` thành `launcher` / Hệ quả\". The complete bound unit is carried with an equal native digest. SOURCE occurrence 5 of 8; registered anchor unheaded-block-235 shifts +6 to unheaded-block-241, with identical text and preserved occurrence order authenticated at 02106766dd6185208187f5fcaca7725cf60da9fe (L10-30).\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/specs/runner.md:2407-2407#unheaded-block-241 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:2407-2407#unheaded-block-241 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-241 under docs/specs/runner.md#unheaded-block-241; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0028 — Đổi tên pinned term `orchestrator` thành `launcher` / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0028 — Đổi tên pinned term `orchestrator` thành `launcher` / Hệ quả\". The complete bound unit is carried with an equal native digest. SOURCE occurrence 5 of 8; registered anchor unheaded-block-235 shifts +6 to unheaded-block-241, with identical text and preserved occurrence order authenticated at 02106766dd6185208187f5fcaca7725cf60da9fe (L10-30).\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
         "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
         "Hệ quả"
-      ],
-      "reviewNote": "deep: runner.md footer sentence 'Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.' occurrence 5 of 8 (registry anchor unheaded-block-235, now unheaded-block-241). Recomputed with the native extractor at 02106766d and at HEAD: exactly 8 units with digest 95a357e2 in the same order, anchor shift +6, ancestry of the target matches the named ADR Hệ quả heading. Digests equal so the unit is whole. The live unit at the target anchor is the reviewed move row claim_73ea5bcc (to decisions/h-36d872fbb0e5.md#unheaded-block-100), so the text is conserved there. Anchor ok.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-0102-s2-f70ecf4ec.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
+      ]
     },
     {
       "claimId": "claim_012bfa2639fb107eeb3baee4fb502f54",
@@ -285,22 +225,16 @@
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
       "targetAnchor": "unheaded-block-250",
-      "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
-      "reviewStatus": "reviewed",
-      "rationale": "Source: docs/specs/runner.md:2496-2496#unheaded-block-250 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:2496-2496#unheaded-block-250 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-250 under docs/specs/runner.md#unheaded-block-250; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị / Hệ quả\". The complete bound unit is carried with an equal native digest. SOURCE occurrence 6 of 8; registered anchor unheaded-block-244 shifts +6 to unheaded-block-250, with identical text and preserved occurrence order authenticated at 02106766dd6185208187f5fcaca7725cf60da9fe (L10-30).\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/specs/runner.md:2496-2496#unheaded-block-250 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:2496-2496#unheaded-block-250 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-250 under docs/specs/runner.md#unheaded-block-250; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị / Hệ quả\". The complete bound unit is carried with an equal native digest. SOURCE occurrence 6 of 8; registered anchor unheaded-block-244 shifts +6 to unheaded-block-250, with identical text and preserved occurrence order authenticated at 02106766dd6185208187f5fcaca7725cf60da9fe (L10-30).\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
         "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
         "Hệ quả"
-      ],
-      "reviewNote": "deep: runner.md footer sentence 'Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.' occurrence 6 of 8 (registry anchor unheaded-block-244, now unheaded-block-250). Recomputed with the native extractor at 02106766d and at HEAD: exactly 8 units with digest 95a357e2 in the same order, anchor shift +6, ancestry of the target matches the named ADR Hệ quả heading. Digests equal so the unit is whole. The live unit at the target anchor is the reviewed move row claim_7f67d9c0 (to decisions/h-36d872fbb0e5.md#unheaded-block-109), so the text is conserved there. Anchor ok.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-0102-s2-f70ecf4ec.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
+      ]
     },
     {
       "claimId": "claim_99806d8b21d05eb7a8e8744d765bea00",
@@ -309,22 +243,16 @@
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
       "targetAnchor": "unheaded-block-274",
-      "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
-      "reviewStatus": "reviewed",
-      "rationale": "Source: docs/specs/runner.md:2677-2677#unheaded-block-274 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:2677-2677#unheaded-block-274 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-274 under docs/specs/runner.md#unheaded-block-274; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới / Hệ quả\". The complete bound unit is carried with an equal native digest. SOURCE occurrence 7 of 8; registered anchor unheaded-block-268 shifts +6 to unheaded-block-274, with identical text and preserved occurrence order authenticated at 02106766dd6185208187f5fcaca7725cf60da9fe (L10-30).\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/specs/runner.md:2677-2677#unheaded-block-274 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:2677-2677#unheaded-block-274 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-274 under docs/specs/runner.md#unheaded-block-274; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới / Hệ quả\". The complete bound unit is carried with an equal native digest. SOURCE occurrence 7 of 8; registered anchor unheaded-block-268 shifts +6 to unheaded-block-274, with identical text and preserved occurrence order authenticated at 02106766dd6185208187f5fcaca7725cf60da9fe (L10-30).\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
         "0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
         "Hệ quả"
-      ],
-      "reviewNote": "deep: runner.md footer sentence 'Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.' occurrence 7 of 8 (registry anchor unheaded-block-268, now unheaded-block-274). Recomputed with the native extractor at 02106766d and at HEAD: exactly 8 units with digest 95a357e2 in the same order, anchor shift +6, ancestry of the target matches the named ADR Hệ quả heading. Digests equal so the unit is whole. The live unit at the target anchor is the reviewed move row claim_825b8970 (to decisions/h-36d872fbb0e5.md#unheaded-block-133), so the text is conserved there. Anchor ok.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-0102-s2-f70ecf4ec.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
+      ]
     },
     {
       "claimId": "claim_a6f43d98b3eebe97802fd01a4ac7863b",
@@ -333,22 +261,16 @@
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
       "targetAnchor": "unheaded-block-286",
-      "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
-      "reviewStatus": "reviewed",
-      "rationale": "Source: docs/specs/runner.md:2789-2789#unheaded-block-286 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:2789-2789#unheaded-block-286 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-286 under docs/specs/runner.md#unheaded-block-286; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người / Hệ quả\". The complete bound unit is carried with an equal native digest. SOURCE occurrence 8 of 8; registered anchor unheaded-block-280 shifts +6 to unheaded-block-286, with identical text and preserved occurrence order authenticated at 02106766dd6185208187f5fcaca7725cf60da9fe (L10-30).\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/specs/runner.md:2789-2789#unheaded-block-286 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nTarget: docs/specs/runner.md:2789-2789#unheaded-block-286 (current lines); unit SHA256 95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104.\nSource and target unit digests equal.\nNo prior reviewed target digest available; no unchanged-since-review claim.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-286 under docs/specs/runner.md#unheaded-block-286; source context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người / Hệ quả\", target context \"Spec: Runner (vòng tự hành) / Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) / 0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người / Hệ quả\". The complete bound unit is carried with an equal native digest. SOURCE occurrence 8 of 8; registered anchor unheaded-block-280 shifts +6 to unheaded-block-286, with identical text and preserved occurrence order authenticated at 02106766dd6185208187f5fcaca7725cf60da9fe (L10-30).\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
         "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
         "Hệ quả"
-      ],
-      "reviewNote": "deep: runner.md footer sentence 'Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.' occurrence 8 of 8 (registry anchor unheaded-block-280, now unheaded-block-286). Recomputed with the native extractor at 02106766d and at HEAD: exactly 8 units with digest 95a357e2 in the same order, anchor shift +6, ancestry of the target matches the named ADR Hệ quả heading. Digests equal so the unit is whole. The live unit at the target anchor is the reviewed move row claim_49d98713 (to decisions/h-36d872fbb0e5.md#unheaded-block-145), so the text is conserved there. Anchor ok.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-0102-s2-f70ecf4ec.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
+      ]
     },
     {
       "claimId": "claim_b91c86788522c3516bef2c7bab859093",
@@ -357,20 +279,14 @@
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
       "targetAnchor": "unheaded-block-81",
-      "authoredBy": "codex-session:27@2026-10-14",
-      "reviewStatus": "reviewed",
-      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. A31 current target follows its real native identity at the current anchor; independent conservation re-review pending, no approval carry.",
-      "reviewNote": "deep: previously ok in review-3-boundary-gaps, now pending with review fields cleared (no approval carry); target text digest 661c9e16 is unchanged at the prior unit and moved from block-79 to 81 only; source text is the older pre-main text and the main edit (RUL76 clause) is already inside the target",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-15",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-02.md",
-      "reviewMode": "ordinary",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "A31 main-only source change: this native old identity gap has the shown same-file successor from the upstream diff. This is conservation accounting, not a plan move or truth approval. A31 current target follows its real native identity at the current anchor; independent conservation re-review pending, no approval carry. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending.",
       "targetUnitDigest": "661c9e16abe9ed411801ccbaec1066f2cabe3fbc6dc11197bda2def6cbed3df7",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Business Rules"
-      ],
-      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2"
+      ]
     },
     {
       "claimId": "claim_76d404ea624a10455d7a14debe2b2a95",
@@ -379,20 +295,15 @@
       "disposition": "supersede",
       "targetOwner": "docs/specs/runner.md",
       "targetAnchor": "unheaded-block-9",
-      "authoredBy": "codex-session:unit-run-1792150605063-4191f728@2026-10-16",
-      "reviewStatus": "reviewed",
-      "rationale": "Source: docs/specs/runner.md:73-87#unheaded-block-9 (historical witness at c3272bc6fc70015e995921e1c458658b084b0b11); unit SHA256 9070d65058bf41570d8fb1fbaef63f8decdc54c10b932c90d069a15d5f780677.\nTarget: docs/specs/runner.md:70-84#unheaded-block-9 (current lines); unit SHA256 43f03eb4dffdeff420f464531d60be7e37e13192429963b10ba302be1e9b777e.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 43f03eb4dffdeff420f464531d60be7e37e13192429963b10ba302be1e9b777e at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-9 under docs/specs/runner.md#unheaded-block-9; source context \"Spec: Runner (vòng tự hành) / Data Dictionary\", target context \"Spec: Runner (vòng tự hành) / Data Dictionary\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence.",
-      "targetUnitDigest": "43f03eb4dffdeff420f464531d60be7e37e13192429963b10ba302be1e9b777e",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": "Source: docs/specs/runner.md:73-87#unheaded-block-9 (historical witness at c3272bc6fc70015e995921e1c458658b084b0b11); unit SHA256 9070d65058bf41570d8fb1fbaef63f8decdc54c10b932c90d069a15d5f780677.\nTarget: docs/specs/runner.md:70-84#unheaded-block-9 (current lines); unit SHA256 43f03eb4dffdeff420f464531d60be7e37e13192429963b10ba302be1e9b777e.\nSource and target unit digests differ.\nTarget unchanged since last reviewed digest 43f03eb4dffdeff420f464531d60be7e37e13192429963b10ba302be1e9b777e at 345f15d95663260976200be66d1b9a6c648bcd6d.\nLinks: source 0, target 0; 0 changed spellings/labels, 0 destination changes; 0 added, 0 removed.\nApplicable labelled corrections: none in this bound unit.\nDisposition supersede: Account for docs/specs/runner.md#unheaded-block-9 under docs/specs/runner.md#unheaded-block-9; source context \"Spec: Runner (vòng tự hành) / Data Dictionary\", target context \"Spec: Runner (vòng tự hành) / Data Dictionary\". The successor has different direct text; its complete bound unit replaces or accounts for the source under this disposition.\nConservation accounting only; current truth, promotion, retirement and cutover require their own evidence. Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval. Content/context successor bound by full-text comparison; mandatory independent deep read; no approval.",
+      "targetUnitDigest": "bed26a6b7f0dee207b5bf82ac049ead30f5fe8494120cddfd2261fced5788aad",
       "targetAncestry": [
         "Spec: Runner (vòng tự hành)",
         "Data Dictionary"
-      ],
-      "reviewNote": "deep: Data Dictionary block (witness c3272bc6, 73-87, digest 9070d650 confirmed) to current runner.md#unheaded-block-9 (70-84, 43f03eb4, already seen at 345f15d95). Word diff: all source words kept; additions are the 4h worker timeout with RUL96, the discover/plan runner-config note with RUL93, and the credentialSource or credentialSources account rule with RUL80, all upstream main edits. Live unit at the anchor has its own pending row claim_5a944093. Anchor ok.",
-      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
-      "reviewedAt": "2026-10-16",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-global-pending-0102-s2-f70ecf4ec.md",
-      "reviewMode": "ordinary",
-      "reviewReportCommit": "f323249f9b0490599c156a8a673513319eea8431"
+      ]
     }
-  ]
+  ],
+  "correctionSession": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17"
 }

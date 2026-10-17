@@ -931,126 +931,135 @@
       "claimId": "claim_52a03c3549f8c6d8bd46c2954015eea2",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-recovery.json",
       "receiptCommit": "2269f2d2790f5bcef0a9ea4838cf27954619feda",
-      "authoredBy": "codex-session:1@2026-10-10",
-      "reviewStatus": "reviewed",
-      "reviewedBy": "reviewer:claude-session:4df9e88c@2026-10-12",
-      "reviewedAt": "2026-10-12",
-      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2-registry-projection.md",
-      "reviewReportCommit": "dd1fe8d808aa60d559722b4c604acaff1894837c",
-      "reviewMode": "ordinary",
-      "reviewNote": "identity projection of plans/260925-documentation-authority-unification/reports/phase-06/review-2-liveness-classifications.md row claim_d3693949c113334a34529301cb903bb7; bytes equal"
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "rationale": " Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending."
     },
     {
       "claimId": "claim_6b9d77ea4dcd08cde0c9003939ebc000",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-boundary-repin.json",
       "receiptCommit": "b6cdda81b333a375ebfb72141e962e1feac724f0",
-      "authoredBy": "codex-session:1@2026-10-11",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "reviewStatus": "pending",
-      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion.",
+      "rationale": " Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending."
     },
     {
       "claimId": "claim_d375b290e2ac560a3ea02781d5715e7b",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-boundary-repin.json",
       "receiptCommit": "b6cdda81b333a375ebfb72141e962e1feac724f0",
-      "authoredBy": "codex-session:1@2026-10-11",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "reviewStatus": "pending",
-      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion.",
+      "rationale": " Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending."
     },
     {
       "claimId": "claim_c7d3e8ef6acdffb1b08e61d5b5bd4d9a",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-boundary-repin.json",
       "receiptCommit": "b6cdda81b333a375ebfb72141e962e1feac724f0",
-      "authoredBy": "codex-session:1@2026-10-11",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "reviewStatus": "pending",
-      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion.",
+      "rationale": " Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending."
     },
     {
       "claimId": "claim_456ad50a7253122ec3610059e0779e03",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-boundary-repin.json",
       "receiptCommit": "b6cdda81b333a375ebfb72141e962e1feac724f0",
-      "authoredBy": "codex-session:1@2026-10-11",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "reviewStatus": "pending",
-      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion.",
+      "rationale": " Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending."
     },
     {
       "claimId": "claim_59f6314467565caef24f13c7338a59be",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-boundary-repin.json",
       "receiptCommit": "b6cdda81b333a375ebfb72141e962e1feac724f0",
-      "authoredBy": "codex-session:1@2026-10-10",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "reviewStatus": "pending",
-      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion.",
+      "rationale": " Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending."
     },
     {
       "claimId": "claim_041ac1009b965096340a81e9c4503cdc",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-boundary-repin.json",
       "receiptCommit": "b6cdda81b333a375ebfb72141e962e1feac724f0",
-      "authoredBy": "codex-session:1@2026-10-10",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "reviewStatus": "pending",
-      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion.",
+      "rationale": " Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending."
     },
     {
       "claimId": "claim_da2ae48948793578312ac28653ea94a1",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-boundary-repin.json",
       "receiptCommit": "b6cdda81b333a375ebfb72141e962e1feac724f0",
-      "authoredBy": "codex-session:1@2026-10-10",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "reviewStatus": "pending",
-      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion.",
+      "rationale": " Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending."
     },
     {
       "claimId": "claim_322d2c6df8da103a227d25767f5db2dd",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-boundary-repin.json",
       "receiptCommit": "b6cdda81b333a375ebfb72141e962e1feac724f0",
-      "authoredBy": "codex-session:1@2026-10-10",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "reviewStatus": "pending",
-      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion.",
+      "rationale": " Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending."
     },
     {
       "claimId": "claim_1566bd6207fd7d92e2df1af41f8d6282",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-boundary-repin.json",
       "receiptCommit": "b6cdda81b333a375ebfb72141e962e1feac724f0",
-      "authoredBy": "codex-session:1@2026-10-10",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "reviewStatus": "pending",
-      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion.",
+      "rationale": " Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending."
     },
     {
       "claimId": "claim_92334b1c898f23a57c6d60f3c737f4d9",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-boundary-repin.json",
       "receiptCommit": "b6cdda81b333a375ebfb72141e962e1feac724f0",
-      "authoredBy": "codex-session:1@2026-10-10",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "reviewStatus": "pending",
-      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion.",
+      "rationale": " Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending."
     },
     {
       "claimId": "claim_2d967da655fb640e62cbbc74cc394b89",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-boundary-repin.json",
       "receiptCommit": "b6cdda81b333a375ebfb72141e962e1feac724f0",
-      "authoredBy": "codex-session:1@2026-10-10",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "reviewStatus": "pending",
-      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion.",
+      "rationale": " Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending."
     },
     {
       "claimId": "claim_ce9cf7041e0794dd190740863312964a",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-boundary-repin.json",
       "receiptCommit": "b6cdda81b333a375ebfb72141e962e1feac724f0",
-      "authoredBy": "codex-session:1@2026-10-10",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "reviewStatus": "pending",
-      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion."
+      "pendingReason": "A31 cited code changed; old receipt stays immutable history, current native unit candidate-unverified under A28; full truth check owed at promotion.",
+      "rationale": " Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending."
     },
     {
       "claimId": "claim_eb4f9f793cdbefbf6465ae8c571bf941",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-boundary-sync-repin.json",
       "receiptCommit": "6c6a65e8543fa72012bd55f8999f13f9ed6193c4",
-      "authoredBy": "codex-session:1@2026-10-10",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "reviewStatus": "pending",
-      "pendingReason": "A31 unchanged cited bytes re-pin; independent machine verification pending, no truth re-review."
+      "pendingReason": "A31 unchanged cited bytes re-pin; independent machine verification pending, no truth re-review.",
+      "rationale": " Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending."
     },
     {
       "claimId": "claim_057f9c8cb4fef4cce1ca3f05007755d5",
       "receiptPath": "plans/260925-documentation-authority-unification/ledger/candidate-classifications-agent-coordination-boundary-sync-repin.json",
       "receiptCommit": "6c6a65e8543fa72012bd55f8999f13f9ed6193c4",
-      "authoredBy": "codex-session:1@2026-10-10",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
       "reviewStatus": "pending",
-      "pendingReason": "A31 unchanged cited bytes re-pin; independent machine verification pending, no truth re-review."
+      "pendingReason": "A31 unchanged cited bytes re-pin; independent machine verification pending, no truth re-review.",
+      "rationale": " Package rebind at 8b2ee4dd9: changed-file context; no approval carry. Independent review pending."
     },
     {
       "claimId": "claim_a65ac68e098c7ec48fc2ad4f6199c021",
@@ -8271,5 +8280,6 @@
       "pendingReason": "A31 unchanged cited bytes re-pin; independent machine verification pending, no truth re-review."
     }
   ],
-  "step6RepinClassificationShard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-step6-repin-classifications.json"
+  "step6RepinClassificationShard": "plans/260925-documentation-authority-unification/ledger/decisions/s2-agent-coordination-step6-repin-classifications.json",
+  "correctionSession": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17"
 }
